@@ -1,13 +1,29 @@
 import tailwindcss from "@tailwindcss/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  fmt: { sortImports: {}, sortTailwindcss: {} },
-  lint: { options: { typeAware: true, typeCheck: true } },
+  plugins: [
+    tanstackRouter({
+      target: "react",
+      autoCodeSplitting: true,
+      generatedRouteTree: "./src/route-tree.gen.ts",
+    }),
+    react(),
+    tailwindcss(),
+  ],
+  fmt: {
+    sortImports: {},
+    sortTailwindcss: {},
+    ignorePatterns: ["*.gen.ts"],
+  },
+  lint: {
+    options: { typeAware: true, typeCheck: true },
+    ignorePatterns: ["*.gen.ts"],
+  },
   staged: { "*": "vp check --fix" },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
