@@ -1,8 +1,10 @@
 import { defineConfig } from "vite-plus";
+import react from "@vitejs/plugin-react";
 
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig({
+  plugins: [react()],
   fmt: {},
   lint: { options: { typeAware: true, typeCheck: true } },
   staged: { "*": "vp check --fix" },
