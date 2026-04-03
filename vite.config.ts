@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { lingui } from "@lingui/vite-plugin";
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -9,6 +11,9 @@ import { defineConfig } from "vite-plus";
 const host = process.env.TAURI_DEV_HOST;
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
+// ignore these files for linting and formatting
+const ignorePatterns = ["*.gen.ts", "src/locales/**"];
+
 export default defineConfig({
   plugins: [
     tanstackRouter({
@@ -16,17 +21,21 @@ export default defineConfig({
       autoCodeSplitting: true,
       generatedRouteTree: "./src/route-tree.gen.ts",
     }),
-    react(),
     tailwindcss(),
+    babel({
+      plugins: ["@lingui/babel-plugin-lingui-macro"],
+    }),
+    react(),
+    lingui(),
   ],
   fmt: {
     sortImports: {},
     sortTailwindcss: {},
-    ignorePatterns: ["*.gen.ts"],
+    ignorePatterns,
   },
   lint: {
     options: { typeAware: true, typeCheck: true },
-    ignorePatterns: ["*.gen.ts"],
+    ignorePatterns,
   },
   staged: { "*": "vp check --fix" },
   resolve: {
