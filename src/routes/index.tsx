@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   return (
-    <div>
+    <div className="flex min-h-[40dvh] items-center justify-center">
       <Button>
         <Trans id="hello-fluxnote">Hello FluxNote</Trans>
       </Button>

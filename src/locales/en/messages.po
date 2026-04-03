@@ -6,8 +6,74 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/routes/__root.tsx:43
+msgid "app.title"
+msgstr "FluxNote"
+
+#. js-lingui-explicit-id
+#: src/routes/__root.tsx:28
+msgid "header.go-home"
+msgstr "Go home"
+
+#. js-lingui-explicit-id
+#: src/routes/__root.tsx:30
+msgid "header.open-preferences"
+msgstr "Open preferences"
 
 #. js-lingui-explicit-id
 #: src/routes/index.tsx:14
 msgid "hello-fluxnote"
 msgstr "Hello FluxNote"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:42
+msgid "preferences.description"
+msgstr "Configure language and appearance."
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:49
+msgid "preferences.language.label"
+msgstr "Language"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:108
+msgid "preferences.rtl.description"
+msgstr "Available only when pseudo locale is selected."
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:105
+msgid "preferences.rtl.label"
+msgstr "Right-to-left layout"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:24
+msgid "preferences.theme.dark"
+msgstr "Dark"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:76
+msgid "preferences.theme.label"
+msgstr "Theme"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:23
+msgid "preferences.theme.light"
+msgstr "Light"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:25
+msgid "preferences.theme.system"
+msgstr "System"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:39
+msgid "preferences.title"
+msgstr "Preferences"
