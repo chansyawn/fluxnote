@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SampleIndexRouteImport } from './routes/sample/index'
 
 const PreferencesRoute = PreferencesRouteImport.update({
   id: '/preferences',
@@ -22,31 +23,40 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SampleIndexRoute = SampleIndexRouteImport.update({
+  id: '/sample/',
+  path: '/sample/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
+  '/sample/': typeof SampleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
+  '/sample': typeof SampleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
+  '/sample/': typeof SampleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/preferences'
+  fullPaths: '/' | '/preferences' | '/sample/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/preferences'
-  id: '__root__' | '/' | '/preferences'
+  to: '/' | '/preferences' | '/sample'
+  id: '__root__' | '/' | '/preferences' | '/sample/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PreferencesRoute: typeof PreferencesRoute
+  SampleIndexRoute: typeof SampleIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sample/': {
+      id: '/sample/'
+      path: '/sample'
+      fullPath: '/sample/'
+      preLoaderRoute: typeof SampleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PreferencesRoute: PreferencesRoute,
+  SampleIndexRoute: SampleIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

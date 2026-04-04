@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:43
+#: src/routes/__root.tsx:69
 msgid "app.title"
 msgstr "FluxNote"
 
@@ -24,24 +24,39 @@ msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
+#: src/routes/__root.tsx:56
+msgid "header.go-sample"
+msgstr "前往示例页"
+
+#. js-lingui-explicit-id
 #: src/routes/__root.tsx:30
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:36
-msgid "home.backend-response.error"
-msgstr "请求失败。"
+#: src/routes/__root.tsx:54
+msgid "header.open-sample"
+msgstr "打开示例页"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:27
-msgid "home.backend-response.loading"
-msgstr "正在从 Rust 后端加载欢迎语..."
+#: src/routes/index.tsx:19
+msgid "home.description"
+msgstr "这是轻量化首页。你可以在 /sample 查看基建最佳实践示例。"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:22
-msgid "home.backend-response.title"
-msgstr "后端响应"
+#: src/routes/index.tsx:35
+msgid "home.dev-tip"
+msgstr "仅在开发模式下可见。"
+
+#. js-lingui-explicit-id
+#: src/routes/index.tsx:32
+msgid "home.open-sample"
+msgstr "打开示例页面"
+
+#. js-lingui-explicit-id
+#: src/routes/index.tsx:16
+msgid "home.title"
+msgstr "欢迎使用 FluxNote"
 
 #. js-lingui-explicit-id
 #: src/routes/preferences.tsx:50
@@ -87,3 +102,98 @@ msgstr "跟随系统"
 #: src/routes/preferences.tsx:47
 msgid "preferences.title"
 msgstr "偏好设置"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/index.tsx:19
+msgid "sample.description"
+msgstr "这是 clients、invoke、query 与 i18n 最佳实践的端到端示例。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:58
+msgid "sample.greet.description"
+msgstr "可尝试普通名称、空值、超长值或 `missing`，观察不同错误类型。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:127
+msgid "sample.greet.error.details"
+msgstr "详细信息"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:120
+msgid "sample.greet.error.message"
+msgstr "消息:"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:108
+msgid "sample.greet.error.title"
+msgstr "结构化错误"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:114
+msgid "sample.greet.error.type"
+msgstr "类型:"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:137
+msgid "sample.greet.error.unknown"
+msgstr "未知错误结构。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:67
+msgid "sample.greet.input.label"
+msgstr "名称"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:92
+msgid "sample.greet.loading"
+msgstr "正在从 Rust 后端加载响应..."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:81
+msgid "sample.greet.submit"
+msgstr "执行 greet 查询"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:99
+msgid "sample.greet.success.title"
+msgstr "成功"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:84
+msgid "sample.greet.tip"
+msgstr "提示：试试 `missing` 或空值。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:55
+msgid "sample.greet.title"
+msgstr "Query + Client + Invoke 示例"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:26
+msgid "sample.spec.error"
+msgstr "错误语义：后端返回 `BUSINESS.*` 或 `INTERNAL`，并附带结构化 details。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:21
+msgid "sample.spec.i18n"
+msgstr "国际化：所有面向用户的文案都使用稳定的 Lingui 显式 ID。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:11
+msgid "sample.spec.layering"
+msgstr "分层：路由组件调用 `src/clients`，再由其调用 `@/app/invoke`。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:16
+msgid "sample.spec.query"
+msgstr "数据流：TanStack Query 负责请求生命周期与缓存键变更。"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:7
+msgid "sample.spec.title"
+msgstr "本页展示的实践"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/index.tsx:16
+msgid "sample.title"
+msgstr "基建示例"

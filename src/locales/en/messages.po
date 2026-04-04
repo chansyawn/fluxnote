@@ -14,7 +14,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:43
+#: src/routes/__root.tsx:69
 msgid "app.title"
 msgstr "FluxNote"
 
@@ -24,24 +24,39 @@ msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
+#: src/routes/__root.tsx:56
+msgid "header.go-sample"
+msgstr "Go to sample"
+
+#. js-lingui-explicit-id
 #: src/routes/__root.tsx:30
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:36
-msgid "home.backend-response.error"
-msgstr "Request failed."
+#: src/routes/__root.tsx:54
+msgid "header.open-sample"
+msgstr "Open sample"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:27
-msgid "home.backend-response.loading"
-msgstr "Loading greeting from Rust backend..."
+#: src/routes/index.tsx:19
+msgid "home.description"
+msgstr "This is the lightweight home page. Explore /sample for infrastructure best practices."
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:22
-msgid "home.backend-response.title"
-msgstr "Backend response"
+#: src/routes/index.tsx:35
+msgid "home.dev-tip"
+msgstr "Visible in development mode only."
+
+#. js-lingui-explicit-id
+#: src/routes/index.tsx:32
+msgid "home.open-sample"
+msgstr "Open sample page"
+
+#. js-lingui-explicit-id
+#: src/routes/index.tsx:16
+msgid "home.title"
+msgstr "Welcome to FluxNote"
 
 #. js-lingui-explicit-id
 #: src/routes/preferences.tsx:50
@@ -87,3 +102,98 @@ msgstr "System"
 #: src/routes/preferences.tsx:47
 msgid "preferences.title"
 msgstr "Preferences"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/index.tsx:19
+msgid "sample.description"
+msgstr "End-to-end example for clients, invoke, query, and i18n best practices."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:58
+msgid "sample.greet.description"
+msgstr "Try normal names, empty value, long value, or `missing` to see different error types."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:127
+msgid "sample.greet.error.details"
+msgstr "Details"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:120
+msgid "sample.greet.error.message"
+msgstr "Message:"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:108
+msgid "sample.greet.error.title"
+msgstr "Structured error"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:114
+msgid "sample.greet.error.type"
+msgstr "Type:"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:137
+msgid "sample.greet.error.unknown"
+msgstr "Unknown error shape."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:67
+msgid "sample.greet.input.label"
+msgstr "Name"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:92
+msgid "sample.greet.loading"
+msgstr "Loading response from Rust backend..."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:81
+msgid "sample.greet.submit"
+msgstr "Run greet query"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:99
+msgid "sample.greet.success.title"
+msgstr "Success"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:84
+msgid "sample.greet.tip"
+msgstr "Tip: try `missing` or an empty value."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-greet-panel.tsx:55
+msgid "sample.greet.title"
+msgstr "Query + Client + Invoke Demo"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:26
+msgid "sample.spec.error"
+msgstr "Error semantics: backend returns `BUSINESS.*` or `INTERNAL` with structured details."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:21
+msgid "sample.spec.i18n"
+msgstr "Internationalization: all user-facing strings use stable Lingui explicit IDs."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:11
+msgid "sample.spec.layering"
+msgstr "Layering: route component calls `src/clients`, which uses `@/app/invoke`."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:16
+msgid "sample.spec.query"
+msgstr "Data flow: TanStack Query handles request lifecycle and cache key changes."
+
+#. js-lingui-explicit-id
+#: src/routes/sample/-features/sample-spec-panel.tsx:7
+msgid "sample.spec.title"
+msgstr "Practices Demonstrated on This Page"
+
+#. js-lingui-explicit-id
+#: src/routes/sample/index.tsx:16
+msgid "sample.title"
+msgstr "Infrastructure Sample"

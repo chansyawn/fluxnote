@@ -49,6 +49,13 @@
 - UI components and routes must use TanStack Query for backend data loading, with the shared `queryClient` from `@/app/query`.
 - Ensure object keys passed to `invoke` exactly match Rust command argument names.
 
+## Sample Conventions
+
+- For frontend sample patterns, refer to:
+  - `src/routes/sample/index.tsx`
+- For backend sample patterns, refer to:
+  - `src-tauri/src/features/sample.rs`
+
 ## Workflow
 
 - After every frontend change, run `vp check` and `vp build`.

@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Outlet, createRootRoute, useLocation, useNavigate } from "@tanstack/react-router";
-import { ArrowLeftIcon, Settings2Icon } from "lucide-react";
+import { ArrowLeftIcon, FlaskConicalIcon, HouseIcon, Settings2Icon } from "lucide-react";
 
 import { Button } from "@/ui/components/button";
 
@@ -34,6 +34,32 @@ function HeaderActionButton() {
   );
 }
 
+function HeaderSampleButton() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const onSamplePage = location.pathname === "/sample";
+
+  return (
+    <Button
+      size="icon"
+      variant="ghost"
+      onClick={() => {
+        void navigate({ to: onSamplePage ? "/" : "/sample" });
+      }}
+    >
+      {onSamplePage ? <HouseIcon /> : <FlaskConicalIcon />}
+      <span className="sr-only">
+        {onSamplePage ? (
+          <Trans id="header.open-sample">Open sample</Trans>
+        ) : (
+          <Trans id="header.go-sample">Go to sample</Trans>
+        )}
+      </span>
+    </Button>
+  );
+}
+
 function RootComponent() {
   return (
     <div className="bg-background min-h-dvh">
@@ -42,7 +68,10 @@ function RootComponent() {
           <p className="font-medium">
             <Trans id="app.title">FluxNote</Trans>
           </p>
-          <HeaderActionButton />
+          <div className="flex items-center gap-1">
+            {import.meta.env.DEV ? <HeaderSampleButton /> : null}
+            <HeaderActionButton />
+          </div>
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl px-4 py-6">
