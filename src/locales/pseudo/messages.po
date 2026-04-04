@@ -29,27 +29,37 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:14
-msgid "hello-fluxnote"
+#: src/routes/index.tsx:36
+msgid "home.backend-response.error"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:42
+#: src/routes/index.tsx:27
+msgid "home.backend-response.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/index.tsx:22
+msgid "home.backend-response.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:50
 msgid "preferences.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:49
+#: src/routes/preferences.tsx:57
 msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:108
+#: src/routes/preferences.tsx:118
 msgid "preferences.rtl.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:105
+#: src/routes/preferences.tsx:115
 msgid "preferences.rtl.label"
 msgstr ""
 
@@ -59,7 +69,7 @@ msgid "preferences.theme.dark"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:76
+#: src/routes/preferences.tsx:85
 msgid "preferences.theme.label"
 msgstr ""
 
@@ -74,6 +84,6 @@ msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:39
+#: src/routes/preferences.tsx:47
 msgid "preferences.title"
 msgstr ""
