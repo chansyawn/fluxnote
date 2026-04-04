@@ -78,6 +78,11 @@
 - `INVALID_INVOKE` should be used for command argument validation failures (Garde) and include the validation report in `details`.
 - Internal errors (database, IO, runtime failures, etc.) must be mapped to `INTERNAL` and preserve the `anyhow` context chain in `details`.
 
+### Logging
+
+- Use `tracing` for backend logs; do not introduce ad-hoc logging APIs.
+- Add `#[tracing::instrument]` at Tauri command boundaries for stable request-level context.
+
 ## Workflow & Verification
 
 ### When Frontend Changes
