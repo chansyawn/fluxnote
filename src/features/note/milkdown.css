@@ -1,0 +1,6 @@
+@import "@milkdown/crepe/theme/common/style.css";
+@import "@milkdown/crepe/theme/frame.css";
+
+.milkdown .ProseMirror {
+  padding: 0;
+}

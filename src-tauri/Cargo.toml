@@ -27,3 +27,7 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 thiserror = "2.0.18"
 garde = { version = "0.22.1", features = ["derive", "serde"] }
+rusqlite = { version = "0.39.0", features = ["bundled"] }
+rusqlite_migration = "2.5.0"
+time = { version = "0.3.44", features = ["formatting"] }
+uuid = { version = "1.18.1", features = ["v7"] }

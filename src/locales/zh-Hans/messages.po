@@ -39,24 +39,29 @@ msgid "header.open-sample"
 msgstr "打开示例页"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:19
-msgid "home.description"
-msgstr "这是轻量化首页。你可以在 /sample 查看基建最佳实践示例。"
+#: src/features/note/home-note-screen.tsx:152
+msgid "home-note.add-block"
+msgstr "新增区块"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:35
-msgid "home.dev-tip"
-msgstr "仅在开发模式下可见。"
+#: src/features/note/note-block-editor.tsx:166
+msgid "home-note.block.delete"
+msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:32
-msgid "home.open-sample"
-msgstr "打开示例页面"
+#: src/features/note/home-note-screen.tsx:112
+msgid "home-note.error.retry"
+msgstr "重试"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:16
-msgid "home.title"
-msgstr "欢迎使用 FluxNote"
+#: src/features/note/home-note-screen.tsx:102
+msgid "home-note.error.title"
+msgstr "加载笔记失败"
+
+#. js-lingui-explicit-id
+#: src/features/note/home-note-screen.tsx:90
+msgid "home-note.loading"
+msgstr "正在加载你的笔记..."
 
 #. js-lingui-explicit-id
 #: src/routes/preferences.tsx:50
