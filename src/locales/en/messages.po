@@ -39,24 +39,29 @@ msgid "header.open-sample"
 msgstr "Open sample"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:19
-msgid "home.description"
-msgstr "This is the lightweight home page. Explore /sample for infrastructure best practices."
+#: src/features/note/home-note-screen.tsx:152
+msgid "home-note.add-block"
+msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:35
-msgid "home.dev-tip"
-msgstr "Visible in development mode only."
+#: src/features/note/note-block-editor.tsx:166
+msgid "home-note.block.delete"
+msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:32
-msgid "home.open-sample"
-msgstr "Open sample page"
+#: src/features/note/home-note-screen.tsx:112
+msgid "home-note.error.retry"
+msgstr "Retry"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:16
-msgid "home.title"
-msgstr "Welcome to FluxNote"
+#: src/features/note/home-note-screen.tsx:102
+msgid "home-note.error.title"
+msgstr "Failed to load note"
+
+#. js-lingui-explicit-id
+#: src/features/note/home-note-screen.tsx:90
+msgid "home-note.loading"
+msgstr "Loading your note..."
 
 #. js-lingui-explicit-id
 #: src/routes/preferences.tsx:50

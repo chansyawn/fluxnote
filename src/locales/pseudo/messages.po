@@ -39,23 +39,28 @@ msgid "header.open-sample"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:19
-msgid "home.description"
+#: src/features/note/home-note-screen.tsx:152
+msgid "home-note.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:35
-msgid "home.dev-tip"
+#: src/features/note/note-block-editor.tsx:166
+msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:32
-msgid "home.open-sample"
+#: src/features/note/home-note-screen.tsx:112
+msgid "home-note.error.retry"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:16
-msgid "home.title"
+#: src/features/note/home-note-screen.tsx:102
+msgid "home-note.error.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note/home-note-screen.tsx:90
+msgid "home-note.loading"
 msgstr ""
 
 #. js-lingui-explicit-id

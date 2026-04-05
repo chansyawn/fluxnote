@@ -12,6 +12,10 @@ pub enum BusinessError {
     NotFound(String),
     #[error("{0}")]
     InvalidInvoke(String, Option<Value>),
+    #[error("{0}")]
+    InvalidOperation(String, Option<Value>),
+    #[error("{0}")]
+    InternalState(String),
 }
 
 impl BusinessError {
@@ -19,13 +23,18 @@ impl BusinessError {
         match self {
             Self::NotFound(_) => "BUSINESS.NOT_FOUND",
             Self::InvalidInvoke(_, _) => "BUSINESS.INVALID_INVOKE",
+            Self::InvalidOperation(_, _) => "BUSINESS.INVALID_OPERATION",
+            Self::InternalState(_) => "INTERNAL",
         }
     }
 
     fn details(&self) -> Option<&Value> {
         match self {
-            Self::InvalidInvoke(_, details) => details.as_ref(),
+            Self::InvalidInvoke(_, details) | Self::InvalidOperation(_, details) => {
+                details.as_ref()
+            }
             Self::NotFound(_) => None,
+            Self::InternalState(_) => None,
         }
     }
 }

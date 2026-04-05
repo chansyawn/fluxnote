@@ -1,3 +1,5 @@
+use tauri::Manager;
+
 mod error;
 mod features;
 
@@ -20,7 +22,18 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![features::sample::greet])
+        .setup(|app| {
+            let note_state = features::note::init_note_state(app.handle())?;
+            app.manage(note_state);
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            features::sample::greet,
+            features::note::get_home_note,
+            features::note::create_note_block,
+            features::note::update_note_block_content,
+            features::note::delete_note_block
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
