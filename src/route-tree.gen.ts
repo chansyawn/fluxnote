@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SampleIndexRouteImport } from './routes/sample/index'
+import { Route as NotesIdIndexRouteImport } from './routes/notes/$id/index'
 
 const PreferencesRoute = PreferencesRouteImport.update({
   id: '/preferences',
@@ -28,35 +29,44 @@ const SampleIndexRoute = SampleIndexRouteImport.update({
   path: '/sample/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotesIdIndexRoute = NotesIdIndexRouteImport.update({
+  id: '/notes/$id/',
+  path: '/notes/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/sample/': typeof SampleIndexRoute
+  '/notes/$id/': typeof NotesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/sample': typeof SampleIndexRoute
+  '/notes/$id': typeof NotesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/sample/': typeof SampleIndexRoute
+  '/notes/$id/': typeof NotesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/preferences' | '/sample/'
+  fullPaths: '/' | '/preferences' | '/sample/' | '/notes/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/preferences' | '/sample'
-  id: '__root__' | '/' | '/preferences' | '/sample/'
+  to: '/' | '/preferences' | '/sample' | '/notes/$id'
+  id: '__root__' | '/' | '/preferences' | '/sample/' | '/notes/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PreferencesRoute: typeof PreferencesRoute
   SampleIndexRoute: typeof SampleIndexRoute
+  NotesIdIndexRoute: typeof NotesIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SampleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notes/$id/': {
+      id: '/notes/$id/'
+      path: '/notes/$id'
+      fullPath: '/notes/$id/'
+      preLoaderRoute: typeof NotesIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PreferencesRoute: PreferencesRoute,
   SampleIndexRoute: SampleIndexRoute,
+  NotesIdIndexRoute: NotesIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -16,9 +16,13 @@ export interface NoteBlock {
   updatedAt: string;
 }
 
-export interface HomeNote {
+export interface NoteDetail {
   note: NoteSummary;
   blocks: NoteBlock[];
+}
+
+export interface GetNoteByIdRequest {
+  noteId: string;
 }
 
 export interface CreateNoteBlockRequest {
@@ -38,8 +42,16 @@ export interface DeleteNoteBlockResult {
   deletedBlockId: string;
 }
 
-export async function getHomeNote(): Promise<HomeNote> {
-  return await invoke<HomeNote>("get_home_note");
+export interface GetInboxNoteIdResponse {
+  noteId: string;
+}
+
+export async function getInboxNoteId(): Promise<GetInboxNoteIdResponse> {
+  return await invoke<GetInboxNoteIdResponse>("get_inbox_note_id");
+}
+
+export async function getNoteById(req: GetNoteByIdRequest): Promise<NoteDetail> {
+  return await invoke<NoteDetail>("get_note_by_id", { ...req });
 }
 
 export async function createNoteBlock(req: CreateNoteBlockRequest): Promise<NoteBlock> {

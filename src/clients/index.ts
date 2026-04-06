@@ -2,7 +2,8 @@ export { greet } from "@/clients/sample";
 export {
   createNoteBlock,
   deleteNoteBlock,
-  getHomeNote,
+  getInboxNoteId,
+  getNoteById,
   updateNoteBlockContent,
 } from "@/clients/note";
 export type { GreetRequest, GreetResponse } from "@/clients/sample";
@@ -10,7 +11,9 @@ export type {
   CreateNoteBlockRequest,
   DeleteNoteBlockRequest,
   DeleteNoteBlockResult,
-  HomeNote,
+  GetInboxNoteIdResponse,
+  GetNoteByIdRequest,
+  NoteDetail,
   NoteBlock,
   NoteSummary,
   UpdateNoteBlockContentRequest,

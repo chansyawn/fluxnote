@@ -22,9 +22,15 @@ pub struct NoteBlock {
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct HomeNote {
+pub struct NoteDetail {
     pub note: NoteSummary,
     pub blocks: Vec<NoteBlock>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InboxNoteIdResult {
+    pub note_id: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
