@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ArrowLeftIcon, FlaskConicalIcon, HouseIcon, Settings2Icon, XIcon } from "lucide-react";
-import { type MouseEvent } from "react";
 
 import { Button } from "@/ui/components/button";
 
@@ -80,36 +79,18 @@ function HeaderCloseButton() {
 }
 
 export function WindowTitleBar() {
-  const handleTitleBarMouseDown = (event: MouseEvent<HTMLElement>) => {
-    if (event.button !== 0) {
-      return;
-    }
-
-    const target = event.target as HTMLElement;
-    if (target.closest("[data-window-control]")) {
-      return;
-    }
-
-    void appWindow.startDragging();
-  };
-
   return (
-    <header
-      className="border-border/70 bg-background/92 z-20 cursor-default border-b backdrop-blur-sm select-none"
-      onMouseDown={handleTitleBarMouseDown}
-    >
-      <div className="mx-auto flex h-10 w-full max-w-5xl items-center gap-2 px-3">
+    <header className="border-border/70 bg-background/92 z-20 h-10 cursor-default border-b backdrop-blur-sm select-none">
+      <div className="relative z-10 flex h-full items-center gap-2 px-3" data-tauri-drag-region>
         <div className="flex shrink-0 items-center gap-2">
           <HeaderCloseButton />
         </div>
 
-        <div className="flex min-w-0 flex-1 items-center">
-          <p className="pointer-events-none truncate text-sm font-medium">
-            <Trans id="app.title">FluxNote</Trans>
-          </p>
+        <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
+          <Trans id="app.title">FluxNote</Trans>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1" data-window-control>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
           {import.meta.env.DEV ? <HeaderSampleButton /> : null}
           <HeaderActionButton />
         </div>

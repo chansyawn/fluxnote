@@ -10,11 +10,15 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "fluxnote",
         "decorations": false,
+        "transparent": true,
+        "shadow": true,
         "alwaysOnTop": true,
+        "acceptFirstMouse": true,
         "skipTaskbar": true,
         "width": 800,
         "height": 600
