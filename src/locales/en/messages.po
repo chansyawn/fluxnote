@@ -14,27 +14,27 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:69
+#: src/routes/__root.tsx:104
 msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:28
+#: src/routes/__root.tsx:32
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:56
+#: src/routes/__root.tsx:60
 msgid "header.go-sample"
 msgstr "Go to sample"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:30
+#: src/routes/__root.tsx:34
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:54
+#: src/routes/__root.tsx:58
 msgid "header.open-sample"
 msgstr "Open sample"
 
@@ -202,3 +202,8 @@ msgstr "Practices Demonstrated on This Page"
 #: src/routes/sample/index.tsx:16
 msgid "sample.title"
 msgstr "Infrastructure Sample"
+
+#. js-lingui-explicit-id
+#: src/routes/__root.tsx:79
+msgid "window.hide"
+msgstr "Hide window"

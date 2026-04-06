@@ -14,27 +14,27 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:69
+#: src/routes/__root.tsx:104
 msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:28
+#: src/routes/__root.tsx:32
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:56
+#: src/routes/__root.tsx:60
 msgid "header.go-sample"
 msgstr "前往示例页"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:30
+#: src/routes/__root.tsx:34
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/routes/__root.tsx:54
+#: src/routes/__root.tsx:58
 msgid "header.open-sample"
 msgstr "打开示例页"
 
@@ -202,3 +202,8 @@ msgstr "本页展示的实践"
 #: src/routes/sample/index.tsx:16
 msgid "sample.title"
 msgstr "基建示例"
+
+#. js-lingui-explicit-id
+#: src/routes/__root.tsx:79
+msgid "window.hide"
+msgstr "隐藏窗口"
