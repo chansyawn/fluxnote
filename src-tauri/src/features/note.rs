@@ -11,7 +11,7 @@ use tracing::info;
 use crate::error::{AppResult, BusinessError};
 use crate::features::validated_command_arg::Validated;
 
-pub use models::{DeleteNoteBlockResult, HomeNote, NoteBlock};
+pub use models::{DeleteNoteBlockResult, InboxNoteIdResult, NoteBlock, NoteDetail};
 use service::NoteService;
 
 pub struct NoteState {
@@ -31,6 +31,13 @@ pub fn init_note_state(app: &AppHandle) -> anyhow::Result<NoteState> {
     Ok(NoteState {
         service: Mutex::new(service),
     })
+}
+
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct GetNoteByIdArgs {
+    #[garde(length(min = 1))]
+    pub note_id: String,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -57,11 +64,25 @@ pub struct DeleteNoteBlockArgs {
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.get_home_note", skip(state))]
-pub fn get_home_note(state: State<'_, NoteState>) -> AppResult<HomeNote> {
-    info!("loading home note");
+#[tracing::instrument(name = "command.get_inbox_note_id", skip(state))]
+pub fn get_inbox_note_id(state: State<'_, NoteState>) -> AppResult<InboxNoteIdResult> {
+    info!("loading inbox note id");
     let mut service = state.lock()?;
-    service.get_home_note()
+    let note_id = service.get_inbox_note_id()?;
+    Ok(InboxNoteIdResult { note_id })
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.get_note_by_id", skip(state, args))]
+pub fn get_note_by_id(
+    state: State<'_, NoteState>,
+    args: Validated<GetNoteByIdArgs>,
+) -> AppResult<NoteDetail> {
+    let args = args.into_inner();
+
+    info!("loading note by id");
+    let mut service = state.lock()?;
+    service.get_note_by_id(&args.note_id)
 }
 
 #[tauri::command]

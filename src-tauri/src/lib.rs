@@ -119,7 +119,8 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             features::sample::greet,
-            features::note::get_home_note,
+            features::note::get_inbox_note_id,
+            features::note::get_note_by_id,
             features::note::create_note_block,
             features::note::update_note_block_content,
             features::note::delete_note_block

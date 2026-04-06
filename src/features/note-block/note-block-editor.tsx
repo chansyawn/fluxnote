@@ -7,21 +7,22 @@ import { useEffect, useEffectEvent, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { queryClient } from "@/app/query";
-import { type HomeNote, type NoteBlock, updateNoteBlockContent } from "@/clients";
-import { homeNoteQueryKey } from "@/features/note/home-note-screen";
+import { type NoteBlock, type NoteDetail, updateNoteBlockContent } from "@/clients";
+import { noteDetailQueryKey } from "@/features/note-block/note-query-key";
 import { Button } from "@/ui/components/button";
 
 import "./milkdown.css";
 
 interface NoteBlockEditorProps {
+  noteId: string;
   block: NoteBlock;
   isDeleting: boolean;
   isOnlyBlock: boolean;
   onDelete: (block: NoteBlock) => Promise<void>;
 }
 
-function updateBlockInCache(updatedBlock: NoteBlock): void {
-  queryClient.setQueryData<HomeNote>(homeNoteQueryKey, (current) => {
+function updateBlockInCache(noteId: string, updatedBlock: NoteBlock): void {
+  queryClient.setQueryData<NoteDetail>(noteDetailQueryKey(noteId), (current) => {
     if (!current) {
       return current;
     }
@@ -66,6 +67,7 @@ function NoteBlockMilkdown({
 }
 
 export function NoteBlockEditor({
+  noteId,
   block,
   isDeleting,
   isOnlyBlock,
@@ -101,7 +103,7 @@ export function NoteBlockEditor({
 
       appliedRequestIdRef.current = requestId;
       persistedContentRef.current = updatedBlock.content;
-      updateBlockInCache(updatedBlock);
+      updateBlockInCache(noteId, updatedBlock);
     },
   );
 

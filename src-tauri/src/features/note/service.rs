@@ -9,10 +9,10 @@ use uuid::Uuid;
 
 use crate::error::{AppResult, BusinessError};
 
-use super::models::{DeleteNoteBlockResult, HomeNote, NoteBlock, NoteSummary};
+use super::models::{DeleteNoteBlockResult, NoteBlock, NoteDetail, NoteSummary};
 
 const DATABASE_FILE_NAME: &str = "fluxnote.sqlite3";
-const DEFAULT_NOTE_ID_KEY: &str = "default_note_id";
+const INBOX_NOTE_ID_KEY: &str = "inbox_note_id";
 const DEFAULT_NOTE_TITLE: &str = "My Note";
 
 pub struct NoteService {
@@ -52,17 +52,20 @@ impl NoteService {
 
         let mut service = Self { conn };
         service
-            .ensure_home_note()
-            .context("failed to initialize home note")?;
+            .ensure_inbox_note()
+            .context("failed to initialize inbox note")?;
         Ok(service)
     }
 
-    pub fn get_home_note(&mut self) -> AppResult<HomeNote> {
-        let note_id = self.resolve_home_note_id()?;
-        let note = self.get_note_summary(&note_id)?;
-        let blocks = self.list_blocks(&note_id)?;
+    pub fn get_inbox_note_id(&mut self) -> AppResult<String> {
+        self.resolve_inbox_note_id()
+    }
 
-        Ok(HomeNote { note, blocks })
+    pub fn get_note_by_id(&mut self, note_id: &str) -> AppResult<NoteDetail> {
+        let note = self.get_note_summary(note_id)?;
+        let blocks = self.list_blocks(note_id)?;
+
+        Ok(NoteDetail { note, blocks })
     }
 
     pub fn create_note_block(&mut self, note_id: &str) -> AppResult<NoteBlock> {
@@ -154,8 +157,8 @@ impl NoteService {
         })
     }
 
-    fn ensure_home_note(&mut self) -> anyhow::Result<String> {
-        if let Some(note_id) = self.find_default_note_id()? {
+    fn ensure_inbox_note(&mut self) -> anyhow::Result<String> {
+        if let Some(note_id) = self.find_inbox_note_id()? {
             return Ok(note_id);
         }
 
@@ -169,30 +172,30 @@ impl NoteService {
              VALUES (?1, ?2, ?3, ?4)",
             params![note_id, DEFAULT_NOTE_TITLE, now, now],
         )
-        .context("failed to insert default note")?;
+        .context("failed to insert inbox note")?;
         tx.execute(
             "INSERT INTO note_blocks (id, note_id, position, content, created_at, updated_at)
              VALUES (?1, ?2, 0, '', ?3, ?4)",
             params![block_id, note_id, now, now],
         )
-        .context("failed to insert default note block")?;
-        set_meta_value(&tx, DEFAULT_NOTE_ID_KEY, &note_id)?;
+        .context("failed to insert inbox note block")?;
+        set_meta_value(&tx, INBOX_NOTE_ID_KEY, &note_id)?;
         tx.commit()
-            .context("failed to commit default note transaction")?;
+            .context("failed to commit inbox note transaction")?;
 
         Ok(note_id)
     }
 
-    fn resolve_home_note_id(&mut self) -> AppResult<String> {
-        if let Some(note_id) = self.find_default_note_id()? {
+    fn resolve_inbox_note_id(&mut self) -> AppResult<String> {
+        if let Some(note_id) = self.find_inbox_note_id()? {
             return Ok(note_id);
         }
 
-        self.ensure_home_note().map_err(Into::into)
+        self.ensure_inbox_note().map_err(Into::into)
     }
 
-    fn find_default_note_id(&mut self) -> anyhow::Result<Option<String>> {
-        let Some(note_id) = get_meta_value(&self.conn, DEFAULT_NOTE_ID_KEY)? else {
+    fn find_inbox_note_id(&mut self) -> anyhow::Result<Option<String>> {
+        let Some(note_id) = get_meta_value(&self.conn, INBOX_NOTE_ID_KEY)? else {
             return Ok(None);
         };
 
@@ -203,9 +206,9 @@ impl NoteService {
         self.conn
             .execute(
                 "DELETE FROM app_meta WHERE key = ?1",
-                params![DEFAULT_NOTE_ID_KEY],
+                params![INBOX_NOTE_ID_KEY],
             )
-            .context("failed to clear stale default note id")?;
+            .context("failed to clear stale inbox note id")?;
 
         Ok(None)
     }
