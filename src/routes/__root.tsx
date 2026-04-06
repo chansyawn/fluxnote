@@ -35,10 +35,12 @@ function RootComponent() {
   }, []);
 
   return (
-    <div className="bg-background min-h-dvh">
+    <div className="bg-background flex h-full flex-col overflow-hidden">
       <WindowTitleBar />
-      <main className="mx-auto w-full max-w-5xl px-4 pt-20 pb-6">
-        <Outlet />
+      <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="mx-auto w-full max-w-5xl p-3 pb-6">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
