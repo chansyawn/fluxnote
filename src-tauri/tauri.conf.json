@@ -18,9 +18,12 @@
         "transparent": true,
         "shadow": true,
         "alwaysOnTop": true,
+        "maximizable": false,
         "acceptFirstMouse": true,
         "skipTaskbar": true,
-        "width": 800,
+        "width": 640,
+        "minWidth": 320,
+        "maxWidth": 640,
         "height": 600
       }
     ],
