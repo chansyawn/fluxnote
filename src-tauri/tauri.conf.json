@@ -13,6 +13,9 @@
     "windows": [
       {
         "title": "fluxnote",
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
         "width": 800,
         "height": 600
       }
