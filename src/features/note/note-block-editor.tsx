@@ -143,9 +143,9 @@ export function NoteBlockEditor({
   });
 
   return (
-    <article className="border-border/70 bg-card rounded border px-4 py-4">
+    <article className="border-border/60 bg-background/20 rounded-xl border">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="bg-primary/10 text-primary inline-flex min-w-10 items-center justify-center rounded-full px-2 py-1 text-[11px] font-semibold">
+        <div className="bg-primary/12 text-primary inline-flex min-w-10 items-center justify-center rounded-full px-2 py-1 text-[11px] font-semibold backdrop-blur-sm">
           #{block.position + 1}
         </div>
 
@@ -168,7 +168,7 @@ export function NoteBlockEditor({
         </Button>
       </div>
 
-      <div className="min-h-28">
+      <div className="min-h-28 px-4 pb-4">
         <MilkdownProvider>
           <NoteBlockMilkdown
             block={block}
