@@ -35,10 +35,10 @@ function RootComponent() {
   }, []);
 
   return (
-    <div className="bg-background ring-border/55 dark:ring-border/35 mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl ring-1">
+    <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
       <WindowTitleBar />
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className="mx-auto w-full max-w-5xl p-3 pb-6">
+        <div className="mx-auto w-full max-w-5xl px-3 pb-6">
           <Outlet />
         </div>
       </main>

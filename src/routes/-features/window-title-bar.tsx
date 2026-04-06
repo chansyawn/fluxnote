@@ -80,7 +80,7 @@ function HeaderCloseButton() {
 
 export function WindowTitleBar() {
   return (
-    <header className="border-border/70 bg-background/92 z-20 h-10 cursor-default border-b backdrop-blur-sm select-none">
+    <header className="z-20 h-10 select-none">
       <div className="relative z-10 flex h-full items-center gap-2 px-3" data-tauri-drag-region>
         <div className="flex shrink-0 items-center gap-2">
           <HeaderCloseButton />

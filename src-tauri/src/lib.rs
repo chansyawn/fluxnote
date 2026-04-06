@@ -3,6 +3,8 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, RunEvent,
 };
+#[cfg(target_os = "macos")]
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
 mod error;
 mod features;
@@ -10,6 +12,7 @@ mod features;
 const MAIN_WINDOW_LABEL: &str = "main";
 const SHOW_MAIN_MENU_ID: &str = "show-main";
 const QUIT_APP_MENU_ID: &str = "quit-app";
+const MAIN_WINDOW_RADIUS_PX: f64 = 14.0;
 
 fn init_tracing() {
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
@@ -32,6 +35,23 @@ fn show_main_window(app: &AppHandle) -> tauri::Result<()> {
     window.unminimize()?;
     window.show()?;
     window.set_focus()?;
+
+    Ok(())
+}
+
+fn configure_main_window(app: &AppHandle) -> tauri::Result<()> {
+    let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) else {
+        return Ok(());
+    };
+
+    #[cfg(target_os = "macos")]
+    apply_vibrancy(
+        &window,
+        NSVisualEffectMaterial::UnderWindowBackground,
+        Some(NSVisualEffectState::Active),
+        Some(MAIN_WINDOW_RADIUS_PX),
+    )
+    .map_err(anyhow::Error::from)?;
 
     Ok(())
 }
@@ -91,6 +111,7 @@ pub fn run() {
         .setup(|app| {
             let note_state = features::note::init_note_state(app.handle())?;
             app.manage(note_state);
+            configure_main_window(app.handle())?;
             #[cfg(target_os = "macos")]
             app.handle().set_dock_visibility(false)?;
             build_tray(app.handle())?;
