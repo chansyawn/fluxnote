@@ -35,7 +35,7 @@ function RootComponent() {
   }, []);
 
   return (
-    <div className="bg-background flex h-full flex-col overflow-hidden">
+    <div className="bg-background ring-border/55 dark:ring-border/35 mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl ring-1">
       <WindowTitleBar />
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="mx-auto w-full max-w-5xl p-3 pb-6">
