@@ -20,7 +20,7 @@
 
 ### Do / Don't
 
-- Keep command argument key names passed from frontend to backend exactly aligned with Rust command argument names.
+- Keep frontend payload keys aligned with backend request-struct fields.
 - Do not introduce duplicate client command entrypoints outside `src/clients` + `src/clients/index.ts`.
 
 ## Frontend
@@ -63,6 +63,7 @@
 
 - Define backend commands in `src-tauri/src` with `#[tauri::command]` and register them in the builder `invoke_handler`.
 - Prefer a request-struct + `garde` validation pattern for command args.
+- Prefer command signatures that consume a validated request object (for example `Validated<TRequest>`) so validation/mapping is centralized and command bodies stay business-focused.
 
 ### Error Model
 
