@@ -6,9 +6,10 @@ use std::sync::Mutex;
 use garde::Validate;
 use serde::Deserialize;
 use tauri::{AppHandle, State};
-use tracing::{info, warn};
+use tracing::info;
 
 use crate::error::{AppResult, BusinessError};
+use crate::features::validated_command_arg::Validated;
 
 pub use models::{DeleteNoteBlockResult, HomeNote, NoteBlock};
 use service::NoteService;
@@ -33,12 +34,14 @@ pub fn init_note_state(app: &AppHandle) -> anyhow::Result<NoteState> {
 }
 
 #[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateNoteBlockArgs {
     #[garde(length(min = 1))]
     pub note_id: String,
 }
 
 #[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateNoteBlockContentArgs {
     #[garde(length(min = 1))]
     pub block_id: String,
@@ -47,23 +50,10 @@ pub struct UpdateNoteBlockContentArgs {
 }
 
 #[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct DeleteNoteBlockArgs {
     #[garde(length(min = 1))]
     pub block_id: String,
-}
-
-fn validate_args<T: Validate>(args: &T, command_name: &str) -> AppResult<()>
-where
-    T::Context: Default,
-{
-    args.validate().map_err(|report| {
-        warn!(command = command_name, error = %report, "note command argument validation failed");
-        let details = serde_json::to_value(&report)
-            .ok()
-            .or_else(|| Some(serde_json::json!({ "report": report.to_string() })));
-
-        BusinessError::InvalidInvoke("Validation failed".to_string(), details).into()
-    })
 }
 
 #[tauri::command]
@@ -75,10 +65,12 @@ pub fn get_home_note(state: State<'_, NoteState>) -> AppResult<HomeNote> {
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.create_note_block", skip(state, note_id))]
-pub fn create_note_block(state: State<'_, NoteState>, note_id: String) -> AppResult<NoteBlock> {
-    let args = CreateNoteBlockArgs { note_id };
-    validate_args(&args, "create_note_block")?;
+#[tracing::instrument(name = "command.create_note_block", skip(state, args))]
+pub fn create_note_block(
+    state: State<'_, NoteState>,
+    args: Validated<CreateNoteBlockArgs>,
+) -> AppResult<NoteBlock> {
+    let args = args.into_inner();
 
     info!("creating note block");
     let mut service = state.lock()?;
@@ -88,16 +80,14 @@ pub fn create_note_block(state: State<'_, NoteState>, note_id: String) -> AppRes
 #[tauri::command]
 #[tracing::instrument(
     name = "command.update_note_block_content",
-    skip(state, content),
+    skip(state, args),
     fields(content_len = tracing::field::Empty)
 )]
 pub fn update_note_block_content(
     state: State<'_, NoteState>,
-    block_id: String,
-    content: String,
+    args: Validated<UpdateNoteBlockContentArgs>,
 ) -> AppResult<NoteBlock> {
-    let args = UpdateNoteBlockContentArgs { block_id, content };
-    validate_args(&args, "update_note_block_content")?;
+    let args = args.into_inner();
     tracing::Span::current().record("content_len", tracing::field::display(args.content.len()));
 
     info!("updating note block content");
@@ -106,13 +96,12 @@ pub fn update_note_block_content(
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.delete_note_block", skip(state, block_id))]
+#[tracing::instrument(name = "command.delete_note_block", skip(state, args))]
 pub fn delete_note_block(
     state: State<'_, NoteState>,
-    block_id: String,
+    args: Validated<DeleteNoteBlockArgs>,
 ) -> AppResult<DeleteNoteBlockResult> {
-    let args = DeleteNoteBlockArgs { block_id };
-    validate_args(&args, "delete_note_block")?;
+    let args = args.into_inner();
 
     info!("deleting note block");
     let mut service = state.lock()?;

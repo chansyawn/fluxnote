@@ -3,8 +3,10 @@ use serde::Deserialize;
 use tracing::{info, warn};
 
 use crate::error::{AppResult, BusinessError};
+use crate::features::validated_command_arg::Validated;
 
 #[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct GreetArgs {
     #[garde(length(min = 1, max = 20))]
     pub name: String,
@@ -14,25 +16,12 @@ pub struct GreetArgs {
 #[tauri::command]
 #[tracing::instrument(
     name = "command.greet",
-    skip(name),
+    skip(args),
     fields(name_len = tracing::field::Empty)
 )]
-pub async fn greet(name: String) -> AppResult<String> {
-    let args = GreetArgs { name };
+pub async fn greet(args: Validated<GreetArgs>) -> AppResult<String> {
+    let args = args.into_inner();
     tracing::Span::current().record("name_len", tracing::field::display(args.name.len()));
-
-    info!("starting greet argument validation");
-
-    args.validate().map_err(|report| {
-        warn!(error = %report, "greet argument validation failed");
-        let details = serde_json::to_value(&report)
-            .ok()
-            .or_else(|| Some(serde_json::json!({ "report": report.to_string() })));
-
-        BusinessError::InvalidInvoke("Validation failed".to_string(), details)
-    })?;
-
-    info!("greet argument validation passed");
 
     if args.name.eq_ignore_ascii_case("missing") {
         warn!("greet resource not found by business rule");
