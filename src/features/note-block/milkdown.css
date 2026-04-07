@@ -2,64 +2,9 @@
 @import "@milkdown/crepe/theme/frame.css";
 
 .milkdown {
-  --crepe-color-background: transparent;
-  --crepe-color-surface: transparent;
-  --crepe-color-surface-low: transparent;
-  --crepe-color-hover: color-mix(in srgb, var(--color-foreground), transparent 92%);
-  --crepe-color-selected: color-mix(in srgb, var(--color-primary), transparent 84%);
-  --crepe-color-inline-area: color-mix(in srgb, var(--color-background), transparent 20%);
-  --crepe-color-outline: color-mix(in srgb, var(--color-border), transparent 24%);
-  --crepe-color-primary: var(--color-foreground);
-  --crepe-color-on-background: var(--color-foreground);
-  --crepe-color-on-surface: var(--color-foreground);
-  --crepe-color-on-surface-variant: var(--color-muted-foreground);
-  --crepe-shadow-1: 0 14px 34px -26px rgb(15 23 42 / 0.38);
-  --crepe-shadow-2: 0 24px 54px -30px rgb(15 23 42 / 0.42);
-  background: transparent;
-}
-
-.milkdown .editor,
-.milkdown .ProseMirror,
-.milkdown .milkdown-toolbar,
-.milkdown .milkdown-slash-menu,
-.milkdown .milkdown-link-preview,
-.milkdown .milkdown-link-edit,
-.milkdown .milkdown-image-block-menu,
-.milkdown .milkdown-table-block-selector,
-.milkdown .milkdown-latex-inline-edit {
   background: transparent;
 }
 
 .milkdown .ProseMirror {
   padding: 0;
-  min-height: 7rem;
-}
-
-.milkdown .milkdown-toolbar,
-.milkdown .milkdown-slash-menu,
-.milkdown .milkdown-link-preview,
-.milkdown .milkdown-link-edit,
-.milkdown .milkdown-image-block-menu,
-.milkdown .milkdown-table-block-selector,
-.milkdown .milkdown-latex-inline-edit {
-  border: 1px solid color-mix(in srgb, var(--color-border), transparent 25%);
-  backdrop-filter: blur(18px);
-  box-shadow: var(--crepe-shadow-1);
-}
-
-.milkdown .ProseMirror code,
-.milkdown .ProseMirror pre,
-.milkdown .cm-editor,
-.milkdown .cm-gutters {
-  background: color-mix(in srgb, var(--color-background), transparent 28%);
-}
-
-.milkdown .ProseMirror pre,
-.milkdown .cm-editor {
-  border: 1px solid color-mix(in srgb, var(--color-border), transparent 30%);
-  backdrop-filter: blur(12px);
-}
-
-.milkdown .ProseMirror blockquote::before {
-  background: color-mix(in srgb, var(--color-primary), transparent 55%);
 }

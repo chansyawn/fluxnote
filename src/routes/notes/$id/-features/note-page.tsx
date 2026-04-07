@@ -2,7 +2,6 @@ import { Trans } from "@lingui/react/macro";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
-import { type NoteBlock } from "@/clients";
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
 import { useNotePage } from "@/routes/notes/$id/-features/use-note-page";
 import { Button } from "@/ui/components/button";
@@ -47,8 +46,8 @@ export function NotePage({ noteId, onMissingNote }: NotePageProps) {
             block={block}
             isDeleting={deletingBlockId === block.id}
             isOnlyBlock={noteDetail.blocks.length === 1}
-            onDelete={async (targetBlock: NoteBlock) => {
-              await deleteBlock(targetBlock.id);
+            onDelete={async (blockId: string) => {
+              await deleteBlock(blockId);
             }}
           />
         ))}

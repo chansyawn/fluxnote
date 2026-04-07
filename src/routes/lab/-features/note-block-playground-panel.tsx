@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
-import { NoteBlockCoreEditor } from "@/features/note-block/note-block-core-editor";
+import { NoteBlockEditorView } from "@/features/note-block/note-block-editor-view";
 import { Button } from "@/ui/components/button";
 
 const DEFAULT_PLAYGROUND_MARKDOWN = `# Note Block Playground
@@ -94,11 +94,18 @@ export function NoteBlockPlaygroundPanel() {
         </Button>
       </div>
 
-      <NoteBlockCoreEditor
-        initialMarkdown={markdown}
+      <NoteBlockEditorView
         editorKey={editorKey}
+        initialMarkdown={markdown}
+        isDeleting={false}
+        isOnlyBlock={false}
+        onBlur={() => {}}
         onMarkdownUpdated={(latestMarkdown) => {
           setMarkdown(latestMarkdown);
+        }}
+        onDelete={() => {
+          setMarkdown("");
+          setEditorVersion((prevVersion) => prevVersion + 1);
         }}
       />
     </section>
