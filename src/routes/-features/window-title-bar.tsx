@@ -33,26 +33,26 @@ function HeaderActionButton() {
   );
 }
 
-function HeaderSampleButton() {
+function HeaderLabButton() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const onSamplePage = location.pathname === "/sample";
+  const onLabPage = location.pathname === "/lab";
 
   return (
     <Button
       size="icon"
       variant="ghost"
       onClick={() => {
-        void navigate({ to: onSamplePage ? "/" : "/sample" });
+        void navigate({ to: onLabPage ? "/" : "/lab" });
       }}
     >
-      {onSamplePage ? <HouseIcon /> : <FlaskConicalIcon />}
+      {onLabPage ? <HouseIcon /> : <FlaskConicalIcon />}
       <span className="sr-only">
-        {onSamplePage ? (
-          <Trans id="header.open-sample">Open sample</Trans>
+        {onLabPage ? (
+          <Trans id="header.open-lab">Open lab</Trans>
         ) : (
-          <Trans id="header.go-sample">Go to sample</Trans>
+          <Trans id="header.go-lab">Go to lab</Trans>
         )}
       </span>
     </Button>
@@ -96,7 +96,7 @@ export function WindowTitleBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
-          {import.meta.env.DEV ? <HeaderSampleButton /> : null}
+          {import.meta.env.DEV ? <HeaderLabButton /> : null}
           <HeaderActionButton />
         </div>
       </div>

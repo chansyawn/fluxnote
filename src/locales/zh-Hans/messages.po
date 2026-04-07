@@ -25,8 +25,13 @@ msgstr "返回首页"
 
 #. js-lingui-explicit-id
 #: src/routes/-features/window-title-bar.tsx:55
-msgid "header.go-sample"
-msgstr "前往示例页"
+msgid "header.go-lab"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/window-title-bar.tsx:53
+msgid "header.open-lab"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/routes/-features/window-title-bar.tsx:29
@@ -34,12 +39,7 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:53
-msgid "header.open-sample"
-msgstr "打开示例页"
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-screen.tsx:179
+#: src/routes/notes/$id/-features/note-page.tsx:70
 msgid "home-note.add-block"
 msgstr "新增区块"
 
@@ -49,19 +49,39 @@ msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-screen.tsx:138
-msgid "home-note.error.retry"
-msgstr "重试"
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-screen.tsx:128
-msgid "home-note.error.title"
-msgstr "加载笔记失败"
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-screen.tsx:116
+#: src/routes/notes/$id/-features/note-page.tsx:20
 msgid "home-note.loading"
 msgstr "正在加载你的笔记..."
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:20
+msgid "lab.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:47
+msgid "lab.overview.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:44
+msgid "lab.overview.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:32
+msgid "lab.tabs.overview"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:29
+msgid "lab.tabs.sample"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:17
+msgid "lab.title"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/routes/index.tsx:68
@@ -124,99 +144,89 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/index.tsx:19
-msgid "sample.description"
-msgstr "这是 clients、invoke、query 与 i18n 最佳实践的端到端示例。"
-
-#. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:58
+#: src/routes/lab/-features/sample-greet-panel.tsx:58
 msgid "sample.greet.description"
 msgstr "可尝试普通名称、空值、超长值或 `missing`，观察不同错误类型。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:127
+#: src/routes/lab/-features/sample-greet-panel.tsx:127
 msgid "sample.greet.error.details"
 msgstr "详细信息"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:120
+#: src/routes/lab/-features/sample-greet-panel.tsx:120
 msgid "sample.greet.error.message"
 msgstr "消息:"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:108
+#: src/routes/lab/-features/sample-greet-panel.tsx:108
 msgid "sample.greet.error.title"
 msgstr "结构化错误"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:114
+#: src/routes/lab/-features/sample-greet-panel.tsx:114
 msgid "sample.greet.error.type"
 msgstr "类型:"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:137
+#: src/routes/lab/-features/sample-greet-panel.tsx:137
 msgid "sample.greet.error.unknown"
 msgstr "未知错误结构。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:67
+#: src/routes/lab/-features/sample-greet-panel.tsx:67
 msgid "sample.greet.input.label"
 msgstr "名称"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:92
+#: src/routes/lab/-features/sample-greet-panel.tsx:92
 msgid "sample.greet.loading"
 msgstr "正在从 Rust 后端加载响应..."
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:81
+#: src/routes/lab/-features/sample-greet-panel.tsx:81
 msgid "sample.greet.submit"
 msgstr "执行 greet 查询"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:99
+#: src/routes/lab/-features/sample-greet-panel.tsx:99
 msgid "sample.greet.success.title"
 msgstr "成功"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:84
+#: src/routes/lab/-features/sample-greet-panel.tsx:84
 msgid "sample.greet.tip"
 msgstr "提示：试试 `missing` 或空值。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-greet-panel.tsx:55
+#: src/routes/lab/-features/sample-greet-panel.tsx:55
 msgid "sample.greet.title"
 msgstr "Query + Client + Invoke 示例"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-spec-panel.tsx:26
+#: src/routes/lab/-features/sample-spec-panel.tsx:26
 msgid "sample.spec.error"
 msgstr "错误语义：后端返回 `BUSINESS.*` 或 `INTERNAL`，并附带结构化 details。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-spec-panel.tsx:21
+#: src/routes/lab/-features/sample-spec-panel.tsx:21
 msgid "sample.spec.i18n"
 msgstr "国际化：所有面向用户的文案都使用稳定的 Lingui 显式 ID。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-spec-panel.tsx:11
+#: src/routes/lab/-features/sample-spec-panel.tsx:11
 msgid "sample.spec.layering"
 msgstr "分层：路由组件调用 `src/clients`，再由其调用 `@/app/invoke`。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-spec-panel.tsx:16
+#: src/routes/lab/-features/sample-spec-panel.tsx:16
 msgid "sample.spec.query"
 msgstr "数据流：TanStack Query 负责请求生命周期与缓存键变更。"
 
 #. js-lingui-explicit-id
-#: src/routes/sample/-features/sample-spec-panel.tsx:7
+#: src/routes/lab/-features/sample-spec-panel.tsx:7
 msgid "sample.spec.title"
 msgstr "本页展示的实践"
-
-#. js-lingui-explicit-id
-#: src/routes/sample/index.tsx:16
-msgid "sample.title"
-msgstr "基建示例"
 
 #. js-lingui-explicit-id
 #: src/routes/-features/window-title-bar.tsx:75
