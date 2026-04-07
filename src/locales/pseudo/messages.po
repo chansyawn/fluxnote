@@ -44,7 +44,7 @@ msgid "home-note.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor.tsx:168
+#: src/features/note-block/note-block-editor.tsx:137
 msgid "home-note.block.delete"
 msgstr ""
 
@@ -54,32 +54,37 @@ msgid "home-note.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:20
+#: src/routes/lab/index.tsx:21
 msgid "lab.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:47
-msgid "lab.overview.description"
+#: src/routes/lab/-features/note-block-playground-panel.tsx:80
+msgid "lab.playground.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:44
-msgid "lab.overview.title"
+#: src/routes/lab/-features/note-block-playground-panel.tsx:93
+msgid "lab.playground.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:32
-msgid "lab.tabs.overview"
+#: src/routes/lab/-features/note-block-playground-panel.tsx:77
+msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:29
+#: src/routes/lab/index.tsx:33
+msgid "lab.tabs.playground"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/lab/index.tsx:30
 msgid "lab.tabs.sample"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/lab/index.tsx:17
+#: src/routes/lab/index.tsx:18
 msgid "lab.title"
 msgstr ""
 

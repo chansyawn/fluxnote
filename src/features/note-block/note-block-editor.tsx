@@ -1,6 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import { CrepeBuilder } from "@milkdown/crepe";
-import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircleIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useEffectEvent, useRef } from "react";
@@ -8,10 +6,9 @@ import { useDebouncedCallback } from "use-debounce";
 
 import { queryClient } from "@/app/query";
 import { type NoteBlock, type NoteDetail, updateNoteBlockContent } from "@/clients";
+import { NoteBlockCoreEditor } from "@/features/note-block/note-block-core-editor";
 import { noteDetailQueryKey } from "@/features/note-block/note-query-key";
 import { Button } from "@/ui/components/button";
-
-import "./milkdown.css";
 
 interface NoteBlockEditorProps {
   noteId: string;
@@ -36,34 +33,6 @@ function updateBlockInCache(noteId: string, updatedBlock: NoteBlock): void {
       blocks: current.blocks.map((block) => (block.id === updatedBlock.id ? updatedBlock : block)),
     };
   });
-}
-
-function NoteBlockMilkdown({
-  block,
-  onBlur,
-  onMarkdownUpdated,
-}: {
-  block: NoteBlock;
-  onBlur: () => void;
-  onMarkdownUpdated: (markdown: string) => void;
-}) {
-  useEditor(
-    (root) =>
-      new CrepeBuilder({
-        root,
-        defaultValue: block.content,
-      }).on((listener) => {
-        listener.markdownUpdated((_ctx, markdown) => {
-          onMarkdownUpdated(markdown);
-        });
-        listener.blur(() => {
-          onBlur();
-        });
-      }),
-    [block.id],
-  );
-
-  return <Milkdown />;
 }
 
 export function NoteBlockEditor({
@@ -171,13 +140,12 @@ export function NoteBlockEditor({
       </div>
 
       <div className="min-h-28 px-4 pb-4">
-        <MilkdownProvider>
-          <NoteBlockMilkdown
-            block={block}
-            onBlur={flushPendingSave}
-            onMarkdownUpdated={handleMarkdownUpdated}
-          />
-        </MilkdownProvider>
+        <NoteBlockCoreEditor
+          initialMarkdown={block.content}
+          editorKey={block.id}
+          onBlur={flushPendingSave}
+          onMarkdownUpdated={handleMarkdownUpdated}
+        />
       </div>
     </article>
   );

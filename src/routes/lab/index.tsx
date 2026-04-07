@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { NoteBlockPlaygroundPanel } from "@/routes/lab/-features/note-block-playground-panel";
 import { SampleGreetPanel } from "@/routes/lab/-features/sample-greet-panel";
 import { SampleSpecPanel } from "@/routes/lab/-features/sample-spec-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/components/tabs";
@@ -28,8 +29,8 @@ function RouteComponent() {
           <TabsTrigger value="sample">
             <Trans id="lab.tabs.sample">Sample</Trans>
           </TabsTrigger>
-          <TabsTrigger value="overview">
-            <Trans id="lab.tabs.overview">Overview</Trans>
+          <TabsTrigger value="playground">
+            <Trans id="lab.tabs.playground">Playground</Trans>
           </TabsTrigger>
         </TabsList>
 
@@ -38,17 +39,8 @@ function RouteComponent() {
           <SampleSpecPanel />
         </TabsContent>
 
-        <TabsContent value="overview" className="pt-2">
-          <section className="border-border/70 bg-card rounded-xl border p-4">
-            <h2 className="text-sm font-semibold">
-              <Trans id="lab.overview.title">About Lab</Trans>
-            </h2>
-            <p className="text-muted-foreground mt-2 text-xs">
-              <Trans id="lab.overview.description">
-                Use this workspace to host multiple demos and diagnostics in one place.
-              </Trans>
-            </p>
-          </section>
+        <TabsContent value="playground" className="pt-2">
+          <NoteBlockPlaygroundPanel />
         </TabsContent>
       </Tabs>
     </section>
