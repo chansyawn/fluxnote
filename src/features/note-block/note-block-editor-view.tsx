@@ -6,7 +6,6 @@ import { Button } from "@/ui/components/button";
 import { ButtonGroup } from "@/ui/components/button-group";
 
 interface NoteBlockEditorViewProps {
-  editorKey: string;
   initialMarkdown: string;
   isDeleting: boolean;
   isOnlyBlock: boolean;
@@ -16,7 +15,6 @@ interface NoteBlockEditorViewProps {
 }
 
 export function NoteBlockEditorView({
-  editorKey,
   initialMarkdown,
   isDeleting,
   isOnlyBlock,
@@ -49,7 +47,6 @@ export function NoteBlockEditorView({
       <div className="min-h-28 px-4 pt-4 pb-4">
         <NoteBlockCoreEditor
           initialMarkdown={initialMarkdown}
-          editorKey={editorKey}
           onBlur={onBlur}
           onMarkdownUpdated={onMarkdownUpdated}
         />

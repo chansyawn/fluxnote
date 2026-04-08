@@ -112,7 +112,6 @@ export function NoteBlockEditor({
 
   return (
     <NoteBlockEditorView
-      editorKey={block.id}
       initialMarkdown={block.content}
       isDeleting={isDeleting}
       isOnlyBlock={isOnlyBlock}
