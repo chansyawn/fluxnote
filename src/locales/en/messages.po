@@ -44,12 +44,12 @@ msgid "home-note.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:43
+#: src/features/note-block/note-block-editor-view.tsx:41
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-core-editor.tsx:34
+#: src/features/note-block/note-block-core-editor.tsx:37
 msgid "home-note.block.placeholder"
 msgstr "Write something..."
 
@@ -64,17 +64,17 @@ msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
 #. js-lingui-explicit-id
-#: src/routes/lab/-features/note-block-playground-panel.tsx:59
+#: src/routes/lab/-features/note-block-playground-panel.tsx:74
 msgid "lab.playground.description"
 msgstr "Frontend-only playground. Edit this preset markdown to verify note block behavior."
 
 #. js-lingui-explicit-id
-#: src/routes/lab/-features/note-block-playground-panel.tsx:72
+#: src/routes/lab/-features/note-block-playground-panel.tsx:87
 msgid "lab.playground.reset"
 msgstr "Reset preset"
 
 #. js-lingui-explicit-id
-#: src/routes/lab/-features/note-block-playground-panel.tsx:56
+#: src/routes/lab/-features/note-block-playground-panel.tsx:71
 msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 
