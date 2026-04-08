@@ -14,8 +14,12 @@ export const noteBlockLexicalTheme: EditorThemeClasses = {
   list: {
     ol: "note-block-editor__list note-block-editor__list--ordered",
     ul: "note-block-editor__list note-block-editor__list--unordered",
+    checklist: "note-block-editor__list note-block-editor__list--checklist",
     listitem: "note-block-editor__list-item",
+    listitemChecked: "note-block-editor__list-item note-block-editor__list-item--checked",
+    listitemUnchecked: "note-block-editor__list-item note-block-editor__list-item--unchecked",
     nested: {
+      list: "note-block-editor__list note-block-editor__list--nested",
       listitem: "note-block-editor__list-item--nested",
     },
   },
@@ -26,6 +30,14 @@ export const noteBlockLexicalTheme: EditorThemeClasses = {
     code: "note-block-editor__text--code",
   },
   code: "note-block-editor__code",
+  hr: "note-block-editor__hr",
+  hrSelected: "note-block-editor__hr--selected",
+  table: "note-block-editor__table",
+  tableRow: "note-block-editor__table-row",
+  tableCell: "note-block-editor__table-cell",
+  tableCellHeader: "note-block-editor__table-cell note-block-editor__table-cell--header",
+  tableCellSelected: "note-block-editor__table-cell--selected",
+  tableScrollableWrapper: "note-block-editor__table-scroll",
   codeHighlight: {
     atrule: "note-block-editor__token note-block-editor__token--keyword",
     attr: "note-block-editor__token note-block-editor__token--attr",

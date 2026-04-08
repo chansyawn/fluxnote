@@ -1,4 +1,5 @@
 import { CodeNode } from "@lexical/code";
+import { HorizontalRuleNode } from "@lexical/extension";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
@@ -12,11 +13,14 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { Trans } from "@lingui/react/macro";
 
 import { noteBlockLexicalTheme } from "@/features/note-block/note-block-lexical-theme";
 import { NOTE_BLOCK_MARKDOWN_TRANSFORMERS } from "@/features/note-block/note-block-markdown";
+import { NoteBlockTableShortcutPlugin } from "@/features/note-block/note-block-table-shortcut-plugin";
 
 import "./note-block-editor.css";
 
@@ -46,7 +50,18 @@ export function NoteBlockCoreEditor({
       initialConfig={{
         namespace: "note-block-editor",
         theme: noteBlockLexicalTheme,
-        nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode, CodeNode],
+        nodes: [
+          HeadingNode,
+          QuoteNode,
+          ListNode,
+          ListItemNode,
+          LinkNode,
+          CodeNode,
+          HorizontalRuleNode,
+          TableNode,
+          TableRowNode,
+          TableCellNode,
+        ],
         editorState: () => {
           $convertFromMarkdownString(initialMarkdown, NOTE_BLOCK_MARKDOWN_TRANSFORMERS);
         },
@@ -73,6 +88,8 @@ export function NoteBlockCoreEditor({
         <HistoryPlugin />
         <ListPlugin />
         <LinkPlugin />
+        <TablePlugin hasCellBackgroundColor={false} hasCellMerge={false} />
+        <NoteBlockTableShortcutPlugin />
         <MarkdownShortcutPlugin transformers={NOTE_BLOCK_MARKDOWN_TRANSFORMERS} />
         {autoFocus ? <AutoFocusPlugin /> : null}
         <OnChangePlugin

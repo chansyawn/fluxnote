@@ -25,6 +25,14 @@ This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code
 1. Ordered item one
 2. Ordered item two
 
+## Task List
+
+- [x] Shipped Lexical migration
+- [ ] Add richer GFM support
+- [ ] Revisit single-document editor later
+
+---
+
 ## Code Blocks
 
 \`\`\`ts
@@ -41,6 +49,14 @@ console.log(demoUser);
 pnpm install
 pnpm dev
 \`\`\`
+
+## Table
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| Paragraphs | Ready | Stable core support |
+| Task list | Ready | GFM syntax enabled |
+| Tables | In progress | Markdown round-trip focused |
 `;
 
 export function NoteBlockPlaygroundPanel() {

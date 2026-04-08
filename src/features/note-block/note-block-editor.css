@@ -61,8 +61,31 @@
   @apply list-decimal;
 }
 
+.note-block-editor__list--checklist,
+.note-block-editor__list--nested {
+  @apply list-none ps-0;
+}
+
 .note-block-editor__list-item {
   @apply ps-1 text-[15px]/7;
+}
+
+.note-block-editor__list-item--checked,
+.note-block-editor__list-item--unchecked {
+  @apply relative list-none ps-8;
+}
+
+.note-block-editor__list-item--checked::before,
+.note-block-editor__list-item--unchecked::before {
+  @apply border-border bg-background absolute start-0 top-2 size-4 rounded-[0.3rem] border content-[''];
+}
+
+.note-block-editor__list-item--checked::before {
+  @apply border-primary bg-primary;
+}
+
+.note-block-editor__list-item--checked::after {
+  @apply border-primary-foreground absolute start-[0.3rem] top-[0.46rem] h-2 w-1 rotate-45 border-r-2 border-b-2 content-[''];
 }
 
 .note-block-editor__list-item::marker {
@@ -93,8 +116,48 @@
   @apply bg-muted text-foreground my-4 block overflow-x-auto rounded-xl border px-4 py-3 font-mono text-sm/6;
 }
 
+.note-block-editor__hr {
+  @apply border-border my-5 block border-t;
+}
+
+.note-block-editor__hr--selected {
+  @apply border-primary ring-primary/25 rounded-sm ring-4;
+}
+
 .note-block-editor__link {
   @apply text-primary decoration-primary/35 hover:decoration-primary underline underline-offset-3 transition-colors;
+}
+
+.note-block-editor__table-scroll {
+  @apply my-4 overflow-x-auto rounded-xl border;
+}
+
+.note-block-editor__table {
+  @apply bg-background w-full min-w-full border-collapse text-sm/6;
+}
+
+.note-block-editor__table-row {
+  @apply border-border border-b;
+}
+
+.note-block-editor__table-cell {
+  @apply border-border min-w-32 border-e px-3 py-2 align-top;
+}
+
+.note-block-editor__table-cell--header {
+  @apply bg-muted/80 font-semibold;
+}
+
+.note-block-editor__table-cell--selected {
+  @apply bg-primary/10;
+}
+
+.note-block-editor__table-cell .note-block-editor__paragraph:not(:first-child) {
+  @apply mt-2;
+}
+
+.note-block-editor__table-cell .note-block-editor__paragraph {
+  @apply text-sm/6;
 }
 
 .note-block-editor__token--keyword,
