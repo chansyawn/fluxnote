@@ -22,7 +22,6 @@ import "./note-block-editor.css";
 
 interface NoteBlockCoreEditorProps {
   initialMarkdown: string;
-  editorKey: string;
   onMarkdownUpdated: (markdown: string) => void;
   onBlur?: () => void;
   autoFocus?: boolean;
@@ -38,14 +37,12 @@ function NoteBlockPlaceholder() {
 
 export function NoteBlockCoreEditor({
   initialMarkdown,
-  editorKey,
   onBlur,
   onMarkdownUpdated,
   autoFocus = false,
 }: NoteBlockCoreEditorProps) {
   return (
     <LexicalComposer
-      key={editorKey}
       initialConfig={{
         namespace: "note-block-editor",
         theme: noteBlockLexicalTheme,

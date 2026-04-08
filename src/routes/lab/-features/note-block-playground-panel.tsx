@@ -46,7 +46,6 @@ pnpm dev
 export function NoteBlockPlaygroundPanel() {
   const [markdown, setMarkdown] = useState(DEFAULT_PLAYGROUND_MARKDOWN);
   const [editorVersion, setEditorVersion] = useState(0);
-  const editorKey = `lab-note-block-playground-${editorVersion}`;
 
   return (
     <section className="flex flex-col gap-3">
@@ -74,7 +73,7 @@ export function NoteBlockPlaygroundPanel() {
       </div>
 
       <NoteBlockEditorView
-        editorKey={editorKey}
+        key={editorVersion}
         initialMarkdown={markdown}
         isDeleting={false}
         isOnlyBlock={false}
