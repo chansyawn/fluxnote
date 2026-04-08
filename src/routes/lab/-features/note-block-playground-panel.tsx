@@ -4,16 +4,14 @@ import { useState } from "react";
 import { NoteBlockEditorView } from "@/features/note-block/note-block-editor-view";
 import { Button } from "@/ui/components/button";
 
-const DEFAULT_PLAYGROUND_MARKDOWN = `# Note Block Playground
+const DEFAULT_PLAYGROUND_MARKDOWN = `# Heading 1
 
-## Headings
-### H3 heading
+## Heading 2
+### Heading 3
 
 This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code\`.
 
-> Blockquote with a [link](https://example.com) and an image:
->
-> ![Sample image](https://picsum.photos/320/160)
+> Blockquote with a [link](https://example.com).
 
 ---
 
@@ -26,17 +24,6 @@ This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code
 
 1. Ordered item one
 2. Ordered item two
-
-- [x] Completed task
-- [ ] Incomplete task
-
-## Table (GFM)
-
-| Syntax | Support | Notes |
-| --- | --- | --- |
-| CommonMark | Yes | Paragraph, list, quote |
-| GFM | Yes | Table, task list, strike |
-| LaTeX | Yes | Inline and block math |
 
 ## Code Blocks
 
@@ -54,14 +41,6 @@ console.log(demoUser);
 pnpm install
 pnpm dev
 \`\`\`
-
-## Math
-
-Inline math: $E = mc^2$ and $a^2 + b^2 = c^2$.
-
-$$
-\\int_0^1 x^2 \\; dx = \\frac{1}{3}
-$$
 `;
 
 export function NoteBlockPlaygroundPanel() {

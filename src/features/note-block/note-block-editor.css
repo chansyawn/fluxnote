@@ -1,0 +1,137 @@
+@reference "#global.css";
+
+.note-block-editor {
+  @apply relative;
+}
+
+.note-block-editor__input {
+  @apply text-foreground min-h-20 resize-none text-[15px]/7 outline-none;
+}
+
+.note-block-editor__placeholder {
+  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 text-[15px]/7;
+}
+
+.note-block-editor__paragraph {
+  @apply my-0;
+}
+
+.note-block-editor__paragraph:not(:first-child) {
+  @apply mt-3;
+}
+
+.note-block-editor__heading {
+  @apply font-heading text-foreground font-semibold tracking-tight;
+}
+
+.note-block-editor__heading--h1 {
+  @apply mt-6 mb-2 text-3xl/9 first:mt-0;
+}
+
+.note-block-editor__heading--h2 {
+  @apply mt-5 mb-2 text-2xl/8 first:mt-0;
+}
+
+.note-block-editor__heading--h3 {
+  @apply mt-4 mb-2 text-xl/7 first:mt-0;
+}
+
+.note-block-editor__heading--h4 {
+  @apply mt-4 mb-2 text-lg/7 first:mt-0;
+}
+
+.note-block-editor__heading--h5,
+.note-block-editor__heading--h6 {
+  @apply mt-3 mb-2 text-base/7 first:mt-0;
+}
+
+.note-block-editor__quote {
+  @apply border-border text-muted-foreground my-4 border-s-4 ps-4 text-[15px]/7 italic;
+}
+
+.note-block-editor__list {
+  @apply my-3 ps-6;
+}
+
+.note-block-editor__list--unordered {
+  @apply list-disc;
+}
+
+.note-block-editor__list--ordered {
+  @apply list-decimal;
+}
+
+.note-block-editor__list-item {
+  @apply ps-1 text-[15px]/7;
+}
+
+.note-block-editor__list-item::marker {
+  @apply text-muted-foreground;
+}
+
+.note-block-editor__list-item--nested {
+  @apply mt-2;
+}
+
+.note-block-editor__text--bold {
+  @apply font-semibold;
+}
+
+.note-block-editor__text--italic {
+  @apply italic;
+}
+
+.note-block-editor__text--strikethrough {
+  @apply line-through;
+}
+
+.note-block-editor__text--code {
+  @apply bg-muted rounded px-1.5 py-0.5 font-mono text-[0.9em];
+}
+
+.note-block-editor__code {
+  @apply bg-muted text-foreground my-4 block overflow-x-auto rounded-xl border px-4 py-3 font-mono text-sm/6;
+}
+
+.note-block-editor__link {
+  @apply text-primary decoration-primary/35 hover:decoration-primary underline underline-offset-3 transition-colors;
+}
+
+.note-block-editor__token--keyword,
+.note-block-editor__token--tag {
+  @apply text-orange-600 dark:text-orange-300;
+}
+
+.note-block-editor__token--attr,
+.note-block-editor__token--property,
+.note-block-editor__token--class,
+.note-block-editor__token--function {
+  @apply text-sky-700 dark:text-sky-300;
+}
+
+.note-block-editor__token--string,
+.note-block-editor__token--selector,
+.note-block-editor__token--inserted {
+  @apply text-emerald-700 dark:text-emerald-300;
+}
+
+.note-block-editor__token--number,
+.note-block-editor__token--constant,
+.note-block-editor__token--builtin,
+.note-block-editor__token--variable {
+  @apply text-fuchsia-700 dark:text-fuchsia-300;
+}
+
+.note-block-editor__token--comment {
+  @apply text-muted-foreground italic;
+}
+
+.note-block-editor__token--operator,
+.note-block-editor__token--punctuation {
+  @apply text-foreground/75;
+}
+
+.note-block-editor__token--deleted,
+.note-block-editor__token--regex {
+  @apply text-rose-700 dark:text-rose-300;
+}
