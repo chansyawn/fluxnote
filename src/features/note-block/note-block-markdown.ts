@@ -223,6 +223,7 @@ function createTableNodeFromMarkdown(rootNode: ElementNode, lines: string[]): vo
   rootNode.append(createTableNodeFromMarkdownLines(lines));
 }
 
+// Keeps horizontal rules in the same markdown pipeline as the rest of the note block content.
 const HORIZONTAL_RULE_TRANSFORMER: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
   export: (node) => {
@@ -243,6 +244,7 @@ const HORIZONTAL_RULE_TRANSFORMER: ElementTransformer = {
   type: "element",
 };
 
+// Imports and exports GitHub-style markdown tables as Lexical table nodes.
 const TABLE_TRANSFORMER: MultilineElementTransformer = {
   dependencies: [TableNode, TableRowNode, TableCellNode],
   export: (node, traverseChildren) => {

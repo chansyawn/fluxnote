@@ -37,6 +37,7 @@ function focusFirstBodyCell(tableNode: ReturnType<typeof createTableNodeFromMark
   tableNode.selectStart();
 }
 
+// Converts a markdown table header + divider into a real Lexical table when Enter is pressed.
 export function NoteBlockTableShortcutPlugin() {
   const [editor] = useLexicalComposerContext();
 
