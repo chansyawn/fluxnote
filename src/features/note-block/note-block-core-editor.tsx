@@ -4,6 +4,7 @@ import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -87,6 +88,7 @@ export function NoteBlockCoreEditor({
         />
         <HistoryPlugin />
         <ListPlugin />
+        <CheckListPlugin disableTakeFocusOnClick />
         <LinkPlugin />
         <TablePlugin hasCellBackgroundColor={false} hasCellMerge={false} />
         <NoteBlockTableShortcutPlugin />
