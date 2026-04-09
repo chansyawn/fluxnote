@@ -27,9 +27,9 @@ This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code
 
 ## Task List
 
-- [x] Shipped Lexical migration
-- [ ] Add richer GFM support
-- [ ] Revisit single-document editor later
+[x] Shipped Lexical migration
+[ ] Add richer GFM support
+[ ] Revisit single-document editor later
 
 ---
 
