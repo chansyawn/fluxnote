@@ -177,6 +177,7 @@ function areSelectionRectsEqual(
   });
 }
 
+// Replaces the browser's block-level selection paint with text-only highlight rects.
 export function NoteBlockSelectionOverlayPlugin() {
   const [editor] = useLexicalComposerContext();
   const [selectionRects, setSelectionRects] = useState<SelectionRect[]>([]);
