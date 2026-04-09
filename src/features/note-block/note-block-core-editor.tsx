@@ -21,6 +21,7 @@ import { Trans } from "@lingui/react/macro";
 
 import { noteBlockLexicalTheme } from "@/features/note-block/note-block-lexical-theme";
 import { NOTE_BLOCK_MARKDOWN_TRANSFORMERS } from "@/features/note-block/note-block-markdown";
+import { NoteBlockSelectionOverlayPlugin } from "@/features/note-block/note-block-selection-overlay-plugin";
 import { NoteBlockTableShortcutPlugin } from "@/features/note-block/note-block-table-shortcut-plugin";
 
 import "./note-block-editor.css";
@@ -72,6 +73,7 @@ export function NoteBlockCoreEditor({
       }}
     >
       <div className="note-block-editor">
+        <NoteBlockSelectionOverlayPlugin />
         <RichTextPlugin
           contentEditable={
             <ContentEditable
