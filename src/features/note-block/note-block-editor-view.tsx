@@ -23,7 +23,7 @@ export function NoteBlockEditorView({
   onDelete,
 }: NoteBlockEditorViewProps) {
   return (
-    <article className="group border-border/60 bg-background/20 relative rounded-xl border">
+    <article className="group border-border bg-card relative rounded-xl border">
       <div className="pointer-events-none absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
         <ButtonGroup>
           <Button
