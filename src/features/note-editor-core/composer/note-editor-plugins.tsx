@@ -11,12 +11,19 @@ import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/m
 import { NoteEditorSelectionOverlayPlugin } from "@/features/note-editor-core/selection/note-editor-selection-overlay-plugin";
 import { NoteEditorTableShortcutPlugin } from "@/features/note-editor-core/table/note-editor-table-shortcut-plugin";
 
+import { NoteEditorFocusPlugin } from "./note-editor-focus-plugin";
+
 interface NoteEditorPluginsProps {
   autoFocus: boolean;
+  focusRequestKey: number;
   onMarkdownUpdated: (markdown: string) => void;
 }
 
-export function NoteEditorPlugins({ autoFocus, onMarkdownUpdated }: NoteEditorPluginsProps) {
+export function NoteEditorPlugins({
+  autoFocus,
+  focusRequestKey,
+  onMarkdownUpdated,
+}: NoteEditorPluginsProps) {
   return (
     <>
       <NoteEditorSelectionOverlayPlugin />
@@ -27,6 +34,7 @@ export function NoteEditorPlugins({ autoFocus, onMarkdownUpdated }: NoteEditorPl
       <NoteEditorTableShortcutPlugin />
       <MarkdownShortcutPlugin transformers={NOTE_EDITOR_MARKDOWN_TRANSFORMERS} />
       {autoFocus ? <AutoFocusPlugin /> : null}
+      <NoteEditorFocusPlugin focusRequestKey={focusRequestKey} />
       <OnChangePlugin
         ignoreHistoryMergeTagChange
         ignoreSelectionChange

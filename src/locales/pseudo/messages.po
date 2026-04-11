@@ -39,12 +39,12 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:69
+#: src/routes/notes/$id/-features/note-page.tsx:78
 msgid "home-note.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:41
+#: src/features/note-block/note-block-editor-view.tsx:51
 msgid "home-note.block.delete"
 msgstr ""
 
@@ -54,7 +54,7 @@ msgid "home-note.block.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:19
+#: src/routes/notes/$id/-features/note-page.tsx:20
 msgid "home-note.loading"
 msgstr ""
 
@@ -109,27 +109,87 @@ msgid "note.route.initializing"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:37
+#: src/routes/preferences.tsx:38
 msgid "preferences.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:44
+#: src/routes/preferences.tsx:45
 msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:77
+#: src/routes/preferences.tsx:78
 msgid "preferences.rtl.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:74
+#: src/routes/preferences.tsx:75
 msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:34
+#: src/features/shortcut/shortcut-settings-section.tsx:249
+msgid "preferences.shortcuts.clear"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:31
+msgid "preferences.shortcuts.create-block.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:35
+msgid "preferences.shortcuts.delete-block.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:141
+msgid "preferences.shortcuts.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:205
+msgid "preferences.shortcuts.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:43
+msgid "preferences.shortcuts.error.duplicate"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:53
+msgid "preferences.shortcuts.error.invalid"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:63
+msgid "preferences.shortcuts.error.unavailable"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:195
+msgid "preferences.shortcuts.recording"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:228
+msgid "preferences.shortcuts.reset"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:138
+msgid "preferences.shortcuts.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:27
+msgid "preferences.shortcuts.toggle-window.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:35
 msgid "preferences.title"
 msgstr ""
 

@@ -5,6 +5,7 @@ import { DirectionStateProvider } from "@/app/direction";
 import { I18nStateProvider } from "@/app/i18n";
 import { queryClient } from "@/app/query";
 import { ThemeStateProvider } from "@/app/theme";
+import { ShortcutStateProvider } from "@/features/shortcut/shortcut-state";
 import { routeTree } from "@/route-tree.gen";
 
 const router = createRouter({ routeTree });
@@ -20,9 +21,11 @@ export function App() {
     <ThemeStateProvider>
       <I18nStateProvider>
         <QueryClientProvider client={queryClient}>
-          <DirectionStateProvider>
-            <RouterProvider router={router} />
-          </DirectionStateProvider>
+          <ShortcutStateProvider>
+            <DirectionStateProvider>
+              <RouterProvider router={router} />
+            </DirectionStateProvider>
+          </ShortcutStateProvider>
         </QueryClientProvider>
       </I18nStateProvider>
     </ThemeStateProvider>

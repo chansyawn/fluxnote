@@ -20,6 +20,7 @@ interface NoteEditorShellProps {
   onBlur?: () => void;
   autoFocus?: boolean;
   editable?: boolean;
+  focusRequestKey?: number;
 }
 
 export function NoteEditorShell({
@@ -28,6 +29,7 @@ export function NoteEditorShell({
   onMarkdownUpdated,
   autoFocus = false,
   editable = true,
+  focusRequestKey = 0,
 }: NoteEditorShellProps) {
   return (
     <LexicalComposer
@@ -60,7 +62,11 @@ export function NoteEditorShell({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <HistoryPlugin />
-        <NoteEditorPlugins autoFocus={autoFocus} onMarkdownUpdated={onMarkdownUpdated} />
+        <NoteEditorPlugins
+          autoFocus={autoFocus}
+          focusRequestKey={focusRequestKey}
+          onMarkdownUpdated={onMarkdownUpdated}
+        />
       </div>
     </LexicalComposer>
   );

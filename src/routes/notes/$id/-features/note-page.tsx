@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
 import { useNotePage } from "@/routes/notes/$id/-features/use-note-page";
+import { useNoteShortcuts } from "@/routes/notes/$id/-features/use-note-shortcuts";
 import { Button } from "@/ui/components/button";
 
 interface NotePageProps {
@@ -28,6 +29,12 @@ export function NotePage({ noteId, onMissingNote }: NotePageProps) {
       noteId,
       onMissingNote,
     });
+  const { createBlockWithFocus, deleteBlockWithFocus, focusRequest, setActiveBlockId } =
+    useNoteShortcuts({
+      noteDetail,
+      createBlock,
+      deleteBlock,
+    });
 
   if (isLoading) {
     return <LoadingState />;
@@ -44,10 +51,12 @@ export function NotePage({ noteId, onMissingNote }: NotePageProps) {
             key={block.id}
             noteId={noteId}
             block={block}
+            focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
             isDeleting={deletingBlockId === block.id}
             isOnlyBlock={noteDetail.blocks.length === 1}
+            onFocus={setActiveBlockId}
             onDelete={async (blockId: string) => {
-              await deleteBlock(blockId);
+              await deleteBlockWithFocus(blockId);
             }}
           />
         ))}
@@ -58,7 +67,7 @@ export function NotePage({ noteId, onMissingNote }: NotePageProps) {
           className="gap-2"
           disabled={isCreatingBlock}
           onClick={() => {
-            void createBlock(noteDetail.note.id);
+            void createBlockWithFocus();
           }}
         >
           {isCreatingBlock ? (

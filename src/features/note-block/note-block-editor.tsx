@@ -10,9 +10,11 @@ import { noteDetailQueryKey } from "@/features/note-block/note-query-key";
 interface NoteBlockEditorProps {
   noteId: string;
   block: NoteBlock;
+  focusRequestKey: number;
   isDeleting: boolean;
   isOnlyBlock: boolean;
   onDelete: (blockId: string) => Promise<void>;
+  onFocus: (blockId: string) => void;
 }
 
 function updateBlockInCache(noteId: string, updatedBlock: NoteBlock): void {
@@ -35,9 +37,11 @@ function updateBlockInCache(noteId: string, updatedBlock: NoteBlock): void {
 export function NoteBlockEditor({
   noteId,
   block,
+  focusRequestKey,
   isDeleting,
   isOnlyBlock,
   onDelete,
+  onFocus,
 }: NoteBlockEditorProps) {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
@@ -112,6 +116,8 @@ export function NoteBlockEditor({
 
   return (
     <NoteBlockEditorView
+      blockId={block.id}
+      focusRequestKey={focusRequestKey}
       initialMarkdown={block.content}
       isDeleting={isDeleting}
       isOnlyBlock={isOnlyBlock}
@@ -119,6 +125,9 @@ export function NoteBlockEditor({
       onMarkdownUpdated={handleMarkdownUpdated}
       onDelete={() => {
         void onDelete(block.id);
+      }}
+      onFocus={() => {
+        onFocus(block.id);
       }}
     />
   );
