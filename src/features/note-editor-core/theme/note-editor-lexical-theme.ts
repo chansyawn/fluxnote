@@ -1,6 +1,6 @@
 import type { EditorThemeClasses } from "lexical";
 
-export const noteBlockLexicalTheme: EditorThemeClasses = {
+export const noteEditorLexicalTheme: EditorThemeClasses = {
   paragraph: "note-block-editor__paragraph",
   quote: "note-block-editor__quote",
   heading: {

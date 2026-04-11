@@ -223,7 +223,6 @@ function createTableNodeFromMarkdown(rootNode: ElementNode, lines: string[]): vo
   rootNode.append(createTableNodeFromMarkdownLines(lines));
 }
 
-// Keeps horizontal rules in the same markdown pipeline as the rest of the note block content.
 const HORIZONTAL_RULE_TRANSFORMER: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
   export: (node) => {
@@ -244,7 +243,6 @@ const HORIZONTAL_RULE_TRANSFORMER: ElementTransformer = {
   type: "element",
 };
 
-// Imports and exports GitHub-style markdown tables as Lexical table nodes.
 const TABLE_TRANSFORMER: MultilineElementTransformer = {
   dependencies: [TableNode, TableRowNode, TableCellNode],
   export: (node, traverseChildren) => {
@@ -276,20 +274,20 @@ const TABLE_TRANSFORMER: MultilineElementTransformer = {
   type: "multiline-element",
 };
 
-const NOTE_BLOCK_ELEMENT_TRANSFORMERS: Transformer[] = [
+const NOTE_EDITOR_ELEMENT_TRANSFORMERS: Transformer[] = [
   ...ELEMENT_TRANSFORMERS,
   CHECK_LIST,
   HORIZONTAL_RULE_TRANSFORMER,
 ];
 
-const NOTE_BLOCK_MULTILINE_TRANSFORMERS: Transformer[] = [
+const NOTE_EDITOR_MULTILINE_TRANSFORMERS: Transformer[] = [
   ...MULTILINE_ELEMENT_TRANSFORMERS,
   TABLE_TRANSFORMER,
 ];
 
-export const NOTE_BLOCK_MARKDOWN_TRANSFORMERS: Transformer[] = [
-  ...NOTE_BLOCK_ELEMENT_TRANSFORMERS,
-  ...NOTE_BLOCK_MULTILINE_TRANSFORMERS,
+export const NOTE_EDITOR_MARKDOWN_TRANSFORMERS: Transformer[] = [
+  ...NOTE_EDITOR_ELEMENT_TRANSFORMERS,
+  ...NOTE_EDITOR_MULTILINE_TRANSFORMERS,
   ...TEXT_FORMAT_TRANSFORMERS,
   ...TEXT_MATCH_TRANSFORMERS,
 ];

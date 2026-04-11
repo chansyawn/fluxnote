@@ -15,7 +15,7 @@ import {
   createTableNodeFromMarkdownLines,
   isMarkdownTableDividerRow,
   isMarkdownTableRow,
-} from "@/features/note-block-core/note-block-markdown";
+} from "@/features/note-editor-core/markdown/note-editor-markdown";
 
 function focusFirstBodyCell(tableNode: ReturnType<typeof createTableNodeFromMarkdownLines>): void {
   const firstBodyRow = tableNode.getChildren().find((child, index): child is TableRowNode => {
@@ -37,8 +37,7 @@ function focusFirstBodyCell(tableNode: ReturnType<typeof createTableNodeFromMark
   tableNode.selectStart();
 }
 
-// Converts a markdown table header + divider into a real Lexical table when Enter is pressed.
-export function NoteBlockTableShortcutPlugin() {
+export function NoteEditorTableShortcutPlugin() {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
