@@ -1,10 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ReactNode } from "react";
 
 import { useDirectionState } from "@/app/direction";
 import { isLocaleCode, useI18nState } from "@/app/i18n";
-import { THEME_MODES, type ThemeMode, isThemeMode, useThemeState } from "@/app/theme";
 import {
   Select,
   SelectContent,
@@ -19,25 +17,14 @@ export const Route = createFileRoute("/preferences")({
   component: RouteComponent,
 });
 
-const themeLabelMap: Record<ThemeMode, ReactNode> = {
-  light: <Trans id="preferences.theme.light">Light</Trans>,
-  dark: <Trans id="preferences.theme.dark">Dark</Trans>,
-  system: <Trans id="preferences.theme.system">System</Trans>,
-};
-
 function RouteComponent() {
   const { locale, setLocale, localeOptions, isPseudoLocale } = useI18nState();
-  const { themeMode, setThemeMode } = useThemeState();
   const { rtlEnabled, setRtlEnabled } = useDirectionState();
 
   const showRtlSwitch = import.meta.env.DEV && isPseudoLocale;
   const languageItems = localeOptions.map((localeOption) => ({
     value: localeOption.key,
     label: localeOption.name,
-  }));
-  const themeItems = THEME_MODES.map((mode) => ({
-    value: mode,
-    label: themeLabelMap[mode],
   }));
 
   return (
@@ -47,7 +34,7 @@ function RouteComponent() {
           <Trans id="preferences.title">Preferences</Trans>
         </h1>
         <p className="text-muted-foreground text-xs">
-          <Trans id="preferences.description">Configure language and appearance.</Trans>
+          <Trans id="preferences.description">Configure language and layout.</Trans>
         </p>
       </div>
 
@@ -73,34 +60,6 @@ function RouteComponent() {
                 {localeOptions.map((localeOption) => (
                   <SelectItem key={localeOption.key} value={localeOption.key}>
                     {localeOption.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </label>
-
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium">
-            <Trans id="preferences.theme.label">Theme</Trans>
-          </span>
-          <Select
-            items={themeItems}
-            value={themeMode}
-            onValueChange={(value) => {
-              if (value && isThemeMode(value)) {
-                setThemeMode(value);
-              }
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end" alignItemWithTrigger={false}>
-              <SelectGroup>
-                {THEME_MODES.map((mode) => (
-                  <SelectItem key={mode} value={mode}>
-                    {themeLabelMap[mode]}
                   </SelectItem>
                 ))}
               </SelectGroup>

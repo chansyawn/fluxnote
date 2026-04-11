@@ -109,47 +109,27 @@ msgid "note.route.initializing"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:50
+#: src/routes/preferences.tsx:37
 msgid "preferences.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:57
+#: src/routes/preferences.tsx:44
 msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:118
+#: src/routes/preferences.tsx:77
 msgid "preferences.rtl.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:115
+#: src/routes/preferences.tsx:74
 msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:24
-msgid "preferences.theme.dark"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:85
-msgid "preferences.theme.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:23
-msgid "preferences.theme.light"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:25
-msgid "preferences.theme.system"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:47
+#: src/routes/preferences.tsx:34
 msgid "preferences.title"
 msgstr ""
 

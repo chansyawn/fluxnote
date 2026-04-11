@@ -1,19 +1,7 @@
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 const STORAGE_KEY_THEME = "fluxnote.theme";
-
-export const THEME_MODES = ["light", "dark", "system"] as const;
-export type ThemeMode = (typeof THEME_MODES)[number];
-
-const themeModeAtom = atomWithStorage<ThemeMode>(STORAGE_KEY_THEME, "system", undefined, {
-  getOnInit: true,
-});
-
-export function isThemeMode(value: string): value is ThemeMode {
-  return (THEME_MODES as readonly string[]).includes(value);
-}
+export type ThemeMode = "system";
 
 type ThemeContextValue = {
   themeMode: ThemeMode;
@@ -28,8 +16,11 @@ type ThemeStateProviderProps = {
 };
 
 export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
-  const [themeMode, setThemeModeState] = useAtom(themeModeAtom);
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
+  // macOS vibrancy does not reliably follow an app-forced light/dark override,
+  // so FluxNote stays pinned to the OS appearance to keep window chrome and
+  // document surfaces visually consistent.
+  const themeMode: ThemeMode = "system";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -45,7 +36,13 @@ export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
     };
   }, []);
 
-  const resolvedTheme = themeMode === "system" ? (systemPrefersDark ? "dark" : "light") : themeMode;
+  useEffect(() => {
+    // Overwrite older persisted overrides so returning users immediately fall
+    // back to the system-resolved theme instead of a stale manual preference.
+    window.localStorage.setItem(STORAGE_KEY_THEME, "system");
+  }, []);
+
+  const resolvedTheme = systemPrefersDark ? "dark" : "light";
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
@@ -54,12 +51,10 @@ export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
   const contextValue = useMemo<ThemeContextValue>(
     () => ({
       themeMode,
-      setThemeMode: (nextThemeMode) => {
-        setThemeModeState(nextThemeMode);
-      },
+      setThemeMode: () => {},
       resolvedTheme,
     }),
-    [resolvedTheme, setThemeModeState, themeMode],
+    [resolvedTheme],
   );
 
   return <ThemeStateContext.Provider value={contextValue}>{children}</ThemeStateContext.Provider>;
