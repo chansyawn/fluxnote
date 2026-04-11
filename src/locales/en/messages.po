@@ -129,62 +129,62 @@ msgid "preferences.rtl.label"
 msgstr "Right-to-left layout"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:249
+#: src/features/shortcut/shortcut-input.tsx:132
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:31
+#: src/features/shortcut/shortcut-settings-section.tsx:24
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:35
+#: src/features/shortcut/shortcut-settings-section.tsx:28
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:141
+#: src/features/shortcut/shortcut-settings-section.tsx:52
 msgid "preferences.shortcuts.description"
 msgstr "Configure the global shortcut and in-app block shortcuts."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:205
+#: src/features/shortcut/shortcut-input.tsx:111
 msgid "preferences.shortcuts.empty"
 msgstr "Not set"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:43
+#: src/features/shortcut/shortcut-input.tsx:28
 msgid "preferences.shortcuts.error.duplicate"
 msgstr "This shortcut is already assigned to another action."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:53
+#: src/features/shortcut/shortcut-input.tsx:38
 msgid "preferences.shortcuts.error.invalid"
 msgstr "Use at least one modifier key with a supported key."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:63
+#: src/features/shortcut/shortcut-input.tsx:48
 msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:195
+#: src/features/shortcut/shortcut-input.tsx:99
 msgid "preferences.shortcuts.recording"
 msgstr "Press keys"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:228
+#: src/features/shortcut/shortcut-input.tsx:123
 msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:138
+#: src/features/shortcut/shortcut-settings-section.tsx:49
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:27
+#: src/features/shortcut/shortcut-settings-section.tsx:20
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
