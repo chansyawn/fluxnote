@@ -129,62 +129,62 @@ msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:249
+#: src/features/shortcut/shortcut-input.tsx:132
 msgid "preferences.shortcuts.clear"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:31
+#: src/features/shortcut/shortcut-settings-section.tsx:24
 msgid "preferences.shortcuts.create-block.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:35
+#: src/features/shortcut/shortcut-settings-section.tsx:28
 msgid "preferences.shortcuts.delete-block.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:141
+#: src/features/shortcut/shortcut-settings-section.tsx:52
 msgid "preferences.shortcuts.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:205
+#: src/features/shortcut/shortcut-input.tsx:111
 msgid "preferences.shortcuts.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:43
+#: src/features/shortcut/shortcut-input.tsx:28
 msgid "preferences.shortcuts.error.duplicate"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:53
+#: src/features/shortcut/shortcut-input.tsx:38
 msgid "preferences.shortcuts.error.invalid"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:63
+#: src/features/shortcut/shortcut-input.tsx:48
 msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:195
+#: src/features/shortcut/shortcut-input.tsx:99
 msgid "preferences.shortcuts.recording"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:228
+#: src/features/shortcut/shortcut-input.tsx:123
 msgid "preferences.shortcuts.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:138
+#: src/features/shortcut/shortcut-settings-section.tsx:49
 msgid "preferences.shortcuts.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:27
+#: src/features/shortcut/shortcut-settings-section.tsx:20
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr ""
 

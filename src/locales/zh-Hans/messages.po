@@ -129,64 +129,64 @@ msgid "preferences.rtl.label"
 msgstr "从右到左布局"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:249
+#: src/features/shortcut/shortcut-input.tsx:132
 msgid "preferences.shortcuts.clear"
-msgstr ""
+msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:31
+#: src/features/shortcut/shortcut-settings-section.tsx:24
 msgid "preferences.shortcuts.create-block.label"
-msgstr ""
+msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:35
+#: src/features/shortcut/shortcut-settings-section.tsx:28
 msgid "preferences.shortcuts.delete-block.label"
-msgstr ""
+msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:141
+#: src/features/shortcut/shortcut-settings-section.tsx:52
 msgid "preferences.shortcuts.description"
-msgstr ""
+msgstr "配置全局快捷键和应用内区块快捷键。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:205
+#: src/features/shortcut/shortcut-input.tsx:111
 msgid "preferences.shortcuts.empty"
-msgstr ""
+msgstr "未设置"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:43
+#: src/features/shortcut/shortcut-input.tsx:28
 msgid "preferences.shortcuts.error.duplicate"
-msgstr ""
+msgstr "该快捷键已分配给其他操作。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:53
+#: src/features/shortcut/shortcut-input.tsx:38
 msgid "preferences.shortcuts.error.invalid"
-msgstr ""
+msgstr "请至少使用一个修饰键和一个受支持的按键。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:63
+#: src/features/shortcut/shortcut-input.tsx:48
 msgid "preferences.shortcuts.error.unavailable"
-msgstr ""
+msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:195
+#: src/features/shortcut/shortcut-input.tsx:99
 msgid "preferences.shortcuts.recording"
-msgstr ""
+msgstr "按下按键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:228
+#: src/features/shortcut/shortcut-input.tsx:123
 msgid "preferences.shortcuts.reset"
-msgstr ""
+msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:138
+#: src/features/shortcut/shortcut-settings-section.tsx:49
 msgid "preferences.shortcuts.title"
-msgstr ""
+msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:27
+#: src/features/shortcut/shortcut-settings-section.tsx:20
 msgid "preferences.shortcuts.toggle-window.label"
-msgstr ""
+msgstr "开启/关闭窗口"
 
 #. js-lingui-explicit-id
 #: src/routes/preferences.tsx:35

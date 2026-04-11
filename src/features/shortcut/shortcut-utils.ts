@@ -137,6 +137,30 @@ function getKeyTokenFromKeyboardEvent(event: KeyboardEvent | ReactKeyboardEvent)
   return normalizeKeyToken(rawKey);
 }
 
+function getModifierTokensFromKeyboardEvent(
+  event: KeyboardEvent | ReactKeyboardEvent,
+): ShortcutModifier[] {
+  const modifiers: ShortcutModifier[] = [];
+
+  if (event.metaKey) {
+    modifiers.push("Command");
+  }
+
+  if (event.ctrlKey) {
+    modifiers.push("Control");
+  }
+
+  if (event.altKey) {
+    modifiers.push("Alt");
+  }
+
+  if (event.shiftKey) {
+    modifiers.push("Shift");
+  }
+
+  return modifiers;
+}
+
 export function normalizeShortcut(shortcut: string): string | null {
   const segments = shortcut
     .split("+")
@@ -175,23 +199,7 @@ export function normalizeShortcut(shortcut: string): string | null {
 export function getShortcutFromKeyboardEvent(
   event: KeyboardEvent | ReactKeyboardEvent,
 ): string | null {
-  const modifiers: ShortcutModifier[] = [];
-
-  if (event.metaKey) {
-    modifiers.push("Command");
-  }
-
-  if (event.ctrlKey) {
-    modifiers.push("Control");
-  }
-
-  if (event.altKey) {
-    modifiers.push("Alt");
-  }
-
-  if (event.shiftKey) {
-    modifiers.push("Shift");
-  }
+  const modifiers = getModifierTokensFromKeyboardEvent(event);
 
   const keyToken = getKeyTokenFromKeyboardEvent(event);
 
@@ -200,6 +208,14 @@ export function getShortcutFromKeyboardEvent(
   }
 
   return [...modifiers, keyToken].join("+");
+}
+
+export function getShortcutPreviewTokens(event: KeyboardEvent | ReactKeyboardEvent): string[] {
+  const modifiers = getModifierTokensFromKeyboardEvent(event);
+  const keyToken = getKeyTokenFromKeyboardEvent(event);
+  const tokens = [...modifiers, ...(keyToken ? [keyToken] : [])];
+
+  return tokens.map((segment) => DISPLAY_LABELS[segment] ?? segment);
 }
 
 export function matchShortcutEvent(
