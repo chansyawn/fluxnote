@@ -19,10 +19,10 @@ import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { Trans } from "@lingui/react/macro";
 
-import { noteBlockLexicalTheme } from "@/features/note-block/note-block-lexical-theme";
-import { NOTE_BLOCK_MARKDOWN_TRANSFORMERS } from "@/features/note-block/note-block-markdown";
-import { NoteBlockSelectionOverlayPlugin } from "@/features/note-block/note-block-selection-overlay-plugin";
-import { NoteBlockTableShortcutPlugin } from "@/features/note-block/note-block-table-shortcut-plugin";
+import { noteBlockLexicalTheme } from "./note-block-lexical-theme";
+import { NOTE_BLOCK_MARKDOWN_TRANSFORMERS } from "./note-block-markdown";
+import { NoteBlockSelectionOverlayPlugin } from "./note-block-selection-overlay-plugin";
+import { NoteBlockTableShortcutPlugin } from "./note-block-table-shortcut-plugin";
 
 import "./note-block-editor.css";
 
