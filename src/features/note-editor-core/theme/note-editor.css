@@ -9,11 +9,11 @@
 }
 
 .note-block-editor__selection-rect {
-  @apply bg-primary/18 absolute rounded-[0.28rem];
+  @apply bg-primary/18 absolute rounded-xs;
 }
 
 .note-block-editor__input {
-  @apply text-foreground relative z-20 min-h-20 resize-none text-[15px]/7 outline-none;
+  @apply text-foreground relative z-20 min-h-16 resize-none text-sm/6 outline-none;
 }
 
 .note-block-editor__input::selection,
@@ -29,7 +29,7 @@
 }
 
 .note-block-editor__placeholder {
-  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 z-40 text-[15px]/7;
+  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 z-40 text-sm/6;
 }
 
 .note-block-editor__paragraph {
@@ -37,7 +37,7 @@
 }
 
 .note-block-editor__paragraph:not(:first-child) {
-  @apply mt-3;
+  @apply mt-2;
 }
 
 .note-block-editor__heading {
@@ -45,32 +45,32 @@
 }
 
 .note-block-editor__heading--h1 {
-  @apply mt-6 mb-2 text-3xl/9 first:mt-0;
+  @apply mt-4 mb-1.5 text-2xl/8 first:mt-0;
 }
 
 .note-block-editor__heading--h2 {
-  @apply mt-5 mb-2 text-2xl/8 first:mt-0;
+  @apply mt-4 mb-1.5 text-xl/7 first:mt-0;
 }
 
 .note-block-editor__heading--h3 {
-  @apply mt-4 mb-2 text-xl/7 first:mt-0;
+  @apply mt-3 mb-1.5 text-lg/6 first:mt-0;
 }
 
 .note-block-editor__heading--h4 {
-  @apply mt-4 mb-2 text-lg/7 first:mt-0;
+  @apply mt-3 mb-1 text-base/6 first:mt-0;
 }
 
 .note-block-editor__heading--h5,
 .note-block-editor__heading--h6 {
-  @apply mt-3 mb-2 text-base/7 first:mt-0;
+  @apply mt-2.5 mb-1 text-sm/6 first:mt-0;
 }
 
 .note-block-editor__quote {
-  @apply border-border text-muted-foreground my-4 border-s-4 ps-4 text-[15px]/7 italic;
+  @apply border-border text-muted-foreground my-3 border-s-4 ps-3 text-sm/6 italic;
 }
 
 .note-block-editor__list {
-  @apply my-3 ps-6;
+  @apply my-2 ps-5;
 }
 
 .note-block-editor__list--unordered {
@@ -87,14 +87,14 @@
 }
 
 .note-block-editor__list-item {
-  @apply ps-1 text-[15px]/7;
+  @apply ps-1 text-sm/6;
 }
 
 .note-block-editor__list-item--checked,
 .note-block-editor__list-item--unchecked {
   --note-block-checklist-box-size: 1rem;
-  --note-block-checklist-box-top: calc((1.75rem - var(--note-block-checklist-box-size)) / 2);
-  @apply relative list-none ps-8 outline-none;
+  --note-block-checklist-box-top: calc((1.5rem - var(--note-block-checklist-box-size)) / 2);
+  @apply relative list-none ps-7 outline-none;
 }
 
 .note-block-editor__list-item--checked::before,
@@ -110,7 +110,7 @@
 .note-block-editor__list-item--checked::after {
   @apply border-primary-foreground absolute h-2 w-[0.35rem] rotate-45 border-r-2 border-b-2 content-[''];
   inset-inline-start: 0.34rem;
-  top: 0.53rem;
+  top: 0.42rem;
 }
 
 .note-block-editor__list-item--checked[role="checkbox"],
@@ -134,7 +134,7 @@
 }
 
 .note-block-editor__list-item--nested {
-  @apply mt-2;
+  @apply mt-1.5;
 }
 
 .note-block-editor__text--bold {
@@ -150,15 +150,15 @@
 }
 
 .note-block-editor__text--code {
-  @apply bg-muted rounded px-1.5 py-0.5 font-mono text-[0.9em];
+  @apply bg-muted rounded px-1 py-0.5 font-mono text-xs;
 }
 
 .note-block-editor__code {
-  @apply bg-muted text-foreground my-4 block overflow-x-auto rounded-xl border px-4 py-3 font-mono text-sm/6;
+  @apply bg-muted text-foreground my-3 block overflow-x-auto rounded-lg border px-3 py-2.5 font-mono text-xs;
 }
 
 .note-block-editor__hr {
-  @apply border-border my-5 block border-t;
+  @apply border-border my-3 block border-t;
 }
 
 .note-block-editor__hr--selected {
@@ -170,11 +170,11 @@
 }
 
 .note-block-editor__table-scroll {
-  @apply my-4 overflow-x-auto rounded-xl border;
+  @apply my-3 overflow-x-auto rounded-lg border;
 }
 
 .note-block-editor__table {
-  @apply bg-background w-full min-w-full border-collapse text-sm/6;
+  @apply bg-background w-full min-w-full border-collapse text-xs;
 }
 
 .note-block-editor__table-row {
@@ -182,7 +182,7 @@
 }
 
 .note-block-editor__table-cell {
-  @apply border-border min-w-32 border-e px-3 py-2 align-top;
+  @apply border-border min-w-28 border-e px-2.5 py-1.5 align-top;
 }
 
 .note-block-editor__table-cell--header {
@@ -190,11 +190,11 @@
 }
 
 .note-block-editor__table-cell .note-block-editor__paragraph:not(:first-child) {
-  @apply mt-2;
+  @apply mt-1.5;
 }
 
 .note-block-editor__table-cell .note-block-editor__paragraph {
-  @apply text-sm/6;
+  @apply text-xs;
 }
 
 .note-block-editor__token--keyword,
