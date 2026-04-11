@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircleIcon, Trash2Icon } from "lucide-react";
 
-import { NoteBlockCoreEditor } from "@/features/note-block-core";
+import { NoteEditorShell } from "@/features/note-editor-core";
 import { Button } from "@/ui/components/button";
 import { ButtonGroup } from "@/ui/components/button-group";
 
@@ -45,7 +45,7 @@ export function NoteBlockEditorView({
       </div>
 
       <div className="min-h-28 px-4 pt-4 pb-4">
-        <NoteBlockCoreEditor
+        <NoteEditorShell
           initialMarkdown={initialMarkdown}
           onBlur={onBlur}
           onMarkdownUpdated={onMarkdownUpdated}

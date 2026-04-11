@@ -49,7 +49,7 @@ msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-core-editor.tsx:37
+#: src/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
 msgstr ""
 
