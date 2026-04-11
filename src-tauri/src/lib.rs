@@ -107,6 +107,7 @@ pub fn run() {
     init_tracing();
 
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let note_state = features::note::init_note_state(app.handle())?;

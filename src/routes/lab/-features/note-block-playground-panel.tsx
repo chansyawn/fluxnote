@@ -90,10 +90,13 @@ export function NoteBlockPlaygroundPanel() {
 
       <NoteBlockEditorView
         key={editorVersion}
+        blockId="playground-block"
+        focusRequestKey={0}
         initialMarkdown={markdown}
         isDeleting={false}
         isOnlyBlock={false}
         onBlur={() => {}}
+        onFocus={() => {}}
         onMarkdownUpdated={(latestMarkdown) => {
           setMarkdown(latestMarkdown);
         }}

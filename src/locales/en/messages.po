@@ -39,12 +39,12 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:69
+#: src/routes/notes/$id/-features/note-page.tsx:78
 msgid "home-note.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:41
+#: src/features/note-block/note-block-editor-view.tsx:51
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -54,7 +54,7 @@ msgid "home-note.block.placeholder"
 msgstr "Write something..."
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:19
+#: src/routes/notes/$id/-features/note-page.tsx:20
 msgid "home-note.loading"
 msgstr "Loading your note..."
 
@@ -109,27 +109,87 @@ msgid "note.route.initializing"
 msgstr "Opening your inbox note..."
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:37
+#: src/routes/preferences.tsx:38
 msgid "preferences.description"
 msgstr "Configure language and layout."
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:44
+#: src/routes/preferences.tsx:45
 msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:77
+#: src/routes/preferences.tsx:78
 msgid "preferences.rtl.description"
 msgstr "Available only when pseudo locale is selected."
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:74
+#: src/routes/preferences.tsx:75
 msgid "preferences.rtl.label"
 msgstr "Right-to-left layout"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:34
+#: src/features/shortcut/shortcut-settings-section.tsx:249
+msgid "preferences.shortcuts.clear"
+msgstr "Clear shortcut"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:31
+msgid "preferences.shortcuts.create-block.label"
+msgstr "Create block"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:35
+msgid "preferences.shortcuts.delete-block.label"
+msgstr "Delete block"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:141
+msgid "preferences.shortcuts.description"
+msgstr "Configure the global shortcut and in-app block shortcuts."
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:205
+msgid "preferences.shortcuts.empty"
+msgstr "Not set"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:43
+msgid "preferences.shortcuts.error.duplicate"
+msgstr "This shortcut is already assigned to another action."
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:53
+msgid "preferences.shortcuts.error.invalid"
+msgstr "Use at least one modifier key with a supported key."
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:63
+msgid "preferences.shortcuts.error.unavailable"
+msgstr "This global shortcut is unavailable. Another app may already be using it."
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:195
+msgid "preferences.shortcuts.recording"
+msgstr "Press keys"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:228
+msgid "preferences.shortcuts.reset"
+msgstr "Reset shortcut"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:138
+msgid "preferences.shortcuts.title"
+msgstr "Shortcuts"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-settings-section.tsx:27
+msgid "preferences.shortcuts.toggle-window.label"
+msgstr "Toggle window"
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:35
 msgid "preferences.title"
 msgstr "Preferences"
 

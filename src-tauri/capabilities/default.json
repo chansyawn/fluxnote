@@ -10,6 +10,9 @@
     "core:window:allow-unminimize",
     "core:window:allow-set-focus",
     "core:window:allow-start-dragging",
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
     "opener:default"
   ]
 }

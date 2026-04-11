@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { useDirectionState } from "@/app/direction";
 import { isLocaleCode, useI18nState } from "@/app/i18n";
+import { ShortcutSettingsSection } from "@/features/shortcut/shortcut-settings-section";
 import {
   Select,
   SelectContent,
@@ -87,6 +88,8 @@ function RouteComponent() {
             />
           </div>
         ) : null}
+
+        <ShortcutSettingsSection />
       </div>
     </section>
   );
