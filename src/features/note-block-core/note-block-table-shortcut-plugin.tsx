@@ -15,7 +15,7 @@ import {
   createTableNodeFromMarkdownLines,
   isMarkdownTableDividerRow,
   isMarkdownTableRow,
-} from "@/features/note-block/note-block-markdown";
+} from "@/features/note-block-core/note-block-markdown";
 
 function focusFirstBodyCell(tableNode: ReturnType<typeof createTableNodeFromMarkdownLines>): void {
   const firstBodyRow = tableNode.getChildren().find((child, index): child is TableRowNode => {

@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircleIcon, Trash2Icon } from "lucide-react";
 
-import { NoteBlockCoreEditor } from "@/features/note-block/note-block-core-editor";
+import { NoteBlockCoreEditor } from "@/features/note-block-core";
 import { Button } from "@/ui/components/button";
 import { ButtonGroup } from "@/ui/components/button-group";
 
