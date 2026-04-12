@@ -125,6 +125,8 @@ pub fn run() {
             features::blocks::blocks_create,
             features::blocks::blocks_update_content,
             features::blocks::blocks_delete,
+            features::blocks::blocks_archive,
+            features::blocks::blocks_restore,
             features::tags::tags_list,
             features::tags::tags_create,
             features::tags::tags_delete,

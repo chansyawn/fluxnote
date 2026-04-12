@@ -3,14 +3,17 @@ import { createContext, startTransition, useContext, useState, type ReactNode } 
 
 import { queryClient } from "@/app/query";
 import {
+  archiveBlock,
   createBlock,
   createTag,
   deleteBlock,
   deleteTag,
   listBlocks,
   listTags,
+  restoreBlock,
   setBlockTags,
   type Block,
+  type BlockVisibility,
   type Tag,
 } from "@/clients";
 import { blockListQueryKey, tagListQueryKey } from "@/features/note-block/note-query-key";
@@ -18,15 +21,21 @@ import { blockListQueryKey, tagListQueryKey } from "@/features/note-block/note-q
 interface BlockWorkspaceState {
   blocks: Block[];
   tags: Tag[];
+  visibility: BlockVisibility;
   selectedTagIds: string[];
   isInitialLoading: boolean;
   isRefreshing: boolean;
   isCreatingBlock: boolean;
   isCreatingTag: boolean;
+  archivingBlockId: string | null;
+  restoringBlockId: string | null;
   deletingBlockId: string | null;
   deletingTagId: string | null;
+  setVisibility: (visibility: BlockVisibility) => void;
   setSelectedTagFilters: (tagIds: string[]) => void;
   createBlock: () => Promise<Block>;
+  archiveBlock: (blockId: string) => Promise<Block>;
+  restoreBlock: (blockId: string) => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
   createTag: (name: string) => Promise<void>;
   createTagAndSelectForFilter: (name: string) => Promise<void>;
@@ -48,13 +57,15 @@ function replaceBlockInCaches(updatedBlock: Block): void {
 }
 
 export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
+  const [visibility, setVisibility] = useState<BlockVisibility>("active");
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const blocksQuery = useQuery({
-    queryKey: blockListQueryKey(selectedTagIds),
+    queryKey: blockListQueryKey(selectedTagIds, visibility),
     queryFn: async () =>
       await listBlocks({
         tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+        visibility,
       }),
     placeholderData: (previousData) => previousData,
   });
@@ -75,9 +86,29 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (newBlock) => {
       startTransition(() => {
-        queryClient.setQueryData<Block[]>(blockListQueryKey([]), (current) =>
+        queryClient.setQueryData<Block[]>(blockListQueryKey([], "active"), (current) =>
           current ? [...current, newBlock] : [newBlock],
         );
+      });
+      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+    },
+  });
+
+  const archiveBlockMutation = useMutation({
+    mutationFn: async (blockId: string) => await archiveBlock({ blockId }),
+    onSuccess: (updatedBlock) => {
+      startTransition(() => {
+        replaceBlockInCaches(updatedBlock);
+      });
+      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+    },
+  });
+
+  const restoreBlockMutation = useMutation({
+    mutationFn: async (blockId: string) => await restoreBlock({ blockId }),
+    onSuccess: (updatedBlock) => {
+      startTransition(() => {
+        replaceBlockInCaches(updatedBlock);
       });
       void queryClient.invalidateQueries({ queryKey: ["blocks"] });
     },
@@ -131,17 +162,23 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
   const contextValue: BlockWorkspaceState = {
     blocks: blocksQuery.data ?? [],
     tags: tagsQuery.data ?? [],
+    visibility,
     selectedTagIds,
     isInitialLoading: blocksQuery.data === undefined || tagsQuery.data === undefined,
     isRefreshing: blocksQuery.isFetching || tagsQuery.isFetching,
     isCreatingBlock: createBlockMutation.isPending,
     isCreatingTag: createTagMutation.isPending,
+    archivingBlockId: archiveBlockMutation.variables ?? null,
+    restoringBlockId: restoreBlockMutation.variables ?? null,
     deletingBlockId: deleteBlockMutation.variables ?? null,
     deletingTagId: deleteTagMutation.variables ?? null,
+    setVisibility,
     setSelectedTagFilters: (tagIds: string[]) => {
       setSelectedTagIds(tagIds);
     },
     createBlock: async () => await createBlockMutation.mutateAsync(),
+    archiveBlock: async (blockId: string) => await archiveBlockMutation.mutateAsync(blockId),
+    restoreBlock: async (blockId: string) => await restoreBlockMutation.mutateAsync(blockId),
     deleteBlock: async (blockId: string) => {
       await deleteBlockMutation.mutateAsync(blockId);
     },

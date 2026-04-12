@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { LoaderCircleIcon, PlusIcon, TagIcon } from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, LoaderCircleIcon, PlusIcon, TagIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
@@ -53,16 +53,36 @@ function EmptyWorkspace({
   );
 }
 
+function ArchivedEmptyState() {
+  return (
+    <section className="border-border/70 bg-card mx-auto flex min-h-[40dvh] w-full max-w-4xl flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center">
+      <h1 className="text-lg font-semibold">
+        <Trans id="workspace.archived.empty.title">No archived blocks</Trans>
+      </h1>
+      <p className="text-muted-foreground mt-2 max-w-md text-sm">
+        <Trans id="workspace.archived.empty.description">
+          Archived blocks will appear here until you restore them.
+        </Trans>
+      </p>
+    </section>
+  );
+}
+
 export function BlockWorkspace() {
   const {
     blocks,
     tags,
+    visibility,
     selectedTagIds,
     isInitialLoading,
     isCreatingBlock,
     isCreatingTag,
+    archivingBlockId,
+    restoringBlockId,
     deletingBlockId,
     createBlock,
+    archiveBlock,
+    restoreBlock,
     deleteBlock,
     createTagAndAssignToBlock,
     assignBlockTags,
@@ -78,7 +98,7 @@ export function BlockWorkspace() {
     return <LoadingState />;
   }
 
-  if (blocks.length === 0 && selectedTagIds.length === 0) {
+  if (visibility === "active" && blocks.length === 0 && selectedTagIds.length === 0) {
     return (
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         <WorkspaceTagFilterPortal />
@@ -91,21 +111,72 @@ export function BlockWorkspace() {
     <section className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       <WorkspaceTagFilterPortal />
       {blocks.length === 0 ? (
-        <div className="border-border/70 bg-card rounded-xl border border-dashed p-6 text-center">
-          <p className="text-sm font-medium">
-            <Trans id="workspace.filtered.empty.title">No blocks match the selected tags</Trans>
-          </p>
-          <p className="text-muted-foreground mt-2 text-sm">
-            <Trans id="workspace.filtered.empty.description">
-              Clear one of the filters or create a new block outside the current tag selection.
-            </Trans>
-          </p>
-        </div>
+        visibility === "archived" && selectedTagIds.length === 0 ? (
+          <ArchivedEmptyState />
+        ) : (
+          <div className="border-border/70 bg-card rounded-xl border border-dashed p-6 text-center">
+            <p className="text-sm font-medium">
+              {visibility === "active" ? (
+                <Trans id="workspace.filtered.empty.title">No blocks match the selected tags</Trans>
+              ) : (
+                <Trans id="workspace.archived.filtered.empty.title">
+                  No archived blocks match the selected tags
+                </Trans>
+              )}
+            </p>
+            <p className="text-muted-foreground mt-2 text-sm">
+              {visibility === "active" ? (
+                <Trans id="workspace.filtered.empty.description">
+                  Clear one of the filters or create a new block outside the current tag selection.
+                </Trans>
+              ) : (
+                <Trans id="workspace.archived.filtered.empty.description">
+                  Clear one of the filters or switch back to active blocks.
+                </Trans>
+              )}
+            </p>
+          </div>
+        )
       ) : (
         <div className="flex flex-col gap-4">
           {blocks.map((block) => (
             <NoteBlockEditor
               key={block.id}
+              archiveAction={
+                <Button
+                  disabled={
+                    visibility === "active"
+                      ? archivingBlockId === block.id
+                      : restoringBlockId === block.id
+                  }
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    void (visibility === "active"
+                      ? archiveBlock(block.id)
+                      : restoreBlock(block.id));
+                  }}
+                >
+                  {visibility === "active" ? (
+                    archivingBlockId === block.id ? (
+                      <LoaderCircleIcon className="size-4 animate-spin" />
+                    ) : (
+                      <ArchiveIcon className="size-4" />
+                    )
+                  ) : restoringBlockId === block.id ? (
+                    <LoaderCircleIcon className="size-4 animate-spin" />
+                  ) : (
+                    <ArchiveRestoreIcon className="size-4" />
+                  )}
+                  <span className="sr-only">
+                    {visibility === "active" ? (
+                      <Trans id="workspace.blocks.archive">Archive block</Trans>
+                    ) : (
+                      <Trans id="workspace.blocks.restore">Restore block</Trans>
+                    )}
+                  </span>
+                </Button>
+              }
               block={block}
               focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
               isDeleting={deletingBlockId === block.id}
@@ -141,22 +212,24 @@ export function BlockWorkspace() {
         </div>
       )}
 
-      <div className="flex justify-center">
-        <Button
-          className="gap-2"
-          disabled={isCreatingBlock}
-          onClick={() => {
-            void createBlockWithFocus();
-          }}
-        >
-          {isCreatingBlock ? (
-            <LoaderCircleIcon className="size-4 animate-spin" />
-          ) : (
-            <PlusIcon className="size-4" />
-          )}
-          <Trans id="workspace.add-block">Add block</Trans>
-        </Button>
-      </div>
+      {visibility === "active" ? (
+        <div className="flex justify-center">
+          <Button
+            className="gap-2"
+            disabled={isCreatingBlock}
+            onClick={() => {
+              void createBlockWithFocus();
+            }}
+          >
+            {isCreatingBlock ? (
+              <LoaderCircleIcon className="size-4 animate-spin" />
+            ) : (
+              <PlusIcon className="size-4" />
+            )}
+            <Trans id="workspace.add-block">Add block</Trans>
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

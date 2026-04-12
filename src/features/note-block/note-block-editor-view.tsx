@@ -10,6 +10,7 @@ interface NoteBlockEditorViewProps {
   blockId: string;
   initialMarkdown: string;
   focusRequestKey: number;
+  archiveAction?: ReactNode;
   isDeleting: boolean;
   isOnlyBlock: boolean;
   onMarkdownUpdated: (markdown: string) => void;
@@ -23,6 +24,7 @@ export function NoteBlockEditorView({
   blockId,
   initialMarkdown,
   focusRequestKey,
+  archiveAction,
   isDeleting,
   isOnlyBlock,
   onMarkdownUpdated,
@@ -40,6 +42,7 @@ export function NoteBlockEditorView({
       <div className="pointer-events-none absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
         <ButtonGroup>
           {tagAction}
+          {archiveAction}
           <Button
             size="icon"
             variant="ghost"

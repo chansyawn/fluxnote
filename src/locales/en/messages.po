@@ -14,32 +14,32 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:95
+#: src/routes/-features/window-title-bar.tsx:101
 msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:27
+#: src/routes/-features/window-title-bar.tsx:28
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:55
+#: src/routes/-features/window-title-bar.tsx:57
 msgid "header.go-lab"
 msgstr "Go to lab"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:53
+#: src/routes/-features/window-title-bar.tsx:55
 msgid "header.open-lab"
 msgstr "Open lab"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:29
+#: src/routes/-features/window-title-bar.tsx:30
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:55
+#: src/features/note-block/note-block-editor-view.tsx:58
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -259,66 +259,106 @@ msgid "sample.spec.title"
 msgstr "Practices Demonstrated on This Page"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/window-title-bar.tsx:75
+#: src/routes/-features/window-title-bar.tsx:77
 msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:168
+#: src/routes/-features/block-workspace.tsx:229
 msgid "workspace.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:49
+#: src/routes/-features/block-workspace.tsx:63
+msgid "workspace.archived.empty.description"
+msgstr "Archived blocks will appear here until you restore them."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:60
+msgid "workspace.archived.empty.title"
+msgstr "No archived blocks"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:133
+msgid "workspace.archived.filtered.empty.description"
+msgstr "Clear one of the filters or switch back to active blocks."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:122
+msgid "workspace.archived.filtered.empty.title"
+msgstr "No archived blocks match the selected tags"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:173
+msgid "workspace.blocks.archive"
+msgstr "Archive block"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:175
+msgid "workspace.blocks.restore"
+msgstr "Restore block"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:50
 msgid "workspace.empty.action"
 msgstr "Create first block"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:35
+#: src/routes/-features/block-workspace.tsx:36
 msgid "workspace.empty.description"
 msgstr "Start with an empty block."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:32
+#: src/routes/-features/block-workspace.tsx:33
 msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:118
+#: src/routes/-features/block-workspace.tsx:129
 msgid "workspace.filtered.empty.description"
 msgstr "Clear one of the filters or create a new block outside the current tag selection."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:115
+#: src/routes/-features/block-workspace.tsx:120
 msgid "workspace.filtered.empty.title"
 msgstr "No blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:16
+#: src/routes/-features/block-workspace.tsx:17
 msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/tag-combobox-popover.tsx:70
+#: src/routes/-features/block-workspace.tsx:194
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/tag-combobox-popover.tsx:130
+#: src/routes/-features/tag-combobox-popover.tsx:136
 msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/tag-combobox-popover.tsx:169
+#: src/routes/-features/tag-combobox-popover.tsx:178
 msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/tag-combobox-popover.tsx:68
+#: src/routes/-features/workspace-tag-filter-portal.tsx:67
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/tag-combobox-popover.tsx:137
+#: src/routes/-features/tag-combobox-popover.tsx:145
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/workspace-tag-filter-portal.tsx:53
+msgid "workspace.visibility.show-active"
+msgstr "Show active blocks"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/workspace-tag-filter-portal.tsx:51
+msgid "workspace.visibility.show-archived"
+msgstr "Show archived blocks"

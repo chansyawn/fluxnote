@@ -8,6 +8,7 @@ pub struct Block {
     pub id: String,
     pub position: i64,
     pub content: String,
+    pub archived_at: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub tags: Vec<Tag>,

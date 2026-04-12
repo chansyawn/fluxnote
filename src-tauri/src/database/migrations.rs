@@ -33,8 +33,12 @@ CREATE INDEX IF NOT EXISTS idx_block_tags_tag_id
     ON block_tags(tag_id);
 ";
 
+const ADD_BLOCK_ARCHIVED_AT: &str = "
+ALTER TABLE blocks ADD COLUMN archived_at TEXT;
+";
+
 pub fn apply(conn: &mut Connection) -> anyhow::Result<()> {
-    Migrations::new(vec![M::up(INITIAL_SCHEMA)])
+    Migrations::new(vec![M::up(INITIAL_SCHEMA), M::up(ADD_BLOCK_ARCHIVED_AT)])
         .to_latest(conn)
         .context("failed to apply final schema migration")
 }

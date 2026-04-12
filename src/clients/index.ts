@@ -1,9 +1,18 @@
 export { greet } from "@/clients/sample";
-export { createBlock, deleteBlock, listBlocks, updateBlockContent } from "@/clients/blocks";
+export {
+  archiveBlock,
+  createBlock,
+  deleteBlock,
+  listBlocks,
+  restoreBlock,
+  updateBlockContent,
+} from "@/clients/blocks";
 export { createTag, deleteTag, listTags, setBlockTags } from "@/clients/tags";
 export type { GreetRequest, GreetResponse } from "@/clients/sample";
 export type {
   Block,
+  BlockMutationRequest,
+  BlockVisibility,
   DeleteBlockResult,
   ListBlocksRequest,
   UpdateBlockContentRequest,

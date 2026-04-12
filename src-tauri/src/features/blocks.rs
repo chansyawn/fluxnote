@@ -12,11 +12,21 @@ use crate::features::validated_command_arg::Validated;
 
 pub use models::{Block, DeleteBlockResult};
 
+#[derive(Debug, Clone, Copy, Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum BlockVisibility {
+    #[default]
+    Active,
+    Archived,
+}
+
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlocksArgs {
     #[garde(skip)]
     pub tag_ids: Option<Vec<String>>,
+    #[garde(skip)]
+    pub visibility: Option<BlockVisibility>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -35,6 +45,13 @@ pub struct DeleteBlockArgs {
     pub block_id: String,
 }
 
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct BlockMutationArgs {
+    #[garde(length(min = 1))]
+    pub block_id: String,
+}
+
 #[tauri::command]
 #[tracing::instrument(name = "command.blocks_list", skip(state, args))]
 pub fn blocks_list(
@@ -45,7 +62,11 @@ pub fn blocks_list(
 
     info!("listing blocks");
     let conn = state.lock()?;
-    service::list_blocks(&conn, args.tag_ids.as_deref().unwrap_or(&[]))
+    service::list_blocks(
+        &conn,
+        args.tag_ids.as_deref().unwrap_or(&[]),
+        args.visibility.unwrap_or_default(),
+    )
 }
 
 #[tauri::command]
@@ -85,4 +106,30 @@ pub fn blocks_delete(
     info!("deleting block");
     let mut conn = state.lock()?;
     service::delete_block(&mut conn, &args.block_id)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.blocks_archive", skip(state, args))]
+pub fn blocks_archive(
+    state: State<'_, DatabaseState>,
+    args: Validated<BlockMutationArgs>,
+) -> AppResult<Block> {
+    let args = args.into_inner();
+
+    info!("archiving block");
+    let mut conn = state.lock()?;
+    service::archive_block(&mut conn, &args.block_id)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.blocks_restore", skip(state, args))]
+pub fn blocks_restore(
+    state: State<'_, DatabaseState>,
+    args: Validated<BlockMutationArgs>,
+) -> AppResult<Block> {
+    let args = args.into_inner();
+
+    info!("restoring block");
+    let mut conn = state.lock()?;
+    service::restore_block(&mut conn, &args.block_id)
 }

@@ -1,19 +1,22 @@
 import { Trans } from "@lingui/react/macro";
-import { TagsIcon } from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, TagsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { TagComboboxPopover } from "@/routes/-features/tag-combobox-popover";
 import { useBlockWorkspace } from "@/routes/-features/use-block-workspace";
+import { Button } from "@/ui/components/button";
 
 const TITLEBAR_ACTIONS_ID = "titlebar-workspace-actions";
 
 export function WorkspaceTagFilterPortal() {
   const {
     tags,
+    visibility,
     selectedTagIds,
     isCreatingTag,
     deletingTagId,
+    setVisibility,
     setSelectedTagFilters,
     createTagAndSelectForFilter,
     deleteTag,
@@ -29,7 +32,28 @@ export function WorkspaceTagFilterPortal() {
   }
 
   return createPortal(
-    <div className="flex shrink-0 items-center" data-window-control>
+    <div className="flex shrink-0 items-center gap-1" data-window-control>
+      <Button
+        data-window-control
+        size="icon-sm"
+        variant="ghost"
+        onClick={() => {
+          setVisibility(visibility === "active" ? "archived" : "active");
+        }}
+      >
+        {visibility === "active" ? (
+          <ArchiveIcon className="size-3.5" />
+        ) : (
+          <ArchiveRestoreIcon className="size-3.5" />
+        )}
+        <span className="sr-only">
+          {visibility === "active" ? (
+            <Trans id="workspace.visibility.show-archived">Show archived blocks</Trans>
+          ) : (
+            <Trans id="workspace.visibility.show-active">Show active blocks</Trans>
+          )}
+        </span>
+      </Button>
       <TagComboboxPopover
         deletingTagId={deletingTagId}
         placeholder="Search or create tags"
