@@ -1,28 +1,28 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
-import type { NoteBlock, NoteDetail } from "@/clients";
+import type { Block } from "@/clients";
 import { useShortcutState } from "@/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@/features/shortcut/shortcut-utils";
-
-interface UseNoteShortcutsParams {
-  noteDetail: NoteDetail | null;
-  createBlock: (noteId: string) => Promise<NoteBlock>;
-  deleteBlock: (blockId: string) => Promise<void>;
-}
 
 interface FocusRequest {
   blockId: string;
   requestKey: number;
 }
 
-interface UseNoteShortcutsResult {
+interface UseBlockShortcutsParams {
+  blocks: Block[];
+  createBlock: () => Promise<Block>;
+  deleteBlock: (blockId: string) => Promise<void>;
+}
+
+interface UseBlockShortcutsResult {
   focusRequest: FocusRequest | null;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   setActiveBlockId: (blockId: string) => void;
 }
 
-function getAdjacentBlockId(blocks: NoteDetail["blocks"], blockId: string): string | null {
+function getAdjacentBlockId(blocks: Block[], blockId: string): string | null {
   const currentIndex = blocks.findIndex((block) => block.id === blockId);
 
   if (currentIndex === -1) {
@@ -32,11 +32,11 @@ function getAdjacentBlockId(blocks: NoteDetail["blocks"], blockId: string): stri
   return blocks[currentIndex - 1]?.id ?? blocks[currentIndex + 1]?.id ?? null;
 }
 
-export function useNoteShortcuts({
-  noteDetail,
+export function useBlockShortcuts({
+  blocks,
   createBlock,
   deleteBlock,
-}: UseNoteShortcutsParams): UseNoteShortcutsResult {
+}: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
@@ -56,23 +56,13 @@ export function useNoteShortcuts({
   });
 
   const createBlockWithFocus = useEffectEvent(async () => {
-    if (!noteDetail) {
-      return;
-    }
-
-    const newBlock = await createBlock(noteDetail.note.id);
+    const newBlock = await createBlock();
     requestBlockFocus(newBlock.id);
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    if (!noteDetail || noteDetail.blocks.length === 1) {
-      return;
-    }
-
     const shouldMoveFocus = activeBlockId === blockId;
-    const nextFocusBlockId = shouldMoveFocus
-      ? getAdjacentBlockId(noteDetail.blocks, blockId)
-      : null;
+    const nextFocusBlockId = shouldMoveFocus ? getAdjacentBlockId(blocks, blockId) : null;
 
     await deleteBlock(blockId);
 
@@ -93,21 +83,16 @@ export function useNoteShortcuts({
       return;
     }
 
-    if (!noteDetail) {
-      setActiveBlockId(null);
-      return;
-    }
-
-    const hasActiveBlock = noteDetail.blocks.some((block) => block.id === activeBlockId);
+    const hasActiveBlock = blocks.some((block) => block.id === activeBlockId);
 
     if (!hasActiveBlock) {
       setActiveBlockId(null);
     }
-  }, [activeBlockId, noteDetail]);
+  }, [activeBlockId, blocks]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || !activeBlockId || !noteDetail) {
+      if (event.repeat || !activeBlockId) {
         return;
       }
 
@@ -131,11 +116,6 @@ export function useNoteShortcuts({
 
       event.preventDefault();
       event.stopPropagation();
-
-      if (noteDetail.blocks.length === 1) {
-        return;
-      }
-
       void deleteBlockWithFocus(activeBlockId);
     };
 
@@ -144,7 +124,7 @@ export function useNoteShortcuts({
     return () => {
       window.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, noteDetail, shortcuts]);
+  }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, shortcuts]);
 
   return {
     focusRequest,

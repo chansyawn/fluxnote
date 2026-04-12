@@ -1,47 +1,39 @@
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useRef, type ReactNode } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { queryClient } from "@/app/query";
-import { type NoteBlock, type NoteDetail, updateNoteBlockContent } from "@/clients";
+import { type Block, updateBlockContent } from "@/clients";
 import { NoteBlockEditorView } from "@/features/note-block/note-block-editor-view";
-import { noteDetailQueryKey } from "@/features/note-block/note-query-key";
 
 interface NoteBlockEditorProps {
-  noteId: string;
-  block: NoteBlock;
+  block: Block;
   focusRequestKey: number;
   isDeleting: boolean;
   isOnlyBlock: boolean;
   onDelete: (blockId: string) => Promise<void>;
   onFocus: (blockId: string) => void;
+  footer?: ReactNode;
 }
 
-function updateBlockInCache(noteId: string, updatedBlock: NoteBlock): void {
-  queryClient.setQueryData<NoteDetail>(noteDetailQueryKey(noteId), (current) => {
+function updateBlockInCache(updatedBlock: Block): void {
+  queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
     if (!current) {
       return current;
     }
 
-    return {
-      ...current,
-      note: {
-        ...current.note,
-        updatedAt: updatedBlock.updatedAt,
-      },
-      blocks: current.blocks.map((block) => (block.id === updatedBlock.id ? updatedBlock : block)),
-    };
+    return current.map((block) => (block.id === updatedBlock.id ? updatedBlock : block));
   });
 }
 
 export function NoteBlockEditor({
-  noteId,
   block,
   focusRequestKey,
   isDeleting,
   isOnlyBlock,
   onDelete,
   onFocus,
+  footer,
 }: NoteBlockEditorProps) {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
@@ -58,7 +50,7 @@ export function NoteBlockEditor({
   const saveMutation = useMutation({
     mutationFn: async ({ content, requestId }: { content: string; requestId: number }) => ({
       requestId,
-      updatedBlock: await updateNoteBlockContent({
+      updatedBlock: await updateBlockContent({
         blockId: block.id,
         content,
       }),
@@ -66,14 +58,14 @@ export function NoteBlockEditor({
   });
 
   const handleSaveSuccess = useEffectEvent(
-    ({ requestId, updatedBlock }: { requestId: number; updatedBlock: NoteBlock }) => {
+    ({ requestId, updatedBlock }: { requestId: number; updatedBlock: Block }) => {
       if (requestId < appliedRequestIdRef.current) {
         return;
       }
 
       appliedRequestIdRef.current = requestId;
       persistedContentRef.current = updatedBlock.content;
-      updateBlockInCache(noteId, updatedBlock);
+      updateBlockInCache(updatedBlock);
     },
   );
 
@@ -123,6 +115,7 @@ export function NoteBlockEditor({
       isOnlyBlock={isOnlyBlock}
       onBlur={flushPendingSave}
       onMarkdownUpdated={handleMarkdownUpdated}
+      footer={footer}
       onDelete={() => {
         void onDelete(block.id);
       }}

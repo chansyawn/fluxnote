@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircleIcon, Trash2Icon } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { NoteEditorShell } from "@/features/note-editor-core";
 import { Button } from "@/ui/components/button";
@@ -15,6 +16,7 @@ interface NoteBlockEditorViewProps {
   onBlur: () => void;
   onDelete: () => void;
   onFocus: () => void;
+  footer?: ReactNode;
 }
 
 export function NoteBlockEditorView({
@@ -27,6 +29,7 @@ export function NoteBlockEditorView({
   onBlur,
   onDelete,
   onFocus,
+  footer,
 }: NoteBlockEditorViewProps) {
   return (
     <article
@@ -62,6 +65,8 @@ export function NoteBlockEditorView({
           onMarkdownUpdated={onMarkdownUpdated}
         />
       </div>
+
+      {footer ? <div className="border-border/70 border-t px-4 py-3">{footer}</div> : null}
     </article>
   );
 }

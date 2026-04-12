@@ -11,7 +11,7 @@ use tracing::info;
 use crate::error::{AppResult, BusinessError};
 use crate::features::validated_command_arg::Validated;
 
-pub use models::{DeleteNoteBlockResult, InboxNoteIdResult, NoteBlock, NoteDetail};
+pub use models::{Block, DeleteBlockResult, Tag};
 use service::NoteService;
 
 pub struct NoteState {
@@ -35,21 +35,14 @@ pub fn init_note_state(app: &AppHandle) -> anyhow::Result<NoteState> {
 
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNoteByIdArgs {
-    #[garde(length(min = 1))]
-    pub note_id: String,
+pub struct ListBlocksArgs {
+    #[garde(skip)]
+    pub tag_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateNoteBlockArgs {
-    #[garde(length(min = 1))]
-    pub note_id: String,
-}
-
-#[derive(Debug, Deserialize, Validate)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateNoteBlockContentArgs {
+pub struct UpdateBlockContentArgs {
     #[garde(length(min = 1))]
     pub block_id: String,
     #[garde(skip)]
@@ -58,73 +51,123 @@ pub struct UpdateNoteBlockContentArgs {
 
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteNoteBlockArgs {
+pub struct DeleteBlockArgs {
     #[garde(length(min = 1))]
     pub block_id: String,
 }
 
-#[tauri::command]
-#[tracing::instrument(name = "command.get_inbox_note_id", skip(state))]
-pub fn get_inbox_note_id(state: State<'_, NoteState>) -> AppResult<InboxNoteIdResult> {
-    info!("loading inbox note id");
-    let mut service = state.lock()?;
-    let note_id = service.get_inbox_note_id()?;
-    Ok(InboxNoteIdResult { note_id })
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateTagArgs {
+    #[garde(skip)]
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteTagArgs {
+    #[garde(length(min = 1))]
+    pub tag_id: String,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct SetBlockTagsArgs {
+    #[garde(length(min = 1))]
+    pub block_id: String,
+    #[garde(skip)]
+    pub tag_ids: Vec<String>,
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.get_note_by_id", skip(state, args))]
-pub fn get_note_by_id(
+#[tracing::instrument(name = "command.list_blocks", skip(state, args))]
+pub fn list_blocks(
     state: State<'_, NoteState>,
-    args: Validated<GetNoteByIdArgs>,
-) -> AppResult<NoteDetail> {
+    args: Validated<ListBlocksArgs>,
+) -> AppResult<Vec<Block>> {
     let args = args.into_inner();
 
-    info!("loading note by id");
+    info!("listing blocks");
     let mut service = state.lock()?;
-    service.get_note_by_id(&args.note_id)
+    service.list_blocks(args.tag_ids.as_deref().unwrap_or(&[]))
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.create_note_block", skip(state, args))]
-pub fn create_note_block(
-    state: State<'_, NoteState>,
-    args: Validated<CreateNoteBlockArgs>,
-) -> AppResult<NoteBlock> {
-    let args = args.into_inner();
-
-    info!("creating note block");
+#[tracing::instrument(name = "command.create_block", skip(state))]
+pub fn create_block(state: State<'_, NoteState>) -> AppResult<Block> {
+    info!("creating block");
     let mut service = state.lock()?;
-    service.create_note_block(&args.note_id)
+    service.create_block()
 }
 
 #[tauri::command]
 #[tracing::instrument(
-    name = "command.update_note_block_content",
+    name = "command.update_block_content",
     skip(state, args),
     fields(content_len = tracing::field::Empty)
 )]
-pub fn update_note_block_content(
+pub fn update_block_content(
     state: State<'_, NoteState>,
-    args: Validated<UpdateNoteBlockContentArgs>,
-) -> AppResult<NoteBlock> {
+    args: Validated<UpdateBlockContentArgs>,
+) -> AppResult<Block> {
     let args = args.into_inner();
     tracing::Span::current().record("content_len", tracing::field::display(args.content.len()));
 
-    info!("updating note block content");
+    info!("updating block content");
     let mut service = state.lock()?;
-    service.update_note_block_content(&args.block_id, &args.content)
+    service.update_block_content(&args.block_id, &args.content)
 }
 
 #[tauri::command]
-#[tracing::instrument(name = "command.delete_note_block", skip(state, args))]
-pub fn delete_note_block(
+#[tracing::instrument(name = "command.delete_block", skip(state, args))]
+pub fn delete_block(
     state: State<'_, NoteState>,
-    args: Validated<DeleteNoteBlockArgs>,
-) -> AppResult<DeleteNoteBlockResult> {
+    args: Validated<DeleteBlockArgs>,
+) -> AppResult<DeleteBlockResult> {
     let args = args.into_inner();
 
-    info!("deleting note block");
+    info!("deleting block");
     let mut service = state.lock()?;
-    service.delete_note_block(&args.block_id)
+    service.delete_block(&args.block_id)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.list_tags", skip(state))]
+pub fn list_tags(state: State<'_, NoteState>) -> AppResult<Vec<Tag>> {
+    info!("listing tags");
+    let mut service = state.lock()?;
+    service.list_tags()
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.create_tag", skip(state, args))]
+pub fn create_tag(state: State<'_, NoteState>, args: Validated<CreateTagArgs>) -> AppResult<Tag> {
+    let args = args.into_inner();
+
+    info!("creating tag");
+    let mut service = state.lock()?;
+    service.create_tag(&args.name)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.delete_tag", skip(state, args))]
+pub fn delete_tag(state: State<'_, NoteState>, args: Validated<DeleteTagArgs>) -> AppResult<()> {
+    let args = args.into_inner();
+
+    info!("deleting tag");
+    let mut service = state.lock()?;
+    service.delete_tag(&args.tag_id)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.set_block_tags", skip(state, args))]
+pub fn set_block_tags(
+    state: State<'_, NoteState>,
+    args: Validated<SetBlockTagsArgs>,
+) -> AppResult<Block> {
+    let args = args.into_inner();
+
+    info!("updating block tags");
+    let mut service = state.lock()?;
+    service.set_block_tags(&args.block_id, &args.tag_ids)
 }

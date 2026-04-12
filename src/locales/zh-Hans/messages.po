@@ -39,12 +39,7 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:78
-msgid "home-note.add-block"
-msgstr "新增区块"
-
-#. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:51
+#: src/features/note-block/note-block-editor-view.tsx:54
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
@@ -52,11 +47,6 @@ msgstr "删除区块"
 #: src/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
 msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:20
-msgid "home-note.loading"
-msgstr "正在加载你的笔记..."
 
 #. js-lingui-explicit-id
 #: src/routes/lab/index.tsx:21
@@ -94,21 +84,6 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:68
-msgid "note.route.init-error.retry"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:58
-msgid "note.route.init-error.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:40
-msgid "note.route.initializing"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/routes/preferences.tsx:38
 msgid "preferences.description"
 msgstr "配置语言与外观。"
@@ -129,7 +104,7 @@ msgid "preferences.rtl.label"
 msgstr "从右到左布局"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:150
+#: src/features/shortcut/shortcut-input.tsx:146
 msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
@@ -149,7 +124,7 @@ msgid "preferences.shortcuts.description"
 msgstr "配置全局快捷键和应用内区块快捷键。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:119
+#: src/features/shortcut/shortcut-input.tsx:115
 msgid "preferences.shortcuts.empty"
 msgstr "未设置"
 
@@ -169,17 +144,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:107
+#: src/features/shortcut/shortcut-input.tsx:103
 msgid "preferences.shortcuts.recording"
 msgstr "输入新的快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:132
+#: src/features/shortcut/shortcut-input.tsx:128
 msgid "preferences.shortcuts.recording.exit"
 msgstr "退出编辑"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:141
+#: src/features/shortcut/shortcut-input.tsx:137
 msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
@@ -287,3 +262,78 @@ msgstr "本页展示的实践"
 #: src/routes/-features/window-title-bar.tsx:75
 msgid "window.hide"
 msgstr "隐藏窗口"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:345
+msgid "workspace.add-block"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:167
+msgid "workspace.blocks.tags.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:306
+msgid "workspace.blocks.tags.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:222
+msgid "workspace.empty.action"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:206
+msgid "workspace.empty.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:203
+msgid "workspace.empty.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:291
+msgid "workspace.filtered.empty.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:288
+msgid "workspace.filtered.empty.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:15
+msgid "workspace.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:150
+msgid "workspace.tags.create-action"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:132
+msgid "workspace.tags.create-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:91
+msgid "workspace.tags.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:40
+msgid "workspace.tags.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:51
+msgid "workspace.tags.filter-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:351
+msgid "workspace.tags.hint"
+msgstr ""

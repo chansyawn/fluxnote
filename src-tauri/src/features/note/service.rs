@@ -1,7 +1,7 @@
-use std::{fs, time::Duration};
+use std::{collections::HashMap, fs, time::Duration};
 
 use anyhow::{anyhow, Context};
-use rusqlite::{params, Connection, OptionalExtension, Transaction};
+use rusqlite::{params, Connection, OptionalExtension, ToSql, Transaction};
 use rusqlite_migration::{Migrations, M};
 use tauri::{AppHandle, Manager};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
@@ -9,11 +9,9 @@ use uuid::Uuid;
 
 use crate::error::{AppResult, BusinessError};
 
-use super::models::{DeleteNoteBlockResult, NoteBlock, NoteDetail, NoteSummary};
+use super::models::{Block, DeleteBlockResult, Tag};
 
 const DATABASE_FILE_NAME: &str = "fluxnote.sqlite3";
-const INBOX_NOTE_ID_KEY: &str = "inbox_note_id";
-const DEFAULT_NOTE_TITLE: &str = "My Note";
 
 pub struct NoteService {
     conn: Connection,
@@ -50,199 +48,255 @@ impl NoteService {
             .to_latest(&mut conn)
             .context("failed to apply sqlite migrations")?;
 
-        let mut service = Self { conn };
-        service
-            .ensure_inbox_note()
-            .context("failed to initialize inbox note")?;
-        Ok(service)
+        Ok(Self { conn })
     }
 
-    pub fn get_inbox_note_id(&mut self) -> AppResult<String> {
-        self.resolve_inbox_note_id()
+    pub fn list_blocks(&mut self, tag_ids: &[String]) -> AppResult<Vec<Block>> {
+        let blocks = if tag_ids.is_empty() {
+            self.list_all_blocks()?
+        } else {
+            self.list_blocks_by_tag_ids(tag_ids)?
+        };
+
+        self.attach_tags(blocks)
     }
 
-    pub fn get_note_by_id(&mut self, note_id: &str) -> AppResult<NoteDetail> {
-        let note = self.get_note_summary(note_id)?;
-        let blocks = self.list_blocks(note_id)?;
-
-        Ok(NoteDetail { note, blocks })
-    }
-
-    pub fn create_note_block(&mut self, note_id: &str) -> AppResult<NoteBlock> {
+    pub fn create_block(&mut self) -> AppResult<Block> {
         let now = timestamp_now()?;
         let block_id = create_id();
         let tx = self.begin_tx()?;
+        let next_position = next_block_position(&tx)?;
 
-        if !note_exists_in_tx(&tx, note_id)? {
-            return Err(BusinessError::NotFound(note_id.to_string()).into());
-        }
-
-        let next_position = next_block_position(&tx, note_id)?;
         tx.execute(
-            "INSERT INTO note_blocks (id, note_id, position, content, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-            params![block_id, note_id, next_position, "", now, now],
+            "INSERT INTO blocks (id, position, content, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![block_id, next_position, "", now, now],
         )
-        .context("failed to insert note block")?;
-        touch_note(&tx, note_id, &now)?;
+        .context("failed to insert block")?;
 
         let block = get_block_by_id(&tx, &block_id)?
             .ok_or_else(|| anyhow!("created block was not found immediately after insert"))?;
 
         tx.commit()
             .context("failed to commit create block transaction")?;
+
         Ok(block)
     }
 
-    pub fn update_note_block_content(
-        &mut self,
-        block_id: &str,
-        content: &str,
-    ) -> AppResult<NoteBlock> {
+    pub fn update_block_content(&mut self, block_id: &str, content: &str) -> AppResult<Block> {
         let now = timestamp_now()?;
         let tx = self.begin_tx()?;
 
-        let note_id = get_block_note_id(&tx, block_id)?
-            .ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
+        ensure_block_exists(&tx, block_id)?;
 
         tx.execute(
-            "UPDATE note_blocks
+            "UPDATE blocks
              SET content = ?2, updated_at = ?3
              WHERE id = ?1",
             params![block_id, content, now],
         )
-        .context("failed to update note block content")?;
-        touch_note(&tx, &note_id, &now)?;
+        .context("failed to update block content")?;
 
         let block = get_block_by_id(&tx, block_id)?
             .ok_or_else(|| anyhow!("updated block was not found immediately after update"))?;
 
         tx.commit()
             .context("failed to commit update block transaction")?;
+
         Ok(block)
     }
 
-    pub fn delete_note_block(&mut self, block_id: &str) -> AppResult<DeleteNoteBlockResult> {
-        let now = timestamp_now()?;
+    pub fn delete_block(&mut self, block_id: &str) -> AppResult<DeleteBlockResult> {
         let tx = self.begin_tx()?;
-
         let block_meta = get_block_meta(&tx, block_id)?
             .ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
-        let block_count = count_note_blocks(&tx, &block_meta.note_id)?;
 
-        if block_count <= 1 {
-            return Err(BusinessError::InvalidOperation(
-                "A note must keep at least one block".to_string(),
-                None,
-            )
-            .into());
-        }
-
-        tx.execute("DELETE FROM note_blocks WHERE id = ?1", params![block_id])
-            .context("failed to delete note block")?;
+        tx.execute("DELETE FROM blocks WHERE id = ?1", params![block_id])
+            .context("failed to delete block")?;
         tx.execute(
-            "UPDATE note_blocks
+            "UPDATE blocks
              SET position = position - 1
-             WHERE note_id = ?1 AND position > ?2",
-            params![block_meta.note_id, block_meta.position],
+             WHERE position > ?1",
+            params![block_meta.position],
         )
-        .context("failed to compact note block positions")?;
-        touch_note(&tx, &block_meta.note_id, &now)?;
+        .context("failed to compact block positions")?;
 
         tx.commit()
             .context("failed to commit delete block transaction")?;
 
-        Ok(DeleteNoteBlockResult {
+        Ok(DeleteBlockResult {
             deleted_block_id: block_id.to_string(),
         })
     }
 
-    fn ensure_inbox_note(&mut self) -> anyhow::Result<String> {
-        if let Some(note_id) = self.find_inbox_note_id()? {
-            return Ok(note_id);
-        }
-
-        let now = timestamp_now()?;
-        let note_id = create_id();
-        let block_id = create_id();
-        let tx = self.begin_tx()?;
-
-        tx.execute(
-            "INSERT INTO notes (id, title, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4)",
-            params![note_id, DEFAULT_NOTE_TITLE, now, now],
-        )
-        .context("failed to insert inbox note")?;
-        tx.execute(
-            "INSERT INTO note_blocks (id, note_id, position, content, created_at, updated_at)
-             VALUES (?1, ?2, 0, '', ?3, ?4)",
-            params![block_id, note_id, now, now],
-        )
-        .context("failed to insert inbox note block")?;
-        set_meta_value(&tx, INBOX_NOTE_ID_KEY, &note_id)?;
-        tx.commit()
-            .context("failed to commit inbox note transaction")?;
-
-        Ok(note_id)
-    }
-
-    fn resolve_inbox_note_id(&mut self) -> AppResult<String> {
-        if let Some(note_id) = self.find_inbox_note_id()? {
-            return Ok(note_id);
-        }
-
-        self.ensure_inbox_note().map_err(Into::into)
-    }
-
-    fn find_inbox_note_id(&mut self) -> anyhow::Result<Option<String>> {
-        let Some(note_id) = get_meta_value(&self.conn, INBOX_NOTE_ID_KEY)? else {
-            return Ok(None);
-        };
-
-        if note_exists(&self.conn, &note_id)? {
-            return Ok(Some(note_id));
-        }
-
-        self.conn
-            .execute(
-                "DELETE FROM app_meta WHERE key = ?1",
-                params![INBOX_NOTE_ID_KEY],
-            )
-            .context("failed to clear stale inbox note id")?;
-
-        Ok(None)
-    }
-
-    fn get_note_summary(&self, note_id: &str) -> AppResult<NoteSummary> {
-        self.conn
-            .query_row(
-                "SELECT id, title, created_at, updated_at FROM notes WHERE id = ?1",
-                params![note_id],
-                map_note_summary,
-            )
-            .optional()
-            .context("failed to query note summary")?
-            .ok_or_else(|| BusinessError::NotFound(note_id.to_string()).into())
-    }
-
-    fn list_blocks(&self, note_id: &str) -> AppResult<Vec<NoteBlock>> {
+    pub fn list_tags(&mut self) -> AppResult<Vec<Tag>> {
         let mut statement = self
             .conn
             .prepare(
-                "SELECT id, note_id, position, content, created_at, updated_at
-                 FROM note_blocks
-                 WHERE note_id = ?1
-                 ORDER BY position ASC",
+                "SELECT id, name, created_at, updated_at
+                 FROM tags
+                 ORDER BY name COLLATE NOCASE ASC, created_at ASC",
             )
-            .context("failed to prepare note block list query")?;
+            .context("failed to prepare tag list query")?;
 
         let rows = statement
-            .query_map(params![note_id], map_note_block)
-            .context("failed to query note blocks")?;
+            .query_map([], map_tag)
+            .context("failed to query tags")?;
 
         rows.collect::<rusqlite::Result<Vec<_>>>()
-            .context("failed to materialize note blocks")
+            .context("failed to materialize tags")
             .map_err(Into::into)
+    }
+
+    pub fn create_tag(&mut self, raw_name: &str) -> AppResult<Tag> {
+        let name = normalize_tag_name(raw_name)?;
+        let now = timestamp_now()?;
+        let tag_id = create_id();
+        let tx = self.begin_tx()?;
+
+        tx.execute(
+            "INSERT INTO tags (id, name, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4)",
+            params![tag_id, name, now, now],
+        )
+        .map_err(map_tag_write_error)?;
+
+        let tag = get_tag_by_id(&tx, &tag_id)?
+            .ok_or_else(|| anyhow!("created tag was not found immediately after insert"))?;
+
+        tx.commit()
+            .context("failed to commit create tag transaction")?;
+
+        Ok(tag)
+    }
+
+    pub fn delete_tag(&mut self, tag_id: &str) -> AppResult<()> {
+        let deleted_rows = self
+            .conn
+            .execute("DELETE FROM tags WHERE id = ?1", params![tag_id])
+            .context("failed to delete tag")?;
+
+        if deleted_rows == 0 {
+            return Err(BusinessError::NotFound(tag_id.to_string()).into());
+        }
+
+        Ok(())
+    }
+
+    pub fn set_block_tags(&mut self, block_id: &str, tag_ids: &[String]) -> AppResult<Block> {
+        let normalized_tag_ids = dedupe_ids(tag_ids);
+        let tx = self.begin_tx()?;
+        ensure_block_exists(&tx, block_id)?;
+
+        if !normalized_tag_ids.is_empty() {
+            let matched_tag_count = count_matching_tags(&tx, &normalized_tag_ids)?;
+            if matched_tag_count != normalized_tag_ids.len() {
+                return Err(BusinessError::InvalidOperation(
+                    "One or more tags do not exist".to_string(),
+                    None,
+                )
+                .into());
+            }
+        }
+
+        tx.execute(
+            "DELETE FROM block_tags WHERE block_id = ?1",
+            params![block_id],
+        )
+        .context("failed to clear block tags")?;
+
+        for tag_id in &normalized_tag_ids {
+            tx.execute(
+                "INSERT INTO block_tags (block_id, tag_id)
+                 VALUES (?1, ?2)",
+                params![block_id, tag_id],
+            )
+            .context("failed to attach tag to block")?;
+        }
+
+        let block = get_block_by_id(&tx, block_id)?
+            .ok_or_else(|| anyhow!("updated block was not found after setting tags"))?;
+
+        tx.commit()
+            .context("failed to commit set block tags transaction")?;
+
+        let mut blocks = self.attach_tags(vec![block])?;
+        blocks
+            .pop()
+            .ok_or_else(|| anyhow!("updated block was not found after attaching tags").into())
+    }
+
+    fn list_all_blocks(&self) -> AppResult<Vec<Block>> {
+        let mut statement = self
+            .conn
+            .prepare(
+                "SELECT id, position, content, created_at, updated_at
+                 FROM blocks
+                 ORDER BY position ASC",
+            )
+            .context("failed to prepare block list query")?;
+
+        let rows = statement
+            .query_map([], map_block)
+            .context("failed to query blocks")?;
+
+        rows.collect::<rusqlite::Result<Vec<_>>>()
+            .context("failed to materialize blocks")
+            .map_err(Into::into)
+    }
+
+    fn list_blocks_by_tag_ids(&self, tag_ids: &[String]) -> AppResult<Vec<Block>> {
+        let placeholders = std::iter::repeat_n("?", tag_ids.len())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let sql = format!(
+            "SELECT b.id, b.position, b.content, b.created_at, b.updated_at
+             FROM blocks b
+             JOIN block_tags bt ON bt.block_id = b.id
+             WHERE bt.tag_id IN ({placeholders})
+             GROUP BY b.id, b.position, b.content, b.created_at, b.updated_at
+             HAVING COUNT(DISTINCT bt.tag_id) = ?
+             ORDER BY b.position ASC"
+        );
+
+        let mut params = tag_ids
+            .iter()
+            .map(|tag_id| tag_id as &dyn ToSql)
+            .collect::<Vec<_>>();
+        let required_matches = tag_ids.len() as i64;
+        params.push(&required_matches);
+
+        let mut statement = self
+            .conn
+            .prepare(&sql)
+            .context("failed to prepare filtered block list query")?;
+        let rows = statement
+            .query_map(params.as_slice(), map_block)
+            .context("failed to query filtered blocks")?;
+
+        rows.collect::<rusqlite::Result<Vec<_>>>()
+            .context("failed to materialize filtered blocks")
+            .map_err(Into::into)
+    }
+
+    fn attach_tags(&self, blocks: Vec<Block>) -> AppResult<Vec<Block>> {
+        if blocks.is_empty() {
+            return Ok(blocks);
+        }
+
+        let block_ids = blocks
+            .iter()
+            .map(|block| block.id.clone())
+            .collect::<Vec<_>>();
+        let tags_by_block_id = list_tags_for_block_ids(&self.conn, &block_ids)?;
+
+        Ok(blocks
+            .into_iter()
+            .map(|mut block| {
+                block.tags = tags_by_block_id.get(&block.id).cloned().unwrap_or_default();
+                block
+            })
+            .collect())
     }
 
     fn begin_tx(&mut self) -> anyhow::Result<Transaction<'_>> {
@@ -253,34 +307,75 @@ impl NoteService {
 }
 
 fn migrations() -> Migrations<'static> {
-    Migrations::new(vec![M::up(
-        "
-        CREATE TABLE IF NOT EXISTS notes (
-            id TEXT PRIMARY KEY,
-            title TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        );
+    Migrations::new(vec![
+        M::up(
+            "
+            CREATE TABLE IF NOT EXISTS notes (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
 
-        CREATE TABLE IF NOT EXISTS note_blocks (
-            id TEXT PRIMARY KEY,
-            note_id TEXT NOT NULL,
-            position INTEGER NOT NULL CHECK (position >= 0),
-            content TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL,
-            FOREIGN KEY(note_id) REFERENCES notes(id) ON DELETE CASCADE
-        );
+            CREATE TABLE IF NOT EXISTS note_blocks (
+                id TEXT PRIMARY KEY,
+                note_id TEXT NOT NULL,
+                position INTEGER NOT NULL CHECK (position >= 0),
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY(note_id) REFERENCES notes(id) ON DELETE CASCADE
+            );
 
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_note_blocks_note_id_position
-            ON note_blocks(note_id, position);
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_note_blocks_note_id_position
+                ON note_blocks(note_id, position);
 
-        CREATE TABLE IF NOT EXISTS app_meta (
-            key TEXT PRIMARY KEY,
-            value TEXT NOT NULL
-        );
-        ",
-    )])
+            CREATE TABLE IF NOT EXISTS app_meta (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            );
+            ",
+        ),
+        M::up(
+            "
+            DROP TABLE IF EXISTS block_tags;
+            DROP TABLE IF EXISTS tags;
+            DROP TABLE IF EXISTS blocks;
+            DROP TABLE IF EXISTS note_blocks;
+            DROP TABLE IF EXISTS notes;
+            DROP TABLE IF EXISTS app_meta;
+
+            CREATE TABLE IF NOT EXISTS blocks (
+                id TEXT PRIMARY KEY,
+                position INTEGER NOT NULL CHECK (position >= 0),
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_blocks_position
+                ON blocks(position);
+
+            CREATE TABLE IF NOT EXISTS tags (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS block_tags (
+                block_id TEXT NOT NULL,
+                tag_id TEXT NOT NULL,
+                PRIMARY KEY (block_id, tag_id),
+                FOREIGN KEY(block_id) REFERENCES blocks(id) ON DELETE CASCADE,
+                FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_block_tags_tag_id
+                ON block_tags(tag_id);
+            ",
+        ),
+    ])
 }
 
 fn timestamp_now() -> anyhow::Result<String> {
@@ -293,108 +388,151 @@ fn create_id() -> String {
     Uuid::now_v7().to_string()
 }
 
-fn note_exists(conn: &Connection, note_id: &str) -> anyhow::Result<bool> {
-    let exists = conn
-        .query_row(
-            "SELECT 1 FROM notes WHERE id = ?1 LIMIT 1",
-            params![note_id],
-            |row| row.get::<_, i64>(0),
+fn dedupe_ids(ids: &[String]) -> Vec<String> {
+    let mut deduped_ids = Vec::with_capacity(ids.len());
+
+    for id in ids {
+        if id.is_empty() || deduped_ids.contains(id) {
+            continue;
+        }
+
+        deduped_ids.push(id.clone());
+    }
+
+    deduped_ids
+}
+
+fn normalize_tag_name(raw_name: &str) -> AppResult<String> {
+    let trimmed_name = raw_name.trim();
+
+    if trimmed_name.is_empty() {
+        return Err(BusinessError::InvalidOperation(
+            "Tag name must not be empty".to_string(),
+            None,
         )
-        .optional()
-        .context("failed to check note existence")?
-        .is_some();
+        .into());
+    }
 
-    Ok(exists)
+    Ok(trimmed_name.to_string())
 }
 
-fn note_exists_in_tx(tx: &Transaction<'_>, note_id: &str) -> anyhow::Result<bool> {
-    let exists = tx
-        .query_row(
-            "SELECT 1 FROM notes WHERE id = ?1 LIMIT 1",
-            params![note_id],
-            |row| row.get::<_, i64>(0),
-        )
-        .optional()
-        .context("failed to check note existence")?
-        .is_some();
+fn map_tag_write_error(error: rusqlite::Error) -> crate::error::AppError {
+    match error {
+        rusqlite::Error::SqliteFailure(sqlite_error, _) => {
+            if sqlite_error.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_UNIQUE {
+                return BusinessError::InvalidOperation(
+                    "Tag name already exists".to_string(),
+                    None,
+                )
+                .into();
+            }
 
-    Ok(exists)
+            anyhow::Error::new(rusqlite::Error::SqliteFailure(sqlite_error, None)).into()
+        }
+        other => anyhow::Error::new(other).into(),
+    }
 }
 
-fn get_meta_value(conn: &Connection, key: &str) -> anyhow::Result<Option<String>> {
-    conn.query_row(
-        "SELECT value FROM app_meta WHERE key = ?1",
-        params![key],
-        |row| row.get(0),
-    )
-    .optional()
-    .context("failed to query app meta value")
-}
-
-fn set_meta_value(tx: &Transaction<'_>, key: &str, value: &str) -> anyhow::Result<()> {
-    tx.execute(
-        "
-        INSERT INTO app_meta (key, value)
-        VALUES (?1, ?2)
-        ON CONFLICT(key) DO UPDATE SET value = excluded.value
-        ",
-        params![key, value],
-    )
-    .context("failed to upsert app meta value")?;
+fn ensure_block_exists(tx: &Transaction<'_>, block_id: &str) -> AppResult<()> {
+    if get_block_meta(tx, block_id)?.is_none() {
+        return Err(BusinessError::NotFound(block_id.to_string()).into());
+    }
 
     Ok(())
 }
 
-fn next_block_position(tx: &Transaction<'_>, note_id: &str) -> anyhow::Result<i64> {
+fn next_block_position(tx: &Transaction<'_>) -> anyhow::Result<i64> {
     tx.query_row(
-        "SELECT COALESCE(MAX(position) + 1, 0) FROM note_blocks WHERE note_id = ?1",
-        params![note_id],
+        "SELECT COALESCE(MAX(position) + 1, 0) FROM blocks",
+        [],
         |row| row.get(0),
     )
     .context("failed to compute next block position")
 }
 
-fn count_note_blocks(tx: &Transaction<'_>, note_id: &str) -> anyhow::Result<i64> {
-    tx.query_row(
-        "SELECT COUNT(*) FROM note_blocks WHERE note_id = ?1",
-        params![note_id],
-        |row| row.get(0),
-    )
-    .context("failed to count note blocks")
+fn count_matching_tags(tx: &Transaction<'_>, tag_ids: &[String]) -> anyhow::Result<usize> {
+    let placeholders = std::iter::repeat_n("?", tag_ids.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!("SELECT COUNT(*) FROM tags WHERE id IN ({placeholders})");
+    let params = tag_ids
+        .iter()
+        .map(|id| id as &dyn ToSql)
+        .collect::<Vec<_>>();
+
+    tx.query_row(&sql, params.as_slice(), |row| row.get::<_, i64>(0))
+        .map(|count| count as usize)
+        .context("failed to count matching tags")
 }
 
-fn touch_note(tx: &Transaction<'_>, note_id: &str, now: &str) -> anyhow::Result<()> {
-    tx.execute(
-        "UPDATE notes SET updated_at = ?2 WHERE id = ?1",
-        params![note_id, now],
-    )
-    .context("failed to update note timestamp")?;
-    Ok(())
+fn list_tags_for_block_ids(
+    conn: &Connection,
+    block_ids: &[String],
+) -> anyhow::Result<HashMap<String, Vec<Tag>>> {
+    let placeholders = std::iter::repeat_n("?", block_ids.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!(
+        "SELECT bt.block_id, t.id, t.name, t.created_at, t.updated_at
+         FROM block_tags bt
+         JOIN tags t ON t.id = bt.tag_id
+         WHERE bt.block_id IN ({placeholders})
+         ORDER BY t.name COLLATE NOCASE ASC, t.created_at ASC"
+    );
+    let params = block_ids
+        .iter()
+        .map(|block_id| block_id as &dyn ToSql)
+        .collect::<Vec<_>>();
+    let mut statement = conn
+        .prepare(&sql)
+        .context("failed to prepare block tags query")?;
+    let rows = statement
+        .query_map(params.as_slice(), |row| {
+            Ok((
+                row.get::<_, String>(0)?,
+                Tag {
+                    id: row.get(1)?,
+                    name: row.get(2)?,
+                    created_at: row.get(3)?,
+                    updated_at: row.get(4)?,
+                },
+            ))
+        })
+        .context("failed to query block tags")?;
+
+    let pairs = rows
+        .collect::<rusqlite::Result<Vec<_>>>()
+        .context("failed to materialize block tags")?;
+    let mut tags_by_block_id: HashMap<String, Vec<Tag>> = HashMap::new();
+
+    for (block_id, tag) in pairs {
+        tags_by_block_id.entry(block_id).or_default().push(tag);
+    }
+
+    Ok(tags_by_block_id)
 }
 
-fn get_block_note_id(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option<String>> {
+fn get_tag_by_id(tx: &Transaction<'_>, tag_id: &str) -> anyhow::Result<Option<Tag>> {
     tx.query_row(
-        "SELECT note_id FROM note_blocks WHERE id = ?1",
-        params![block_id],
-        |row| row.get(0),
+        "SELECT id, name, created_at, updated_at FROM tags WHERE id = ?1",
+        params![tag_id],
+        map_tag,
     )
     .optional()
-    .context("failed to query block note id")
+    .context("failed to query tag by id")
 }
 
 struct BlockMeta {
-    note_id: String,
     position: i64,
 }
 
 fn get_block_meta(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option<BlockMeta>> {
     tx.query_row(
-        "SELECT note_id, position FROM note_blocks WHERE id = ?1",
+        "SELECT position FROM blocks WHERE id = ?1",
         params![block_id],
         |row| {
             Ok(BlockMeta {
-                note_id: row.get(0)?,
-                position: row.get(1)?,
+                position: row.get(0)?,
             })
         },
     )
@@ -402,34 +540,34 @@ fn get_block_meta(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option
     .context("failed to query block metadata")
 }
 
-fn get_block_by_id(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option<NoteBlock>> {
+fn get_block_by_id(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option<Block>> {
     tx.query_row(
-        "SELECT id, note_id, position, content, created_at, updated_at
-         FROM note_blocks
+        "SELECT id, position, content, created_at, updated_at
+         FROM blocks
          WHERE id = ?1",
         params![block_id],
-        map_note_block,
+        map_block,
     )
     .optional()
-    .context("failed to query note block by id")
+    .context("failed to query block by id")
 }
 
-fn map_note_summary(row: &rusqlite::Row<'_>) -> rusqlite::Result<NoteSummary> {
-    Ok(NoteSummary {
+fn map_tag(row: &rusqlite::Row<'_>) -> rusqlite::Result<Tag> {
+    Ok(Tag {
         id: row.get(0)?,
-        title: row.get(1)?,
+        name: row.get(1)?,
         created_at: row.get(2)?,
         updated_at: row.get(3)?,
     })
 }
 
-fn map_note_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<NoteBlock> {
-    Ok(NoteBlock {
+fn map_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<Block> {
+    Ok(Block {
         id: row.get(0)?,
-        note_id: row.get(1)?,
-        position: row.get(2)?,
-        content: row.get(3)?,
-        created_at: row.get(4)?,
-        updated_at: row.get(5)?,
+        position: row.get(1)?,
+        content: row.get(2)?,
+        created_at: row.get(3)?,
+        updated_at: row.get(4)?,
+        tags: Vec::new(),
     })
 }

@@ -120,11 +120,14 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             features::sample::greet,
-            features::note::get_inbox_note_id,
-            features::note::get_note_by_id,
-            features::note::create_note_block,
-            features::note::update_note_block_content,
-            features::note::delete_note_block
+            features::note::list_blocks,
+            features::note::create_block,
+            features::note::update_block_content,
+            features::note::delete_block,
+            features::note::list_tags,
+            features::note::create_tag,
+            features::note::delete_tag,
+            features::note::set_block_tags
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
