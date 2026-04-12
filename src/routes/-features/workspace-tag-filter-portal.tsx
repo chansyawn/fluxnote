@@ -14,8 +14,7 @@ export function WorkspaceTagFilterPortal() {
     tags,
     visibility,
     selectedTagIds,
-    isCreatingTag,
-    deletingTagId,
+    isTagOpPending,
     setVisibility,
     setSelectedTagFilters,
     createTagAndSelectForFilter,
@@ -55,9 +54,9 @@ export function WorkspaceTagFilterPortal() {
         </span>
       </Button>
       <TagComboboxPopover
-        deletingTagId={deletingTagId}
         placeholder="Search or create tags"
-        isCreatingTag={isCreatingTag}
+        isCreatingTag={isTagOpPending("create")}
+        isDeletingTag={(tagId) => isTagOpPending("delete", tagId)}
         selectedTagIds={selectedTagIds}
         tags={tags}
         trigger={

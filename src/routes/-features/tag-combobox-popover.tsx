@@ -29,8 +29,9 @@ interface TagComboboxPopoverProps {
   triggerSize?: VariantProps<typeof buttonVariants>["size"];
   placeholder: string;
   popupContainer?: HTMLElement | null;
+  disabled?: boolean;
   isCreatingTag: boolean;
-  deletingTagId?: string | null;
+  isDeletingTag?: (tagId: string) => boolean;
   onSelectedTagIdsChange: (tagIds: string[]) => void | Promise<void>;
   onCreateTag: (name: string) => Promise<void>;
   onDeleteTag?: (tagId: string) => Promise<void>;
@@ -47,8 +48,9 @@ export function TagComboboxPopover({
   triggerSize = "icon",
   placeholder,
   popupContainer,
+  disabled = false,
   isCreatingTag,
-  deletingTagId = null,
+  isDeletingTag,
   onSelectedTagIdsChange,
   onCreateTag,
   onDeleteTag,
@@ -78,7 +80,7 @@ export function TagComboboxPopover({
     );
   }, [normalizedInputValue, tagOptions]);
   const tagExists = tags.some((tag) => normalizeTagName(tag.name) === normalizedInputValue);
-  const canCreateTag = normalizedInputValue.length > 0 && !tagExists && !isCreatingTag;
+  const canCreateTag = !disabled && normalizedInputValue.length > 0 && !tagExists && !isCreatingTag;
   const createTagFromInput = async (): Promise<void> => {
     if (!canCreateTag) {
       return;
@@ -102,7 +104,14 @@ export function TagComboboxPopover({
       }}
     >
       <ComboboxTrigger
-        render={<Button className="[&>svg:last-child]:hidden" size={triggerSize} variant="ghost" />}
+        render={
+          <Button
+            className="[&>svg:last-child]:hidden"
+            disabled={disabled}
+            size={triggerSize}
+            variant="ghost"
+          />
+        }
       >
         {trigger}
       </ComboboxTrigger>
@@ -113,6 +122,7 @@ export function TagComboboxPopover({
         container={popupContainer ?? undefined}
       >
         <ComboboxInput
+          disabled={disabled}
           placeholder={placeholder}
           showClear={inputValue.length > 0}
           showTrigger={false}
@@ -155,7 +165,7 @@ export function TagComboboxPopover({
             </ComboboxEmpty>
           ) : (
             filteredTagOptions.map((tagOption) => {
-              const isDeleting = deletingTagId === tagOption.value;
+              const isDeleting = isDeletingTag?.(tagOption.value) ?? false;
 
               return (
                 <ComboboxItem
@@ -168,7 +178,7 @@ export function TagComboboxPopover({
                   {onDeleteTag ? (
                     <Button
                       className="text-muted-foreground hover:text-foreground absolute inset-e-7 opacity-0 transition-[opacity,color] group-hover/item:opacity-100 group-data-highlighted/item:opacity-100"
-                      disabled={isDeleting}
+                      disabled={disabled || isDeleting}
                       size="icon-xs"
                       type="button"
                       variant="ghost"
