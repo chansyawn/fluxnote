@@ -93,16 +93,10 @@ export function NoteBlockPlaygroundPanel() {
         blockId="playground-block"
         focusRequestKey={0}
         initialMarkdown={markdown}
-        isDeleting={false}
-        isOnlyBlock={false}
         onBlur={() => {}}
         onFocus={() => {}}
         onMarkdownUpdated={(latestMarkdown) => {
           setMarkdown(latestMarkdown);
-        }}
-        onDelete={() => {
-          setMarkdown("");
-          setEditorVersion((prevVersion) => prevVersion + 1);
         }}
       />
     </section>
