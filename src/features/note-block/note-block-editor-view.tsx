@@ -1,12 +1,16 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { NoteEditorShell } from "@/features/note-editor-core";
+
+interface NoteBlockEditorActionsProps {
+  popupContainer: HTMLElement | null;
+}
 
 interface NoteBlockEditorViewProps {
   blockId: string;
   initialMarkdown: string;
   focusRequestKey: number;
-  actions?: ReactNode;
+  actions?: (props: NoteBlockEditorActionsProps) => ReactNode;
   onMarkdownUpdated: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
@@ -21,15 +25,18 @@ export function NoteBlockEditorView({
   onBlur,
   onFocus,
 }: NoteBlockEditorViewProps) {
+  const [popupContainer, setPopupContainer] = useState<HTMLElement | null>(null);
+
   return (
     <article
       className="group border-border bg-card relative rounded-xl border"
       data-note-block-id={blockId}
+      ref={setPopupContainer}
       onFocusCapture={onFocus}
     >
       {actions ? (
         <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/3 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
-          {actions}
+          {actions({ popupContainer })}
         </div>
       ) : null}
 

@@ -7,6 +7,7 @@ import { TagComboboxPopover } from "@/routes/-features/tag-combobox-popover";
 interface BlockTagActionProps {
   tags: Tag[];
   selectedTagIds: string[];
+  popupContainer?: HTMLElement | null;
   isCreatingTag: boolean;
   onCreateTag: (name: string) => Promise<void>;
   onSelectedTagIdsChange: (tagIds: string[]) => void | Promise<void>;
@@ -15,6 +16,7 @@ interface BlockTagActionProps {
 export function BlockTagAction({
   tags,
   selectedTagIds,
+  popupContainer,
   isCreatingTag,
   onCreateTag,
   onSelectedTagIdsChange,
@@ -23,6 +25,7 @@ export function BlockTagAction({
     <TagComboboxPopover
       placeholder="Search or assign tags"
       isCreatingTag={isCreatingTag}
+      popupContainer={popupContainer}
       selectedTagIds={selectedTagIds}
       tags={tags}
       triggerSize="icon-xs"
