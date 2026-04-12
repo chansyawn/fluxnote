@@ -1,10 +1,11 @@
 import type { BaseUIEvent } from "@base-ui/react/types";
 import { Trans } from "@lingui/react/macro";
+import type { VariantProps } from "class-variance-authority";
 import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import type { Tag } from "@/clients";
-import { Button } from "@/ui/components/button";
+import { Button, buttonVariants } from "@/ui/components/button";
 import {
   Combobox,
   ComboboxContent,
@@ -25,6 +26,7 @@ interface TagComboboxPopoverProps {
   tags: Tag[];
   selectedTagIds: string[];
   trigger: ReactNode;
+  triggerSize?: VariantProps<typeof buttonVariants>["size"];
   placeholder: string;
   isCreatingTag: boolean;
   deletingTagId?: string | null;
@@ -41,6 +43,7 @@ export function TagComboboxPopover({
   tags,
   selectedTagIds,
   trigger,
+  triggerSize = "icon",
   placeholder,
   isCreatingTag,
   deletingTagId = null,
@@ -97,7 +100,7 @@ export function TagComboboxPopover({
       }}
     >
       <ComboboxTrigger
-        render={<Button className="[&>svg:last-child]:hidden" size="icon" variant="ghost" />}
+        render={<Button className="[&>svg:last-child]:hidden" size={triggerSize} variant="ghost" />}
       >
         {trigger}
       </ComboboxTrigger>

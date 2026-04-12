@@ -1,37 +1,25 @@
-import { Trans } from "@lingui/react/macro";
-import { LoaderCircleIcon, Trash2Icon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { NoteEditorShell } from "@/features/note-editor-core";
-import { Button } from "@/ui/components/button";
-import { ButtonGroup } from "@/ui/components/button-group";
 
 interface NoteBlockEditorViewProps {
   blockId: string;
   initialMarkdown: string;
   focusRequestKey: number;
-  archiveAction?: ReactNode;
-  isDeleting: boolean;
-  isOnlyBlock: boolean;
+  actions?: ReactNode;
   onMarkdownUpdated: (markdown: string) => void;
   onBlur: () => void;
-  onDelete: () => void;
   onFocus: () => void;
-  tagAction?: ReactNode;
 }
 
 export function NoteBlockEditorView({
   blockId,
   initialMarkdown,
   focusRequestKey,
-  archiveAction,
-  isDeleting,
-  isOnlyBlock,
+  actions,
   onMarkdownUpdated,
   onBlur,
-  onDelete,
   onFocus,
-  tagAction,
 }: NoteBlockEditorViewProps) {
   return (
     <article
@@ -39,27 +27,11 @@ export function NoteBlockEditorView({
       data-note-block-id={blockId}
       onFocusCapture={onFocus}
     >
-      <div className="pointer-events-none absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
-        <ButtonGroup>
-          {tagAction}
-          {archiveAction}
-          <Button
-            size="icon"
-            variant="ghost"
-            disabled={isOnlyBlock || isDeleting}
-            onClick={onDelete}
-          >
-            {isDeleting ? (
-              <LoaderCircleIcon className="size-4 animate-spin" />
-            ) : (
-              <Trash2Icon className="size-4" />
-            )}
-            <span className="sr-only">
-              <Trans id="home-note.block.delete">Delete block</Trans>
-            </span>
-          </Button>
-        </ButtonGroup>
-      </div>
+      {actions ? (
+        <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/3 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+          {actions}
+        </div>
+      ) : null}
 
       <div className="min-h-28 px-4 pt-4 pb-4">
         <NoteEditorShell

@@ -1,9 +1,12 @@
 import { Trans } from "@lingui/react/macro";
-import { ArchiveIcon, ArchiveRestoreIcon, LoaderCircleIcon, PlusIcon, TagIcon } from "lucide-react";
+import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
+import { BlockActionBar } from "@/features/note-block/block-action-bar";
+import { BlockArchiveAction } from "@/features/note-block/block-archive-action";
+import { BlockDeleteAction } from "@/features/note-block/block-delete-action";
+import { BlockTagAction } from "@/features/note-block/block-tag-action";
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
-import { TagComboboxPopover } from "@/routes/-features/tag-combobox-popover";
 import { useBlockShortcuts } from "@/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@/routes/-features/use-block-workspace";
 import { WorkspaceTagFilterPortal } from "@/routes/-features/workspace-tag-filter-portal";
@@ -138,74 +141,47 @@ export function BlockWorkspace() {
           </div>
         )
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 pt-2">
           {blocks.map((block) => (
             <NoteBlockEditor
               key={block.id}
-              archiveAction={
-                <Button
-                  disabled={
-                    visibility === "active"
-                      ? archivingBlockId === block.id
-                      : restoringBlockId === block.id
-                  }
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => {
-                    void (visibility === "active"
-                      ? archiveBlock(block.id)
-                      : restoreBlock(block.id));
-                  }}
-                >
-                  {visibility === "active" ? (
-                    archivingBlockId === block.id ? (
-                      <LoaderCircleIcon className="size-4 animate-spin" />
-                    ) : (
-                      <ArchiveIcon className="size-4" />
-                    )
-                  ) : restoringBlockId === block.id ? (
-                    <LoaderCircleIcon className="size-4 animate-spin" />
-                  ) : (
-                    <ArchiveRestoreIcon className="size-4" />
-                  )}
-                  <span className="sr-only">
-                    {visibility === "active" ? (
-                      <Trans id="workspace.blocks.archive">Archive block</Trans>
-                    ) : (
-                      <Trans id="workspace.blocks.restore">Restore block</Trans>
-                    )}
-                  </span>
-                </Button>
+              actions={
+                <BlockActionBar>
+                  <BlockTagAction
+                    isCreatingTag={isCreatingTag}
+                    selectedTagIds={block.tags.map((tag) => tag.id)}
+                    tags={tags}
+                    onCreateTag={async (name) => {
+                      await createTagAndAssignToBlock(block.id, name);
+                    }}
+                    onSelectedTagIdsChange={async (tagIds) => {
+                      await assignBlockTags(block.id, tagIds);
+                    }}
+                  />
+                  <BlockArchiveAction
+                    isPending={
+                      visibility === "active"
+                        ? archivingBlockId === block.id
+                        : restoringBlockId === block.id
+                    }
+                    visibility={visibility}
+                    onClick={() => {
+                      void (visibility === "active"
+                        ? archiveBlock(block.id)
+                        : restoreBlock(block.id));
+                    }}
+                  />
+                  <BlockDeleteAction
+                    isDeleting={deletingBlockId === block.id}
+                    isDisabled={false}
+                    onClick={() => {
+                      void deleteBlockWithFocus(block.id);
+                    }}
+                  />
+                </BlockActionBar>
               }
               block={block}
               focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
-              isDeleting={deletingBlockId === block.id}
-              isOnlyBlock={false}
-              tagAction={
-                <TagComboboxPopover
-                  placeholder="Search or assign tags"
-                  isCreatingTag={isCreatingTag}
-                  selectedTagIds={block.tags.map((tag) => tag.id)}
-                  tags={tags}
-                  trigger={
-                    <>
-                      <TagIcon className="size-3.5" />
-                      <span className="sr-only">
-                        <Trans id="workspace.tags.assign.button">Assign tags</Trans>
-                      </span>
-                    </>
-                  }
-                  onCreateTag={async (name) => {
-                    await createTagAndAssignToBlock(block.id, name);
-                  }}
-                  onSelectedTagIdsChange={async (tagIds) => {
-                    await assignBlockTags(block.id, tagIds);
-                  }}
-                />
-              }
-              onDelete={async (blockId: string) => {
-                await deleteBlockWithFocus(blockId);
-              }}
               onFocus={setActiveBlockId}
             />
           ))}
