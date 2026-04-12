@@ -1,0 +1,47 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgFill" x1="160" y1="120" x2="864" y2="904" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7F5F1"/>
+      <stop offset="1" stop-color="#EAE5DC"/>
+    </linearGradient>
+    <linearGradient id="bgInner" x1="220" y1="180" x2="804" y2="844" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="bgStroke" x1="180" y1="140" x2="844" y2="884" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#D8D1C6" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <rect x="96" y="96" width="832" height="832" rx="184" fill="url(#bgFill)"/>
+  <rect x="132" y="132" width="760" height="760" rx="164" fill="url(#bgInner)"/>
+  <rect x="100" y="100" width="828" height="828" rx="184" stroke="url(#bgStroke)" stroke-width="4"/>
+  <g stroke="#5F5B52" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M224 392
+         C260 368 300 340 336 320
+         C360 304 380 300 396 304
+         C404 308 408 320 404 336
+         C400 352 396 364 404 368
+         C416 376 440 364 460 352
+         C480 344 500 344 520 348
+         C548 352 576 360 604 360
+         C656 364 720 356 784 340"/>
+    <path d="M228 500
+         C256 488 292 476 328 472
+         C352 468 376 472 388 484
+         C404 496 412 508 432 508
+         C456 512 488 504 524 492
+         C560 484 592 472 616 464
+         C632 460 644 456 648 464
+         C656 472 648 484 640 496
+         C632 504 632 512 640 516
+         C656 520 700 512 784 484"/>
+    <path d="M228 608
+         C272 600 312 592 352 580
+         C380 576 400 572 420 580
+         C432 584 444 596 452 608
+         C468 620 480 628 500 624
+         C524 620 548 608 576 600
+         C592 592 612 592 624 596"/>
+  </g>
+</svg>
