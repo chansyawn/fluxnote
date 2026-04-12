@@ -129,7 +129,7 @@ msgid "preferences.rtl.label"
 msgstr "Right-to-left layout"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:132
+#: src/features/shortcut/shortcut-input.tsx:150
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
@@ -149,7 +149,7 @@ msgid "preferences.shortcuts.description"
 msgstr "Configure the global shortcut and in-app block shortcuts."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:111
+#: src/features/shortcut/shortcut-input.tsx:119
 msgid "preferences.shortcuts.empty"
 msgstr "Not set"
 
@@ -169,12 +169,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:99
+#: src/features/shortcut/shortcut-input.tsx:107
 msgid "preferences.shortcuts.recording"
 msgstr "Press keys"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:123
+#: src/features/shortcut/shortcut-input.tsx:132
+msgid "preferences.shortcuts.recording.exit"
+msgstr "to exit"
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-input.tsx:141
 msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 

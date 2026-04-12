@@ -129,7 +129,7 @@ msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:132
+#: src/features/shortcut/shortcut-input.tsx:150
 msgid "preferences.shortcuts.clear"
 msgstr ""
 
@@ -149,7 +149,7 @@ msgid "preferences.shortcuts.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:111
+#: src/features/shortcut/shortcut-input.tsx:119
 msgid "preferences.shortcuts.empty"
 msgstr ""
 
@@ -169,12 +169,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:99
+#: src/features/shortcut/shortcut-input.tsx:107
 msgid "preferences.shortcuts.recording"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:123
+#: src/features/shortcut/shortcut-input.tsx:132
+msgid "preferences.shortcuts.recording.exit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/shortcut/shortcut-input.tsx:141
 msgid "preferences.shortcuts.reset"
 msgstr ""
 

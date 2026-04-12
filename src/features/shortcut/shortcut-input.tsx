@@ -67,17 +67,21 @@ export function ShortcutInput({
   onClear,
 }: ShortcutInputProps) {
   const shortcutTokens = getShortcutDisplayTokens(shortcut);
+  const recordingHintId = `${action}-shortcut-recording-hint`;
 
   return (
     <div className="min-w-0">
       <div className="group/shortcut relative">
         <button
-          aria-describedby={error ? `${action}-shortcut-error` : undefined}
+          aria-describedby={
+            isRecording ? recordingHintId : error ? `${action}-shortcut-error` : undefined
+          }
           aria-invalid={error ? true : undefined}
           aria-label={shortcutTokens.join("+") || "Not set"}
           className={cn(
             "border-border bg-input/20 text-foreground placeholder:text-muted-foreground hover:border-ring/50 focus-visible:border-ring focus-visible:ring-ring/30 flex h-7 w-full items-center rounded-md border px-2 pr-18 text-left text-xs/relaxed outline-none transition-colors focus-visible:ring-2",
             !shortcut && !isRecording && "text-muted-foreground",
+            isRecording && "pr-24",
             isRecording && "border-ring ring-ring/30 ring-2",
             error &&
               "border-destructive text-destructive focus-visible:border-destructive focus-visible:ring-destructive/20",
@@ -114,7 +118,17 @@ export function ShortcutInput({
           </span>
         </button>
 
-        {!isRecording ? (
+        {isRecording ? (
+          <div
+            id={recordingHintId}
+            className="text-muted-foreground absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1 text-xs"
+          >
+            <Kbd className="h-5 px-1.5 text-[10px]">Esc</Kbd>
+            <span>
+              <Trans id="preferences.shortcuts.recording.exit">to exit</Trans>
+            </span>
+          </div>
+        ) : (
           <div className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity group-focus-within/shortcut:opacity-100 group-hover/shortcut:opacity-100">
             {shouldShowReset ? (
               <Button aria-label="Reset shortcut" size="icon-sm" variant="ghost" onClick={onReset}>
@@ -134,7 +148,7 @@ export function ShortcutInput({
               </Button>
             ) : null}
           </div>
-        ) : null}
+        )}
       </div>
 
       <div className="mt-1 min-h-4">
