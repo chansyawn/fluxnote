@@ -9,6 +9,7 @@ import { NoteBlockEditorView } from "@/features/note-block/note-block-editor-vie
 interface NoteBlockEditorProps {
   block: Block;
   focusRequestKey: number;
+  archiveAction?: ReactNode;
   isDeleting: boolean;
   isOnlyBlock: boolean;
   onDelete: (blockId: string) => Promise<void>;
@@ -29,6 +30,7 @@ function updateBlockInCache(updatedBlock: Block): void {
 export function NoteBlockEditor({
   block,
   focusRequestKey,
+  archiveAction,
   isDeleting,
   isOnlyBlock,
   onDelete,
@@ -111,6 +113,7 @@ export function NoteBlockEditor({
       blockId={block.id}
       focusRequestKey={focusRequestKey}
       initialMarkdown={block.content}
+      archiveAction={archiveAction}
       isDeleting={isDeleting}
       isOnlyBlock={isOnlyBlock}
       onBlur={flushPendingSave}

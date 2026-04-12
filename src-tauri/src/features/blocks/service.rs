@@ -2,15 +2,20 @@ use anyhow::{anyhow, Context};
 use rusqlite::{params, Connection, OptionalExtension, ToSql, Transaction};
 
 use crate::error::{AppResult, BusinessError};
+use crate::features::blocks::BlockVisibility;
 use crate::features::tags;
 
 use super::models::{Block, DeleteBlockResult};
 
-pub fn list_blocks(conn: &Connection, tag_ids: &[String]) -> AppResult<Vec<Block>> {
+pub fn list_blocks(
+    conn: &Connection,
+    tag_ids: &[String],
+    visibility: BlockVisibility,
+) -> AppResult<Vec<Block>> {
     let blocks = if tag_ids.is_empty() {
-        list_all_blocks(conn)?
+        list_all_blocks(conn, visibility)?
     } else {
-        list_blocks_by_tag_ids(conn, tag_ids)?
+        list_blocks_by_tag_ids(conn, tag_ids, visibility)?
     };
 
     attach_tags(conn, blocks)
@@ -65,6 +70,14 @@ pub fn update_block_content(
     Ok(block)
 }
 
+pub fn archive_block(conn: &mut Connection, block_id: &str) -> AppResult<Block> {
+    set_block_archive_state(conn, block_id, true)
+}
+
+pub fn restore_block(conn: &mut Connection, block_id: &str) -> AppResult<Block> {
+    set_block_archive_state(conn, block_id, false)
+}
+
 pub fn delete_block(conn: &mut Connection, block_id: &str) -> AppResult<DeleteBlockResult> {
     let tx = begin_tx(conn)?;
     let block_meta = get_block_meta(&tx, block_id)?
@@ -113,7 +126,7 @@ pub(crate) fn get_block_by_id(
     block_id: &str,
 ) -> anyhow::Result<Option<Block>> {
     tx.query_row(
-        "SELECT id, position, content, created_at, updated_at
+        "SELECT id, position, content, archived_at, created_at, updated_at
          FROM blocks
          WHERE id = ?1",
         params![block_id],
@@ -123,17 +136,18 @@ pub(crate) fn get_block_by_id(
     .context("failed to query block by id")
 }
 
-fn list_all_blocks(conn: &Connection) -> AppResult<Vec<Block>> {
+fn list_all_blocks(conn: &Connection, visibility: BlockVisibility) -> AppResult<Vec<Block>> {
     let mut statement = conn
         .prepare(
-            "SELECT id, position, content, created_at, updated_at
+            "SELECT id, position, content, archived_at, created_at, updated_at
              FROM blocks
+             WHERE archived_at IS NULL = ?1
              ORDER BY position ASC",
         )
         .context("failed to prepare block list query")?;
 
     let rows = statement
-        .query_map([], map_block)
+        .query_map([visibility_is_active(visibility)], map_block)
         .context("failed to query blocks")?;
 
     rows.collect::<rusqlite::Result<Vec<_>>>()
@@ -141,25 +155,32 @@ fn list_all_blocks(conn: &Connection) -> AppResult<Vec<Block>> {
         .map_err(Into::into)
 }
 
-fn list_blocks_by_tag_ids(conn: &Connection, tag_ids: &[String]) -> AppResult<Vec<Block>> {
+fn list_blocks_by_tag_ids(
+    conn: &Connection,
+    tag_ids: &[String],
+    visibility: BlockVisibility,
+) -> AppResult<Vec<Block>> {
     let placeholders = std::iter::repeat_n("?", tag_ids.len())
         .collect::<Vec<_>>()
         .join(", ");
     let sql = format!(
-        "SELECT b.id, b.position, b.content, b.created_at, b.updated_at
+        "SELECT b.id, b.position, b.content, b.archived_at, b.created_at, b.updated_at
          FROM blocks b
          JOIN block_tags bt ON bt.block_id = b.id
          WHERE bt.tag_id IN ({placeholders})
-         GROUP BY b.id, b.position, b.content, b.created_at, b.updated_at
+           AND b.archived_at IS NULL = ?
+         GROUP BY b.id, b.position, b.content, b.archived_at, b.created_at, b.updated_at
          HAVING COUNT(DISTINCT bt.tag_id) = ?
          ORDER BY b.position ASC"
     );
 
     let required_matches = tag_ids.len() as i64;
+    let visibility_is_active = visibility_is_active(visibility);
     let mut params = tag_ids
         .iter()
         .map(|tag_id| tag_id as &dyn ToSql)
         .collect::<Vec<_>>();
+    params.push(&visibility_is_active);
     params.push(&required_matches);
 
     let mut statement = conn
@@ -177,6 +198,33 @@ fn list_blocks_by_tag_ids(conn: &Connection, tag_ids: &[String]) -> AppResult<Ve
 fn begin_tx(conn: &mut Connection) -> anyhow::Result<Transaction<'_>> {
     conn.transaction()
         .context("failed to start sqlite transaction")
+}
+
+fn set_block_archive_state(
+    conn: &mut Connection,
+    block_id: &str,
+    archived: bool,
+) -> AppResult<Block> {
+    let now = crate::features::tags::service::timestamp_now()?;
+    let tx = begin_tx(conn)?;
+
+    ensure_block_exists(&tx, block_id)?;
+
+    tx.execute(
+        "UPDATE blocks
+         SET archived_at = ?2, updated_at = ?3
+         WHERE id = ?1",
+        params![block_id, archived.then_some(now.clone()), now],
+    )
+    .context("failed to update block archive state")?;
+
+    let block = get_block_by_id(&tx, block_id)?
+        .ok_or_else(|| anyhow!("updated block was not found after archive state change"))?;
+
+    tx.commit()
+        .context("failed to commit archive state transaction")?;
+
+    Ok(block)
 }
 
 fn ensure_block_exists(tx: &Transaction<'_>, block_id: &str) -> AppResult<()> {
@@ -219,8 +267,13 @@ fn map_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<Block> {
         id: row.get(0)?,
         position: row.get(1)?,
         content: row.get(2)?,
-        created_at: row.get(3)?,
-        updated_at: row.get(4)?,
+        archived_at: row.get(3)?,
+        created_at: row.get(4)?,
+        updated_at: row.get(5)?,
         tags: Vec::new(),
     })
+}
+
+fn visibility_is_active(visibility: BlockVisibility) -> bool {
+    matches!(visibility, BlockVisibility::Active)
 }

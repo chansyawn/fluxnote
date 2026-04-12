@@ -5,13 +5,17 @@ export interface Block {
   id: string;
   position: number;
   content: string;
+  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
   tags: Tag[];
 }
 
+export type BlockVisibility = "active" | "archived";
+
 export interface ListBlocksRequest {
   tagIds?: string[];
+  visibility?: BlockVisibility;
 }
 
 export interface UpdateBlockContentRequest {
@@ -20,6 +24,10 @@ export interface UpdateBlockContentRequest {
 }
 
 export interface DeleteBlockRequest {
+  blockId: string;
+}
+
+export interface BlockMutationRequest {
   blockId: string;
 }
 
@@ -41,4 +49,12 @@ export async function updateBlockContent(req: UpdateBlockContentRequest): Promis
 
 export async function deleteBlock(req: DeleteBlockRequest): Promise<DeleteBlockResult> {
   return await invoke<DeleteBlockResult>("blocks_delete", { ...req });
+}
+
+export async function archiveBlock(req: BlockMutationRequest): Promise<Block> {
+  return await invoke<Block>("blocks_archive", { ...req });
+}
+
+export async function restoreBlock(req: BlockMutationRequest): Promise<Block> {
+  return await invoke<Block>("blocks_restore", { ...req });
 }
