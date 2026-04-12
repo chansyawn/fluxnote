@@ -28,6 +28,7 @@ interface TagComboboxPopoverProps {
   trigger: ReactNode;
   triggerSize?: VariantProps<typeof buttonVariants>["size"];
   placeholder: string;
+  popupContainer?: HTMLElement | null;
   isCreatingTag: boolean;
   deletingTagId?: string | null;
   onSelectedTagIdsChange: (tagIds: string[]) => void | Promise<void>;
@@ -45,6 +46,7 @@ export function TagComboboxPopover({
   trigger,
   triggerSize = "icon",
   placeholder,
+  popupContainer,
   isCreatingTag,
   deletingTagId = null,
   onSelectedTagIdsChange,
@@ -105,7 +107,11 @@ export function TagComboboxPopover({
         {trigger}
       </ComboboxTrigger>
 
-      <ComboboxContent align="end" className="w-72 min-w-72">
+      <ComboboxContent
+        align="end"
+        className="w-72 min-w-72"
+        container={popupContainer ?? undefined}
+      >
         <ComboboxInput
           placeholder={placeholder}
           showClear={inputValue.length > 0}

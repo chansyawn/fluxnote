@@ -145,10 +145,11 @@ export function BlockWorkspace() {
           {blocks.map((block) => (
             <NoteBlockEditor
               key={block.id}
-              actions={
+              actions={({ popupContainer }) => (
                 <BlockActionBar>
                   <BlockTagAction
                     isCreatingTag={isCreatingTag}
+                    popupContainer={popupContainer}
                     selectedTagIds={block.tags.map((tag) => tag.id)}
                     tags={tags}
                     onCreateTag={async (name) => {
@@ -179,7 +180,7 @@ export function BlockWorkspace() {
                     }}
                   />
                 </BlockActionBar>
-              }
+              )}
               block={block}
               focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
               onFocus={setActiveBlockId}
