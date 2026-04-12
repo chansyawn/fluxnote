@@ -1,20 +1,22 @@
 export { greet } from "@/clients/sample";
 export {
-  createNoteBlock,
-  deleteNoteBlock,
-  getInboxNoteId,
-  getNoteById,
-  updateNoteBlockContent,
+  createBlock,
+  createTag,
+  deleteBlock,
+  deleteTag,
+  listBlocks,
+  listTags,
+  setBlockTags,
+  updateBlockContent,
 } from "@/clients/note";
 export type { GreetRequest, GreetResponse } from "@/clients/sample";
 export type {
-  CreateNoteBlockRequest,
-  DeleteNoteBlockRequest,
-  DeleteNoteBlockResult,
-  GetInboxNoteIdResponse,
-  GetNoteByIdRequest,
-  NoteDetail,
-  NoteBlock,
-  NoteSummary,
-  UpdateNoteBlockContentRequest,
+  Block,
+  CreateTagRequest,
+  DeleteBlockResult,
+  DeleteTagRequest,
+  ListBlocksRequest,
+  SetBlockTagsRequest,
+  Tag,
+  UpdateBlockContentRequest,
 } from "@/clients/note";

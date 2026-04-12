@@ -1,69 +1,79 @@
 import { invoke } from "@/app/invoke";
 
-export interface NoteSummary {
+export interface Tag {
   id: string;
-  title: string;
+  name: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface NoteBlock {
+export interface Block {
   id: string;
-  noteId: string;
   position: number;
   content: string;
   createdAt: string;
   updatedAt: string;
+  tags: Tag[];
 }
 
-export interface NoteDetail {
-  note: NoteSummary;
-  blocks: NoteBlock[];
+export interface ListBlocksRequest {
+  tagIds?: string[];
 }
 
-export interface GetNoteByIdRequest {
-  noteId: string;
-}
-
-export interface CreateNoteBlockRequest {
-  noteId: string;
-}
-
-export interface UpdateNoteBlockContentRequest {
+export interface UpdateBlockContentRequest {
   blockId: string;
   content: string;
 }
 
-export interface DeleteNoteBlockRequest {
+export interface DeleteBlockRequest {
   blockId: string;
 }
 
-export interface DeleteNoteBlockResult {
+export interface DeleteBlockResult {
   deletedBlockId: string;
 }
 
-export interface GetInboxNoteIdResponse {
-  noteId: string;
+export interface CreateTagRequest {
+  name: string;
 }
 
-export async function getInboxNoteId(): Promise<GetInboxNoteIdResponse> {
-  return await invoke<GetInboxNoteIdResponse>("get_inbox_note_id");
+export interface DeleteTagRequest {
+  tagId: string;
 }
 
-export async function getNoteById(req: GetNoteByIdRequest): Promise<NoteDetail> {
-  return await invoke<NoteDetail>("get_note_by_id", { ...req });
+export interface SetBlockTagsRequest {
+  blockId: string;
+  tagIds: string[];
 }
 
-export async function createNoteBlock(req: CreateNoteBlockRequest): Promise<NoteBlock> {
-  return await invoke<NoteBlock>("create_note_block", { ...req });
+export async function listBlocks(req: ListBlocksRequest = {}): Promise<Block[]> {
+  return await invoke<Block[]>("list_blocks", { ...req });
 }
 
-export async function updateNoteBlockContent(
-  req: UpdateNoteBlockContentRequest,
-): Promise<NoteBlock> {
-  return await invoke<NoteBlock>("update_note_block_content", { ...req });
+export async function createBlock(): Promise<Block> {
+  return await invoke<Block>("create_block");
 }
 
-export async function deleteNoteBlock(req: DeleteNoteBlockRequest): Promise<DeleteNoteBlockResult> {
-  return await invoke<DeleteNoteBlockResult>("delete_note_block", { ...req });
+export async function updateBlockContent(req: UpdateBlockContentRequest): Promise<Block> {
+  return await invoke<Block>("update_block_content", { ...req });
+}
+
+export async function deleteBlock(req: DeleteBlockRequest): Promise<DeleteBlockResult> {
+  return await invoke<DeleteBlockResult>("delete_block", { ...req });
+}
+
+export async function listTags(): Promise<Tag[]> {
+  return await invoke<Tag[]>("list_tags");
+}
+
+export async function createTag(req: CreateTagRequest): Promise<Tag> {
+  return await invoke<Tag>("create_tag", { ...req });
+}
+
+export async function deleteTag(req: DeleteTagRequest): Promise<void> {
+  await invoke("delete_tag", { ...req });
+}
+
+export async function setBlockTags(req: SetBlockTagsRequest): Promise<Block> {
+  return await invoke<Block>("set_block_tags", { ...req });
 }

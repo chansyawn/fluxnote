@@ -39,12 +39,7 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:78
-msgid "home-note.add-block"
-msgstr "Add block"
-
-#. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:51
+#: src/features/note-block/note-block-editor-view.tsx:54
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -52,11 +47,6 @@ msgstr "Delete block"
 #: src/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
 msgstr "Write something..."
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:20
-msgid "home-note.loading"
-msgstr "Loading your note..."
 
 #. js-lingui-explicit-id
 #: src/routes/lab/index.tsx:21
@@ -94,21 +84,6 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:68
-msgid "note.route.init-error.retry"
-msgstr "Retry"
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:58
-msgid "note.route.init-error.title"
-msgstr "Failed to open inbox note"
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:40
-msgid "note.route.initializing"
-msgstr "Opening your inbox note..."
-
-#. js-lingui-explicit-id
 #: src/routes/preferences.tsx:38
 msgid "preferences.description"
 msgstr "Configure language and layout."
@@ -129,7 +104,7 @@ msgid "preferences.rtl.label"
 msgstr "Right-to-left layout"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:150
+#: src/features/shortcut/shortcut-input.tsx:146
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
@@ -149,7 +124,7 @@ msgid "preferences.shortcuts.description"
 msgstr "Configure the global shortcut and in-app block shortcuts."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:119
+#: src/features/shortcut/shortcut-input.tsx:115
 msgid "preferences.shortcuts.empty"
 msgstr "Not set"
 
@@ -169,17 +144,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:107
+#: src/features/shortcut/shortcut-input.tsx:103
 msgid "preferences.shortcuts.recording"
 msgstr "Press keys"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:132
+#: src/features/shortcut/shortcut-input.tsx:128
 msgid "preferences.shortcuts.recording.exit"
 msgstr "to exit"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:141
+#: src/features/shortcut/shortcut-input.tsx:137
 msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
@@ -287,3 +262,78 @@ msgstr "Practices Demonstrated on This Page"
 #: src/routes/-features/window-title-bar.tsx:75
 msgid "window.hide"
 msgstr "Hide window"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:345
+msgid "workspace.add-block"
+msgstr "Add block"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:167
+msgid "workspace.blocks.tags.empty"
+msgstr "No tags yet. Create one above to classify this block."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:306
+msgid "workspace.blocks.tags.label"
+msgstr "Tags"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:222
+msgid "workspace.empty.action"
+msgstr "Create first block"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:206
+msgid "workspace.empty.description"
+msgstr "Start with an empty block and organize it later using tags."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:203
+msgid "workspace.empty.title"
+msgstr "No blocks yet"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:291
+msgid "workspace.filtered.empty.description"
+msgstr "Clear one of the filters or create a new block outside the current tag selection."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:288
+msgid "workspace.filtered.empty.title"
+msgstr "No blocks match the selected tags"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:15
+msgid "workspace.loading"
+msgstr "Loading your blocks..."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:150
+msgid "workspace.tags.create-action"
+msgstr "Add tag"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:132
+msgid "workspace.tags.create-title"
+msgstr "Create tag"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:91
+msgid "workspace.tags.delete"
+msgstr "Delete tag"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:40
+msgid "workspace.tags.empty"
+msgstr "Create tags to organize your blocks."
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:51
+msgid "workspace.tags.filter-title"
+msgstr "Filter by tag"
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:351
+msgid "workspace.tags.hint"
+msgstr "Tags only classify blocks and control filtering. They do not change editor behavior."

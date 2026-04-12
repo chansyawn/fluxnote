@@ -1,3 +1,4 @@
-export const inboxNoteIdQueryKey = ["notes", "inbox-id"] as const;
+export const blockListQueryKey = (tagIds: string[]) =>
+  ["blocks", [...tagIds].sort((left, right) => left.localeCompare(right))] as const;
 
-export const noteDetailQueryKey = (noteId: string) => ["notes", noteId] as const;
+export const tagListQueryKey = ["tags"] as const;

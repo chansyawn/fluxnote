@@ -39,23 +39,13 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:78
-msgid "home-note.add-block"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:51
+#: src/features/note-block/note-block-editor-view.tsx:54
 msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/notes/$id/-features/note-page.tsx:20
-msgid "home-note.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -94,21 +84,6 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/index.tsx:68
-msgid "note.route.init-error.retry"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:58
-msgid "note.route.init-error.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/index.tsx:40
-msgid "note.route.initializing"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/routes/preferences.tsx:38
 msgid "preferences.description"
 msgstr ""
@@ -129,7 +104,7 @@ msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:150
+#: src/features/shortcut/shortcut-input.tsx:146
 msgid "preferences.shortcuts.clear"
 msgstr ""
 
@@ -149,7 +124,7 @@ msgid "preferences.shortcuts.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:119
+#: src/features/shortcut/shortcut-input.tsx:115
 msgid "preferences.shortcuts.empty"
 msgstr ""
 
@@ -169,17 +144,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:107
+#: src/features/shortcut/shortcut-input.tsx:103
 msgid "preferences.shortcuts.recording"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:132
+#: src/features/shortcut/shortcut-input.tsx:128
 msgid "preferences.shortcuts.recording.exit"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-input.tsx:141
+#: src/features/shortcut/shortcut-input.tsx:137
 msgid "preferences.shortcuts.reset"
 msgstr ""
 
@@ -286,4 +261,79 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/routes/-features/window-title-bar.tsx:75
 msgid "window.hide"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:345
+msgid "workspace.add-block"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:167
+msgid "workspace.blocks.tags.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:306
+msgid "workspace.blocks.tags.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:222
+msgid "workspace.empty.action"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:206
+msgid "workspace.empty.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:203
+msgid "workspace.empty.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:291
+msgid "workspace.filtered.empty.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:288
+msgid "workspace.filtered.empty.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:15
+msgid "workspace.loading"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:150
+msgid "workspace.tags.create-action"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:132
+msgid "workspace.tags.create-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:91
+msgid "workspace.tags.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:40
+msgid "workspace.tags.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:51
+msgid "workspace.tags.filter-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/-features/block-workspace.tsx:351
+msgid "workspace.tags.hint"
 msgstr ""
