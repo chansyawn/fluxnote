@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { startTransition, useState } from "react";
+import { createContext, startTransition, useContext, useState, type ReactNode } from "react";
 
 import { queryClient } from "@/app/query";
 import {
@@ -15,22 +15,27 @@ import {
 } from "@/clients";
 import { blockListQueryKey, tagListQueryKey } from "@/features/note-block/note-query-key";
 
-interface UseBlockWorkspaceResult {
+interface BlockWorkspaceState {
   blocks: Block[];
   tags: Tag[];
   selectedTagIds: string[];
-  isLoading: boolean;
+  isInitialLoading: boolean;
+  isRefreshing: boolean;
   isCreatingBlock: boolean;
   isCreatingTag: boolean;
   deletingBlockId: string | null;
   deletingTagId: string | null;
-  toggleTagFilter: (tagId: string) => void;
+  setSelectedTagFilters: (tagIds: string[]) => void;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
   createTag: (name: string) => Promise<void>;
+  createTagAndSelectForFilter: (name: string) => Promise<void>;
+  createTagAndAssignToBlock: (blockId: string, name: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
-  setBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
+  assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
 }
+
+const BlockWorkspaceContext = createContext<BlockWorkspaceState | null>(null);
 
 function replaceBlockInCaches(updatedBlock: Block): void {
   queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
@@ -42,7 +47,7 @@ function replaceBlockInCaches(updatedBlock: Block): void {
   });
 }
 
-export function useBlockWorkspace(): UseBlockWorkspaceResult {
+export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const blocksQuery = useQuery({
@@ -51,6 +56,7 @@ export function useBlockWorkspace(): UseBlockWorkspaceResult {
       await listBlocks({
         tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
       }),
+    placeholderData: (previousData) => previousData,
   });
   const tagsQuery = useQuery({
     queryKey: tagListQueryKey,
@@ -122,21 +128,18 @@ export function useBlockWorkspace(): UseBlockWorkspaceResult {
     },
   });
 
-  return {
+  const contextValue: BlockWorkspaceState = {
     blocks: blocksQuery.data ?? [],
     tags: tagsQuery.data ?? [],
     selectedTagIds,
-    isLoading: blocksQuery.isPending || tagsQuery.isPending,
+    isInitialLoading: blocksQuery.data === undefined || tagsQuery.data === undefined,
+    isRefreshing: blocksQuery.isFetching || tagsQuery.isFetching,
     isCreatingBlock: createBlockMutation.isPending,
     isCreatingTag: createTagMutation.isPending,
     deletingBlockId: deleteBlockMutation.variables ?? null,
     deletingTagId: deleteTagMutation.variables ?? null,
-    toggleTagFilter: (tagId: string) => {
-      setSelectedTagIds((current) =>
-        current.includes(tagId)
-          ? current.filter((currentTagId) => currentTagId !== tagId)
-          : [...current, tagId],
-      );
+    setSelectedTagFilters: (tagIds: string[]) => {
+      setSelectedTagIds(tagIds);
     },
     createBlock: async () => await createBlockMutation.mutateAsync(),
     deleteBlock: async (blockId: string) => {
@@ -145,10 +148,43 @@ export function useBlockWorkspace(): UseBlockWorkspaceResult {
     createTag: async (name: string) => {
       await createTagMutation.mutateAsync(name);
     },
+    createTagAndSelectForFilter: async (name: string) => {
+      const createdTag = await createTagMutation.mutateAsync(name);
+      setSelectedTagIds((current) => {
+        if (current.includes(createdTag.id)) {
+          return current;
+        }
+
+        return [...current, createdTag.id];
+      });
+    },
+    createTagAndAssignToBlock: async (blockId: string, name: string) => {
+      const createdTag = await createTagMutation.mutateAsync(name);
+      const targetBlock = blocksQuery.data?.find((block) => block.id === blockId);
+      const nextTagIds = targetBlock
+        ? [...new Set([...targetBlock.tags.map((tag) => tag.id), createdTag.id])]
+        : [createdTag.id];
+
+      await setBlockTagsMutation.mutateAsync({ blockId, tagIds: nextTagIds });
+    },
     deleteTag: async (tagId: string) => {
       await deleteTagMutation.mutateAsync(tagId);
     },
-    setBlockTags: async (blockId: string, tagIds: string[]) =>
+    assignBlockTags: async (blockId: string, tagIds: string[]) =>
       await setBlockTagsMutation.mutateAsync({ blockId, tagIds }),
   };
+
+  return (
+    <BlockWorkspaceContext.Provider value={contextValue}>{children}</BlockWorkspaceContext.Provider>
+  );
+}
+
+export function useBlockWorkspace() {
+  const context = useContext(BlockWorkspaceContext);
+
+  if (!context) {
+    throw new Error("useBlockWorkspace must be used within BlockWorkspaceProvider");
+  }
+
+  return context;
 }

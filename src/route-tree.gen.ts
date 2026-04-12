@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PreferencesRouteImport } from './routes/preferences'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LabIndexRouteImport } from './routes/lab/index'
-import { Route as NotesIdIndexRouteImport } from './routes/notes/$id/index'
 
 const PreferencesRoute = PreferencesRouteImport.update({
   id: '/preferences',
@@ -29,44 +28,35 @@ const LabIndexRoute = LabIndexRouteImport.update({
   path: '/lab/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotesIdIndexRoute = NotesIdIndexRouteImport.update({
-  id: '/notes/$id/',
-  path: '/notes/$id/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/lab/': typeof LabIndexRoute
-  '/notes/$id/': typeof NotesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/lab': typeof LabIndexRoute
-  '/notes/$id': typeof NotesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/preferences': typeof PreferencesRoute
   '/lab/': typeof LabIndexRoute
-  '/notes/$id/': typeof NotesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/preferences' | '/lab/' | '/notes/$id/'
+  fullPaths: '/' | '/preferences' | '/lab/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/preferences' | '/lab' | '/notes/$id'
-  id: '__root__' | '/' | '/preferences' | '/lab/' | '/notes/$id/'
+  to: '/' | '/preferences' | '/lab'
+  id: '__root__' | '/' | '/preferences' | '/lab/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PreferencesRoute: typeof PreferencesRoute
   LabIndexRoute: typeof LabIndexRoute
-  NotesIdIndexRoute: typeof NotesIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,13 +82,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notes/$id/': {
-      id: '/notes/$id/'
-      path: '/notes/$id'
-      fullPath: '/notes/$id/'
-      preLoaderRoute: typeof NotesIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -106,7 +89,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PreferencesRoute: PreferencesRoute,
   LabIndexRoute: LabIndexRoute,
-  NotesIdIndexRoute: NotesIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

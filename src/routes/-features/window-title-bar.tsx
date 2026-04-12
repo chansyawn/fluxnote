@@ -15,6 +15,7 @@ function HeaderActionButton() {
 
   return (
     <Button
+      data-window-control
       size="icon"
       variant="ghost"
       onClick={() => {
@@ -41,6 +42,7 @@ function HeaderLabButton() {
 
   return (
     <Button
+      data-window-control
       size="icon"
       variant="ghost"
       onClick={() => {
@@ -84,6 +86,10 @@ export function WindowTitleBar() {
       <div
         className="relative z-10 flex h-full items-center gap-2 px-3"
         onMouseDown={(event) => {
+          if ((event.target as HTMLElement).closest("[data-window-control]")) {
+            return;
+          }
+
           if (event.buttons === 1 && event.detail === 1) void appWindow.startDragging();
         }}
       >
@@ -96,6 +102,12 @@ export function WindowTitleBar() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
+          <div
+            aria-hidden="true"
+            className="contents"
+            data-window-control
+            id="titlebar-workspace-actions"
+          />
           {import.meta.env.DEV ? <HeaderLabButton /> : null}
           <HeaderActionButton />
         </div>

@@ -16,7 +16,7 @@ interface NoteBlockEditorViewProps {
   onBlur: () => void;
   onDelete: () => void;
   onFocus: () => void;
-  footer?: ReactNode;
+  tagAction?: ReactNode;
 }
 
 export function NoteBlockEditorView({
@@ -29,7 +29,7 @@ export function NoteBlockEditorView({
   onBlur,
   onDelete,
   onFocus,
-  footer,
+  tagAction,
 }: NoteBlockEditorViewProps) {
   return (
     <article
@@ -39,6 +39,7 @@ export function NoteBlockEditorView({
     >
       <div className="pointer-events-none absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
         <ButtonGroup>
+          {tagAction}
           <Button
             size="icon"
             variant="ghost"
@@ -65,8 +66,6 @@ export function NoteBlockEditorView({
           onMarkdownUpdated={onMarkdownUpdated}
         />
       </div>
-
-      {footer ? <div className="border-border/70 border-t px-4 py-3">{footer}</div> : null}
     </article>
   );
 }

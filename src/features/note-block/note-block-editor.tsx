@@ -13,7 +13,7 @@ interface NoteBlockEditorProps {
   isOnlyBlock: boolean;
   onDelete: (blockId: string) => Promise<void>;
   onFocus: (blockId: string) => void;
-  footer?: ReactNode;
+  tagAction?: ReactNode;
 }
 
 function updateBlockInCache(updatedBlock: Block): void {
@@ -33,7 +33,7 @@ export function NoteBlockEditor({
   isOnlyBlock,
   onDelete,
   onFocus,
-  footer,
+  tagAction,
 }: NoteBlockEditorProps) {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
@@ -115,7 +115,7 @@ export function NoteBlockEditor({
       isOnlyBlock={isOnlyBlock}
       onBlur={flushPendingSave}
       onMarkdownUpdated={handleMarkdownUpdated}
-      footer={footer}
+      tagAction={tagAction}
       onDelete={() => {
         void onDelete(block.id);
       }}
