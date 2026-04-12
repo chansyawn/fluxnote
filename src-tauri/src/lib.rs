@@ -6,6 +6,7 @@ use tauri::{
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
+mod database;
 mod error;
 mod features;
 
@@ -110,8 +111,8 @@ pub fn run() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            let note_state = features::note::init_note_state(app.handle())?;
-            app.manage(note_state);
+            let database_state = database::DatabaseState::init(app.handle())?;
+            app.manage(database_state);
             configure_main_window(app.handle())?;
             #[cfg(target_os = "macos")]
             app.handle().set_dock_visibility(false)?;
@@ -120,14 +121,14 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             features::sample::greet,
-            features::note::list_blocks,
-            features::note::create_block,
-            features::note::update_block_content,
-            features::note::delete_block,
-            features::note::list_tags,
-            features::note::create_tag,
-            features::note::delete_tag,
-            features::note::set_block_tags
+            features::blocks::blocks_list,
+            features::blocks::blocks_create,
+            features::blocks::blocks_update_content,
+            features::blocks::blocks_delete,
+            features::tags::tags_list,
+            features::tags::tags_create,
+            features::tags::tags_delete,
+            features::tags::tags_set_block_tags
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
