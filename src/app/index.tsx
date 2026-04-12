@@ -7,6 +7,7 @@ import { queryClient } from "@/app/query";
 import { ThemeStateProvider } from "@/app/theme";
 import { ShortcutStateProvider } from "@/features/shortcut/shortcut-state";
 import { routeTree } from "@/route-tree.gen";
+import { Toaster } from "@/ui/components/sonner";
 
 const router = createRouter({ routeTree });
 
@@ -24,6 +25,7 @@ export function App() {
           <ShortcutStateProvider>
             <DirectionStateProvider>
               <RouterProvider router={router} />
+              <Toaster />
             </DirectionStateProvider>
           </ShortcutStateProvider>
         </QueryClientProvider>
