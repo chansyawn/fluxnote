@@ -39,7 +39,7 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:54
+#: src/features/note-block/note-block-editor-view.tsx:55
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
@@ -264,76 +264,61 @@ msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:345
+#: src/routes/-features/block-workspace.tsx:168
 msgid "workspace.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:167
-msgid "workspace.blocks.tags.empty"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:306
-msgid "workspace.blocks.tags.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:222
+#: src/routes/-features/block-workspace.tsx:49
 msgid "workspace.empty.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:206
+#: src/routes/-features/block-workspace.tsx:35
 msgid "workspace.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:203
+#: src/routes/-features/block-workspace.tsx:32
 msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:291
+#: src/routes/-features/block-workspace.tsx:118
 msgid "workspace.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:288
+#: src/routes/-features/block-workspace.tsx:115
 msgid "workspace.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:15
+#: src/routes/-features/block-workspace.tsx:16
 msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:150
-msgid "workspace.tags.create-action"
+#: src/routes/-features/tag-combobox-popover.tsx:70
+msgid "workspace.tags.assign.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:132
-msgid "workspace.tags.create-title"
+#: src/routes/-features/tag-combobox-popover.tsx:130
+msgid "workspace.tags.create-inline"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:91
-msgid "workspace.tags.delete"
+#: src/routes/-features/tag-combobox-popover.tsx:169
+msgid "workspace.tags.delete-inline"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:40
-msgid "workspace.tags.empty"
+#: src/routes/-features/tag-combobox-popover.tsx:68
+msgid "workspace.tags.filter.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:51
-msgid "workspace.tags.filter-title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:351
-msgid "workspace.tags.hint"
+#: src/routes/-features/tag-combobox-popover.tsx:137
+msgid "workspace.tags.search.empty"
 msgstr ""

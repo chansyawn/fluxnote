@@ -39,7 +39,7 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/features/note-block/note-block-editor-view.tsx:54
+#: src/features/note-block/note-block-editor-view.tsx:55
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -264,76 +264,61 @@ msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:345
+#: src/routes/-features/block-workspace.tsx:168
 msgid "workspace.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:167
-msgid "workspace.blocks.tags.empty"
-msgstr "No tags yet. Create one above to classify this block."
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:306
-msgid "workspace.blocks.tags.label"
-msgstr "Tags"
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:222
+#: src/routes/-features/block-workspace.tsx:49
 msgid "workspace.empty.action"
 msgstr "Create first block"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:206
+#: src/routes/-features/block-workspace.tsx:35
 msgid "workspace.empty.description"
-msgstr "Start with an empty block and organize it later using tags."
+msgstr "Start with an empty block."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:203
+#: src/routes/-features/block-workspace.tsx:32
 msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:291
+#: src/routes/-features/block-workspace.tsx:118
 msgid "workspace.filtered.empty.description"
 msgstr "Clear one of the filters or create a new block outside the current tag selection."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:288
+#: src/routes/-features/block-workspace.tsx:115
 msgid "workspace.filtered.empty.title"
 msgstr "No blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:15
+#: src/routes/-features/block-workspace.tsx:16
 msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:150
-msgid "workspace.tags.create-action"
-msgstr "Add tag"
+#: src/routes/-features/tag-combobox-popover.tsx:70
+msgid "workspace.tags.assign.button"
+msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:132
-msgid "workspace.tags.create-title"
+#: src/routes/-features/tag-combobox-popover.tsx:130
+msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:91
-msgid "workspace.tags.delete"
+#: src/routes/-features/tag-combobox-popover.tsx:169
+msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:40
-msgid "workspace.tags.empty"
-msgstr "Create tags to organize your blocks."
+#: src/routes/-features/tag-combobox-popover.tsx:68
+msgid "workspace.tags.filter.button"
+msgstr "Filter tags"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:51
-msgid "workspace.tags.filter-title"
-msgstr "Filter by tag"
-
-#. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:351
-msgid "workspace.tags.hint"
-msgstr "Tags only classify blocks and control filtering. They do not change editor behavior."
+#: src/routes/-features/tag-combobox-popover.tsx:137
+msgid "workspace.tags.search.empty"
+msgstr "No matching tags"
