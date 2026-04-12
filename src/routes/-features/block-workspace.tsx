@@ -79,10 +79,9 @@ export function BlockWorkspace() {
     selectedTagIds,
     isInitialLoading,
     isCreatingBlock,
-    isCreatingTag,
-    archivingBlockId,
-    restoringBlockId,
-    deletingBlockId,
+    isBlockLocked,
+    isBlockOpPending,
+    isTagOpPending,
     createBlock,
     archiveBlock,
     restoreBlock,
@@ -142,50 +141,55 @@ export function BlockWorkspace() {
         )
       ) : (
         <div className="flex flex-col gap-3 pt-2">
-          {blocks.map((block) => (
-            <NoteBlockEditor
-              key={block.id}
-              actions={({ popupContainer }) => (
-                <BlockActionBar>
-                  <BlockTagAction
-                    isCreatingTag={isCreatingTag}
-                    popupContainer={popupContainer}
-                    selectedTagIds={block.tags.map((tag) => tag.id)}
-                    tags={tags}
-                    onCreateTag={async (name) => {
-                      await createTagAndAssignToBlock(block.id, name);
-                    }}
-                    onSelectedTagIdsChange={async (tagIds) => {
-                      await assignBlockTags(block.id, tagIds);
-                    }}
-                  />
-                  <BlockArchiveAction
-                    isPending={
-                      visibility === "active"
-                        ? archivingBlockId === block.id
-                        : restoringBlockId === block.id
-                    }
-                    visibility={visibility}
-                    onClick={() => {
-                      void (visibility === "active"
-                        ? archiveBlock(block.id)
-                        : restoreBlock(block.id));
-                    }}
-                  />
-                  <BlockDeleteAction
-                    isDeleting={deletingBlockId === block.id}
-                    isDisabled={false}
-                    onClick={() => {
-                      void deleteBlockWithFocus(block.id);
-                    }}
-                  />
-                </BlockActionBar>
-              )}
-              block={block}
-              focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
-              onFocus={setActiveBlockId}
-            />
-          ))}
+          {blocks.map((block) => {
+            const isActionGroupDisabled = isBlockLocked(block.id);
+
+            return (
+              <NoteBlockEditor
+                key={block.id}
+                actions={({ popupContainer }) => (
+                  <BlockActionBar disabled={isActionGroupDisabled}>
+                    <BlockTagAction
+                      isCreatingTag={isTagOpPending("create")}
+                      isDisabled={isActionGroupDisabled}
+                      popupContainer={popupContainer}
+                      selectedTagIds={block.tags.map((tag) => tag.id)}
+                      tags={tags}
+                      onCreateTag={async (name) => {
+                        await createTagAndAssignToBlock(block.id, name);
+                      }}
+                      onSelectedTagIdsChange={async (tagIds) => {
+                        await assignBlockTags(block.id, tagIds);
+                      }}
+                    />
+                    <BlockArchiveAction
+                      isDisabled={isActionGroupDisabled}
+                      isPending={isBlockOpPending(
+                        block.id,
+                        visibility === "active" ? "archive" : "restore",
+                      )}
+                      visibility={visibility}
+                      onClick={() => {
+                        void (visibility === "active"
+                          ? archiveBlock(block.id)
+                          : restoreBlock(block.id));
+                      }}
+                    />
+                    <BlockDeleteAction
+                      isDeleting={isBlockOpPending(block.id, "delete")}
+                      isDisabled={isActionGroupDisabled}
+                      onClick={() => {
+                        void deleteBlockWithFocus(block.id);
+                      }}
+                    />
+                  </BlockActionBar>
+                )}
+                block={block}
+                focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
+                onFocus={setActiveBlockId}
+              />
+            );
+          })}
         </div>
       )}
 

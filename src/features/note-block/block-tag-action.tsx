@@ -8,6 +8,7 @@ interface BlockTagActionProps {
   tags: Tag[];
   selectedTagIds: string[];
   popupContainer?: HTMLElement | null;
+  isDisabled: boolean;
   isCreatingTag: boolean;
   onCreateTag: (name: string) => Promise<void>;
   onSelectedTagIdsChange: (tagIds: string[]) => void | Promise<void>;
@@ -17,6 +18,7 @@ export function BlockTagAction({
   tags,
   selectedTagIds,
   popupContainer,
+  isDisabled,
   isCreatingTag,
   onCreateTag,
   onSelectedTagIdsChange,
@@ -24,6 +26,7 @@ export function BlockTagAction({
   return (
     <TagComboboxPopover
       placeholder="Search or assign tags"
+      disabled={isDisabled}
       isCreatingTag={isCreatingTag}
       popupContainer={popupContainer}
       selectedTagIds={selectedTagIds}

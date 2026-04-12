@@ -6,13 +6,19 @@ import { Button } from "@/ui/components/button";
 
 interface BlockArchiveActionProps {
   visibility: BlockVisibility;
+  isDisabled: boolean;
   isPending: boolean;
   onClick: () => void;
 }
 
-export function BlockArchiveAction({ visibility, isPending, onClick }: BlockArchiveActionProps) {
+export function BlockArchiveAction({
+  visibility,
+  isDisabled,
+  isPending,
+  onClick,
+}: BlockArchiveActionProps) {
   return (
-    <Button disabled={isPending} size="icon-xs" variant="ghost" onClick={onClick}>
+    <Button disabled={isDisabled || isPending} size="icon-xs" variant="ghost" onClick={onClick}>
       {isPending ? (
         <LoaderCircleIcon className="size-3 animate-spin" />
       ) : visibility === "active" ? (

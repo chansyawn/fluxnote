@@ -1,22 +1,13 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createContext, startTransition, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
-import { queryClient } from "@/app/query";
+import type { Block, BlockVisibility } from "@/clients";
+import type { Tag } from "@/clients/tags";
 import {
-  archiveBlock,
-  createBlock,
-  createTag,
-  deleteBlock,
-  deleteTag,
-  listBlocks,
-  listTags,
-  restoreBlock,
-  setBlockTags,
-  type Block,
-  type BlockVisibility,
-  type Tag,
-} from "@/clients";
-import { blockListQueryKey, tagListQueryKey } from "@/features/note-block/note-query-key";
+  type BlockMutationOperation,
+  type TagMutationOperation,
+  useWorkspaceData,
+} from "@/routes/-features/use-workspace-data";
+import { useWorkspaceViewState } from "@/routes/-features/use-workspace-view-state";
 
 interface BlockWorkspaceState {
   blocks: Block[];
@@ -26,11 +17,9 @@ interface BlockWorkspaceState {
   isInitialLoading: boolean;
   isRefreshing: boolean;
   isCreatingBlock: boolean;
-  isCreatingTag: boolean;
-  archivingBlockId: string | null;
-  restoringBlockId: string | null;
-  deletingBlockId: string | null;
-  deletingTagId: string | null;
+  isBlockLocked: (blockId: string) => boolean;
+  isBlockOpPending: (blockId: string, op: BlockMutationOperation) => boolean;
+  isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
   setVisibility: (visibility: BlockVisibility) => void;
   setSelectedTagFilters: (tagIds: string[]) => void;
   createBlock: () => Promise<Block>;
@@ -46,169 +35,59 @@ interface BlockWorkspaceState {
 
 const BlockWorkspaceContext = createContext<BlockWorkspaceState | null>(null);
 
-function replaceBlockInCaches(updatedBlock: Block): void {
-  queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
-    if (!current) {
-      return current;
-    }
-
-    return current.map((block) => (block.id === updatedBlock.id ? updatedBlock : block));
-  });
-}
-
 export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
-  const [visibility, setVisibility] = useState<BlockVisibility>("active");
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-
-  const blocksQuery = useQuery({
-    queryKey: blockListQueryKey(selectedTagIds, visibility),
-    queryFn: async () =>
-      await listBlocks({
-        tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
-        visibility,
-      }),
-    placeholderData: (previousData) => previousData,
-  });
-  const tagsQuery = useQuery({
-    queryKey: tagListQueryKey,
-    queryFn: listTags,
-  });
-
-  const createBlockMutation = useMutation({
-    mutationFn: async () => {
-      const newBlock = await createBlock();
-
-      if (selectedTagIds.length === 0) {
-        return newBlock;
-      }
-
-      return await setBlockTags({ blockId: newBlock.id, tagIds: selectedTagIds });
-    },
-    onSuccess: (newBlock) => {
-      startTransition(() => {
-        queryClient.setQueryData<Block[]>(blockListQueryKey([], "active"), (current) =>
-          current ? [...current, newBlock] : [newBlock],
-        );
-      });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const archiveBlockMutation = useMutation({
-    mutationFn: async (blockId: string) => await archiveBlock({ blockId }),
-    onSuccess: (updatedBlock) => {
-      startTransition(() => {
-        replaceBlockInCaches(updatedBlock);
-      });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const restoreBlockMutation = useMutation({
-    mutationFn: async (blockId: string) => await restoreBlock({ blockId }),
-    onSuccess: (updatedBlock) => {
-      startTransition(() => {
-        replaceBlockInCaches(updatedBlock);
-      });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const deleteBlockMutation = useMutation({
-    mutationFn: async (blockId: string) => await deleteBlock({ blockId }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const createTagMutation = useMutation({
-    mutationFn: async (name: string) => await createTag({ name }),
-    onSuccess: (tag) => {
-      startTransition(() => {
-        queryClient.setQueryData<Tag[]>(tagListQueryKey, (current) =>
-          current
-            ? [...current, tag].sort((left, right) => left.name.localeCompare(right.name))
-            : [tag],
-        );
-      });
-    },
-  });
-
-  const deleteTagMutation = useMutation({
-    mutationFn: async (tagId: string) => await deleteTag({ tagId }),
-    onSuccess: (_, tagId) => {
-      startTransition(() => {
-        setSelectedTagIds((current) => current.filter((currentTagId) => currentTagId !== tagId));
-        queryClient.setQueryData<Tag[]>(
-          tagListQueryKey,
-          (current) => current?.filter((tag) => tag.id !== tagId) ?? current,
-        );
-      });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const setBlockTagsMutation = useMutation({
-    mutationFn: async ({ blockId, tagIds }: { blockId: string; tagIds: string[] }) =>
-      await setBlockTags({ blockId, tagIds }),
-    onSuccess: (updatedBlock) => {
-      startTransition(() => {
-        replaceBlockInCaches(updatedBlock);
-      });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
+  const viewState = useWorkspaceViewState();
+  const data = useWorkspaceData({
+    selectedTagIds: viewState.selectedTagIds,
+    visibility: viewState.visibility,
   });
 
   const contextValue: BlockWorkspaceState = {
-    blocks: blocksQuery.data ?? [],
-    tags: tagsQuery.data ?? [],
-    visibility,
-    selectedTagIds,
-    isInitialLoading: blocksQuery.data === undefined || tagsQuery.data === undefined,
-    isRefreshing: blocksQuery.isFetching || tagsQuery.isFetching,
-    isCreatingBlock: createBlockMutation.isPending,
-    isCreatingTag: createTagMutation.isPending,
-    archivingBlockId: archiveBlockMutation.variables ?? null,
-    restoringBlockId: restoreBlockMutation.variables ?? null,
-    deletingBlockId: deleteBlockMutation.variables ?? null,
-    deletingTagId: deleteTagMutation.variables ?? null,
-    setVisibility,
-    setSelectedTagFilters: (tagIds: string[]) => {
-      setSelectedTagIds(tagIds);
-    },
-    createBlock: async () => await createBlockMutation.mutateAsync(),
-    archiveBlock: async (blockId: string) => await archiveBlockMutation.mutateAsync(blockId),
-    restoreBlock: async (blockId: string) => await restoreBlockMutation.mutateAsync(blockId),
-    deleteBlock: async (blockId: string) => {
-      await deleteBlockMutation.mutateAsync(blockId);
-    },
+    blocks: data.blocks,
+    tags: data.tags,
+    visibility: viewState.visibility,
+    selectedTagIds: viewState.selectedTagIds,
+    isInitialLoading: data.isInitialLoading,
+    isRefreshing: data.isRefreshing,
+    isCreatingBlock: data.isCreatingBlock,
+    isBlockLocked: data.isBlockLocked,
+    isBlockOpPending: data.isBlockOpPending,
+    isTagOpPending: data.isTagOpPending,
+    setVisibility: viewState.setVisibility,
+    setSelectedTagFilters: viewState.setSelectedTagIds,
+    createBlock: data.createBlock,
+    archiveBlock: data.archiveBlock,
+    restoreBlock: data.restoreBlock,
+    deleteBlock: data.deleteBlock,
     createTag: async (name: string) => {
-      await createTagMutation.mutateAsync(name);
+      await data.createTag(name);
     },
     createTagAndSelectForFilter: async (name: string) => {
-      const createdTag = await createTagMutation.mutateAsync(name);
-      setSelectedTagIds((current) => {
-        if (current.includes(createdTag.id)) {
-          return current;
+      const createdTag = await data.createTag(name);
+      viewState.setSelectedTagIds((currentTagIds) => {
+        if (currentTagIds.includes(createdTag.id)) {
+          return currentTagIds;
         }
 
-        return [...current, createdTag.id];
+        return [...currentTagIds, createdTag.id];
       });
     },
     createTagAndAssignToBlock: async (blockId: string, name: string) => {
-      const createdTag = await createTagMutation.mutateAsync(name);
-      const targetBlock = blocksQuery.data?.find((block) => block.id === blockId);
+      const createdTag = await data.createTag(name);
+      const targetBlock = data.blocks.find((block) => block.id === blockId);
       const nextTagIds = targetBlock
         ? [...new Set([...targetBlock.tags.map((tag) => tag.id), createdTag.id])]
         : [createdTag.id];
 
-      await setBlockTagsMutation.mutateAsync({ blockId, tagIds: nextTagIds });
+      await data.assignBlockTags(blockId, nextTagIds);
     },
     deleteTag: async (tagId: string) => {
-      await deleteTagMutation.mutateAsync(tagId);
+      await data.deleteTag(tagId);
+      viewState.setSelectedTagIds((currentTagIds) =>
+        currentTagIds.filter((currentTagId) => currentTagId !== tagId),
+      );
     },
-    assignBlockTags: async (blockId: string, tagIds: string[]) =>
-      await setBlockTagsMutation.mutateAsync({ blockId, tagIds }),
+    assignBlockTags: data.assignBlockTags,
   };
 
   return (

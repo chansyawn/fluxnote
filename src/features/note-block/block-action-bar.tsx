@@ -1,14 +1,22 @@
 import type { ReactNode } from "react";
 
 import { ButtonGroup } from "@/ui/components/button-group";
+import { cn } from "@/ui/lib/utils";
 
 interface BlockActionBarProps {
   children: ReactNode;
+  disabled?: boolean;
 }
 
-export function BlockActionBar({ children }: BlockActionBarProps) {
+export function BlockActionBar({ children, disabled = false }: BlockActionBarProps) {
   return (
-    <ButtonGroup className="border-border/70 bg-card/95 rounded-lg border p-0.25">
+    <ButtonGroup
+      aria-disabled={disabled}
+      className={cn(
+        "border-border/70 bg-card/95 rounded-lg border p-0.25",
+        disabled && "pointer-events-none opacity-75",
+      )}
+    >
       {children}
     </ButtonGroup>
   );
