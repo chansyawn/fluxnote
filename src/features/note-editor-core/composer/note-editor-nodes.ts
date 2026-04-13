@@ -1,4 +1,4 @@
-import { CodeNode } from "@lexical/code";
+import { CodeHighlightNode, CodeNode } from "@lexical/code-core";
 import { HorizontalRuleNode } from "@lexical/extension";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
@@ -13,6 +13,7 @@ export const NOTE_EDITOR_NODES: ReadonlyArray<Klass<LexicalNode>> = [
   ListItemNode,
   LinkNode,
   CodeNode,
+  CodeHighlightNode,
   HorizontalRuleNode,
   TableNode,
   TableRowNode,
