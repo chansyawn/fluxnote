@@ -2,10 +2,12 @@ import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect } from "react";
 
+import { RouterErrorFallback } from "@/features/error-boundary";
 import { WindowTitleBar } from "@/routes/-features/window-title-bar";
 
 export const Route = createRootRoute({
   component: RootComponent,
+  errorComponent: RouterErrorFallback,
 });
 
 const appWindow = getCurrentWindow();
