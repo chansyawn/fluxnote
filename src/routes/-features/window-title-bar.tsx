@@ -82,7 +82,7 @@ function HeaderCloseButton() {
 
 export function WindowTitleBar() {
   return (
-    <header className="z-20 h-10 select-none">
+    <header className="z-20 mb-1 h-8 pt-1 select-none">
       <div
         className="relative z-10 flex h-full items-center gap-2 px-3"
         onMouseDown={(event) => {

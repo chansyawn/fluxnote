@@ -110,7 +110,7 @@ export function BlockWorkspace() {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+    <section className="z-10 mx-auto flex w-full max-w-4xl flex-col gap-4">
       <WorkspaceTagFilterPortal />
       {blocks.length === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
