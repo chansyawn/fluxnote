@@ -34,7 +34,7 @@ export function WorkspaceTagFilterPortal() {
     <div className="flex shrink-0 items-center gap-1" data-window-control>
       <Button
         data-window-control
-        size="icon-sm"
+        size="icon"
         variant="ghost"
         onClick={() => {
           setVisibility(visibility === "active" ? "archived" : "active");

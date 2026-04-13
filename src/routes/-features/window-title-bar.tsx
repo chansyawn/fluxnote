@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { ArrowLeftIcon, FlaskConicalIcon, HouseIcon, Settings2Icon, XIcon } from "lucide-react";
+import { FlaskConicalIcon, HouseIcon, Settings2Icon, XIcon } from "lucide-react";
 
 import { Button } from "@/ui/components/button";
 
@@ -22,7 +22,7 @@ function HeaderActionButton() {
         void navigate({ to: onPreferencesPage ? "/" : "/preferences" });
       }}
     >
-      {onPreferencesPage ? <ArrowLeftIcon /> : <Settings2Icon />}
+      {onPreferencesPage ? <HouseIcon /> : <Settings2Icon />}
       <span className="sr-only">
         {onPreferencesPage ? (
           <Trans id="header.go-home">Go home</Trans>
@@ -101,6 +101,8 @@ export function WindowTitleBar() {
           <Trans id="app.title">FluxNote</Trans>
         </div>
 
+        {import.meta.env.DEV ? <HeaderLabButton /> : null}
+
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <div
             aria-hidden="true"
@@ -108,7 +110,6 @@ export function WindowTitleBar() {
             data-window-control
             id="titlebar-workspace-actions"
           />
-          {import.meta.env.DEV ? <HeaderLabButton /> : null}
           <HeaderActionButton />
         </div>
       </div>
