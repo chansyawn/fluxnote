@@ -1,4 +1,4 @@
-use std::{collections::HashSet, time::Duration};
+use std::time::Duration;
 
 use anyhow::Context;
 use serde::Serialize;
@@ -11,7 +11,8 @@ use crate::{
     database::DatabaseState,
     error::AppResult,
     features::{
-        auto_archive::AutoArchiveState, blocks::service as block_service,
+        auto_archive::{core, AutoArchiveState},
+        blocks::service as block_service,
         tags::service::timestamp_now,
     },
 };
@@ -107,7 +108,6 @@ pub fn sync_runtime_state<R: Runtime>(
     let window_visible = current_window_visible(app)?;
     let state = app.state::<AutoArchiveState>();
     let last_scan_at = timestamp_now()?;
-
     if !config.enabled {
         let should_emit = state.clear(last_scan_at.clone(), window_visible);
 
@@ -135,26 +135,23 @@ pub fn sync_runtime_state<R: Runtime>(
         block_service::list_stale_active_block_ids(&conn, &cutoff)?
     };
 
-    let archived_count = if window_visible {
+    let decision = core::decide_runtime_update(core::RuntimeInput {
+        enabled: true,
+        window_visible,
+        force_archive_when_hidden,
+        stale_block_ids,
+    });
+    let archived_count = if decision.should_archive {
+        let mut conn = database_state.lock()?;
+        block_service::archive_blocks_without_touching_updated_at(
+            &mut conn,
+            &decision.archive_target_block_ids,
+        )?
+    } else {
         0
-    } else {
-        let should_archive = force_archive_when_hidden || !stale_block_ids.is_empty();
-
-        if !should_archive {
-            0
-        } else {
-            let mut conn = database_state.lock()?;
-            block_service::archive_blocks_without_touching_updated_at(&mut conn, &stale_block_ids)?
-        }
-    };
-
-    let pending_archive_block_ids = if window_visible {
-        stale_block_ids
-    } else {
-        HashSet::new()
     };
     let should_emit = state.update(
-        pending_archive_block_ids.clone(),
+        decision.pending_archive_block_ids.clone(),
         last_scan_at,
         window_visible,
     );
@@ -164,7 +161,7 @@ pub fn sync_runtime_state<R: Runtime>(
             app,
             AutoArchiveEventPayload {
                 archived_count,
-                pending_count: pending_archive_block_ids.len(),
+                pending_count: decision.pending_archive_block_ids.len(),
                 window_visible,
             },
         )?;
@@ -188,6 +185,18 @@ pub fn read_config<R: Runtime>(app: &AppHandle<R>) -> AppResult<AutoArchiveConfi
     let auto_archive = store
         .get(AUTO_ARCHIVE_KEY)
         .unwrap_or_else(default_auto_archive_value);
+    Ok(parse_auto_archive_config(&auto_archive))
+}
+
+fn default_auto_archive_value() -> Value {
+    json!({
+        "enabled": DEFAULT_AUTO_ARCHIVE_ENABLED,
+        "idleMinutes": DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
+        "scanIntervalSeconds": DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
+    })
+}
+
+fn parse_auto_archive_config(auto_archive: &Value) -> AutoArchiveConfig {
     let enabled = auto_archive
         .get("enabled")
         .and_then(Value::as_bool)
@@ -203,19 +212,11 @@ pub fn read_config<R: Runtime>(app: &AppHandle<R>) -> AppResult<AutoArchiveConfi
         .filter(|value| *value > 0)
         .unwrap_or(DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS);
 
-    Ok(AutoArchiveConfig {
+    AutoArchiveConfig {
         enabled,
         idle_minutes,
         scan_interval_seconds,
-    })
-}
-
-fn default_auto_archive_value() -> Value {
-    json!({
-        "enabled": DEFAULT_AUTO_ARCHIVE_ENABLED,
-        "idleMinutes": DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
-        "scanIntervalSeconds": DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
-    })
+    }
 }
 
 fn current_window_visible<R: Runtime>(app: &AppHandle<R>) -> AppResult<bool> {
@@ -240,4 +241,43 @@ fn emit_state_changed<R: Runtime>(
         })?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::{
+        parse_auto_archive_config, DEFAULT_AUTO_ARCHIVE_ENABLED, DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
+        DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
+    };
+
+    #[test]
+    fn parse_auto_archive_config_uses_defaults_for_missing_or_invalid_values() {
+        let config = parse_auto_archive_config(&json!({
+            "enabled": "invalid",
+            "idleMinutes": 0,
+            "scanIntervalSeconds": -1
+        }));
+
+        assert_eq!(config.enabled, DEFAULT_AUTO_ARCHIVE_ENABLED);
+        assert_eq!(config.idle_minutes, DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES);
+        assert_eq!(
+            config.scan_interval_seconds,
+            DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS
+        );
+    }
+
+    #[test]
+    fn parse_auto_archive_config_uses_valid_values() {
+        let config = parse_auto_archive_config(&json!({
+            "enabled": false,
+            "idleMinutes": 42,
+            "scanIntervalSeconds": 120
+        }));
+
+        assert!(!config.enabled);
+        assert_eq!(config.idle_minutes, 42);
+        assert_eq!(config.scan_interval_seconds, 120);
+    }
 }

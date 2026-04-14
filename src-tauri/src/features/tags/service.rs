@@ -253,3 +253,133 @@ fn map_tag(row: &rusqlite::Row<'_>) -> rusqlite::Result<Tag> {
         updated_at: row.get(3)?,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        database::new_in_memory_connection,
+        error::{AppError, BusinessError},
+        features::blocks::service as block_service,
+    };
+
+    use super::{create_tag, delete_tag, list_tags_for_block_ids, set_block_tags};
+
+    #[test]
+    fn create_tag_trims_name() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let tag = create_tag(&mut conn, "  hello  ").expect("tag should be created");
+
+        assert_eq!(tag.name, "hello");
+    }
+
+    #[test]
+    fn create_tag_rejects_blank_name() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let error = create_tag(&mut conn, "   ").expect_err("blank tag name should fail");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::InvalidOperation(message, _))
+            if message == "Tag name must not be empty"
+        ));
+    }
+
+    #[test]
+    fn create_tag_rejects_duplicate_name() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        create_tag(&mut conn, "hello").expect("first create should succeed");
+
+        let error = create_tag(&mut conn, "hello").expect_err("duplicate tag name should fail");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::InvalidOperation(message, _))
+            if message == "Tag name already exists"
+        ));
+    }
+
+    #[test]
+    fn delete_tag_returns_not_found_for_missing_tag() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let error = delete_tag(&mut conn, "missing-id").expect_err("missing tag should fail");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::NotFound(id)) if id == "missing-id"
+        ));
+    }
+
+    #[test]
+    fn set_block_tags_dedupes_and_ignores_empty_ids() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let block = block_service::create_block(&mut conn).expect("block should be created");
+        let tag1 = create_tag(&mut conn, "Tag A").expect("tag1 should be created");
+        let tag2 = create_tag(&mut conn, "Tag B").expect("tag2 should be created");
+
+        let updated = set_block_tags(
+            &mut conn,
+            &block.id,
+            &[
+                tag1.id.clone(),
+                String::new(),
+                tag1.id.clone(),
+                tag2.id.clone(),
+            ],
+        )
+        .expect("set block tags should succeed");
+
+        assert_eq!(updated.tags.len(), 2);
+        assert_eq!(updated.tags[0].id, tag1.id);
+        assert_eq!(updated.tags[1].id, tag2.id);
+    }
+
+    #[test]
+    fn set_block_tags_fails_when_any_tag_is_missing() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let block = block_service::create_block(&mut conn).expect("block should be created");
+
+        let error = set_block_tags(&mut conn, &block.id, &["missing-tag-id".to_string()])
+            .expect_err("set block tags should fail for missing tag");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::InvalidOperation(message, _))
+            if message == "One or more tags do not exist"
+        ));
+    }
+
+    #[test]
+    fn list_tags_for_block_ids_groups_results_by_block() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let block1 = block_service::create_block(&mut conn).expect("block1 should be created");
+        let block2 = block_service::create_block(&mut conn).expect("block2 should be created");
+        let tag1 = create_tag(&mut conn, "Alpha").expect("tag1 should be created");
+        let tag2 = create_tag(&mut conn, "Beta").expect("tag2 should be created");
+
+        set_block_tags(&mut conn, &block1.id, &[tag1.id.clone(), tag2.id.clone()])
+            .expect("block1 tags should be set");
+        set_block_tags(&mut conn, &block2.id, std::slice::from_ref(&tag2.id))
+            .expect("block2 tags should be set");
+
+        let grouped = list_tags_for_block_ids(&conn, &[block1.id.clone(), block2.id.clone()])
+            .expect("grouped tags should be listed");
+
+        assert_eq!(
+            grouped
+                .get(&block1.id)
+                .expect("block1 tags should exist")
+                .len(),
+            2
+        );
+        assert_eq!(
+            grouped
+                .get(&block2.id)
+                .expect("block2 tags should exist")
+                .len(),
+            1
+        );
+    }
+}

@@ -1,3 +1,4 @@
+pub(crate) mod core;
 pub(crate) mod service;
 
 use std::{collections::HashSet, sync::Mutex};

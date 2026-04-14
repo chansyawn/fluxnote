@@ -334,3 +334,153 @@ fn map_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<Block> {
 fn visibility_is_active(visibility: BlockVisibility) -> bool {
     matches!(visibility, BlockVisibility::Active)
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+
+    use rusqlite::params;
+
+    use crate::{
+        database::new_in_memory_connection,
+        error::{AppError, BusinessError},
+        features::{blocks::BlockVisibility, tags::service as tag_service},
+    };
+
+    use super::{
+        archive_block, archive_blocks_without_touching_updated_at, create_block, delete_block,
+        list_blocks, list_stale_active_block_ids, update_block_content,
+    };
+
+    #[test]
+    fn create_block_assigns_incremental_positions() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let first = create_block(&mut conn).expect("first block should be created");
+        let second = create_block(&mut conn).expect("second block should be created");
+
+        assert_eq!(first.position, 0);
+        assert_eq!(second.position, 1);
+    }
+
+    #[test]
+    fn update_block_content_returns_not_found_for_missing_block() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let error = update_block_content(&mut conn, "missing-id", "content")
+            .expect_err("missing block should return error");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::NotFound(id)) if id == "missing-id"
+        ));
+    }
+
+    #[test]
+    fn delete_block_compacts_positions_after_removal() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let first = create_block(&mut conn).expect("first block should be created");
+        let middle = create_block(&mut conn).expect("middle block should be created");
+        let last = create_block(&mut conn).expect("last block should be created");
+
+        delete_block(&mut conn, &middle.id).expect("delete should succeed");
+
+        let blocks =
+            list_blocks(&conn, &[], BlockVisibility::Active).expect("blocks should be listed");
+        assert_eq!(blocks.len(), 2);
+        assert_eq!(blocks[0].id, first.id);
+        assert_eq!(blocks[0].position, 0);
+        assert_eq!(blocks[1].id, last.id);
+        assert_eq!(blocks[1].position, 1);
+    }
+
+    #[test]
+    fn delete_block_returns_not_found_for_missing_block() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+
+        let error = delete_block(&mut conn, "missing-id").expect_err("missing block should fail");
+
+        assert!(matches!(
+            error,
+            AppError::Business(BusinessError::NotFound(id)) if id == "missing-id"
+        ));
+    }
+
+    #[test]
+    fn list_blocks_filters_by_all_tag_ids() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let block1 = create_block(&mut conn).expect("block1 should be created");
+        let block2 = create_block(&mut conn).expect("block2 should be created");
+        let tag1 = tag_service::create_tag(&mut conn, "Tag A").expect("tag1 should be created");
+        let tag2 = tag_service::create_tag(&mut conn, "Tag B").expect("tag2 should be created");
+
+        tag_service::set_block_tags(&mut conn, &block1.id, &[tag1.id.clone(), tag2.id.clone()])
+            .expect("block1 tags should be set");
+        tag_service::set_block_tags(&mut conn, &block2.id, std::slice::from_ref(&tag1.id))
+            .expect("block2 tags should be set");
+
+        let by_tag1 = list_blocks(
+            &conn,
+            std::slice::from_ref(&tag1.id),
+            BlockVisibility::Active,
+        )
+        .expect("tag filtered list should succeed");
+        assert_eq!(by_tag1.len(), 2);
+
+        let by_both = list_blocks(
+            &conn,
+            &[tag1.id.clone(), tag2.id.clone()],
+            BlockVisibility::Active,
+        )
+        .expect("all-tags filtered list should succeed");
+        assert_eq!(by_both.len(), 1);
+        assert_eq!(by_both[0].id, block1.id);
+    }
+
+    #[test]
+    fn archive_blocks_without_touching_updated_at_preserves_timestamp() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let block = create_block(&mut conn).expect("block should be created");
+        let updated = update_block_content(&mut conn, &block.id, "hello")
+            .expect("content update should succeed");
+        let before = updated.updated_at.clone();
+
+        let archived_count = archive_blocks_without_touching_updated_at(
+            &mut conn,
+            &HashSet::from([block.id.clone()]),
+        )
+        .expect("archive should succeed");
+
+        assert_eq!(archived_count, 1);
+        let archived = list_blocks(&conn, &[], BlockVisibility::Archived)
+            .expect("archived blocks should list");
+        assert_eq!(archived.len(), 1);
+        assert!(archived[0].archived_at.is_some());
+        assert_eq!(archived[0].updated_at, before);
+    }
+
+    #[test]
+    fn list_stale_active_block_ids_excludes_archived_blocks() {
+        let mut conn = new_in_memory_connection().expect("test db should initialize");
+        let active = create_block(&mut conn).expect("active block should be created");
+        let archived = create_block(&mut conn).expect("archived block should be created");
+
+        conn.execute(
+            "UPDATE blocks SET updated_at = ?2 WHERE id = ?1",
+            params![active.id, "2020-01-01T00:00:00Z"],
+        )
+        .expect("active block updated_at should be set");
+        conn.execute(
+            "UPDATE blocks SET updated_at = ?2 WHERE id = ?1",
+            params![archived.id, "2020-01-01T00:00:00Z"],
+        )
+        .expect("archived block updated_at should be set");
+        archive_block(&mut conn, &archived.id).expect("archived block should be archived");
+
+        let stale_ids = list_stale_active_block_ids(&conn, "2021-01-01T00:00:00Z")
+            .expect("stale block ids should be listed");
+        assert!(stale_ids.contains(&active.id));
+        assert!(!stale_ids.contains(&archived.id));
+    }
+}
