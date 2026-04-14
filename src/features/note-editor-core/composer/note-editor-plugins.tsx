@@ -7,6 +7,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 
+import { NoteEditorClipboardPlugin } from "@/features/note-editor-core/clipboard/note-editor-clipboard-plugin";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorSelectionOverlayPlugin } from "@/features/note-editor-core/selection/note-editor-selection-overlay-plugin";
 import { NoteEditorTableShortcutPlugin } from "@/features/note-editor-core/table/note-editor-table-shortcut-plugin";
@@ -27,6 +28,7 @@ export function NoteEditorPlugins({
 }: NoteEditorPluginsProps) {
   return (
     <>
+      <NoteEditorClipboardPlugin />
       <NoteEditorSelectionOverlayPlugin />
       <ListPlugin />
       <CheckListPlugin disableTakeFocusOnClick />

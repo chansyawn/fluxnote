@@ -9,7 +9,7 @@ import { NoteBlockEditorView } from "@/features/note-block/note-block-editor-vie
 interface NoteBlockEditorProps {
   block: Block;
   focusRequestKey: number;
-  actions?: (props: { popupContainer: HTMLElement | null }) => ReactNode;
+  actions?: (props: { popupContainer: HTMLElement | null; onCopy: () => void }) => ReactNode;
   onFocus: (blockId: string) => void;
 }
 

@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 
 import { BlockActionBar } from "@/features/note-block/block-action-bar";
 import { BlockArchiveAction } from "@/features/note-block/block-archive-action";
+import { BlockCopyAction } from "@/features/note-block/block-copy-action";
 import { BlockDeleteAction } from "@/features/note-block/block-delete-action";
 import { BlockTagAction } from "@/features/note-block/block-tag-action";
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
@@ -147,8 +148,9 @@ export function BlockWorkspace() {
             return (
               <NoteBlockEditor
                 key={block.id}
-                actions={({ popupContainer }) => (
+                actions={({ popupContainer, onCopy }) => (
                   <BlockActionBar disabled={isActionGroupDisabled}>
+                    <BlockCopyAction isDisabled={isActionGroupDisabled} onCopy={onCopy} />
                     <BlockTagAction
                       isCreatingTag={isTagOpPending("create")}
                       isDisabled={isActionGroupDisabled}
