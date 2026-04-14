@@ -105,6 +105,7 @@ export function NoteBlockEditor({
       blockId={block.id}
       focusRequestKey={focusRequestKey}
       initialMarkdown={block.content}
+      willArchive={block.willArchive}
       actions={actions}
       onBlur={flushPendingSave}
       onMarkdownUpdated={handleMarkdownUpdated}

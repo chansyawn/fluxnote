@@ -11,6 +11,7 @@ pub struct Block {
     pub archived_at: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    pub will_archive: bool,
     pub tags: Vec<Tag>,
 }
 

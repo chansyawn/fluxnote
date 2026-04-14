@@ -93,6 +93,7 @@ export function NoteBlockPlaygroundPanel() {
         blockId="playground-block"
         focusRequestKey={0}
         initialMarkdown={markdown}
+        willArchive={false}
         onBlur={() => {}}
         onFocus={() => {}}
         onMarkdownUpdated={(latestMarkdown) => {

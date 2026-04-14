@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { useDirectionState } from "@/app/direction";
 import { isLocaleCode, useI18nState } from "@/app/i18n";
+import { AutoArchiveSettingsSection } from "@/features/auto-archive/auto-archive-settings-section";
 import { ShortcutSettingsSection } from "@/features/shortcut/shortcut-settings-section";
 import {
   Select,
@@ -89,6 +90,7 @@ function RouteComponent() {
           </div>
         ) : null}
 
+        <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />
       </div>
     </section>
