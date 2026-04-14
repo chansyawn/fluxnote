@@ -20,6 +20,26 @@ msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:234
+msgid "editor.code-block.language.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:126
+msgid "editor.code-block.language.option.plain-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:308
+msgid "editor.code-block.language.search.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:299
+msgid "editor.code-block.language.search.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/features/error-boundary/block-error-fallback.tsx:85
 msgid "error.block.delete"
 msgstr ""
@@ -131,47 +151,47 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:59
+#: src/features/auto-archive/auto-archive-settings-section.tsx:60
 msgid "preferences.auto-archive.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:71
+#: src/features/auto-archive/auto-archive-settings-section.tsx:72
 msgid "preferences.auto-archive.enable.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:68
+#: src/features/auto-archive/auto-archive-settings-section.tsx:69
 msgid "preferences.auto-archive.enable.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:89
+#: src/features/auto-archive/auto-archive-settings-section.tsx:90
 msgid "preferences.auto-archive.threshold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:34
+#: src/features/auto-archive/auto-archive-settings-section.tsx:35
 msgid "preferences.auto-archive.threshold.option.1-day"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:38
+#: src/features/auto-archive/auto-archive-settings-section.tsx:39
 msgid "preferences.auto-archive.threshold.option.3-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:46
+#: src/features/auto-archive/auto-archive-settings-section.tsx:47
 msgid "preferences.auto-archive.threshold.option.30-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:42
+#: src/features/auto-archive/auto-archive-settings-section.tsx:43
 msgid "preferences.auto-archive.threshold.option.7-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:56
+#: src/features/auto-archive/auto-archive-settings-section.tsx:57
 msgid "preferences.auto-archive.title"
 msgstr ""
 
@@ -191,17 +211,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:24
+#: src/features/shortcut/shortcut-settings-section.tsx:21
 msgid "preferences.shortcuts.create-block.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:28
+#: src/features/shortcut/shortcut-settings-section.tsx:25
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:52
+#: src/features/shortcut/shortcut-settings-section.tsx:49
 msgid "preferences.shortcuts.description"
 msgstr "配置全局快捷键和应用内区块快捷键。"
 
@@ -241,12 +261,12 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:49
+#: src/features/shortcut/shortcut-settings-section.tsx:46
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:20
+#: src/features/shortcut/shortcut-settings-section.tsx:17
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "开启/关闭窗口"
 

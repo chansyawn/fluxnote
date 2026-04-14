@@ -13,6 +13,7 @@ import { NoteEditorSelectionOverlayPlugin } from "@/features/note-editor-core/se
 import { NoteEditorTableShortcutPlugin } from "@/features/note-editor-core/table/note-editor-table-shortcut-plugin";
 
 import { NoteEditorCodeHighlightPlugin } from "./note-editor-code-highlight-plugin";
+import { NoteEditorCodeLanguagePlugin } from "./note-editor-code-language-plugin";
 import { NoteEditorFocusPlugin } from "./note-editor-focus-plugin";
 
 interface NoteEditorPluginsProps {
@@ -36,6 +37,7 @@ export function NoteEditorPlugins({
       <TablePlugin hasCellBackgroundColor={false} hasCellMerge={false} />
       <NoteEditorTableShortcutPlugin />
       <NoteEditorCodeHighlightPlugin />
+      <NoteEditorCodeLanguagePlugin />
       <MarkdownShortcutPlugin transformers={NOTE_EDITOR_MARKDOWN_TRANSFORMERS} />
       {autoFocus ? <AutoFocusPlugin /> : null}
       <NoteEditorFocusPlugin focusRequestKey={focusRequestKey} />

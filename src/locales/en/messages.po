@@ -20,6 +20,26 @@ msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:234
+msgid "editor.code-block.language.label"
+msgstr "Code language"
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:126
+msgid "editor.code-block.language.option.plain-text"
+msgstr "Plain text"
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:308
+msgid "editor.code-block.language.search.empty"
+msgstr "No matching language"
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:299
+msgid "editor.code-block.language.search.placeholder"
+msgstr "Search language"
+
+#. js-lingui-explicit-id
 #: src/features/error-boundary/block-error-fallback.tsx:85
 msgid "error.block.delete"
 msgstr "Delete block"
@@ -131,47 +151,47 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:59
+#: src/features/auto-archive/auto-archive-settings-section.tsx:60
 msgid "preferences.auto-archive.description"
 msgstr "Blocks are scanned in the background and archived after the app hides."
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:71
+#: src/features/auto-archive/auto-archive-settings-section.tsx:72
 msgid "preferences.auto-archive.enable.description"
 msgstr "Expired blocks stay dimmed until the window is hidden."
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:68
+#: src/features/auto-archive/auto-archive-settings-section.tsx:69
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:89
+#: src/features/auto-archive/auto-archive-settings-section.tsx:90
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Archive after"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:34
+#: src/features/auto-archive/auto-archive-settings-section.tsx:35
 msgid "preferences.auto-archive.threshold.option.1-day"
 msgstr "1 day"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:38
+#: src/features/auto-archive/auto-archive-settings-section.tsx:39
 msgid "preferences.auto-archive.threshold.option.3-days"
 msgstr "3 days"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:46
+#: src/features/auto-archive/auto-archive-settings-section.tsx:47
 msgid "preferences.auto-archive.threshold.option.30-days"
 msgstr "30 days"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:42
+#: src/features/auto-archive/auto-archive-settings-section.tsx:43
 msgid "preferences.auto-archive.threshold.option.7-days"
 msgstr "7 days"
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:56
+#: src/features/auto-archive/auto-archive-settings-section.tsx:57
 msgid "preferences.auto-archive.title"
 msgstr "Auto archive"
 
@@ -191,17 +211,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:24
+#: src/features/shortcut/shortcut-settings-section.tsx:21
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:28
+#: src/features/shortcut/shortcut-settings-section.tsx:25
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:52
+#: src/features/shortcut/shortcut-settings-section.tsx:49
 msgid "preferences.shortcuts.description"
 msgstr "Configure the global shortcut and in-app block shortcuts."
 
@@ -241,12 +261,12 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:49
+#: src/features/shortcut/shortcut-settings-section.tsx:46
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/features/shortcut/shortcut-settings-section.tsx:20
+#: src/features/shortcut/shortcut-settings-section.tsx:17
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
