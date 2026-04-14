@@ -1,6 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-
-const STORAGE_KEY_THEME = "fluxnote.theme";
 export type ThemeMode = "system";
 
 type ThemeContextValue = {
@@ -34,12 +32,6 @@ export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
     return () => {
       mediaQuery.removeEventListener("change", updateSystemTheme);
     };
-  }, []);
-
-  useEffect(() => {
-    // Overwrite older persisted overrides so returning users immediately fall
-    // back to the system-resolved theme instead of a stale manual preference.
-    window.localStorage.setItem(STORAGE_KEY_THEME, "system");
   }, []);
 
   const resolvedTheme = systemPrefersDark ? "dark" : "light";

@@ -1,12 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { type ReactElement } from "react";
 
+import { DEFAULT_SETTINGS, type ShortcutAction } from "@/app/preferences/preferences-schema";
 import { ShortcutInput } from "@/features/shortcut/shortcut-input";
 import { useShortcutState } from "@/features/shortcut/shortcut-state";
-import {
-  DEFAULT_SHORTCUT_PREFERENCES,
-  type ShortcutAction,
-} from "@/features/shortcut/shortcut-utils";
 import { useShortcutRecorder } from "@/features/shortcut/use-shortcut-recorder";
 
 interface ShortcutFieldDefinition {
@@ -65,7 +62,7 @@ export function ShortcutSettingsSection() {
             globalShortcutError === shortcut
               ? ("unavailable" as const)
               : (fieldErrors[field.action] ?? null);
-          const shouldShowReset = shortcut !== DEFAULT_SHORTCUT_PREFERENCES[field.action];
+          const shouldShowReset = shortcut !== DEFAULT_SETTINGS.shortcuts[field.action];
 
           return (
             <div

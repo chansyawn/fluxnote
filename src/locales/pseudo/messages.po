@@ -81,6 +81,11 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/features/note-block/block-copy-action.tsx:32
+msgid "home-note.block.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/features/note-block/block-delete-action.tsx:21
 msgid "home-note.block.delete"
 msgstr ""
@@ -126,68 +131,58 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:75
+#: src/features/auto-archive/auto-archive-settings-section.tsx:59
 msgid "preferences.auto-archive.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:87
+#: src/features/auto-archive/auto-archive-settings-section.tsx:71
 msgid "preferences.auto-archive.enable.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:84
+#: src/features/auto-archive/auto-archive-settings-section.tsx:68
 msgid "preferences.auto-archive.enable.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:106
+#: src/features/auto-archive/auto-archive-settings-section.tsx:89
 msgid "preferences.auto-archive.threshold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:50
+#: src/features/auto-archive/auto-archive-settings-section.tsx:34
 msgid "preferences.auto-archive.threshold.option.1-day"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:54
+#: src/features/auto-archive/auto-archive-settings-section.tsx:38
 msgid "preferences.auto-archive.threshold.option.3-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:62
+#: src/features/auto-archive/auto-archive-settings-section.tsx:46
 msgid "preferences.auto-archive.threshold.option.30-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:58
+#: src/features/auto-archive/auto-archive-settings-section.tsx:42
 msgid "preferences.auto-archive.threshold.option.7-days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/auto-archive/auto-archive-settings-section.tsx:72
+#: src/features/auto-archive/auto-archive-settings-section.tsx:56
 msgid "preferences.auto-archive.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:39
+#: src/routes/preferences.tsx:35
 msgid "preferences.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:46
+#: src/routes/preferences.tsx:44
 msgid "preferences.language.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:79
-msgid "preferences.rtl.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/routes/preferences.tsx:76
-msgid "preferences.rtl.label"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -256,7 +251,7 @@ msgid "preferences.shortcuts.toggle-window.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:36
+#: src/routes/preferences.tsx:32
 msgid "preferences.title"
 msgstr ""
 
@@ -351,27 +346,27 @@ msgid "window.hide"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:210
+#: src/routes/-features/block-workspace.tsx:212
 msgid "workspace.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:66
+#: src/routes/-features/block-workspace.tsx:67
 msgid "workspace.archived.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:63
+#: src/routes/-features/block-workspace.tsx:64
 msgid "workspace.archived.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:135
+#: src/routes/-features/block-workspace.tsx:136
 msgid "workspace.archived.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:124
+#: src/routes/-features/block-workspace.tsx:125
 msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
@@ -386,32 +381,32 @@ msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:53
+#: src/routes/-features/block-workspace.tsx:54
 msgid "workspace.empty.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:39
+#: src/routes/-features/block-workspace.tsx:40
 msgid "workspace.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:36
+#: src/routes/-features/block-workspace.tsx:37
 msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:131
+#: src/routes/-features/block-workspace.tsx:132
 msgid "workspace.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:122
+#: src/routes/-features/block-workspace.tsx:123
 msgid "workspace.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:20
+#: src/routes/-features/block-workspace.tsx:21
 msgid "workspace.loading"
 msgstr ""
 

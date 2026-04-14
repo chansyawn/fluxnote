@@ -51,6 +51,7 @@
 - Keep API request/response types and command wrappers in `src/clients`.
 - Export client APIs through `src/clients/index.ts` as the single frontend entrypoint for backend commands.
 - UI components and routes must use TanStack Query for backend data loading, with the shared `queryClient` from `@/app/query`.
+- Configuration read/write in frontend must follow the existing preferences framework in `src/app/preferences` (schema + store). Do not introduce parallel config persistence paths.
 
 ## Backend
 
@@ -64,6 +65,7 @@
 - Define backend commands in `src-tauri/src` with `#[tauri::command]` and register them in the builder `invoke_handler`.
 - Prefer a request-struct + `garde` validation pattern for command args.
 - Prefer command signatures that consume a validated request object (for example `Validated<TRequest>`) so validation/mapping is centralized and command bodies stay business-focused.
+- Backend can read configuration values for runtime behavior, but must not persist or mutate frontend preference/config files. Configuration writes are frontend-owned.
 
 ### Error Model
 
