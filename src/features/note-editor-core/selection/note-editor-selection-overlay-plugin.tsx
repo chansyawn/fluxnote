@@ -34,7 +34,7 @@ export function NoteEditorSelectionOverlayPlugin() {
           return;
         }
 
-        const nextRects = editor.getEditorState().read(() => {
+        const nextRects = editor.read(() => {
           const lexicalSelection = $getSelection();
 
           if ($isTableSelection(lexicalSelection)) {

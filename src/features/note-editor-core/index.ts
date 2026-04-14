@@ -1,6 +1,6 @@
 export { NOTE_EDITOR_NODES } from "./composer/note-editor-nodes";
 export { NoteEditorPlugins } from "./composer/note-editor-plugins";
-export { NoteEditorShell } from "./composer/note-editor-shell";
+export { NoteEditorShell, type NoteEditorShellHandle } from "./composer/note-editor-shell";
 export {
   NOTE_EDITOR_MARKDOWN_TRANSFORMERS,
   createTableNodeFromMarkdownLines,

@@ -1,10 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
-import { NoteEditorShell } from "@/features/note-editor-core";
+import { NoteEditorShell, type NoteEditorShellHandle } from "@/features/note-editor-core";
 import { cn } from "@/ui/lib/utils";
 
-interface NoteBlockEditorActionsProps {
+export interface NoteBlockEditorActionsProps {
   popupContainer: HTMLElement | null;
+  onCopy: () => void;
 }
 
 interface NoteBlockEditorViewProps {
@@ -29,6 +30,11 @@ export function NoteBlockEditorView({
   onFocus,
 }: NoteBlockEditorViewProps) {
   const [popupContainer, setPopupContainer] = useState<HTMLElement | null>(null);
+  const editorRef = useRef<NoteEditorShellHandle>(null);
+
+  const handleCopy = () => {
+    void editorRef.current?.copyContent();
+  };
 
   return (
     <article
@@ -42,12 +48,13 @@ export function NoteBlockEditorView({
     >
       {actions ? (
         <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/3 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
-          {actions({ popupContainer })}
+          {actions({ popupContainer, onCopy: handleCopy })}
         </div>
       ) : null}
 
       <div className="min-h-28 px-4 pt-4 pb-4">
         <NoteEditorShell
+          ref={editorRef}
           focusRequestKey={focusRequestKey}
           initialMarkdown={initialMarkdown}
           onBlur={onBlur}

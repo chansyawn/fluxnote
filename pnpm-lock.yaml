@@ -24,6 +24,9 @@ importers:
       '@fontsource-variable/noto-sans':
         specifier: ^5.2.10
         version: 5.2.10
+      '@lexical/clipboard':
+        specifier: ^0.43.0
+        version: 0.43.0
       '@lexical/code-core':
         specifier: ^0.43.0
         version: 0.43.0
