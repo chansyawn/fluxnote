@@ -52,7 +52,7 @@ export function NoteBlockEditorView({
         </div>
       ) : null}
 
-      <div className="min-h-28 px-4 pt-4 pb-4">
+      <div className="min-h-16 px-3 pt-3 pb-2">
         <NoteEditorShell
           ref={editorRef}
           focusRequestKey={focusRequestKey}
