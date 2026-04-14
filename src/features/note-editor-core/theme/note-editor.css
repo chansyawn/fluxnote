@@ -13,7 +13,7 @@
 }
 
 .note-block-editor__input {
-  @apply text-foreground relative z-20 min-h-16 resize-none text-sm/6 outline-none;
+  @apply text-foreground relative z-20 min-h-16 resize-none text-sm outline-none;
 }
 
 .note-block-editor__input::selection,
@@ -29,7 +29,7 @@
 }
 
 .note-block-editor__placeholder {
-  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 z-40 text-sm/6;
+  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 z-40 text-sm;
 }
 
 .note-block-editor__paragraph {
@@ -37,7 +37,7 @@
 }
 
 .note-block-editor__paragraph:not(:first-child) {
-  @apply mt-2;
+  @apply mt-1.5;
 }
 
 .note-block-editor__heading {
@@ -45,32 +45,32 @@
 }
 
 .note-block-editor__heading--h1 {
-  @apply mt-4 mb-1.5 text-2xl/8 first:mt-0;
+  @apply mt-3 mb-1 text-2xl first:mt-0;
 }
 
 .note-block-editor__heading--h2 {
-  @apply mt-4 mb-1.5 text-xl/7 first:mt-0;
+  @apply mt-3 mb-1 text-xl first:mt-0;
 }
 
 .note-block-editor__heading--h3 {
-  @apply mt-3 mb-1.5 text-lg/6 first:mt-0;
+  @apply mt-2.5 mb-1 text-lg first:mt-0;
 }
 
 .note-block-editor__heading--h4 {
-  @apply mt-3 mb-1 text-base/6 first:mt-0;
+  @apply mt-2.5 mb-0.5 text-base first:mt-0;
 }
 
 .note-block-editor__heading--h5,
 .note-block-editor__heading--h6 {
-  @apply mt-2.5 mb-1 text-sm/6 first:mt-0;
+  @apply mt-2 mb-0.5 text-sm first:mt-0;
 }
 
 .note-block-editor__quote {
-  @apply border-border text-muted-foreground my-3 border-s-4 ps-3 text-sm/6 italic;
+  @apply border-border text-muted-foreground my-2.5 border-s-4 ps-2.5 text-sm italic;
 }
 
 .note-block-editor__list {
-  @apply my-2 ps-5;
+  @apply my-1.5 ps-5;
 }
 
 .note-block-editor__list--unordered {
@@ -87,7 +87,7 @@
 }
 
 .note-block-editor__list-item {
-  @apply ps-1 text-sm/6;
+  @apply ps-1 text-sm/5.5;
 }
 
 .note-block-editor__list-item--checked,
@@ -134,7 +134,7 @@
 }
 
 .note-block-editor__list-item--nested {
-  @apply mt-1.5;
+  @apply mt-1;
 }
 
 .note-block-editor__text--bold {
@@ -150,15 +150,15 @@
 }
 
 .note-block-editor__text--code {
-  @apply bg-muted rounded px-1 py-0.5 font-mono text-xs;
+  @apply bg-muted text-muted-foreground border-border rounded-md border px-1 py-0.5 font-mono text-xs;
 }
 
 .note-block-editor__code {
-  @apply bg-muted text-foreground my-3 block overflow-x-auto rounded-lg border px-3 py-2.5 font-mono text-xs;
+  @apply bg-muted text-foreground my-2.5 block overflow-x-auto rounded-lg border px-3 py-2 font-mono text-xs;
 }
 
 .note-block-editor__hr {
-  @apply border-border my-3 block border-t;
+  @apply border-border my-2.5 block border-t;
 }
 
 .note-block-editor__hr--selected {
@@ -170,7 +170,7 @@
 }
 
 .note-block-editor__table-scroll {
-  @apply my-3 overflow-x-auto rounded-lg border;
+  @apply my-2.5 overflow-x-auto rounded-lg border;
 }
 
 .note-block-editor__table {
@@ -182,7 +182,7 @@
 }
 
 .note-block-editor__table-cell {
-  @apply border-border min-w-28 border-e px-2.5 py-1.5 align-top;
+  @apply border-border min-w-28 border-e px-2 py-1.5 align-top;
 }
 
 .note-block-editor__table-cell--header {
