@@ -8,6 +8,7 @@ export interface Block {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  willArchive: boolean;
   tags: Tag[];
 }
 

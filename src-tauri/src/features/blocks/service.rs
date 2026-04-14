@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use anyhow::{anyhow, Context};
 use rusqlite::{params, Connection, OptionalExtension, ToSql, Transaction};
 
@@ -119,6 +121,60 @@ pub(crate) fn attach_tags(conn: &Connection, blocks: Vec<Block>) -> AppResult<Ve
             block
         })
         .collect())
+}
+
+pub fn list_stale_active_block_ids(conn: &Connection, cutoff: &str) -> AppResult<HashSet<String>> {
+    let mut statement = conn
+        .prepare(
+            "SELECT id
+             FROM blocks
+             WHERE archived_at IS NULL
+               AND updated_at <= ?1",
+        )
+        .context("failed to prepare stale block query")?;
+
+    let rows = statement
+        .query_map(params![cutoff], |row| row.get::<_, String>(0))
+        .context("failed to query stale blocks")?;
+
+    rows.collect::<rusqlite::Result<HashSet<_>>>()
+        .context("failed to materialize stale block ids")
+        .map_err(Into::into)
+}
+
+pub fn archive_blocks_without_touching_updated_at(
+    conn: &mut Connection,
+    block_ids: &HashSet<String>,
+) -> AppResult<usize> {
+    if block_ids.is_empty() {
+        return Ok(0);
+    }
+
+    let now = crate::features::tags::service::timestamp_now()?;
+    let placeholders = std::iter::repeat_n("?", block_ids.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!(
+        "UPDATE blocks
+         SET archived_at = ?
+         WHERE archived_at IS NULL
+           AND id IN ({placeholders})"
+    );
+    let tx = begin_tx(conn)?;
+    let mut params = Vec::<&dyn ToSql>::with_capacity(block_ids.len() + 1);
+    params.push(&now);
+    for block_id in block_ids {
+        params.push(block_id as &dyn ToSql);
+    }
+
+    let archived_count = tx
+        .execute(&sql, params.as_slice())
+        .context("failed to archive stale blocks")?;
+
+    tx.commit()
+        .context("failed to commit stale block archive transaction")?;
+
+    Ok(archived_count)
 }
 
 pub(crate) fn get_block_by_id(
@@ -270,6 +326,7 @@ fn map_block(row: &rusqlite::Row<'_>) -> rusqlite::Result<Block> {
         archived_at: row.get(3)?,
         created_at: row.get(4)?,
         updated_at: row.get(5)?,
+        will_archive: false,
         tags: Vec::new(),
     })
 }

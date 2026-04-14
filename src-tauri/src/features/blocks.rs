@@ -8,6 +8,7 @@ use tracing::info;
 
 use crate::database::DatabaseState;
 use crate::error::AppResult;
+use crate::features::auto_archive::AutoArchiveState;
 use crate::features::validated_command_arg::Validated;
 
 pub use models::{Block, DeleteBlockResult};
@@ -56,17 +57,26 @@ pub struct BlockMutationArgs {
 #[tracing::instrument(name = "command.blocks_list", skip(state, args))]
 pub fn blocks_list(
     state: State<'_, DatabaseState>,
+    auto_archive_state: State<'_, AutoArchiveState>,
     args: Validated<ListBlocksArgs>,
 ) -> AppResult<Vec<Block>> {
     let args = args.into_inner();
 
     info!("listing blocks");
     let conn = state.lock()?;
-    service::list_blocks(
+    let mut blocks = service::list_blocks(
         &conn,
         args.tag_ids.as_deref().unwrap_or(&[]),
         args.visibility.unwrap_or_default(),
-    )
+    )?;
+
+    if matches!(args.visibility.unwrap_or_default(), BlockVisibility::Active) {
+        let pending_archive_block_ids = auto_archive_state.pending_archive_block_ids();
+        blocks.iter_mut().for_each(|block| {
+            block.will_archive = pending_archive_block_ids.contains(&block.id);
+        });
+    }
+    Ok(blocks)
 }
 
 #[tauri::command]

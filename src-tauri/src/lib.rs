@@ -10,7 +10,7 @@ mod database;
 mod error;
 mod features;
 
-const MAIN_WINDOW_LABEL: &str = "main";
+pub(crate) const MAIN_WINDOW_LABEL: &str = "main";
 const SHOW_MAIN_MENU_ID: &str = "show-main";
 const QUIT_APP_MENU_ID: &str = "quit-app";
 const MAIN_WINDOW_RADIUS_PX: f64 = 14.0;
@@ -110,13 +110,18 @@ pub fn run() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let database_state = database::DatabaseState::init(app.handle())?;
             app.manage(database_state);
+            let auto_archive_state = features::auto_archive::AutoArchiveState::default();
+            app.manage(auto_archive_state);
+            features::auto_archive::service::init_store(app.handle())?;
             configure_main_window(app.handle())?;
             #[cfg(target_os = "macos")]
             app.handle().set_dock_visibility(false)?;
             build_tray(app.handle())?;
+            features::auto_archive::service::spawn_runtime(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

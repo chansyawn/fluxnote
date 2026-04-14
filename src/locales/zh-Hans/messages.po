@@ -14,49 +14,49 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/error-title-bar.tsx:40
+#: src/features/error-boundary/error-title-bar.tsx:41
 #: src/routes/-features/window-title-bar.tsx:101
 msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/block-error-fallback.tsx:75
+#: src/features/error-boundary/block-error-fallback.tsx:85
 msgid "error.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/block-error-fallback.tsx:37
+#: src/features/error-boundary/block-error-fallback.tsx:48
 msgid "error.block.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/block-error-fallback.tsx:56
+#: src/features/error-boundary/block-error-fallback.tsx:66
 msgid "error.block.retry"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/block-error-fallback.tsx:34
+#: src/features/error-boundary/block-error-fallback.tsx:45
 msgid "error.block.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/app-error-fallback.tsx:35
+#: src/features/error-boundary/global-error-content.tsx:44
 msgid "error.global.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/app-error-fallback.tsx:63
-#: src/features/error-boundary/error-title-bar.tsx:34
+#: src/features/error-boundary/error-title-bar.tsx:35
+#: src/features/error-boundary/global-error-content.tsx:59
 msgid "error.global.exit-app"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/app-error-fallback.tsx:54
+#: src/features/error-boundary/global-error-content.tsx:55
 msgid "error.global.retry"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/error-boundary/app-error-fallback.tsx:32
+#: src/features/error-boundary/global-error-content.tsx:41
 msgid "error.global.title"
 msgstr ""
 
@@ -126,22 +126,67 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:38
+#: src/features/auto-archive/auto-archive-settings-section.tsx:75
+msgid "preferences.auto-archive.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:87
+msgid "preferences.auto-archive.enable.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:84
+msgid "preferences.auto-archive.enable.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:106
+msgid "preferences.auto-archive.threshold.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:50
+msgid "preferences.auto-archive.threshold.option.1-day"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:54
+msgid "preferences.auto-archive.threshold.option.3-days"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:62
+msgid "preferences.auto-archive.threshold.option.30-days"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:58
+msgid "preferences.auto-archive.threshold.option.7-days"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/auto-archive/auto-archive-settings-section.tsx:72
+msgid "preferences.auto-archive.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/routes/preferences.tsx:39
 msgid "preferences.description"
 msgstr "配置语言与外观。"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:45
+#: src/routes/preferences.tsx:46
 msgid "preferences.language.label"
 msgstr "语言"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:78
+#: src/routes/preferences.tsx:79
 msgid "preferences.rtl.description"
 msgstr "仅在选择 pseudo 语言后可用。"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:75
+#: src/routes/preferences.tsx:76
 msgid "preferences.rtl.label"
 msgstr "从右到左布局"
 
@@ -211,7 +256,7 @@ msgid "preferences.shortcuts.toggle-window.label"
 msgstr "开启/关闭窗口"
 
 #. js-lingui-explicit-id
-#: src/routes/preferences.tsx:35
+#: src/routes/preferences.tsx:36
 msgid "preferences.title"
 msgstr "偏好设置"
 
@@ -306,27 +351,27 @@ msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:218
+#: src/routes/-features/block-workspace.tsx:210
 msgid "workspace.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:67
+#: src/routes/-features/block-workspace.tsx:66
 msgid "workspace.archived.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:64
+#: src/routes/-features/block-workspace.tsx:63
 msgid "workspace.archived.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:136
+#: src/routes/-features/block-workspace.tsx:135
 msgid "workspace.archived.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:125
+#: src/routes/-features/block-workspace.tsx:124
 msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
@@ -341,32 +386,32 @@ msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:54
+#: src/routes/-features/block-workspace.tsx:53
 msgid "workspace.empty.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:40
+#: src/routes/-features/block-workspace.tsx:39
 msgid "workspace.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:37
+#: src/routes/-features/block-workspace.tsx:36
 msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:132
+#: src/routes/-features/block-workspace.tsx:131
 msgid "workspace.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:123
+#: src/routes/-features/block-workspace.tsx:122
 msgid "workspace.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:21
+#: src/routes/-features/block-workspace.tsx:20
 msgid "workspace.loading"
 msgstr ""
 

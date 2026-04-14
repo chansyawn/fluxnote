@@ -5,6 +5,7 @@ import { DirectionStateProvider } from "@/app/direction";
 import { I18nStateProvider } from "@/app/i18n";
 import { queryClient } from "@/app/query";
 import { ThemeStateProvider } from "@/app/theme";
+import { AutoArchiveSync } from "@/features/auto-archive/auto-archive-sync";
 import { AppErrorBoundary, RouterErrorFallback } from "@/features/error-boundary";
 import { ShortcutStateProvider } from "@/features/shortcut/shortcut-state";
 import { routeTree } from "@/route-tree.gen";
@@ -29,6 +30,7 @@ export function App() {
           <QueryClientProvider client={queryClient}>
             <ShortcutStateProvider>
               <DirectionStateProvider>
+                <AutoArchiveSync />
                 <RouterProvider router={router} />
                 <Toaster />
               </DirectionStateProvider>
