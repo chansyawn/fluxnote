@@ -1,7 +1,5 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import {
   createContext,
   useContext,
@@ -13,24 +11,18 @@ import {
 } from "react";
 
 import {
-  DEFAULT_SHORTCUT_PREFERENCES,
-  SHORTCUT_STORAGE_KEY,
-  normalizeShortcut,
-  type ShortcutBinding,
   type ShortcutAction,
+  type ShortcutBinding,
   type ShortcutPreferences,
+} from "@/app/preferences/preferences-schema";
+import { useShortcutPreferences } from "@/app/preferences/preferences-store";
+import {
+  normalizeShortcut,
   type ShortcutUpdateError,
   validateShortcutUpdate,
 } from "@/features/shortcut/shortcut-utils";
 
 const appWindow = getCurrentWindow();
-
-const shortcutPreferencesAtom = atomWithStorage<ShortcutPreferences>(
-  SHORTCUT_STORAGE_KEY,
-  DEFAULT_SHORTCUT_PREFERENCES,
-  undefined,
-  { getOnInit: true },
-);
 
 type ShortcutUpdateResult = { ok: true } | { ok: false; error: ShortcutUpdateError };
 
@@ -62,8 +54,8 @@ async function toggleMainWindowVisibility(): Promise<void> {
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
-  const [shortcuts, setShortcuts] = useAtom(shortcutPreferencesAtom);
   const [globalShortcutError, setGlobalShortcutError] = useState<ShortcutBinding>(null);
+  const { clearShortcut, resetShortcut, setShortcut, shortcuts } = useShortcutPreferences();
 
   const handleToggleWindow = useEffectEvent(() => {
     void toggleMainWindowVisibility();
@@ -116,16 +108,10 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       shortcuts,
       globalShortcutError,
       clearShortcut: (action) => {
-        setShortcuts((currentShortcuts) => ({
-          ...currentShortcuts,
-          [action]: null,
-        }));
+        clearShortcut(action);
       },
       resetShortcut: (action) => {
-        setShortcuts((currentShortcuts) => ({
-          ...currentShortcuts,
-          [action]: DEFAULT_SHORTCUT_PREFERENCES[action],
-        }));
+        resetShortcut(action);
       },
       updateShortcut: (action, shortcut) => {
         const error = validateShortcutUpdate(action, shortcut, shortcuts);
@@ -140,15 +126,12 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
           return { ok: false, error: "invalid" };
         }
 
-        setShortcuts((currentShortcuts) => ({
-          ...currentShortcuts,
-          [action]: normalizedShortcut,
-        }));
+        setShortcut(action, normalizedShortcut);
 
         return { ok: true };
       },
     }),
-    [globalShortcutError, setShortcuts, shortcuts],
+    [clearShortcut, globalShortcutError, resetShortcut, setShortcut, shortcuts],
   );
 
   return (

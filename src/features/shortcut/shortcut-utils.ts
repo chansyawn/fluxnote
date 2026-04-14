@@ -1,16 +1,14 @@
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 
-export const SHORTCUT_STORAGE_KEY = "fluxnote.shortcuts";
-
-export const SHORTCUT_ACTIONS = ["toggle-window", "create-block", "delete-block"] as const;
-
-export type ShortcutAction = (typeof SHORTCUT_ACTIONS)[number];
-
-export type ShortcutBinding = string | null;
-
-export type ShortcutPreferences = Record<ShortcutAction, ShortcutBinding>;
+import {
+  shortcutActionSchema,
+  type ShortcutAction,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@/app/preferences/preferences-schema";
 
 export type ShortcutUpdateError = "invalid" | "duplicate";
+export const SHORTCUT_ACTIONS = shortcutActionSchema.options;
 
 type ShortcutModifier = "Command" | "Control" | "Alt" | "Shift";
 
@@ -46,12 +44,6 @@ const DISPLAY_LABELS: Record<string, string> = {
   Space: "Space",
   Tab: "Tab",
   Up: "Up",
-};
-
-export const DEFAULT_SHORTCUT_PREFERENCES: ShortcutPreferences = {
-  "toggle-window": "Alt+N",
-  "create-block": "Command+N",
-  "delete-block": "Command+W",
 };
 
 function normalizeModifierToken(token: string): ShortcutModifier | null {

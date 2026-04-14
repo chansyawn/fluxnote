@@ -1,26 +1,19 @@
 import { i18n, type Messages } from "@lingui/core";
-import { detect, fromNavigator } from "@lingui/detect-locale";
 import { I18nProvider } from "@lingui/react";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 
+import {
+  LANGUAGE_OPTIONS,
+  type LanguageOption,
+  type LocaleCode,
+} from "@/app/preferences/preferences-schema";
+import { useLocalePreference } from "@/app/preferences/preferences-store";
 import { messages as enMessages } from "@/locales/en/messages.po";
 import { messages as pseudoMessages } from "@/locales/pseudo/messages.po";
 import { messages as zhHansMessages } from "@/locales/zh-Hans/messages.po";
 
-const STORAGE_KEY_LOCALE = "fluxnote.locale";
 const DEV_ONLY_LOCALE = "pseudo";
 const IS_DEV = import.meta.env.DEV;
-
-export const LANGUAGE_OPTIONS = [
-  { key: "en", name: "English", rtl: false },
-  { key: "zh-Hans", name: "简体中文", rtl: false },
-  { key: "pseudo", name: "Pseudo", rtl: false, devOnly: true },
-] as const;
-
-export type LocaleCode = (typeof LANGUAGE_OPTIONS)[number]["key"];
-export type LanguageOption = (typeof LANGUAGE_OPTIONS)[number];
 
 const DEFAULT_LOCALE: LocaleCode = "en";
 
@@ -35,17 +28,6 @@ for (const localeKey of Object.keys(catalogs) as LocaleCode[]) {
 }
 
 i18n.activate(DEFAULT_LOCALE);
-
-const localeAtom = atomWithStorage<LocaleCode>(
-  STORAGE_KEY_LOCALE,
-  detectDefaultLocale(),
-  undefined,
-  { getOnInit: true },
-);
-
-export function isLocaleCode(value: string): value is LocaleCode {
-  return LANGUAGE_OPTIONS.some((option) => option.key === value);
-}
 
 function normalizeLocale(input: string | null | undefined): LocaleCode {
   if (!input) {
@@ -67,10 +49,6 @@ function normalizeLocale(input: string | null | undefined): LocaleCode {
   return DEFAULT_LOCALE;
 }
 
-function detectDefaultLocale(): LocaleCode {
-  return normalizeLocale(detect(fromNavigator()));
-}
-
 type I18nContextValue = {
   locale: LocaleCode;
   setLocale: (locale: LocaleCode) => void;
@@ -87,7 +65,7 @@ type I18nStateProviderProps = {
 };
 
 export function I18nStateProvider({ children }: I18nStateProviderProps) {
-  const [locale, setLocaleState] = useAtom(localeAtom);
+  const { locale, setLocale } = useLocalePreference();
 
   const localeOptions = useMemo<LanguageOption[]>(() => {
     if (IS_DEV) {
@@ -114,14 +92,14 @@ export function I18nStateProvider({ children }: I18nStateProviderProps) {
     () => ({
       locale,
       setLocale: (nextLocale) => {
-        setLocaleState(nextLocale);
+        setLocale(normalizeLocale(nextLocale));
       },
       effectiveLocale,
       isPseudoLocale: effectiveLocale === DEV_ONLY_LOCALE,
       localeOptions,
       activeLocale,
     }),
-    [activeLocale, effectiveLocale, locale, localeOptions, setLocaleState],
+    [activeLocale, effectiveLocale, locale, localeOptions, setLocale],
   );
 
   return (

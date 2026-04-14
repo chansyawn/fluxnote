@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { RotateCcwIcon, XIcon } from "lucide-react";
 
-import type { ShortcutBinding } from "@/features/shortcut/shortcut-utils";
+import type { ShortcutBinding } from "@/app/preferences/preferences-schema";
 import { getShortcutDisplayTokens } from "@/features/shortcut/shortcut-utils";
 import { Button } from "@/ui/components/button";
 import { Kbd, KbdGroup } from "@/ui/components/kbd";

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
+import type { ShortcutAction } from "@/app/preferences/preferences-schema";
 import type { ShortcutInputError } from "@/features/shortcut/shortcut-input";
 import {
   getShortcutFromKeyboardEvent,
   getShortcutPreviewTokens,
-  type ShortcutAction,
 } from "@/features/shortcut/shortcut-utils";
 
 interface ShortcutUpdateResult {

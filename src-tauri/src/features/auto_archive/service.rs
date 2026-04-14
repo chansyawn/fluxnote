@@ -2,7 +2,7 @@ use std::{collections::HashSet, time::Duration};
 
 use anyhow::Context;
 use serde::Serialize;
-use serde_json::json;
+use serde_json::{json, Value};
 use tauri::{AppHandle, Emitter, Manager, Runtime};
 use tauri_plugin_store::StoreExt;
 use time::OffsetDateTime;
@@ -16,13 +16,13 @@ use crate::{
     },
 };
 
-const PREFERENCES_FILE_NAME: &str = "preferences.json";
-const AUTO_ARCHIVE_ENABLED_KEY: &str = "autoArchiveEnabled";
-const AUTO_ARCHIVE_IDLE_MINUTES_KEY: &str = "autoArchiveIdleMinutes";
-const AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS_KEY: &str = "autoArchiveScanIntervalSeconds";
+const SETTINGS_FILE_NAME: &str = "settings.json";
+const LOCALE_KEY: &str = "locale";
+const AUTO_ARCHIVE_KEY: &str = "autoArchive";
 const DEFAULT_AUTO_ARCHIVE_ENABLED: bool = true;
 const DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES: i64 = 7 * 24 * 60;
 const DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS: u64 = 300;
+const DEFAULT_LOCALE: &str = "en";
 const MIN_SCAN_INTERVAL_SECONDS: u64 = 30;
 const VISIBILITY_POLL_INTERVAL_SECONDS: u64 = 1;
 const AUTO_ARCHIVE_STATE_CHANGED_EVENT: &str = "auto-archive://state-changed";
@@ -44,22 +44,15 @@ pub struct AutoArchiveEventPayload {
 
 pub fn init_store<R: Runtime>(app: &AppHandle<R>) -> anyhow::Result<()> {
     let store = app
-        .store_builder(PREFERENCES_FILE_NAME)
-        .default(AUTO_ARCHIVE_ENABLED_KEY, DEFAULT_AUTO_ARCHIVE_ENABLED)
-        .default(
-            AUTO_ARCHIVE_IDLE_MINUTES_KEY,
-            DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
-        )
-        .default(
-            AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS_KEY,
-            DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
-        )
+        .store_builder(SETTINGS_FILE_NAME)
+        .default(LOCALE_KEY, DEFAULT_LOCALE)
+        .default(AUTO_ARCHIVE_KEY, default_auto_archive_value())
         .build()
-        .context("failed to initialize preferences store")?;
+        .context("failed to initialize settings store")?;
 
     store
         .save()
-        .context("failed to persist default preferences store")?;
+        .context("failed to persist default settings store")?;
 
     Ok(())
 }
@@ -182,35 +175,31 @@ pub fn sync_runtime_state<R: Runtime>(
 
 pub fn read_config<R: Runtime>(app: &AppHandle<R>) -> AppResult<AutoArchiveConfig> {
     let store = app
-        .store_builder(PREFERENCES_FILE_NAME)
-        .default(AUTO_ARCHIVE_ENABLED_KEY, DEFAULT_AUTO_ARCHIVE_ENABLED)
-        .default(
-            AUTO_ARCHIVE_IDLE_MINUTES_KEY,
-            DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
-        )
-        .default(
-            AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS_KEY,
-            DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
-        )
+        .store_builder(SETTINGS_FILE_NAME)
+        .default(LOCALE_KEY, DEFAULT_LOCALE)
+        .default(AUTO_ARCHIVE_KEY, default_auto_archive_value())
         .build()
-        .context("failed to load preferences store")?;
+        .context("failed to load settings store")?;
 
     store
         .reload()
-        .context("failed to reload preferences store from disk")?;
+        .context("failed to reload settings store from disk")?;
 
-    let enabled = store
-        .get(AUTO_ARCHIVE_ENABLED_KEY)
-        .and_then(|value| value.as_bool())
+    let auto_archive = store
+        .get(AUTO_ARCHIVE_KEY)
+        .unwrap_or_else(default_auto_archive_value);
+    let enabled = auto_archive
+        .get("enabled")
+        .and_then(Value::as_bool)
         .unwrap_or(DEFAULT_AUTO_ARCHIVE_ENABLED);
-    let idle_minutes = store
-        .get(AUTO_ARCHIVE_IDLE_MINUTES_KEY)
-        .and_then(|value| value.as_i64())
+    let idle_minutes = auto_archive
+        .get("idleMinutes")
+        .and_then(Value::as_i64)
         .filter(|value| *value > 0)
         .unwrap_or(DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES);
-    let scan_interval_seconds = store
-        .get(AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS_KEY)
-        .and_then(|value| value.as_u64())
+    let scan_interval_seconds = auto_archive
+        .get("scanIntervalSeconds")
+        .and_then(Value::as_u64)
         .filter(|value| *value > 0)
         .unwrap_or(DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS);
 
@@ -218,6 +207,14 @@ pub fn read_config<R: Runtime>(app: &AppHandle<R>) -> AppResult<AutoArchiveConfi
         enabled,
         idle_minutes,
         scan_interval_seconds,
+    })
+}
+
+fn default_auto_archive_value() -> Value {
+    json!({
+        "enabled": DEFAULT_AUTO_ARCHIVE_ENABLED,
+        "idleMinutes": DEFAULT_AUTO_ARCHIVE_IDLE_MINUTES,
+        "scanIntervalSeconds": DEFAULT_AUTO_ARCHIVE_SCAN_INTERVAL_SECONDS,
     })
 }
 

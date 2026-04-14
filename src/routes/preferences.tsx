@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { useDirectionState } from "@/app/direction";
-import { isLocaleCode, useI18nState } from "@/app/i18n";
+import { useI18nState } from "@/app/i18n";
+import { isLocaleCode } from "@/app/preferences/preferences-schema";
 import { AutoArchiveSettingsSection } from "@/features/auto-archive/auto-archive-settings-section";
 import { ShortcutSettingsSection } from "@/features/shortcut/shortcut-settings-section";
 import {
@@ -13,17 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/components/select";
-import { Switch } from "@/ui/components/switch";
 
 export const Route = createFileRoute("/preferences")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { locale, setLocale, localeOptions, isPseudoLocale } = useI18nState();
-  const { rtlEnabled, setRtlEnabled } = useDirectionState();
-
-  const showRtlSwitch = import.meta.env.DEV && isPseudoLocale;
+  const { locale, setLocale, localeOptions } = useI18nState();
   const languageItems = localeOptions.map((localeOption) => ({
     value: localeOption.key,
     label: localeOption.name,
@@ -36,7 +32,9 @@ function RouteComponent() {
           <Trans id="preferences.title">Preferences</Trans>
         </h1>
         <p className="text-muted-foreground text-xs">
-          <Trans id="preferences.description">Configure language and layout.</Trans>
+          <Trans id="preferences.description">
+            Configure language, auto-archive, and shortcuts.
+          </Trans>
         </p>
       </div>
 
@@ -68,27 +66,6 @@ function RouteComponent() {
             </SelectContent>
           </Select>
         </label>
-
-        {showRtlSwitch ? (
-          <div className="border-border/70 flex items-center justify-between rounded-md border p-3">
-            <div className="flex flex-col gap-0.5">
-              <p className="text-xs font-medium">
-                <Trans id="preferences.rtl.label">Right-to-left layout</Trans>
-              </p>
-              <p className="text-muted-foreground text-xs">
-                <Trans id="preferences.rtl.description">
-                  Available only when pseudo locale is selected.
-                </Trans>
-              </p>
-            </div>
-            <Switch
-              checked={rtlEnabled}
-              onCheckedChange={(checked) => {
-                setRtlEnabled(checked);
-              }}
-            />
-          </div>
-        ) : null}
 
         <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />

@@ -1,15 +1,13 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { queryClient } from "@/app/query";
 import {
   AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS,
-  DEFAULT_AUTO_ARCHIVE_PREFERENCES,
-  readAutoArchivePreferences,
-  writeAutoArchivePreferences,
-  type AutoArchivePreferences,
-} from "@/features/auto-archive/auto-archive-store";
+  DEFAULT_AUTO_ARCHIVE_SETTINGS,
+  type AutoArchiveIdleMinute,
+} from "@/app/preferences/preferences-schema";
+import { useAutoArchivePreference } from "@/app/preferences/preferences-store";
+import { queryClient } from "@/app/query";
 import {
   Select,
   SelectContent,
@@ -20,32 +18,19 @@ import {
 } from "@/ui/components/select";
 import { Switch } from "@/ui/components/switch";
 
-const AUTO_ARCHIVE_PREFERENCES_QUERY_KEY = ["preferences", "auto-archive"] as const;
-
 export function AutoArchiveSettingsSection() {
   const { i18n } = useLingui();
-  const preferencesQuery = useQuery({
-    queryKey: AUTO_ARCHIVE_PREFERENCES_QUERY_KEY,
-    queryFn: readAutoArchivePreferences,
-    staleTime: Infinity,
-  });
+  const { autoArchive, patchAutoArchive } = useAutoArchivePreference();
+  const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_SETTINGS;
 
-  const preferences = preferencesQuery.data ?? DEFAULT_AUTO_ARCHIVE_PREFERENCES;
-  const updatePreferencesMutation = useMutation({
-    mutationKey: ["preferences", "auto-archive", "update"],
-    mutationFn: writeAutoArchivePreferences,
-    onSuccess: (nextPreferences) => {
-      queryClient.setQueryData(AUTO_ARCHIVE_PREFERENCES_QUERY_KEY, nextPreferences);
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    },
-  });
-
-  const savePreferences = async (
-    updater: (currentPreferences: AutoArchivePreferences) => AutoArchivePreferences,
+  const savePreferences = (
+    updater: (currentPreferences: typeof preferences) => typeof preferences,
   ) => {
     const nextPreferences = updater(preferences);
-    await updatePreferencesMutation.mutateAsync(nextPreferences);
+    patchAutoArchive(nextPreferences);
+    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
   };
+
   const durationLabels: Record<number, string> = {
     1440: i18n._({
       id: "preferences.auto-archive.threshold.option.1-day",
@@ -66,7 +51,7 @@ export function AutoArchiveSettingsSection() {
   };
 
   return (
-    <section className="border-border/70 flex flex-col gap-4 rounded-xl border p-4">
+    <section className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 className="text-sm font-semibold">
           <Trans id="preferences.auto-archive.title">Auto archive</Trans>
@@ -90,12 +75,11 @@ export function AutoArchiveSettingsSection() {
           </p>
         </div>
         <Switch
-          checked={preferences.autoArchiveEnabled}
-          disabled={updatePreferencesMutation.isPending}
+          checked={preferences.enabled}
           onCheckedChange={(checked) => {
-            void savePreferences((currentPreferences) => ({
+            savePreferences((currentPreferences) => ({
               ...currentPreferences,
-              autoArchiveEnabled: checked,
+              enabled: checked,
             }));
           }}
         />
@@ -110,21 +94,23 @@ export function AutoArchiveSettingsSection() {
             value: String(minutes),
             label: durationLabels[minutes],
           }))}
-          value={String(preferences.autoArchiveIdleMinutes)}
+          value={String(preferences.idleMinutes)}
           onValueChange={(value) => {
             const nextIdleMinutes = Number(value);
 
-            if (!Number.isFinite(nextIdleMinutes)) {
+            if (
+              !AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS.includes(nextIdleMinutes as AutoArchiveIdleMinute)
+            ) {
               return;
             }
 
-            void savePreferences((currentPreferences) => ({
+            savePreferences((currentPreferences) => ({
               ...currentPreferences,
-              autoArchiveIdleMinutes: nextIdleMinutes,
+              idleMinutes: nextIdleMinutes as AutoArchiveIdleMinute,
             }));
           }}
         >
-          <SelectTrigger className="w-full" disabled={!preferences.autoArchiveEnabled}>
+          <SelectTrigger className="w-full" disabled={!preferences.enabled}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent align="end" alignItemWithTrigger={false}>
