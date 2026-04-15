@@ -6,10 +6,10 @@ use tauri::{
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
+pub mod cli;
 mod database;
 mod error;
 mod features;
-pub mod cli;
 
 pub(crate) const MAIN_WINDOW_LABEL: &str = "main";
 const SHOW_MAIN_MENU_ID: &str = "show-main";
@@ -108,11 +108,31 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 pub fn run() {
     init_tracing();
 
-    let app = tauri::Builder::default()
+    let mut builder = tauri::Builder::default();
+
+    // Single instance must be registered first
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            tracing::info!("Additional instance detected, focusing main window");
+            if let Err(error) = show_main_window(app) {
+                tracing::error!(
+                    ?error,
+                    "Failed to show main window from single instance handler"
+                );
+            }
+        }));
+    }
+
+    let app = builder
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
+            // Setup deep link handler
+            features::deep_link::setup_deep_link_handler(app.handle())?;
+
             let database_state = database::DatabaseState::init(app.handle())?;
             app.manage(database_state);
             let auto_archive_state = features::auto_archive::AutoArchiveState::default();
@@ -123,6 +143,12 @@ pub fn run() {
             app.handle().set_dock_visibility(false)?;
             build_tray(app.handle())?;
             features::auto_archive::service::spawn_runtime(app.handle().clone());
+
+            // Check for initial deep link
+            if let Err(e) = features::deep_link::check_initial_deep_link(app.handle()) {
+                tracing::error!(?e, "Failed to check initial deep link");
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

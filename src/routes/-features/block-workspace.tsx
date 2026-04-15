@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 import { BlockActionBar } from "@/features/note-block/block-action-bar";
 import { BlockArchiveAction } from "@/features/note-block/block-archive-action";
@@ -10,6 +12,7 @@ import { BlockTagAction } from "@/features/note-block/block-tag-action";
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
 import { useBlockShortcuts } from "@/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@/routes/-features/use-block-workspace";
+import { useDeepLink } from "@/routes/-features/use-deep-link";
 import { WorkspaceTagFilterPortal } from "@/routes/-features/workspace-tag-filter-portal";
 import { Button } from "@/ui/components/button";
 
@@ -96,6 +99,31 @@ export function BlockWorkspace() {
       createBlock,
       deleteBlock,
     });
+
+  const { pendingBlockId, clearPendingBlockId } = useDeepLink();
+
+  // Handle deep link focus request
+  useEffect(() => {
+    if (!pendingBlockId || isInitialLoading) {
+      return;
+    }
+
+    console.log("Processing deep link for block:", pendingBlockId);
+
+    // Check if block exists in current view
+    const blockExists = blocks.some((block) => block.id === pendingBlockId);
+
+    if (blockExists) {
+      setActiveBlockId(pendingBlockId);
+      clearPendingBlockId();
+    } else {
+      // Block not found in current view
+      toast.error("Block not found", {
+        description: "The requested block does not exist or has been archived.",
+      });
+      clearPendingBlockId();
+    }
+  }, [pendingBlockId, blocks, isInitialLoading, setActiveBlockId, clearPendingBlockId]);
 
   if (isInitialLoading) {
     return <LoadingState />;
