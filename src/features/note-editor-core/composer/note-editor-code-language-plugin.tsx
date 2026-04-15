@@ -22,7 +22,9 @@ import {
 } from "@/ui/components/combobox";
 
 import {
+  getCodeLanguageSearchTokens,
   getCommonCodeLanguageOptions,
+  resolveCodeLanguageVariant,
   type CodeLanguageOption,
 } from "./note-editor-code-language-options";
 
@@ -118,6 +120,7 @@ export function NoteEditorCodeLanguagePlugin() {
   const [editor] = useLexicalComposerContext();
   const { i18n } = useLingui();
   const [controlState, setControlState] = useState<CodeLanguageControlState | null>(null);
+  const [searchValue, setSearchValue] = useState("");
   const frameRef = useRef<number | null>(null);
 
   const plainTextLabel = i18n._({
@@ -154,7 +157,9 @@ export function NoteEditorCodeLanguagePlugin() {
 
       const nextState: CodeLanguageControlState = {
         codeNodeKey: activeCodeNode.key,
-        language: activeCodeNode.language,
+        language:
+          resolveCodeLanguageVariant(activeCodeNode.language) ??
+          normalizeCodeLanguage(activeCodeNode.language),
         top: position.top,
         inlineEnd: position.inlineEnd,
         popupContainer: position.popupContainer,
@@ -207,8 +212,18 @@ export function NoteEditorCodeLanguagePlugin() {
         {
           value: controlState.language,
           label: controlState.language,
+          aliases: [],
         },
       ];
+  const normalizedSearchValue = searchValue.trim().toLocaleLowerCase();
+  const filteredOptions =
+    normalizedSearchValue.length === 0
+      ? effectiveOptions
+      : effectiveOptions.filter((option) =>
+          getCodeLanguageSearchTokens(option).some((token) =>
+            token.includes(normalizedSearchValue),
+          ),
+        );
   const selectedOption =
     effectiveOptions.find((option) => option.value === controlState.language) ??
     effectiveOptions[0];
@@ -231,16 +246,20 @@ export function NoteEditorCodeLanguagePlugin() {
     >
       <Combobox<CodeLanguageOption>
         items={effectiveOptions}
+        inputValue={searchValue}
         itemToStringLabel={(item) => item.label}
         itemToStringValue={(item) => item.value}
         isItemEqualToValue={(item, value) => item.value === value.value}
+        onInputValueChange={setSearchValue}
         value={selectedOption}
         onValueChange={(option) => {
           if (!option) {
             return;
           }
 
-          const normalizedLanguage = normalizeCodeLanguage(option.value);
+          const normalizedLanguage =
+            resolveCodeLanguageVariant(option.value) ?? normalizeCodeLanguage(option.value);
+          setSearchValue("");
 
           editor.update(() => {
             const node = $getNodeByKey(controlState.codeNodeKey);
@@ -261,7 +280,7 @@ export function NoteEditorCodeLanguagePlugin() {
         }}
       >
         <ComboboxInput
-          className="text-muted-foreground h-6 w-20 [&>input]:text-[0.625rem]"
+          className="text-muted-foreground h-5 w-20 [&>input]:text-[0.625rem]"
           placeholder={i18n._({
             id: "editor.code-block.language.search.placeholder",
             message: "Search language",
@@ -276,11 +295,11 @@ export function NoteEditorCodeLanguagePlugin() {
             })}
           </ComboboxEmpty>
           <ComboboxList>
-            {(option) => (
+            {filteredOptions.map((option) => (
               <ComboboxItem key={option.value} value={option} className="h-5 min-h-5 px-1.5 py-1">
                 <span className="text-[0.625rem]">{option.label}</span>
               </ComboboxItem>
-            )}
+            ))}
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
