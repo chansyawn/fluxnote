@@ -1,3 +1,4 @@
+pub mod assets;
 pub mod auto_archive;
 pub mod blocks;
 pub mod deep_link;

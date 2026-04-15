@@ -50,6 +50,10 @@ pnpm install
 pnpm dev
 \`\`\`
 
+## Image
+
+![Placeholder demo image](https://placehold.co/600x400)
+
 ## Table
 
 | Feature | Status | Notes |

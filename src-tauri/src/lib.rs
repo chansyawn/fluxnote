@@ -153,6 +153,8 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             features::sample::greet,
+            features::assets::assets_create,
+            features::assets::assets_resolve,
             features::blocks::blocks_list,
             features::blocks::blocks_create,
             features::blocks::blocks_update_content,

@@ -11,6 +11,13 @@
   },
   "app": {
     "macOSPrivateApi": true,
+    "security": {
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$APPDATA/assets/**"]
+      },
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost data: https:"
+    },
     "windows": [
       {
         "title": "fluxnote",
@@ -26,10 +33,7 @@
         "maxWidth": 640,
         "height": 600
       }
-    ],
-    "security": {
-      "csp": null
-    }
+    ]
   },
   "bundle": {
     "active": true,

@@ -54,6 +54,7 @@ export function NoteBlockEditorView({
 
       <div className="min-h-16 px-3 pt-3 pb-2">
         <NoteEditorShell
+          blockId={blockId}
           ref={editorRef}
           focusRequestKey={focusRequestKey}
           initialMarkdown={initialMarkdown}

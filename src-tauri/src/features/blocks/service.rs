@@ -2,8 +2,10 @@ use std::collections::HashSet;
 
 use anyhow::{anyhow, Context};
 use rusqlite::{params, Connection, OptionalExtension, ToSql, Transaction};
+use tauri::AppHandle;
 
 use crate::error::{AppResult, BusinessError};
+use crate::features::assets;
 use crate::features::blocks::BlockVisibility;
 use crate::features::tags;
 
@@ -53,7 +55,7 @@ pub fn update_block_content(
     let now = crate::features::tags::service::timestamp_now()?;
     let tx = begin_tx(conn)?;
 
-    ensure_block_exists(&tx, block_id)?;
+    get_block_by_id(&tx, block_id)?.ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
 
     tx.execute(
         "UPDATE blocks
@@ -68,6 +70,36 @@ pub fn update_block_content(
 
     tx.commit()
         .context("failed to commit update block transaction")?;
+
+    Ok(block)
+}
+
+pub fn update_block_content_with_assets(
+    conn: &mut Connection,
+    app: &AppHandle,
+    block_id: &str,
+    content: &str,
+) -> AppResult<Block> {
+    let previous_content = {
+        let tx = begin_tx(conn)?;
+        let previous_block = get_block_by_id(&tx, block_id)?
+            .ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
+        let previous_content = previous_block.content.clone();
+        tx.commit()
+            .context("failed to commit pre-update read transaction")?;
+        previous_content
+    };
+
+    let block = update_block_content(conn, block_id, content)?;
+
+    if let Err(error) = assets::service::cleanup_assets_after_content_update(
+        app,
+        block_id,
+        &previous_content,
+        content,
+    ) {
+        tracing::warn!(?error, block_id, "failed to cleanup removed block assets");
+    }
 
     Ok(block)
 }
@@ -101,6 +133,32 @@ pub fn delete_block(conn: &mut Connection, block_id: &str) -> AppResult<DeleteBl
     Ok(DeleteBlockResult {
         deleted_block_id: block_id.to_string(),
     })
+}
+
+pub fn delete_block_with_assets(
+    conn: &mut Connection,
+    app: &AppHandle,
+    block_id: &str,
+) -> AppResult<DeleteBlockResult> {
+    let deleted_content = {
+        let tx = begin_tx(conn)?;
+        let block_meta = get_block_meta(&tx, block_id)?
+            .ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
+        let deleted_content = block_meta.content.clone();
+        tx.commit()
+            .context("failed to commit pre-delete read transaction")?;
+        deleted_content
+    };
+
+    let result = delete_block(conn, block_id)?;
+
+    if let Err(error) =
+        assets::service::cleanup_assets_for_block_content(app, block_id, &deleted_content)
+    {
+        tracing::warn!(?error, block_id, "failed to cleanup deleted block assets");
+    }
+
+    Ok(result)
 }
 
 pub(crate) fn attach_tags(conn: &Connection, blocks: Vec<Block>) -> AppResult<Vec<Block>> {
@@ -264,7 +322,7 @@ fn set_block_archive_state(
     let now = crate::features::tags::service::timestamp_now()?;
     let tx = begin_tx(conn)?;
 
-    ensure_block_exists(&tx, block_id)?;
+    get_block_by_id(&tx, block_id)?.ok_or_else(|| BusinessError::NotFound(block_id.to_string()))?;
 
     tx.execute(
         "UPDATE blocks
@@ -283,14 +341,6 @@ fn set_block_archive_state(
     Ok(block)
 }
 
-fn ensure_block_exists(tx: &Transaction<'_>, block_id: &str) -> AppResult<()> {
-    if get_block_meta(tx, block_id)?.is_none() {
-        return Err(BusinessError::NotFound(block_id.to_string()).into());
-    }
-
-    Ok(())
-}
-
 fn next_block_position(tx: &Transaction<'_>) -> anyhow::Result<i64> {
     tx.query_row(
         "SELECT COALESCE(MAX(position) + 1, 0) FROM blocks",
@@ -302,15 +352,17 @@ fn next_block_position(tx: &Transaction<'_>) -> anyhow::Result<i64> {
 
 struct BlockMeta {
     position: i64,
+    content: String,
 }
 
 fn get_block_meta(tx: &Transaction<'_>, block_id: &str) -> anyhow::Result<Option<BlockMeta>> {
     tx.query_row(
-        "SELECT position FROM blocks WHERE id = ?1",
+        "SELECT position, content FROM blocks WHERE id = ?1",
         params![block_id],
         |row| {
             Ok(BlockMeta {
                 position: row.get(0)?,
+                content: row.get(1)?,
             })
         },
     )

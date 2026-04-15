@@ -6,6 +6,8 @@ import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import type { Klass, LexicalNode } from "lexical";
 
+import { NoteEditorImageNode } from "@/features/note-editor-core/image/note-editor-image-node";
+
 export const NOTE_EDITOR_NODES: ReadonlyArray<Klass<LexicalNode>> = [
   HeadingNode,
   QuoteNode,
@@ -18,4 +20,5 @@ export const NOTE_EDITOR_NODES: ReadonlyArray<Klass<LexicalNode>> = [
   TableNode,
   TableRowNode,
   TableCellNode,
+  NoteEditorImageNode,
 ];

@@ -28,12 +28,15 @@ import {
 } from "@lexical/table";
 import { $createParagraphNode, type ElementNode } from "lexical";
 
+import { NOTE_EDITOR_IMAGE_TRANSFORMER } from "@/features/note-editor-core/image/note-editor-image-markdown";
+
 const TABLE_ROW_REGEXP = /^(?:\|)(.+)(?:\|)\s?$/;
 const TABLE_DIVIDER_REGEXP = /^(\| *(?::?-{3,}:?) *)+\|\s?$/;
 const HORIZONTAL_RULE_REGEXP = /^(---|\*\*\*|___)\s?$/;
 
 const TABLE_CELL_MARKDOWN_TRANSFORMERS: Transformer[] = [
   ...TEXT_FORMAT_TRANSFORMERS,
+  NOTE_EDITOR_IMAGE_TRANSFORMER,
   ...TEXT_MATCH_TRANSFORMERS,
 ];
 
@@ -289,5 +292,6 @@ export const NOTE_EDITOR_MARKDOWN_TRANSFORMERS: Transformer[] = [
   ...NOTE_EDITOR_ELEMENT_TRANSFORMERS,
   ...NOTE_EDITOR_MULTILINE_TRANSFORMERS,
   ...TEXT_FORMAT_TRANSFORMERS,
+  NOTE_EDITOR_IMAGE_TRANSFORMER,
   ...TEXT_MATCH_TRANSFORMERS,
 ];
