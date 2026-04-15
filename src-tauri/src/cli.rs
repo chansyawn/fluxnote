@@ -28,8 +28,7 @@ fn get_database_path() -> Result<std::path::PathBuf> {
         .context("failed to resolve data directory")?
         .join("app.fluxnote");
 
-    fs::create_dir_all(&app_data_dir)
-        .context("failed to create app data directory")?;
+    fs::create_dir_all(&app_data_dir).context("failed to create app data directory")?;
 
     Ok(app_data_dir.join("fluxnote.sqlite3"))
 }
@@ -44,8 +43,7 @@ fn read_content(input: &str) -> Result<String> {
 
     // 如果是文件路径且文件存在，读取文件内容
     if path.exists() && path.is_file() {
-        fs::read_to_string(path)
-            .with_context(|| format!("failed to read file: {}", path.display()))
+        fs::read_to_string(path).with_context(|| format!("failed to read file: {}", path.display()))
     } else {
         // 否则作为文本内容直接使用
         Ok(input.to_string())
@@ -76,8 +74,15 @@ fn run_cli() -> Result<()> {
     let block = service::update_block_content(&mut conn, &block.id, &content)
         .map_err(|e| anyhow::anyhow!("failed to update block content: {:?}", e))?;
 
+    // 构造 deep link URL
+    let deep_link_url = format!("fluxnote://block/{}", block.id);
+
     // 输出结果
     println!("✓ Block created: {}", block.id);
+
+    // 打开 GUI
+    open::that(&deep_link_url).context("failed to open deep link URL")?;
+    println!("→ Opening FluxNote...");
 
     Ok(())
 }
