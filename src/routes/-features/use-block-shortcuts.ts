@@ -20,6 +20,7 @@ interface UseBlockShortcutsResult {
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   setActiveBlockId: (blockId: string) => void;
+  requestBlockFocus: (blockId: string) => void;
 }
 
 function getAdjacentBlockId(blocks: Block[], blockId: string): string | null {
@@ -131,5 +132,6 @@ export function useBlockShortcuts({
     createBlockWithFocus,
     deleteBlockWithFocus,
     setActiveBlockId,
+    requestBlockFocus,
   };
 }

@@ -93,12 +93,17 @@ export function BlockWorkspace() {
     createTagAndAssignToBlock,
     assignBlockTags,
   } = useBlockWorkspace();
-  const { createBlockWithFocus, deleteBlockWithFocus, focusRequest, setActiveBlockId } =
-    useBlockShortcuts({
-      blocks,
-      createBlock,
-      deleteBlock,
-    });
+  const {
+    createBlockWithFocus,
+    deleteBlockWithFocus,
+    focusRequest,
+    setActiveBlockId,
+    requestBlockFocus,
+  } = useBlockShortcuts({
+    blocks,
+    createBlock,
+    deleteBlock,
+  });
 
   const { pendingBlockId, clearPendingBlockId } = useDeepLink();
 
@@ -114,7 +119,7 @@ export function BlockWorkspace() {
     const blockExists = blocks.some((block) => block.id === pendingBlockId);
 
     if (blockExists) {
-      setActiveBlockId(pendingBlockId);
+      requestBlockFocus(pendingBlockId);
       clearPendingBlockId();
     } else {
       // Block not found in current view
@@ -123,7 +128,7 @@ export function BlockWorkspace() {
       });
       clearPendingBlockId();
     }
-  }, [pendingBlockId, blocks, isInitialLoading, setActiveBlockId, clearPendingBlockId]);
+  }, [pendingBlockId, blocks, isInitialLoading, requestBlockFocus, clearPendingBlockId]);
 
   if (isInitialLoading) {
     return <LoadingState />;
