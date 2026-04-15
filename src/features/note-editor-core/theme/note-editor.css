@@ -1,35 +1,15 @@
 @reference "#global.css";
 
-.note-block-editor {
-  @apply relative isolate;
-}
-
-.note-block-editor__selection-overlay {
-  @apply pointer-events-none absolute inset-0 z-30;
-}
-
-.note-block-editor__selection-rect {
-  @apply bg-primary/18 absolute rounded-xs;
-}
-
-.note-block-editor__input {
-  @apply text-foreground relative z-20 min-h-16 resize-none text-sm outline-none;
-}
-
-.note-block-editor__input::selection,
-.note-block-editor__input *::selection {
+[data-note-editor-input]::selection,
+[data-note-editor-input] *::selection {
   background: transparent;
   color: inherit;
 }
 
-.note-block-editor__input::-moz-selection,
-.note-block-editor__input *::-moz-selection {
+[data-note-editor-input]::-moz-selection,
+[data-note-editor-input] *::-moz-selection {
   background: transparent;
   color: inherit;
-}
-
-.note-block-editor__placeholder {
-  @apply text-muted-foreground pointer-events-none absolute top-0 left-0 z-40 text-sm;
 }
 
 .note-block-editor__paragraph {

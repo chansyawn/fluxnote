@@ -89,12 +89,12 @@ export function NoteEditorSelectionOverlayPlugin() {
   }, [editor]);
 
   return (
-    <div aria-hidden className="note-block-editor__selection-overlay">
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-30">
       {selectionRects.map((rect, index) => {
         return (
           <div
             key={`${rect.top}-${rect.left}-${rect.width}-${rect.height}-${index}`}
-            className="note-block-editor__selection-rect"
+            className="bg-primary/18 absolute rounded-xs"
             style={{
               top: rect.top,
               left: rect.left,
