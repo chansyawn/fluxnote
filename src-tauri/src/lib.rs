@@ -9,6 +9,7 @@ use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectStat
 mod database;
 mod error;
 mod features;
+pub mod cli;
 
 pub(crate) const MAIN_WINDOW_LABEL: &str = "main";
 const SHOW_MAIN_MENU_ID: &str = "show-main";

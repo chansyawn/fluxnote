@@ -55,6 +55,21 @@ impl DatabaseState {
     }
 }
 
+/// Initialize a database connection for CLI usage
+pub fn init_cli_connection(path: &std::path::Path) -> anyhow::Result<Connection> {
+    let mut conn = Connection::open(path)
+        .with_context(|| format!("failed to open database: {}", path.display()))?;
+
+    conn.busy_timeout(Duration::from_secs(5))
+        .context("failed to set sqlite busy timeout")?;
+    conn.pragma_update(None, "foreign_keys", "ON")
+        .context("failed to enable sqlite foreign keys")?;
+
+    migrations::apply(&mut conn).context("failed to apply sqlite migrations")?;
+
+    Ok(conn)
+}
+
 #[cfg(test)]
 pub(crate) fn new_in_memory_connection() -> anyhow::Result<Connection> {
     let mut conn = Connection::open_in_memory().context("failed to open in-memory sqlite db")?;

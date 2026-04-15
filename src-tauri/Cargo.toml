@@ -33,6 +33,12 @@ rusqlite_migration = "2.5.0"
 time = { version = "0.3.44", features = ["formatting"] }
 uuid = { version = "1.18.1", features = ["v7"] }
 tauri-plugin-store = "2.4.2"
+clap = { version = "4", features = ["derive"] }
+dirs = "5"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-global-shortcut = "2.3.1"
+
+[[bin]]
+name = "flux"
+path = "src/main.rs"
