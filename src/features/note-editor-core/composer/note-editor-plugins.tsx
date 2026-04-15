@@ -8,12 +8,12 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 
 import { NoteEditorClipboardPlugin } from "@/features/note-editor-core/clipboard/note-editor-clipboard-plugin";
+import { NoteEditorCodeHighlightPlugin } from "@/features/note-editor-core/code-block/note-editor-code-highlight-plugin";
+import { NoteEditorCodeLanguagePlugin } from "@/features/note-editor-core/code-block/note-editor-code-language-plugin";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorSelectionOverlayPlugin } from "@/features/note-editor-core/selection/note-editor-selection-overlay-plugin";
 import { NoteEditorTableShortcutPlugin } from "@/features/note-editor-core/table/note-editor-table-shortcut-plugin";
 
-import { NoteEditorCodeHighlightPlugin } from "./note-editor-code-highlight-plugin";
-import { NoteEditorCodeLanguagePlugin } from "./note-editor-code-language-plugin";
 import { NoteEditorFocusPlugin } from "./note-editor-focus-plugin";
 
 interface NoteEditorPluginsProps {
