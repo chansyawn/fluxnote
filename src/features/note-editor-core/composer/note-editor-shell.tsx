@@ -56,12 +56,13 @@ function NoteEditorShellContent(
   }));
 
   return (
-    <div className="note-block-editor">
+    <div className="note-block-editor relative isolate">
       <RichTextPlugin
         contentEditable={
           <ContentEditable
             aria-placeholder="Write something..."
-            className="note-block-editor__input"
+            className="text-foreground relative z-20 min-h-16 resize-none text-sm outline-none"
+            data-note-editor-input
             onBlur={onBlur}
             placeholder={<NoteEditorPlaceholder />}
           />
