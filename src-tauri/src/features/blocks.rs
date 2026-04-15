@@ -3,7 +3,7 @@ pub(crate) mod service;
 
 use garde::Validate;
 use serde::Deserialize;
-use tauri::State;
+use tauri::{AppHandle, State};
 use tracing::info;
 
 use crate::database::DatabaseState;
@@ -95,6 +95,7 @@ pub fn blocks_create(state: State<'_, DatabaseState>) -> AppResult<Block> {
 )]
 pub fn blocks_update_content(
     state: State<'_, DatabaseState>,
+    app: AppHandle,
     args: Validated<UpdateBlockContentArgs>,
 ) -> AppResult<Block> {
     let args = args.into_inner();
@@ -102,20 +103,21 @@ pub fn blocks_update_content(
 
     info!("updating block content");
     let mut conn = state.lock()?;
-    service::update_block_content(&mut conn, &args.block_id, &args.content)
+    service::update_block_content_with_assets(&mut conn, &app, &args.block_id, &args.content)
 }
 
 #[tauri::command]
 #[tracing::instrument(name = "command.blocks_delete", skip(state, args))]
 pub fn blocks_delete(
     state: State<'_, DatabaseState>,
+    app: AppHandle,
     args: Validated<DeleteBlockArgs>,
 ) -> AppResult<DeleteBlockResult> {
     let args = args.into_inner();
 
     info!("deleting block");
     let mut conn = state.lock()?;
-    service::delete_block(&mut conn, &args.block_id)
+    service::delete_block_with_assets(&mut conn, &app, &args.block_id)
 }
 
 #[tauri::command]

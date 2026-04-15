@@ -1,3 +1,4 @@
+export { createAsset, resolveAsset } from "@/clients/assets";
 export { greet } from "@/clients/sample";
 export {
   archiveBlock,
@@ -8,6 +9,12 @@ export {
   updateBlockContent,
 } from "@/clients/blocks";
 export { createTag, deleteTag, listTags, setBlockTags } from "@/clients/tags";
+export type {
+  CreateAssetRequest,
+  CreateAssetResult,
+  ResolveAssetRequest,
+  ResolveAssetResult,
+} from "@/clients/assets";
 export type { GreetRequest, GreetResponse } from "@/clients/sample";
 export type {
   Block,

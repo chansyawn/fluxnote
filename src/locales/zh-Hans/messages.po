@@ -20,23 +20,34 @@ msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
-#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:234
+#: src/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:237
 msgid "editor.code-block.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:126
+#: src/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:126
 msgid "editor.code-block.language.option.plain-text"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:308
+#: src/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:292
 msgid "editor.code-block.language.search.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/features/note-editor-core/composer/note-editor-code-language-plugin.tsx:299
+#: src/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:284
 msgid "editor.code-block.language.search.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/image/note-editor-image-plugin.tsx:41
+#: src/features/note-editor-core/image/note-editor-image-plugin.tsx:89
+msgid "editor.image.insert-error"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/features/note-editor-core/image/note-editor-image-component.tsx:136
+msgid "editor.image.load-error"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -366,27 +377,27 @@ msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:212
+#: src/routes/-features/block-workspace.tsx:245
 msgid "workspace.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:67
+#: src/routes/-features/block-workspace.tsx:70
 msgid "workspace.archived.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:64
+#: src/routes/-features/block-workspace.tsx:67
 msgid "workspace.archived.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:136
+#: src/routes/-features/block-workspace.tsx:169
 msgid "workspace.archived.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:125
+#: src/routes/-features/block-workspace.tsx:158
 msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
@@ -401,32 +412,32 @@ msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:54
+#: src/routes/-features/block-workspace.tsx:57
 msgid "workspace.empty.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:40
+#: src/routes/-features/block-workspace.tsx:43
 msgid "workspace.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:37
+#: src/routes/-features/block-workspace.tsx:40
 msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:132
+#: src/routes/-features/block-workspace.tsx:165
 msgid "workspace.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:123
+#: src/routes/-features/block-workspace.tsx:156
 msgid "workspace.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/routes/-features/block-workspace.tsx:21
+#: src/routes/-features/block-workspace.tsx:24
 msgid "workspace.loading"
 msgstr ""
 

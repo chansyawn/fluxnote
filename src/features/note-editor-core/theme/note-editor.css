@@ -215,3 +215,23 @@
 .note-block-editor__token--regex {
   @apply text-rose-700 dark:text-rose-300;
 }
+
+.note-block-editor__image-node {
+  @apply inline-block w-full align-top;
+}
+
+.note-block-editor__image-shell {
+  @apply ring-primary/25 relative my-2 block w-full rounded-xl transition-shadow outline-none;
+}
+
+.note-block-editor__image-shell[data-selected="true"] {
+  @apply ring-2;
+}
+
+.note-block-editor__image {
+  @apply border-border bg-muted block max-w-full rounded-xl border object-contain;
+}
+
+.note-block-editor__image--error {
+  @apply text-muted-foreground border-border bg-muted my-2 block rounded-lg border px-3 py-2 text-sm;
+}

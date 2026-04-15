@@ -21,6 +21,7 @@ export interface NoteEditorShellHandle {
 }
 
 interface NoteEditorShellProps {
+  blockId: string;
   initialMarkdown: string;
   onMarkdownUpdated: (markdown: string) => void;
   onBlur?: () => void;
@@ -31,11 +32,15 @@ interface NoteEditorShellProps {
 
 function NoteEditorShellContent(
   {
+    blockId,
     onBlur,
     onMarkdownUpdated,
     autoFocus = false,
     focusRequestKey = 0,
-  }: Pick<NoteEditorShellProps, "onBlur" | "onMarkdownUpdated" | "autoFocus" | "focusRequestKey">,
+  }: Pick<
+    NoteEditorShellProps,
+    "blockId" | "onBlur" | "onMarkdownUpdated" | "autoFocus" | "focusRequestKey"
+  >,
   ref: React.Ref<NoteEditorShellHandle>,
 ) {
   const [editor] = useLexicalComposerContext();
@@ -73,6 +78,7 @@ function NoteEditorShellContent(
       <HistoryPlugin />
       <NoteEditorPlugins
         autoFocus={autoFocus}
+        blockId={blockId}
         focusRequestKey={focusRequestKey}
         onMarkdownUpdated={onMarkdownUpdated}
       />
@@ -85,6 +91,7 @@ const NoteEditorShellContentWithRef = forwardRef(NoteEditorShellContent);
 export const NoteEditorShell = forwardRef<NoteEditorShellHandle, NoteEditorShellProps>(
   function NoteEditorShell(
     {
+      blockId,
       initialMarkdown,
       editable = true,
       onBlur,
@@ -97,7 +104,7 @@ export const NoteEditorShell = forwardRef<NoteEditorShellHandle, NoteEditorShell
     return (
       <LexicalComposer
         initialConfig={{
-          namespace: "note-block-editor",
+          namespace: `note-block-editor-${blockId}`,
           theme: noteEditorLexicalTheme,
           editable,
           nodes: NOTE_EDITOR_NODES,
@@ -110,6 +117,7 @@ export const NoteEditorShell = forwardRef<NoteEditorShellHandle, NoteEditorShell
         }}
       >
         <NoteEditorShellContentWithRef
+          blockId={blockId}
           onBlur={onBlur}
           onMarkdownUpdated={onMarkdownUpdated}
           autoFocus={autoFocus}
