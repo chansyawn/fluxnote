@@ -21,6 +21,10 @@ import {
   type ShortcutUpdateError,
   validateShortcutUpdate,
 } from "@/features/shortcut/shortcut-utils";
+import {
+  saveCurrentWindowPosition,
+  showWindowOnCursorMonitor,
+} from "@/features/window/window-position-manager";
 
 const appWindow = getCurrentWindow();
 
@@ -44,13 +48,16 @@ async function toggleMainWindowVisibility(): Promise<void> {
   const isVisible = await appWindow.isVisible();
 
   if (isVisible) {
+    await saveCurrentWindowPosition().catch(() => {});
     await appWindow.hide();
     return;
   }
 
-  await appWindow.unminimize();
-  await appWindow.show();
-  await appWindow.setFocus();
+  await showWindowOnCursorMonitor().catch(async () => {
+    await appWindow.unminimize();
+    await appWindow.show();
+    await appWindow.setFocus();
+  });
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
