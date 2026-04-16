@@ -29,18 +29,6 @@ fn init_tracing() {
     }
 }
 
-fn show_main_window(app: &AppHandle) -> tauri::Result<()> {
-    let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) else {
-        return Ok(());
-    };
-
-    window.unminimize()?;
-    window.show()?;
-    window.set_focus()?;
-
-    Ok(())
-}
-
 fn configure_main_window(app: &AppHandle) -> tauri::Result<()> {
     let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) else {
         return Ok(());
@@ -77,7 +65,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     tray_builder
         .on_menu_event(|app, event| match event.id().as_ref() {
             SHOW_MAIN_MENU_ID => {
-                if let Err(error) = show_main_window(app) {
+                if let Err(error) = features::window::show_main_window(app, MAIN_WINDOW_LABEL) {
                     tracing::error!(?error, "failed to show main window from tray menu");
                 }
             }
@@ -94,8 +82,10 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 ..
             } = event
             {
-                if let Err(error) = show_main_window(tray.app_handle()) {
-                    tracing::error!(?error, "failed to show main window from tray icon click");
+                if let Err(error) =
+                    features::window::toggle_main_window(tray.app_handle(), MAIN_WINDOW_LABEL)
+                {
+                    tracing::error!(?error, "failed to toggle main window from tray icon click");
                 }
             }
         })
@@ -115,7 +105,7 @@ pub fn run() {
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             tracing::info!("Additional instance detected, focusing main window");
-            if let Err(error) = show_main_window(app) {
+            if let Err(error) = features::window::show_main_window(app, MAIN_WINDOW_LABEL) {
                 tracing::error!(
                     ?error,
                     "Failed to show main window from single instance handler"
@@ -164,7 +154,8 @@ pub fn run() {
             features::tags::tags_list,
             features::tags::tags_create,
             features::tags::tags_delete,
-            features::tags::tags_set_block_tags
+            features::tags::tags_set_block_tags,
+            features::window::toggle_main_window_command
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
@@ -176,7 +167,7 @@ pub fn run() {
             ..
         } = event
         {
-            if let Err(error) = show_main_window(app) {
+            if let Err(error) = features::window::show_main_window(app, MAIN_WINDOW_LABEL) {
                 tracing::error!(?error, "failed to show main window on macOS reopen");
             }
         }

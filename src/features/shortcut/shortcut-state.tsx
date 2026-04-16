@@ -1,4 +1,4 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { invoke } from "@tauri-apps/api/core";
 import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
 import {
   createContext,
@@ -21,12 +21,6 @@ import {
   type ShortcutUpdateError,
   validateShortcutUpdate,
 } from "@/features/shortcut/shortcut-utils";
-import {
-  saveCurrentWindowPosition,
-  showWindowOnCursorMonitor,
-} from "@/features/window/window-position-manager";
-
-const appWindow = getCurrentWindow();
 
 type ShortcutUpdateResult = { ok: true } | { ok: false; error: ShortcutUpdateError };
 
@@ -45,19 +39,7 @@ interface ShortcutStateProviderProps {
 }
 
 async function toggleMainWindowVisibility(): Promise<void> {
-  const isVisible = await appWindow.isVisible();
-
-  if (isVisible) {
-    await saveCurrentWindowPosition().catch(() => {});
-    await appWindow.hide();
-    return;
-  }
-
-  await showWindowOnCursorMonitor().catch(async () => {
-    await appWindow.unminimize();
-    await appWindow.show();
-    await appWindow.setFocus();
-  });
+  await invoke("toggle_main_window_command");
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
