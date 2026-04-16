@@ -3,8 +3,6 @@ import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection"
 import { i18n } from "@lingui/core";
 import {
   $getNodeByKey,
-  $getSelection,
-  $isNodeSelection,
   $setSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
@@ -15,7 +13,6 @@ import {
 } from "lexical";
 import { useEffect, useState } from "react";
 
-import { $isNoteEditorImageNode } from "./note-editor-image-node";
 import { isInternalAssetUrl, resolveAssetUrl } from "./note-editor-image-utils";
 
 interface NoteEditorImageComponentProps {
@@ -110,17 +107,7 @@ export function NoteEditorImageComponent({
 
     event.preventDefault();
     editor.update(() => {
-      const selection = $getSelection();
-      if (!$isNodeSelection(selection)) {
-        return;
-      }
-
-      const node = $getNodeByKey(nodeKey);
-      if (!$isNoteEditorImageNode(node)) {
-        return;
-      }
-
-      node.remove();
+      $getNodeByKey(nodeKey)?.remove();
       $setSelection(null);
     });
 
