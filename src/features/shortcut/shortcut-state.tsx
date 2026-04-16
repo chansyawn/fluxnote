@@ -1,14 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { register, unregister } from "@tauri-apps/plugin-global-shortcut";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffectEvent, useMemo, type ReactNode } from "react";
 
 import {
   type ShortcutAction,
@@ -21,6 +12,7 @@ import {
   type ShortcutUpdateError,
   validateShortcutUpdate,
 } from "@/features/shortcut/shortcut-utils";
+import { useGlobalShortcutSync } from "@/features/shortcut/use-global-shortcut-sync";
 
 type ShortcutUpdateResult = { ok: true } | { ok: false; error: ShortcutUpdateError };
 
@@ -43,54 +35,16 @@ async function toggleMainWindowVisibility(): Promise<void> {
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
-  const [globalShortcutError, setGlobalShortcutError] = useState<ShortcutBinding>(null);
   const { clearShortcut, resetShortcut, setShortcut, shortcuts } = useShortcutPreferences();
 
   const handleToggleWindow = useEffectEvent(() => {
     void toggleMainWindowVisibility();
   });
 
-  useEffect(() => {
-    let isActive = true;
-    const normalizedGlobalShortcut = normalizeShortcut(shortcuts["toggle-window"] ?? "");
-
-    setGlobalShortcutError(null);
-
-    const syncGlobalShortcut = async () => {
-      if (!normalizedGlobalShortcut) {
-        return;
-      }
-
-      try {
-        await unregister(normalizedGlobalShortcut).catch(() => {});
-        await register(normalizedGlobalShortcut, (event) => {
-          if (event.state !== "Pressed") {
-            return;
-          }
-
-          handleToggleWindow();
-        });
-      } catch (error) {
-        if (!isActive) {
-          return;
-        }
-
-        console.error("Failed to register global shortcut", error);
-        setGlobalShortcutError(normalizedGlobalShortcut);
-      }
-    };
-
-    void syncGlobalShortcut();
-
-    return () => {
-      isActive = false;
-      if (!normalizedGlobalShortcut) {
-        return;
-      }
-
-      void unregister(normalizedGlobalShortcut).catch(() => {});
-    };
-  }, [handleToggleWindow, shortcuts["toggle-window"]]);
+  const globalShortcutError = useGlobalShortcutSync({
+    shortcut: shortcuts["toggle-window"],
+    onPressed: handleToggleWindow,
+  });
 
   const contextValue = useMemo<ShortcutStateContextValue>(
     () => ({
