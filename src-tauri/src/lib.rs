@@ -145,6 +145,7 @@ pub fn run() {
             features::sample::greet,
             features::assets::assets_create,
             features::assets::assets_resolve,
+            features::assets::assets_copy,
             features::blocks::blocks_list,
             features::blocks::blocks_create,
             features::blocks::blocks_update_content,

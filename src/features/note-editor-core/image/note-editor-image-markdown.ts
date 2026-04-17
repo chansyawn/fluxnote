@@ -1,5 +1,5 @@
-import type { TextMatchTransformer } from "@lexical/markdown";
-import type { LexicalNode } from "lexical";
+import type { ElementTransformer } from "@lexical/markdown";
+import { type ElementNode, type LexicalNode } from "lexical";
 
 import {
   $createNoteEditorImageNode,
@@ -7,28 +7,41 @@ import {
   NoteEditorImageNode,
 } from "./note-editor-image-node";
 
-const IMAGE_IMPORT_REGEXP = /!\[([^\]]*)\]\(([^)\n]+)\)/;
-const IMAGE_SHORTCUT_REGEXP = /!\[([^\]]*)\]\(([^)\n]+)\)$/;
+const IMAGE_REGEXP = /^!\[([^\]]*)\]\(([^)\n]+)\)\s?$/;
 
-function createImageNodeFromMatch(match: RegExpMatchArray): NoteEditorImageNode {
-  const [, altText = "", src = ""] = match;
-
-  return $createNoteEditorImageNode({
-    altText,
-    src: src.trim(),
-  });
-}
-
-export const NOTE_EDITOR_IMAGE_TRANSFORMER: TextMatchTransformer = {
+export const NOTE_EDITOR_IMAGE_TRANSFORMER: ElementTransformer = {
   dependencies: [NoteEditorImageNode],
+
   export: (node: LexicalNode) => {
-    return $isNoteEditorImageNode(node) ? `![${node.getAltText()}](${node.getSrc()})` : null;
+    if (!$isNoteEditorImageNode(node)) {
+      return null;
+    }
+    return `![${node.getAltText()}](${node.getSrc()})`;
   },
-  importRegExp: IMAGE_IMPORT_REGEXP,
-  regExp: IMAGE_SHORTCUT_REGEXP,
-  replace: (textNode, match) => {
-    textNode.replace(createImageNodeFromMatch(match));
+
+  regExp: IMAGE_REGEXP,
+
+  replace: (
+    parentNode: ElementNode,
+    _children: Array<LexicalNode>,
+    match: Array<string>,
+    isImport: boolean,
+  ) => {
+    const [, altText = "", src = ""] = match;
+
+    const imageNode = $createNoteEditorImageNode({
+      altText,
+      src: src.trim(),
+    });
+
+    if (isImport || parentNode.getNextSibling() != null) {
+      parentNode.replace(imageNode);
+    } else {
+      parentNode.insertBefore(imageNode);
+    }
+
+    imageNode.selectNext();
   },
-  trigger: ")",
-  type: "text-match",
+
+  type: "element",
 };

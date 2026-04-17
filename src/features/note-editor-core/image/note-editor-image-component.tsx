@@ -30,7 +30,7 @@ export function NoteEditorImageComponent({
 }: NoteEditorImageComponentProps) {
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(nodeKey);
-  const [resolvedSrc, setResolvedSrc] = useState(src);
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
@@ -126,6 +126,10 @@ export function NoteEditorImageComponent({
         })}
       </span>
     );
+  }
+
+  if (!resolvedSrc) {
+    return null;
   }
 
   return (

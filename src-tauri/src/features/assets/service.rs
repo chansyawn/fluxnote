@@ -10,7 +10,7 @@ use sha2::{Digest, Sha256};
 use tauri::{AppHandle, Manager};
 
 use crate::error::{AppResult, BusinessError};
-use crate::features::assets::{CreateAssetResult, ResolveAssetResult};
+use crate::features::assets::{CopyAssetResult, CreateAssetResult, ResolveAssetResult};
 
 const ASSET_SCHEME_PREFIX: &str = "assets://";
 const ASSET_DIRECTORY_NAME: &str = "assets";
@@ -76,6 +76,61 @@ pub fn resolve_asset(
 
     Ok(ResolveAssetResult {
         resolved_path: file_path.to_string_lossy().into_owned(),
+    })
+}
+
+pub fn copy_asset(
+    app: &AppHandle,
+    source_block_id: &str,
+    target_block_id: &str,
+    asset_url: &str,
+) -> AppResult<CopyAssetResult> {
+    if is_external_asset_url(asset_url) {
+        return Ok(CopyAssetResult {
+            asset_url: asset_url.to_string(),
+        });
+    }
+
+    let hash = parse_asset_hash(asset_url)?;
+    let asset_dir = ensure_asset_dir(app)?;
+
+    let source_file_path = find_asset_file_by_hash(&asset_dir, source_block_id, &hash)?
+        .ok_or_else(|| BusinessError::NotFound(format!("{source_block_id}:{asset_url}")))?;
+
+    let bytes = fs::read(&source_file_path).with_context(|| {
+        format!(
+            "failed to read source asset file: {}",
+            source_file_path.display()
+        )
+    })?;
+
+    let extension = source_file_path
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .ok_or_else(|| {
+            BusinessError::InvalidOperation("Source asset file has no extension".to_string(), None)
+        })?;
+
+    let new_hash = Sha256::digest(&bytes)
+        .iter()
+        .take(SHORT_HASH_BYTES)
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
+
+    let stored_file_name = format!("{target_block_id}-{new_hash}.{extension}");
+    let target_file_path = asset_dir.join(&stored_file_name);
+
+    remove_asset_files_by_hash(&asset_dir, target_block_id, &new_hash)?;
+
+    fs::write(&target_file_path, bytes).with_context(|| {
+        format!(
+            "failed to write target asset file: {}",
+            target_file_path.display()
+        )
+    })?;
+
+    Ok(CopyAssetResult {
+        asset_url: format!("{ASSET_SCHEME_PREFIX}{new_hash}"),
     })
 }
 

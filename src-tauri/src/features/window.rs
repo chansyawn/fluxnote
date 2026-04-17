@@ -21,9 +21,9 @@ fn save_window_position(app: &AppHandle, window_label: &str) -> tauri::Result<()
         .ok_or_else(|| tauri::Error::WindowNotFound)?;
 
     let position = window.outer_position()?;
-    let monitor = window.current_monitor()?.ok_or_else(|| {
-        tauri::Error::Anyhow(anyhow::anyhow!("Failed to get current monitor"))
-    })?;
+    let monitor = window
+        .current_monitor()?
+        .ok_or_else(|| tauri::Error::Anyhow(anyhow::anyhow!("Failed to get current monitor")))?;
 
     let key = get_monitor_key(&monitor);
     let scale = monitor.scale_factor();
@@ -33,10 +33,10 @@ fn save_window_position(app: &AppHandle, window_label: &str) -> tauri::Result<()
         *positions = Some(HashMap::new());
     }
 
-    positions.as_mut().unwrap().insert(
-        key,
-        (position.x as f64 / scale, position.y as f64 / scale),
-    );
+    positions
+        .as_mut()
+        .unwrap()
+        .insert(key, (position.x as f64 / scale, position.y as f64 / scale));
 
     Ok(())
 }
