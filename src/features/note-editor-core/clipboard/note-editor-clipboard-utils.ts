@@ -9,6 +9,7 @@ import {
   $getSelection,
   $isDecoratorNode,
   $isElementNode,
+  $isNodeSelection,
   $isRangeSelection,
   createEditor,
   type LexicalEditor,
@@ -29,7 +30,15 @@ export function $getMarkdownFromCurrentState(editor: LexicalEditor): string {
   const convertToMarkdown = (root = $getRoot()) =>
     $convertToMarkdownString(NOTE_EDITOR_MARKDOWN_TRANSFORMERS, root);
 
-  if (!selection || selection.isCollapsed() || !$isRangeSelection(selection)) {
+  if (!selection) {
+    return convertToMarkdown();
+  }
+
+  if ($isRangeSelection(selection) && selection.isCollapsed()) {
+    return convertToMarkdown();
+  }
+
+  if (!$isRangeSelection(selection) && !$isNodeSelection(selection)) {
     return convertToMarkdown();
   }
 

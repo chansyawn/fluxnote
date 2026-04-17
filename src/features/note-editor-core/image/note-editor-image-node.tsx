@@ -12,7 +12,7 @@ import {
 import type { JSX } from "react";
 
 import { NoteEditorImageComponent } from "./note-editor-image-component";
-import { isInternalAssetUrl } from "./note-editor-image-utils";
+import { getCachedImageDataUrl, isInternalAssetUrl } from "./note-editor-image-utils";
 
 export type SerializedNoteEditorImageNode = Spread<
   {
@@ -99,7 +99,7 @@ export class NoteEditorImageNode extends DecoratorNode<JSX.Element> {
     img.alt = this.__altText;
 
     if (isInternalAssetUrl(this.__src)) {
-      img.src = "";
+      img.src = getCachedImageDataUrl(this.__src, this.__blockId) ?? "";
       img.setAttribute("data-internal-asset", this.__src);
     } else {
       img.src = this.__src;
