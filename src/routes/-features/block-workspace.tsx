@@ -94,9 +94,9 @@ export function BlockWorkspace() {
     assignBlockTags,
   } = useBlockWorkspace();
   const {
+    editorRefs,
     createBlockWithFocus,
     deleteBlockWithFocus,
-    focusRequest,
     setActiveBlockId,
     requestBlockFocus,
   } = useBlockShortcuts({
@@ -181,6 +181,13 @@ export function BlockWorkspace() {
             return (
               <NoteBlockEditor
                 key={block.id}
+                ref={(handle) => {
+                  if (handle) {
+                    editorRefs.current.set(block.id, handle);
+                  } else {
+                    editorRefs.current.delete(block.id);
+                  }
+                }}
                 actions={({ popupContainer, onCopy }) => (
                   <BlockActionBar disabled={isActionGroupDisabled}>
                     <BlockCopyAction isDisabled={isActionGroupDisabled} onCopy={onCopy} />
@@ -220,7 +227,6 @@ export function BlockWorkspace() {
                   </BlockActionBar>
                 )}
                 block={block}
-                focusRequestKey={focusRequest?.blockId === block.id ? focusRequest.requestKey : 0}
                 onFocus={setActiveBlockId}
               />
             );
