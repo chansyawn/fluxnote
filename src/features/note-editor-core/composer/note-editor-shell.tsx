@@ -11,6 +11,7 @@ import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/m
 import { NoteEditorPlaceholder } from "@/features/note-editor-core/rich-text/note-editor-placeholder";
 import { noteEditorLexicalTheme } from "@/features/note-editor-core/theme/note-editor-lexical-theme";
 
+import { NoteEditorBlockContext } from "./note-editor-block-context";
 import { NOTE_EDITOR_NODES } from "./note-editor-nodes";
 import { NoteEditorPlugins } from "./note-editor-plugins";
 
@@ -32,15 +33,11 @@ interface NoteEditorShellProps {
 
 function NoteEditorShellContent(
   {
-    blockId,
     onBlur,
     onMarkdownUpdated,
     autoFocus = false,
     focusRequestKey = 0,
-  }: Pick<
-    NoteEditorShellProps,
-    "blockId" | "onBlur" | "onMarkdownUpdated" | "autoFocus" | "focusRequestKey"
-  >,
+  }: Pick<NoteEditorShellProps, "onBlur" | "onMarkdownUpdated" | "autoFocus" | "focusRequestKey">,
   ref: React.Ref<NoteEditorShellHandle>,
 ) {
   const [editor] = useLexicalComposerContext();
@@ -78,7 +75,6 @@ function NoteEditorShellContent(
       <HistoryPlugin />
       <NoteEditorPlugins
         autoFocus={autoFocus}
-        blockId={blockId}
         focusRequestKey={focusRequestKey}
         onMarkdownUpdated={onMarkdownUpdated}
       />
@@ -116,14 +112,15 @@ export const NoteEditorShell = forwardRef<NoteEditorShellHandle, NoteEditorShell
           },
         }}
       >
-        <NoteEditorShellContentWithRef
-          blockId={blockId}
-          onBlur={onBlur}
-          onMarkdownUpdated={onMarkdownUpdated}
-          autoFocus={autoFocus}
-          focusRequestKey={focusRequestKey}
-          ref={ref}
-        />
+        <NoteEditorBlockContext.Provider value={blockId}>
+          <NoteEditorShellContentWithRef
+            onBlur={onBlur}
+            onMarkdownUpdated={onMarkdownUpdated}
+            autoFocus={autoFocus}
+            focusRequestKey={focusRequestKey}
+            ref={ref}
+          />
+        </NoteEditorBlockContext.Provider>
       </LexicalComposer>
     );
   },

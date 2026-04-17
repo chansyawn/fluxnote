@@ -11,11 +11,8 @@ import {
 } from "lexical";
 import { useEffect } from "react";
 
-import {
-  createTableNodeFromMarkdownLines,
-  isMarkdownTableDividerRow,
-  isMarkdownTableRow,
-} from "@/features/note-editor-core/markdown/note-editor-markdown";
+import { createTableNodeFromMarkdownLines } from "./note-editor-table-markdown";
+import { isMarkdownTableDividerRow, isMarkdownTableRow } from "./note-editor-table-utils";
 
 function focusFirstBodyCell(tableNode: ReturnType<typeof createTableNodeFromMarkdownLines>): void {
   const firstBodyRow = tableNode.getChildren().find((child, index): child is TableRowNode => {
