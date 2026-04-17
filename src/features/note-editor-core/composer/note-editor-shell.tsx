@@ -7,7 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useImperativeHandle } from "react";
 
-import { copyContentWithImages } from "@/features/note-editor-core/clipboard/note-editor-clipboard-utils";
+import { copyEditorContentToClipboard } from "@/features/note-editor-core/clipboard/note-editor-clipboard-utils";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorPlaceholder } from "@/features/note-editor-core/rich-text/note-editor-placeholder";
 import { noteEditorLexicalTheme } from "@/features/note-editor-core/theme/note-editor-lexical-theme";
@@ -46,7 +46,7 @@ function NoteEditorShellContent({
   useImperativeHandle(ref, () => ({
     copyContent: async () => {
       try {
-        await copyContentWithImages(editor);
+        await copyEditorContentToClipboard(editor, "document");
       } catch (error) {
         console.error("Failed to copy content:", error);
         throw error;
