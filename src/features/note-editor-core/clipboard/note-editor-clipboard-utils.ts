@@ -15,6 +15,8 @@ import {
 } from "lexical";
 
 import { NOTE_EDITOR_NODES } from "../composer/note-editor-nodes";
+import { $isNoteEditorImageNode } from "../image/note-editor-image-node";
+import { convertAssetToDataUrl } from "../image/note-editor-image-utils";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "../markdown/note-editor-markdown";
 
 /**
@@ -74,4 +76,78 @@ export function $getMarkdownFromCurrentState(editor: LexicalEditor): string {
     console.warn("Failed to convert selection to markdown:", error);
     return convertToMarkdown();
   }
+}
+
+/**
+ * 复制整个编辑器内容，包含图片的 Data URL
+ */
+export async function copyContentWithImages(editor: LexicalEditor): Promise<void> {
+  const { markdown, imageData } = editor.read(() => {
+    const markdown = $convertToMarkdownString(NOTE_EDITOR_MARKDOWN_TRANSFORMERS);
+    const root = $getRoot();
+    const imageData: Array<{ src: string; blockId: string }> = [];
+
+    function collectImages(node: any) {
+      if ($isNoteEditorImageNode(node)) {
+        imageData.push({
+          src: node.getSrc(),
+          blockId: node.getBlockId(),
+        });
+      }
+      if ($isElementNode(node)) {
+        node.getChildren().forEach(collectImages);
+      }
+    }
+
+    root.getChildren().forEach(collectImages);
+
+    return { markdown, imageData };
+  });
+
+  if (imageData.length === 0) {
+    await navigator.clipboard.writeText(markdown);
+    return;
+  }
+
+  const htmlPromise = (async () => {
+    const imageDataMap = new Map<string, string>();
+
+    await Promise.all(
+      imageData.map(async ({ src, blockId }) => {
+        const dataUrl = await convertAssetToDataUrl(src, blockId);
+
+        if (dataUrl) {
+          imageDataMap.set(src, dataUrl);
+        }
+      }),
+    );
+
+    const lines = markdown.split("\n");
+    const htmlLines: string[] = [];
+
+    for (const line of lines) {
+      const imageMatch = line.match(/!\[([^\]]*)\]\(([^)]+)\)/);
+      if (imageMatch) {
+        const [, alt, src] = imageMatch;
+        const dataUrl = imageDataMap.get(src);
+        if (dataUrl) {
+          htmlLines.push(`<img src="${dataUrl}" alt="${alt}" />`);
+        } else {
+          htmlLines.push(`<p>${line}</p>`);
+        }
+      } else if (line.trim()) {
+        htmlLines.push(`<p>${line}</p>`);
+      }
+    }
+
+    const enhancedHtml = htmlLines.join("");
+    return new Blob([enhancedHtml], { type: "text/html" });
+  })();
+
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      "text/html": htmlPromise,
+      "text/plain": new Blob([markdown], { type: "text/plain" }),
+    }),
+  ]);
 }

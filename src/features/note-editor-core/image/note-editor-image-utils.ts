@@ -33,6 +33,38 @@ export async function resolveAssetUrl(src: string, blockId: string): Promise<str
   return convertFileSrc(resolvedPath);
 }
 
+export async function convertAssetToDataUrl(src: string, blockId: string): Promise<string | null> {
+  try {
+    let url: string;
+
+    if (isInternalAssetUrl(src)) {
+      url = await resolveAssetUrl(src, blockId);
+    } else {
+      url = src;
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64 = btoa(binary);
+
+    return `data:${blob.type};base64,${base64}`;
+  } catch (error) {
+    console.error("Failed to convert to data URL:", error);
+    return null;
+  }
+}
+
 async function fileToBase64(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
