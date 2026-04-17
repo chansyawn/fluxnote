@@ -13,7 +13,11 @@ import {
 } from "lexical";
 import { useEffect, useState } from "react";
 
-import { isInternalAssetUrl, resolveAssetUrl } from "./note-editor-image-utils";
+import {
+  isInternalAssetUrl,
+  resolveAssetUrl,
+  warmImageDataUrlCache,
+} from "./note-editor-image-utils";
 
 interface NoteEditorImageComponentProps {
   altText: string;
@@ -35,6 +39,8 @@ export function NoteEditorImageComponent({
 
   useEffect(() => {
     let cancelled = false;
+
+    warmImageDataUrlCache(src, blockId);
 
     void (async () => {
       try {
