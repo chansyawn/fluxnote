@@ -9,7 +9,7 @@ import { type NoteEditorShellHandle } from "@/features/note-editor-core";
 
 interface NoteBlockEditorProps {
   block: Block;
-  actions?: (props: { popupContainer: HTMLElement | null; onCopy: () => void }) => ReactNode;
+  actions?: ReactNode;
   onFocus: (blockId: string) => void;
 }
 

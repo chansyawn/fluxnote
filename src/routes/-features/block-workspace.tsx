@@ -4,11 +4,7 @@ import type { ReactElement } from "react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import { BlockActionBar } from "@/features/note-block/block-action-bar";
-import { BlockArchiveAction } from "@/features/note-block/block-archive-action";
-import { BlockCopyAction } from "@/features/note-block/block-copy-action";
-import { BlockDeleteAction } from "@/features/note-block/block-delete-action";
-import { BlockTagAction } from "@/features/note-block/block-tag-action";
+import { BlockActions } from "@/features/note-block/block-actions";
 import { NoteBlockEditor } from "@/features/note-block/note-block-editor";
 import { useBlockShortcuts } from "@/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@/routes/-features/use-block-workspace";
@@ -188,44 +184,36 @@ export function BlockWorkspace() {
                     editorRefs.current.delete(block.id);
                   }
                 }}
-                actions={({ popupContainer, onCopy }) => (
-                  <BlockActionBar disabled={isActionGroupDisabled}>
-                    <BlockCopyAction isDisabled={isActionGroupDisabled} onCopy={onCopy} />
-                    <BlockTagAction
-                      isCreatingTag={isTagOpPending("create")}
-                      isDisabled={isActionGroupDisabled}
-                      popupContainer={popupContainer}
-                      selectedTagIds={block.tags.map((tag) => tag.id)}
-                      tags={tags}
-                      onCreateTag={async (name) => {
-                        await createTagAndAssignToBlock(block.id, name);
-                      }}
-                      onSelectedTagIdsChange={async (tagIds) => {
-                        await assignBlockTags(block.id, tagIds);
-                      }}
-                    />
-                    <BlockArchiveAction
-                      isDisabled={isActionGroupDisabled}
-                      isPending={isBlockOpPending(
-                        block.id,
-                        visibility === "active" ? "archive" : "restore",
-                      )}
-                      visibility={visibility}
-                      onClick={() => {
-                        void (visibility === "active"
-                          ? archiveBlock(block.id)
-                          : restoreBlock(block.id));
-                      }}
-                    />
-                    <BlockDeleteAction
-                      isDeleting={isBlockOpPending(block.id, "delete")}
-                      isDisabled={isActionGroupDisabled}
-                      onClick={() => {
-                        void deleteBlockWithFocus(block.id);
-                      }}
-                    />
-                  </BlockActionBar>
-                )}
+                actions={
+                  <BlockActions
+                    block={block}
+                    visibility={visibility}
+                    tags={tags}
+                    editorRef={editorRefs.current.get(block.id)}
+                    isDisabled={isActionGroupDisabled}
+                    isArchivePending={isBlockOpPending(
+                      block.id,
+                      visibility === "active" ? "archive" : "restore",
+                    )}
+                    isDeletePending={isBlockOpPending(block.id, "delete")}
+                    isTagOpPending={isTagOpPending("create")}
+                    onArchive={() => {
+                      void archiveBlock(block.id);
+                    }}
+                    onRestore={() => {
+                      void restoreBlock(block.id);
+                    }}
+                    onDelete={() => {
+                      void deleteBlockWithFocus(block.id);
+                    }}
+                    onCreateTag={async (name) => {
+                      await createTagAndAssignToBlock(block.id, name);
+                    }}
+                    onAssignTags={async (tagIds) => {
+                      await assignBlockTags(block.id, tagIds);
+                    }}
+                  />
+                }
                 block={block}
                 onFocus={setActiveBlockId}
               />
