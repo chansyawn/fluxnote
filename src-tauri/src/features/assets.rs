@@ -30,6 +30,17 @@ pub struct ResolveAssetArgs {
     pub asset_url: String,
 }
 
+#[derive(Debug, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct CopyAssetArgs {
+    #[garde(length(min = 1))]
+    pub source_block_id: String,
+    #[garde(length(min = 1))]
+    pub target_block_id: String,
+    #[garde(length(min = 1))]
+    pub asset_url: String,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAssetResult {
@@ -41,6 +52,12 @@ pub struct CreateAssetResult {
 #[serde(rename_all = "camelCase")]
 pub struct ResolveAssetResult {
     pub resolved_path: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CopyAssetResult {
+    pub asset_url: String,
 }
 
 #[tauri::command]
@@ -71,4 +88,23 @@ pub fn assets_resolve(
 
     info!(block_id = %args.block_id, asset_url = %args.asset_url, "resolving asset");
     service::resolve_asset(&app, &args.block_id, &args.asset_url)
+}
+
+#[tauri::command]
+#[tracing::instrument(name = "command.assets_copy", skip(app, args))]
+pub fn assets_copy(app: AppHandle, args: Validated<CopyAssetArgs>) -> AppResult<CopyAssetResult> {
+    let args = args.into_inner();
+
+    info!(
+        source_block_id = %args.source_block_id,
+        target_block_id = %args.target_block_id,
+        asset_url = %args.asset_url,
+        "copying asset"
+    );
+    service::copy_asset(
+        &app,
+        &args.source_block_id,
+        &args.target_block_id,
+        &args.asset_url,
+    )
 }

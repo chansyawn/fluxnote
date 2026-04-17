@@ -172,7 +172,7 @@ export function NoteEditorCodeLanguagePlugin() {
   }, [editor]);
 
   useEffect(() => {
-    refreshControlState();
+    queueMicrotask(refreshControlState);
 
     const removeUpdateListener = editor.registerUpdateListener(() => {
       refreshControlState();

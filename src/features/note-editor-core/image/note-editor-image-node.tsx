@@ -1,5 +1,8 @@
 import {
   DecoratorNode,
+  type DOMConversionMap,
+  type DOMConversionOutput,
+  type DOMExportOutput,
   type EditorConfig,
   type LexicalNode,
   type NodeKey,
@@ -9,10 +12,12 @@ import {
 import type { JSX } from "react";
 
 import { NoteEditorImageComponent } from "./note-editor-image-component";
+import { isInternalAssetUrl } from "./note-editor-image-utils";
 
 export type SerializedNoteEditorImageNode = Spread<
   {
     altText: string;
+    blockId: string;
     src: string;
   },
   SerializedLexicalNode
@@ -34,8 +39,31 @@ export class NoteEditorImageNode extends DecoratorNode<JSX.Element> {
   static importJSON(serializedNode: SerializedNoteEditorImageNode): NoteEditorImageNode {
     return $createNoteEditorImageNode({
       altText: serializedNode.altText,
+      blockId: serializedNode.blockId || "",
       src: serializedNode.src,
     });
+  }
+
+  static importDOM(): DOMConversionMap {
+    return {
+      img: (_node: Node) => ({
+        conversion: (domNode: Node): DOMConversionOutput | null => {
+          if (!(domNode instanceof HTMLImageElement)) {
+            return null;
+          }
+          const { alt, src } = domNode;
+          const blockId = domNode.getAttribute("data-block-id") || "";
+          return {
+            node: $createNoteEditorImageNode({
+              altText: alt,
+              blockId,
+              src,
+            }),
+          };
+        },
+        priority: 0,
+      }),
+    };
   }
 
   constructor(src: string, altText: string, blockId = "", key?: NodeKey) {
@@ -46,7 +74,7 @@ export class NoteEditorImageNode extends DecoratorNode<JSX.Element> {
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const element = document.createElement("span");
+    const element = document.createElement("div");
     element.className = "note-block-editor__image-node";
     return element;
   }
@@ -59,10 +87,29 @@ export class NoteEditorImageNode extends DecoratorNode<JSX.Element> {
     return {
       ...super.exportJSON(),
       altText: this.__altText,
+      blockId: this.__blockId,
       src: this.__src,
       type: "note-editor-image",
       version: 1,
     };
+  }
+
+  exportDOM(): DOMExportOutput {
+    const img = document.createElement("img");
+    img.alt = this.__altText;
+
+    if (isInternalAssetUrl(this.__src)) {
+      img.src = "";
+      img.setAttribute("data-internal-asset", this.__src);
+    } else {
+      img.src = this.__src;
+    }
+
+    if (this.__blockId) {
+      img.setAttribute("data-block-id", this.__blockId);
+    }
+
+    return { element: img };
   }
 
   setBlockId(blockId: string): this {
@@ -95,7 +142,7 @@ export class NoteEditorImageNode extends DecoratorNode<JSX.Element> {
   }
 
   isInline(): boolean {
-    return true;
+    return false;
   }
 
   isIsolated(): boolean {

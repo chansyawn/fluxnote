@@ -21,10 +21,24 @@ export interface ResolveAssetResult {
   resolvedPath: string;
 }
 
+export interface CopyAssetRequest {
+  sourceBlockId: string;
+  targetBlockId: string;
+  assetUrl: string;
+}
+
+export interface CopyAssetResult {
+  assetUrl: string;
+}
+
 export async function createAsset(req: CreateAssetRequest): Promise<CreateAssetResult> {
   return await invoke<CreateAssetResult>("assets_create", { ...req });
 }
 
 export async function resolveAsset(req: ResolveAssetRequest): Promise<ResolveAssetResult> {
   return await invoke<ResolveAssetResult>("assets_resolve", { ...req });
+}
+
+export async function copyAsset(req: CopyAssetRequest): Promise<CopyAssetResult> {
+  return await invoke<CopyAssetResult>("assets_copy", { ...req });
 }

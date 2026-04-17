@@ -217,21 +217,29 @@
 }
 
 .note-block-editor__image-node {
-  @apply inline-block w-full align-top;
+  @apply my-2 first:mt-0 last:mb-0;
 }
 
 .note-block-editor__image-shell {
-  @apply ring-primary/25 relative my-2 block w-full rounded-xl transition-shadow outline-none;
+  @apply relative inline-block cursor-pointer rounded-md transition-all outline-none;
 }
 
-.note-block-editor__image-shell[data-selected="true"] {
-  @apply ring-2;
+.note-block-editor__image-shell:hover:not([data-selected="true"]) {
+  @apply ring-border ring-1;
+}
+
+[data-note-editor-input]:focus-within .note-block-editor__image-shell[data-selected="true"] {
+  @apply ring-primary ring-offset-background shadow-lg ring-2 ring-offset-2;
+}
+
+.note-block-editor__image-shell:focus-visible {
+  @apply ring-ring ring-2 ring-offset-2;
 }
 
 .note-block-editor__image {
-  @apply border-border bg-muted block max-w-full rounded-xl border object-contain;
+  @apply block h-auto max-w-full rounded-md select-none;
 }
 
 .note-block-editor__image--error {
-  @apply text-muted-foreground border-border bg-muted my-2 block rounded-lg border px-3 py-2 text-sm;
+  @apply bg-muted text-muted-foreground inline-flex items-center justify-center rounded-md px-4 py-8 text-sm;
 }
