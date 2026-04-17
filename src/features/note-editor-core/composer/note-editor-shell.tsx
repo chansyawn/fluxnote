@@ -1,4 +1,4 @@
-import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
+import { $convertFromMarkdownString } from "@lexical/markdown";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -7,6 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useImperativeHandle } from "react";
 
+import { copyContentWithImages } from "@/features/note-editor-core/clipboard/note-editor-clipboard-utils";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorPlaceholder } from "@/features/note-editor-core/rich-text/note-editor-placeholder";
 import { noteEditorLexicalTheme } from "@/features/note-editor-core/theme/note-editor-lexical-theme";
@@ -45,11 +46,7 @@ function NoteEditorShellContent({
   useImperativeHandle(ref, () => ({
     copyContent: async () => {
       try {
-        const markdown = editor.read(() => {
-          return $convertToMarkdownString(NOTE_EDITOR_MARKDOWN_TRANSFORMERS);
-        });
-
-        await navigator.clipboard.writeText(markdown);
+        await copyContentWithImages(editor);
       } catch (error) {
         console.error("Failed to copy content:", error);
         throw error;
