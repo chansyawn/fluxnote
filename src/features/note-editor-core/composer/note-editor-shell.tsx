@@ -5,7 +5,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { forwardRef, useImperativeHandle } from "react";
+import { useImperativeHandle } from "react";
 
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorPlaceholder } from "@/features/note-editor-core/rich-text/note-editor-placeholder";
@@ -19,6 +19,7 @@ import "../theme/note-editor.css";
 
 export interface NoteEditorShellHandle {
   copyContent: () => Promise<void>;
+  focus: () => void;
 }
 
 interface NoteEditorShellProps {
@@ -26,20 +27,19 @@ interface NoteEditorShellProps {
   initialMarkdown: string;
   onMarkdownUpdated: (markdown: string) => void;
   onBlur?: () => void;
-  autoFocus?: boolean;
   editable?: boolean;
-  focusRequestKey?: number;
+  ref?: React.Ref<NoteEditorShellHandle>;
 }
 
-function NoteEditorShellContent(
-  {
-    onBlur,
-    onMarkdownUpdated,
-    autoFocus = false,
-    focusRequestKey = 0,
-  }: Pick<NoteEditorShellProps, "onBlur" | "onMarkdownUpdated" | "autoFocus" | "focusRequestKey">,
-  ref: React.Ref<NoteEditorShellHandle>,
-) {
+function NoteEditorShellContent({
+  onBlur,
+  onMarkdownUpdated,
+  ref,
+}: {
+  onBlur?: () => void;
+  onMarkdownUpdated: (markdown: string) => void;
+  ref?: React.Ref<NoteEditorShellHandle>;
+}) {
   const [editor] = useLexicalComposerContext();
 
   useImperativeHandle(ref, () => ({
@@ -54,6 +54,9 @@ function NoteEditorShellContent(
         console.error("Failed to copy content:", error);
         throw error;
       }
+    },
+    focus: () => {
+      editor.focus();
     },
   }));
 
@@ -73,55 +76,37 @@ function NoteEditorShellContent(
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
-      <NoteEditorPlugins
-        autoFocus={autoFocus}
-        focusRequestKey={focusRequestKey}
-        onMarkdownUpdated={onMarkdownUpdated}
-      />
+      <NoteEditorPlugins onMarkdownUpdated={onMarkdownUpdated} />
     </div>
   );
 }
 
-const NoteEditorShellContentWithRef = forwardRef(NoteEditorShellContent);
-
-export const NoteEditorShell = forwardRef<NoteEditorShellHandle, NoteEditorShellProps>(
-  function NoteEditorShell(
-    {
-      blockId,
-      initialMarkdown,
-      editable = true,
-      onBlur,
-      onMarkdownUpdated,
-      autoFocus = false,
-      focusRequestKey = 0,
-    },
-    ref,
-  ) {
-    return (
-      <LexicalComposer
-        initialConfig={{
-          namespace: `note-block-editor-${blockId}`,
-          theme: noteEditorLexicalTheme,
-          editable,
-          nodes: NOTE_EDITOR_NODES,
-          editorState: () => {
-            $convertFromMarkdownString(initialMarkdown, NOTE_EDITOR_MARKDOWN_TRANSFORMERS);
-          },
-          onError: (error) => {
-            throw error;
-          },
-        }}
-      >
-        <NoteEditorBlockContext.Provider value={blockId}>
-          <NoteEditorShellContentWithRef
-            onBlur={onBlur}
-            onMarkdownUpdated={onMarkdownUpdated}
-            autoFocus={autoFocus}
-            focusRequestKey={focusRequestKey}
-            ref={ref}
-          />
-        </NoteEditorBlockContext.Provider>
-      </LexicalComposer>
-    );
-  },
-);
+export function NoteEditorShell({
+  blockId,
+  initialMarkdown,
+  editable = true,
+  onBlur,
+  onMarkdownUpdated,
+  ref,
+}: NoteEditorShellProps) {
+  return (
+    <LexicalComposer
+      initialConfig={{
+        namespace: `note-block-editor-${blockId}`,
+        theme: noteEditorLexicalTheme,
+        editable,
+        nodes: NOTE_EDITOR_NODES,
+        editorState: () => {
+          $convertFromMarkdownString(initialMarkdown, NOTE_EDITOR_MARKDOWN_TRANSFORMERS);
+        },
+        onError: (error) => {
+          throw error;
+        },
+      }}
+    >
+      <NoteEditorBlockContext.Provider value={blockId}>
+        <NoteEditorShellContent onBlur={onBlur} onMarkdownUpdated={onMarkdownUpdated} ref={ref} />
+      </NoteEditorBlockContext.Provider>
+    </LexicalComposer>
+  );
+}

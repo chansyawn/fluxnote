@@ -95,7 +95,6 @@ export function NoteBlockPlaygroundPanel() {
       <NoteBlockEditorView
         key={editorVersion}
         blockId="playground-block"
-        focusRequestKey={0}
         initialMarkdown={markdown}
         willArchive={false}
         onBlur={() => {}}

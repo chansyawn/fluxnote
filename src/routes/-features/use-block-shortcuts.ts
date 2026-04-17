@@ -1,13 +1,9 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 import type { Block } from "@/clients";
+import type { NoteEditorShellHandle } from "@/features/note-editor-core";
 import { useShortcutState } from "@/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@/features/shortcut/shortcut-utils";
-
-interface FocusRequest {
-  blockId: string;
-  requestKey: number;
-}
 
 interface UseBlockShortcutsParams {
   blocks: Block[];
@@ -16,7 +12,7 @@ interface UseBlockShortcutsParams {
 }
 
 interface UseBlockShortcutsResult {
-  focusRequest: FocusRequest | null;
+  editorRefs: React.RefObject<Map<string, NoteEditorShellHandle>>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   setActiveBlockId: (blockId: string) => void;
@@ -40,19 +36,16 @@ export function useBlockShortcuts({
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
-  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
-  const focusRequestCounterRef = useRef(0);
+  const editorRefs = useRef<Map<string, NoteEditorShellHandle>>(new Map());
 
   const requestBlockFocus = useEffectEvent((blockId: string | null) => {
     if (!blockId) {
       return;
     }
 
-    focusRequestCounterRef.current += 1;
-    setFocusRequest({
-      blockId,
-      requestKey: focusRequestCounterRef.current,
-    });
+    setTimeout(() => {
+      editorRefs.current.get(blockId)?.focus();
+    }, 0);
     setActiveBlockId(blockId);
   });
 
@@ -128,7 +121,7 @@ export function useBlockShortcuts({
   }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, shortcuts]);
 
   return {
-    focusRequest,
+    editorRefs,
     createBlockWithFocus,
     deleteBlockWithFocus,
     setActiveBlockId,
