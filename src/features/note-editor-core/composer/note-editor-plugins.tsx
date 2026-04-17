@@ -19,21 +19,19 @@ import { NoteEditorFocusPlugin } from "./note-editor-focus-plugin";
 
 interface NoteEditorPluginsProps {
   autoFocus: boolean;
-  blockId: string;
   focusRequestKey: number;
   onMarkdownUpdated: (markdown: string) => void;
 }
 
 export function NoteEditorPlugins({
   autoFocus,
-  blockId,
   focusRequestKey,
   onMarkdownUpdated,
 }: NoteEditorPluginsProps) {
   return (
     <>
       <NoteEditorClipboardPlugin />
-      <NoteEditorImagePlugin blockId={blockId} />
+      <NoteEditorImagePlugin />
       <NoteEditorSelectionOverlayPlugin />
       <ListPlugin />
       <CheckListPlugin disableTakeFocusOnClick />

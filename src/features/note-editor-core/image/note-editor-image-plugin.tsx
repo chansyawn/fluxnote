@@ -4,6 +4,8 @@ import { COMMAND_PRIORITY_HIGH, $insertNodes, DROP_COMMAND, PASTE_COMMAND } from
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
+import { useNoteEditorBlockId } from "@/features/note-editor-core/composer/note-editor-block-context";
+
 import {
   $createNoteEditorImageNode,
   $isNoteEditorImageNode,
@@ -11,12 +13,9 @@ import {
 } from "./note-editor-image-node";
 import { createAssetFromFile, isSupportedImageFile } from "./note-editor-image-utils";
 
-interface NoteEditorImagePluginProps {
-  blockId: string;
-}
-
-export function NoteEditorImagePlugin({ blockId }: NoteEditorImagePluginProps) {
+export function NoteEditorImagePlugin() {
   const [editor] = useLexicalComposerContext();
+  const blockId = useNoteEditorBlockId();
 
   const insertImagesFromFiles = useCallback(
     async (files: File[]) => {
