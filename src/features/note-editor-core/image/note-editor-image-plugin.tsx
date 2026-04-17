@@ -1,7 +1,16 @@
 import { $generateNodesFromSerializedNodes } from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { i18n } from "@lingui/core";
-import { $insertNodes, COMMAND_PRIORITY_HIGH, DROP_COMMAND, PASTE_COMMAND } from "lexical";
+import {
+  $insertNodes,
+  $isElementNode,
+  COMMAND_PRIORITY_HIGH,
+  DROP_COMMAND,
+  PASTE_COMMAND,
+  type LexicalEditor,
+  type LexicalNode,
+  type SerializedLexicalNode,
+} from "lexical";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -18,6 +27,14 @@ import {
   isInternalAssetUrl,
   isSupportedImageFile,
 } from "./note-editor-image-utils";
+
+type SerializedClipboardNode = SerializedLexicalNode & {
+  children?: SerializedClipboardNode[];
+};
+
+interface SerializedLexicalClipboardPayload {
+  nodes: SerializedClipboardNode[];
+}
 
 export function NoteEditorImagePlugin() {
   const [editor] = useLexicalComposerContext();
@@ -68,55 +85,22 @@ export function NoteEditorImagePlugin() {
           return false;
         }
 
-        const lexicalData = clipboardData.getData("application/x-lexical-editor");
-        if (lexicalData) {
-          try {
-            const parsed = JSON.parse(lexicalData);
+        const lexicalPayload = parseLexicalClipboardPayload(
+          clipboardData.getData("application/x-lexical-editor"),
+        );
+        if (lexicalPayload && hasSerializedImageNodes(lexicalPayload.nodes)) {
+          event.preventDefault();
 
-            const hasImageNodes = JSON.stringify(parsed).includes('"type":"note-editor-image"');
-            if (hasImageNodes) {
-              event.preventDefault();
+          let pastedImageNodes: NoteEditorImageNode[] = [];
+          editor.update(() => {
+            const nodes = $generateNodesFromSerializedNodes(lexicalPayload.nodes);
+            pastedImageNodes = collectImageNodes(nodes);
 
-              editor.update(() => {
-                const nodes = $generateNodesFromSerializedNodes(parsed.nodes);
-                const imageNodes = nodes.filter($isNoteEditorImageNode);
+            $insertNodes(nodes);
+          });
+          void rehomePastedImageNodes(editor, pastedImageNodes, blockId);
 
-                const crossBlockImages = imageNodes.filter(
-                  (node) => node.getBlockId() && node.getBlockId() !== blockId,
-                );
-
-                if (crossBlockImages.length > 0) {
-                  void (async () => {
-                    for (const imageNode of crossBlockImages) {
-                      if (isInternalAssetUrl(imageNode.getSrc())) {
-                        try {
-                          const { assetUrl } = await copyAsset({
-                            assetUrl: imageNode.getSrc(),
-                            sourceBlockId: imageNode.getBlockId(),
-                            targetBlockId: blockId,
-                          });
-
-                          editor.update(() => {
-                            const writable = imageNode.getWritable();
-                            writable.__src = assetUrl;
-                            writable.__blockId = blockId;
-                          });
-                        } catch (error) {
-                          console.error("Failed to copy asset", error);
-                        }
-                      }
-                    }
-                  })();
-                }
-
-                $insertNodes(nodes);
-              });
-
-              return true;
-            }
-          } catch (error) {
-            console.error("Failed to parse lexical data", error);
-          }
+          return true;
         }
 
         const files = Array.from(clipboardData.files).filter(isSupportedImageFile);
@@ -158,4 +142,102 @@ export function NoteEditorImagePlugin() {
   }, [blockId, editor]);
 
   return null;
+}
+
+function parseLexicalClipboardPayload(
+  lexicalData: string,
+): SerializedLexicalClipboardPayload | null {
+  if (!lexicalData) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(lexicalData) as unknown;
+    if (!parsed || typeof parsed !== "object") {
+      return null;
+    }
+
+    const { nodes } = parsed as { nodes?: unknown };
+    if (!Array.isArray(nodes)) {
+      return null;
+    }
+
+    return {
+      nodes: nodes as SerializedClipboardNode[],
+    };
+  } catch (error) {
+    console.error("Failed to parse lexical data", error);
+    return null;
+  }
+}
+
+function hasSerializedImageNodes(nodes: readonly SerializedClipboardNode[]): boolean {
+  return nodes.some(
+    (node) =>
+      node.type === "note-editor-image" ||
+      (node.children ? hasSerializedImageNodes(node.children) : false),
+  );
+}
+
+function collectImageNodes(nodes: readonly LexicalNode[]): NoteEditorImageNode[] {
+  const imageNodes: NoteEditorImageNode[] = [];
+
+  for (const node of nodes) {
+    if ($isNoteEditorImageNode(node)) {
+      imageNodes.push(node);
+      continue;
+    }
+
+    if ($isElementNode(node)) {
+      imageNodes.push(...collectImageNodes(node.getChildren()));
+    }
+  }
+
+  return imageNodes;
+}
+
+async function rehomePastedImageNodes(
+  editor: LexicalEditor,
+  imageNodes: readonly NoteEditorImageNode[],
+  targetBlockId: string,
+): Promise<void> {
+  const externalImages = imageNodes.filter(
+    (node) =>
+      node.getBlockId() &&
+      node.getBlockId() !== targetBlockId &&
+      !isInternalAssetUrl(node.getSrc()),
+  );
+
+  if (externalImages.length > 0) {
+    editor.update(() => {
+      for (const imageNode of externalImages) {
+        imageNode.setBlockId(targetBlockId);
+      }
+    });
+  }
+
+  const internalImages = imageNodes.filter(
+    (node) =>
+      node.getBlockId() && node.getBlockId() !== targetBlockId && isInternalAssetUrl(node.getSrc()),
+  );
+
+  await Promise.allSettled(
+    internalImages.map(async (imageNode) => {
+      try {
+        const { assetUrl } = await copyAsset({
+          assetUrl: imageNode.getSrc(),
+          sourceBlockId: imageNode.getBlockId(),
+          targetBlockId,
+        });
+
+        editor.update(() => {
+          const writable = imageNode.getWritable();
+          writable.__src = assetUrl;
+          writable.__blockId = targetBlockId;
+        });
+      } catch (error) {
+        console.error("Failed to copy asset", error);
+      }
+    }),
+  );
 }
