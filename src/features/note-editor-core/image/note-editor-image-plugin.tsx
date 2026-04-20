@@ -4,6 +4,8 @@ import { i18n } from "@lingui/core";
 import {
   $insertNodes,
   $isElementNode,
+  $createNodeSelection,
+  $setSelection,
   COMMAND_PRIORITY_HIGH,
   DROP_COMMAND,
   PASTE_COMMAND,
@@ -53,15 +55,21 @@ export function NoteEditorImagePlugin() {
         );
 
         editor.update(() => {
-          $insertNodes(
-            assets.map((asset) =>
-              $createNoteEditorImageNode({
-                altText: asset.altText,
-                blockId,
-                src: asset.assetUrl,
-              }),
-            ),
+          const imageNodes = assets.map((asset) =>
+            $createNoteEditorImageNode({
+              altText: asset.altText,
+              blockId,
+              src: asset.assetUrl,
+            }),
           );
+
+          $insertNodes(imageNodes);
+
+          if (imageNodes.length === 1) {
+            const nodeSelection = $createNodeSelection();
+            nodeSelection.add(imageNodes[0].getKey());
+            $setSelection(nodeSelection);
+          }
         });
       } catch (error) {
         console.error("Failed to insert images", error);

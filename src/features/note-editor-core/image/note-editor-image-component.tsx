@@ -6,13 +6,20 @@ import {
   $setSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_LEFT_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
+  KEY_ARROW_UP_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
+  KEY_ENTER_COMMAND,
   mergeRegister,
   type NodeKey,
 } from "lexical";
 import { useEffect, useState } from "react";
 
+import { $moveCaretAfterImage, $moveCaretBeforeImage } from "./note-editor-image-cursor";
+import { $isNoteEditorImageNode } from "./note-editor-image-node";
 import {
   isInternalAssetUrl,
   resolveAssetUrl,
@@ -65,6 +72,46 @@ export function NoteEditorImageComponent({
   }, [blockId, src]);
 
   useEffect(() => {
+    /**
+     * Handles keyboard commands when image is selected.
+     *
+     * Interaction rules:
+     * - Delete/Backspace → remove the image
+     * - ↑/← → move cursor before the image (creates paragraph if needed)
+     * - ↓/→ → move cursor after the image (creates paragraph if needed)
+     * - Enter → insert new line after the image
+     */
+    const handleImageCommand = (
+      action: "remove" | "moveAfter" | "moveBefore",
+      event: KeyboardEvent | null,
+    ) => {
+      if (!isSelected) {
+        return false;
+      }
+
+      if (event) {
+        event.preventDefault();
+      }
+
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if (!$isNoteEditorImageNode(node)) {
+          return;
+        }
+
+        if (action === "remove") {
+          node.remove();
+          $setSelection(null);
+        } else if (action === "moveAfter") {
+          $moveCaretAfterImage(node);
+        } else {
+          $moveCaretBeforeImage(node);
+        }
+      });
+
+      return true;
+    };
+
     return mergeRegister(
       editor.registerCommand(
         CLICK_COMMAND,
@@ -91,34 +138,41 @@ export function NoteEditorImageComponent({
       ),
       editor.registerCommand(
         KEY_DELETE_COMMAND,
-        (event) => {
-          return removeSelectedImageNode(event);
-        },
+        (event) => handleImageCommand("remove", event),
         COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
-        (event) => {
-          return removeSelectedImageNode(event);
-        },
+        (event) => handleImageCommand("remove", event),
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_DOWN_COMMAND,
+        (event) => handleImageCommand("moveAfter", event),
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_RIGHT_COMMAND,
+        (event) => handleImageCommand("moveAfter", event),
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_UP_COMMAND,
+        (event) => handleImageCommand("moveBefore", event),
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_LEFT_COMMAND,
+        (event) => handleImageCommand("moveBefore", event),
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_ENTER_COMMAND,
+        (event) => handleImageCommand("moveAfter", event),
         COMMAND_PRIORITY_LOW,
       ),
     );
   }, [clearSelected, editor, isSelected, nodeKey, setSelected]);
-
-  const removeSelectedImageNode = (event: KeyboardEvent) => {
-    if (!isSelected) {
-      return false;
-    }
-
-    event.preventDefault();
-    editor.update(() => {
-      $getNodeByKey(nodeKey)?.remove();
-      $setSelection(null);
-    });
-
-    return true;
-  };
 
   if (hasError) {
     return (
