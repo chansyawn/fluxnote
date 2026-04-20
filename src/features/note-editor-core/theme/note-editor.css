@@ -217,7 +217,7 @@
 }
 
 .note-block-editor__image-node {
-  @apply my-2 first:mt-0 last:mb-0;
+  @apply last:mb-0;
 }
 
 .note-block-editor__image-shell {
