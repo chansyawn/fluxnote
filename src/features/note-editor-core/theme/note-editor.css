@@ -57,12 +57,83 @@
   @apply list-disc;
 }
 
+.note-block-editor__list--unordered .note-block-editor__list--unordered {
+  list-style-type: circle;
+}
+
+.note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered {
+  list-style-type: square;
+}
+
+.note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered {
+  list-style-type: disc;
+}
+
+.note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered {
+  list-style-type: circle;
+}
+
+.note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered
+  .note-block-editor__list--unordered {
+  list-style-type: square;
+}
+
 .note-block-editor__list--ordered {
   @apply list-decimal;
 }
 
-.note-block-editor__list--checklist,
-.note-block-editor__list--nested {
+.note-block-editor__list--ordered .note-block-editor__list--ordered {
+  list-style-type: lower-alpha;
+}
+
+.note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered {
+  list-style-type: lower-roman;
+}
+
+.note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered {
+  list-style-type: decimal;
+}
+
+.note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered {
+  list-style-type: lower-alpha;
+}
+
+.note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered
+  .note-block-editor__list--ordered {
+  list-style-type: lower-roman;
+}
+
+.note-block-editor__list--ordered.note-block-editor__list--nested {
+  list-style-type: inherit;
+}
+
+.note-block-editor__list--checklist {
   @apply list-none ps-0;
 }
 
@@ -114,7 +185,12 @@
 }
 
 .note-block-editor__list-item--nested {
-  @apply mt-1;
+  @apply mt-1 list-none;
+}
+
+.note-block-editor__list-item--nested::before,
+.note-block-editor__list-item--nested::after {
+  display: none;
 }
 
 .note-block-editor__text--bold {
