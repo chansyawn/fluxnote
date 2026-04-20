@@ -11,6 +11,8 @@ import { NoteEditorCodeHighlightPlugin } from "@/features/note-editor-core/code-
 import { NoteEditorCodeLanguagePlugin } from "@/features/note-editor-core/code-block/note-editor-code-language-plugin";
 import { NoteEditorImageNavigationPlugin } from "@/features/note-editor-core/image/note-editor-image-navigation-plugin";
 import { NoteEditorImagePlugin } from "@/features/note-editor-core/image/note-editor-image-plugin";
+import { NoteEditorListRegistrationPlugin } from "@/features/note-editor-core/list/note-editor-list-registration-plugin";
+import { NoteEditorListTabPlugin } from "@/features/note-editor-core/list/note-editor-list-tab-plugin";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorSelectionOverlayPlugin } from "@/features/note-editor-core/selection/note-editor-selection-overlay-plugin";
 import { NoteEditorTableShortcutPlugin } from "@/features/note-editor-core/table/note-editor-table-shortcut-plugin";
@@ -28,6 +30,8 @@ export function NoteEditorPlugins({ onMarkdownUpdated }: NoteEditorPluginsProps)
       <NoteEditorSelectionOverlayPlugin />
       <ListPlugin />
       <CheckListPlugin disableTakeFocusOnClick />
+      <NoteEditorListRegistrationPlugin />
+      <NoteEditorListTabPlugin />
       <LinkPlugin />
       <TablePlugin hasCellBackgroundColor={false} hasCellMerge={false} />
       <NoteEditorTableShortcutPlugin />
