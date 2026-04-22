@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
+default-run = "flux"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -39,6 +40,8 @@ dirs = "5"
 open = "5"
 base64 = "0.22.1"
 sha2 = "0.11.0"
+interprocess = { version = "2.2.1", features = ["tokio"] }
+tokio = { version = "1", features = ["rt", "io-util"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-global-shortcut = "2"
@@ -47,3 +50,8 @@ tauri-plugin-single-instance = "2"
 [[bin]]
 name = "flux"
 path = "src/main.rs"
+
+[[bin]]
+name = "flux-dev-open"
+path = "src/bin/flux-dev-open.rs"
+

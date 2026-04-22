@@ -12,6 +12,7 @@
     "preview": "vp preview",
     "tauri": "tauri",
     "flux": "cargo run --manifest-path=src-tauri/Cargo.toml --bin flux --",
+    "open": "cargo run --manifest-path=src-tauri/Cargo.toml --bin flux-dev-open --",
     "lingui": "lingui",
     "lingui:extract": "lingui extract --overwrite --clean",
     "lingui:compile": "lingui compile --strict"
