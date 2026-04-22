@@ -6,6 +6,7 @@ use clap::Parser;
 use rusqlite::Connection;
 
 use crate::database;
+use crate::dev::{client, env, protocol::IpcMessage};
 use crate::features::blocks::service;
 
 #[derive(Parser)]
@@ -81,8 +82,23 @@ fn run_cli() -> Result<()> {
     println!("✓ Block created: {}", block.id);
 
     // 打开 GUI
-    open::that(&deep_link_url).context("failed to open deep link URL")?;
+    open_deep_link(&deep_link_url)?;
     println!("→ Opening FluxNote...");
 
+    Ok(())
+}
+
+fn open_deep_link(url: &str) -> Result<()> {
+    if env::is_dev_mode() {
+        // 开发环境：通过 IPC 发送消息
+        let message = IpcMessage::DeepLink {
+            url: url.to_string(),
+        };
+        client::send_message_blocking(&message)
+            .context("Failed to send IPC message. Is the GUI running?")?;
+    } else {
+        // 生产环境：系统级 URL 打开
+        open::that(url).context("Failed to open deep link URL")?;
+    }
     Ok(())
 }

@@ -8,6 +8,7 @@ use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectStat
 
 pub mod cli;
 mod database;
+pub mod dev;
 mod error;
 mod features;
 
@@ -122,6 +123,9 @@ pub fn run() {
         .setup(|app| {
             // Setup deep link handler
             features::deep_link::setup_deep_link_handler(app.handle())?;
+
+            // Start IPC server for dev mode
+            dev::server::start_ipc_server(app.handle().clone())?;
 
             let database_state = database::DatabaseState::init(app.handle())?;
             app.manage(database_state);

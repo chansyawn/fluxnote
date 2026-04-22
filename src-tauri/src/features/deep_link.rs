@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_deep_link::DeepLinkExt;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 
 const DEEP_LINK_EVENT: &str = "deep-link://open-block";
 
@@ -22,26 +22,8 @@ pub fn setup_deep_link_handler(app: &AppHandle) -> Result<()> {
             let url_str = url.as_str();
             info!(?url_str, "Received deep link URL");
 
-            match parse_block_url(url_str) {
-                Ok(block_id) => {
-                    info!(?block_id, "Parsed block ID from deep link");
-
-                    // Show main window
-                    if let Err(e) = show_main_window(&app_handle) {
-                        error!(?e, "Failed to show main window");
-                    }
-
-                    // Emit event to frontend
-                    let payload = DeepLinkPayload { block_id };
-                    if let Err(e) = app_handle.emit(DEEP_LINK_EVENT, payload) {
-                        error!(?e, "Failed to emit deep-link event");
-                    } else {
-                        info!("Emitted deep-link event to frontend");
-                    }
-                }
-                Err(e) => {
-                    warn!(?e, ?url_str, "Failed to parse deep link URL");
-                }
+            if let Err(e) = handle_deep_link_url(&app_handle, url_str) {
+                error!(?e, ?url_str, "Failed to handle deep link URL");
             }
         }
     });
@@ -60,30 +42,26 @@ pub fn check_initial_deep_link(app: &AppHandle) -> Result<()> {
             let url_str = url.as_str();
             info!(?url_str, "Processing initial deep link URL");
 
-            match parse_block_url(url_str) {
-                Ok(block_id) => {
-                    info!(?block_id, "Parsed block ID from initial deep link");
-
-                    // Show main window
-                    if let Err(e) = show_main_window(app) {
-                        error!(?e, "Failed to show main window");
-                    }
-
-                    // Emit event to frontend
-                    let payload = DeepLinkPayload { block_id };
-                    if let Err(e) = app.emit(DEEP_LINK_EVENT, payload) {
-                        error!(?e, "Failed to emit deep-link event");
-                    } else {
-                        info!("Emitted initial deep-link event to frontend");
-                    }
-                }
-                Err(e) => {
-                    warn!(?e, ?url_str, "Failed to parse initial deep link URL");
-                }
+            if let Err(e) = handle_deep_link_url(app, url_str) {
+                error!(?e, ?url_str, "Failed to handle initial deep link URL");
             }
         }
     }
 
+    Ok(())
+}
+
+/// Handle deep link URL - can be called from URL schema or IPC
+pub fn handle_deep_link_url(app: &AppHandle, url: &str) -> Result<()> {
+    let block_id = parse_block_url(url)?;
+    info!(?block_id, "Parsed block ID from deep link");
+
+    show_main_window(app)?;
+
+    let payload = DeepLinkPayload { block_id };
+    app.emit(DEEP_LINK_EVENT, payload)?;
+
+    info!("Deep link handled successfully");
     Ok(())
 }
 
