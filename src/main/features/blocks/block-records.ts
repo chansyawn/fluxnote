@@ -1,36 +1,20 @@
 import type { Block, Tag } from "@shared/ipc/contracts";
 import { businessError } from "@shared/ipc/errors";
+import { eq, inArray, sql } from "drizzle-orm";
 
-import type { SqliteDatabase } from "../backend-store";
-
-export interface BlockRow {
-  id: string;
-  position: number;
-  content: string;
-  archived_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TagRow {
-  id: string;
-  name: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface TagJoinRow extends TagRow {
-  block_id: string;
-}
+import type { AppDatabase } from "../database/database-client";
+import {
+  blockTags,
+  blocks,
+  tags,
+  type BlockRecord,
+  type TagRecord,
+} from "../database/database-schema";
 
 export const assetUrlScheme = "assets://";
 
 export function nowIsoString(): string {
   return new Date().toISOString();
-}
-
-export function placeholders(count: number): string {
-  return Array.from({ length: count }, () => "?").join(",");
 }
 
 export function sanitizeFileName(fileName: string): string {
@@ -72,78 +56,58 @@ export function splitAssetUrl(assetUrl: string): { blockId: string; fileName: st
   return { blockId, fileName };
 }
 
-export function mapTagRow(tag: TagRow): Tag {
+export function mapTagRow(tag: TagRecord): Tag {
   return {
     id: tag.id,
     name: tag.name,
-    createdAt: tag.created_at,
-    updatedAt: tag.updated_at,
+    createdAt: tag.createdAt,
+    updatedAt: tag.updatedAt,
   };
 }
 
-export function mapBlockRow(block: BlockRow, tags: Tag[]): Block {
+export function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
   return {
     id: block.id,
     position: block.position,
     content: block.content,
-    archivedAt: block.archived_at,
-    createdAt: block.created_at,
-    updatedAt: block.updated_at,
+    archivedAt: block.archivedAt,
+    createdAt: block.createdAt,
+    updatedAt: block.updatedAt,
     willArchive: false,
     tags,
   };
 }
 
-export function getTagsForBlocks(
-  db: SqliteDatabase,
-  blockIds: readonly string[],
-): Map<string, Tag[]> {
+export function getTagsForBlocks(db: AppDatabase, blockIds: readonly string[]): Map<string, Tag[]> {
   if (blockIds.length === 0) {
     return new Map();
   }
 
   const rows = db
-    .prepare<TagJoinRow>(
-      `
-      SELECT
-        bt.block_id AS block_id,
-        t.id,
-        t.name,
-        t.created_at,
-        t.updated_at
-      FROM block_tags bt
-      INNER JOIN tags t ON t.id = bt.tag_id
-      WHERE bt.block_id IN (${placeholders(blockIds.length)})
-      ORDER BY t.name COLLATE NOCASE ASC
-    `,
-    )
-    .all(...blockIds);
+    .select({
+      blockId: blockTags.blockId,
+      id: tags.id,
+      name: tags.name,
+      createdAt: tags.createdAt,
+      updatedAt: tags.updatedAt,
+    })
+    .from(blockTags)
+    .innerJoin(tags, eq(tags.id, blockTags.tagId))
+    .where(inArray(blockTags.blockId, [...blockIds]))
+    .orderBy(sql`lower(${tags.name})`)
+    .all();
 
   const grouped = new Map<string, Tag[]>();
   for (const row of rows) {
-    const bucket = grouped.get(row.block_id) ?? [];
+    const bucket = grouped.get(row.blockId) ?? [];
     bucket.push(mapTagRow(row));
-    grouped.set(row.block_id, bucket);
+    grouped.set(row.blockId, bucket);
   }
   return grouped;
 }
 
-export function getPublicBlockById(db: SqliteDatabase, blockId: string): Block {
-  const block = db
-    .prepare<BlockRow>(
-      `
-        SELECT
-          id,
-          position,
-          content,
-          archived_at,
-          created_at,
-          updated_at
-        FROM blocks
-        WHERE id = ?
-      `,
-    )
-    .get(blockId);
+export function getPublicBlockById(db: AppDatabase, blockId: string): Block {
+  const block = db.select().from(blocks).where(eq(blocks.id, blockId)).get();
   if (!block) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
@@ -152,11 +116,21 @@ export function getPublicBlockById(db: SqliteDatabase, blockId: string): Block {
   return mapBlockRow(block, tagsByBlockId.get(blockId) ?? []);
 }
 
-export function assertBlockExists(db: SqliteDatabase, blockId: string): void {
-  const row = db.prepare<{ id: string }>("SELECT id FROM blocks WHERE id = ?").get(blockId);
+export function assertBlockExists(db: AppDatabase, blockId: string): void {
+  const row = db.select({ id: blocks.id }).from(blocks).where(eq(blocks.id, blockId)).get();
   if (!row) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
+}
+
+export function getNextBlockPosition(db: AppDatabase): number {
+  const row = db
+    .select({
+      maxPosition: sql<number>`coalesce(max(${blocks.position}), 0)`,
+    })
+    .from(blocks)
+    .get();
+  return (row?.maxPosition ?? 0) + 1;
 }
 
 export function isSqliteUniqueConstraint(error: unknown): boolean {

@@ -9,6 +9,7 @@ const config: ForgeConfig = {
     appBundleId: "app.fluxnote",
     appCategoryType: "public.app-category.productivity",
     asar: true,
+    extraResource: ["drizzle"],
     icon: "src/assets/electron/icon",
     name: "fluxnote",
   },

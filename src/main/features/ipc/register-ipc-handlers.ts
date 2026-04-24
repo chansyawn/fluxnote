@@ -2,8 +2,9 @@ import { ipcCommandContracts, ipcCommandKeys, type IpcCommandKey } from "@shared
 import type { BrowserWindow, WebContents } from "electron";
 
 import { createAssetsCommandHandlers } from "../assets/ipc-handlers";
-import type { BackendStore, SqliteDatabase } from "../backend-store";
+import type { BackendStore } from "../backend-store";
 import { createBlocksCommandHandlers } from "../blocks/ipc-handlers";
+import type { AppDatabase } from "../database/database-client";
 import { createPreferencesCommandHandlers } from "../preferences/ipc-handlers";
 import { createSampleCommandHandlers } from "../sample/ipc-handlers";
 import { createShortcutCommandHandlers } from "../shortcut/ipc-handlers";
@@ -31,7 +32,7 @@ interface DuplicateCommandKeyEntry {
   key: IpcCommandKey;
 }
 
-async function getDb(options: RegisterIpcHandlersOptions): Promise<SqliteDatabase> {
+async function getDb(options: RegisterIpcHandlersOptions): Promise<AppDatabase> {
   await options.store.init();
   return options.store.getDb();
 }

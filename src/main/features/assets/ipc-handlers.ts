@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { businessError, internalError } from "@shared/ipc/errors";
 
-import type { BackendStore, SqliteDatabase } from "../backend-store";
+import type { BackendStore } from "../backend-store";
 import {
   assetUrlScheme,
   assertBlockExists,
@@ -11,13 +11,14 @@ import {
   sanitizeFileName,
   splitAssetUrl,
 } from "../blocks/block-records";
+import type { AppDatabase } from "../database/database-client";
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
 
 interface AssetsCommandServices {
-  getDb: () => Promise<SqliteDatabase>;
+  getDb: () => Promise<AppDatabase>;
   store: BackendStore;
 }
 
