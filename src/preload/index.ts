@@ -11,7 +11,7 @@ import {
 import type { IpcErrorPayload, IpcResult } from "@shared/ipc/errors";
 import { contextBridge, ipcRenderer } from "electron";
 
-const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production";
+const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production" && !process.env.VITEST;
 
 function isIpcResult<TData>(value: unknown): value is IpcResult<TData> {
   if (typeof value !== "object" || value === null) {
@@ -64,7 +64,7 @@ function subscribe<TKey extends IpcEventKey>(
     const parsedPayload = contract.payload.safeParse(payload);
     if (!parsedPayload.success) {
       if (shouldLogInvalidEventPayload) {
-        console.error(`Invalid IPC event payload for ${key}`, parsedPayload.error);
+        console.error(`Invalid IPC event payload for ${key}`, parsedPayload.error.issues);
       }
       return;
     }
