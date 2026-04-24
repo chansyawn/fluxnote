@@ -3,16 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": ".vite/build/main.cjs",
   "imports": {
-    "#global.css": "./src/global.css"
+    "#global.css": "./src/renderer/global.css"
   },
   "scripts": {
-    "dev": "vp dev",
-    "build": "tsc && vp build",
-    "preview": "vp preview",
-    "tauri": "tauri",
-    "flux": "cargo run --manifest-path=src-tauri/Cargo.toml --bin flux --",
-    "open": "cargo run --manifest-path=src-tauri/Cargo.toml --bin flux-dev-open --",
+    "dev": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "flux": "node src/cli/flux-cli.mjs",
     "lingui": "lingui",
     "lingui:extract": "lingui extract --overwrite --clean",
     "lingui:compile": "lingui compile --strict"
@@ -36,13 +35,10 @@
     "@lingui/react": "6.0.0-next.3",
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-router": "^1.168.10",
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-deep-link": "^2",
-    "@tauri-apps/plugin-global-shortcut": "^2",
-    "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-store": "^2.4.2",
+    "better-sqlite3": "^12.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "electron-store": "^11.0.2",
     "lexical": "^0.43.0",
     "lucide-react": "^1.7.0",
     "next-themes": "^0.4.6",
@@ -59,20 +55,36 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@electron-forge/cli": "8.0.0-alpha.8",
+    "@electron-forge/maker-zip": "8.0.0-alpha.8",
+    "@electron-forge/plugin-fuses": "8.0.0-alpha.8",
+    "@electron-forge/plugin-vite": "8.0.0-alpha.8",
+    "@electron-forge/shared-types": "8.0.0-alpha.8",
+    "@electron/fuses": "2.1.1",
     "@lingui/babel-plugin-lingui-macro": "6.0.0-next.3",
     "@lingui/cli": "6.0.0-next.3",
     "@lingui/vite-plugin": "6.0.0-next.3",
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
-    "@tauri-apps/cli": "^2",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "electron": "41.3.0",
     "typescript": "~5.9.3",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
-  "packageManager": "pnpm@10.33.0"
+  "config": {
+    "forge": "./forge.config.ts"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "electron"
+    ]
+  },
+  "productName": "fluxnote"
 }

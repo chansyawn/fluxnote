@@ -14,27 +14,27 @@
 - Use Vite+ as the primary frontend toolchain.
 - File naming must use `kebab-case` only, for example `user-profile.tsx`.
 - Use a Feature-First file structure:
-  - Shared business logic/components should be split by feature under `src/features`.
-  - Page-private functionality should live in each route's `-features` folder.
-  - The `app` directory should contain global content.
+  - Shared business logic/components should be split by feature under `src/renderer/features`.
+  - Page-private functionality should live in each route's `-features` folder under `src/renderer/routes`.
+  - The `src/renderer/app` directory should contain global content.
 
 ### Do / Don't
 
 - Keep frontend payload keys aligned with backend request-struct fields.
-- Do not introduce duplicate client command entrypoints outside `src/clients` + `src/clients/index.ts`.
+- Do not introduce duplicate client command entrypoints outside `src/renderer/clients` + `src/renderer/clients/index.ts`.
 
 ## Frontend
 
 ### Toolchain & Structure
 
 - Build frontend features with Vite+ conventions and keep route-private code under each route's `-features` folder.
-- Place shared frontend business logic and reusable feature-level components under `src/features`.
-- Keep application-wide frontend bootstrapping and global cross-feature content in `app`.
+- Place shared frontend business logic and reusable feature-level components under `src/renderer/features`.
+- Keep application-wide frontend bootstrapping and global cross-feature content in `src/renderer/app`.
 
 ### UI Conventions
 
 - Use the shadcn CLI to create new components when appropriate.
-- Do not modify existing shadcn components in `src/ui` unless explicitly requested.
+- Do not modify existing shadcn components in `src/renderer/ui` unless explicitly requested.
 - Use `lucide-react` for icons, and name icon wrappers with an `Icon` suffix.
 - Design and test with RTL behavior in mind.
 
@@ -47,62 +47,62 @@
 
 ### Frontend-Backend Client Boundary
 
-- Frontend code must import invoke from `@/app/invoke`; do not call `@tauri-apps/api/core` `invoke` directly in pages/features.
-- Keep API request/response types and command wrappers in `src/clients`.
-- Export client APIs through `src/clients/index.ts` as the single frontend entrypoint for backend commands.
-- UI components and routes must use TanStack Query for backend data loading, with the shared `queryClient` from `@/app/query`.
-- Configuration read/write in frontend must follow the existing preferences framework in `src/app/preferences` (schema + store). Do not introduce parallel config persistence paths.
+- Frontend code must import invoke from `@renderer/app/invoke`; do not call backend bridge APIs directly in pages/features.
+- Keep API request/response types and command wrappers in `src/renderer/clients`.
+- Export client APIs through `src/renderer/clients/index.ts` as the single frontend entrypoint for backend commands.
+- UI components and routes must use TanStack Query for backend data loading, with the shared `queryClient` from `@renderer/app/query`.
+- Configuration read/write in frontend must follow the existing preferences framework in `src/renderer/app/preferences` (schema + store). Do not introduce parallel config persistence paths.
 
 ## Backend
 
 ### Module & Layout
 
-- Backend Rust code must follow Feature-First structure under `src-tauri/src/features`.
-- Follow modern Rust module conventions: do not use `mod.rs`; use same-name module files (for example `features.rs` for `features/`).
+- Backend TypeScript code must follow Feature-First structure under `src/main/features`.
+- Keep Electron main process as the single backend runtime entry and route backend commands through IPC handlers only.
 
 ### Command & Validation
 
-- Define backend commands in `src-tauri/src` with `#[tauri::command]` and register them in the builder `invoke_handler`.
-- Prefer a request-struct + `garde` validation pattern for command args.
-- Prefer command signatures that consume a validated request object (for example `Validated<TRequest>`) so validation/mapping is centralized and command bodies stay business-focused.
+- Define backend command dispatch in `src/main/features/backend-commands.ts` and register IPC handlers in `src/main/index.ts`.
+- Prefer explicit request parsing/validation helpers per command so command bodies stay business-focused.
 - Backend can read configuration values for runtime behavior, but must not persist or mutate frontend preference/config files. Configuration writes are frontend-owned.
 
 ### Error Model
 
-- Follow this split: business/domain errors use `thiserror`; internal/technical errors use `anyhow`.
-- Every Tauri command must return `AppResult<T>` with `AppError` as the global error surface.
-- `AppError` must serialize to a flat JSON payload:
+- Keep business/domain errors and internal/technical errors separated in command handlers.
+- Every backend IPC command should return or throw a flat JSON error payload:
   - `type: string`
   - `message: string`
   - `details: any`
-- `BusinessError` variants must map to `BUSINESS.[CODE]` names, for example:
+- Business errors must map to `BUSINESS.[CODE]` names, for example:
   - `BUSINESS.NOT_FOUND`
   - `BUSINESS.INVALID_INVOKE`
-- `INVALID_INVOKE` should be used for command argument validation failures (Garde) and include the validation report in `details`.
-- Internal errors (database, IO, runtime failures, etc.) must be mapped to `INTERNAL` and preserve the `anyhow` context chain in `details`.
+- `INVALID_INVOKE` should be used for command argument validation failures and include validation details in `details`.
+- Internal errors (database, IO, runtime failures, etc.) must be mapped to `INTERNAL` and preserve debug context in `details` when available.
 
 ### Logging
 
-- Use `tracing` for backend logs; do not introduce ad-hoc logging APIs.
-- Add `#[tracing::instrument]` at Tauri command boundaries for stable request-level context.
+- Use a single structured logging approach in Electron main; do not introduce ad-hoc logging APIs.
 
 ## Workflow & Verification
+
+`vp build` defaults to the root `vite.config.ts`. For this multi-target Electron project, always pass `--config` explicitly for renderer/main/preload validation.
 
 ### When Frontend Changes
 
 - Run `vp check`.
-- Run `vp build`.
+- Run `vp build -c vite.renderer.config.ts`.
 
 ### When Backend Changes
 
-- Run `cargo fmt`.
-- Run `cargo clippy`.
-- Run `cargo check`.
+- Run `vp check`.
+- Run `vp build -c vite.main.config.ts`.
+- Run `vp build -c vite.preload.config.ts`.
+- Run `vp run dev` for runtime verification when IPC/main process behavior changes.
 
 ### References
 
-- Frontend sample pattern: `src/routes/sample/index.tsx`
-- Backend sample pattern: `src-tauri/src/features/sample.rs`
+- Frontend sample pattern: `src/renderer/routes/sample/index.tsx`
+- Backend sample pattern: `src/main/features/backend-commands.ts`
 
 ### Spec Maintenance
 

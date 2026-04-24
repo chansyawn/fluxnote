@@ -1,0 +1,476 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-04-03 22:41+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/error-title-bar.tsx:29
+#: src/renderer/routes/-features/window-title-bar.tsx:88
+msgid "app.title"
+msgstr "FluxNote"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:236
+msgid "editor.code-block.language.label"
+msgstr "Code language"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:125
+msgid "editor.code-block.language.option.plain-text"
+msgstr "Plain text"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:291
+msgid "editor.code-block.language.search.empty"
+msgstr "No matching language"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:283
+msgid "editor.code-block.language.search.placeholder"
+msgstr "Search language"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/image/note-editor-image-plugin.tsx:76
+msgid "editor.image.insert-error"
+msgstr "Failed to insert image"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/image/note-editor-image-component.tsx:183
+msgid "editor.image.load-error"
+msgstr "Image unavailable"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:84
+msgid "error.block.delete"
+msgstr "Delete block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:47
+msgid "error.block.description"
+msgstr "Retry this block, or delete it if the content is corrupted."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:65
+msgid "error.block.retry"
+msgstr "Retry block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:44
+msgid "error.block.title"
+msgstr "This block failed to render"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:41
+msgid "error.global.description"
+msgstr "FluxNote encountered an unexpected error. You can retry or exit the app."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/error-title-bar.tsx:23
+#: src/renderer/features/error-boundary/global-error-content.tsx:56
+msgid "error.global.exit-app"
+msgstr "Exit app"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:52
+msgid "error.global.retry"
+msgstr "Retry"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:38
+msgid "error.global.title"
+msgstr "Something went wrong"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/window-title-bar.tsx:25
+msgid "header.go-home"
+msgstr "Go home"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/window-title-bar.tsx:54
+msgid "header.go-lab"
+msgstr "Go to lab"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/window-title-bar.tsx:52
+msgid "header.open-lab"
+msgstr "Open lab"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/window-title-bar.tsx:27
+msgid "header.open-preferences"
+msgstr "Open preferences"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-copy-action.tsx:31
+msgid "home-note.block.copy"
+msgstr "Copy block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-delete-action.tsx:20
+msgid "home-note.block.delete"
+msgstr "Delete block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
+msgid "home-note.block.placeholder"
+msgstr "Write something..."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/index.tsx:20
+msgid "lab.description"
+msgstr "Experiment area for infrastructure and integration demos."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:77
+msgid "lab.playground.description"
+msgstr "Frontend-only playground. Edit this preset markdown to verify note block behavior."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:90
+msgid "lab.playground.reset"
+msgstr "Reset preset"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:74
+msgid "lab.playground.title"
+msgstr "Note Block Editor Playground"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/index.tsx:32
+msgid "lab.tabs.playground"
+msgstr "Playground"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/index.tsx:29
+msgid "lab.tabs.sample"
+msgstr "Sample"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/index.tsx:17
+msgid "lab.title"
+msgstr "Lab"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:59
+msgid "preferences.auto-archive.description"
+msgstr "Blocks are scanned in the background and archived after the app hides."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:71
+msgid "preferences.auto-archive.enable.description"
+msgstr "Expired blocks stay dimmed until the window is hidden."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:68
+msgid "preferences.auto-archive.enable.label"
+msgstr "Enable auto-archive"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:89
+msgid "preferences.auto-archive.threshold.label"
+msgstr "Archive after"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:34
+msgid "preferences.auto-archive.threshold.option.1-day"
+msgstr "1 day"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:38
+msgid "preferences.auto-archive.threshold.option.3-days"
+msgstr "3 days"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:46
+msgid "preferences.auto-archive.threshold.option.30-days"
+msgstr "30 days"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:42
+msgid "preferences.auto-archive.threshold.option.7-days"
+msgstr "7 days"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/auto-archive/auto-archive-settings-section.tsx:56
+msgid "preferences.auto-archive.title"
+msgstr "Auto archive"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences.tsx:34
+msgid "preferences.description"
+msgstr "Configure language, auto-archive, and shortcuts."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences.tsx:43
+msgid "preferences.language.label"
+msgstr "Language"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:145
+msgid "preferences.shortcuts.clear"
+msgstr "Clear shortcut"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-settings-section.tsx:23
+msgid "preferences.shortcuts.create-block.label"
+msgstr "Create block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-settings-section.tsx:27
+msgid "preferences.shortcuts.delete-block.label"
+msgstr "Delete block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-settings-section.tsx:51
+msgid "preferences.shortcuts.description"
+msgstr "Configure the global shortcut and in-app block shortcuts."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:114
+msgid "preferences.shortcuts.empty"
+msgstr "Not set"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:27
+msgid "preferences.shortcuts.error.duplicate"
+msgstr "This shortcut is already assigned to another action."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:37
+msgid "preferences.shortcuts.error.invalid"
+msgstr "Use at least one modifier key with a supported key."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:47
+msgid "preferences.shortcuts.error.unavailable"
+msgstr "This global shortcut is unavailable. Another app may already be using it."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:102
+msgid "preferences.shortcuts.recording"
+msgstr "Press keys"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:127
+msgid "preferences.shortcuts.recording.exit"
+msgstr "to exit"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-input.tsx:136
+msgid "preferences.shortcuts.reset"
+msgstr "Reset shortcut"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-settings-section.tsx:48
+msgid "preferences.shortcuts.title"
+msgstr "Shortcuts"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-settings-section.tsx:19
+msgid "preferences.shortcuts.toggle-window.label"
+msgstr "Toggle window"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences.tsx:31
+msgid "preferences.title"
+msgstr "Preferences"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:57
+msgid "sample.greet.description"
+msgstr "Try normal names, empty value, long value, or `missing` to see different error types."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:126
+msgid "sample.greet.error.details"
+msgstr "Details"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:119
+msgid "sample.greet.error.message"
+msgstr "Message:"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:107
+msgid "sample.greet.error.title"
+msgstr "Structured error"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:113
+msgid "sample.greet.error.type"
+msgstr "Type:"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:136
+msgid "sample.greet.error.unknown"
+msgstr "Unknown error shape."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:66
+msgid "sample.greet.input.label"
+msgstr "Name"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:91
+msgid "sample.greet.loading"
+msgstr "Loading response from Rust backend..."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:80
+msgid "sample.greet.submit"
+msgstr "Run greet query"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:98
+msgid "sample.greet.success.title"
+msgstr "Success"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:83
+msgid "sample.greet.tip"
+msgstr "Tip: try `missing` or an empty value."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:54
+msgid "sample.greet.title"
+msgstr "Query + Client + Invoke Demo"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:26
+msgid "sample.spec.error"
+msgstr "Error semantics: backend returns `BUSINESS.*` or `INTERNAL` with structured details."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:21
+msgid "sample.spec.i18n"
+msgstr "Internationalization: all user-facing strings use stable Lingui explicit IDs."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:11
+msgid "sample.spec.layering"
+msgstr "Layering: route component calls `src/clients`, which uses `@renderer/app/invoke`."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:16
+msgid "sample.spec.query"
+msgstr "Data flow: TanStack Query handles request lifecycle and cache key changes."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:7
+msgid "sample.spec.title"
+msgstr "Practices Demonstrated on This Page"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/window-title-bar.tsx:73
+msgid "window.hide"
+msgstr "Hide window"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:238
+msgid "workspace.add-block"
+msgstr "Add block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:65
+msgid "workspace.archived.empty.description"
+msgstr "Archived blocks will appear here until you restore them."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:62
+msgid "workspace.archived.empty.title"
+msgstr "No archived blocks"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:164
+msgid "workspace.archived.filtered.empty.description"
+msgstr "Clear one of the filters or switch back to active blocks."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:153
+msgid "workspace.archived.filtered.empty.title"
+msgstr "No archived blocks match the selected tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-archive-action.tsx:30
+msgid "workspace.blocks.archive"
+msgstr "Archive block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-archive-action.tsx:32
+msgid "workspace.blocks.restore"
+msgstr "Restore block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:52
+msgid "workspace.empty.action"
+msgstr "Create first block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:38
+msgid "workspace.empty.description"
+msgstr "Start with an empty block."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:35
+msgid "workspace.empty.title"
+msgstr "No blocks yet"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:160
+msgid "workspace.filtered.empty.description"
+msgstr "Clear one of the filters or create a new block outside the current tag selection."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:151
+msgid "workspace.filtered.empty.title"
+msgstr "No blocks match the selected tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/block-workspace.tsx:19
+msgid "workspace.loading"
+msgstr "Loading your blocks..."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-tag-action.tsx:38
+msgid "workspace.tags.assign.button"
+msgstr "Assign tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/tag-combobox-popover.tsx:154
+msgid "workspace.tags.create-inline"
+msgstr "Create tag"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/tag-combobox-popover.tsx:196
+msgid "workspace.tags.delete-inline"
+msgstr "Delete tag"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/workspace-tag-filter-portal.tsx:64
+msgid "workspace.tags.filter.button"
+msgstr "Filter tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/tag-combobox-popover.tsx:163
+msgid "workspace.tags.search.empty"
+msgstr "No matching tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/workspace-tag-filter-portal.tsx:50
+msgid "workspace.visibility.show-active"
+msgstr "Show active blocks"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/-features/workspace-tag-filter-portal.tsx:48
+msgid "workspace.visibility.show-archived"
+msgstr "Show archived blocks"
