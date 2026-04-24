@@ -9,7 +9,7 @@ export default defineConfig({
       fileName: () => "preload.cjs",
       formats: ["cjs"],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ["electron"],
       output: {
         assetFileNames: "preload.[ext]",
