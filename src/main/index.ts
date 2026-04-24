@@ -19,6 +19,7 @@ import { AutoArchiveRuntime } from "./features/auto-archive-runtime";
 import { BackendStore } from "./features/backend-store";
 import { createEmitIpcEvent } from "./features/ipc/emit-ipc-event";
 import { registerIpcHandlers } from "./features/ipc/register-ipc-handlers";
+import { calculateWindowPosition, saveWindowPosition } from "./features/window/window-position";
 
 const MAIN_WINDOW_HEIGHT = 600;
 const MAIN_WINDOW_MAX_WIDTH = 640;
@@ -152,6 +153,8 @@ function showMainWindow() {
   }
 
   if (!mainWindow.isVisible()) {
+    const { x, y } = calculateWindowPosition(mainWindow);
+    mainWindow.setPosition(x, y);
     mainWindow.show();
   }
   if (mainWindow.isMinimized()) {
@@ -166,6 +169,7 @@ function toggleMainWindowVisibility() {
   }
 
   if (mainWindow.isVisible()) {
+    saveWindowPosition(mainWindow);
     mainWindow.hide();
     return;
   }
@@ -247,7 +251,10 @@ function createMainWindow() {
 
     emitIpcEvent("windowCloseRequested", null);
     event.preventDefault();
-    mainWindow?.hide();
+    if (mainWindow) {
+      saveWindowPosition(mainWindow);
+      mainWindow.hide();
+    }
   });
 
   mainWindow.on("focus", () => {
@@ -268,7 +275,11 @@ function createMainWindow() {
   });
 
   mainWindow.once("ready-to-show", () => {
-    mainWindow?.show();
+    if (mainWindow) {
+      const { x, y } = calculateWindowPosition(mainWindow);
+      mainWindow.setPosition(x, y);
+      mainWindow.show();
+    }
     emitIpcEvent("windowFocusChanged", true);
     emitPendingDeepLink();
   });
