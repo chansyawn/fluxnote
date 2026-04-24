@@ -1,7 +1,7 @@
 import { ipcEventContracts, type IpcEventKey, type IpcEventPayload } from "@shared/ipc/contracts";
 import type { BrowserWindow } from "electron";
 
-const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production";
+const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production" && !process.env.VITEST;
 
 export type EmitIpcEvent = <TKey extends IpcEventKey>(
   key: TKey,
@@ -23,7 +23,7 @@ export function createEmitIpcEvent(options: CreateEmitIpcEventOptions): EmitIpcE
     const parsedPayload = contract.payload.safeParse(payload);
     if (!parsedPayload.success) {
       if (shouldLogInvalidEventPayload) {
-        console.error(`Invalid IPC event payload for ${key}`, parsedPayload.error);
+        console.error(`Invalid IPC event payload for ${key}`, parsedPayload.error.issues);
       }
       return false;
     }
