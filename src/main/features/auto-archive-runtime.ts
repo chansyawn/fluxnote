@@ -1,8 +1,11 @@
 import fs from "node:fs/promises";
 
 import type { AutoArchiveStateChangedPayload } from "@shared/ipc/contracts";
+import { and, inArray, isNull, lt } from "drizzle-orm";
 
-import type { BackendStore, SqliteDatabase } from "./backend-store";
+import type { BackendStore } from "./backend-store";
+import type { AppDatabase } from "./database/database-client";
+import { blocks } from "./database/database-schema";
 import type { EmitIpcEvent } from "./ipc/emit-ipc-event";
 
 interface AutoArchiveConfig {
@@ -16,10 +19,6 @@ interface AutoArchiveRuntimeOptions {
   getWindowVisible: () => boolean;
   settingsFilePath: string;
   store: BackendStore;
-}
-
-interface BlockIdRow {
-  id: string;
 }
 
 const DEFAULT_CONFIG: AutoArchiveConfig = {
@@ -160,44 +159,27 @@ export class AutoArchiveRuntime {
   }
 }
 
-function listStaleActiveBlockIds(db: SqliteDatabase, cutoffIso: string): string[] {
+function listStaleActiveBlockIds(db: AppDatabase, cutoffIso: string): string[] {
   return db
-    .prepare<BlockIdRow>(
-      `
-        SELECT id
-        FROM blocks
-        WHERE archived_at IS NULL
-          AND updated_at < ?
-      `,
-    )
-    .all(cutoffIso)
+    .select({ id: blocks.id })
+    .from(blocks)
+    .where(and(isNull(blocks.archivedAt), lt(blocks.updatedAt, cutoffIso)))
+    .all()
     .map((row) => row.id);
 }
 
-function archiveBlocks(
-  db: SqliteDatabase,
-  blockIds: readonly string[],
-  archivedAt: string,
-): number {
+function archiveBlocks(db: AppDatabase, blockIds: readonly string[], archivedAt: string): number {
   if (blockIds.length === 0) {
     return 0;
   }
 
-  const update = db.prepare(
-    `
-      UPDATE blocks
-      SET archived_at = ?, updated_at = ?
-      WHERE id = ?
-    `,
-  );
-  const run = db.transaction(() => {
-    let changed = 0;
-    for (const blockId of blockIds) {
-      const result = update.run(archivedAt, archivedAt, blockId);
-      changed += result.changes;
-    }
-    return changed;
-  });
-
-  return run();
+  const result = db
+    .update(blocks)
+    .set({
+      archivedAt,
+      updatedAt: archivedAt,
+    })
+    .where(and(isNull(blocks.archivedAt), inArray(blocks.id, [...blockIds])))
+    .run();
+  return result.changes;
 }

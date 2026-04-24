@@ -1,72 +1,69 @@
 import fs from "node:fs/promises";
 
 import { businessError } from "@shared/ipc/errors";
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
-import type { BackendStore, SqliteDatabase } from "../backend-store";
+import type { BackendStore } from "../backend-store";
+import type { AppDatabase } from "../database/database-client";
+import { blockTags, blocks, type BlockRecord } from "../database/database-schema";
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
 import {
+  getNextBlockPosition,
   getPublicBlockById,
   getTagsForBlocks,
   mapBlockRow,
   nowIsoString,
-  placeholders,
-  type BlockRow,
 } from "./block-records";
 
 interface BlocksCommandServices {
-  getDb: () => Promise<SqliteDatabase>;
+  getDb: () => Promise<AppDatabase>;
   store: BackendStore;
 }
 
 async function listBlocks(
-  db: SqliteDatabase,
+  db: AppDatabase,
   tagIds: string[] | undefined,
   visibility: "active" | "archived",
 ) {
   const archivedPredicate =
-    visibility === "archived" ? "b.archived_at IS NOT NULL" : "b.archived_at IS NULL";
+    visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
+  const selectedFields = {
+    archivedAt: blocks.archivedAt,
+    content: blocks.content,
+    createdAt: blocks.createdAt,
+    id: blocks.id,
+    position: blocks.position,
+    updatedAt: blocks.updatedAt,
+  } satisfies Record<string, unknown>;
 
-  let blockRows: BlockRow[];
-  if (tagIds && tagIds.length > 0) {
-    const tagPlaceholders = placeholders(tagIds.length);
+  let blockRows: BlockRecord[];
+  const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
+  if (uniqueTagIds.length > 0) {
     blockRows = db
-      .prepare<BlockRow>(
-        `
-          SELECT
-            b.id,
-            b.position,
-            b.content,
-            b.archived_at,
-            b.created_at,
-            b.updated_at
-          FROM blocks b
-          INNER JOIN block_tags bt ON bt.block_id = b.id
-          WHERE ${archivedPredicate} AND bt.tag_id IN (${tagPlaceholders})
-          GROUP BY b.id
-          HAVING COUNT(DISTINCT bt.tag_id) = ?
-          ORDER BY b.position DESC
-        `,
+      .select(selectedFields)
+      .from(blocks)
+      .innerJoin(blockTags, eq(blockTags.blockId, blocks.id))
+      .where(and(archivedPredicate, inArray(blockTags.tagId, uniqueTagIds)))
+      .groupBy(
+        blocks.id,
+        blocks.position,
+        blocks.content,
+        blocks.archivedAt,
+        blocks.createdAt,
+        blocks.updatedAt,
       )
-      .all(...tagIds, tagIds.length);
+      .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
+      .orderBy(desc(blocks.position))
+      .all();
   } else {
     blockRows = db
-      .prepare<BlockRow>(
-        `
-          SELECT
-            b.id,
-            b.position,
-            b.content,
-            b.archived_at,
-            b.created_at,
-            b.updated_at
-          FROM blocks b
-          WHERE ${archivedPredicate}
-          ORDER BY b.position DESC
-        `,
-      )
+      .select(selectedFields)
+      .from(blocks)
+      .where(archivedPredicate)
+      .orderBy(desc(blocks.position))
       .all();
   }
 
@@ -91,25 +88,16 @@ export function createBlocksCommandHandlers(
         const db = await services.getDb();
         const now = nowIsoString();
         const blockId = crypto.randomUUID();
-        const maxPositionRow = db
-          .prepare<{ max_position: number }>(
-            "SELECT COALESCE(MAX(position), 0) AS max_position FROM blocks",
-          )
-          .get();
-        const nextPosition = (maxPositionRow?.max_position ?? 0) + 1;
-
-        db.prepare(
-          `
-            INSERT INTO blocks (
-              id,
-              position,
-              content,
-              archived_at,
-              created_at,
-              updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?)
-          `,
-        ).run(blockId, nextPosition, "", null, now, now);
+        db.insert(blocks)
+          .values({
+            archivedAt: null,
+            content: "",
+            createdAt: now,
+            id: blockId,
+            position: getNextBlockPosition(db),
+            updatedAt: now,
+          })
+          .run();
 
         return getPublicBlockById(db, blockId);
       },
@@ -119,8 +107,13 @@ export function createBlocksCommandHandlers(
       async handle(request) {
         const db = await services.getDb();
         const result = db
-          .prepare("UPDATE blocks SET content = ?, updated_at = ? WHERE id = ?")
-          .run(request.content, nowIsoString(), request.blockId);
+          .update(blocks)
+          .set({
+            content: request.content,
+            updatedAt: nowIsoString(),
+          })
+          .where(eq(blocks.id, request.blockId))
+          .run();
         if (result.changes === 0) {
           throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${request.blockId}`);
         }
@@ -132,7 +125,7 @@ export function createBlocksCommandHandlers(
       key: "blocksDelete",
       async handle(request) {
         const db = await services.getDb();
-        const result = db.prepare("DELETE FROM blocks WHERE id = ?").run(request.blockId);
+        const result = db.delete(blocks).where(eq(blocks.id, request.blockId)).run();
         if (result.changes === 0) {
           throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${request.blockId}`);
         }
@@ -150,8 +143,13 @@ export function createBlocksCommandHandlers(
         const db = await services.getDb();
         const now = nowIsoString();
         const result = db
-          .prepare("UPDATE blocks SET archived_at = ?, updated_at = ? WHERE id = ?")
-          .run(now, now, request.blockId);
+          .update(blocks)
+          .set({
+            archivedAt: now,
+            updatedAt: now,
+          })
+          .where(eq(blocks.id, request.blockId))
+          .run();
         if (result.changes === 0) {
           throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${request.blockId}`);
         }
@@ -164,8 +162,13 @@ export function createBlocksCommandHandlers(
       async handle(request) {
         const db = await services.getDb();
         const result = db
-          .prepare("UPDATE blocks SET archived_at = NULL, updated_at = ? WHERE id = ?")
-          .run(nowIsoString(), request.blockId);
+          .update(blocks)
+          .set({
+            archivedAt: null,
+            updatedAt: nowIsoString(),
+          })
+          .where(eq(blocks.id, request.blockId))
+          .run();
         if (result.changes === 0) {
           throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${request.blockId}`);
         }

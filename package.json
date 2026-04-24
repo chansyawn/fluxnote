@@ -8,6 +8,7 @@
     "#global.css": "./src/renderer/global.css"
   },
   "scripts": {
+    "db:generate": "drizzle-kit generate",
     "dev": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -38,6 +39,7 @@
     "better-sqlite3": "^12.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
     "electron-store": "^11.0.2",
     "lexical": "^0.43.0",
     "lucide-react": "^1.7.0",
@@ -67,10 +69,12 @@
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "drizzle-kit": "^0.31.10",
     "electron": "41.3.0",
     "typescript": "~5.9.3",
     "vite": "catalog:",

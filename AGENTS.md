@@ -60,6 +60,13 @@
 - Backend TypeScript code must follow Feature-First structure under `src/main/features`.
 - Keep Electron main process as the single backend runtime entry and route backend commands through IPC handlers only.
 
+### Database (Drizzle)
+
+- Keep the SQLite schema and Drizzle runtime helpers under `src/main/features/database`.
+- Use `drizzle-orm/better-sqlite3` in Electron main; do not introduce renderer-side database access.
+- Generate schema migrations with `vp run db:generate` and commit the generated `drizzle/` directory.
+- Keep runtime migration loading compatible with Electron packaging by treating `drizzle/` as a packaged resource.
+
 ### Command & Validation
 
 - Define backend command dispatch in `src/main/features/backend-commands.ts` and register IPC handlers in `src/main/index.ts`.
@@ -98,6 +105,12 @@
 - Run `vp build -c vite.main.config.ts`.
 - Run `vp build -c vite.preload.config.ts`.
 - Run `vp run dev` for runtime verification when IPC/main process behavior changes.
+
+### When Database Schema Changes
+
+- Run `vp run db:generate`.
+- Run `vp check`.
+- Run `vp build -c vite.main.config.ts`.
 
 ### References
 
