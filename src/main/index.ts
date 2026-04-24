@@ -244,6 +244,8 @@ function createMainWindow() {
     ...macOSVibrancyOptions,
   });
 
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+
   mainWindow.on("close", (event) => {
     if (isQuitting) {
       return;
@@ -369,6 +371,7 @@ app.on("open-url", (event, urlText) => {
 });
 
 void app.whenReady().then(async () => {
+  app.dock?.hide();
   await backendStore.init();
   app.setAsDefaultProtocolClient(DEEP_LINK_PROTOCOL);
   registerAssetProtocol();
