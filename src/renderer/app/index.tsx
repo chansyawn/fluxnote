@@ -8,10 +8,15 @@ import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-stat
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { RouterProvider, createMemoryHistory, createRouter } from "@tanstack/react-router";
+
+const history = createMemoryHistory({
+  initialEntries: ["/"],
+});
 
 const router = createRouter({
   routeTree,
+  history,
   defaultErrorComponent: RouterErrorFallback,
 });
 
