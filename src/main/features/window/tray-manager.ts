@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { app, Menu, nativeImage, Tray } from "electron";
+import { app, Menu, nativeImage, type NativeImage, Tray } from "electron";
 
 interface TrayManagerServices {
   requestQuit: () => void;
@@ -13,10 +13,21 @@ export interface TrayManager {
   destroyTray: () => void;
 }
 
-function resolveTrayIconPath(): string {
+function resolveIconPath(iconName: string): string {
   return app.isPackaged
-    ? path.join(process.resourcesPath, "icon.png")
-    : path.resolve(process.cwd(), "src/assets/electron/32x32.png");
+    ? path.join(process.resourcesPath, "assets/icons", iconName)
+    : path.resolve(process.cwd(), "src/assets/icons", iconName);
+}
+
+function createTrayIcon(): NativeImage {
+  const iconName = process.platform === "darwin" ? "tray-template.png" : "32x32.png";
+  const icon = nativeImage.createFromPath(resolveIconPath(iconName));
+
+  if (process.platform === "darwin") {
+    icon.setTemplateImage(true);
+  }
+
+  return icon;
 }
 
 export function createTrayManager(services: TrayManagerServices): TrayManager {
@@ -27,7 +38,7 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
       return;
     }
 
-    const icon = nativeImage.createFromPath(resolveTrayIconPath());
+    const icon = createTrayIcon();
     tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
     tray.setToolTip("FluxNote");
     tray.setContextMenu(
