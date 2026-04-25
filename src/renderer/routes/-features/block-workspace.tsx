@@ -100,30 +100,25 @@ export function BlockWorkspace() {
     deleteBlock,
   });
 
-  const { pendingBlockId, clearPendingBlockId } = useDeepLink();
+  const { acknowledgePendingBlockId, pendingBlockId } = useDeepLink();
 
-  // Handle deep link focus request
   useEffect(() => {
     if (!pendingBlockId || isInitialLoading) {
       return;
     }
 
-    console.log("Processing deep link for block:", pendingBlockId);
-
-    // Check if block exists in current view
     const blockExists = blocks.some((block) => block.id === pendingBlockId);
 
     if (blockExists) {
       requestBlockFocus(pendingBlockId);
-      clearPendingBlockId();
+      acknowledgePendingBlockId(pendingBlockId);
     } else {
-      // Block not found in current view
       toast.error("Block not found", {
         description: "The requested block does not exist or has been archived.",
       });
-      clearPendingBlockId();
+      acknowledgePendingBlockId(pendingBlockId);
     }
-  }, [pendingBlockId, blocks, isInitialLoading, requestBlockFocus, clearPendingBlockId]);
+  }, [acknowledgePendingBlockId, pendingBlockId, blocks, isInitialLoading, requestBlockFocus]);
 
   if (isInitialLoading) {
     return <LoadingState />;

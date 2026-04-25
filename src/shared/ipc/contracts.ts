@@ -25,6 +25,9 @@ export type Block = z.infer<typeof blockSchema>;
 export const blockMutationRequestSchema = z.object({
   blockId: z.string().min(1),
 });
+export const deepLinkPendingSchema = z.object({
+  blockId: z.string().nullable(),
+});
 
 export const ipcCommandContracts = {
   assetsCopy: {
@@ -84,6 +87,18 @@ export const ipcCommandContracts = {
       content: z.string(),
     }),
     response: blockSchema,
+  },
+  deepLinkPendingAcknowledge: {
+    channel: "fluxnote:deep-link:pending-acknowledge",
+    request: z.object({
+      blockId: z.string().min(1),
+    }),
+    response: voidSchema,
+  },
+  deepLinkPendingRead: {
+    channel: "fluxnote:deep-link:pending-read",
+    request: voidSchema,
+    response: deepLinkPendingSchema,
   },
   preferencesRead: {
     channel: "fluxnote:preferences:read",
@@ -181,6 +196,8 @@ export type CreateAssetRequest = IpcRequest<"assetsCreate">;
 export type CreateAssetResult = IpcResponse<"assetsCreate">;
 export type CopyAssetRequest = IpcRequest<"assetsCopy">;
 export type CopyAssetResult = IpcResponse<"assetsCopy">;
+export type DeepLinkPending = IpcResponse<"deepLinkPendingRead">;
+export type DeepLinkPendingAcknowledgeRequest = IpcRequest<"deepLinkPendingAcknowledge">;
 export type ShortcutRequest = IpcRequest<"shortcutRegister">;
 export type PreferencesSnapshot = IpcResponse<"preferencesRead">;
 

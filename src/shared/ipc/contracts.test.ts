@@ -16,6 +16,14 @@ describe("ipc contracts", () => {
     expect(ipcCommandContracts.blocksList.request.parse({})).toEqual({
       visibility: "active",
     });
+    expect(ipcCommandContracts.deepLinkPendingRead.response.parse({ blockId: null })).toEqual({
+      blockId: null,
+    });
+    expect(
+      ipcCommandContracts.deepLinkPendingAcknowledge.request.parse({ blockId: "block-1" }),
+    ).toEqual({
+      blockId: "block-1",
+    });
   });
 
   it("validates event payload schemas", () => {

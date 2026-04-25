@@ -6,32 +6,11 @@ vi.mock("@renderer/app/invoke", () => ({
   subscribeEvent: subscribeEventMock,
 }));
 
-import { onAutoArchiveStateChanged, onDeepLinkOpenBlock } from "@renderer/clients/event";
+import { onAutoArchiveStateChanged } from "@renderer/clients/event";
 
 describe("event client helpers", () => {
   beforeEach(() => {
     subscribeEventMock.mockReset();
-  });
-
-  it("forwards deep link payloads with their real shared shape", () => {
-    const handler = vi.fn();
-    let runtimeHandler: ((payload: { blockId: string }) => void) | undefined;
-    const unlisten = vi.fn();
-    subscribeEventMock.mockImplementation((key, callback) => {
-      if (key === "deepLinkOpenBlock") {
-        runtimeHandler = callback as (payload: { blockId: string }) => void;
-      }
-      return unlisten;
-    });
-
-    const returnedUnlisten = onDeepLinkOpenBlock(handler);
-    if (runtimeHandler) {
-      runtimeHandler({ blockId: "block-1" });
-    }
-    returnedUnlisten();
-
-    expect(handler).toHaveBeenCalledWith({ blockId: "block-1" });
-    expect(unlisten).toHaveBeenCalledTimes(1);
   });
 
   it("forwards auto-archive payloads and preserves cleanup", () => {
