@@ -10,7 +10,7 @@ export default defineConfig({
       formats: ["cjs"],
     },
     rolldownOptions: {
-      external: ["better-sqlite3", "bindings"],
+      external: ["better-sqlite3"],
     },
   },
   resolve: {
