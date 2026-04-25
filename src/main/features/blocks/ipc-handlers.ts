@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 
 import { businessError } from "@shared/ipc/errors";
-import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
 import type { BackendStore } from "../backend-store";
 import type { AppDatabase } from "../database/database-client";
@@ -51,14 +51,14 @@ async function listBlocks(
         blocks.updatedAt,
       )
       .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
-      .orderBy(desc(blocks.position))
+      .orderBy(asc(blocks.position))
       .all();
   } else {
     blockRows = db
       .select(selectedFields)
       .from(blocks)
       .where(archivedPredicate)
-      .orderBy(desc(blocks.position))
+      .orderBy(asc(blocks.position))
       .all();
   }
 
