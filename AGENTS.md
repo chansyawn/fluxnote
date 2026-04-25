@@ -64,8 +64,8 @@
 
 - Keep the SQLite schema and Drizzle runtime helpers under `src/main/features/database`.
 - Use `drizzle-orm/better-sqlite3` in Electron main; do not introduce renderer-side database access.
-- Generate schema migrations with `vp run db:generate` and commit the generated `drizzle/` directory.
-- Keep runtime migration loading compatible with Electron packaging by treating `drizzle/` as a packaged resource.
+- Generate schema migrations with `vp run db:generate` and commit the generated `src/main/features/database/drizzle/` directory.
+- Keep runtime migration loading compatible with Electron packaging by treating `src/main/features/database/drizzle/` as a packaged resource.
 
 ### Command & Validation
 
