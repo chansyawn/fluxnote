@@ -12,6 +12,12 @@ const config: ForgeConfig = {
     extraResource: ["drizzle"],
     icon: "src/assets/electron/icon",
     name: "fluxnote",
+    protocols: [
+      {
+        name: "FluxNote",
+        schemes: ["fluxnote"],
+      },
+    ],
   },
   rebuildConfig: {},
   makers: [new MakerZIP({}, ["darwin"])],
