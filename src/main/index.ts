@@ -6,13 +6,16 @@ import { app, globalShortcut, protocol } from "electron";
 
 import { registerAssetProtocol } from "./features/assets/asset-protocol";
 import { AutoArchiveRuntime } from "./features/auto-archive-runtime";
+import { createBackendCommandDispatcher } from "./features/backend-commands";
 import { BackendStore } from "./features/backend-store";
+import { createCliIpcServer } from "./features/cli/cli-ipc-server";
 import {
   createDeepLinkHandler,
   extractDeepLinkFromArgv,
 } from "./features/deep-link/deep-link-handler";
 import { createEmitIpcEvent } from "./features/ipc/emit-ipc-event";
 import { registerIpcHandlers } from "./features/ipc/register-ipc-handlers";
+import { createOpenBlockHandler } from "./features/open-block/open-block-handler";
 import { getConfigStore } from "./features/preferences/config-store";
 import { createTrayManager } from "./features/window/tray-manager";
 import { createWindowManager } from "./features/window/window-manager";
@@ -73,14 +76,30 @@ function startPrimaryInstance(): void {
     settingsFilePath: settingsStore.path,
     store: backendStore,
   });
-  const deepLinkHandler = createDeepLinkHandler({
+  const openBlockHandler = createOpenBlockHandler({
     emitEvent: emitIpcEvent,
     showWindow: () => windowManager.showMainWindow(),
+  });
+  const backendCommandDispatcher = createBackendCommandDispatcher({
+    getDb: async () => {
+      await backendStore.init();
+      return backendStore.getDb();
+    },
+    requestOpenBlock: (blockId) => {
+      openBlockHandler.requestOpen(blockId);
+    },
+    showMainWindow: () => windowManager.showMainWindow(),
+  });
+  const deepLinkHandler = createDeepLinkHandler({
+    dispatchCommand: backendCommandDispatcher.dispatch,
+  });
+  const cliIpcServer = createCliIpcServer({
+    dispatchCommand: backendCommandDispatcher.dispatch,
   });
   windowManager = createWindowManager({
     emitEvent: emitIpcEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
-    onDeepLinkReady: () => deepLinkHandler.emitPending(),
+    onOpenBlockReady: () => openBlockHandler.emitPending(),
   });
   const trayManager = createTrayManager({
     requestQuit: () => windowManager.requestQuit(),
@@ -90,11 +109,11 @@ function startPrimaryInstance(): void {
 
   function registerAppIpcHandlers(): void {
     registerIpcHandlers({
-      acknowledgePendingDeepLink: (blockId) => deepLinkHandler.acknowledgePending(blockId),
+      acknowledgePendingOpenBlock: (blockId) => openBlockHandler.acknowledgePending(blockId),
       emitEvent: emitIpcEvent,
       getMainWindow: () => windowManager.getMainWindow(),
       hideMainWindow: () => windowManager.hideMainWindow(),
-      readPendingDeepLink: () => deepLinkHandler.readPending(),
+      readPendingOpenBlock: () => openBlockHandler.readPending(),
       readPreferences: () =>
         getConfigStore(SETTINGS_STORE_NAME, {}).store as Record<string, unknown>,
       requestQuit: () => windowManager.requestQuit(),
@@ -110,13 +129,13 @@ function startPrimaryInstance(): void {
     windowManager.showMainWindow();
     const deepLink = extractDeepLinkFromArgv(argv);
     if (deepLink) {
-      deepLinkHandler.handle(deepLink);
+      void deepLinkHandler.handle(deepLink);
     }
   });
 
   app.on("open-url", (event, urlText) => {
     event.preventDefault();
-    deepLinkHandler.handle(urlText);
+    void deepLinkHandler.handle(urlText);
   });
 
   void app.whenReady().then(async () => {
@@ -124,13 +143,14 @@ function startPrimaryInstance(): void {
     await backendStore.init();
     registerAssetProtocol(backendStore);
     registerAppIpcHandlers();
+    await cliIpcServer.start();
     windowManager.createMainWindow();
     trayManager.createTray();
     await autoArchiveRuntime.start();
 
     const startupDeepLink = extractDeepLinkFromArgv(process.argv);
     if (startupDeepLink) {
-      deepLinkHandler.handle(startupDeepLink);
+      void deepLinkHandler.handle(startupDeepLink);
     }
 
     app.on("activate", () => {
@@ -148,6 +168,7 @@ function startPrimaryInstance(): void {
     autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
     trayManager.destroyTray();
+    await cliIpcServer.close();
     await backendStore.close();
   });
 

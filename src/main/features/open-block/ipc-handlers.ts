@@ -2,25 +2,25 @@ import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
-import type { PendingDeepLink } from "./deep-link-handler";
+import type { PendingOpenBlockRequest } from "./open-block-handler";
 
-interface DeepLinkCommandServices {
+interface OpenBlockCommandServices {
   acknowledgePending: (blockId: string) => void;
-  readPending: () => PendingDeepLink;
+  readPending: () => PendingOpenBlockRequest;
 }
 
-export function createDeepLinkCommandHandlers(
-  services: DeepLinkCommandServices,
+export function createOpenBlockCommandHandlers(
+  services: OpenBlockCommandServices,
 ): readonly AnyIpcCommandHandlerDefinition[] {
   return [
     defineIpcCommandHandler({
-      key: "deepLinkPendingRead",
+      key: "openBlockPendingRead",
       handle() {
         return services.readPending();
       },
     }),
     defineIpcCommandHandler({
-      key: "deepLinkPendingAcknowledge",
+      key: "openBlockPendingAcknowledge",
       handle(request) {
         services.acknowledgePending(request.blockId);
         return undefined;

@@ -22,6 +22,8 @@
 
 - Keep frontend payload keys aligned with backend request-struct fields.
 - Do not introduce duplicate client command entrypoints outside `src/renderer/clients` + `src/renderer/clients/index.ts`.
+- Keep CLI source in `src/cli` as TypeScript and build it with `vite.cli.config.ts`.
+- CLI commands must route through Electron main's backend command dispatcher over local IPC; do not let CLI code write the database directly.
 
 ## Frontend
 
@@ -72,6 +74,7 @@
 - Define backend command dispatch in `src/main/features/backend-commands.ts` and register IPC handlers in `src/main/index.ts`.
 - Prefer explicit request parsing/validation helpers per command so command bodies stay business-focused.
 - Backend can read configuration values for runtime behavior, but must not persist or mutate frontend preference/config files. Configuration writes are frontend-owned.
+- Treat deeplinks and CLI requests as adapters into backend commands rather than separate business logic entrypoints.
 
 ### Error Model
 

@@ -2,79 +2,49 @@
 
 ## Overview
 
-In development mode, the CLI and deep-link flows communicate with the GUI over IPC instead of relying on the packaged app. This makes it possible to test the full note creation and navigation flow without building a production bundle.
+FluxNote uses Electron as the single backend runtime. The renderer, CLI, and deep links all route user actions into Electron main process commands instead of writing application data directly.
 
-IPC endpoints are isolated per repository instance by default, so multiple worktrees can run `pnpm tauri dev` at the same time without sending messages to the wrong GUI process.
+The CLI talks to the running app through a local IPC socket. If the app is not running, the CLI opens `fluxnote://app/open`, waits for the IPC server, and then sends the requested command.
 
 ## Usage
 
-### 1. Start the GUI in development mode
+### Start the GUI in development mode
 
 ```bash
-pnpm tauri dev
+vp run dev
 ```
 
-The GUI detects development mode automatically and starts the local IPC server during startup.
-
-### 2. Create a note from the CLI
+### Open the app from the CLI
 
 ```bash
-pnpm flux "note content"
+vp run flux
 ```
 
-The CLI will:
-
-- create a block
-- send a deep-link IPC message to the GUI
-- show the window and focus the target block
-
-### 3. Test a deep link directly
+### Create a block from inline text
 
 ```bash
-pnpm open fluxnote://block/01JQWXYZ123456789
+vp run flux -- --text "note content"
 ```
 
-This helper command sends an arbitrary `fluxnote://` URL to the running development GUI without changing application code.
-
-### 4. Optionally override the IPC endpoint
+### Create a block from a Markdown file
 
 ```bash
-FLUXNOTE_DEV_SOCKET=/tmp/fluxnote-dev-custom.sock pnpm tauri dev
-FLUXNOTE_DEV_SOCKET=/tmp/fluxnote-dev-custom.sock pnpm flux "note content"
+vp run flux -- --file ./input.md
+vp run flux -- ./input.md
 ```
-
-If `FLUXNOTE_DEV_SOCKET` is not set, FluxNote derives a unique endpoint from the repository root path. If it is set, both the GUI and the CLI must use the same value.
 
 ## How It Works
 
-### Development mode detection
+- Electron main starts a local IPC server after app initialization.
+- The CLI parses arguments with `cac` and sends a structured command request to main.
+- Main validates the command payload, performs database work, and returns a structured result.
+- Deep links are thin adapters:
+  - `fluxnote://app/open` maps to the app open command.
+  - `fluxnote://block/<block-id>` maps to the block open command.
+- Renderer receives an open-block request, refreshes block data, clears workspace filters, and focuses the target block.
 
-Development mode is enabled automatically when either of the following is true:
+Run the CLI build explicitly when needed:
 
-- the `CARGO` environment variable is present, which is the normal case for `cargo run`
-- `FLUXNOTE_DEV_MODE=1` is set explicitly
-
-### IPC transport
-
-- the GUI starts a local socket server bound to the current repository instance
-- the CLI connects to the same endpoint and sends JSON messages
-- the current message payload carries a deep-link URL
-- `FLUXNOTE_DEV_SOCKET` can override the auto-derived endpoint when needed
-
-## Production Behavior
-
-Outside development mode, the CLI and deep-link flows continue to use the system-level URL scheme. Development IPC does not replace the production deep-link path.
-
-## Extending the Workflow
-
-### Add a new CLI-triggered navigation flow
-
-Call `open_deep_link(url)` from CLI code. The IPC layer will route the request in development mode and keep the existing system deep-link behavior in production mode.
-
-### Add a new deep-link route
-
-Extend the parsing and handling logic in `src-tauri/src/features/deep_link.rs`.
-
-### Add new IPC message types
-
-Extend `src-tauri/src/dev/protocol.rs` and reuse the existing client/server infrastructure.
+```bash
+vp run cli:build
+```
