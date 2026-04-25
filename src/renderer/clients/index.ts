@@ -1,4 +1,9 @@
 export { convertFileSrc, copyAsset, createAsset } from "@renderer/clients/assets";
+export {
+  acknowledgePendingDeepLink,
+  onDeepLinkOpenBlock,
+  readPendingDeepLink,
+} from "@renderer/clients/deep-link";
 export { greet } from "@renderer/clients/sample";
 export {
   archiveBlock,
@@ -15,6 +20,7 @@ export type {
   CreateAssetRequest,
   CreateAssetResult,
 } from "@renderer/clients/assets";
+export type { DeepLinkOpenBlockPayload, DeepLinkPending } from "@renderer/clients/deep-link";
 export type { GreetRequest, GreetResponse } from "@renderer/clients/sample";
 export type {
   Block,

@@ -8,8 +8,11 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 function createOptions(): RegisterIpcHandlersOptions {
   return {
+    acknowledgePendingDeepLink: vi.fn(),
     emitEvent: vi.fn(() => true),
     getMainWindow: () => null,
+    hideMainWindow: vi.fn(),
+    readPendingDeepLink: () => ({ blockId: null }),
     readPreferences: () => ({}),
     requestQuit: vi.fn(),
     store: {

@@ -1,12 +1,10 @@
-import type { BrowserWindow } from "electron";
-
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
 
 interface WindowCommandServices {
-  getMainWindow: () => BrowserWindow | null;
+  hideMainWindow: () => void;
   requestQuit: () => void;
   toggleMainWindow: () => void;
 }
@@ -18,7 +16,7 @@ export function createWindowCommandHandlers(
     defineIpcCommandHandler({
       key: "windowHide",
       handle() {
-        services.getMainWindow()?.hide();
+        services.hideMainWindow();
         return undefined;
       },
     }),
