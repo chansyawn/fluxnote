@@ -1,3 +1,4 @@
+export { getCliStatus, installCli, uninstallCli } from "@renderer/clients/cli";
 export { convertFileSrc, copyAsset, createAsset } from "@renderer/clients/assets";
 export {
   acknowledgePendingOpenBlock,
@@ -14,6 +15,7 @@ export {
   updateBlockContent,
 } from "@renderer/clients/blocks";
 export { createTag, deleteTag, listTags, setBlockTags } from "@renderer/clients/tags";
+export type { CliStatus } from "@renderer/clients/cli";
 export type {
   CopyAssetRequest,
   CopyAssetResult,

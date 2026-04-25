@@ -4,6 +4,7 @@ import type { BrowserWindow, WebContents } from "electron";
 import { createAssetsCommandHandlers } from "../assets/ipc-handlers";
 import type { BackendStore } from "../backend-store";
 import { createBlocksCommandHandlers } from "../blocks/ipc-handlers";
+import { createCliCommandHandlers } from "../cli/ipc-handlers";
 import type { AppDatabase } from "../database/database-client";
 import { createOpenBlockCommandHandlers } from "../open-block/ipc-handlers";
 import type { PendingOpenBlockRequest } from "../open-block/open-block-handler";
@@ -46,6 +47,7 @@ export function collectIpcCommandHandlerDefinitions(
   options: RegisterIpcHandlersOptions,
 ): readonly AnyIpcCommandHandlerDefinition[] {
   return [
+    ...createCliCommandHandlers(),
     ...createSampleCommandHandlers(),
     ...createBlocksCommandHandlers({
       getDb: async () => await getDb(options),

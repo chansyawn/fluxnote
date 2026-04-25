@@ -4,11 +4,9 @@ import { viteAliases } from "./vite.config";
 
 export default defineConfig({
   build: {
-    emptyOutDir: false,
-    outDir: ".vite/build",
+    outDir: ".vite/cli",
     rolldownOptions: {
       output: {
-        banner: "#!/usr/bin/env node",
         entryFileNames: "flux-cli.mjs",
       },
     },
@@ -17,5 +15,8 @@ export default defineConfig({
   },
   resolve: {
     alias: viteAliases,
+  },
+  ssr: {
+    noExternal: true,
   },
 });

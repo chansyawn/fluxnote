@@ -22,8 +22,9 @@
 
 - Keep frontend payload keys aligned with backend request-struct fields.
 - Do not introduce duplicate client command entrypoints outside `src/renderer/clients` + `src/renderer/clients/index.ts`.
-- Keep CLI source in `src/cli` as TypeScript and build it with `vite.cli.config.ts`.
+- Keep CLI source in `src/cli` as TypeScript and build it with `vite.cli.config.ts`. Build output goes to `.vite/cli/`.
 - CLI commands must route through Electron main's backend command dispatcher over local IPC; do not let CLI code write the database directly.
+- The CLI ships inside the Electron app bundle (`Contents/Resources/cli/`) and uses `ELECTRON_RUN_AS_NODE=1` via a shell wrapper. The `src/cli/flux` wrapper script is source-controlled; `.vite/cli/flux-cli.mjs` is a build artifact. Both are assembled into the app bundle during packaging via the forge `packageAfterCopy` hook.
 
 ## Frontend
 
@@ -108,6 +109,12 @@
 - Run `vp build -c vite.main.config.ts`.
 - Run `vp build -c vite.preload.config.ts`.
 - Run `vp run dev` for runtime verification when IPC/main process behavior changes.
+
+### When CLI Changes
+
+- Run `vp check`.
+- Run `vp run cli:build`.
+- Test with `vp run flux`.
 
 ### When Database Schema Changes
 

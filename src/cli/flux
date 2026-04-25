@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+resolve_symlink() {
+  local target="$1"
+  while [ -L "$target" ]; do
+    local dir
+    dir="$(cd "$(dirname "$target")" && pwd)"
+    target="$(readlink "$target")"
+    [[ "$target" != /* ]] && target="$dir/$target"
+  done
+  echo "$target"
+}
+
+SCRIPT="$(resolve_symlink "$0")"
+CLI_DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
+ROOT_DIR="$(dirname "$(dirname "$CLI_DIR")")"
+
+ELECTRON="$ROOT_DIR/MacOS/fluxnote"
+CLI_JS="$CLI_DIR/flux-cli.mjs"
+
+if [ ! -f "$ELECTRON" ]; then
+  ELECTRON="$ROOT_DIR/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
+  CLI_JS="$ROOT_DIR/.vite/cli/flux-cli.mjs"
+fi
+
+if [ ! -f "$ELECTRON" ]; then
+  echo "Electron binary not found." >&2
+  echo "In production: reinstall FluxNote or run 'Install flux command in PATH' from the app." >&2
+  echo "In development: run 'vp install' first." >&2
+  exit 1
+fi
+
+if [ ! -f "$CLI_JS" ]; then
+  echo "CLI script not found at $CLI_JS." >&2
+  echo "Run 'vp run cli:build' to build it." >&2
+  exit 1
+fi
+
+ELECTRON_RUN_AS_NODE=1 exec "$ELECTRON" "$CLI_JS" "$@"

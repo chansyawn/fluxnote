@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { isLocaleCode } from "@renderer/app/preferences/preferences-schema";
 import { AutoArchiveSettingsSection } from "@renderer/features/auto-archive/auto-archive-settings-section";
+import { CliSettingsSection } from "@renderer/features/cli/cli-settings-section";
 import { ShortcutSettingsSection } from "@renderer/features/shortcut/shortcut-settings-section";
 import {
   Select,
@@ -68,6 +69,7 @@ function RouteComponent() {
 
         <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />
+        <CliSettingsSection />
       </div>
     </section>
   );
