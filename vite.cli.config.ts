@@ -10,7 +10,7 @@ export default defineConfig({
         entryFileNames: "flux-cli.mjs",
       },
     },
-    ssr: "src/cli/flux-cli.ts",
+    ssr: "src/cli/index.ts",
     target: "node20",
   },
   resolve: {

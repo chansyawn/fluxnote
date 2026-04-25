@@ -1,4 +1,4 @@
-import { parseFluxArgs, FluxCliUsageError } from "@cli/flux-cli";
+import { FluxCliUsageError, parseFluxArgs } from "@cli/parse-args";
 import { describe, expect, it } from "vite-plus/test";
 
 const baseArgv = ["node", "flux"];
