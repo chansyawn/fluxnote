@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "bin": {
-    "flux": ".vite/build/flux-cli.mjs"
+    "flux": ".vite/cli/flux-cli.mjs"
   },
   "type": "module",
   "main": ".vite/build/main.cjs",
@@ -16,7 +16,7 @@
     "dev": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "flux": "vp build -c vite.cli.config.ts && node .vite/build/flux-cli.mjs",
+    "flux": "vp build -c vite.cli.config.ts && ./src/cli/flux",
     "lingui": "lingui",
     "lingui:extract": "lingui extract --overwrite --clean",
     "lingui:compile": "lingui compile --strict"

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, stat } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import process from "node:process";
@@ -17,7 +17,6 @@ import {
 } from "@shared/cli-ipc";
 import { cac } from "cac";
 
-const APP_OPEN_DEEP_LINK = "fluxnote://app/open";
 const INITIAL_SERVER_WAIT_MS = 3_000;
 const DEV_SERVER_WAIT_MS = 15_000;
 const CONNECT_RETRY_INTERVAL_MS = 150;
@@ -234,56 +233,68 @@ async function waitForCliIpcServer(timeoutMs: number): Promise<void> {
   throw lastError instanceof Error ? lastError : new Error("Timed out waiting for FluxNote.");
 }
 
-function openDeepLink(url: string): void {
-  if (process.platform === "darwin") {
-    spawn("open", [url], { detached: true, stdio: "ignore" }).unref();
-    return;
-  }
+// --- 应用发现与启动 ---
 
-  if (process.platform === "win32") {
-    spawn("cmd", ["/c", "start", "", url], { detached: true, stdio: "ignore" }).unref();
-    return;
-  }
+type CliContext =
+  | { mode: "production"; appBundlePath: string }
+  | { mode: "development"; repoRoot: string };
 
-  spawn("xdg-open", [url], { detached: true, stdio: "ignore" }).unref();
+function getCliDir(): string {
+  return path.dirname(fileURLToPath(import.meta.url));
 }
 
-function getRepositoryRootFromBuiltCli(): string {
-  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-}
+/**
+ * 通过 CLI 脚本所在目录判断运行环境：
+ * - 生产环境：脚本在 .app/Contents/Resources/cli/ 内，上两级的 MacOS/fluxnote 存在
+ * - 开发环境：脚本在仓库的 resources/cli/ 内，上两级有 package.json
+ */
+async function detectCliContext(): Promise<CliContext> {
+  const cliDir = getCliDir();
+  const contentsDir = path.resolve(cliDir, "../..");
+  const electronBinary = path.join(contentsDir, "MacOS", "fluxnote");
 
-async function canStartDevApp(): Promise<boolean> {
-  const repositoryRoot = getRepositoryRootFromBuiltCli();
   try {
-    await access(path.join(repositoryRoot, "package.json"));
-    await access(path.join(repositoryRoot, "src/main/index.ts"));
-    return true;
+    const s = await stat(electronBinary);
+    if (s.isFile()) {
+      return { mode: "production", appBundlePath: path.dirname(contentsDir) };
+    }
   } catch {
-    return false;
+    // Not inside an app bundle
   }
+
+  const repoRoot = path.resolve(cliDir, "../..");
+  try {
+    await access(path.join(repoRoot, "package.json"));
+    await access(path.join(repoRoot, "src/main/index.ts"));
+    return { mode: "development", repoRoot };
+  } catch {
+    // Not in a dev repo either
+  }
+
+  throw new Error("Cannot determine FluxNote location. Reinstall the application.");
 }
 
-function startDevApp(): void {
-  spawn("vp", ["run", "dev"], {
-    cwd: getRepositoryRootFromBuiltCli(),
-    detached: true,
-    stdio: "ignore",
-  }).unref();
+function launchApp(context: CliContext): void {
+  if (context.mode === "production") {
+    spawn("open", ["-a", context.appBundlePath], {
+      detached: true,
+      stdio: "ignore",
+    }).unref();
+  } else {
+    spawn("vp", ["run", "dev"], {
+      cwd: context.repoRoot,
+      detached: true,
+      stdio: "ignore",
+    }).unref();
+  }
 }
 
 async function ensureAppRunning(): Promise<void> {
-  openDeepLink(APP_OPEN_DEEP_LINK);
-  try {
-    await waitForCliIpcServer(INITIAL_SERVER_WAIT_MS);
-    return;
-  } catch (error) {
-    if (!isConnectionError(error) || !(await canStartDevApp())) {
-      throw error;
-    }
-  }
+  const context = await detectCliContext();
+  const waitMs = context.mode === "production" ? INITIAL_SERVER_WAIT_MS : DEV_SERVER_WAIT_MS;
 
-  startDevApp();
-  await waitForCliIpcServer(DEV_SERVER_WAIT_MS);
+  launchApp(context);
+  await waitForCliIpcServer(waitMs);
 }
 
 async function dispatchCliCommand<TKey extends BackendCommandKey>(

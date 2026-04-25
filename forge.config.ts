@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -24,6 +25,13 @@ async function copyNativeRuntimeDependencies(buildPath: string): Promise<void> {
   );
 }
 
+async function copyCliResources(buildPath: string): Promise<void> {
+  const resourcesCliPath = path.resolve(buildPath, "..", "cli");
+  await mkdir(resourcesCliPath, { recursive: true });
+  await cp("src/cli/flux", path.join(resourcesCliPath, "flux"));
+  await cp(".vite/cli/flux-cli.mjs", path.join(resourcesCliPath, "flux-cli.mjs"));
+}
+
 const config: ForgeConfig = {
   packagerConfig: {
     appBundleId: "app.fluxnote",
@@ -41,7 +49,9 @@ const config: ForgeConfig = {
   },
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
+      execSync("vp build -c vite.cli.config.ts", { stdio: "inherit" });
       await copyNativeRuntimeDependencies(buildPath);
+      await copyCliResources(buildPath);
     },
   },
   rebuildConfig: {},
@@ -70,7 +80,7 @@ const config: ForgeConfig = {
     }),
     new FusesPlugin({
       version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: false,
+      [FuseV1Options.RunAsNode]: true,
       [FuseV1Options.EnableCookieEncryption]: true,
       [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
       [FuseV1Options.EnableNodeCliInspectArguments]: false,

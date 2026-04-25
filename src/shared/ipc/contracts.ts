@@ -30,6 +30,23 @@ export const openBlockPendingSchema = z.object({
 });
 
 export const ipcCommandContracts = {
+  cliInstall: {
+    channel: "fluxnote:cli:install",
+    request: voidSchema,
+    response: voidSchema,
+  },
+  cliStatus: {
+    channel: "fluxnote:cli:status",
+    request: voidSchema,
+    response: z.object({
+      installed: z.boolean(),
+    }),
+  },
+  cliUninstall: {
+    channel: "fluxnote:cli:uninstall",
+    request: voidSchema,
+    response: voidSchema,
+  },
   assetsCopy: {
     channel: "fluxnote:assets:copy",
     request: z.object({
