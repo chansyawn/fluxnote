@@ -14,7 +14,7 @@ const MAIN_WINDOW_VIBRANCY = "under-window" as const;
 interface WindowManagerServices {
   emitEvent: EmitIpcEvent;
   onAutoArchiveTrigger: (force: boolean) => void;
-  onDeepLinkReady: () => void;
+  onOpenBlockReady: () => void;
 }
 
 export interface WindowManager {
@@ -163,7 +163,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     });
 
     createdWindow.webContents.on("did-finish-load", () => {
-      services.onDeepLinkReady();
+      services.onOpenBlockReady();
     });
 
     createdWindow.once("ready-to-show", () => {
@@ -173,7 +173,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         createdWindow.show();
       }
       services.emitEvent("windowFocusChanged", true);
-      services.onDeepLinkReady();
+      services.onOpenBlockReady();
     });
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

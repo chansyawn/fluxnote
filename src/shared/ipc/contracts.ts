@@ -25,7 +25,7 @@ export type Block = z.infer<typeof blockSchema>;
 export const blockMutationRequestSchema = z.object({
   blockId: z.string().min(1),
 });
-export const deepLinkPendingSchema = z.object({
+export const openBlockPendingSchema = z.object({
   blockId: z.string().nullable(),
 });
 
@@ -88,17 +88,17 @@ export const ipcCommandContracts = {
     }),
     response: blockSchema,
   },
-  deepLinkPendingAcknowledge: {
-    channel: "fluxnote:deep-link:pending-acknowledge",
+  openBlockPendingAcknowledge: {
+    channel: "fluxnote:open-block:pending-acknowledge",
     request: z.object({
       blockId: z.string().min(1),
     }),
     response: voidSchema,
   },
-  deepLinkPendingRead: {
-    channel: "fluxnote:deep-link:pending-read",
+  openBlockPendingRead: {
+    channel: "fluxnote:open-block:pending-read",
     request: voidSchema,
-    response: deepLinkPendingSchema,
+    response: openBlockPendingSchema,
   },
   preferencesRead: {
     channel: "fluxnote:preferences:read",
@@ -196,8 +196,8 @@ export type CreateAssetRequest = IpcRequest<"assetsCreate">;
 export type CreateAssetResult = IpcResponse<"assetsCreate">;
 export type CopyAssetRequest = IpcRequest<"assetsCopy">;
 export type CopyAssetResult = IpcResponse<"assetsCopy">;
-export type DeepLinkPending = IpcResponse<"deepLinkPendingRead">;
-export type DeepLinkPendingAcknowledgeRequest = IpcRequest<"deepLinkPendingAcknowledge">;
+export type OpenBlockPending = IpcResponse<"openBlockPendingRead">;
+export type OpenBlockPendingAcknowledgeRequest = IpcRequest<"openBlockPendingAcknowledge">;
 export type ShortcutRequest = IpcRequest<"shortcutRegister">;
 export type PreferencesSnapshot = IpcResponse<"preferencesRead">;
 
@@ -208,10 +208,10 @@ export const autoArchiveStateChangedPayloadSchema = z.object({
 });
 export type AutoArchiveStateChangedPayload = z.infer<typeof autoArchiveStateChangedPayloadSchema>;
 
-export const deepLinkOpenBlockPayloadSchema = z.object({
+export const openBlockRequestedPayloadSchema = z.object({
   blockId: z.string(),
 });
-export type DeepLinkOpenBlockPayload = z.infer<typeof deepLinkOpenBlockPayloadSchema>;
+export type OpenBlockRequestedPayload = z.infer<typeof openBlockRequestedPayloadSchema>;
 
 export const shortcutPressedPayloadSchema = z.object({
   shortcut: z.string(),
@@ -230,9 +230,9 @@ export const ipcEventContracts = {
     channel: "fluxnote:event:auto-archive://state-changed",
     payload: autoArchiveStateChangedPayloadSchema,
   },
-  deepLinkOpenBlock: {
-    channel: "fluxnote:event:deep-link://open-block",
-    payload: deepLinkOpenBlockPayloadSchema,
+  openBlockRequested: {
+    channel: "fluxnote:event:open-block://requested",
+    payload: openBlockRequestedPayloadSchema,
   },
   shortcutPressed: {
     channel: "fluxnote:event:shortcut://pressed",

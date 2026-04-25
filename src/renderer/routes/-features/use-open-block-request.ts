@@ -1,24 +1,24 @@
 import {
-  acknowledgePendingDeepLink,
-  onDeepLinkOpenBlock,
-  readPendingDeepLink,
-} from "@renderer/clients/deep-link";
+  acknowledgePendingOpenBlock,
+  onOpenBlockRequested,
+  readPendingOpenBlock,
+} from "@renderer/clients/open-block";
 import { useCallback, useEffect, useState } from "react";
 
-interface UseDeepLinkResult {
+interface UseOpenBlockRequestResult {
   acknowledgePendingBlockId: (blockId: string) => void;
   pendingBlockId: string | null;
 }
 
-export function useDeepLink(): UseDeepLinkResult {
+export function useOpenBlockRequest(): UseOpenBlockRequestResult {
   const [pendingBlockId, setPendingBlockId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
-    const unlisten = onDeepLinkOpenBlock((payload) => {
+    const unlisten = onOpenBlockRequested((payload) => {
       setPendingBlockId(payload.blockId);
     });
-    void readPendingDeepLink()
+    void readPendingOpenBlock()
       .then((pending) => {
         if (active && pending.blockId) {
           setPendingBlockId(pending.blockId);
@@ -34,7 +34,7 @@ export function useDeepLink(): UseDeepLinkResult {
 
   const acknowledgePendingBlockId = useCallback((blockId: string) => {
     setPendingBlockId((currentBlockId) => (currentBlockId === blockId ? null : currentBlockId));
-    void acknowledgePendingDeepLink(blockId).catch(() => undefined);
+    void acknowledgePendingOpenBlock(blockId).catch(() => undefined);
   }, []);
 
   return {

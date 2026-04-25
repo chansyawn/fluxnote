@@ -9,43 +9,43 @@ vi.mock("@renderer/app/invoke", () => ({
 }));
 
 import {
-  acknowledgePendingDeepLink,
-  onDeepLinkOpenBlock,
-  readPendingDeepLink,
-} from "@renderer/clients/deep-link";
+  acknowledgePendingOpenBlock,
+  onOpenBlockRequested,
+  readPendingOpenBlock,
+} from "@renderer/clients/open-block";
 
-describe("deep link client helpers", () => {
+describe("open block client helpers", () => {
   beforeEach(() => {
     invokeCommandMock.mockReset();
     subscribeEventMock.mockReset();
   });
 
-  it("reads and acknowledges pending deep links through the transport", async () => {
+  it("reads and acknowledges pending open block requests through the transport", async () => {
     invokeCommandMock
       .mockResolvedValueOnce({ blockId: "block-1" })
       .mockResolvedValueOnce(undefined);
 
-    await expect(readPendingDeepLink()).resolves.toEqual({ blockId: "block-1" });
-    await acknowledgePendingDeepLink("block-1");
+    await expect(readPendingOpenBlock()).resolves.toEqual({ blockId: "block-1" });
+    await acknowledgePendingOpenBlock("block-1");
 
     expect(invokeCommandMock.mock.calls).toEqual([
-      ["deepLinkPendingRead", undefined],
-      ["deepLinkPendingAcknowledge", { blockId: "block-1" }],
+      ["openBlockPendingRead", undefined],
+      ["openBlockPendingAcknowledge", { blockId: "block-1" }],
     ]);
   });
 
-  it("forwards deep link events with their shared payload shape", () => {
+  it("forwards open block events with their shared payload shape", () => {
     const handler = vi.fn();
     let runtimeHandler: ((payload: { blockId: string }) => void) | undefined;
     const unlisten = vi.fn();
     subscribeEventMock.mockImplementation((key, callback) => {
-      if (key === "deepLinkOpenBlock") {
+      if (key === "openBlockRequested") {
         runtimeHandler = callback as (payload: { blockId: string }) => void;
       }
       return unlisten;
     });
 
-    const returnedUnlisten = onDeepLinkOpenBlock(handler);
+    const returnedUnlisten = onOpenBlockRequested(handler);
     if (runtimeHandler) {
       runtimeHandler({ blockId: "block-1" });
     }

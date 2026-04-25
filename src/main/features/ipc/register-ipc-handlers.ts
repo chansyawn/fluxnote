@@ -5,8 +5,8 @@ import { createAssetsCommandHandlers } from "../assets/ipc-handlers";
 import type { BackendStore } from "../backend-store";
 import { createBlocksCommandHandlers } from "../blocks/ipc-handlers";
 import type { AppDatabase } from "../database/database-client";
-import type { PendingDeepLink } from "../deep-link/deep-link-handler";
-import { createDeepLinkCommandHandlers } from "../deep-link/ipc-handlers";
+import { createOpenBlockCommandHandlers } from "../open-block/ipc-handlers";
+import type { PendingOpenBlockRequest } from "../open-block/open-block-handler";
 import { createPreferencesCommandHandlers } from "../preferences/ipc-handlers";
 import { createSampleCommandHandlers } from "../sample/ipc-handlers";
 import { createShortcutCommandHandlers } from "../shortcut/ipc-handlers";
@@ -20,11 +20,11 @@ import type {
 } from "./ipc-handler-definition";
 
 export interface RegisterIpcHandlersOptions {
-  acknowledgePendingDeepLink: (blockId: string) => void;
+  acknowledgePendingOpenBlock: (blockId: string) => void;
   emitEvent: EmitIpcEvent;
   getMainWindow: () => BrowserWindow | null;
   hideMainWindow: () => void;
-  readPendingDeepLink: () => PendingDeepLink;
+  readPendingOpenBlock: () => PendingOpenBlockRequest;
   readPreferences: () => Record<string, unknown>;
   requestQuit: () => void;
   store: BackendStore;
@@ -58,9 +58,9 @@ export function collectIpcCommandHandlerDefinitions(
       getDb: async () => await getDb(options),
       store: options.store,
     }),
-    ...createDeepLinkCommandHandlers({
-      acknowledgePending: options.acknowledgePendingDeepLink,
-      readPending: options.readPendingDeepLink,
+    ...createOpenBlockCommandHandlers({
+      acknowledgePending: options.acknowledgePendingOpenBlock,
+      readPending: options.readPendingOpenBlock,
     }),
     ...createWindowCommandHandlers({
       hideMainWindow: options.hideMainWindow,

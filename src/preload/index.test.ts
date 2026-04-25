@@ -50,7 +50,7 @@ describe("preload runtime", () => {
       listener({}, { wrong: true });
     });
 
-    getRuntime().subscribe("deepLinkOpenBlock", handler);
+    getRuntime().subscribe("openBlockRequested", handler);
 
     expect(handler).not.toHaveBeenCalled();
   });

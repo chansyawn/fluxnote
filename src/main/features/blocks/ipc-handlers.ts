@@ -10,13 +10,8 @@ import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
-import {
-  getNextBlockPosition,
-  getPublicBlockById,
-  getTagsForBlocks,
-  mapBlockRow,
-  nowIsoString,
-} from "./block-records";
+import { getPublicBlockById, getTagsForBlocks, mapBlockRow, nowIsoString } from "./block-records";
+import { createBlockRecord } from "./block-service";
 
 interface BlocksCommandServices {
   getDb: () => Promise<AppDatabase>;
@@ -85,21 +80,7 @@ export function createBlocksCommandHandlers(
     defineIpcCommandHandler({
       key: "blocksCreate",
       async handle() {
-        const db = await services.getDb();
-        const now = nowIsoString();
-        const blockId = crypto.randomUUID();
-        db.insert(blocks)
-          .values({
-            archivedAt: null,
-            content: "",
-            createdAt: now,
-            id: blockId,
-            position: getNextBlockPosition(db),
-            updatedAt: now,
-          })
-          .run();
-
-        return getPublicBlockById(db, blockId);
+        return createBlockRecord(await services.getDb());
       },
     }),
     defineIpcCommandHandler({

@@ -1,9 +1,10 @@
 import { Trans } from "@lingui/react/macro";
+import { queryClient } from "@renderer/app/query";
 import { BlockActions } from "@renderer/features/note-block/block-actions";
 import { NoteBlockEditor } from "@renderer/features/note-block/note-block-editor";
 import { useBlockShortcuts } from "@renderer/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
-import { useDeepLink } from "@renderer/routes/-features/use-deep-link";
+import { useOpenBlockRequest } from "@renderer/routes/-features/use-open-block-request";
 import { WorkspaceTagFilterPortal } from "@renderer/routes/-features/workspace-tag-filter-portal";
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
@@ -77,6 +78,7 @@ export function BlockWorkspace() {
     visibility,
     selectedTagIds,
     isInitialLoading,
+    isRefreshing,
     isCreatingBlock,
     isBlockLocked,
     isBlockOpPending,
@@ -87,6 +89,8 @@ export function BlockWorkspace() {
     deleteBlock,
     createTagAndAssignToBlock,
     assignBlockTags,
+    setVisibility,
+    setSelectedTagFilters,
   } = useBlockWorkspace();
   const {
     editorRefs,
@@ -100,10 +104,26 @@ export function BlockWorkspace() {
     deleteBlock,
   });
 
-  const { acknowledgePendingBlockId, pendingBlockId } = useDeepLink();
+  const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
 
   useEffect(() => {
-    if (!pendingBlockId || isInitialLoading) {
+    if (!pendingBlockId) {
+      return;
+    }
+
+    setVisibility("active");
+    setSelectedTagFilters([]);
+    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+  }, [pendingBlockId, setSelectedTagFilters, setVisibility]);
+
+  useEffect(() => {
+    if (
+      !pendingBlockId ||
+      isInitialLoading ||
+      isRefreshing ||
+      visibility !== "active" ||
+      selectedTagIds.length > 0
+    ) {
       return;
     }
 
@@ -118,7 +138,16 @@ export function BlockWorkspace() {
       });
       acknowledgePendingBlockId(pendingBlockId);
     }
-  }, [acknowledgePendingBlockId, pendingBlockId, blocks, isInitialLoading, requestBlockFocus]);
+  }, [
+    acknowledgePendingBlockId,
+    pendingBlockId,
+    blocks,
+    isInitialLoading,
+    isRefreshing,
+    requestBlockFocus,
+    selectedTagIds.length,
+    visibility,
+  ]);
 
   if (isInitialLoading) {
     return <LoadingState />;

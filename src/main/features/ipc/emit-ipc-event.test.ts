@@ -29,7 +29,7 @@ describe("createEmitIpcEvent", () => {
         }) as unknown as BrowserWindow,
     });
 
-    const emitted = emitEvent("deepLinkOpenBlock", { nope: true } as never);
+    const emitted = emitEvent("openBlockRequested", { nope: true } as never);
 
     expect(emitted).toBe(false);
     expect(send).not.toHaveBeenCalled();

@@ -1,72 +1,62 @@
-import type { EmitIpcEvent } from "../ipc/emit-ipc-event";
+import type { BackendCommandKey } from "@shared/backend-command-contracts";
 
 const DEEP_LINK_PROTOCOL = "fluxnote";
 
-interface DeepLinkHandlerServices {
-  emitEvent: EmitIpcEvent;
-  showWindow: () => void;
-}
+type DeepLinkCommand =
+  | {
+      command: "app.open";
+      payload: null;
+    }
+  | {
+      command: "block.open";
+      payload: { blockId: string };
+    };
 
-export interface PendingDeepLink {
-  blockId: string | null;
+interface DeepLinkHandlerServices {
+  dispatchCommand: (command: BackendCommandKey, payload: unknown) => Promise<unknown>;
 }
 
 export function extractDeepLinkFromArgv(argv: readonly string[]): string | null {
   return argv.find((arg) => arg.startsWith(`${DEEP_LINK_PROTOCOL}://`)) ?? null;
 }
 
-export function parseDeepLinkBlockId(urlText: string): string | null {
+export function parseDeepLinkCommand(urlText: string): DeepLinkCommand | null {
   try {
     const parsed = new URL(urlText);
     if (parsed.protocol !== `${DEEP_LINK_PROTOCOL}:`) {
       return null;
     }
 
-    const blockPath = parsed.pathname.replace(/^\/+/, "");
-    if (parsed.hostname !== "block" || !blockPath) {
-      return null;
+    const cleanPath = parsed.pathname.replace(/^\/+/, "");
+    if (parsed.hostname === "app" && cleanPath === "open") {
+      return { command: "app.open", payload: null };
     }
 
-    return blockPath;
+    if (parsed.hostname === "block" && cleanPath) {
+      return {
+        command: "block.open",
+        payload: { blockId: cleanPath },
+      };
+    }
+
+    return null;
   } catch {
     return null;
   }
 }
 
 export function createDeepLinkHandler(services: DeepLinkHandlerServices) {
-  let pendingBlockId: string | null = null;
-
-  function readPending(): PendingDeepLink {
-    return { blockId: pendingBlockId };
-  }
-
-  function acknowledgePending(blockId: string): void {
-    if (pendingBlockId === blockId) {
-      pendingBlockId = null;
-    }
-  }
-
-  function emitPending(): boolean {
-    if (!pendingBlockId) {
+  async function handle(urlText: string): Promise<boolean> {
+    const parsedCommand = parseDeepLinkCommand(urlText);
+    if (!parsedCommand) {
       return false;
     }
 
-    return services.emitEvent("deepLinkOpenBlock", { blockId: pendingBlockId });
-  }
-
-  function handle(urlText: string): boolean {
-    const blockId = parseDeepLinkBlockId(urlText);
-    if (!blockId) {
-      return false;
-    }
-
-    pendingBlockId = blockId;
-    services.showWindow();
-    emitPending();
+    await services.dispatchCommand(parsedCommand.command, parsedCommand.payload);
     return true;
   }
 
-  return { acknowledgePending, emitPending, handle, readPending };
+  return { handle };
 }
 
 export type DeepLinkHandler = ReturnType<typeof createDeepLinkHandler>;
