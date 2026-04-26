@@ -10,6 +10,12 @@ function createOptions(): RegisterIpcHandlersOptions {
   return {
     acknowledgePendingOpenBlock: vi.fn(),
     emitEvent: vi.fn(() => true),
+    externalEditManager: {
+      cancelAll: vi.fn(),
+      begin: vi.fn(),
+      claim: vi.fn(),
+      listSessions: vi.fn(() => []),
+    },
     getMainWindow: () => null,
     hideMainWindow: vi.fn(),
     readPendingOpenBlock: () => ({ blockId: null }),

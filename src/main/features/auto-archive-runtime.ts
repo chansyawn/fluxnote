@@ -16,6 +16,7 @@ interface AutoArchiveConfig {
 
 interface AutoArchiveRuntimeOptions {
   emitEvent: EmitIpcEvent;
+  getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
   settingsFilePath: string;
   store: BackendStore;
@@ -30,6 +31,7 @@ const MIN_SCAN_INTERVAL_SECONDS = 30;
 
 export class AutoArchiveRuntime {
   private readonly emitEvent: EmitIpcEvent;
+  private readonly getProtectedBlockIds: () => Set<string>;
   private readonly getWindowVisible: AutoArchiveRuntimeOptions["getWindowVisible"];
   private readonly settingsFilePath: string;
   private readonly store: BackendStore;
@@ -39,6 +41,7 @@ export class AutoArchiveRuntime {
 
   constructor(options: AutoArchiveRuntimeOptions) {
     this.emitEvent = options.emitEvent;
+    this.getProtectedBlockIds = options.getProtectedBlockIds ?? (() => new Set());
     this.getWindowVisible = options.getWindowVisible;
     this.settingsFilePath = options.settingsFilePath;
     this.store = options.store;
@@ -106,7 +109,10 @@ export class AutoArchiveRuntime {
       return;
     }
 
-    const staleBlockIds = listStaleActiveBlockIds(db, cutoffTime);
+    const protectedIds = this.getProtectedBlockIds();
+    const staleBlockIds = listStaleActiveBlockIds(db, cutoffTime).filter(
+      (id) => !protectedIds.has(id),
+    );
     let archivedCount = 0;
     if (forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0) {
       archivedCount = archiveBlocks(db, staleBlockIds, now.toISOString());

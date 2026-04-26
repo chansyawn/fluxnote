@@ -12,6 +12,7 @@ describe("flux cli parser", () => {
     expect(parseFluxArgs([...baseArgv, "--text", "hello world"])).toEqual({
       kind: "create",
       source: {
+        edit: false,
         text: "hello world",
         type: "text",
       },
@@ -19,6 +20,7 @@ describe("flux cli parser", () => {
     expect(parseFluxArgs([...baseArgv, "--", "--text", "hello world"])).toEqual({
       kind: "create",
       source: {
+        edit: false,
         text: "hello world",
         type: "text",
       },
@@ -29,6 +31,7 @@ describe("flux cli parser", () => {
     expect(parseFluxArgs([...baseArgv, "--file", "./input.md"])).toEqual({
       kind: "create",
       source: {
+        edit: false,
         filePath: "./input.md",
         type: "file",
       },
@@ -36,6 +39,34 @@ describe("flux cli parser", () => {
     expect(parseFluxArgs([...baseArgv, "./input.md"])).toEqual({
       kind: "create",
       source: {
+        edit: false,
+        filePath: "./input.md",
+        type: "file",
+      },
+    });
+  });
+
+  it("parses edit mode for file input only", () => {
+    expect(parseFluxArgs([...baseArgv, "--edit", "./input.md"])).toEqual({
+      kind: "create",
+      source: {
+        edit: true,
+        filePath: "./input.md",
+        type: "file",
+      },
+    });
+    expect(parseFluxArgs([...baseArgv, "./input.md", "--edit"])).toEqual({
+      kind: "create",
+      source: {
+        edit: true,
+        filePath: "./input.md",
+        type: "file",
+      },
+    });
+    expect(parseFluxArgs([...baseArgv, "--file", "./input.md", "--edit"])).toEqual({
+      kind: "create",
+      source: {
+        edit: true,
         filePath: "./input.md",
         type: "file",
       },
@@ -50,5 +81,12 @@ describe("flux cli parser", () => {
 
   it("rejects unknown options", () => {
     expect(() => parseFluxArgs([...baseArgv, "--bad"])).toThrow(FluxCliUsageError);
+  });
+
+  it("rejects edit mode without a file input", () => {
+    expect(() => parseFluxArgs([...baseArgv, "--edit"])).toThrow(FluxCliUsageError);
+    expect(() => parseFluxArgs([...baseArgv, "--text", "hello", "--edit"])).toThrow(
+      FluxCliUsageError,
+    );
   });
 });

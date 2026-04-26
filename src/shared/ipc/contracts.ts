@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { externalEditSessionSchema } from "../external-edit-contracts";
+
 const voidSchema = z.undefined();
 
 export const tagSchema = z.object({
@@ -101,6 +103,26 @@ export const ipcCommandContracts = {
     channel: "fluxnote:blocks:update-content",
     request: z.object({
       blockId: z.string().min(1),
+      content: z.string(),
+    }),
+    response: blockSchema,
+  },
+  externalEditsCancel: {
+    channel: "fluxnote:external-edits:cancel",
+    request: z.object({
+      editId: z.string().min(1),
+    }),
+    response: voidSchema,
+  },
+  externalEditsList: {
+    channel: "fluxnote:external-edits:list",
+    request: voidSchema,
+    response: z.array(externalEditSessionSchema),
+  },
+  externalEditsSubmit: {
+    channel: "fluxnote:external-edits:submit",
+    request: z.object({
+      editId: z.string().min(1),
       content: z.string(),
     }),
     response: blockSchema,
@@ -217,6 +239,9 @@ export type OpenBlockPending = IpcResponse<"openBlockPendingRead">;
 export type OpenBlockPendingAcknowledgeRequest = IpcRequest<"openBlockPendingAcknowledge">;
 export type ShortcutRequest = IpcRequest<"shortcutRegister">;
 export type PreferencesSnapshot = IpcResponse<"preferencesRead">;
+export type { ExternalEditSession } from "../external-edit-contracts";
+export type ExternalEditCancelRequest = IpcRequest<"externalEditsCancel">;
+export type ExternalEditSubmitRequest = IpcRequest<"externalEditsSubmit">;
 
 export const autoArchiveStateChangedPayloadSchema = z.object({
   archivedCount: z.number(),
@@ -229,6 +254,11 @@ export const openBlockRequestedPayloadSchema = z.object({
   blockId: z.string(),
 });
 export type OpenBlockRequestedPayload = z.infer<typeof openBlockRequestedPayloadSchema>;
+
+export const externalEditSessionsChangedPayloadSchema = z.array(externalEditSessionSchema);
+export type ExternalEditSessionsChangedPayload = z.infer<
+  typeof externalEditSessionsChangedPayloadSchema
+>;
 
 export const shortcutPressedPayloadSchema = z.object({
   shortcut: z.string(),
@@ -246,6 +276,10 @@ export const ipcEventContracts = {
   autoArchiveStateChanged: {
     channel: "fluxnote:event:auto-archive://state-changed",
     payload: autoArchiveStateChangedPayloadSchema,
+  },
+  externalEditSessionsChanged: {
+    channel: "fluxnote:event:external-edit://sessions-changed",
+    payload: externalEditSessionsChangedPayloadSchema,
   },
   openBlockRequested: {
     channel: "fluxnote:event:open-block://requested",

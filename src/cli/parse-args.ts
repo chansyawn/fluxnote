@@ -5,10 +5,12 @@ export type FluxCliCommand =
       kind: "create";
       source:
         | {
+            edit: false;
             text: string;
             type: "text";
           }
         | {
+            edit: boolean;
             filePath: string;
             type: "file";
           };
@@ -21,6 +23,7 @@ export type FluxCliCommand =
     };
 
 interface FluxCliOptions {
+  edit?: unknown;
   file?: unknown;
   help?: unknown;
   text?: unknown;
@@ -35,7 +38,8 @@ export class FluxCliUsageError extends Error {
 
 function createCli() {
   return cac("flux")
-    .usage("[--text <text> | --file <path> | <path>]")
+    .usage("[--text <text> | --file <path> | <path>] [--edit]")
+    .option("--edit", "Edit a file-backed block and wait for submit or cancel")
     .option("--text <text>", "Create a block with inline text")
     .option("--file <path>", "Create a block from a UTF-8 text file")
     .help();
@@ -54,7 +58,7 @@ function getStringOption(value: unknown, flag: string): string | null {
 }
 
 function findUnknownOptions(options: Record<string, unknown>): string[] {
-  const allowedOptions = new Set(["--", "file", "help", "text"]);
+  const allowedOptions = new Set(["--", "edit", "file", "help", "text"]);
   return Object.keys(options).filter((key) => !allowedOptions.has(key));
 }
 
@@ -78,11 +82,16 @@ export function parseFluxArgs(argv: readonly string[]): FluxCliCommand {
 
   const text = getStringOption(options.text, "--text");
   const file = getStringOption(options.file, "--file");
+  const edit = Boolean(options.edit);
   const positionalFiles = parsed.args;
   const selectedInputCount =
     (text === null ? 0 : 1) + (file === null ? 0 : 1) + positionalFiles.length;
 
   if (selectedInputCount === 0) {
+    if (edit) {
+      throw new FluxCliUsageError("--edit requires a file path.");
+    }
+
     return { kind: "open" };
   }
 
@@ -91,9 +100,14 @@ export function parseFluxArgs(argv: readonly string[]): FluxCliCommand {
   }
 
   if (text !== null) {
+    if (edit) {
+      throw new FluxCliUsageError("--edit can only be used with --file or a file path.");
+    }
+
     return {
       kind: "create",
       source: {
+        edit: false,
         text,
         type: "text",
       },
@@ -103,6 +117,7 @@ export function parseFluxArgs(argv: readonly string[]): FluxCliCommand {
   return {
     kind: "create",
     source: {
+      edit,
       filePath: file ?? positionalFiles[0],
       type: "file",
     },

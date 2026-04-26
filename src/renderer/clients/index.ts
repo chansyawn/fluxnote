@@ -1,6 +1,12 @@
 export { getCliStatus, installCli, uninstallCli } from "@renderer/clients/cli";
 export { convertFileSrc, copyAsset, createAsset } from "@renderer/clients/assets";
 export {
+  cancelExternalEdit,
+  listExternalEditSessions,
+  onExternalEditSessionsChanged,
+  submitExternalEdit,
+} from "@renderer/clients/external-edits";
+export {
   acknowledgePendingOpenBlock,
   onOpenBlockRequested,
   readPendingOpenBlock,
@@ -16,6 +22,12 @@ export {
 } from "@renderer/clients/blocks";
 export { createTag, deleteTag, listTags, setBlockTags } from "@renderer/clients/tags";
 export type { CliStatus } from "@renderer/clients/cli";
+export type {
+  ExternalEditCancelRequest,
+  ExternalEditSession,
+  ExternalEditSessionsChangedPayload,
+  ExternalEditSubmitRequest,
+} from "@renderer/clients/external-edits";
 export type {
   CopyAssetRequest,
   CopyAssetResult,

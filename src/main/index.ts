@@ -13,6 +13,7 @@ import {
   createDeepLinkHandler,
   extractDeepLinkFromArgv,
 } from "./features/deep-link/deep-link-handler";
+import { createExternalEditManager } from "./features/external-edit/external-edit-manager";
 import { createEmitIpcEvent } from "./features/ipc/emit-ipc-event";
 import { registerIpcHandlers } from "./features/ipc/register-ipc-handlers";
 import { createOpenBlockHandler } from "./features/open-block/open-block-handler";
@@ -70,8 +71,12 @@ function startPrimaryInstance(): void {
   const emitIpcEvent = createEmitIpcEvent({
     getMainWindow: () => windowManager.getMainWindow(),
   });
+  const externalEditManager = createExternalEditManager({
+    emitEvent: emitIpcEvent,
+  });
   const autoArchiveRuntime = new AutoArchiveRuntime({
     emitEvent: emitIpcEvent,
+    getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
     settingsFilePath: settingsStore.path,
     store: backendStore,
@@ -81,6 +86,8 @@ function startPrimaryInstance(): void {
     showWindow: () => windowManager.showMainWindow(),
   });
   const backendCommandDispatcher = createBackendCommandDispatcher({
+    createExternalEditSession: (blockId, originalContent, signal) =>
+      externalEditManager.begin(blockId, originalContent, { signal }).result,
     getDb: async () => {
       await backendStore.init();
       return backendStore.getDb();
@@ -111,6 +118,7 @@ function startPrimaryInstance(): void {
     registerIpcHandlers({
       acknowledgePendingOpenBlock: (blockId) => openBlockHandler.acknowledgePending(blockId),
       emitEvent: emitIpcEvent,
+      externalEditManager,
       getMainWindow: () => windowManager.getMainWindow(),
       hideMainWindow: () => windowManager.hideMainWindow(),
       readPendingOpenBlock: () => openBlockHandler.readPending(),
@@ -168,6 +176,7 @@ function startPrimaryInstance(): void {
     autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
     trayManager.destroyTray();
+    externalEditManager.cancelAll();
     await cliIpcServer.close();
     await backendStore.close();
   });

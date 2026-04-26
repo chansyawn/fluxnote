@@ -3,13 +3,26 @@ import { type Block, updateBlockContent } from "@renderer/clients";
 import { NoteBlockEditorView } from "@renderer/features/note-block/note-block-editor-view";
 import { type NoteEditorShellHandle } from "@renderer/features/note-editor-core";
 import { useMutation } from "@tanstack/react-query";
-import { forwardRef, useEffect, useEffectEvent, useRef, type ReactNode } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useImperativeHandle,
+  useRef,
+  type ReactNode,
+} from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 interface NoteBlockEditorProps {
   block: Block;
   actions?: ReactNode;
+  isExternalEditPending?: boolean;
+  leadingActions?: ReactNode;
   onFocus: (blockId: string) => void;
+}
+
+export interface NoteBlockEditorHandle extends NoteEditorShellHandle {
+  flushPendingMarkdown: () => Promise<string>;
 }
 
 function updateBlockInCache(updatedBlock: Block): void {
@@ -22,18 +35,24 @@ function updateBlockInCache(updatedBlock: Block): void {
   });
 }
 
-export const NoteBlockEditor = forwardRef<NoteEditorShellHandle, NoteBlockEditorProps>(
-  function NoteBlockEditor({ block, actions, onFocus }, ref) {
+export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditorProps>(
+  function NoteBlockEditor(
+    { block, actions, isExternalEditPending = false, leadingActions, onFocus },
+    ref,
+  ) {
+    const editorShellRef = useRef<NoteEditorShellHandle | null>(null);
     const latestContentRef = useRef(block.content);
     const persistedContentRef = useRef(block.content);
     const latestRequestIdRef = useRef(0);
     const appliedRequestIdRef = useRef(0);
+    const savePromiseRef = useRef<Promise<void> | null>(null);
 
     useEffect(() => {
       latestContentRef.current = block.content;
       persistedContentRef.current = block.content;
       latestRequestIdRef.current = 0;
       appliedRequestIdRef.current = 0;
+      savePromiseRef.current = null;
     }, [block.id, block.content]);
 
     const saveMutation = useMutation({
@@ -66,10 +85,16 @@ export const NoteBlockEditor = forwardRef<NoteEditorShellHandle, NoteBlockEditor
       const requestId = latestRequestIdRef.current + 1;
       latestRequestIdRef.current = requestId;
 
-      void saveMutation
+      const savePromise = saveMutation
         .mutateAsync({ content, requestId })
         .then(handleSaveSuccess)
         .catch(handleSaveError);
+      savePromiseRef.current = savePromise;
+      void savePromise.finally(() => {
+        if (savePromiseRef.current === savePromise) {
+          savePromiseRef.current = null;
+        }
+      });
     });
 
     const debouncedSave = useDebouncedCallback(
@@ -95,11 +120,29 @@ export const NoteBlockEditor = forwardRef<NoteEditorShellHandle, NoteBlockEditor
       debouncedSave.flush();
     });
 
+    const flushPendingMarkdown = useEffectEvent(async () => {
+      debouncedSave.flush();
+      await savePromiseRef.current;
+      return latestContentRef.current;
+    });
+
+    useImperativeHandle(ref, () => ({
+      copyContent: async () => {
+        await editorShellRef.current?.copyContent();
+      },
+      flushPendingMarkdown,
+      focus: () => {
+        editorShellRef.current?.focus();
+      },
+    }));
+
     return (
       <NoteBlockEditorView
         blockId={block.id}
-        ref={ref}
+        ref={editorShellRef}
         initialMarkdown={block.content}
+        isExternalEditPending={isExternalEditPending}
+        leadingActions={leadingActions}
         willArchive={block.willArchive}
         actions={actions}
         onBlur={flushPendingSave}
