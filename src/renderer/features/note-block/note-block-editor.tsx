@@ -1,5 +1,5 @@
 import { queryClient } from "@renderer/app/query";
-import { type Block, updateBlockContent } from "@renderer/clients";
+import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/clients";
 import { NoteBlockEditorView } from "@renderer/features/note-block/note-block-editor-view";
 import { type NoteEditorShellHandle } from "@renderer/features/note-editor-core";
 import { useMutation } from "@tanstack/react-query";
@@ -26,12 +26,15 @@ export interface NoteBlockEditorHandle extends NoteEditorShellHandle {
 }
 
 function updateBlockInCache(updatedBlock: Block): void {
-  queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
+  queryClient.setQueriesData<ListBlocksResult>({ queryKey: ["blocks"] }, (current) => {
     if (!current) {
       return current;
     }
 
-    return current.map((block) => (block.id === updatedBlock.id ? updatedBlock : block));
+    return {
+      ...current,
+      blocks: current.blocks.map((block) => (block.id === updatedBlock.id ? updatedBlock : block)),
+    };
   });
 }
 
@@ -112,9 +115,12 @@ export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditor
         if (latestContentRef.current !== persistedContentRef.current) {
           const id = blockIdRef.current;
           const content = latestContentRef.current;
-          queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
+          queryClient.setQueriesData<ListBlocksResult>({ queryKey: ["blocks"] }, (current) => {
             if (!current) return current;
-            return current.map((b) => (b.id === id ? { ...b, content } : b));
+            return {
+              ...current,
+              blocks: current.blocks.map((b) => (b.id === id ? { ...b, content } : b)),
+            };
           });
         }
         debouncedSave.flush();

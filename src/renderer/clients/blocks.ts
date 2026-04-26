@@ -5,6 +5,9 @@ import type {
   DeleteBlockRequest,
   DeleteBlockResult,
   ListBlocksRequest,
+  ListBlocksResult,
+  LocateBlockRequest,
+  LocateBlockResult,
   UpdateBlockContentRequest,
 } from "@shared/ipc/contracts";
 
@@ -14,13 +17,19 @@ export type {
   DeleteBlockRequest,
   DeleteBlockResult,
   ListBlocksRequest,
+  ListBlocksResult,
+  LocateBlockRequest,
+  LocateBlockResult,
   UpdateBlockContentRequest,
 } from "@shared/ipc/contracts";
 
 export type BlockVisibility = "active" | "archived";
 
-export const listBlocks = (req: ListBlocksRequest = {}): Promise<Block[]> =>
+export const listBlocks = (req: ListBlocksRequest = {}): Promise<ListBlocksResult> =>
   invokeCommand("blocksList", req);
+
+export const locateBlock = (req: LocateBlockRequest): Promise<LocateBlockResult> =>
+  invokeCommand("blocksLocate", req);
 
 export const createBlock = (): Promise<Block> => invokeCommand("blocksCreate", undefined);
 

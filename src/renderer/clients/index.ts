@@ -17,6 +17,7 @@ export {
   createBlock,
   deleteBlock,
   listBlocks,
+  locateBlock,
   restoreBlock,
   updateBlockContent,
 } from "@renderer/clients/blocks";
@@ -42,6 +43,9 @@ export type {
   BlockVisibility,
   DeleteBlockResult,
   ListBlocksRequest,
+  ListBlocksResult,
+  LocateBlockRequest,
+  LocateBlockResult,
   UpdateBlockContentRequest,
 } from "@renderer/clients/blocks";
 export type {

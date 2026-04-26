@@ -1,5 +1,10 @@
 import { queryClient } from "@renderer/app/query";
-import type { Block, BlockVisibility } from "@renderer/clients";
+import type {
+  Block,
+  BlockVisibility,
+  ListBlocksResult,
+  LocateBlockResult,
+} from "@renderer/clients";
 import type { Tag } from "@renderer/clients/tags";
 import {
   type BlockMutationOperation,
@@ -10,7 +15,8 @@ import { useWorkspaceViewState } from "@renderer/routes/-features/use-workspace-
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
 interface BlockWorkspaceState {
-  blocks: Block[];
+  loadedBlocks: Block[];
+  totalBlockCount: number;
   tags: Tag[];
   visibility: BlockVisibility;
   selectedTagIds: string[];
@@ -20,6 +26,10 @@ interface BlockWorkspaceState {
   isBlockLocked: (blockId: string) => boolean;
   isBlockOpPending: (blockId: string, op: BlockMutationOperation) => boolean;
   isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
+  getBlockAtIndex: (index: number) => Block | undefined;
+  ensureBlockIndex: (index: number) => void;
+  ensureBlockIndexLoaded: (index: number) => Promise<void>;
+  locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   setVisibility: (visibility: BlockVisibility) => void;
   setSelectedTagFilters: (tagIds: string[]) => void;
   createBlock: () => Promise<Block>;
@@ -67,8 +77,10 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
     async (blockId: string, name: string) => {
       const createdTag = await data.createTag(name);
       let targetBlock: Block | undefined;
-      for (const [, blocks] of queryClient.getQueriesData<Block[]>({ queryKey: ["blocks"] })) {
-        targetBlock = blocks?.find((b) => b.id === blockId);
+      for (const [, page] of queryClient.getQueriesData<ListBlocksResult>({
+        queryKey: ["blocks"],
+      })) {
+        targetBlock = page?.blocks.find((b) => b.id === blockId);
         if (targetBlock) break;
       }
       const nextTagIds = targetBlock
@@ -91,7 +103,8 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
   );
 
   const contextValue: BlockWorkspaceState = {
-    blocks: data.blocks,
+    loadedBlocks: data.loadedBlocks,
+    totalBlockCount: data.totalBlockCount,
     tags: data.tags,
     visibility: viewState.visibility,
     selectedTagIds: viewState.selectedTagIds,
@@ -101,6 +114,10 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
     isBlockLocked: data.isBlockLocked,
     isBlockOpPending: data.isBlockOpPending,
     isTagOpPending: data.isTagOpPending,
+    getBlockAtIndex: data.getBlockAtIndex,
+    ensureBlockIndex: data.ensureBlockIndex,
+    ensureBlockIndexLoaded: data.ensureBlockIndexLoaded,
+    locateBlockInView: data.locateBlockInView,
     setVisibility: viewState.setVisibility,
     setSelectedTagFilters: viewState.setSelectedTagIds,
     createBlock: data.createBlock,

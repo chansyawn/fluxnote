@@ -1,36 +1,35 @@
-import { queryClient } from "@renderer/app/query";
-import type { Block, BlockVisibility } from "@renderer/clients";
-import { listBlocks } from "@renderer/clients";
-import { blockListQueryKey } from "@renderer/features/note-block/note-query-key";
+import type { BlockVisibility, LocateBlockResult } from "@renderer/clients";
+import { locateBlock } from "@renderer/clients";
 import { useEffect, useEffectEvent } from "react";
 import { toast } from "sonner";
 
 /**
- * Fetches a fresh active-blocks list and returns whether the given block exists.
+ * Resolves a fresh locate result into the navigation status used by the route effect.
  * Extracted as a pure async function so it can be tested independently.
  */
-export async function locateBlock(
+export async function resolveLocatedBlock(
   blockId: string,
-  fetchBlocks: () => Promise<Block[]>,
-): Promise<"found" | "not_found"> {
-  const blocks = await fetchBlocks();
-  return blocks.some((block) => block.id === blockId) ? "found" : "not_found";
+  locate: () => Promise<LocateBlockResult>,
+): Promise<{ status: "found"; blockId: string; index: number } | { status: "not_found" }> {
+  const result = await locate();
+  return result && result.block.id === blockId
+    ? { status: "found", blockId: result.block.id, index: result.index }
+    : { status: "not_found" };
 }
 
 interface UseOpenBlockTargetOptions {
   pendingBlockId: string | null;
   onSetVisibility: (visibility: BlockVisibility) => void;
   onClearFilters: () => void;
-  onFocus: (blockId: string) => void;
+  onFocus: (blockId: string, index: number) => void;
   onAcknowledge: (blockId: string) => void;
 }
 
 /**
  * Manages the full lifecycle of navigating to a pending open-block request.
  *
- * When pendingBlockId arrives, resets filter state then fetches a fresh active-blocks list via
- * fetchQuery. The existence check runs against that fresh data, eliminating the race condition
- * where invalidateQueries was called but isRefreshing had not yet become true.
+ * When pendingBlockId arrives, resets filter state then asks the backend for the block's active
+ * list index. That keeps deep jumps working even when the target page has not been loaded.
  *
  * Callbacks are wrapped in useEffectEvent so inline functions passed by callers do not cause
  * the effect to re-run on every render.
@@ -47,18 +46,20 @@ export function useOpenBlockTarget({
     onClearFilters();
 
     try {
-      const result = await locateBlock(blockId, () =>
-        queryClient.fetchQuery({
-          queryKey: blockListQueryKey([], "active"),
-          queryFn: () => listBlocks({ visibility: "active" }),
-          staleTime: 0, // bypass the global 30s staleTime to always fetch fresh data
-        }),
+      const result = await resolveLocatedBlock(blockId, () =>
+        locateBlock({ blockId, visibility: "active" }),
       );
 
       if (isCancelled()) return;
 
-      if (result === "found") {
-        onFocus(blockId);
+      if (result.status === "found") {
+        onAcknowledge(blockId);
+        setTimeout(() => {
+          if (!isCancelled()) {
+            onFocus(result.blockId, result.index);
+          }
+        }, 0);
+        return;
       } else {
         toast.error("Block not found", {
           description: "The requested block does not exist or has been archived.",

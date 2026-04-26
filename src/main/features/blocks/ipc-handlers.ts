@@ -22,6 +22,8 @@ async function listBlocks(
   db: AppDatabase,
   tagIds: string[] | undefined,
   visibility: "active" | "archived",
+  offset: number,
+  limit: number,
 ) {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
@@ -51,20 +53,106 @@ async function listBlocks(
         blocks.updatedAt,
       )
       .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
-      .orderBy(asc(blocks.position))
+      .orderBy(asc(blocks.position), asc(blocks.id))
+      .limit(limit)
+      .offset(offset)
       .all();
   } else {
     blockRows = db
       .select(selectedFields)
       .from(blocks)
       .where(archivedPredicate)
-      .orderBy(asc(blocks.position))
+      .orderBy(asc(blocks.position), asc(blocks.id))
+      .limit(limit)
+      .offset(offset)
       .all();
   }
 
   const blockIds = blockRows.map((block) => block.id);
   const tagsByBlockId = getTagsForBlocks(db, blockIds);
-  return blockRows.map((block) => mapBlockRow(block, tagsByBlockId.get(block.id) ?? []));
+  return {
+    blocks: blockRows.map((block) => mapBlockRow(block, tagsByBlockId.get(block.id) ?? [])),
+    offset,
+    limit,
+    totalCount: countBlocks(db, uniqueTagIds, visibility),
+  };
+}
+
+function countBlocks(
+  db: AppDatabase,
+  tagIds: readonly string[],
+  visibility: "active" | "archived",
+  beforePosition?: { position: number; id: string },
+): number {
+  const archivedPredicate =
+    visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
+  const beforePredicate = beforePosition
+    ? sql`(${blocks.position} < ${beforePosition.position} OR (${blocks.position} = ${beforePosition.position} AND ${blocks.id} < ${beforePosition.id}))`
+    : undefined;
+
+  if (tagIds.length === 0) {
+    const row = db
+      .select({ totalCount: sql<number>`count(*)` })
+      .from(blocks)
+      .where(and(archivedPredicate, beforePredicate))
+      .get();
+    return row?.totalCount ?? 0;
+  }
+
+  const filtered = db
+    .select({ id: blocks.id })
+    .from(blocks)
+    .innerJoin(blockTags, eq(blockTags.blockId, blocks.id))
+    .where(and(archivedPredicate, inArray(blockTags.tagId, [...tagIds]), beforePredicate))
+    .groupBy(blocks.id)
+    .having(sql`count(distinct ${blockTags.tagId}) = ${tagIds.length}`)
+    .as("filtered");
+  const row = db
+    .select({ totalCount: sql<number>`count(*)` })
+    .from(filtered)
+    .get();
+  return row?.totalCount ?? 0;
+}
+
+function locateBlock(
+  db: AppDatabase,
+  blockId: string,
+  tagIds: string[] | undefined,
+  visibility: "active" | "archived",
+) {
+  const archivedPredicate =
+    visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
+  const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
+
+  const targetBlock = db
+    .select({ id: blocks.id, position: blocks.position })
+    .from(blocks)
+    .where(and(archivedPredicate, eq(blocks.id, blockId)))
+    .get();
+  if (!targetBlock) {
+    return null;
+  }
+
+  if (uniqueTagIds.length > 0) {
+    const tagMatch = db
+      .select({ matchCount: sql<number>`count(distinct ${blockTags.tagId})` })
+      .from(blockTags)
+      .where(and(eq(blockTags.blockId, blockId), inArray(blockTags.tagId, uniqueTagIds)))
+      .get();
+    if (!tagMatch || tagMatch.matchCount < uniqueTagIds.length) {
+      return null;
+    }
+  }
+
+  const index = countBlocks(db, uniqueTagIds, visibility, {
+    position: targetBlock.position,
+    id: targetBlock.id,
+  });
+
+  return {
+    block: getPublicBlockById(db, blockId),
+    index,
+  };
 }
 
 export function createBlocksCommandHandlers(
@@ -74,7 +162,24 @@ export function createBlocksCommandHandlers(
     defineIpcCommandHandler({
       key: "blocksList",
       async handle(request) {
-        return await listBlocks(await services.getDb(), request.tagIds, request.visibility);
+        return listBlocks(
+          await services.getDb(),
+          request.tagIds,
+          request.visibility,
+          request.offset,
+          request.limit,
+        );
+      },
+    }),
+    defineIpcCommandHandler({
+      key: "blocksLocate",
+      async handle(request) {
+        return locateBlock(
+          await services.getDb(),
+          request.blockId,
+          request.tagIds,
+          request.visibility,
+        );
       },
     }),
     defineIpcCommandHandler({

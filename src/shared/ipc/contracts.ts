@@ -30,6 +30,30 @@ export const blockMutationRequestSchema = z.object({
 export const openBlockPendingSchema = z.object({
   blockId: z.string().nullable(),
 });
+export const blockVisibilitySchema = z.enum(["active", "archived"]);
+export const blocksListRequestSchema = z.object({
+  tagIds: z.array(z.string()).optional(),
+  visibility: blockVisibilitySchema.default("active"),
+  offset: z.number().int().min(0).default(0),
+  limit: z.number().int().min(1).max(200).default(50),
+});
+export const blocksListResponseSchema = z.object({
+  blocks: z.array(blockSchema),
+  offset: z.number().int().min(0),
+  limit: z.number().int().min(1),
+  totalCount: z.number().int().min(0),
+});
+export const blocksLocateRequestSchema = z.object({
+  blockId: z.string().min(1),
+  tagIds: z.array(z.string()).optional(),
+  visibility: blockVisibilitySchema.default("active"),
+});
+export const blocksLocateResponseSchema = z
+  .object({
+    block: blockSchema,
+    index: z.number().int().min(0),
+  })
+  .nullable();
 
 export const ipcCommandContracts = {
   cliInstall: {
@@ -88,11 +112,13 @@ export const ipcCommandContracts = {
   },
   blocksList: {
     channel: "fluxnote:blocks:list",
-    request: z.object({
-      tagIds: z.array(z.string()).optional(),
-      visibility: z.enum(["active", "archived"]).default("active"),
-    }),
-    response: z.array(blockSchema),
+    request: blocksListRequestSchema,
+    response: blocksListResponseSchema,
+  },
+  blocksLocate: {
+    channel: "fluxnote:blocks:locate",
+    request: blocksLocateRequestSchema,
+    response: blocksLocateResponseSchema,
   },
   blocksRestore: {
     channel: "fluxnote:blocks:restore",
@@ -224,6 +250,9 @@ export type GreetRequest = IpcRequest<"sampleGreet">;
 export type GreetResponse = IpcResponse<"sampleGreet">;
 export type ListBlocksRequest = IpcRequest<"blocksList">;
 export type ParsedListBlocksRequest = ParsedIpcRequest<"blocksList">;
+export type ListBlocksResult = IpcResponse<"blocksList">;
+export type LocateBlockRequest = IpcRequest<"blocksLocate">;
+export type LocateBlockResult = IpcResponse<"blocksLocate">;
 export type UpdateBlockContentRequest = IpcRequest<"blocksUpdateContent">;
 export type BlockMutationRequest = IpcRequest<"blocksArchive">;
 export type DeleteBlockRequest = IpcRequest<"blocksDelete">;

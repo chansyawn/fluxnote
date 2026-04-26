@@ -11,6 +11,7 @@ import {
   forwardRef,
   memo,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useMemo,
@@ -25,11 +26,13 @@ const BLOCK_GAP_PX = 12;
 const BLOCK_OVERSCAN = 3;
 
 export interface VirtualBlockListHandle {
-  scrollToBlock: (blockId: string) => void;
+  scrollToIndex: (index: number) => void;
 }
 
 interface VirtualBlockListProps {
-  blocks: Block[];
+  totalCount: number;
+  getBlockAtIndex: (index: number) => Block | undefined;
+  ensureBlockIndex: (index: number) => void;
   tags: Tag[];
   visibility: BlockVisibility;
   sessionsByBlockId: Map<string, ExternalEditSession>;
@@ -170,7 +173,9 @@ const VirtualBlockItem = memo(function VirtualBlockItem({
 export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockListProps>(
   function VirtualBlockList(
     {
-      blocks,
+      totalCount,
+      getBlockAtIndex,
+      ensureBlockIndex,
       tags,
       visibility,
       sessionsByBlockId,
@@ -195,10 +200,10 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
     const [scrollMargin, setScrollMargin] = useState(0);
 
     const blockVirtualizer = useVirtualizer({
-      count: blocks.length,
+      count: totalCount,
       estimateSize: () => BLOCK_ESTIMATED_SIZE_PX,
       gap: BLOCK_GAP_PX,
-      getItemKey: (index) => blocks[index]?.id ?? index,
+      getItemKey: (index) => index,
       getScrollElement: () => scrollElement,
       overscan: BLOCK_OVERSCAN,
       scrollMargin,
@@ -253,20 +258,34 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
     useImperativeHandle(
       ref,
       () => ({
-        scrollToBlock: (blockId: string) => {
-          const blockIndex = blocks.findIndex((block) => block.id === blockId);
-          if (blockIndex === -1) {
+        scrollToIndex: (index: number) => {
+          if (index < 0 || index >= totalCount) {
             return;
           }
 
-          blockVirtualizer.scrollToIndex(blockIndex, { align: "center" });
+          blockVirtualizer.scrollToIndex(index, { align: "center" });
         },
       }),
-      [blockVirtualizer, blocks],
+      [blockVirtualizer, totalCount],
     );
 
     const isTagCreatePending = isTagOpPending("create");
     const virtualBlocks = blockVirtualizer.getVirtualItems();
+    const prevVisibleRangeRef = useRef<{ start: number; end: number } | null>(null);
+
+    useEffect(() => {
+      if (virtualBlocks.length === 0) return;
+
+      const start = virtualBlocks[0].index;
+      const end = virtualBlocks[virtualBlocks.length - 1].index;
+      const prev = prevVisibleRangeRef.current;
+      if (prev && prev.start === start && prev.end === end) return;
+
+      prevVisibleRangeRef.current = { start, end };
+      for (const virtualBlock of virtualBlocks) {
+        ensureBlockIndex(virtualBlock.index);
+      }
+    });
 
     return (
       <div ref={setListElement} className="pt-2">
@@ -277,12 +296,9 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
           }}
         >
           {virtualBlocks.map((virtualBlock) => {
-            const block = blocks[virtualBlock.index];
-            if (!block) {
-              return null;
-            }
+            const block = getBlockAtIndex(virtualBlock.index);
 
-            const externalEditSession = sessionsByBlockId.get(block.id);
+            const externalEditSession = block ? sessionsByBlockId.get(block.id) : undefined;
 
             return (
               <div
@@ -296,33 +312,37 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
                   }px)`,
                 }}
               >
-                <VirtualBlockItem
-                  block={block}
-                  tags={tags}
-                  visibility={visibility}
-                  externalEditSession={externalEditSession}
-                  isExternalEditPending={
-                    externalEditSession
-                      ? pendingExternalEditIds.has(externalEditSession.editId)
-                      : false
-                  }
-                  isLocked={isBlockLocked(block.id)}
-                  isArchivePending={isBlockOpPending(
-                    block.id,
-                    visibility === "active" ? "archive" : "restore",
-                  )}
-                  isDeletePending={isBlockOpPending(block.id, "delete")}
-                  isTagCreatePending={isTagCreatePending}
-                  registerEditorRef={registerEditorRef}
-                  onArchiveBlock={onArchiveBlock}
-                  onRestoreBlock={onRestoreBlock}
-                  onDeleteBlock={onDeleteBlock}
-                  onCreateTag={onCreateTag}
-                  onAssignTags={onAssignTags}
-                  onCancelExternalEdit={onCancelExternalEdit}
-                  onSubmitExternalEdit={onSubmitExternalEdit}
-                  onFocusBlock={onFocusBlock}
-                />
+                {block ? (
+                  <VirtualBlockItem
+                    block={block}
+                    tags={tags}
+                    visibility={visibility}
+                    externalEditSession={externalEditSession}
+                    isExternalEditPending={
+                      externalEditSession
+                        ? pendingExternalEditIds.has(externalEditSession.editId)
+                        : false
+                    }
+                    isLocked={isBlockLocked(block.id)}
+                    isArchivePending={isBlockOpPending(
+                      block.id,
+                      visibility === "active" ? "archive" : "restore",
+                    )}
+                    isDeletePending={isBlockOpPending(block.id, "delete")}
+                    isTagCreatePending={isTagCreatePending}
+                    registerEditorRef={registerEditorRef}
+                    onArchiveBlock={onArchiveBlock}
+                    onRestoreBlock={onRestoreBlock}
+                    onDeleteBlock={onDeleteBlock}
+                    onCreateTag={onCreateTag}
+                    onAssignTags={onAssignTags}
+                    onCancelExternalEdit={onCancelExternalEdit}
+                    onSubmitExternalEdit={onSubmitExternalEdit}
+                    onFocusBlock={onFocusBlock}
+                  />
+                ) : (
+                  <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
+                )}
               </div>
             );
           })}

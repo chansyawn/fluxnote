@@ -6,16 +6,24 @@ import {
   deleteBlock,
   deleteTag,
   listBlocks,
+  locateBlock,
   listTags,
   restoreBlock,
   setBlockTags,
   type Block,
   type BlockVisibility,
+  type ListBlocksResult,
+  type LocateBlockResult,
   type Tag,
 } from "@renderer/clients";
-import { blockListQueryKey, tagListQueryKey } from "@renderer/features/note-block/note-query-key";
-import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import {
+  BLOCKS_PAGE_SIZE,
+  blockListPageQueryKey,
+  getBlockPageOffset,
+  tagListQueryKey,
+} from "@renderer/features/note-block/note-query-key";
+import { useMutation, useMutationState, useQueries, useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export type BlockMutationOperation = "archive" | "restore" | "delete" | "setTags";
@@ -27,10 +35,15 @@ interface UseWorkspaceDataParams {
 }
 
 interface UseWorkspaceDataResult {
-  blocks: Block[];
+  loadedBlocks: Block[];
+  totalBlockCount: number;
   tags: Tag[];
   isInitialLoading: boolean;
   isRefreshing: boolean;
+  getBlockAtIndex: (index: number) => Block | undefined;
+  ensureBlockIndex: (index: number) => void;
+  ensureBlockIndexLoaded: (index: number) => Promise<void>;
+  locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   isCreatingBlock: boolean;
   createBlock: () => Promise<Block>;
   archiveBlock: (blockId: string) => Promise<Block>;
@@ -101,19 +114,130 @@ export function useWorkspaceData({
   visibility,
   selectedTagIds,
 }: UseWorkspaceDataParams): UseWorkspaceDataResult {
-  const blocksQuery = useQuery({
-    queryKey: blockListQueryKey(selectedTagIds, visibility),
-    queryFn: async () =>
-      await listBlocks({
-        tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
-        visibility,
-      }),
-    placeholderData: (previousData) => previousData,
+  const normalizedTagIds = useMemo(
+    () => [...selectedTagIds].sort((left, right) => left.localeCompare(right)),
+    [selectedTagIds],
+  );
+  const viewCacheKey = `${visibility}:${normalizedTagIds.join("\u0000")}`;
+  const [requestedPageOffsets, setRequestedPageOffsets] = useState<Set<number>>(() => new Set([0]));
+
+  useEffect(() => {
+    setRequestedPageOffsets(new Set([0]));
+  }, [viewCacheKey]);
+
+  const requestedOffsets = useMemo(
+    () => [...requestedPageOffsets].sort((left, right) => left - right),
+    [requestedPageOffsets],
+  );
+
+  const ensureBlockIndex = useCallback((index: number) => {
+    if (index < 0) {
+      return;
+    }
+
+    const offset = getBlockPageOffset(index);
+    setRequestedPageOffsets((currentOffsets) => {
+      if (currentOffsets.has(offset)) {
+        return currentOffsets;
+      }
+
+      const nextOffsets = new Set(currentOffsets);
+      nextOffsets.add(offset);
+      return nextOffsets;
+    });
+  }, []);
+
+  const pageQueries = useQueries({
+    queries: requestedOffsets.map((offset) => ({
+      queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
+      queryFn: async () =>
+        await listBlocks({
+          tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
+          visibility,
+          offset,
+          limit: BLOCKS_PAGE_SIZE,
+        }),
+      placeholderData: (previousData: ListBlocksResult | undefined) => previousData,
+    })),
   });
   const tagsQuery = useQuery({
     queryKey: tagListQueryKey,
     queryFn: listTags,
   });
+
+  const pagesByOffset = useMemo(() => {
+    const pages = new Map<number, ListBlocksResult>();
+    pageQueries.forEach((query, queryIndex) => {
+      const page = query.data;
+      if (page) {
+        pages.set(requestedOffsets[queryIndex], page);
+      }
+    });
+    return pages;
+  }, [pageQueries, requestedOffsets]);
+
+  const loadedBlocks = useMemo(
+    () =>
+      [...pagesByOffset.values()]
+        .sort((left, right) => left.offset - right.offset)
+        .flatMap((page) => page.blocks),
+    [pagesByOffset],
+  );
+  const totalBlockCount = useMemo(() => {
+    let latest: ListBlocksResult | undefined;
+    for (const query of pageQueries) {
+      if (query.data) {
+        latest = query.data;
+      }
+    }
+    return latest?.totalCount ?? 0;
+  }, [pageQueries]);
+
+  const getBlockAtIndex = useCallback(
+    (index: number) => {
+      if (index < 0) {
+        return undefined;
+      }
+
+      const offset = getBlockPageOffset(index);
+      const page = pagesByOffset.get(offset);
+      return page?.blocks[index - offset];
+    },
+    [pagesByOffset],
+  );
+
+  const ensureBlockIndexLoaded = useCallback(
+    async (index: number) => {
+      if (index < 0) {
+        return;
+      }
+
+      ensureBlockIndex(index);
+      const offset = getBlockPageOffset(index);
+      await queryClient.fetchQuery({
+        queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
+        queryFn: async () =>
+          await listBlocks({
+            tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
+            visibility,
+            offset,
+            limit: BLOCKS_PAGE_SIZE,
+          }),
+        staleTime: 0,
+      });
+    },
+    [ensureBlockIndex, normalizedTagIds, visibility],
+  );
+
+  const locateBlockInView = useCallback(
+    async (blockId: string) =>
+      await locateBlock({
+        blockId,
+        tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
+        visibility,
+      }),
+    [normalizedTagIds, visibility],
+  );
 
   const createBlockMutation = useMutation({
     mutationKey: ["blocks", "create"],
@@ -239,10 +363,15 @@ export function useWorkspaceData({
   );
 
   return {
-    blocks: blocksQuery.data ?? [],
+    loadedBlocks,
+    totalBlockCount,
     tags: tagsQuery.data ?? [],
-    isInitialLoading: blocksQuery.data === undefined || tagsQuery.data === undefined,
-    isRefreshing: blocksQuery.isFetching || tagsQuery.isFetching,
+    isInitialLoading: pagesByOffset.get(0) === undefined || tagsQuery.data === undefined,
+    isRefreshing: pageQueries.some((query) => query.isFetching) || tagsQuery.isFetching,
+    getBlockAtIndex,
+    ensureBlockIndex,
+    ensureBlockIndexLoaded,
+    locateBlockInView,
     isCreatingBlock: createBlockMutation.isPending,
     createBlock: stableCreateBlock,
     archiveBlock: stableArchiveBlock,
