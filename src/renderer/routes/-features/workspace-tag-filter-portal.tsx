@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
-import { TagComboboxPopover } from "@renderer/routes/-features/tag-combobox-popover";
-import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
+import type { BlockVisibility, Tag } from "@renderer/clients";
+import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
+import type { TagMutationOperation } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
 import { ArchiveIcon, ArchiveRestoreIcon, TagsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -8,17 +9,27 @@ import { createPortal } from "react-dom";
 
 const TITLEBAR_ACTIONS_ID = "titlebar-workspace-actions";
 
-export function WorkspaceTagFilterPortal() {
-  const {
-    tags,
-    visibility,
-    selectedTagIds,
-    isTagOpPending,
-    setVisibility,
-    setSelectedTagFilters,
-    createTagAndSelectForFilter,
-    deleteTag,
-  } = useBlockWorkspace();
+interface WorkspaceTagFilterPortalProps {
+  tags: Tag[];
+  visibility: BlockVisibility;
+  selectedTagIds: string[];
+  isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
+  onSetVisibility: (v: BlockVisibility) => void;
+  onSetSelectedTagIds: (ids: string[]) => void;
+  onCreateTag: (name: string) => Promise<void>;
+  onDeleteTag: (tagId: string) => Promise<void>;
+}
+
+export function WorkspaceTagFilterPortal({
+  tags,
+  visibility,
+  selectedTagIds,
+  isTagOpPending,
+  onSetVisibility,
+  onSetSelectedTagIds,
+  onCreateTag,
+  onDeleteTag,
+}: WorkspaceTagFilterPortalProps) {
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -35,7 +46,7 @@ export function WorkspaceTagFilterPortal() {
         size="icon"
         variant="ghost"
         onClick={() => {
-          setVisibility(visibility === "active" ? "archived" : "active");
+          onSetVisibility(visibility === "active" ? "archived" : "active");
         }}
       >
         {visibility === "active" ? (
@@ -65,9 +76,9 @@ export function WorkspaceTagFilterPortal() {
             </span>
           </>
         }
-        onCreateTag={createTagAndSelectForFilter}
-        onDeleteTag={deleteTag}
-        onSelectedTagIdsChange={setSelectedTagFilters}
+        onCreateTag={onCreateTag}
+        onDeleteTag={onDeleteTag}
+        onSelectedTagIdsChange={onSetSelectedTagIds}
       />
     </div>,
     portalTarget,

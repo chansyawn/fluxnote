@@ -3,67 +3,8 @@ import { businessError } from "@shared/ipc/errors";
 import { eq, inArray, sql } from "drizzle-orm";
 
 import type { AppDatabase } from "../database/database-client";
-import {
-  blockTags,
-  blocks,
-  tags,
-  type BlockRecord,
-  type TagRecord,
-} from "../database/database-schema";
-
-export const assetUrlScheme = "assets://";
-
-export function nowIsoString(): string {
-  return new Date().toISOString();
-}
-
-export function sanitizeFileName(fileName: string): string {
-  return (
-    fileName
-      .replace(/[^a-zA-Z0-9._-]/g, "_")
-      .replace(/_+/g, "_")
-      .slice(0, 120) || "asset"
-  );
-}
-
-export function extFromMimeType(mimeType: string): string {
-  switch (mimeType) {
-    case "image/png":
-      return "png";
-    case "image/jpeg":
-      return "jpg";
-    case "image/webp":
-      return "webp";
-    case "image/gif":
-      return "gif";
-    default:
-      return "bin";
-  }
-}
-
-export function splitAssetUrl(assetUrl: string): { blockId: string; fileName: string } {
-  if (!assetUrl.startsWith(assetUrlScheme)) {
-    throw businessError("BUSINESS.INVALID_INVOKE", "Invalid asset url", { assetUrl });
-  }
-
-  const suffix = assetUrl.slice(assetUrlScheme.length);
-  const [blockId, ...fileNameParts] = suffix.split("/");
-  const fileName = fileNameParts.join("/");
-  if (!blockId || !fileName) {
-    throw businessError("BUSINESS.INVALID_INVOKE", "Invalid asset url", { assetUrl });
-  }
-
-  return { blockId, fileName };
-}
-
-export function mapTagRow(tag: TagRecord): Tag {
-  return {
-    id: tag.id,
-    name: tag.name,
-    createdAt: tag.createdAt,
-    updatedAt: tag.updatedAt,
-  };
-}
+import { blockTags, blocks, tags, type BlockRecord } from "../database/database-schema";
+import { mapTagRow } from "../tags/tag-records";
 
 export function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
   return {
@@ -131,12 +72,4 @@ export function getNextBlockPosition(db: AppDatabase): number {
     .from(blocks)
     .get();
   return (row?.maxPosition ?? 0) + 1;
-}
-
-export function isSqliteUniqueConstraint(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  return error.message.includes("UNIQUE constraint failed");
 }

@@ -1,19 +1,15 @@
 import { businessError, internalError } from "@shared/ipc/errors";
 import { eq, inArray, sql } from "drizzle-orm";
 
-import {
-  assertBlockExists,
-  getPublicBlockById,
-  isSqliteUniqueConstraint,
-  mapTagRow,
-  nowIsoString,
-} from "../blocks/block-records";
+import { assertBlockExists, getPublicBlockById } from "../blocks/block-records";
 import type { AppDatabase } from "../database/database-client";
 import { blockTags, blocks, tags } from "../database/database-schema";
+import { isSqliteUniqueConstraint, nowIsoString } from "../database/db-utils";
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
+import { mapTagRow } from "./tag-records";
 
 interface TagsCommandServices {
   getDb: () => Promise<AppDatabase>;

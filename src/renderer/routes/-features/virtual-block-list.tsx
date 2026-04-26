@@ -1,5 +1,5 @@
 import { useScrollContainer } from "@renderer/app/scroll-container";
-import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
+import type { Block } from "@renderer/clients";
 import { BlockActions } from "@renderer/features/note-block/block-actions";
 import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
 import {
@@ -19,7 +19,7 @@ import {
   useState,
 } from "react";
 
-import type { BlockMutationOperation, TagMutationOperation } from "./use-workspace-data";
+import { useBlockListItemActions } from "./block-list-context";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
@@ -33,65 +33,10 @@ interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
-  tags: Tag[];
-  visibility: BlockVisibility;
-  sessionsByBlockId: Map<string, ExternalEditSession>;
-  pendingExternalEditIds: Set<string>;
-  registerEditorRef: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
-  isBlockLocked: (blockId: string) => boolean;
-  isBlockOpPending: (blockId: string, op: BlockMutationOperation) => boolean;
-  isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
-  onArchiveBlock: (blockId: string) => void;
-  onRestoreBlock: (blockId: string) => void;
-  onDeleteBlock: (blockId: string) => void;
-  onCreateTag: (blockId: string, name: string) => Promise<void>;
-  onAssignTags: (blockId: string, tagIds: string[]) => Promise<void>;
-  onCancelExternalEdit: (editId: string) => void;
-  onSubmitExternalEdit: (blockId: string, editId: string) => void;
-  onFocusBlock: (blockId: string) => void;
 }
 
-interface VirtualBlockItemProps {
-  block: Block;
-  tags: Tag[];
-  visibility: BlockVisibility;
-  externalEditSession: ExternalEditSession | undefined;
-  isExternalEditPending: boolean;
-  isLocked: boolean;
-  isArchivePending: boolean;
-  isDeletePending: boolean;
-  isTagCreatePending: boolean;
-  registerEditorRef: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
-  onArchiveBlock: (blockId: string) => void;
-  onRestoreBlock: (blockId: string) => void;
-  onDeleteBlock: (blockId: string) => void;
-  onCreateTag: (blockId: string, name: string) => Promise<void>;
-  onAssignTags: (blockId: string, tagIds: string[]) => Promise<void>;
-  onCancelExternalEdit: (editId: string) => void;
-  onSubmitExternalEdit: (blockId: string, editId: string) => void;
-  onFocusBlock: (blockId: string) => void;
-}
-
-const VirtualBlockItem = memo(function VirtualBlockItem({
-  block,
-  tags,
-  visibility,
-  externalEditSession,
-  isExternalEditPending,
-  isLocked,
-  isArchivePending,
-  isDeletePending,
-  isTagCreatePending,
-  registerEditorRef,
-  onArchiveBlock,
-  onRestoreBlock,
-  onDeleteBlock,
-  onCreateTag,
-  onAssignTags,
-  onCancelExternalEdit,
-  onSubmitExternalEdit,
-  onFocusBlock,
-}: VirtualBlockItemProps) {
+const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Block }) {
+  const actions = useBlockListItemActions();
   const editorHandleRef = useRef<NoteBlockEditorHandle | null>(null);
   const editorHandleProxy = useMemo<NoteBlockEditorHandle>(
     () => ({
@@ -110,9 +55,31 @@ const VirtualBlockItem = memo(function VirtualBlockItem({
   const setEditorRef = useCallback(
     (handle: NoteBlockEditorHandle | null) => {
       editorHandleRef.current = handle;
-      registerEditorRef(block.id, handle);
+      actions.registerEditorRef(block.id, handle);
     },
-    [block.id, registerEditorRef],
+    [block.id, actions.registerEditorRef],
+  );
+
+  const externalEditSession = actions.sessionsByBlockId.get(block.id);
+  const isExternalEditPending = externalEditSession
+    ? actions.pendingExternalEditIds.has(externalEditSession.editId)
+    : false;
+  const isLocked = actions.isBlockLocked(block.id);
+
+  const handleCreateTag = useCallback(
+    async (name: string) => {
+      const tag = await actions.onCreateTag(name);
+      const currentTagIds = block.tags.map((t) => t.id);
+      await actions.onAssignTags(block.id, [...new Set([...currentTagIds, tag.id])]);
+    },
+    [actions.onCreateTag, actions.onAssignTags, block.id, block.tags],
+  );
+
+  const handleAssignTags = useCallback(
+    async (tagIds: string[]) => {
+      await actions.onAssignTags(block.id, tagIds);
+    },
+    [actions.onAssignTags, block.id],
   );
 
   return (
@@ -121,33 +88,32 @@ const VirtualBlockItem = memo(function VirtualBlockItem({
       actions={
         <BlockActions
           block={block}
-          visibility={visibility}
-          tags={tags}
+          visibility={actions.visibility}
+          tags={actions.tags}
           editorRef={editorHandleProxy}
           isDisabled={isLocked || isExternalEditPending}
-          isArchivePending={isArchivePending}
-          isDeletePending={isDeletePending}
-          isTagOpPending={isTagCreatePending}
+          isArchivePending={actions.isBlockOpPending(
+            block.id,
+            actions.visibility === "active" ? "archive" : "restore",
+          )}
+          isDeletePending={actions.isBlockOpPending(block.id, "delete")}
+          isTagOpPending={actions.isTagCreatePending}
           onArchive={() => {
-            onArchiveBlock(block.id);
+            actions.onArchive(block.id);
           }}
           onRestore={() => {
-            onRestoreBlock(block.id);
+            actions.onRestore(block.id);
           }}
           onDelete={() => {
             if (externalEditSession) {
-              onCancelExternalEdit(externalEditSession.editId);
+              actions.onCancelExternalEdit(externalEditSession.editId);
               return;
             }
 
-            onDeleteBlock(block.id);
+            actions.onDelete(block.id);
           }}
-          onCreateTag={async (name) => {
-            await onCreateTag(block.id, name);
-          }}
-          onAssignTags={async (tagIds) => {
-            await onAssignTags(block.id, tagIds);
-          }}
+          onCreateTag={handleCreateTag}
+          onAssignTags={handleAssignTags}
         />
       }
       isExternalEditPending={Boolean(externalEditSession)}
@@ -156,45 +122,22 @@ const VirtualBlockItem = memo(function VirtualBlockItem({
           <BlockExternalEditActions
             isPending={isExternalEditPending}
             onCancel={() => {
-              onCancelExternalEdit(externalEditSession.editId);
+              actions.onCancelExternalEdit(externalEditSession.editId);
             }}
             onSubmit={() => {
-              onSubmitExternalEdit(block.id, externalEditSession.editId);
+              actions.onSubmitExternalEdit(block.id, externalEditSession.editId);
             }}
           />
         ) : null
       }
       block={block}
-      onFocus={onFocusBlock}
+      onFocus={actions.onFocus}
     />
   );
 });
 
 export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockListProps>(
-  function VirtualBlockList(
-    {
-      totalCount,
-      getBlockAtIndex,
-      ensureBlockIndex,
-      tags,
-      visibility,
-      sessionsByBlockId,
-      pendingExternalEditIds,
-      registerEditorRef,
-      isBlockLocked,
-      isBlockOpPending,
-      isTagOpPending,
-      onArchiveBlock,
-      onRestoreBlock,
-      onDeleteBlock,
-      onCreateTag,
-      onAssignTags,
-      onCancelExternalEdit,
-      onSubmitExternalEdit,
-      onFocusBlock,
-    },
-    ref,
-  ) {
+  function VirtualBlockList({ totalCount, getBlockAtIndex, ensureBlockIndex }, ref) {
     const scrollElement = useScrollContainer();
     const listElementRef = useRef<HTMLDivElement | null>(null);
     const [scrollMargin, setScrollMargin] = useState(0);
@@ -269,7 +212,6 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
       [blockVirtualizer, totalCount],
     );
 
-    const isTagCreatePending = isTagOpPending("create");
     const virtualBlocks = blockVirtualizer.getVirtualItems();
     const prevVisibleRangeRef = useRef<{ start: number; end: number } | null>(null);
 
@@ -298,8 +240,6 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
           {virtualBlocks.map((virtualBlock) => {
             const block = getBlockAtIndex(virtualBlock.index);
 
-            const externalEditSession = block ? sessionsByBlockId.get(block.id) : undefined;
-
             return (
               <div
                 key={virtualBlock.key}
@@ -313,33 +253,7 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
                 }}
               >
                 {block ? (
-                  <VirtualBlockItem
-                    block={block}
-                    tags={tags}
-                    visibility={visibility}
-                    externalEditSession={externalEditSession}
-                    isExternalEditPending={
-                      externalEditSession
-                        ? pendingExternalEditIds.has(externalEditSession.editId)
-                        : false
-                    }
-                    isLocked={isBlockLocked(block.id)}
-                    isArchivePending={isBlockOpPending(
-                      block.id,
-                      visibility === "active" ? "archive" : "restore",
-                    )}
-                    isDeletePending={isBlockOpPending(block.id, "delete")}
-                    isTagCreatePending={isTagCreatePending}
-                    registerEditorRef={registerEditorRef}
-                    onArchiveBlock={onArchiveBlock}
-                    onRestoreBlock={onRestoreBlock}
-                    onDeleteBlock={onDeleteBlock}
-                    onCreateTag={onCreateTag}
-                    onAssignTags={onAssignTags}
-                    onCancelExternalEdit={onCancelExternalEdit}
-                    onSubmitExternalEdit={onSubmitExternalEdit}
-                    onFocusBlock={onFocusBlock}
-                  />
+                  <VirtualBlockItem block={block} />
                 ) : (
                   <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
                 )}

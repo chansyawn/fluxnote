@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { Tag } from "@renderer/clients";
-import { TagComboboxPopover } from "@renderer/routes/-features/tag-combobox-popover";
+import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { TagIcon } from "lucide-react";
 
 interface BlockTagActionProps {

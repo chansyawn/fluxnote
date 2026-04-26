@@ -4,18 +4,18 @@ import path from "node:path";
 import { businessError, internalError } from "@shared/ipc/errors";
 
 import type { BackendStore } from "../backend-store";
-import {
-  assetUrlScheme,
-  assertBlockExists,
-  extFromMimeType,
-  sanitizeFileName,
-  splitAssetUrl,
-} from "../blocks/block-records";
+import { assertBlockExists } from "../blocks/block-records";
 import type { AppDatabase } from "../database/database-client";
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
 } from "../ipc/ipc-handler-definition";
+import {
+  assetUrlScheme,
+  extFromMimeType,
+  sanitizeFileName,
+  splitAssetUrl,
+} from "./asset-url-utils";
 
 interface AssetsCommandServices {
   getDb: () => Promise<AppDatabase>;
