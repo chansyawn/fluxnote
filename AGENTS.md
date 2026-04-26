@@ -24,7 +24,7 @@
 - Do not introduce duplicate client command entrypoints outside `src/renderer/clients` + `src/renderer/clients/index.ts`.
 - Keep CLI source in `src/cli` as TypeScript and build it with `vite.cli.config.ts`. Build output goes to `.vite/cli/`.
 - CLI commands must route through Electron main's backend command dispatcher over local IPC; do not let CLI code write the database directly.
-- The CLI ships inside the Electron app bundle (`Contents/Resources/cli/`) and uses `ELECTRON_RUN_AS_NODE=1` via a shell wrapper. The `src/cli/flux` wrapper script is source-controlled; `.vite/cli/flux-cli.mjs` is a build artifact. Both are assembled into the app bundle during packaging via the forge `packageAfterCopy` hook.
+- The CLI ships inside the Electron app bundle (`Contents/Resources/cli/`) and uses `ELECTRON_RUN_AS_NODE=1` via a shell wrapper. The `src/cli/flux` wrapper script is source-controlled; `.vite/cli/flux-cli.mjs` is a build artifact. The CLI build is registered as a Forge Vite build target so development and package builds generate it, and `packageAfterCopy` only assembles the wrapper and built CLI into the app bundle.
 
 ## Frontend
 
