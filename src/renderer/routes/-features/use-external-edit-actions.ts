@@ -6,7 +6,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 interface UseExternalEditActionsParams {
-  editorRefs: React.RefObject<Map<string, NoteBlockEditorHandle>>;
+  getEditor: (blockId: string) => NoteBlockEditorHandle | undefined;
 }
 
 interface UseExternalEditActionsResult {
@@ -16,7 +16,7 @@ interface UseExternalEditActionsResult {
 }
 
 export function useExternalEditActions({
-  editorRefs,
+  getEditor,
 }: UseExternalEditActionsParams): UseExternalEditActionsResult {
   const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
     () => new Set(),
@@ -42,7 +42,7 @@ export function useExternalEditActions({
     async (blockId: string, editId: string) => {
       setPendingExternalEditIds((current) => new Set(current).add(editId));
       try {
-        const editorContent = await editorRefs.current.get(blockId)?.flushPendingMarkdown();
+        const editorContent = await getEditor(blockId)?.flushPendingMarkdown();
         let content = editorContent;
         if (content === undefined) {
           for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
@@ -71,7 +71,7 @@ export function useExternalEditActions({
         });
       }
     },
-    [editorRefs],
+    [getEditor],
   );
 
   return {

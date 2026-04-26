@@ -1,142 +1,39 @@
 import type { Block, LocateBlockResult } from "@renderer/clients";
-import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@renderer/features/shortcut/shortcut-utils";
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 interface UseBlockShortcutsParams {
-  loadedBlocks: Block[];
+  activeBlockId: string | null;
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
-  getBlockAtIndex: (index: number) => Block | undefined;
-  ensureBlockIndexLoaded: (index: number) => Promise<void>;
+  requestFocus: (blockId: string) => void;
+  requestFocusAtIndex: (index: number) => void;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
-  scrollToBlockIndex: (index: number) => void;
+  setActiveBlockId: (blockId: string | null) => void;
 }
 
 interface UseBlockShortcutsResult {
-  editorRefs: React.RefObject<Map<string, NoteBlockEditorHandle>>;
-  registerEditorRef: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
-  setActiveBlockId: (blockId: string) => void;
-  requestBlockFocus: (blockId: string) => void;
-  requestLocatedBlockFocus: (blockId: string, index: number) => void;
 }
 
 export function useBlockShortcuts({
-  loadedBlocks,
+  activeBlockId,
   totalBlockCount,
   createBlock,
   deleteBlock,
-  getBlockAtIndex,
-  ensureBlockIndexLoaded,
+  requestFocus,
+  requestFocusAtIndex,
   locateBlockInView,
-  scrollToBlockIndex,
+  setActiveBlockId,
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
-  const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
-  const editorRefs = useRef<Map<string, NoteBlockEditorHandle>>(new Map());
-  const pendingFocusBlockIdRef = useRef<string | null>(null);
-  const pendingFocusIndexRef = useRef<number | null>(null);
-
-  const attemptPendingFocus = useCallback(() => {
-    const blockId = pendingFocusBlockIdRef.current;
-    if (!blockId) return;
-
-    const editor = editorRefs.current.get(blockId);
-    if (!editor) return;
-
-    pendingFocusBlockIdRef.current = null;
-    editor.focus();
-  }, []);
-
-  const registerEditorRef = useCallback(
-    (blockId: string, handle: NoteBlockEditorHandle | null) => {
-      if (handle) {
-        editorRefs.current.set(blockId, handle);
-        if (pendingFocusBlockIdRef.current === blockId) {
-          setTimeout(attemptPendingFocus, 0);
-        }
-        return;
-      }
-
-      editorRefs.current.delete(blockId);
-    },
-    [attemptPendingFocus],
-  );
-
-  const requestLocatedBlockFocus = useEffectEvent((blockId: string | null, index: number) => {
-    if (!blockId) {
-      return;
-    }
-
-    pendingFocusBlockIdRef.current = blockId;
-    pendingFocusIndexRef.current = null;
-    setActiveBlockId(blockId);
-    scrollToBlockIndex(index);
-    attemptPendingFocus();
-    void ensureBlockIndexLoaded(index).then(() => {
-      scrollToBlockIndex(index);
-      attemptPendingFocus();
-    });
-  });
-
-  const requestBlockFocus = useEffectEvent((blockId: string | null) => {
-    if (!blockId) {
-      return;
-    }
-
-    pendingFocusBlockIdRef.current = blockId;
-    void locateBlockInView(blockId).then((result) => {
-      if (!result) {
-        pendingFocusBlockIdRef.current = null;
-        return;
-      }
-
-      requestLocatedBlockFocus(result.block.id, result.index);
-    });
-  });
-
-  const requestBlockFocusAtIndex = useEffectEvent((index: number) => {
-    if (index < 0) {
-      setActiveBlockId(null);
-      return;
-    }
-
-    const block = getBlockAtIndex(index);
-    if (block) {
-      requestLocatedBlockFocus(block.id, index);
-      return;
-    }
-
-    pendingFocusIndexRef.current = index;
-    scrollToBlockIndex(index);
-    void ensureBlockIndexLoaded(index).then(() => {
-      scrollToBlockIndex(index);
-      attemptPendingIndexFocus();
-    });
-  });
-
-  const attemptPendingIndexFocus = useEffectEvent(() => {
-    const index = pendingFocusIndexRef.current;
-    if (index === null) {
-      return;
-    }
-
-    const block = getBlockAtIndex(index);
-    if (!block) {
-      return;
-    }
-
-    pendingFocusIndexRef.current = null;
-    requestLocatedBlockFocus(block.id, index);
-  });
 
   const createBlockWithFocus = useEffectEvent(async () => {
     const newBlock = await createBlock();
-    requestBlockFocus(newBlock.id);
+    requestFocus(newBlock.id);
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
@@ -159,13 +56,8 @@ export function useBlockShortcuts({
       currentLocation.index >= countBeforeDelete - 1
         ? currentLocation.index - 1
         : currentLocation.index;
-    requestBlockFocusAtIndex(nextIndex);
+    requestFocusAtIndex(nextIndex);
   });
-
-  useEffect(() => {
-    attemptPendingIndexFocus();
-    attemptPendingFocus();
-  }, [attemptPendingFocus, attemptPendingIndexFocus, loadedBlocks]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -204,12 +96,7 @@ export function useBlockShortcuts({
   }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, shortcuts]);
 
   return {
-    editorRefs,
-    registerEditorRef,
     createBlockWithFocus,
     deleteBlockWithFocus,
-    setActiveBlockId,
-    requestBlockFocus,
-    requestLocatedBlockFocus,
   };
 }
