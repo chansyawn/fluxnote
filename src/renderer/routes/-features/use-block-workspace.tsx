@@ -1,3 +1,4 @@
+import { queryClient } from "@renderer/app/query";
 import type { Block, BlockVisibility } from "@renderer/clients";
 import type { Tag } from "@renderer/clients/tags";
 import {
@@ -6,7 +7,7 @@ import {
   useWorkspaceData,
 } from "@renderer/routes/-features/use-workspace-data";
 import { useWorkspaceViewState } from "@renderer/routes/-features/use-workspace-view-state";
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useCallback, useContext, type ReactNode } from "react";
 
 interface BlockWorkspaceState {
   blocks: Block[];
@@ -41,6 +42,54 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
     visibility: viewState.visibility,
   });
 
+  const stableCreateTag = useCallback(
+    async (name: string) => {
+      await data.createTag(name);
+    },
+    [data.createTag],
+  );
+
+  const createTagAndSelectForFilter = useCallback(
+    async (name: string) => {
+      const createdTag = await data.createTag(name);
+      viewState.setSelectedTagIds((currentTagIds) => {
+        if (currentTagIds.includes(createdTag.id)) {
+          return currentTagIds;
+        }
+
+        return [...currentTagIds, createdTag.id];
+      });
+    },
+    [data.createTag, viewState.setSelectedTagIds],
+  );
+
+  const createTagAndAssignToBlock = useCallback(
+    async (blockId: string, name: string) => {
+      const createdTag = await data.createTag(name);
+      let targetBlock: Block | undefined;
+      for (const [, blocks] of queryClient.getQueriesData<Block[]>({ queryKey: ["blocks"] })) {
+        targetBlock = blocks?.find((b) => b.id === blockId);
+        if (targetBlock) break;
+      }
+      const nextTagIds = targetBlock
+        ? [...new Set([...targetBlock.tags.map((tag) => tag.id), createdTag.id])]
+        : [createdTag.id];
+
+      await data.assignBlockTags(blockId, nextTagIds);
+    },
+    [data.createTag, data.assignBlockTags],
+  );
+
+  const stableDeleteTag = useCallback(
+    async (tagId: string) => {
+      await data.deleteTag(tagId);
+      viewState.setSelectedTagIds((currentTagIds) =>
+        currentTagIds.filter((currentTagId) => currentTagId !== tagId),
+      );
+    },
+    [data.deleteTag, viewState.setSelectedTagIds],
+  );
+
   const contextValue: BlockWorkspaceState = {
     blocks: data.blocks,
     tags: data.tags,
@@ -58,34 +107,10 @@ export function BlockWorkspaceProvider({ children }: { children: ReactNode }) {
     archiveBlock: data.archiveBlock,
     restoreBlock: data.restoreBlock,
     deleteBlock: data.deleteBlock,
-    createTag: async (name: string) => {
-      await data.createTag(name);
-    },
-    createTagAndSelectForFilter: async (name: string) => {
-      const createdTag = await data.createTag(name);
-      viewState.setSelectedTagIds((currentTagIds) => {
-        if (currentTagIds.includes(createdTag.id)) {
-          return currentTagIds;
-        }
-
-        return [...currentTagIds, createdTag.id];
-      });
-    },
-    createTagAndAssignToBlock: async (blockId: string, name: string) => {
-      const createdTag = await data.createTag(name);
-      const targetBlock = data.blocks.find((block) => block.id === blockId);
-      const nextTagIds = targetBlock
-        ? [...new Set([...targetBlock.tags.map((tag) => tag.id), createdTag.id])]
-        : [createdTag.id];
-
-      await data.assignBlockTags(blockId, nextTagIds);
-    },
-    deleteTag: async (tagId: string) => {
-      await data.deleteTag(tagId);
-      viewState.setSelectedTagIds((currentTagIds) =>
-        currentTagIds.filter((currentTagId) => currentTagId !== tagId),
-      );
-    },
+    createTag: stableCreateTag,
+    createTagAndSelectForFilter,
+    createTagAndAssignToBlock,
+    deleteTag: stableDeleteTag,
     assignBlockTags: data.assignBlockTags,
   };
 
