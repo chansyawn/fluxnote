@@ -14,12 +14,12 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 
 import { useBlockListItemActions } from "./block-list-context";
+import { useEditorRegistryContext } from "./editor-registry-context";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
@@ -37,28 +37,18 @@ interface VirtualBlockListProps {
 
 const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Block }) {
   const actions = useBlockListItemActions();
-  const editorHandleRef = useRef<NoteBlockEditorHandle | null>(null);
-  const editorHandleProxy = useMemo<NoteBlockEditorHandle>(
-    () => ({
-      copyContent: async () => {
-        await editorHandleRef.current?.copyContent();
-      },
-      flushPendingMarkdown: async () =>
-        (await editorHandleRef.current?.flushPendingMarkdown()) ?? "",
-      focus: () => {
-        editorHandleRef.current?.focus();
-      },
-    }),
-    [],
-  );
+  const registry = useEditorRegistryContext();
 
   const setEditorRef = useCallback(
     (handle: NoteBlockEditorHandle | null) => {
-      editorHandleRef.current = handle;
-      actions.registerEditorRef(block.id, handle);
+      registry.registerEditor(block.id, handle);
     },
-    [block.id, actions.registerEditorRef],
+    [block.id, registry.registerEditor],
   );
+
+  const handleCopy = useCallback(() => {
+    void registry.getEditor(block.id)?.copyContent();
+  }, [block.id, registry.getEditor]);
 
   const externalEditSession = actions.sessionsByBlockId.get(block.id);
   const isExternalEditPending = externalEditSession
@@ -90,7 +80,6 @@ const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Bloc
           block={block}
           visibility={actions.visibility}
           tags={actions.tags}
-          editorRef={editorHandleProxy}
           isDisabled={isLocked || isExternalEditPending}
           isArchivePending={actions.isBlockOpPending(
             block.id,
@@ -112,6 +101,7 @@ const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Bloc
 
             actions.onDelete(block.id);
           }}
+          onCopy={handleCopy}
           onCreateTag={handleCreateTag}
           onAssignTags={handleAssignTags}
         />

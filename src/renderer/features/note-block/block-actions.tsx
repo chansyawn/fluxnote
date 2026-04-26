@@ -1,5 +1,4 @@
 import type { Block, BlockVisibility, Tag } from "@renderer/clients";
-import type { NoteEditorShellHandle } from "@renderer/features/note-editor-core";
 import { useState } from "react";
 
 import { BlockActionBar } from "./block-action-bar";
@@ -12,7 +11,6 @@ interface BlockActionsProps {
   block: Block;
   visibility: BlockVisibility;
   tags: Tag[];
-  editorRef: NoteEditorShellHandle | undefined;
   isDisabled: boolean;
   isArchivePending: boolean;
   isDeletePending: boolean;
@@ -20,6 +18,7 @@ interface BlockActionsProps {
   onArchive: () => void;
   onRestore: () => void;
   onDelete: () => void;
+  onCopy: () => void;
   onCreateTag: (name: string) => Promise<void>;
   onAssignTags: (tagIds: string[]) => Promise<void>;
 }
@@ -28,7 +27,6 @@ export function BlockActions({
   block,
   visibility,
   tags,
-  editorRef,
   isDisabled,
   isArchivePending,
   isDeletePending,
@@ -36,19 +34,16 @@ export function BlockActions({
   onArchive,
   onRestore,
   onDelete,
+  onCopy,
   onCreateTag,
   onAssignTags,
 }: BlockActionsProps) {
   const [popupContainer, setPopupContainer] = useState<HTMLElement | null>(null);
 
-  const handleCopy = () => {
-    void editorRef?.copyContent();
-  };
-
   return (
     <div ref={setPopupContainer}>
       <BlockActionBar disabled={isDisabled}>
-        <BlockCopyAction isDisabled={isDisabled} onCopy={handleCopy} />
+        <BlockCopyAction isDisabled={isDisabled} onCopy={onCopy} />
         <BlockTagAction
           isCreatingTag={isTagOpPending}
           isDisabled={isDisabled}

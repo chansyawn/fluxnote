@@ -6,10 +6,13 @@ import type { ReactElement } from "react";
 import { useCallback, useMemo, useRef } from "react";
 
 import { BlockListItemActionsProvider, type BlockListItemActions } from "./block-list-context";
+import { EditorRegistryProvider } from "./editor-registry-context";
 import { useOpenBlockTarget } from "./open-block-target";
+import { useBlockFocus } from "./use-block-focus";
 import { useBlockList } from "./use-block-list";
 import { useBlockMutations } from "./use-block-mutations";
 import { useBlockShortcuts } from "./use-block-shortcuts";
+import { useEditorRegistry } from "./use-editor-registry";
 import { useExternalEditActions } from "./use-external-edit-actions";
 import { useExternalEditSessions } from "./use-external-edit-sessions";
 import { useOpenBlockRequest } from "./use-open-block-request";
@@ -77,6 +80,11 @@ function ArchivedEmptyState() {
 }
 
 export function BlockWorkspace() {
+  const blockListRef = useRef<VirtualBlockListHandle | null>(null);
+  const scrollToBlockIndex = useCallback((index: number) => {
+    blockListRef.current?.scrollToIndex(index);
+  }, []);
+
   const viewState = useWorkspaceViewState();
   const blockList = useBlockList({
     visibility: viewState.visibility,
@@ -86,20 +94,19 @@ export function BlockWorkspace() {
   const tagData = useTagData();
   const { sessionsByBlockId } = useExternalEditSessions();
 
-  const blockListRef = useRef<VirtualBlockListHandle | null>(null);
-  const scrollToBlockIndex = useCallback((index: number) => {
-    blockListRef.current?.scrollToIndex(index);
-  }, []);
+  const editorRegistry = useEditorRegistry();
 
-  const {
-    editorRefs,
-    registerEditorRef,
-    createBlockWithFocus,
-    deleteBlockWithFocus,
-    setActiveBlockId,
-    requestLocatedBlockFocus,
-  } = useBlockShortcuts({
+  const blockFocus = useBlockFocus({
+    registry: editorRegistry,
     loadedBlocks: blockList.loadedBlocks,
+    getBlockAtIndex: blockList.getBlockAtIndex,
+    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
+    locateBlockInView: blockList.locateBlockInView,
+    scrollToBlockIndex,
+  });
+
+  const { createBlockWithFocus, deleteBlockWithFocus } = useBlockShortcuts({
+    activeBlockId: blockFocus.activeBlockId,
     totalBlockCount: blockList.totalBlockCount,
     createBlock: async () => {
       const block = await blockMutations.createBlock();
@@ -109,13 +116,15 @@ export function BlockWorkspace() {
       return block;
     },
     deleteBlock: blockMutations.deleteBlock,
-    getBlockAtIndex: blockList.getBlockAtIndex,
-    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
+    requestFocus: blockFocus.requestFocus,
+    requestFocusAtIndex: blockFocus.requestFocusAtIndex,
     locateBlockInView: blockList.locateBlockInView,
-    scrollToBlockIndex,
+    setActiveBlockId: blockFocus.setActiveBlockId,
   });
 
-  const externalEditActions = useExternalEditActions({ editorRefs });
+  const externalEditActions = useExternalEditActions({
+    getEditor: editorRegistry.getEditor,
+  });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
 
@@ -123,7 +132,7 @@ export function BlockWorkspace() {
     pendingBlockId,
     onSetVisibility: viewState.setVisibility,
     onClearFilters: () => viewState.setSelectedTagIds([]),
-    onFocus: requestLocatedBlockFocus,
+    onFocus: blockFocus.requestLocatedFocus,
     onAcknowledge: acknowledgePendingBlockId,
   });
 
@@ -169,13 +178,20 @@ export function BlockWorkspace() {
     [tagData.deleteTag, viewState.setSelectedTagIds],
   );
 
+  const registryContextValue = useMemo(
+    () => ({
+      registerEditor: editorRegistry.registerEditor,
+      getEditor: editorRegistry.getEditor,
+    }),
+    [editorRegistry.registerEditor, editorRegistry.getEditor],
+  );
+
   const itemActions = useMemo<BlockListItemActions>(
     () => ({
       tags: tagData.tags,
       visibility: viewState.visibility,
       sessionsByBlockId,
       pendingExternalEditIds: externalEditActions.pendingExternalEditIds,
-      registerEditorRef,
       isBlockLocked: blockMutations.isBlockLocked,
       isBlockOpPending: blockMutations.isBlockOpPending,
       isTagCreatePending: tagData.isTagOpPending("create"),
@@ -186,14 +202,13 @@ export function BlockWorkspace() {
       onAssignTags: blockMutations.assignBlockTags,
       onCancelExternalEdit: externalEditActions.handleCancelExternalEdit,
       onSubmitExternalEdit: externalEditActions.handleSubmitExternalEdit,
-      onFocus: setActiveBlockId,
+      onFocus: blockFocus.setActiveBlockId,
     }),
     [
       tagData.tags,
       viewState.visibility,
       sessionsByBlockId,
       externalEditActions.pendingExternalEditIds,
-      registerEditorRef,
       blockMutations.isBlockLocked,
       blockMutations.isBlockOpPending,
       tagData.isTagOpPending,
@@ -204,7 +219,7 @@ export function BlockWorkspace() {
       blockMutations.assignBlockTags,
       externalEditActions.handleCancelExternalEdit,
       externalEditActions.handleSubmitExternalEdit,
-      setActiveBlockId,
+      blockFocus.setActiveBlockId,
     ],
   );
 
@@ -276,14 +291,16 @@ export function BlockWorkspace() {
           </div>
         )
       ) : (
-        <BlockListItemActionsProvider value={itemActions}>
-          <VirtualBlockList
-            ref={blockListRef}
-            totalCount={totalBlockCount}
-            getBlockAtIndex={blockList.getBlockAtIndex}
-            ensureBlockIndex={blockList.ensureBlockIndex}
-          />
-        </BlockListItemActionsProvider>
+        <EditorRegistryProvider value={registryContextValue}>
+          <BlockListItemActionsProvider value={itemActions}>
+            <VirtualBlockList
+              ref={blockListRef}
+              totalCount={totalBlockCount}
+              getBlockAtIndex={blockList.getBlockAtIndex}
+              ensureBlockIndex={blockList.ensureBlockIndex}
+            />
+          </BlockListItemActionsProvider>
+        </EditorRegistryProvider>
       )}
 
       {visibility === "active" ? (

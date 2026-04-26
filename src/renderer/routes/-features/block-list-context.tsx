@@ -1,5 +1,4 @@
 import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
-import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
 import { createContext, useContext, type ReactNode } from "react";
 
 import type { BlockMutationOperation } from "./use-block-mutations";
@@ -9,7 +8,6 @@ export interface BlockListItemActions {
   visibility: BlockVisibility;
   sessionsByBlockId: Map<string, ExternalEditSession>;
   pendingExternalEditIds: Set<string>;
-  registerEditorRef: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
   isBlockLocked: (blockId: string) => boolean;
   isBlockOpPending: (blockId: string, op: BlockMutationOperation) => boolean;
   isTagCreatePending: boolean;
