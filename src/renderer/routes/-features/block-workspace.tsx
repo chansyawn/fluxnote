@@ -5,6 +5,7 @@ import { cancelExternalEdit, submitExternalEdit } from "@renderer/clients";
 import { BlockActions } from "@renderer/features/note-block/block-actions";
 import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
 import { NoteBlockEditor } from "@renderer/features/note-block/note-block-editor";
+import { useOpenBlockTarget } from "@renderer/routes/-features/open-block-target";
 import { useBlockShortcuts } from "@renderer/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
 import { useExternalEditSessions } from "@renderer/routes/-features/use-external-edit-sessions";
@@ -13,7 +14,7 @@ import { WorkspaceTagFilterPortal } from "@renderer/routes/-features/workspace-t
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 function LoadingState(): ReactElement {
@@ -82,7 +83,6 @@ export function BlockWorkspace() {
     visibility,
     selectedTagIds,
     isInitialLoading,
-    isRefreshing,
     isCreatingBlock,
     isBlockLocked,
     isBlockOpPending,
@@ -113,6 +113,14 @@ export function BlockWorkspace() {
   });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
+
+  useOpenBlockTarget({
+    pendingBlockId,
+    onSetVisibility: setVisibility,
+    onClearFilters: () => setSelectedTagFilters([]),
+    onFocus: requestBlockFocus,
+    onAcknowledge: acknowledgePendingBlockId,
+  });
 
   const setExternalEditPending = (editId: string, pending: boolean) => {
     setPendingExternalEditIds((current) => {
@@ -155,49 +163,6 @@ export function BlockWorkspace() {
       setExternalEditPending(editId, false);
     }
   };
-
-  useEffect(() => {
-    if (!pendingBlockId) {
-      return;
-    }
-
-    setVisibility("active");
-    setSelectedTagFilters([]);
-    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-  }, [pendingBlockId, setSelectedTagFilters, setVisibility]);
-
-  useEffect(() => {
-    if (
-      !pendingBlockId ||
-      isInitialLoading ||
-      isRefreshing ||
-      visibility !== "active" ||
-      selectedTagIds.length > 0
-    ) {
-      return;
-    }
-
-    const blockExists = blocks.some((block) => block.id === pendingBlockId);
-
-    if (blockExists) {
-      requestBlockFocus(pendingBlockId);
-      acknowledgePendingBlockId(pendingBlockId);
-    } else {
-      toast.error("Block not found", {
-        description: "The requested block does not exist or has been archived.",
-      });
-      acknowledgePendingBlockId(pendingBlockId);
-    }
-  }, [
-    acknowledgePendingBlockId,
-    pendingBlockId,
-    blocks,
-    isInitialLoading,
-    isRefreshing,
-    requestBlockFocus,
-    selectedTagIds.length,
-    visibility,
-  ]);
 
   if (isInitialLoading) {
     return <LoadingState />;
