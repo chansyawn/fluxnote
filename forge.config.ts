@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -49,7 +48,6 @@ const config: ForgeConfig = {
   },
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
-      execSync("vp build -c vite.cli.config.ts", { stdio: "inherit" });
       await copyNativeRuntimeDependencies(buildPath);
       await copyCliResources(buildPath);
     },
@@ -69,6 +67,11 @@ const config: ForgeConfig = {
           entry: "src/preload/index.ts",
           config: "vite.preload.config.ts",
           target: "preload",
+        },
+        {
+          entry: "src/cli/index.ts",
+          config: "vite.cli.config.ts",
+          target: "main",
         },
       ],
       renderer: [

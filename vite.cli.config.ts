@@ -4,6 +4,7 @@ import { viteAliases } from "./vite.config";
 
 export default defineConfig({
   build: {
+    lib: false,
     outDir: ".vite/cli",
     rolldownOptions: {
       output: {
