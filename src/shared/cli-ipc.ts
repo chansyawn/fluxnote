@@ -7,13 +7,9 @@ import { z } from "zod";
 import { backendCommandKeySchema } from "./backend-command-contracts";
 import type { BackendCommandKey } from "./backend-command-contracts";
 
-export const cliIpcRequestModeSchema = z.enum(["return-immediately", "wait"]);
-export type CliIpcRequestMode = z.infer<typeof cliIpcRequestModeSchema>;
-
 export const cliIpcRequestEnvelopeSchema = z.object({
   id: z.string().min(1),
   command: backendCommandKeySchema,
-  mode: cliIpcRequestModeSchema.default("return-immediately"),
   payload: z.unknown(),
 });
 
@@ -74,7 +70,6 @@ export function createCliIpcRequest(
   return {
     command,
     id: crypto.randomUUID(),
-    mode: "return-immediately",
     payload,
   };
 }

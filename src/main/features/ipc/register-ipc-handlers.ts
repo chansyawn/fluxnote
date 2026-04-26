@@ -6,6 +6,8 @@ import type { BackendStore } from "../backend-store";
 import { createBlocksCommandHandlers } from "../blocks/ipc-handlers";
 import { createCliCommandHandlers } from "../cli/ipc-handlers";
 import type { AppDatabase } from "../database/database-client";
+import type { ExternalEditManager } from "../external-edit/external-edit-manager";
+import { createExternalEditCommandHandlers } from "../external-edit/ipc-handlers";
 import { createOpenBlockCommandHandlers } from "../open-block/ipc-handlers";
 import type { PendingOpenBlockRequest } from "../open-block/open-block-handler";
 import { createPreferencesCommandHandlers } from "../preferences/ipc-handlers";
@@ -23,6 +25,7 @@ import type {
 export interface RegisterIpcHandlersOptions {
   acknowledgePendingOpenBlock: (blockId: string) => void;
   emitEvent: EmitIpcEvent;
+  externalEditManager: ExternalEditManager;
   getMainWindow: () => BrowserWindow | null;
   hideMainWindow: () => void;
   readPendingOpenBlock: () => PendingOpenBlockRequest;
@@ -51,6 +54,11 @@ export function collectIpcCommandHandlerDefinitions(
     ...createSampleCommandHandlers(),
     ...createBlocksCommandHandlers({
       getDb: async () => await getDb(options),
+      store: options.store,
+    }),
+    ...createExternalEditCommandHandlers({
+      getDb: async () => await getDb(options),
+      manager: options.externalEditManager,
       store: options.store,
     }),
     ...createTagsCommandHandlers({

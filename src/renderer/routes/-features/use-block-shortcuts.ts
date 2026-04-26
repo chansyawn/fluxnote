@@ -1,5 +1,5 @@
 import type { Block } from "@renderer/clients";
-import type { NoteEditorShellHandle } from "@renderer/features/note-editor-core";
+import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@renderer/features/shortcut/shortcut-utils";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
@@ -11,7 +11,7 @@ interface UseBlockShortcutsParams {
 }
 
 interface UseBlockShortcutsResult {
-  editorRefs: React.RefObject<Map<string, NoteEditorShellHandle>>;
+  editorRefs: React.RefObject<Map<string, NoteBlockEditorHandle>>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   setActiveBlockId: (blockId: string) => void;
@@ -35,7 +35,7 @@ export function useBlockShortcuts({
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
-  const editorRefs = useRef<Map<string, NoteEditorShellHandle>>(new Map());
+  const editorRefs = useRef<Map<string, NoteBlockEditorHandle>>(new Map());
 
   const requestBlockFocus = useEffectEvent((blockId: string | null) => {
     if (!blockId) {

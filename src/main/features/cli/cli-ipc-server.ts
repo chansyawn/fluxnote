@@ -10,7 +10,11 @@ import {
 import { toIpcErrorPayload } from "@shared/ipc/errors";
 
 interface CliIpcServerServices {
-  dispatchCommand: (command: BackendCommandKey, payload: unknown) => Promise<unknown>;
+  dispatchCommand: (
+    command: BackendCommandKey,
+    payload: unknown,
+    signal?: AbortSignal,
+  ) => Promise<unknown>;
 }
 
 export interface CliIpcServer {
@@ -35,7 +39,9 @@ export function createCliIpcServer(services: CliIpcServerServices): CliIpcServer
   const server = net.createServer((socket) => {
     let buffer = "";
     let handled = false;
+    const abortController = new AbortController();
 
+    socket.once("close", () => abortController.abort());
     socket.setEncoding("utf8");
     socket.on("data", (chunk) => {
       if (handled) {
@@ -50,13 +56,18 @@ export function createCliIpcServer(services: CliIpcServerServices): CliIpcServer
 
       handled = true;
       const line = buffer.slice(0, newlineIndex);
-      void handleRequestLine(line).then((response) => {
-        socket.end(encodeResponse(response));
+      void handleRequestLine(line, abortController.signal).then((response) => {
+        if (!socket.destroyed) {
+          socket.end(encodeResponse(response));
+        }
       });
     });
   });
 
-  async function handleRequestLine(line: string): Promise<CliIpcResponseEnvelope> {
+  async function handleRequestLine(
+    line: string,
+    signal: AbortSignal,
+  ): Promise<CliIpcResponseEnvelope> {
     let requestId = "unknown";
 
     try {
@@ -64,7 +75,7 @@ export function createCliIpcServer(services: CliIpcServerServices): CliIpcServer
       requestId = envelope.id;
       const contract = backendCommandContracts[envelope.command];
       const request = contract.request.parse(envelope.payload);
-      const response = await services.dispatchCommand(envelope.command, request);
+      const response = await services.dispatchCommand(envelope.command, request, signal);
       const data = contract.response.parse(response);
 
       return {
