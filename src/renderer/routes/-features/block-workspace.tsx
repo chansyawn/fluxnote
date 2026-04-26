@@ -1,22 +1,21 @@
 import { Trans } from "@lingui/react/macro";
-import { toAppInvokeError } from "@renderer/app/invoke";
-import { queryClient } from "@renderer/app/query";
-import { cancelExternalEdit, submitExternalEdit, type ListBlocksResult } from "@renderer/clients";
-import { useOpenBlockTarget } from "@renderer/routes/-features/open-block-target";
-import { useBlockShortcuts } from "@renderer/routes/-features/use-block-shortcuts";
-import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
-import { useExternalEditSessions } from "@renderer/routes/-features/use-external-edit-sessions";
-import { useOpenBlockRequest } from "@renderer/routes/-features/use-open-block-request";
-import {
-  VirtualBlockList,
-  type VirtualBlockListHandle,
-} from "@renderer/routes/-features/virtual-block-list";
-import { WorkspaceTagFilterPortal } from "@renderer/routes/-features/workspace-tag-filter-portal";
+import { useTagData } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
-import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useCallback, useMemo, useRef } from "react";
+
+import { BlockListItemActionsProvider, type BlockListItemActions } from "./block-list-context";
+import { useOpenBlockTarget } from "./open-block-target";
+import { useBlockList } from "./use-block-list";
+import { useBlockMutations } from "./use-block-mutations";
+import { useBlockShortcuts } from "./use-block-shortcuts";
+import { useExternalEditActions } from "./use-external-edit-actions";
+import { useExternalEditSessions } from "./use-external-edit-sessions";
+import { useOpenBlockRequest } from "./use-open-block-request";
+import { useWorkspaceViewState } from "./use-workspace-view-state";
+import { VirtualBlockList, type VirtualBlockListHandle } from "./virtual-block-list";
+import { WorkspaceTagFilterPortal } from "./workspace-tag-filter-portal";
 
 function LoadingState(): ReactElement {
   return (
@@ -78,38 +77,20 @@ function ArchivedEmptyState() {
 }
 
 export function BlockWorkspace() {
-  const {
-    loadedBlocks,
-    totalBlockCount,
-    tags,
-    visibility,
-    selectedTagIds,
-    isInitialLoading,
-    isCreatingBlock,
-    isBlockLocked,
-    isBlockOpPending,
-    isTagOpPending,
-    createBlock,
-    archiveBlock,
-    restoreBlock,
-    deleteBlock,
-    createTagAndAssignToBlock,
-    assignBlockTags,
-    getBlockAtIndex,
-    ensureBlockIndex,
-    ensureBlockIndexLoaded,
-    locateBlockInView,
-    setVisibility,
-    setSelectedTagFilters,
-  } = useBlockWorkspace();
+  const viewState = useWorkspaceViewState();
+  const blockList = useBlockList({
+    visibility: viewState.visibility,
+    tagIds: viewState.selectedTagIds,
+  });
+  const blockMutations = useBlockMutations();
+  const tagData = useTagData();
   const { sessionsByBlockId } = useExternalEditSessions();
-  const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
-    () => new Set(),
-  );
+
   const blockListRef = useRef<VirtualBlockListHandle | null>(null);
   const scrollToBlockIndex = useCallback((index: number) => {
     blockListRef.current?.scrollToIndex(index);
   }, []);
+
   const {
     editorRefs,
     registerEditorRef,
@@ -118,38 +99,46 @@ export function BlockWorkspace() {
     setActiveBlockId,
     requestLocatedBlockFocus,
   } = useBlockShortcuts({
-    loadedBlocks,
-    totalBlockCount,
-    createBlock,
-    deleteBlock,
-    getBlockAtIndex,
-    ensureBlockIndexLoaded,
-    locateBlockInView,
+    loadedBlocks: blockList.loadedBlocks,
+    totalBlockCount: blockList.totalBlockCount,
+    createBlock: async () => {
+      const block = await blockMutations.createBlock();
+      if (viewState.selectedTagIds.length > 0) {
+        return await blockMutations.assignBlockTags(block.id, viewState.selectedTagIds);
+      }
+      return block;
+    },
+    deleteBlock: blockMutations.deleteBlock,
+    getBlockAtIndex: blockList.getBlockAtIndex,
+    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
+    locateBlockInView: blockList.locateBlockInView,
     scrollToBlockIndex,
   });
+
+  const externalEditActions = useExternalEditActions({ editorRefs });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
 
   useOpenBlockTarget({
     pendingBlockId,
-    onSetVisibility: setVisibility,
-    onClearFilters: () => setSelectedTagFilters([]),
+    onSetVisibility: viewState.setVisibility,
+    onClearFilters: () => viewState.setSelectedTagIds([]),
     onFocus: requestLocatedBlockFocus,
     onAcknowledge: acknowledgePendingBlockId,
   });
 
   const handleArchiveBlock = useCallback(
     (blockId: string) => {
-      void archiveBlock(blockId);
+      void blockMutations.archiveBlock(blockId);
     },
-    [archiveBlock],
+    [blockMutations.archiveBlock],
   );
 
   const handleRestoreBlock = useCallback(
     (blockId: string) => {
-      void restoreBlock(blockId);
+      void blockMutations.restoreBlock(blockId);
     },
-    [restoreBlock],
+    [blockMutations.restoreBlock],
   );
 
   const handleDeleteBlock = useCallback(
@@ -159,88 +148,106 @@ export function BlockWorkspace() {
     [deleteBlockWithFocus],
   );
 
-  const handleCreateTag = useCallback(
-    async (blockId: string, name: string) => {
-      await createTagAndAssignToBlock(blockId, name);
-    },
-    [createTagAndAssignToBlock],
-  );
-
-  const handleAssignTags = useCallback(
-    async (blockId: string, tagIds: string[]) => {
-      await assignBlockTags(blockId, tagIds);
-    },
-    [assignBlockTags],
-  );
-
-  const handleCancelExternalEdit = useCallback(async (editId: string) => {
-    setPendingExternalEditIds((current) => new Set(current).add(editId));
-    try {
-      await cancelExternalEdit({ editId });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    } catch (error) {
-      toast.error(toAppInvokeError(error).message);
-    } finally {
-      setPendingExternalEditIds((current) => {
-        const next = new Set(current);
-        next.delete(editId);
-        return next;
+  const handleCreateTagForFilter = useCallback(
+    async (name: string) => {
+      const createdTag = await tagData.createTag(name);
+      viewState.setSelectedTagIds((currentTagIds) => {
+        if (currentTagIds.includes(createdTag.id)) {
+          return currentTagIds;
+        }
+        return [...currentTagIds, createdTag.id];
       });
-    }
-  }, []);
-
-  const handleSubmitExternalEdit = useCallback(
-    async (blockId: string, editId: string) => {
-      setPendingExternalEditIds((current) => new Set(current).add(editId));
-      try {
-        const editorContent = await editorRefs.current.get(blockId)?.flushPendingMarkdown();
-        let content = editorContent;
-        if (content === undefined) {
-          for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
-            queryKey: ["blocks"],
-          })) {
-            const found = cached?.blocks.find((b) => b.id === blockId);
-            if (found) {
-              content = found.content;
-              break;
-            }
-          }
-        }
-        if (content === undefined) {
-          toast.error("Cannot submit: block content unavailable.");
-          return;
-        }
-        await submitExternalEdit({ content, editId });
-        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-      } catch (error) {
-        toast.error(toAppInvokeError(error).message);
-      } finally {
-        setPendingExternalEditIds((current) => {
-          const next = new Set(current);
-          next.delete(editId);
-          return next;
-        });
-      }
     },
-    [editorRefs],
+    [tagData.createTag, viewState.setSelectedTagIds],
   );
 
-  if (isInitialLoading) {
+  const handleDeleteTag = useCallback(
+    async (tagId: string) => {
+      await tagData.deleteTag(tagId);
+      viewState.setSelectedTagIds((currentTagIds) => currentTagIds.filter((id) => id !== tagId));
+    },
+    [tagData.deleteTag, viewState.setSelectedTagIds],
+  );
+
+  const itemActions = useMemo<BlockListItemActions>(
+    () => ({
+      tags: tagData.tags,
+      visibility: viewState.visibility,
+      sessionsByBlockId,
+      pendingExternalEditIds: externalEditActions.pendingExternalEditIds,
+      registerEditorRef,
+      isBlockLocked: blockMutations.isBlockLocked,
+      isBlockOpPending: blockMutations.isBlockOpPending,
+      isTagCreatePending: tagData.isTagOpPending("create"),
+      onArchive: handleArchiveBlock,
+      onRestore: handleRestoreBlock,
+      onDelete: handleDeleteBlock,
+      onCreateTag: tagData.createTag,
+      onAssignTags: blockMutations.assignBlockTags,
+      onCancelExternalEdit: externalEditActions.handleCancelExternalEdit,
+      onSubmitExternalEdit: externalEditActions.handleSubmitExternalEdit,
+      onFocus: setActiveBlockId,
+    }),
+    [
+      tagData.tags,
+      viewState.visibility,
+      sessionsByBlockId,
+      externalEditActions.pendingExternalEditIds,
+      registerEditorRef,
+      blockMutations.isBlockLocked,
+      blockMutations.isBlockOpPending,
+      tagData.isTagOpPending,
+      handleArchiveBlock,
+      handleRestoreBlock,
+      handleDeleteBlock,
+      tagData.createTag,
+      blockMutations.assignBlockTags,
+      externalEditActions.handleCancelExternalEdit,
+      externalEditActions.handleSubmitExternalEdit,
+      setActiveBlockId,
+    ],
+  );
+
+  if (blockList.isInitialLoading) {
     return <LoadingState />;
   }
+
+  const { visibility, selectedTagIds } = viewState;
+  const { totalBlockCount } = blockList;
 
   if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
     return (
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-        <WorkspaceTagFilterPortal />
-        <EmptyWorkspace isCreatingBlock={isCreatingBlock} onCreateBlock={createBlockWithFocus} />
+        <WorkspaceTagFilterPortal
+          tags={tagData.tags}
+          visibility={visibility}
+          selectedTagIds={selectedTagIds}
+          isTagOpPending={tagData.isTagOpPending}
+          onSetVisibility={viewState.setVisibility}
+          onSetSelectedTagIds={viewState.setSelectedTagIds}
+          onCreateTag={handleCreateTagForFilter}
+          onDeleteTag={handleDeleteTag}
+        />
+        <EmptyWorkspace
+          isCreatingBlock={blockMutations.isCreatingBlock}
+          onCreateBlock={createBlockWithFocus}
+        />
       </div>
     );
   }
 
   return (
     <section className="z-10 mx-auto flex w-full max-w-4xl flex-col gap-4">
-      <WorkspaceTagFilterPortal />
+      <WorkspaceTagFilterPortal
+        tags={tagData.tags}
+        visibility={visibility}
+        selectedTagIds={selectedTagIds}
+        isTagOpPending={tagData.isTagOpPending}
+        onSetVisibility={viewState.setVisibility}
+        onSetSelectedTagIds={viewState.setSelectedTagIds}
+        onCreateTag={handleCreateTagForFilter}
+        onDeleteTag={handleDeleteTag}
+      />
       {totalBlockCount === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
           <ArchivedEmptyState />
@@ -269,40 +276,26 @@ export function BlockWorkspace() {
           </div>
         )
       ) : (
-        <VirtualBlockList
-          ref={blockListRef}
-          totalCount={totalBlockCount}
-          getBlockAtIndex={getBlockAtIndex}
-          ensureBlockIndex={ensureBlockIndex}
-          tags={tags}
-          visibility={visibility}
-          sessionsByBlockId={sessionsByBlockId}
-          pendingExternalEditIds={pendingExternalEditIds}
-          registerEditorRef={registerEditorRef}
-          isBlockLocked={isBlockLocked}
-          isBlockOpPending={isBlockOpPending}
-          isTagOpPending={isTagOpPending}
-          onArchiveBlock={handleArchiveBlock}
-          onRestoreBlock={handleRestoreBlock}
-          onDeleteBlock={handleDeleteBlock}
-          onCreateTag={handleCreateTag}
-          onAssignTags={handleAssignTags}
-          onCancelExternalEdit={handleCancelExternalEdit}
-          onSubmitExternalEdit={handleSubmitExternalEdit}
-          onFocusBlock={setActiveBlockId}
-        />
+        <BlockListItemActionsProvider value={itemActions}>
+          <VirtualBlockList
+            ref={blockListRef}
+            totalCount={totalBlockCount}
+            getBlockAtIndex={blockList.getBlockAtIndex}
+            ensureBlockIndex={blockList.ensureBlockIndex}
+          />
+        </BlockListItemActionsProvider>
       )}
 
       {visibility === "active" ? (
         <div className="flex justify-center">
           <Button
             className="gap-2"
-            disabled={isCreatingBlock}
+            disabled={blockMutations.isCreatingBlock}
             onClick={() => {
               void createBlockWithFocus();
             }}
           >
-            {isCreatingBlock ? (
+            {blockMutations.isCreatingBlock ? (
               <LoaderCircleIcon className="size-4 animate-spin" />
             ) : (
               <PlusIcon className="size-4" />

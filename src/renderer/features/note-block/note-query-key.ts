@@ -13,5 +13,3 @@ export const blockListPageQueryKey = (
 
 export const getBlockPageOffset = (index: number) =>
   Math.floor(index / BLOCKS_PAGE_SIZE) * BLOCKS_PAGE_SIZE;
-
-export const tagListQueryKey = ["tags"] as const;

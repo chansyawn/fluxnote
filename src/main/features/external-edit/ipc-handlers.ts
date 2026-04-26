@@ -4,9 +4,10 @@ import { businessError } from "@shared/ipc/errors";
 import { eq } from "drizzle-orm";
 
 import type { BackendStore } from "../backend-store";
-import { getPublicBlockById, nowIsoString } from "../blocks/block-records";
+import { getPublicBlockById } from "../blocks/block-records";
 import type { AppDatabase } from "../database/database-client";
 import { blocks } from "../database/database-schema";
+import { nowIsoString } from "../database/db-utils";
 import {
   defineIpcCommandHandler,
   type AnyIpcCommandHandlerDefinition,
