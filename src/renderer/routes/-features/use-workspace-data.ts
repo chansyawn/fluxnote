@@ -15,7 +15,7 @@ import {
 } from "@renderer/clients";
 import { blockListQueryKey, tagListQueryKey } from "@renderer/features/note-block/note-query-key";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
 export type BlockMutationOperation = "archive" | "restore" | "delete" | "setTags";
@@ -205,24 +205,52 @@ export function useWorkspaceData({
   const pendingBlockIdsByOperation = usePendingBlockIdsByOperation();
   const pendingTagOperationState = usePendingTagOperationState();
 
+  const stableCreateBlock = useCallback(
+    () => createBlockMutation.mutateAsync(),
+    [createBlockMutation.mutateAsync],
+  );
+  const stableArchiveBlock = useCallback(
+    (blockId: string) => archiveBlockMutation.mutateAsync(blockId),
+    [archiveBlockMutation.mutateAsync],
+  );
+  const stableRestoreBlock = useCallback(
+    (blockId: string) => restoreBlockMutation.mutateAsync(blockId),
+    [restoreBlockMutation.mutateAsync],
+  );
+  const stableDeleteBlock = useCallback(
+    async (blockId: string) => {
+      await deleteBlockMutation.mutateAsync(blockId);
+    },
+    [deleteBlockMutation.mutateAsync],
+  );
+  const stableCreateTag = useCallback(
+    (name: string) => createTagMutation.mutateAsync(name),
+    [createTagMutation.mutateAsync],
+  );
+  const stableDeleteTag = useCallback(
+    async (tagId: string) => {
+      await deleteTagMutation.mutateAsync(tagId);
+    },
+    [deleteTagMutation.mutateAsync],
+  );
+  const stableAssignBlockTags = useCallback(
+    (blockId: string, tagIds: string[]) => setBlockTagsMutation.mutateAsync({ blockId, tagIds }),
+    [setBlockTagsMutation.mutateAsync],
+  );
+
   return {
     blocks: blocksQuery.data ?? [],
     tags: tagsQuery.data ?? [],
     isInitialLoading: blocksQuery.data === undefined || tagsQuery.data === undefined,
     isRefreshing: blocksQuery.isFetching || tagsQuery.isFetching,
     isCreatingBlock: createBlockMutation.isPending,
-    createBlock: async () => await createBlockMutation.mutateAsync(),
-    archiveBlock: async (blockId: string) => await archiveBlockMutation.mutateAsync(blockId),
-    restoreBlock: async (blockId: string) => await restoreBlockMutation.mutateAsync(blockId),
-    deleteBlock: async (blockId: string) => {
-      await deleteBlockMutation.mutateAsync(blockId);
-    },
-    createTag: async (name: string) => await createTagMutation.mutateAsync(name),
-    deleteTag: async (tagId: string) => {
-      await deleteTagMutation.mutateAsync(tagId);
-    },
-    assignBlockTags: async (blockId: string, tagIds: string[]) =>
-      await setBlockTagsMutation.mutateAsync({ blockId, tagIds }),
+    createBlock: stableCreateBlock,
+    archiveBlock: stableArchiveBlock,
+    restoreBlock: stableRestoreBlock,
+    deleteBlock: stableDeleteBlock,
+    createTag: stableCreateTag,
+    deleteTag: stableDeleteTag,
+    assignBlockTags: stableAssignBlockTags,
     isBlockLocked: (blockId: string) =>
       (["archive", "restore", "delete", "setTags"] as BlockMutationOperation[]).some((op) =>
         pendingBlockIdsByOperation[op].has(blockId),

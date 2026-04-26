@@ -1,20 +1,21 @@
 import { Trans } from "@lingui/react/macro";
 import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
-import { cancelExternalEdit, submitExternalEdit } from "@renderer/clients";
-import { BlockActions } from "@renderer/features/note-block/block-actions";
-import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
-import { NoteBlockEditor } from "@renderer/features/note-block/note-block-editor";
+import { cancelExternalEdit, submitExternalEdit, type Block } from "@renderer/clients";
 import { useOpenBlockTarget } from "@renderer/routes/-features/open-block-target";
 import { useBlockShortcuts } from "@renderer/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
 import { useExternalEditSessions } from "@renderer/routes/-features/use-external-edit-sessions";
 import { useOpenBlockRequest } from "@renderer/routes/-features/use-open-block-request";
+import {
+  VirtualBlockList,
+  type VirtualBlockListHandle,
+} from "@renderer/routes/-features/virtual-block-list";
 import { WorkspaceTagFilterPortal } from "@renderer/routes/-features/workspace-tag-filter-portal";
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
 function LoadingState(): ReactElement {
@@ -100,8 +101,13 @@ export function BlockWorkspace() {
   const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const blockListRef = useRef<VirtualBlockListHandle | null>(null);
+  const scrollToBlock = useCallback((blockId: string) => {
+    blockListRef.current?.scrollToBlock(blockId);
+  }, []);
   const {
     editorRefs,
+    registerEditorRef,
     createBlockWithFocus,
     deleteBlockWithFocus,
     setActiveBlockId,
@@ -110,6 +116,7 @@ export function BlockWorkspace() {
     blocks,
     createBlock,
     deleteBlock,
+    scrollToBlock,
   });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
@@ -122,47 +129,92 @@ export function BlockWorkspace() {
     onAcknowledge: acknowledgePendingBlockId,
   });
 
-  const setExternalEditPending = (editId: string, pending: boolean) => {
-    setPendingExternalEditIds((current) => {
-      const next = new Set(current);
-      if (pending) {
-        next.add(editId);
-      } else {
-        next.delete(editId);
-      }
-      return next;
-    });
-  };
+  const handleArchiveBlock = useCallback(
+    (blockId: string) => {
+      void archiveBlock(blockId);
+    },
+    [archiveBlock],
+  );
 
-  const handleSubmitExternalEdit = async (blockId: string, editId: string) => {
-    setExternalEditPending(editId, true);
-    try {
-      const editorContent = await editorRefs.current.get(blockId)?.flushPendingMarkdown();
-      const content = editorContent ?? blocks.find((block) => block.id === blockId)?.content;
-      if (content === undefined) {
-        toast.error("Cannot submit: block content unavailable.");
-        return;
-      }
-      await submitExternalEdit({ content, editId });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    } catch (error) {
-      toast.error(toAppInvokeError(error).message);
-    } finally {
-      setExternalEditPending(editId, false);
-    }
-  };
+  const handleRestoreBlock = useCallback(
+    (blockId: string) => {
+      void restoreBlock(blockId);
+    },
+    [restoreBlock],
+  );
 
-  const handleCancelExternalEdit = async (editId: string) => {
-    setExternalEditPending(editId, true);
+  const handleDeleteBlock = useCallback(
+    (blockId: string) => {
+      void deleteBlockWithFocus(blockId);
+    },
+    [deleteBlockWithFocus],
+  );
+
+  const handleCreateTag = useCallback(
+    async (blockId: string, name: string) => {
+      await createTagAndAssignToBlock(blockId, name);
+    },
+    [createTagAndAssignToBlock],
+  );
+
+  const handleAssignTags = useCallback(
+    async (blockId: string, tagIds: string[]) => {
+      await assignBlockTags(blockId, tagIds);
+    },
+    [assignBlockTags],
+  );
+
+  const handleCancelExternalEdit = useCallback(async (editId: string) => {
+    setPendingExternalEditIds((current) => new Set(current).add(editId));
     try {
       await cancelExternalEdit({ editId });
       void queryClient.invalidateQueries({ queryKey: ["blocks"] });
     } catch (error) {
       toast.error(toAppInvokeError(error).message);
     } finally {
-      setExternalEditPending(editId, false);
+      setPendingExternalEditIds((current) => {
+        const next = new Set(current);
+        next.delete(editId);
+        return next;
+      });
     }
-  };
+  }, []);
+
+  const handleSubmitExternalEdit = useCallback(
+    async (blockId: string, editId: string) => {
+      setPendingExternalEditIds((current) => new Set(current).add(editId));
+      try {
+        const editorContent = await editorRefs.current.get(blockId)?.flushPendingMarkdown();
+        let content = editorContent;
+        if (content === undefined) {
+          for (const [, cached] of queryClient.getQueriesData<Block[]>({
+            queryKey: ["blocks"],
+          })) {
+            const found = cached?.find((b) => b.id === blockId);
+            if (found) {
+              content = found.content;
+              break;
+            }
+          }
+        }
+        if (content === undefined) {
+          toast.error("Cannot submit: block content unavailable.");
+          return;
+        }
+        await submitExternalEdit({ content, editId });
+        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      } catch (error) {
+        toast.error(toAppInvokeError(error).message);
+      } finally {
+        setPendingExternalEditIds((current) => {
+          const next = new Set(current);
+          next.delete(editId);
+          return next;
+        });
+      }
+    },
+    [editorRefs],
+  );
 
   if (isInitialLoading) {
     return <LoadingState />;
@@ -208,79 +260,26 @@ export function BlockWorkspace() {
           </div>
         )
       ) : (
-        <div className="flex flex-col gap-3 pt-2">
-          {blocks.map((block) => {
-            const externalEditSession = sessionsByBlockId.get(block.id);
-            const isExternalEditPending = externalEditSession
-              ? pendingExternalEditIds.has(externalEditSession.editId)
-              : false;
-            const isActionGroupDisabled = isBlockLocked(block.id) || isExternalEditPending;
-
-            return (
-              <NoteBlockEditor
-                key={block.id}
-                ref={(handle) => {
-                  if (handle) {
-                    editorRefs.current.set(block.id, handle);
-                  } else {
-                    editorRefs.current.delete(block.id);
-                  }
-                }}
-                actions={
-                  <BlockActions
-                    block={block}
-                    visibility={visibility}
-                    tags={tags}
-                    editorRef={editorRefs.current.get(block.id)}
-                    isDisabled={isActionGroupDisabled}
-                    isArchivePending={isBlockOpPending(
-                      block.id,
-                      visibility === "active" ? "archive" : "restore",
-                    )}
-                    isDeletePending={isBlockOpPending(block.id, "delete")}
-                    isTagOpPending={isTagOpPending("create")}
-                    onArchive={() => {
-                      void archiveBlock(block.id);
-                    }}
-                    onRestore={() => {
-                      void restoreBlock(block.id);
-                    }}
-                    onDelete={() => {
-                      if (externalEditSession) {
-                        void handleCancelExternalEdit(externalEditSession.editId);
-                        return;
-                      }
-
-                      void deleteBlockWithFocus(block.id);
-                    }}
-                    onCreateTag={async (name) => {
-                      await createTagAndAssignToBlock(block.id, name);
-                    }}
-                    onAssignTags={async (tagIds) => {
-                      await assignBlockTags(block.id, tagIds);
-                    }}
-                  />
-                }
-                isExternalEditPending={Boolean(externalEditSession)}
-                leadingActions={
-                  externalEditSession ? (
-                    <BlockExternalEditActions
-                      isPending={isExternalEditPending}
-                      onCancel={() => {
-                        void handleCancelExternalEdit(externalEditSession.editId);
-                      }}
-                      onSubmit={() => {
-                        void handleSubmitExternalEdit(block.id, externalEditSession.editId);
-                      }}
-                    />
-                  ) : null
-                }
-                block={block}
-                onFocus={setActiveBlockId}
-              />
-            );
-          })}
-        </div>
+        <VirtualBlockList
+          ref={blockListRef}
+          blocks={blocks}
+          tags={tags}
+          visibility={visibility}
+          sessionsByBlockId={sessionsByBlockId}
+          pendingExternalEditIds={pendingExternalEditIds}
+          registerEditorRef={registerEditorRef}
+          isBlockLocked={isBlockLocked}
+          isBlockOpPending={isBlockOpPending}
+          isTagOpPending={isTagOpPending}
+          onArchiveBlock={handleArchiveBlock}
+          onRestoreBlock={handleRestoreBlock}
+          onDeleteBlock={handleDeleteBlock}
+          onCreateTag={handleCreateTag}
+          onAssignTags={handleAssignTags}
+          onCancelExternalEdit={handleCancelExternalEdit}
+          onSubmitExternalEdit={handleSubmitExternalEdit}
+          onFocusBlock={setActiveBlockId}
+        />
       )}
 
       {visibility === "active" ? (

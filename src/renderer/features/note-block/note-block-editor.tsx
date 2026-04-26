@@ -41,6 +41,8 @@ export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditor
     ref,
   ) {
     const editorShellRef = useRef<NoteEditorShellHandle | null>(null);
+    const blockIdRef = useRef(block.id);
+    blockIdRef.current = block.id;
     const latestContentRef = useRef(block.content);
     const persistedContentRef = useRef(block.content);
     const latestRequestIdRef = useRef(0);
@@ -104,6 +106,20 @@ export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditor
       600,
       { flushOnExit: true },
     );
+
+    useEffect(() => {
+      return () => {
+        if (latestContentRef.current !== persistedContentRef.current) {
+          const id = blockIdRef.current;
+          const content = latestContentRef.current;
+          queryClient.setQueriesData<Block[]>({ queryKey: ["blocks"] }, (current) => {
+            if (!current) return current;
+            return current.map((b) => (b.id === id ? { ...b, content } : b));
+          });
+        }
+        debouncedSave.flush();
+      };
+    }, [debouncedSave]);
 
     const handleMarkdownUpdated = useEffectEvent((markdown: string) => {
       latestContentRef.current = markdown;
