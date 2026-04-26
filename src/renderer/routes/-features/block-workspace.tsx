@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
-import { cancelExternalEdit, submitExternalEdit, type Block } from "@renderer/clients";
+import { cancelExternalEdit, submitExternalEdit, type ListBlocksResult } from "@renderer/clients";
 import { useOpenBlockTarget } from "@renderer/routes/-features/open-block-target";
 import { useBlockShortcuts } from "@renderer/routes/-features/use-block-shortcuts";
 import { useBlockWorkspace } from "@renderer/routes/-features/use-block-workspace";
@@ -79,7 +79,8 @@ function ArchivedEmptyState() {
 
 export function BlockWorkspace() {
   const {
-    blocks,
+    loadedBlocks,
+    totalBlockCount,
     tags,
     visibility,
     selectedTagIds,
@@ -94,6 +95,10 @@ export function BlockWorkspace() {
     deleteBlock,
     createTagAndAssignToBlock,
     assignBlockTags,
+    getBlockAtIndex,
+    ensureBlockIndex,
+    ensureBlockIndexLoaded,
+    locateBlockInView,
     setVisibility,
     setSelectedTagFilters,
   } = useBlockWorkspace();
@@ -102,8 +107,8 @@ export function BlockWorkspace() {
     () => new Set(),
   );
   const blockListRef = useRef<VirtualBlockListHandle | null>(null);
-  const scrollToBlock = useCallback((blockId: string) => {
-    blockListRef.current?.scrollToBlock(blockId);
+  const scrollToBlockIndex = useCallback((index: number) => {
+    blockListRef.current?.scrollToIndex(index);
   }, []);
   const {
     editorRefs,
@@ -111,12 +116,16 @@ export function BlockWorkspace() {
     createBlockWithFocus,
     deleteBlockWithFocus,
     setActiveBlockId,
-    requestBlockFocus,
+    requestLocatedBlockFocus,
   } = useBlockShortcuts({
-    blocks,
+    loadedBlocks,
+    totalBlockCount,
     createBlock,
     deleteBlock,
-    scrollToBlock,
+    getBlockAtIndex,
+    ensureBlockIndexLoaded,
+    locateBlockInView,
+    scrollToBlockIndex,
   });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
@@ -125,7 +134,7 @@ export function BlockWorkspace() {
     pendingBlockId,
     onSetVisibility: setVisibility,
     onClearFilters: () => setSelectedTagFilters([]),
-    onFocus: requestBlockFocus,
+    onFocus: requestLocatedBlockFocus,
     onAcknowledge: acknowledgePendingBlockId,
   });
 
@@ -187,10 +196,10 @@ export function BlockWorkspace() {
         const editorContent = await editorRefs.current.get(blockId)?.flushPendingMarkdown();
         let content = editorContent;
         if (content === undefined) {
-          for (const [, cached] of queryClient.getQueriesData<Block[]>({
+          for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
             queryKey: ["blocks"],
           })) {
-            const found = cached?.find((b) => b.id === blockId);
+            const found = cached?.blocks.find((b) => b.id === blockId);
             if (found) {
               content = found.content;
               break;
@@ -220,7 +229,7 @@ export function BlockWorkspace() {
     return <LoadingState />;
   }
 
-  if (visibility === "active" && blocks.length === 0 && selectedTagIds.length === 0) {
+  if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
     return (
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         <WorkspaceTagFilterPortal />
@@ -232,7 +241,7 @@ export function BlockWorkspace() {
   return (
     <section className="z-10 mx-auto flex w-full max-w-4xl flex-col gap-4">
       <WorkspaceTagFilterPortal />
-      {blocks.length === 0 ? (
+      {totalBlockCount === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
           <ArchivedEmptyState />
         ) : (
@@ -262,7 +271,9 @@ export function BlockWorkspace() {
       ) : (
         <VirtualBlockList
           ref={blockListRef}
-          blocks={blocks}
+          totalCount={totalBlockCount}
+          getBlockAtIndex={getBlockAtIndex}
+          ensureBlockIndex={ensureBlockIndex}
           tags={tags}
           visibility={visibility}
           sessionsByBlockId={sessionsByBlockId}

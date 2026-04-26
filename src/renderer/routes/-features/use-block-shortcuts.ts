@@ -1,14 +1,18 @@
-import type { Block } from "@renderer/clients";
+import type { Block, LocateBlockResult } from "@renderer/clients";
 import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@renderer/features/shortcut/shortcut-utils";
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 
 interface UseBlockShortcutsParams {
-  blocks: Block[];
+  loadedBlocks: Block[];
+  totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
-  scrollToBlock: (blockId: string) => void;
+  getBlockAtIndex: (index: number) => Block | undefined;
+  ensureBlockIndexLoaded: (index: number) => Promise<void>;
+  locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
+  scrollToBlockIndex: (index: number) => void;
 }
 
 interface UseBlockShortcutsResult {
@@ -18,28 +22,24 @@ interface UseBlockShortcutsResult {
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   setActiveBlockId: (blockId: string) => void;
   requestBlockFocus: (blockId: string) => void;
-}
-
-function getAdjacentBlockId(blocks: Block[], blockId: string): string | null {
-  const currentIndex = blocks.findIndex((block) => block.id === blockId);
-
-  if (currentIndex === -1) {
-    return null;
-  }
-
-  return blocks[currentIndex - 1]?.id ?? blocks[currentIndex + 1]?.id ?? null;
+  requestLocatedBlockFocus: (blockId: string, index: number) => void;
 }
 
 export function useBlockShortcuts({
-  blocks,
+  loadedBlocks,
+  totalBlockCount,
   createBlock,
   deleteBlock,
-  scrollToBlock,
+  getBlockAtIndex,
+  ensureBlockIndexLoaded,
+  locateBlockInView,
+  scrollToBlockIndex,
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const editorRefs = useRef<Map<string, NoteBlockEditorHandle>>(new Map());
   const pendingFocusBlockIdRef = useRef<string | null>(null);
+  const pendingFocusIndexRef = useRef<number | null>(null);
 
   const attemptPendingFocus = useCallback(() => {
     const blockId = pendingFocusBlockIdRef.current;
@@ -67,15 +67,71 @@ export function useBlockShortcuts({
     [attemptPendingFocus],
   );
 
+  const requestLocatedBlockFocus = useEffectEvent((blockId: string | null, index: number) => {
+    if (!blockId) {
+      return;
+    }
+
+    pendingFocusBlockIdRef.current = blockId;
+    pendingFocusIndexRef.current = null;
+    setActiveBlockId(blockId);
+    scrollToBlockIndex(index);
+    attemptPendingFocus();
+    void ensureBlockIndexLoaded(index).then(() => {
+      scrollToBlockIndex(index);
+      attemptPendingFocus();
+    });
+  });
+
   const requestBlockFocus = useEffectEvent((blockId: string | null) => {
     if (!blockId) {
       return;
     }
 
     pendingFocusBlockIdRef.current = blockId;
-    scrollToBlock(blockId);
-    setActiveBlockId(blockId);
-    setTimeout(attemptPendingFocus, 0);
+    void locateBlockInView(blockId).then((result) => {
+      if (!result) {
+        pendingFocusBlockIdRef.current = null;
+        return;
+      }
+
+      requestLocatedBlockFocus(result.block.id, result.index);
+    });
+  });
+
+  const requestBlockFocusAtIndex = useEffectEvent((index: number) => {
+    if (index < 0) {
+      setActiveBlockId(null);
+      return;
+    }
+
+    const block = getBlockAtIndex(index);
+    if (block) {
+      requestLocatedBlockFocus(block.id, index);
+      return;
+    }
+
+    pendingFocusIndexRef.current = index;
+    scrollToBlockIndex(index);
+    void ensureBlockIndexLoaded(index).then(() => {
+      scrollToBlockIndex(index);
+      attemptPendingIndexFocus();
+    });
+  });
+
+  const attemptPendingIndexFocus = useEffectEvent(() => {
+    const index = pendingFocusIndexRef.current;
+    if (index === null) {
+      return;
+    }
+
+    const block = getBlockAtIndex(index);
+    if (!block) {
+      return;
+    }
+
+    pendingFocusIndexRef.current = null;
+    requestLocatedBlockFocus(block.id, index);
   });
 
   const createBlockWithFocus = useEffectEvent(async () => {
@@ -85,7 +141,8 @@ export function useBlockShortcuts({
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
     const shouldMoveFocus = activeBlockId === blockId;
-    const nextFocusBlockId = shouldMoveFocus ? getAdjacentBlockId(blocks, blockId) : null;
+    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
+    const countBeforeDelete = totalBlockCount;
 
     await deleteBlock(blockId);
 
@@ -93,38 +150,22 @@ export function useBlockShortcuts({
       return;
     }
 
-    if (!nextFocusBlockId) {
+    if (!currentLocation || countBeforeDelete <= 1) {
       setActiveBlockId(null);
       return;
     }
 
-    requestBlockFocus(nextFocusBlockId);
+    const nextIndex =
+      currentLocation.index >= countBeforeDelete - 1
+        ? currentLocation.index - 1
+        : currentLocation.index;
+    requestBlockFocusAtIndex(nextIndex);
   });
 
   useEffect(() => {
-    if (!activeBlockId) {
-      return;
-    }
-
-    const hasActiveBlock = blocks.some((block) => block.id === activeBlockId);
-
-    if (!hasActiveBlock) {
-      setActiveBlockId(null);
-    }
-  }, [activeBlockId, blocks]);
-
-  useEffect(() => {
-    const pendingBlockId = pendingFocusBlockIdRef.current;
-    if (!pendingBlockId) return;
-
-    const exists = blocks.some((block) => block.id === pendingBlockId);
-    if (!exists) {
-      pendingFocusBlockIdRef.current = null;
-      return;
-    }
-
-    scrollToBlock(pendingBlockId);
-  }, [blocks, scrollToBlock]);
+    attemptPendingIndexFocus();
+    attemptPendingFocus();
+  }, [attemptPendingFocus, attemptPendingIndexFocus, loadedBlocks]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -169,5 +210,6 @@ export function useBlockShortcuts({
     deleteBlockWithFocus,
     setActiveBlockId,
     requestBlockFocus,
+    requestLocatedBlockFocus,
   };
 }

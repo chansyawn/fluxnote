@@ -1,5 +1,5 @@
-import type { Block } from "@renderer/clients";
-import { locateBlock } from "@renderer/routes/-features/open-block-target";
+import type { Block, LocateBlockResult } from "@renderer/clients";
+import { resolveLocatedBlock } from "@renderer/routes/-features/open-block-target";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 function makeBlock(id: string): Block {
@@ -16,22 +16,32 @@ function makeBlock(id: string): Block {
 }
 
 describe("locateBlock", () => {
-  it("returns 'found' when the block exists in the fetched list", async () => {
-    const fetchBlocks = vi.fn().mockResolvedValue([makeBlock("block-1"), makeBlock("block-2")]);
+  it("returns the located index when the backend finds the requested block", async () => {
+    const locate = vi.fn<() => Promise<LocateBlockResult>>().mockResolvedValue({
+      block: makeBlock("block-1"),
+      index: 3,
+    });
 
-    await expect(locateBlock("block-1", fetchBlocks)).resolves.toBe("found");
-    expect(fetchBlocks).toHaveBeenCalledOnce();
+    await expect(resolveLocatedBlock("block-1", locate)).resolves.toEqual({
+      status: "found",
+      blockId: "block-1",
+      index: 3,
+    });
+    expect(locate).toHaveBeenCalledOnce();
   });
 
-  it("returns 'not_found' when the block is absent from the fetched list", async () => {
-    const fetchBlocks = vi.fn().mockResolvedValue([makeBlock("block-2")]);
+  it("returns 'not_found' when the backend cannot locate the block", async () => {
+    const locate = vi.fn<() => Promise<LocateBlockResult>>().mockResolvedValue(null);
 
-    await expect(locateBlock("block-1", fetchBlocks)).resolves.toBe("not_found");
+    await expect(resolveLocatedBlock("block-1", locate)).resolves.toEqual({ status: "not_found" });
   });
 
-  it("returns 'not_found' when the fetched list is empty", async () => {
-    const fetchBlocks = vi.fn().mockResolvedValue([]);
+  it("returns 'not_found' when the locate result does not match the requested block", async () => {
+    const locate = vi.fn<() => Promise<LocateBlockResult>>().mockResolvedValue({
+      block: makeBlock("block-2"),
+      index: 0,
+    });
 
-    await expect(locateBlock("block-1", fetchBlocks)).resolves.toBe("not_found");
+    await expect(resolveLocatedBlock("block-1", locate)).resolves.toEqual({ status: "not_found" });
   });
 });

@@ -14,8 +14,16 @@ describe("ipc contracts", () => {
 
   it("parses defaulted command inputs", () => {
     expect(ipcCommandContracts.blocksList.request.parse({})).toEqual({
+      limit: 50,
+      offset: 0,
       visibility: "active",
     });
+    expect(ipcCommandContracts.blocksList.request.parse({ limit: 200, offset: 10 })).toEqual({
+      limit: 200,
+      offset: 10,
+      visibility: "active",
+    });
+    expect(() => ipcCommandContracts.blocksList.request.parse({ limit: 201 })).toThrow();
     expect(ipcCommandContracts.openBlockPendingRead.response.parse({ blockId: null })).toEqual({
       blockId: null,
     });
