@@ -18,7 +18,7 @@ import { NoteEditorPlugins } from "./note-editor-plugins";
 import "../theme/note-editor.css";
 
 export interface NoteEditorShellHandle {
-  copyContent: () => Promise<void>;
+  copy: () => Promise<void>;
   focus: () => void;
 }
 
@@ -43,7 +43,7 @@ function NoteEditorShellContent({
   const [editor] = useLexicalComposerContext();
 
   useImperativeHandle(ref, () => ({
-    copyContent: async () => {
+    copy: async () => {
       try {
         await copyEditorContentToClipboard(editor, "document");
       } catch (error) {
