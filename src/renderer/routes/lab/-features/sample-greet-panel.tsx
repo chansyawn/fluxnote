@@ -2,12 +2,13 @@ import { Trans } from "@lingui/react/macro";
 import { AppInvokeError } from "@renderer/app/invoke";
 import { greet } from "@renderer/clients";
 import { Button } from "@renderer/ui/components/button";
+import { Input } from "@renderer/ui/components/input";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 
 type QueryName = string | null;
 
-function formatDetails(details: unknown): string {
+export function formatDetails(details: unknown): string {
   if (details === undefined || details === null) {
     return "";
   }
@@ -21,6 +22,10 @@ function formatDetails(details: unknown): string {
   } catch {
     return JSON.stringify({ fallback: "Unserializable details" }, null, 2);
   }
+}
+
+export function shouldRefetchSameQuery(queryName: QueryName, nameInput: string): boolean {
+  return queryName === nameInput;
 }
 
 export function SampleGreetPanel() {
@@ -39,7 +44,7 @@ export function SampleGreetPanel() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (queryName === nameInput) {
+    if (shouldRefetchSameQuery(queryName, nameInput)) {
       void greetQuery.refetch();
       return;
     }
@@ -65,13 +70,13 @@ export function SampleGreetPanel() {
           <span className="text-xs font-medium">
             <Trans id="sample.greet.input.label">Name</Trans>
           </span>
-          <input
-            className="border-border bg-background focus-visible:ring-ring/30 h-8 rounded-md border px-2 text-xs outline-none focus-visible:ring-2"
+          <Input
             value={nameInput}
             onChange={(event) => {
               setNameInput(event.target.value);
             }}
             placeholder="FluxNote"
+            className="h-8 text-xs"
           />
         </label>
 
@@ -88,7 +93,7 @@ export function SampleGreetPanel() {
       <div className="mt-4">
         {greetQuery.isPending ? (
           <p className="text-muted-foreground text-xs">
-            <Trans id="sample.greet.loading">Loading response from Rust backend...</Trans>
+            <Trans id="sample.greet.loading">Loading response from Electron main process...</Trans>
           </p>
         ) : null}
 

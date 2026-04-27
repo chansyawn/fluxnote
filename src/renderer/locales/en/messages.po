@@ -136,7 +136,7 @@ msgid "home-note.block.placeholder"
 msgstr "Write something..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:20
+#: src/renderer/routes/lab/index.tsx:19
 msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
@@ -156,17 +156,17 @@ msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:32
+#: src/renderer/routes/lab/index.tsx:31
 msgid "lab.tabs.playground"
 msgstr "Playground"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:29
+#: src/renderer/routes/lab/index.tsx:28
 msgid "lab.tabs.sample"
 msgstr "Sample"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:16
 msgid "lab.title"
 msgstr "Lab"
 
@@ -331,62 +331,62 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:57
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:62
 msgid "sample.greet.description"
 msgstr "Try normal names, empty value, long value, or `missing` to see different error types."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:126
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:131
 msgid "sample.greet.error.details"
 msgstr "Details"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:119
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:124
 msgid "sample.greet.error.message"
 msgstr "Message:"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:107
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:112
 msgid "sample.greet.error.title"
 msgstr "Structured error"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:113
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:118
 msgid "sample.greet.error.type"
 msgstr "Type:"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:136
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:141
 msgid "sample.greet.error.unknown"
 msgstr "Unknown error shape."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:66
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:71
 msgid "sample.greet.input.label"
 msgstr "Name"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:91
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:96
 msgid "sample.greet.loading"
-msgstr "Loading response from Rust backend..."
+msgstr "Loading response from Electron main process..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:80
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:85
 msgid "sample.greet.submit"
 msgstr "Run greet query"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:98
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:103
 msgid "sample.greet.success.title"
 msgstr "Success"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:83
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:88
 msgid "sample.greet.tip"
 msgstr "Tip: try `missing` or an empty value."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:54
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:59
 msgid "sample.greet.title"
 msgstr "Query + Client + Invoke Demo"
 
@@ -403,7 +403,7 @@ msgstr "Internationalization: all user-facing strings use stable Lingui explicit
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/sample-spec-panel.tsx:11
 msgid "sample.spec.layering"
-msgstr "Layering: route component calls `src/clients`, which uses `@renderer/app/invoke`."
+msgstr "Layering: route component calls `@renderer/clients`, which uses `@renderer/app/invoke`."
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/sample-spec-panel.tsx:16
@@ -421,27 +421,27 @@ msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:303
+#: src/renderer/routes/-features/block-workspace.tsx:320
 msgid "workspace.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:71
+#: src/renderer/routes/-features/block-workspace.tsx:74
 msgid "workspace.archived.empty.description"
 msgstr "Archived blocks will appear here until you restore them."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:68
+#: src/renderer/routes/-features/block-workspace.tsx:71
 msgid "workspace.archived.empty.title"
 msgstr "No archived blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:271
+#: src/renderer/routes/-features/block-workspace.tsx:286
 msgid "workspace.archived.filtered.empty.description"
 msgstr "Clear one of the filters or switch back to active blocks."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:260
+#: src/renderer/routes/-features/block-workspace.tsx:275
 msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
@@ -456,32 +456,32 @@ msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:58
+#: src/renderer/routes/-features/block-workspace.tsx:61
 msgid "workspace.empty.action"
 msgstr "Create first block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:44
+#: src/renderer/routes/-features/block-workspace.tsx:47
 msgid "workspace.empty.description"
 msgstr "Start with an empty block."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:41
+#: src/renderer/routes/-features/block-workspace.tsx:44
 msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:267
+#: src/renderer/routes/-features/block-workspace.tsx:282
 msgid "workspace.filtered.empty.description"
 msgstr "Clear one of the filters or create a new block outside the current tag selection."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:258
+#: src/renderer/routes/-features/block-workspace.tsx:273
 msgid "workspace.filtered.empty.title"
 msgstr "No blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:25
+#: src/renderer/routes/-features/block-workspace.tsx:28
 msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
