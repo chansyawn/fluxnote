@@ -11,12 +11,11 @@
     "#global.css": "./src/renderer/global.css"
   },
   "scripts": {
-    "cli:build": "vp build -c vite.cli.config.ts",
     "db:generate": "drizzle-kit generate",
     "dev": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "flux": "vp build -c vite.cli.config.ts && ./src/cli/flux",
+    "flux": "./src/cli/flux",
     "lingui": "lingui",
     "lingui:extract": "lingui extract --overwrite --clean",
     "lingui:compile": "lingui compile --strict"
