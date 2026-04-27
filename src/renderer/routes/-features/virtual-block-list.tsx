@@ -1,4 +1,3 @@
-import { useScrollContainer } from "@renderer/app/scroll-container";
 import type { Block } from "@renderer/clients";
 import { BlockActions } from "@renderer/features/note-block/block-actions";
 import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
@@ -25,6 +24,27 @@ import { useEditorRegistryContext } from "./editor-registry-context";
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
 const BLOCK_OVERSCAN = 5;
+
+function isScrollableOverflow(overflowValue: string): boolean {
+  return overflowValue === "auto" || overflowValue === "scroll" || overflowValue === "overlay";
+}
+
+function findNearestScrollElement(element: HTMLElement): HTMLElement | null {
+  let currentElement: HTMLElement | null = element.parentElement;
+  while (currentElement) {
+    const style = window.getComputedStyle(currentElement);
+    if (isScrollableOverflow(style.overflowY) || isScrollableOverflow(style.overflow)) {
+      return currentElement;
+    }
+    currentElement = currentElement.parentElement;
+  }
+
+  if (document.scrollingElement instanceof HTMLElement) {
+    return document.scrollingElement;
+  }
+
+  return document.documentElement;
+}
 
 export interface VirtualBlockListHandle {
   scrollToIndex: (index: number) => void;
@@ -129,7 +149,7 @@ const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Bloc
 
 export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockListProps>(
   function VirtualBlockList({ totalCount, getBlockAtIndex, ensureBlockIndex }, ref) {
-    const scrollElement = useScrollContainer();
+    const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
     const listElementRef = useRef<HTMLDivElement | null>(null);
     const [scrollMargin, setScrollMargin] = useState(0);
 
@@ -151,6 +171,7 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
 
     const setListElement = useCallback((element: HTMLDivElement | null) => {
       listElementRef.current = element;
+      setScrollElement(element ? findNearestScrollElement(element) : null);
     }, []);
 
     useLayoutEffect(() => {
