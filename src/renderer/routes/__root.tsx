@@ -25,7 +25,10 @@ function RootComponent() {
   return (
     <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
       <WindowTitleBar />
-      <main ref={setScrollContainer} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <main
+        ref={setScrollContainer}
+        className="me-1 min-h-0 flex-1 overflow-y-auto overscroll-contain"
+      >
         <ScrollContainerProvider element={scrollContainer}>
           <div className="mx-auto w-full max-w-5xl px-3 pb-6">
             <Outlet />
