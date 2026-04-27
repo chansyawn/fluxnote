@@ -2,6 +2,7 @@ import { queryClient } from "@renderer/app/query";
 import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/clients";
 import { NoteBlockEditorView } from "@renderer/features/note-block/note-block-editor-view";
 import { type NoteEditorShellHandle } from "@renderer/features/note-editor-core";
+import { useDebouncer } from "@tanstack/react-pacer";
 import { useMutation } from "@tanstack/react-query";
 import {
   forwardRef,
@@ -11,7 +12,6 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useDebouncedCallback } from "use-debounce";
 
 interface NoteBlockEditorProps {
   block: Block;
@@ -102,12 +102,16 @@ export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditor
       });
     });
 
-    const debouncedSave = useDebouncedCallback(
+    const saveDebouncer = useDebouncer(
       (content: string) => {
         runSave(content);
       },
-      600,
-      { flushOnExit: true },
+      {
+        wait: 600,
+        onUnmount: (debouncer) => {
+          debouncer.flush();
+        },
+      },
     );
 
     useEffect(() => {
@@ -123,27 +127,27 @@ export const NoteBlockEditor = forwardRef<NoteBlockEditorHandle, NoteBlockEditor
             };
           });
         }
-        debouncedSave.flush();
+        saveDebouncer.flush();
       };
-    }, [debouncedSave]);
+    }, [saveDebouncer]);
 
     const handleMarkdownUpdated = useEffectEvent((markdown: string) => {
       latestContentRef.current = markdown;
 
       if (markdown === persistedContentRef.current) {
-        debouncedSave.cancel();
+        saveDebouncer.cancel();
         return;
       }
 
-      debouncedSave(markdown);
+      saveDebouncer.maybeExecute(markdown);
     });
 
     const flushPendingSave = useEffectEvent(() => {
-      debouncedSave.flush();
+      saveDebouncer.flush();
     });
 
     const flushPendingMarkdown = useEffectEvent(async () => {
-      debouncedSave.flush();
+      saveDebouncer.flush();
       await savePromiseRef.current;
       return latestContentRef.current;
     });
