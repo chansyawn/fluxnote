@@ -1,4 +1,4 @@
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnoteRuntime } from "@shared/platform/electron-runtime";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const electronMock = vi.hoisted(() => ({

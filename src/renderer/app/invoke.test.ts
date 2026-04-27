@@ -4,7 +4,7 @@ import {
   subscribeEvent,
   toAppInvokeError,
 } from "@renderer/app/invoke";
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnoteRuntime } from "@shared/platform/electron-runtime";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 function setRuntime(runtime: FluxnoteRuntime): void {

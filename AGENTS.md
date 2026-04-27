@@ -30,12 +30,23 @@
 
 ### Structure
 
-- Backend TypeScript code must follow Feature-First structure under `src/main/features`.
-- Keep Electron main process as the single backend runtime entry and route backend commands through IPC handlers only.
+- **App assembly** (`src/main/app/`): process bootstrap, runtime composition, `ipc-registry` (aggregate IPC commands from feature manifests), and `backend-commands` (CLI / deep-link command surface).
+- **Platform core** (`src/main/core/`): IPC infrastructure (`core/ipc`), persistence (`core/persistence`, e.g. `BackendStore`), and **Drizzle** under `core/database`.
+- **Feature-First domains** (`src/main/features/<domain>/`): business logic with stable `index.ts` exports, per-domain `manifest.ts`, `service.ts`, optional `repository.ts` / `mapper.ts`, and per-domain `ipc-commands.ts` (and tests) for that area.
+- Keep file names role-based inside feature directories. Prefer `service.ts`, `repository.ts`, `mapper.ts`, and `ipc-commands.ts` over repeating the domain prefix in file names.
+- Keep Electron main process as the single backend runtime entry; renderer talks to the backend through IPC only (plus the separate CLI socket for the `flux` helper).
+
+### Shared contracts
+
+- **Domain DTOs and IPC fragments** live under `src/shared/domains/<domain>/` (for example `models.ts`, `ipc-commands.ts`, `ipc-events.ts`).
+- **Merged IPC registries** live under `src/shared/ipc/registry/`; import the stable surface from `@shared/ipc/contracts` unless you are editing a specific domain.
+- **Non-IPC entrypoints** (for example `backend-command-contracts`) are under `src/shared/entrypoints/`.
+- **Transport envelopes** (for example the standalone CLI IPC line protocol) are under `src/shared/transport/`.
+- **Preload/runtime-only types** (for example `FluxnoteRuntime`) are under `src/shared/platform/`.
 
 ### Database (Drizzle)
 
-- Keep the SQLite schema and Drizzle runtime helpers under `src/main/features/database`.
+- Keep the SQLite schema and Drizzle runtime helpers under `src/main/core/database`.
 - Database access is main-process only; do not introduce renderer-side database access.
 
 ### Error Model
@@ -75,7 +86,7 @@ vp run package
 ### References
 
 - Frontend sample pattern: `src/renderer/routes/lab/index.tsx`
-- Backend sample pattern: `src/main/features/backend-commands.ts`
+- Backend sample pattern: `src/main/app/backend-commands.ts` and `src/main/app/ipc-registry.ts`
 
 ### Spec Maintenance
 

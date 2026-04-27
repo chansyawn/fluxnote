@@ -5,7 +5,7 @@ import {
 } from "@main/features/deep-link/deep-link-handler";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-describe("deep link handler", () => {
+describe("deep link command", () => {
   it("extracts fluxnote urls from argv", () => {
     expect(extractDeepLinkFromArgv(["--flag", "fluxnote://block/block-1"])).toBe(
       "fluxnote://block/block-1",
@@ -39,18 +39,18 @@ describe("deep link handler", () => {
 
   it("dispatches parsed deep link commands", async () => {
     const dispatchCommand = vi.fn(async () => null);
-    const handler = createDeepLinkHandler({ dispatchCommand });
+    const command = createDeepLinkHandler({ dispatchCommand });
 
-    await expect(handler.handle("fluxnote://block/block-1")).resolves.toBe(true);
+    await expect(command.handle("fluxnote://block/block-1")).resolves.toBe(true);
 
     expect(dispatchCommand).toHaveBeenCalledWith("block.open", { blockId: "block-1" });
   });
 
   it("ignores invalid deep links without dispatching commands", async () => {
     const dispatchCommand = vi.fn(async () => null);
-    const handler = createDeepLinkHandler({ dispatchCommand });
+    const command = createDeepLinkHandler({ dispatchCommand });
 
-    await expect(handler.handle("fluxnote://tag/tag-1")).resolves.toBe(false);
+    await expect(command.handle("fluxnote://tag/tag-1")).resolves.toBe(false);
 
     expect(dispatchCommand).not.toHaveBeenCalled();
   });

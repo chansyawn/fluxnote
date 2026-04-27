@@ -1,13 +1,16 @@
 import fs from "node:fs/promises";
 import net from "node:net";
 
-import { backendCommandContracts, type BackendCommandKey } from "@shared/backend-command-contracts";
+import {
+  backendCommandContracts,
+  type BackendCommandKey,
+} from "@shared/entrypoints/backend-command-contracts";
+import { toIpcErrorPayload } from "@shared/ipc/errors";
 import {
   cliIpcRequestEnvelopeSchema,
   resolveCliIpcSocketPath,
   type CliIpcResponseEnvelope,
-} from "@shared/cli-ipc";
-import { toIpcErrorPayload } from "@shared/ipc/errors";
+} from "@shared/transport/cli-ipc";
 
 interface CliIpcServerServices {
   dispatchCommand: (
