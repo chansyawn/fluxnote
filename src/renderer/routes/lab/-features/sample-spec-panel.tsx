@@ -9,7 +9,7 @@ export function SampleSpecPanel() {
       <ul className="text-muted-foreground mt-3 list-disc space-y-1 pl-5 text-xs">
         <li>
           <Trans id="sample.spec.layering">
-            Layering: route component calls `src/clients`, which uses `@renderer/app/invoke`.
+            Layering: route component calls `@renderer/clients`, which uses `@renderer/app/invoke`.
           </Trans>
         </li>
         <li>

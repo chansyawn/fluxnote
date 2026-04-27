@@ -44,9 +44,9 @@
 
 ```ts
 {
-  type: string
-  message: string
-  details: any
+  type: string;
+  message: string;
+  details: any;
 }
 ```
 
@@ -74,7 +74,7 @@ vp run package
 
 ### References
 
-- Frontend sample pattern: `src/renderer/routes/sample/index.tsx`
+- Frontend sample pattern: `src/renderer/routes/lab/index.tsx`
 - Backend sample pattern: `src/main/features/backend-commands.ts`
 
 ### Spec Maintenance

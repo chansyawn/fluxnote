@@ -136,7 +136,7 @@ msgid "home-note.block.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:20
+#: src/renderer/routes/lab/index.tsx:19
 msgid "lab.description"
 msgstr ""
 
@@ -156,17 +156,17 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:32
+#: src/renderer/routes/lab/index.tsx:31
 msgid "lab.tabs.playground"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:29
+#: src/renderer/routes/lab/index.tsx:28
 msgid "lab.tabs.sample"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:16
 msgid "lab.title"
 msgstr ""
 
@@ -331,62 +331,62 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:57
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:62
 msgid "sample.greet.description"
 msgstr "可尝试普通名称、空值、超长值或 `missing`，观察不同错误类型。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:126
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:131
 msgid "sample.greet.error.details"
 msgstr "详细信息"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:119
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:124
 msgid "sample.greet.error.message"
 msgstr "消息:"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:107
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:112
 msgid "sample.greet.error.title"
 msgstr "结构化错误"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:113
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:118
 msgid "sample.greet.error.type"
 msgstr "类型:"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:136
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:141
 msgid "sample.greet.error.unknown"
 msgstr "未知错误结构。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:66
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:71
 msgid "sample.greet.input.label"
 msgstr "名称"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:91
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:96
 msgid "sample.greet.loading"
 msgstr "正在从 Rust 后端加载响应..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:80
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:85
 msgid "sample.greet.submit"
 msgstr "执行 greet 查询"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:98
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:103
 msgid "sample.greet.success.title"
 msgstr "成功"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:83
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:88
 msgid "sample.greet.tip"
 msgstr "提示：试试 `missing` 或空值。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:54
+#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:59
 msgid "sample.greet.title"
 msgstr "Query + Client + Invoke 示例"
 
@@ -421,27 +421,27 @@ msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:303
+#: src/renderer/routes/-features/block-workspace.tsx:320
 msgid "workspace.add-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:71
+#: src/renderer/routes/-features/block-workspace.tsx:74
 msgid "workspace.archived.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:68
+#: src/renderer/routes/-features/block-workspace.tsx:71
 msgid "workspace.archived.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:271
+#: src/renderer/routes/-features/block-workspace.tsx:286
 msgid "workspace.archived.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:260
+#: src/renderer/routes/-features/block-workspace.tsx:275
 msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
@@ -456,32 +456,32 @@ msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:58
+#: src/renderer/routes/-features/block-workspace.tsx:61
 msgid "workspace.empty.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:44
+#: src/renderer/routes/-features/block-workspace.tsx:47
 msgid "workspace.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:41
+#: src/renderer/routes/-features/block-workspace.tsx:44
 msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:267
+#: src/renderer/routes/-features/block-workspace.tsx:282
 msgid "workspace.filtered.empty.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:258
+#: src/renderer/routes/-features/block-workspace.tsx:273
 msgid "workspace.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-features/block-workspace.tsx:25
+#: src/renderer/routes/-features/block-workspace.tsx:28
 msgid "workspace.loading"
 msgstr ""
 
