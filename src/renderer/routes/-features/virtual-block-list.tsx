@@ -7,7 +7,6 @@ import {
 } from "@renderer/features/note-block/note-block-editor";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
-  forwardRef,
   memo,
   useCallback,
   useEffect,
@@ -16,6 +15,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type Ref,
 } from "react";
 
 import { useBlockListItemActions } from "./block-list-context";
@@ -54,6 +54,7 @@ interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
+  ref?: Ref<VirtualBlockListHandle>;
 }
 
 const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Block }) {
@@ -68,7 +69,7 @@ const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Bloc
   );
 
   const handleCopy = useCallback(() => {
-    void registry.getEditor(block.id)?.copyContent();
+    void registry.getEditor(block.id)?.copy();
   }, [block.id, registry.getEditor]);
 
   const externalEditSession = actions.sessionsByBlockId.get(block.id);
@@ -147,143 +148,141 @@ const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Bloc
   );
 });
 
-export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockListProps>(
-  function VirtualBlockList({ totalCount, getBlockAtIndex, ensureBlockIndex }, ref) {
-    const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
-    const listElementRef = useRef<HTMLDivElement | null>(null);
-    const [scrollMargin, setScrollMargin] = useState(0);
+export function VirtualBlockList({
+  totalCount,
+  getBlockAtIndex,
+  ensureBlockIndex,
+  ref,
+}: VirtualBlockListProps) {
+  const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
+  const listElementRef = useRef<HTMLDivElement | null>(null);
+  const [scrollMargin, setScrollMargin] = useState(0);
 
-    const getBlockItemKey = useCallback(
-      (index: number) => getBlockAtIndex(index)?.id ?? `placeholder-${index}`,
-      [getBlockAtIndex],
-    );
+  const getBlockItemKey = useCallback(
+    (index: number) => getBlockAtIndex(index)?.id ?? `placeholder-${index}`,
+    [getBlockAtIndex],
+  );
 
-    const blockVirtualizer = useVirtualizer({
-      count: totalCount,
-      estimateSize: () => BLOCK_ESTIMATED_SIZE_PX,
-      gap: BLOCK_GAP_PX,
-      getItemKey: getBlockItemKey,
-      getScrollElement: () => scrollElement,
-      overscan: BLOCK_OVERSCAN,
-      scrollMargin,
-      useFlushSync: false,
-    });
+  const blockVirtualizer = useVirtualizer({
+    count: totalCount,
+    estimateSize: () => BLOCK_ESTIMATED_SIZE_PX,
+    gap: BLOCK_GAP_PX,
+    getItemKey: getBlockItemKey,
+    getScrollElement: () => scrollElement,
+    overscan: BLOCK_OVERSCAN,
+    scrollMargin,
+    useFlushSync: false,
+  });
 
-    const setListElement = useCallback((element: HTMLDivElement | null) => {
-      listElementRef.current = element;
-      setScrollElement(element ? findNearestScrollElement(element) : null);
-    }, []);
+  const setListElement = useCallback((element: HTMLDivElement | null) => {
+    listElementRef.current = element;
+    setScrollElement(element ? findNearestScrollElement(element) : null);
+  }, []);
 
-    useLayoutEffect(() => {
-      if (!scrollElement || !listElementRef.current) {
+  useLayoutEffect(() => {
+    if (!scrollElement || !listElementRef.current) {
+      return;
+    }
+
+    let animationFrameId = 0;
+    const updateScrollMargin = () => {
+      const scrollRect = scrollElement.getBoundingClientRect();
+      const listRect = listElementRef.current?.getBoundingClientRect();
+      if (!listRect) {
         return;
       }
 
-      let animationFrameId = 0;
-      const updateScrollMargin = () => {
-        const scrollRect = scrollElement.getBoundingClientRect();
-        const listRect = listElementRef.current?.getBoundingClientRect();
-        if (!listRect) {
+      const nextScrollMargin = Math.max(0, listRect.top - scrollRect.top + scrollElement.scrollTop);
+      setScrollMargin((currentScrollMargin) =>
+        currentScrollMargin === nextScrollMargin ? currentScrollMargin : nextScrollMargin,
+      );
+    };
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(updateScrollMargin);
+    };
+
+    updateScrollMargin();
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleUpdate);
+    resizeObserver?.observe(scrollElement);
+    resizeObserver?.observe(listElementRef.current);
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [scrollElement]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToIndex: (index: number) => {
+        if (index < 0 || index >= totalCount) {
           return;
         }
 
-        const nextScrollMargin = Math.max(
-          0,
-          listRect.top - scrollRect.top + scrollElement.scrollTop,
-        );
-        setScrollMargin((currentScrollMargin) =>
-          currentScrollMargin === nextScrollMargin ? currentScrollMargin : nextScrollMargin,
-        );
-      };
-      const scheduleUpdate = () => {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = requestAnimationFrame(updateScrollMargin);
-      };
+        blockVirtualizer.scrollToIndex(index, { align: "center" });
+      },
+    }),
+    [blockVirtualizer, totalCount],
+  );
 
-      updateScrollMargin();
+  const virtualBlocks = blockVirtualizer.getVirtualItems();
+  const visibleRange = useMemo(() => {
+    if (virtualBlocks.length === 0) {
+      return null;
+    }
 
-      const resizeObserver =
-        typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleUpdate);
-      resizeObserver?.observe(scrollElement);
-      resizeObserver?.observe(listElementRef.current);
-      window.addEventListener("resize", scheduleUpdate);
+    return {
+      start: virtualBlocks[0].index,
+      end: virtualBlocks[virtualBlocks.length - 1].index,
+    };
+  }, [virtualBlocks]);
 
-      return () => {
-        cancelAnimationFrame(animationFrameId);
-        resizeObserver?.disconnect();
-        window.removeEventListener("resize", scheduleUpdate);
-      };
-    }, [scrollElement]);
+  useEffect(() => {
+    if (!visibleRange) {
+      return;
+    }
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        scrollToIndex: (index: number) => {
-          if (index < 0 || index >= totalCount) {
-            return;
-          }
+    for (let index = visibleRange.start; index <= visibleRange.end; index += 1) {
+      ensureBlockIndex(index);
+    }
+  }, [ensureBlockIndex, visibleRange]);
 
-          blockVirtualizer.scrollToIndex(index, { align: "center" });
-        },
-      }),
-      [blockVirtualizer, totalCount],
-    );
+  return (
+    <div ref={setListElement} className="pt-2">
+      <div
+        className="relative w-full"
+        style={{
+          height: `${blockVirtualizer.getTotalSize()}px`,
+        }}
+      >
+        {virtualBlocks.map((virtualBlock) => {
+          const block = getBlockAtIndex(virtualBlock.index);
 
-    const virtualBlocks = blockVirtualizer.getVirtualItems();
-    const visibleRange = useMemo(() => {
-      if (virtualBlocks.length === 0) {
-        return null;
-      }
-
-      return {
-        start: virtualBlocks[0].index,
-        end: virtualBlocks[virtualBlocks.length - 1].index,
-      };
-    }, [virtualBlocks]);
-
-    useEffect(() => {
-      if (!visibleRange) {
-        return;
-      }
-
-      for (let index = visibleRange.start; index <= visibleRange.end; index += 1) {
-        ensureBlockIndex(index);
-      }
-    }, [ensureBlockIndex, visibleRange]);
-
-    return (
-      <div ref={setListElement} className="pt-2">
-        <div
-          className="relative w-full"
-          style={{
-            height: `${blockVirtualizer.getTotalSize()}px`,
-          }}
-        >
-          {virtualBlocks.map((virtualBlock) => {
-            const block = getBlockAtIndex(virtualBlock.index);
-
-            return (
-              <div
-                key={virtualBlock.key}
-                ref={blockVirtualizer.measureElement}
-                className="absolute inset-x-0 top-0 w-full"
-                data-index={virtualBlock.index}
-                style={{
-                  transform: `translateY(${
-                    virtualBlock.start - blockVirtualizer.options.scrollMargin
-                  }px)`,
-                }}
-              >
-                {block ? (
-                  <VirtualBlockItem block={block} />
-                ) : (
-                  <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
-                )}
-              </div>
-            );
-          })}
-        </div>
+          return (
+            <div
+              key={virtualBlock.key}
+              ref={blockVirtualizer.measureElement}
+              className="absolute inset-x-0 top-0 w-full"
+              data-index={virtualBlock.index}
+              style={{
+                transform: `translateY(${virtualBlock.start - blockVirtualizer.options.scrollMargin}px)`,
+              }}
+            >
+              {block ? (
+                <VirtualBlockItem block={block} />
+              ) : (
+                <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
+              )}
+            </div>
+          );
+        })}
       </div>
-    );
-  },
-);
+    </div>
+  );
+}
