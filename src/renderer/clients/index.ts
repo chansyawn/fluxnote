@@ -11,7 +11,6 @@ export {
   onOpenBlockRequested,
   readPendingOpenBlock,
 } from "@renderer/clients/open-block";
-export { greet } from "@renderer/clients/sample";
 export {
   archiveBlock,
   createBlock,
@@ -36,7 +35,6 @@ export type {
   CreateAssetResult,
 } from "@renderer/clients/assets";
 export type { OpenBlockPending, OpenBlockRequestedPayload } from "@renderer/clients/open-block";
-export type { GreetRequest, GreetResponse } from "@renderer/clients/sample";
 export type {
   Block,
   BlockMutationRequest,

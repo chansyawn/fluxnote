@@ -136,7 +136,7 @@ msgid "home-note.block.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:19
+#: src/renderer/routes/lab/index.tsx:17
 msgid "lab.description"
 msgstr ""
 
@@ -156,17 +156,7 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:31
-msgid "lab.tabs.playground"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:28
-msgid "lab.tabs.sample"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:16
+#: src/renderer/routes/lab/index.tsx:14
 msgid "lab.title"
 msgstr ""
 
@@ -329,91 +319,6 @@ msgstr "开启/关闭窗口"
 #: src/renderer/routes/preferences.tsx:32
 msgid "preferences.title"
 msgstr "偏好设置"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:62
-msgid "sample.greet.description"
-msgstr "可尝试普通名称、空值、超长值或 `missing`，观察不同错误类型。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:131
-msgid "sample.greet.error.details"
-msgstr "详细信息"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:124
-msgid "sample.greet.error.message"
-msgstr "消息:"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:112
-msgid "sample.greet.error.title"
-msgstr "结构化错误"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:118
-msgid "sample.greet.error.type"
-msgstr "类型:"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:141
-msgid "sample.greet.error.unknown"
-msgstr "未知错误结构。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:71
-msgid "sample.greet.input.label"
-msgstr "名称"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:96
-msgid "sample.greet.loading"
-msgstr "正在从 Rust 后端加载响应..."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:85
-msgid "sample.greet.submit"
-msgstr "执行 greet 查询"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:103
-msgid "sample.greet.success.title"
-msgstr "成功"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:88
-msgid "sample.greet.tip"
-msgstr "提示：试试 `missing` 或空值。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:59
-msgid "sample.greet.title"
-msgstr "Query + Client + Invoke 示例"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:26
-msgid "sample.spec.error"
-msgstr "错误语义：后端返回 `BUSINESS.*` 或 `INTERNAL`，并附带结构化 details。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:21
-msgid "sample.spec.i18n"
-msgstr "国际化：所有面向用户的文案都使用稳定的 Lingui 显式 ID。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:11
-msgid "sample.spec.layering"
-msgstr "分层：路由组件调用 `src/clients`，再由其调用 `@renderer/app/invoke`。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:16
-msgid "sample.spec.query"
-msgstr "数据流：TanStack Query 负责请求生命周期与缓存键变更。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:7
-msgid "sample.spec.title"
-msgstr "本页展示的实践"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-features/window-title-bar.tsx:73

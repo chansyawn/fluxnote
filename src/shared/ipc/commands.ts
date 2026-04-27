@@ -6,7 +6,6 @@ import { cliIpcCommandContracts } from "../features/cli/ipc-commands";
 import { externalEditIpcCommandContracts } from "../features/external-edit/ipc-commands";
 import { openBlockIpcCommandContracts } from "../features/open-block/ipc-commands";
 import { preferencesIpcCommandContracts } from "../features/preferences/ipc-commands";
-import { sampleIpcCommandContracts } from "../features/sample/ipc-commands";
 import { shortcutIpcCommandContracts } from "../features/shortcut/ipc-commands";
 import { tagsIpcCommandContracts } from "../features/tags/ipc-commands";
 import { windowIpcCommandContracts } from "../features/window/ipc-commands";
@@ -18,7 +17,6 @@ export const ipcCommandContracts = {
   ...externalEditIpcCommandContracts,
   ...openBlockIpcCommandContracts,
   ...preferencesIpcCommandContracts,
-  ...sampleIpcCommandContracts,
   ...shortcutIpcCommandContracts,
   ...tagsIpcCommandContracts,
   ...windowIpcCommandContracts,

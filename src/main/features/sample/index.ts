@@ -1,1 +1,0 @@
-export { createSampleFeature } from "./manifest";

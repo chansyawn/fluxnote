@@ -20,17 +20,17 @@ describe("defineIpcCommand", () => {
 
   it("rejects invocations from untrusted senders", async () => {
     const trustedSender = {};
-    defineIpcCommand<"sampleGreet">({
-      command: ipcCommandContracts.sampleGreet,
+    defineIpcCommand<"windowDestroy">({
+      command: ipcCommandContracts.windowDestroy,
       getTrustedWebContents: () => trustedSender as never,
-      run: async (request) => ({ message: request.name }),
+      run: async () => undefined,
     });
 
     const registeredHandler = electronMock.handle.mock.calls[0]?.[1] as (
       event: { sender: unknown },
       payload: unknown,
     ) => Promise<{ ok: boolean; error?: { type: string }; data?: unknown }>;
-    const result = await registeredHandler({ sender: {} }, { name: "FluxNote" });
+    const result = await registeredHandler({ sender: {} }, undefined);
 
     expect(result).toEqual(
       expect.objectContaining({
@@ -42,21 +42,21 @@ describe("defineIpcCommand", () => {
 
   it("parses requests and returns successful responses for trusted senders", async () => {
     const trustedSender = {};
-    defineIpcCommand<"sampleGreet">({
-      command: ipcCommandContracts.sampleGreet,
+    defineIpcCommand<"windowDestroy">({
+      command: ipcCommandContracts.windowDestroy,
       getTrustedWebContents: () => trustedSender as never,
-      run: async (request) => ({ message: `Hello ${request.name}` }),
+      run: async () => undefined,
     });
 
     const registeredHandler = electronMock.handle.mock.calls[0]?.[1] as (
       event: { sender: unknown },
       payload: unknown,
     ) => Promise<{ ok: boolean; data?: unknown }>;
-    const result = await registeredHandler({ sender: trustedSender }, { name: "FluxNote" });
+    const result = await registeredHandler({ sender: trustedSender }, undefined);
 
     expect(result).toEqual({
       ok: true,
-      data: { message: "Hello FluxNote" },
+      data: undefined,
     });
   });
 });

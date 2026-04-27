@@ -1,7 +1,5 @@
 import { Trans } from "@lingui/react/macro";
 import { NoteBlockPlaygroundPanel } from "@renderer/routes/lab/-features/note-block-playground-panel";
-import { SampleGreetPanel } from "@renderer/routes/lab/-features/sample-greet-panel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@renderer/ui/components/tabs";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/lab/")({
@@ -22,24 +20,9 @@ function RouteComponent() {
         </p>
       </div>
 
-      <Tabs defaultValue="sample">
-        <TabsList>
-          <TabsTrigger value="sample">
-            <Trans id="lab.tabs.sample">Sample</Trans>
-          </TabsTrigger>
-          <TabsTrigger value="playground">
-            <Trans id="lab.tabs.playground">Playground</Trans>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="sample" className="flex flex-col gap-4 pt-2">
-          <SampleGreetPanel />
-        </TabsContent>
-
-        <TabsContent value="playground" className="pt-2">
-          <NoteBlockPlaygroundPanel />
-        </TabsContent>
-      </Tabs>
+      <div className="pt-2">
+        <NoteBlockPlaygroundPanel />
+      </div>
     </section>
   );
 }
