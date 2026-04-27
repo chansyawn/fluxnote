@@ -36,7 +36,7 @@ const config: ForgeConfig = {
     appBundleId: "app.fluxnote",
     appCategoryType: "public.app-category.productivity",
     asar: true,
-    extraResource: ["src/main/features/database/drizzle", "src/assets"],
+    extraResource: ["src/main/core/database/drizzle", "src/assets"],
     icon: "src/assets/icons/icon",
     name: "fluxnote",
     protocols: [

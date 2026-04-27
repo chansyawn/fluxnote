@@ -2,9 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import type { BackendStore } from "@main/core/persistence/backend-store";
 import { net, protocol } from "electron";
-
-import type { BackendStore } from "../backend-store";
 
 export function registerAssetProtocol(store: BackendStore): void {
   protocol.handle("assets", async (request) => {

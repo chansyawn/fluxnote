@@ -1,8 +1,8 @@
 import path from "node:path";
 
+import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import { app, BrowserWindow } from "electron";
 
-import type { EmitIpcEvent } from "../ipc/emit-ipc-event";
 import { calculateWindowPosition, saveWindowPosition } from "./window-position";
 
 const MAIN_WINDOW_HEIGHT = 600;

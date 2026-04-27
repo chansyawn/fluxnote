@@ -8,12 +8,12 @@ import {
   backendCommandContracts,
   type BackendCommandKey,
   type BackendCommandResponse,
-} from "@shared/backend-command-contracts";
+} from "@shared/entrypoints/backend-command-contracts";
 import {
   cliIpcResponseEnvelopeSchema,
   createCliIpcRequest,
   resolveCliIpcSocketPath,
-} from "@shared/cli-ipc";
+} from "@shared/transport/cli-ipc";
 
 const INITIAL_SERVER_WAIT_MS = 3_000;
 const DEV_SERVER_WAIT_MS = 15_000;

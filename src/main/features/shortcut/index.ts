@@ -1,0 +1,1 @@
+export { createShortcutFeature } from "./manifest";

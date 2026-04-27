@@ -1,0 +1,1 @@
+export { createCliFeature } from "./manifest";

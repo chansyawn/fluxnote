@@ -1,4 +1,3 @@
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
 import type {
   IpcCommandKey,
   IpcEventKey,
@@ -7,6 +6,7 @@ import type {
   IpcResponse,
 } from "@shared/ipc/contracts";
 import type { IpcErrorPayload } from "@shared/ipc/errors";
+import type { FluxnoteRuntime } from "@shared/platform/electron-runtime";
 
 export type RuntimeBridge = FluxnoteRuntime;
 export type AppInvokeErrorPayload = IpcErrorPayload;
