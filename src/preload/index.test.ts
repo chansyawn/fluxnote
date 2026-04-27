@@ -36,12 +36,12 @@ describe("preload runtime", () => {
   it("validates invoke responses against the shared command contract", async () => {
     electronMock.invoke.mockResolvedValue({
       ok: true,
-      data: { message: "Hello FluxNote" },
+      data: {},
     });
 
-    const result = await getRuntime().invoke("sampleGreet", { name: "FluxNote" });
+    const result = await getRuntime().invoke("preferencesRead", undefined);
 
-    expect(result).toEqual({ message: "Hello FluxNote" });
+    expect(result).toEqual({});
   });
 
   it("drops invalid event payloads before invoking listeners", () => {

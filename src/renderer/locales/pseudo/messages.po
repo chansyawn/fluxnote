@@ -136,7 +136,7 @@ msgid "home-note.block.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:19
+#: src/renderer/routes/lab/index.tsx:17
 msgid "lab.description"
 msgstr ""
 
@@ -156,17 +156,7 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:31
-msgid "lab.tabs.playground"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:28
-msgid "lab.tabs.sample"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:16
+#: src/renderer/routes/lab/index.tsx:14
 msgid "lab.title"
 msgstr ""
 
@@ -328,91 +318,6 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences.tsx:32
 msgid "preferences.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:62
-msgid "sample.greet.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:131
-msgid "sample.greet.error.details"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:124
-msgid "sample.greet.error.message"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:112
-msgid "sample.greet.error.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:118
-msgid "sample.greet.error.type"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:141
-msgid "sample.greet.error.unknown"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:71
-msgid "sample.greet.input.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:96
-msgid "sample.greet.loading"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:85
-msgid "sample.greet.submit"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:103
-msgid "sample.greet.success.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:88
-msgid "sample.greet.tip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-greet-panel.tsx:59
-msgid "sample.greet.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:26
-msgid "sample.spec.error"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:21
-msgid "sample.spec.i18n"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:11
-msgid "sample.spec.layering"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:16
-msgid "sample.spec.query"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/sample-spec-panel.tsx:7
-msgid "sample.spec.title"
 msgstr ""
 
 #. js-lingui-explicit-id

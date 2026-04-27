@@ -119,11 +119,6 @@ vp run package
 
 ## Appendix
 
-### References
-
-- Frontend sample pattern: `src/renderer/routes/lab/index.tsx`
-- Backend sample pattern: `src/main/app/backend-commands.ts` and `src/main/app/ipc-registry.ts`
-
 ### Spec Maintenance
 
 - Update `AGENTS.md` promptly whenever repository conventions or infrastructure are added or changed.

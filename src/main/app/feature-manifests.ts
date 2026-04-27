@@ -6,7 +6,6 @@ import { createCliFeature } from "../features/cli";
 import { createExternalEditFeature } from "../features/external-edit";
 import { createOpenBlockFeature } from "../features/open-block";
 import { createPreferencesFeature } from "../features/preferences";
-import { createSampleFeature } from "../features/sample";
 import { createShortcutFeature } from "../features/shortcut";
 import { createTagsFeature } from "../features/tags";
 import { createWindowFeature } from "../features/window";
@@ -19,7 +18,6 @@ export function createBackendFeatureManifests(
 
   return [
     createCliFeature(),
-    createSampleFeature(),
     createBlocksFeature({
       getDb,
       store: options.store,

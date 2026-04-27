@@ -20,16 +20,14 @@ describe("renderer invoke transport", () => {
   });
 
   it("invokes commands through the runtime transport", async () => {
-    const invoke = vi.fn(async () => ({ message: "Hello FluxNote" }));
+    const invoke = vi.fn(async () => undefined);
     setRuntime({
       invoke: invoke as unknown as FluxnoteRuntime["invoke"],
       subscribe: vi.fn(() => () => {}) as unknown as FluxnoteRuntime["subscribe"],
     } as FluxnoteRuntime);
 
-    await expect(invokeCommand("sampleGreet", { name: "FluxNote" })).resolves.toEqual({
-      message: "Hello FluxNote",
-    });
-    expect(invoke).toHaveBeenCalledWith("sampleGreet", { name: "FluxNote" });
+    await expect(invokeCommand("windowDestroy", undefined)).resolves.toBeUndefined();
+    expect(invoke).toHaveBeenCalledWith("windowDestroy", undefined);
   });
 
   it("wraps payload-shaped runtime failures into AppInvokeError", async () => {
@@ -44,7 +42,7 @@ describe("renderer invoke transport", () => {
       subscribe: vi.fn(() => () => {}) as unknown as FluxnoteRuntime["subscribe"],
     } as FluxnoteRuntime);
 
-    await expect(invokeCommand("sampleGreet", { name: "FluxNote" })).rejects.toMatchObject({
+    await expect(invokeCommand("windowDestroy", undefined)).rejects.toMatchObject({
       details: { id: "1" },
       message: "Missing",
       type: "BUSINESS.NOT_FOUND",
