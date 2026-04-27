@@ -14,6 +14,7 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -23,7 +24,7 @@ import { useEditorRegistryContext } from "./editor-registry-context";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
-const BLOCK_OVERSCAN = 3;
+const BLOCK_OVERSCAN = 5;
 
 export interface VirtualBlockListHandle {
   scrollToIndex: (index: number) => void;
@@ -132,11 +133,16 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
     const listElementRef = useRef<HTMLDivElement | null>(null);
     const [scrollMargin, setScrollMargin] = useState(0);
 
+    const getBlockItemKey = useCallback(
+      (index: number) => getBlockAtIndex(index)?.id ?? `placeholder-${index}`,
+      [getBlockAtIndex],
+    );
+
     const blockVirtualizer = useVirtualizer({
       count: totalCount,
       estimateSize: () => BLOCK_ESTIMATED_SIZE_PX,
       gap: BLOCK_GAP_PX,
-      getItemKey: (index) => index,
+      getItemKey: getBlockItemKey,
       getScrollElement: () => scrollElement,
       overscan: BLOCK_OVERSCAN,
       scrollMargin,
@@ -203,21 +209,26 @@ export const VirtualBlockList = forwardRef<VirtualBlockListHandle, VirtualBlockL
     );
 
     const virtualBlocks = blockVirtualizer.getVirtualItems();
-    const prevVisibleRangeRef = useRef<{ start: number; end: number } | null>(null);
+    const visibleRange = useMemo(() => {
+      if (virtualBlocks.length === 0) {
+        return null;
+      }
+
+      return {
+        start: virtualBlocks[0].index,
+        end: virtualBlocks[virtualBlocks.length - 1].index,
+      };
+    }, [virtualBlocks]);
 
     useEffect(() => {
-      if (virtualBlocks.length === 0) return;
-
-      const start = virtualBlocks[0].index;
-      const end = virtualBlocks[virtualBlocks.length - 1].index;
-      const prev = prevVisibleRangeRef.current;
-      if (prev && prev.start === start && prev.end === end) return;
-
-      prevVisibleRangeRef.current = { start, end };
-      for (const virtualBlock of virtualBlocks) {
-        ensureBlockIndex(virtualBlock.index);
+      if (!visibleRange) {
+        return;
       }
-    });
+
+      for (let index = visibleRange.start; index <= visibleRange.end; index += 1) {
+        ensureBlockIndex(index);
+      }
+    }, [ensureBlockIndex, visibleRange]);
 
     return (
       <div ref={setListElement} className="pt-2">
