@@ -1,5 +1,5 @@
 import { invokeCommand, subscribeEvent } from "@renderer/app/invoke";
-import type { OpenBlockPending, OpenBlockRequestedPayload } from "@shared/ipc/contracts";
+import type { OpenBlockPending, OpenBlockRequestedPayload } from "@shared/features/open-block";
 
 export async function readPendingOpenBlock(): Promise<OpenBlockPending> {
   return await invokeCommand("openBlockPendingRead", undefined);

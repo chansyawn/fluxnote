@@ -1,19 +1,72 @@
 import fs from "node:fs/promises";
 
 import type { AppDatabase } from "@main/core/database/database-client";
-import { blockTags, blocks, type BlockRecord } from "@main/core/database/database-schema";
+import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database/database-schema";
 import { nowIsoString } from "@main/core/database/db-utils";
-import type { Block } from "@shared/ipc/contracts";
+import type { Block } from "@shared/features/blocks";
+import type { Tag } from "@shared/features/tags";
 import { businessError } from "@shared/ipc/errors";
 import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
-import { mapBlockRow } from "./mapper";
-import {
-  assertBlockExists as assertBlockRecordExists,
-  getNextBlockPosition,
-  getPublicBlockById as getPublicBlockRecordById,
-  getTagsForBlocks,
-} from "./repository";
+function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt: string }): Tag {
+  return {
+    id: tag.id,
+    name: tag.name,
+    createdAt: tag.createdAt,
+    updatedAt: tag.updatedAt,
+  };
+}
+
+function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
+  return {
+    id: block.id,
+    position: block.position,
+    content: block.content,
+    archivedAt: block.archivedAt,
+    createdAt: block.createdAt,
+    updatedAt: block.updatedAt,
+    willArchive: false,
+    tags,
+  };
+}
+
+function getTagsForBlocks(db: AppDatabase, blockIds: readonly string[]): Map<string, Tag[]> {
+  if (blockIds.length === 0) {
+    return new Map();
+  }
+
+  const rows = db
+    .select({
+      blockId: blockTags.blockId,
+      id: tags.id,
+      name: tags.name,
+      createdAt: tags.createdAt,
+      updatedAt: tags.updatedAt,
+    })
+    .from(blockTags)
+    .innerJoin(tags, eq(tags.id, blockTags.tagId))
+    .where(inArray(blockTags.blockId, [...blockIds]))
+    .orderBy(sql`lower(${tags.name})`)
+    .all();
+
+  const grouped = new Map<string, Tag[]>();
+  for (const row of rows) {
+    const bucket = grouped.get(row.blockId) ?? [];
+    bucket.push(mapTagRow(row));
+    grouped.set(row.blockId, bucket);
+  }
+  return grouped;
+}
+
+function getNextBlockPosition(db: AppDatabase): number {
+  const row = db
+    .select({
+      maxPosition: sql<number>`coalesce(max(${blocks.position}), 0)`,
+    })
+    .from(blocks)
+    .get();
+  return (row?.maxPosition ?? 0) + 1;
+}
 
 export function createBlockRecord(db: AppDatabase, content = ""): Block {
   const now = nowIsoString();
@@ -34,11 +87,20 @@ export function createBlockRecord(db: AppDatabase, content = ""): Block {
 }
 
 export function assertBlockExists(db: AppDatabase, blockId: string): void {
-  assertBlockRecordExists(db, blockId);
+  const row = db.select({ id: blocks.id }).from(blocks).where(eq(blocks.id, blockId)).get();
+  if (!row) {
+    throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+  }
 }
 
 export function getPublicBlockById(db: AppDatabase, blockId: string): Block {
-  return getPublicBlockRecordById(db, blockId);
+  const block = db.select().from(blocks).where(eq(blocks.id, blockId)).get();
+  if (!block) {
+    throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+  }
+
+  const tagsByBlockId = getTagsForBlocks(db, [blockId]);
+  return mapBlockRow(block, tagsByBlockId.get(blockId) ?? []);
 }
 
 function countBlocks(

@@ -2,7 +2,7 @@ import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type {
   ExternalEditResult,
   ExternalEditSession,
-} from "@shared/domains/external-edit/session-contracts";
+} from "@shared/features/external-edit/session-contracts";
 import { businessError } from "@shared/ipc/errors";
 
 interface PendingExternalEdit {

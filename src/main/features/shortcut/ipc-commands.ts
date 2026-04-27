@@ -3,7 +3,7 @@ import {
   defineIpcCommandDefinition,
   type AnyIpcCommandDefinition,
 } from "@main/core/ipc/ipc-command-definition";
-import type { ShortcutPressedPayload } from "@shared/ipc/contracts";
+import type { ShortcutPressedPayload } from "@shared/features/shortcut";
 import { businessError } from "@shared/ipc/errors";
 import { globalShortcut } from "electron";
 

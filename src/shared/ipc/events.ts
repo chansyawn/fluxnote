@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { blocksIpcEventContracts } from "../../domains/blocks/ipc-events";
-import { externalEditIpcEventContracts } from "../../domains/external-edit/ipc-events";
-import { openBlockIpcEventContracts } from "../../domains/open-block/ipc-events";
-import { shortcutIpcEventContracts } from "../../domains/shortcut/ipc-events";
-import { windowIpcEventContracts } from "../../domains/window/ipc-events";
+import { blocksIpcEventContracts } from "../features/blocks/ipc-events";
+import { externalEditIpcEventContracts } from "../features/external-edit/ipc-events";
+import { openBlockIpcEventContracts } from "../features/open-block/ipc-events";
+import { shortcutIpcEventContracts } from "../features/shortcut/ipc-events";
+import { windowIpcEventContracts } from "../features/window/ipc-events";
 
 export const ipcEventContracts = {
   ...blocksIpcEventContracts,

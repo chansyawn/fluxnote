@@ -1,13 +1,21 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import { blockTags, blocks, tags } from "@main/core/database/database-schema";
+import { blockTags, blocks, tags, type TagRecord } from "@main/core/database/database-schema";
 import { isSqliteUniqueConstraint, nowIsoString } from "@main/core/database/db-utils";
-import type { Block } from "@shared/domains/blocks/models";
-import type { Tag } from "@shared/domains/tags/models";
+import type { Block } from "@shared/features/blocks";
+import type { Tag } from "@shared/features/tags";
 import { businessError, internalError } from "@shared/ipc/errors";
 import { eq, inArray, sql } from "drizzle-orm";
 
 import { assertBlockExists, getPublicBlockById } from "../blocks/service";
-import { mapTagRow } from "./mapper";
+
+function mapTagRow(tag: TagRecord): Tag {
+  return {
+    id: tag.id,
+    name: tag.name,
+    createdAt: tag.createdAt,
+    updatedAt: tag.updatedAt,
+  };
+}
 
 export function listTags(db: AppDatabase): Tag[] {
   const rows = db

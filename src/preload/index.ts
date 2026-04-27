@@ -1,3 +1,4 @@
+import type { FluxnoteRuntime } from "@shared/electron-runtime";
 import {
   ipcCommandContracts,
   ipcEventContracts,
@@ -8,7 +9,6 @@ import {
   type IpcResponse,
 } from "@shared/ipc/contracts";
 import type { IpcErrorPayload, IpcResult } from "@shared/ipc/errors";
-import type { FluxnoteRuntime } from "@shared/platform/electron-runtime";
 import { contextBridge, ipcRenderer } from "electron";
 
 const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production" && !process.env.VITEST;

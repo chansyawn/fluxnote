@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { externalEditResultSchema } from "../domains/external-edit/session-contracts";
+import { externalEditResultSchema } from "../features/external-edit/session-contracts";
 
 export const backendCommandKeys = [
   "app.open",
