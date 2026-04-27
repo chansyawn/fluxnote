@@ -4,7 +4,7 @@ import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import type { AutoArchiveStateChangedPayload } from "@shared/ipc/contracts";
+import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
 import { and, inArray, isNull, lt } from "drizzle-orm";
 
 interface AutoArchiveConfig {

@@ -4,14 +4,14 @@ import type {
   CopyAssetResult,
   CreateAssetRequest,
   CreateAssetResult,
-} from "@shared/ipc/contracts";
+} from "@shared/features/assets";
 
 export type {
   CopyAssetRequest,
   CopyAssetResult,
   CreateAssetRequest,
   CreateAssetResult,
-} from "@shared/ipc/contracts";
+} from "@shared/features/assets";
 
 export const createAsset = (req: CreateAssetRequest): Promise<CreateAssetResult> =>
   invokeCommand("assetsCreate", req);

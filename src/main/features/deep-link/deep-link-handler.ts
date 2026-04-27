@@ -1,4 +1,4 @@
-import type { BackendCommandKey } from "@shared/entrypoints/backend-command-contracts";
+import type { BackendCommandKey } from "@shared/backend-entrypoint/commands";
 
 const DEEP_LINK_PROTOCOL = "fluxnote";
 

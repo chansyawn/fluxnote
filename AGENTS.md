@@ -7,12 +7,64 @@
 - Use **Vite+** as the primary toolchain.
 - File naming must use `kebab-case` by default (auto-generated files are excluded), for example `user-profile.tsx`.
 
+### File Organization
+
+```bash
+src/
+  main/
+    app/                  # app assembly: bootstrap, runtime composition, IPC registration, backend command surface
+      bootstrap.ts
+      runtime.ts
+      protocols.ts
+      ipc-registry.ts
+      feature-manifests.ts
+      backend-commands.ts
+    core/                 # platform core shared by backend features
+      database/
+      features/
+      ipc/
+      persistence/
+    features/             # feature-first backend domains
+      <feature>/
+        index.ts          # stable feature export
+        manifest.ts       # feature contribution to app assembly
+        service.ts        # feature business logic, data access, and DTO mapping by default
+        ipc-commands.ts   # renderer IPC command implementations
+        *.test.ts            # colocated tests when feature-scoped
+
+  renderer/
+    app/                  # renderer bootstrapping and global cross-feature content
+    clients/              # typed renderer-side IPC clients
+    features/             # shared frontend business logic and reusable feature-level components
+      <feature>/
+    routes/
+      -features/          # route-local shared logic/components
+    ui/
+      components/         # shadcn/ui components; do not modify unless explicitly requested
+      lib/
+    locales/
+
+  shared/
+    backend-entrypoint/   # non-renderer backend entrypoint contracts
+      commands.ts         # CLI / deep-link backend command contracts
+      cli-ipc.ts          # CLI socket transport envelopes
+    features/             # cross-process feature DTOs, schemas, and IPC fragments
+      <feature>/
+        index.ts          # stable feature-level contract export
+        models.ts         # optional: shared DTO schemas and inferred public types
+        ipc-commands.ts   # optional: request/response schemas for renderer-to-main commands
+        ipc-events.ts     # optional: payload schemas for main-to-renderer events
+    ipc/                  # merged IPC registries and generic IPC types
+      commands.ts         # merged IPC command registry
+      events.ts           # merged IPC event registry
+      contracts.ts        # stable generic IPC surface
+      errors.ts           # flat IPC error payload model
+    electron-runtime.ts   # preload-exposed renderer runtime contract
+```
+
+- Use `kebab-case` file names by default.
+
 ## Frontend
-
-### Structure
-
-- Place shared frontend business logic and reusable feature-level components under `src/renderer/features`.
-- Keep application-wide frontend bootstrapping and global cross-feature content in `src/renderer/app`.
 
 ### UI Conventions
 
@@ -27,22 +79,6 @@
 - The project uses `@lingui/vite-plugin`; do not run `vp run lingui:compile`. `pseudo` is for development/testing only (for example, RTL checks or long-text overflow checks), and must not be translated manually.
 
 ## Backend
-
-### Structure
-
-- **App assembly** (`src/main/app/`): process bootstrap, runtime composition, `ipc-registry` (aggregate IPC commands from feature manifests), and `backend-commands` (CLI / deep-link command surface).
-- **Platform core** (`src/main/core/`): IPC infrastructure (`core/ipc`), persistence (`core/persistence`, e.g. `BackendStore`), and **Drizzle** under `core/database`.
-- **Feature-First domains** (`src/main/features/<domain>/`): business logic with stable `index.ts` exports, per-domain `manifest.ts`, `service.ts`, optional `repository.ts` / `mapper.ts`, and per-domain `ipc-commands.ts` (and tests) for that area.
-- Keep file names role-based inside feature directories. Prefer `service.ts`, `repository.ts`, `mapper.ts`, and `ipc-commands.ts` over repeating the domain prefix in file names.
-- Keep Electron main process as the single backend runtime entry; renderer talks to the backend through IPC only (plus the separate CLI socket for the `flux` helper).
-
-### Shared contracts
-
-- **Domain DTOs and IPC fragments** live under `src/shared/domains/<domain>/` (for example `models.ts`, `ipc-commands.ts`, `ipc-events.ts`).
-- **Merged IPC registries** live under `src/shared/ipc/registry/`; import the stable surface from `@shared/ipc/contracts` unless you are editing a specific domain.
-- **Non-IPC entrypoints** (for example `backend-command-contracts`) are under `src/shared/entrypoints/`.
-- **Transport envelopes** (for example the standalone CLI IPC line protocol) are under `src/shared/transport/`.
-- **Preload/runtime-only types** (for example `FluxnoteRuntime`) are under `src/shared/platform/`.
 
 ### Database (Drizzle)
 

@@ -5,15 +5,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  backendCommandContracts,
-  type BackendCommandKey,
-  type BackendCommandResponse,
-} from "@shared/entrypoints/backend-command-contracts";
-import {
   cliIpcResponseEnvelopeSchema,
   createCliIpcRequest,
   resolveCliIpcSocketPath,
-} from "@shared/transport/cli-ipc";
+} from "@shared/backend-entrypoint/cli-ipc";
+import {
+  backendCommandContracts,
+  type BackendCommandKey,
+  type BackendCommandResponse,
+} from "@shared/backend-entrypoint/commands";
 
 const INITIAL_SERVER_WAIT_MS = 3_000;
 const DEV_SERVER_WAIT_MS = 15_000;

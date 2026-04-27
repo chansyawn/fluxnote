@@ -1,18 +1,18 @@
 import { invokeCommand } from "@renderer/app/invoke";
+import type { Block } from "@shared/features/blocks";
 import type {
-  Block,
   CreateTagRequest,
   DeleteTagRequest,
   SetBlockTagsRequest,
   Tag,
-} from "@shared/ipc/contracts";
+} from "@shared/features/tags";
 
 export type {
   CreateTagRequest,
   DeleteTagRequest,
   SetBlockTagsRequest,
   Tag,
-} from "@shared/ipc/contracts";
+} from "@shared/features/tags";
 
 export const listTags = (): Promise<Tag[]> => invokeCommand("tagsList", undefined);
 

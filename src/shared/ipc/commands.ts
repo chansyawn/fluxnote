@@ -1,15 +1,15 @@
 import { z } from "zod";
 
-import { assetsIpcCommandContracts } from "../../domains/assets/ipc-commands";
-import { blocksIpcCommandContracts } from "../../domains/blocks/ipc-commands";
-import { cliIpcCommandContracts } from "../../domains/cli/ipc-commands";
-import { externalEditIpcCommandContracts } from "../../domains/external-edit/ipc-commands";
-import { openBlockIpcCommandContracts } from "../../domains/open-block/ipc-commands";
-import { preferencesIpcCommandContracts } from "../../domains/preferences/ipc-commands";
-import { sampleIpcCommandContracts } from "../../domains/sample/ipc-commands";
-import { shortcutIpcCommandContracts } from "../../domains/shortcut/ipc-commands";
-import { tagsIpcCommandContracts } from "../../domains/tags/ipc-commands";
-import { windowIpcCommandContracts } from "../../domains/window/ipc-commands";
+import { assetsIpcCommandContracts } from "../features/assets/ipc-commands";
+import { blocksIpcCommandContracts } from "../features/blocks/ipc-commands";
+import { cliIpcCommandContracts } from "../features/cli/ipc-commands";
+import { externalEditIpcCommandContracts } from "../features/external-edit/ipc-commands";
+import { openBlockIpcCommandContracts } from "../features/open-block/ipc-commands";
+import { preferencesIpcCommandContracts } from "../features/preferences/ipc-commands";
+import { sampleIpcCommandContracts } from "../features/sample/ipc-commands";
+import { shortcutIpcCommandContracts } from "../features/shortcut/ipc-commands";
+import { tagsIpcCommandContracts } from "../features/tags/ipc-commands";
+import { windowIpcCommandContracts } from "../features/window/ipc-commands";
 
 export const ipcCommandContracts = {
   ...cliIpcCommandContracts,

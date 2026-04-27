@@ -9,11 +9,12 @@ import type {
   LocateBlockRequest,
   LocateBlockResult,
   UpdateBlockContentRequest,
-} from "@shared/ipc/contracts";
+} from "@shared/features/blocks";
 
 export type {
   Block,
   BlockMutationRequest,
+  BlockVisibility,
   DeleteBlockRequest,
   DeleteBlockResult,
   ListBlocksRequest,
@@ -21,9 +22,7 @@ export type {
   LocateBlockRequest,
   LocateBlockResult,
   UpdateBlockContentRequest,
-} from "@shared/ipc/contracts";
-
-export type BlockVisibility = "active" | "archived";
+} from "@shared/features/blocks";
 
 export const listBlocks = (req: ListBlocksRequest = {}): Promise<ListBlocksResult> =>
   invokeCommand("blocksList", req);

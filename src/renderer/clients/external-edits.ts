@@ -4,7 +4,7 @@ import type {
   ExternalEditSession,
   ExternalEditSessionsChangedPayload,
   ExternalEditSubmitRequest,
-} from "@shared/ipc/contracts";
+} from "@shared/features/external-edit";
 
 import type { Block } from "./blocks";
 
@@ -13,7 +13,7 @@ export type {
   ExternalEditSession,
   ExternalEditSessionsChangedPayload,
   ExternalEditSubmitRequest,
-} from "@shared/ipc/contracts";
+} from "@shared/features/external-edit";
 
 export const listExternalEditSessions = (): Promise<ExternalEditSession[]> =>
   invokeCommand("externalEditsList", undefined);

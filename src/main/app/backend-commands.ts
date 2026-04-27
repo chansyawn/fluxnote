@@ -1,10 +1,10 @@
-import type { ExternalEditResult } from "@shared/domains/external-edit/session-contracts";
 import {
   backendCommandContracts,
   type BackendCommandKey,
   type BackendCommandResponse,
   type ParsedBackendCommandRequest,
-} from "@shared/entrypoints/backend-command-contracts";
+} from "@shared/backend-entrypoint/commands";
+import type { ExternalEditResult } from "@shared/features/external-edit/session-contracts";
 
 import type { AppDatabase } from "../core/database/database-client";
 import { createBlockRecord } from "../features/blocks/service";

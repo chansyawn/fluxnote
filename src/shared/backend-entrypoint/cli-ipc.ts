@@ -4,8 +4,8 @@ import path from "node:path";
 import type { IpcErrorPayload } from "@shared/ipc/errors";
 import { z } from "zod";
 
-import { backendCommandKeySchema } from "../entrypoints/backend-command-contracts";
-import type { BackendCommandKey } from "../entrypoints/backend-command-contracts";
+import { backendCommandKeySchema } from "./commands";
+import type { BackendCommandKey } from "./commands";
 
 export const cliIpcRequestEnvelopeSchema = z.object({
   id: z.string().min(1),
