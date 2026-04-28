@@ -7,7 +7,7 @@ type NavigationRequest = Extract<NavigationEvent, { type: "start" }>["request"];
 
 function blockRequest(overrides: Partial<NavigationRequest> = {}): NavigationRequest {
   return {
-    align: "center",
+    align: "start",
     blockId: "block-1",
     focus: "editor",
     kind: "block-id",

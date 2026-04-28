@@ -3,13 +3,15 @@ import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { matchShortcutEvent } from "@renderer/features/shortcut/shortcut-utils";
 import { useEffect, useEffectEvent } from "react";
 
+import type { BlockNavigationAlign } from "./use-block-navigation";
+
 interface UseBlockShortcutsParams {
   activeBlockId: string | null;
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
   navigateToBlock: (blockId: string) => void;
-  navigateToIndex: (index: number) => void;
+  navigateToIndex: (index: number, options?: { align?: BlockNavigationAlign }) => void;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   setActiveBlockId: (blockId: string | null) => void;
 }
@@ -56,7 +58,7 @@ export function useBlockShortcuts({
       currentLocation.index >= countBeforeDelete - 1
         ? currentLocation.index - 1
         : currentLocation.index;
-    navigateToIndex(nextIndex);
+    navigateToIndex(nextIndex, { align: "auto" });
   });
 
   useEffect(() => {

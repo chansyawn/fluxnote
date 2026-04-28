@@ -145,6 +145,7 @@ export function VirtualBlockList({
 }: VirtualBlockListProps) {
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
   const listElementRef = useRef<HTMLDivElement | null>(null);
+  const navigationAnchorRef = useRef<HTMLSpanElement | null>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
 
   const getBlockItemKey = useCallback(
@@ -206,6 +207,8 @@ export function VirtualBlockList({
     };
   }, [scrollElement]);
 
+  const virtualBlocks = blockVirtualizer.getVirtualItems();
+
   useEffect(() => {
     if (!scrollTarget || !scrollElement) {
       return;
@@ -214,13 +217,36 @@ export function VirtualBlockList({
       return;
     }
 
-    blockVirtualizer.scrollToIndex(scrollTarget.index, {
-      align: scrollTarget.align,
-      behavior: "auto",
-    });
-  }, [blockVirtualizer, scrollElement, scrollTarget, totalCount]);
+    if (scrollTarget.align !== "start") {
+      blockVirtualizer.scrollToIndex(scrollTarget.index, {
+        align: scrollTarget.align,
+        behavior: "smooth",
+      });
+      return;
+    }
 
-  const virtualBlocks = blockVirtualizer.getVirtualItems();
+    const anchorElement = navigationAnchorRef.current;
+    const targetElement = listElementRef.current?.querySelector<HTMLElement>(
+      `[data-index="${scrollTarget.index}"]`,
+    );
+
+    if (!anchorElement || !targetElement) {
+      blockVirtualizer.scrollToIndex(scrollTarget.index, {
+        align: "start",
+        behavior: "auto",
+      });
+      return;
+    }
+
+    const anchorTop = anchorElement.getBoundingClientRect().top;
+    const targetTop = targetElement.getBoundingClientRect().top;
+    const nextScrollTop = scrollElement.scrollTop + (targetTop - anchorTop);
+    scrollElement.scrollTo({
+      top: Math.max(0, nextScrollTop),
+      behavior: "smooth",
+    });
+  }, [blockVirtualizer, scrollElement, scrollTarget, totalCount, virtualBlocks]);
+
   const visibleRange = useMemo(() => {
     if (virtualBlocks.length === 0) {
       return null;
@@ -276,6 +302,11 @@ export function VirtualBlockList({
           height: `${blockVirtualizer.getTotalSize()}px`,
         }}
       >
+        <span
+          ref={navigationAnchorRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-0 h-0 w-0"
+        />
         <div
           className="absolute top-0 left-0 flex w-full flex-col gap-3"
           style={{
