@@ -1,17 +1,7 @@
 import { Trans } from "@lingui/react/macro";
-import { useI18nState } from "@renderer/app/i18n";
-import { isLocaleCode } from "@renderer/app/preferences/preferences-schema";
-import { AutoArchiveSettingsSection } from "@renderer/features/auto-archive/auto-archive-settings-section";
-import { CliSettingsSection } from "@renderer/features/cli/cli-settings-section";
-import { ShortcutSettingsSection } from "@renderer/features/shortcut/shortcut-settings-section";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@renderer/ui/components/select";
+import { AppSettingsSection } from "@renderer/routes/preferences/-features/app-settings-section";
+import { AutoArchiveSettingsSection } from "@renderer/routes/preferences/-features/auto-archive-settings-section";
+import { ShortcutSettingsSection } from "@renderer/routes/preferences/-features/shortcut-settings";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/preferences/")({
@@ -19,16 +9,10 @@ export const Route = createFileRoute("/preferences/")({
 });
 
 function RouteComponent() {
-  const { locale, setLocale, localeOptions } = useI18nState();
-  const languageItems = localeOptions.map((localeOption) => ({
-    value: localeOption.key,
-    label: localeOption.name,
-  }));
-
   return (
-    <section className="border-border/70 bg-card mx-auto w-full max-w-xl rounded-xl border p-5">
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-2 py-3 sm:px-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-base font-semibold">
+        <h1 className="text-2xl font-semibold">
           <Trans id="preferences.title">Preferences</Trans>
         </h1>
         <p className="text-muted-foreground text-xs">
@@ -38,38 +22,10 @@ function RouteComponent() {
         </p>
       </div>
 
-      <div className="mt-6 flex flex-col gap-5">
-        <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium">
-            <Trans id="preferences.language.label">Language</Trans>
-          </span>
-          <Select
-            items={languageItems}
-            value={locale}
-            onValueChange={(value) => {
-              if (value && isLocaleCode(value)) {
-                setLocale(value);
-              }
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end" alignItemWithTrigger={false}>
-              <SelectGroup>
-                {localeOptions.map((localeOption) => (
-                  <SelectItem key={localeOption.key} value={localeOption.key}>
-                    {localeOption.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </label>
-
+      <div className="flex flex-col gap-2">
+        <AppSettingsSection />
         <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />
-        <CliSettingsSection />
       </div>
     </section>
   );
