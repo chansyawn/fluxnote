@@ -8,8 +8,12 @@ import type { AppDatabase } from "./database-client";
 const MIGRATIONS_DIR_NAME = "drizzle";
 const SOURCE_MIGRATIONS_DIR = "src/main/core/database/drizzle";
 
+function isPackagedElectronRuntime(): boolean {
+  return Boolean(app?.isPackaged);
+}
+
 export function resolveMigrationsFolder(): string {
-  return app.isPackaged
+  return isPackagedElectronRuntime()
     ? path.join(process.resourcesPath, MIGRATIONS_DIR_NAME)
     : path.resolve(process.cwd(), SOURCE_MIGRATIONS_DIR);
 }

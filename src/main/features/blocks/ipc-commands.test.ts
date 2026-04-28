@@ -3,6 +3,7 @@ import {
   type DatabaseClient,
   type AppDatabase,
 } from "@main/core/database/database-client";
+import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blockTags, tags } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import { sql } from "drizzle-orm";
@@ -12,40 +13,7 @@ import { createBlocksIpcCommands } from "./ipc-commands";
 
 async function createTestDatabaseClient(): Promise<DatabaseClient> {
   const client = createDatabaseClient(":memory:");
-
-  await client.db.run(sql`
-    CREATE TABLE blocks (
-      id text PRIMARY KEY NOT NULL,
-      position integer NOT NULL,
-      content text DEFAULT '' NOT NULL,
-      archived_at text,
-      created_at text NOT NULL,
-      updated_at text NOT NULL
-    )
-  `);
-  await client.db.run(sql`CREATE INDEX idx_blocks_archived_at ON blocks (archived_at)`);
-  await client.db.run(sql`CREATE INDEX idx_blocks_position ON blocks (position)`);
-  await client.db.run(sql`
-    CREATE TABLE tags (
-      id text PRIMARY KEY NOT NULL,
-      name text NOT NULL,
-      created_at text NOT NULL,
-      updated_at text NOT NULL
-    )
-  `);
-  await client.db.run(sql`CREATE UNIQUE INDEX uq_tags_name_lower ON tags (lower("name"))`);
-  await client.db.run(sql`
-    CREATE TABLE block_tags (
-      block_id text NOT NULL,
-      tag_id text NOT NULL,
-      PRIMARY KEY (block_id, tag_id),
-      FOREIGN KEY (block_id) REFERENCES blocks(id) ON DELETE CASCADE,
-      FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
-    )
-  `);
-  await client.db.run(sql`CREATE INDEX idx_block_tags_tag_id ON block_tags (tag_id)`);
-  await client.db.run(sql`CREATE INDEX idx_block_tags_block_id ON block_tags (block_id)`);
-
+  await migrateDatabase(client.db);
   return client;
 }
 
@@ -323,5 +291,16 @@ describe("blocks ipc commands", () => {
     const page = await listBlocks(db, { tagIds: ["tag-a"], limit: 1, offset: 0 });
     expect(page.totalCount).toBe(3);
     expect(page.blocks).toHaveLength(1);
+  });
+
+  it("creates blocks concurrently with unique ascending positions", async () => {
+    const db = await getDb();
+    const created = await Promise.all(
+      Array.from({ length: 10 }, async () => await createBlock(db)),
+    );
+
+    const sortedPositions = created.map((block) => block.position).toSorted((a, b) => a - b);
+    expect(sortedPositions).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(new Set(sortedPositions).size).toBe(10);
   });
 });

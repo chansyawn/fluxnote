@@ -61,16 +61,6 @@ async function getTagsForBlocks(
   return grouped;
 }
 
-async function getNextBlockPosition(db: AppDatabase): Promise<number> {
-  const row = await db
-    .select({
-      maxPosition: sql<number>`coalesce(max(${blocks.position}), 0)`,
-    })
-    .from(blocks)
-    .get();
-  return (row?.maxPosition ?? 0) + 1;
-}
-
 export async function createBlockRecord(db: AppDatabase, content = ""): Promise<Block> {
   const now = nowIsoString();
   const blockId = crypto.randomUUID();
@@ -82,7 +72,7 @@ export async function createBlockRecord(db: AppDatabase, content = ""): Promise<
       content,
       createdAt: now,
       id: blockId,
-      position: await getNextBlockPosition(db),
+      position: sql<number>`(select coalesce(max(${blocks.position}), 0) + 1 from ${blocks})`,
       updatedAt: now,
     })
     .run();
