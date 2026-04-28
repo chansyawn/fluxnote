@@ -2,7 +2,7 @@ import {
   shortcutActionSchema,
   type ShortcutAction,
   type ShortcutPreferences as StoredShortcutPreferences,
-} from "@renderer/app/preferences/preferences-schema";
+} from "@renderer/features/preferences/preferences-schema";
 import {
   formatForDisplay,
   normalizeHotkey,

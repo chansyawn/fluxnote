@@ -1,12 +1,12 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { queryClient } from "@renderer/app/query";
 import {
   AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS,
   DEFAULT_AUTO_ARCHIVE_SETTINGS,
   type AutoArchiveIdleMinute,
-} from "@renderer/app/preferences/preferences-schema";
-import { useAutoArchivePreference } from "@renderer/app/preferences/preferences-store";
-import { queryClient } from "@renderer/app/query";
+} from "@renderer/features/preferences/preferences-schema";
+import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-store";
 import {
   SettingsGroup,
   SettingsRow,

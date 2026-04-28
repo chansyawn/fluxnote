@@ -1,3 +1,4 @@
+import { LazyStore } from "@renderer/clients/store";
 import {
   DEFAULT_SETTINGS,
   normalizeSettings,
@@ -5,8 +6,7 @@ import {
   type LocaleCode,
   type Settings,
   type ShortcutAction,
-} from "@renderer/app/preferences/preferences-schema";
-import { LazyStore } from "@renderer/clients/store";
+} from "@renderer/features/preferences/preferences-schema";
 import {
   normalizeShortcutPreferences,
   type ShortcutBinding,
