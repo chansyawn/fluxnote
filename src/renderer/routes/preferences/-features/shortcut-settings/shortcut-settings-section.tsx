@@ -50,6 +50,7 @@ export function ShortcutSettingsSection() {
     recordingAction,
     startRecording,
   } = useShortcutRecorder({
+    clearShortcut,
     updateShortcut,
   });
 

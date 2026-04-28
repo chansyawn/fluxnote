@@ -31,13 +31,13 @@ describe("global-shortcut-sync", () => {
     mockedRegister.mockResolvedValue();
 
     const result = await registerGlobalShortcut({
-      shortcut: "Alt+N",
+      shortcut: "Mod+N",
       onPressed: vi.fn(),
     });
 
     expect(result).toEqual({ type: "registered" });
     expect(mockedUnregister).not.toHaveBeenCalled();
-    expect(mockedRegister).toHaveBeenCalledTimes(1);
+    expect(mockedRegister).toHaveBeenCalledWith("CommandOrControl+N", expect.any(Function));
   });
 
   it("unregisters before registering when shortcut already exists", async () => {
@@ -46,12 +46,12 @@ describe("global-shortcut-sync", () => {
     mockedRegister.mockResolvedValue();
 
     await registerGlobalShortcut({
-      shortcut: "Alt+N",
+      shortcut: "Mod+N",
       onPressed: vi.fn(),
     });
 
-    expect(mockedUnregister).toHaveBeenCalledWith("Alt+N");
-    expect(mockedRegister).toHaveBeenCalledWith("Alt+N", expect.any(Function));
+    expect(mockedUnregister).toHaveBeenCalledWith("CommandOrControl+N");
+    expect(mockedRegister).toHaveBeenCalledWith("CommandOrControl+N", expect.any(Function));
   });
 
   it("returns recoverable-error when registration throws but shortcut remains active", async () => {
@@ -60,7 +60,7 @@ describe("global-shortcut-sync", () => {
     mockedRegister.mockRejectedValue(registerError);
 
     const result = await registerGlobalShortcut({
-      shortcut: "Alt+N",
+      shortcut: "Mod+N",
       onPressed: vi.fn(),
     });
 
@@ -73,7 +73,7 @@ describe("global-shortcut-sync", () => {
     mockedRegister.mockRejectedValue(registerError);
 
     const result = await registerGlobalShortcut({
-      shortcut: "Alt+N",
+      shortcut: "Mod+N",
       onPressed: vi.fn(),
     });
 
@@ -89,7 +89,7 @@ describe("global-shortcut-sync", () => {
     });
 
     await registerGlobalShortcut({
-      shortcut: "Alt+N",
+      shortcut: "Mod+N",
       onPressed,
     });
 
@@ -99,6 +99,7 @@ describe("global-shortcut-sync", () => {
   it("swallows unregister errors", async () => {
     mockedUnregister.mockRejectedValue(new Error("cannot unregister"));
 
-    await expect(unregisterGlobalShortcut("Alt+N")).resolves.toBeUndefined();
+    await expect(unregisterGlobalShortcut("Mod+N")).resolves.toBeUndefined();
+    expect(mockedUnregister).toHaveBeenCalledWith("CommandOrControl+N");
   });
 });

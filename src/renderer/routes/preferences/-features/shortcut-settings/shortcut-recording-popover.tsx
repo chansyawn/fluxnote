@@ -17,7 +17,7 @@ function ShortcutRecordingMessage({ error }: { error: ShortcutInputError | null 
     );
   }
 
-  if (error === "invalid") {
+  if (error === "invalid" || error === "modifier-required") {
     return (
       <Trans id="preferences.shortcuts.error.invalid-modifier">
         At least one modifier should be included into a hotkey.

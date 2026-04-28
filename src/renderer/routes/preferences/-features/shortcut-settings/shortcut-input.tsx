@@ -1,6 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import type { ShortcutAction, ShortcutBinding } from "@renderer/app/preferences/preferences-schema";
-import { getShortcutDisplayTokens } from "@renderer/features/shortcut/shortcut-utils";
+import type { ShortcutAction } from "@renderer/app/preferences/preferences-schema";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { Button } from "@renderer/ui/components/button";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@renderer/ui/components/popover";
@@ -33,7 +36,7 @@ export function ShortcutInput({
   onReset,
   onClear,
 }: ShortcutInputProps) {
-  const shortcutTokens = getShortcutDisplayTokens(shortcut);
+  const shortcutTokens = formatShortcutTokens(shortcut);
   const isRecording = feedback !== null;
   const isInvalid = Boolean(error);
 

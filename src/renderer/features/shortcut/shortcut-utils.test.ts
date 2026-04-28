@@ -1,48 +1,48 @@
 import {
-  getShortcutDisplayTokens,
-  getShortcutFromKeyboardEvent,
-  getShortcutPreviewTokens,
-  normalizeShortcut,
+  formatShortcutTokens,
+  normalizeShortcutBinding,
+  normalizeShortcutPreferences,
+  type ShortcutPreferences,
+  validateShortcutUpdate,
 } from "@renderer/features/shortcut/shortcut-utils";
 import { describe, expect, it } from "vite-plus/test";
 
-function keyboardEvent(overrides: Partial<KeyboardEvent>): KeyboardEvent {
-  return {
-    altKey: false,
-    code: "",
-    ctrlKey: false,
-    key: "",
-    metaKey: false,
-    shiftKey: false,
-    ...overrides,
-  } as KeyboardEvent;
-}
+const shortcuts: ShortcutPreferences = {
+  "toggle-window": "Alt+N",
+  "create-block": "Mod+N",
+  "delete-block": "Mod+W",
+};
 
 describe("shortcut-utils", () => {
-  it("rejects a single non-modifier key as a shortcut", () => {
-    expect(getShortcutFromKeyboardEvent(keyboardEvent({ code: "KeyA", key: "a" }))).toBeNull();
-    expect(normalizeShortcut("A")).toBeNull();
+  it("normalizes aliases and case with TanStack Hotkeys", () => {
+    expect(normalizeShortcutBinding("ctrl+n", "mac")).toBe("Control+N");
+    expect(normalizeShortcutBinding("Command+N", "mac")).toBe("Mod+N");
+    expect(normalizeShortcutBinding("Mod+N", "mac")).toBe("Mod+N");
   });
 
-  it("normalizes and displays command letter shortcuts", () => {
-    const shortcut = getShortcutFromKeyboardEvent(
-      keyboardEvent({ code: "KeyA", key: "a", metaKey: true }),
-    );
-
-    expect(shortcut).toBe("Command+A");
-    expect(normalizeShortcut("Command+A")).toBe("Command+A");
-    expect(getShortcutDisplayTokens(shortcut)).toEqual(["Cmd", "A"]);
+  it("rejects single-key shortcuts by business rule", () => {
+    expect(validateShortcutUpdate("create-block", "A", shortcuts)).toBe("modifier-required");
   });
 
-  it("normalizes modifier order and displays space shortcuts", () => {
-    expect(normalizeShortcut("Shift+Control+Space")).toBe("Control+Shift+Space");
-    expect(getShortcutDisplayTokens("Shift+Control+Space")).toEqual(["Ctrl", "Shift", "Space"]);
+  it("rejects duplicate shortcuts across actions", () => {
+    expect(validateShortcutUpdate("delete-block", "Command+N", shortcuts)).toBe("duplicate");
   });
 
-  it("previews modifier-only keydown without capturing a shortcut", () => {
-    const event = keyboardEvent({ code: "ShiftLeft", key: "Shift", shiftKey: true });
+  it("normalizes persisted shortcut preferences into a complete record", () => {
+    expect(
+      normalizeShortcutPreferences({
+        "toggle-window": "Option+N",
+        "create-block": "Command+N",
+        "delete-block": null,
+      }),
+    ).toEqual({
+      "toggle-window": "Alt+N",
+      "create-block": "Mod+N",
+      "delete-block": null,
+    });
+  });
 
-    expect(getShortcutPreviewTokens(event)).toEqual(["Shift"]);
-    expect(getShortcutFromKeyboardEvent(event)).toBeNull();
+  it("formats shortcuts into stable display tokens", () => {
+    expect(formatShortcutTokens("Mod+Shift+N", "mac")).toEqual(["Cmd", "Shift", "N"]);
   });
 });
