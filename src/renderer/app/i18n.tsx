@@ -4,8 +4,8 @@ import {
   LANGUAGE_OPTIONS,
   type LanguageOption,
   type LocaleCode,
-} from "@renderer/app/preferences/preferences-schema";
-import { useLocalePreference } from "@renderer/app/preferences/preferences-store";
+} from "@renderer/features/preferences/preferences-schema";
+import { useLocalePreference } from "@renderer/features/preferences/preferences-store";
 import { messages as enMessages } from "@renderer/locales/en/messages.po";
 import { messages as pseudoMessages } from "@renderer/locales/pseudo/messages.po";
 import { messages as zhHansMessages } from "@renderer/locales/zh-Hans/messages.po";

@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import type { ShortcutAction } from "@renderer/app/preferences/preferences-schema";
+import type { ShortcutAction } from "@renderer/features/preferences/preferences-schema";
 import {
   formatShortcutTokens,
   type ShortcutBinding,

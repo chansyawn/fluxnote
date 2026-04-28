@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { toAppInvokeError } from "@renderer/app/invoke";
-import { isLocaleCode } from "@renderer/app/preferences/preferences-schema";
 import { queryClient } from "@renderer/app/query";
 import { getCliStatus, installCli, uninstallCli } from "@renderer/clients";
+import { isLocaleCode } from "@renderer/features/preferences/preferences-schema";
 import {
   SettingsGroup,
   SettingsRow,

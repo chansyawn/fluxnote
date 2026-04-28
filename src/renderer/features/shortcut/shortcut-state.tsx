@@ -1,6 +1,6 @@
-import { type ShortcutAction } from "@renderer/app/preferences/preferences-schema";
-import { useShortcutPreferences } from "@renderer/app/preferences/preferences-store";
 import { toggleMainWindowVisibility } from "@renderer/clients/window";
+import { type ShortcutAction } from "@renderer/features/preferences/preferences-schema";
+import { useShortcutPreferences } from "@renderer/features/preferences/preferences-store";
 import {
   normalizeShortcutBinding,
   type ShortcutBinding,

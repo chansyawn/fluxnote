@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import {
   DEFAULT_SETTINGS,
   type ShortcutAction,
-} from "@renderer/app/preferences/preferences-schema";
+} from "@renderer/features/preferences/preferences-schema";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   SettingsGroup,
