@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 import type { EditorRegistry } from "./use-editor-registry";
 
-export type BlockNavigationAlign = "start" | "center" | "end" | "auto";
+export type BlockNavigationAlign = "start" | "auto";
 export type BlockNavigationFocus = "editor" | "block" | "none";
 export type BlockNavigationViewMode = "current" | "active-unfiltered";
 
@@ -160,7 +160,7 @@ interface UseBlockNavigationResult {
 
 function normalizeOptions(options: NavigationOptions | undefined) {
   return {
-    align: options?.align ?? "center",
+    align: options?.align ?? "start",
     focus: options?.focus ?? "editor",
     viewMode: options?.viewMode ?? "current",
   } satisfies Pick<NavigationRequest, "align" | "focus" | "viewMode">;
