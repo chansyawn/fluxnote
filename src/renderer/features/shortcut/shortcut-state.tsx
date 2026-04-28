@@ -1,19 +1,20 @@
-import {
-  type ShortcutAction,
-  type ShortcutBinding,
-  type ShortcutPreferences,
-} from "@renderer/app/preferences/preferences-schema";
+import { type ShortcutAction } from "@renderer/app/preferences/preferences-schema";
 import { useShortcutPreferences } from "@renderer/app/preferences/preferences-store";
 import { toggleMainWindowVisibility } from "@renderer/clients/window";
 import {
-  normalizeShortcut,
+  normalizeShortcutBinding,
+  type ShortcutBinding,
+  type ShortcutPreferences,
   type ShortcutUpdateError,
   validateShortcutUpdate,
 } from "@renderer/features/shortcut/shortcut-utils";
 import { useGlobalShortcutSync } from "@renderer/features/shortcut/use-global-shortcut-sync";
+import type { Hotkey } from "@tanstack/react-hotkeys";
 import { createContext, useContext, useEffectEvent, useMemo, type ReactNode } from "react";
 
-type ShortcutUpdateResult = { ok: true } | { ok: false; error: ShortcutUpdateError };
+type ShortcutUpdateResult =
+  | { ok: true; shortcut: Hotkey }
+  | { ok: false; error: ShortcutUpdateError };
 
 interface ShortcutStateContextValue {
   shortcuts: ShortcutPreferences;
@@ -58,7 +59,7 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
           return { ok: false, error };
         }
 
-        const normalizedShortcut = normalizeShortcut(shortcut);
+        const normalizedShortcut = normalizeShortcutBinding(shortcut);
 
         if (!normalizedShortcut) {
           return { ok: false, error: "invalid" };
@@ -66,7 +67,7 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
 
         setShortcut(action, normalizedShortcut);
 
-        return { ok: true };
+        return { ok: true, shortcut: normalizedShortcut };
       },
     }),
     [clearShortcut, globalShortcutError, resetShortcut, setShortcut, shortcuts],

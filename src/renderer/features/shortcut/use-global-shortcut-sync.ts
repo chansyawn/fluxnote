@@ -1,9 +1,11 @@
-import type { ShortcutBinding } from "@renderer/app/preferences/preferences-schema";
 import {
   registerGlobalShortcut,
   unregisterGlobalShortcut,
 } from "@renderer/features/shortcut/global-shortcut-sync";
-import { normalizeShortcut } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  normalizeShortcutBinding,
+  type ShortcutBinding,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 interface UseGlobalShortcutSyncOptions {
@@ -20,7 +22,7 @@ export function useGlobalShortcutSync(options: UseGlobalShortcutSyncOptions): Sh
   useEffect(() => {
     let isMounted = true;
     const syncToken = ++syncTokenRef.current;
-    const normalizedShortcut = normalizeShortcut(shortcut ?? "");
+    const normalizedShortcut = normalizeShortcutBinding(shortcut ?? "");
     const isCurrentSync = () => isMounted && syncTokenRef.current === syncToken;
 
     setErrorShortcut(null);

@@ -7,6 +7,7 @@ import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
+import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createMemoryHistory, createRouter } from "@tanstack/react-router";
 
@@ -32,13 +33,15 @@ export function App() {
       <I18nStateProvider>
         <AppErrorBoundary>
           <QueryClientProvider client={queryClient}>
-            <ShortcutStateProvider>
-              <DirectionStateProvider>
-                <AutoArchiveSync />
-                <RouterProvider router={router} />
-                <Toaster />
-              </DirectionStateProvider>
-            </ShortcutStateProvider>
+            <HotkeysProvider>
+              <ShortcutStateProvider>
+                <DirectionStateProvider>
+                  <AutoArchiveSync />
+                  <RouterProvider router={router} />
+                  <Toaster />
+                </DirectionStateProvider>
+              </ShortcutStateProvider>
+            </HotkeysProvider>
           </QueryClientProvider>
         </AppErrorBoundary>
       </I18nStateProvider>

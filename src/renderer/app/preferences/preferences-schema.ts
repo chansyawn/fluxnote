@@ -31,8 +31,8 @@ export const shortcutActionSchema = z.enum(["toggle-window", "create-block", "de
 export const shortcutBindingSchema = z.string().nullable();
 export const shortcutPreferencesSchema = z.object({
   "toggle-window": shortcutBindingSchema.catch("Alt+N"),
-  "create-block": shortcutBindingSchema.catch("Command+N"),
-  "delete-block": shortcutBindingSchema.catch("Command+W"),
+  "create-block": shortcutBindingSchema.catch("Mod+N"),
+  "delete-block": shortcutBindingSchema.catch("Mod+W"),
 });
 
 export type ShortcutAction = z.infer<typeof shortcutActionSchema>;
@@ -48,8 +48,8 @@ const DEFAULT_SETTINGS_VALUE = {
   },
   shortcuts: {
     "toggle-window": "Alt+N",
-    "create-block": "Command+N",
-    "delete-block": "Command+W",
+    "create-block": "Mod+N",
+    "delete-block": "Mod+W",
   },
 } as const;
 

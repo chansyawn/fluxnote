@@ -5,9 +5,13 @@ import {
   type LocaleCode,
   type Settings,
   type ShortcutAction,
-  type ShortcutBinding,
 } from "@renderer/app/preferences/preferences-schema";
 import { LazyStore } from "@renderer/clients/store";
+import {
+  normalizeShortcutPreferences,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
@@ -22,6 +26,8 @@ const settingsStore = new LazyStore(SETTINGS_STORE_PATH, {
   },
 });
 
+const DEFAULT_NORMALIZED_SETTINGS = normalizeStoredSettings(DEFAULT_SETTINGS);
+
 function parsePersistState<T>(value: string | null, fallback: T): T {
   if (!value) {
     return fallback;
@@ -35,12 +41,25 @@ function parsePersistState<T>(value: string | null, fallback: T): T {
   }
 }
 
+type NormalizedSettings = Omit<Settings, "shortcuts"> & {
+  shortcuts: ShortcutPreferences;
+};
+
+function normalizeStoredSettings(input: unknown): NormalizedSettings {
+  const settings = normalizeSettings(input);
+
+  return {
+    ...settings,
+    shortcuts: normalizeShortcutPreferences(settings.shortcuts),
+  };
+}
+
 const settingsStateStorage: StateStorage = {
   getItem: async () => {
     await settingsStore.init();
     await settingsStore.reload({ ignoreDefaults: false });
 
-    const settings = normalizeSettings({
+    const settings = normalizeStoredSettings({
       locale: await settingsStore.get("locale"),
       autoArchive: await settingsStore.get("autoArchive"),
       shortcuts: await settingsStore.get("shortcuts"),
@@ -51,7 +70,7 @@ const settingsStateStorage: StateStorage = {
   setItem: async (_, value) => {
     await settingsStore.init();
     const persistedState = parsePersistState<Settings>(value, DEFAULT_SETTINGS);
-    const nextSettings = normalizeSettings(persistedState);
+    const nextSettings = normalizeStoredSettings(persistedState);
 
     await settingsStore.set("locale", nextSettings.locale);
     await settingsStore.set("autoArchive", nextSettings.autoArchive);
@@ -67,7 +86,7 @@ const settingsStateStorage: StateStorage = {
   },
 };
 
-interface SettingsStoreState extends Settings {
+interface SettingsStoreState extends NormalizedSettings {
   setLocale: (locale: LocaleCode) => void;
   patchAutoArchive: (patch: Partial<AutoArchiveSettings>) => void;
   setShortcut: (action: ShortcutAction, shortcut: ShortcutBinding) => void;
@@ -78,32 +97,31 @@ interface SettingsStoreState extends Settings {
 const usePreferencesStore = create<SettingsStoreState>()(
   persist(
     (set) => ({
-      ...DEFAULT_SETTINGS,
+      ...DEFAULT_NORMALIZED_SETTINGS,
       setLocale: (locale) => {
-        set((state) => normalizeSettings({ ...state, locale }));
+        set({ locale });
       },
       patchAutoArchive: (patch) => {
-        set((state) =>
-          normalizeSettings({ ...state, autoArchive: { ...state.autoArchive, ...patch } }),
-        );
+        set((state) => ({ autoArchive: { ...state.autoArchive, ...patch } }));
       },
       setShortcut: (action, shortcut) => {
-        set((state) =>
-          normalizeSettings({ ...state, shortcuts: { ...state.shortcuts, [action]: shortcut } }),
-        );
+        set((state) => ({
+          shortcuts: {
+            ...state.shortcuts,
+            [action]: shortcut,
+          },
+        }));
       },
       clearShortcut: (action) => {
-        set((state) =>
-          normalizeSettings({ ...state, shortcuts: { ...state.shortcuts, [action]: null } }),
-        );
+        set((state) => ({ shortcuts: { ...state.shortcuts, [action]: null } }));
       },
       resetShortcut: (action) => {
-        set((state) =>
-          normalizeSettings({
-            ...state,
-            shortcuts: { ...state.shortcuts, [action]: DEFAULT_SETTINGS.shortcuts[action] },
-          }),
-        );
+        set((state) => ({
+          shortcuts: {
+            ...state.shortcuts,
+            [action]: DEFAULT_NORMALIZED_SETTINGS.shortcuts[action],
+          },
+        }));
       },
     }),
     {
@@ -116,7 +134,7 @@ const usePreferencesStore = create<SettingsStoreState>()(
         shortcuts: state.shortcuts,
       }),
       merge: (persistedState, currentState) => {
-        const normalized = normalizeSettings(persistedState);
+        const normalized = normalizeStoredSettings(persistedState);
         return {
           ...currentState,
           ...normalized,

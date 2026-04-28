@@ -1,7 +1,7 @@
 import type { Block, LocateBlockResult } from "@renderer/clients";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import { matchShortcutEvent } from "@renderer/features/shortcut/shortcut-utils";
-import { useEffect, useEffectEvent } from "react";
+import { useHotkeys, type UseHotkeyDefinition } from "@tanstack/react-hotkeys";
+import { useEffectEvent, useMemo } from "react";
 
 import type { BlockNavigationAlign } from "./use-block-navigation";
 
@@ -33,6 +33,16 @@ export function useBlockShortcuts({
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
   const { shortcuts } = useShortcutState();
 
+  const isActiveBlockFocused = useEffectEvent(() => {
+    if (!activeBlockId) {
+      return false;
+    }
+
+    const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-note-block-id]");
+
+    return focusedBlockEditor?.dataset.noteBlockId === activeBlockId;
+  });
+
   const createBlockWithFocus = useEffectEvent(async () => {
     const newBlock = await createBlock();
     navigateToBlock(newBlock.id);
@@ -61,41 +71,55 @@ export function useBlockShortcuts({
     navigateToIndex(nextIndex, { align: "auto" });
   });
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || !activeBlockId) {
-        return;
-      }
+  const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
+    const definitions: UseHotkeyDefinition[] = [];
+    const createBlockShortcut = shortcuts["create-block"];
+    const deleteBlockShortcut = shortcuts["delete-block"];
 
-      const focusedBlockEditor =
-        document.activeElement?.closest<HTMLElement>("[data-note-block-id]");
+    if (createBlockShortcut) {
+      definitions.push({
+        hotkey: createBlockShortcut,
+        callback: (event) => {
+          if (event.repeat || !isActiveBlockFocused()) {
+            return;
+          }
 
-      if (!focusedBlockEditor || focusedBlockEditor.dataset.noteBlockId !== activeBlockId) {
-        return;
-      }
+          event.preventDefault();
+          event.stopPropagation();
+          void createBlockWithFocus();
+        },
+        options: {
+          meta: { name: "Create block" },
+        },
+      });
+    }
 
-      if (matchShortcutEvent(event, shortcuts["create-block"])) {
-        event.preventDefault();
-        event.stopPropagation();
-        void createBlockWithFocus();
-        return;
-      }
+    if (deleteBlockShortcut) {
+      definitions.push({
+        hotkey: deleteBlockShortcut,
+        callback: (event) => {
+          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+            return;
+          }
 
-      if (!matchShortcutEvent(event, shortcuts["delete-block"])) {
-        return;
-      }
+          event.preventDefault();
+          event.stopPropagation();
+          void deleteBlockWithFocus(activeBlockId);
+        },
+        options: {
+          meta: { name: "Delete block" },
+        },
+      });
+    }
 
-      event.preventDefault();
-      event.stopPropagation();
-      void deleteBlockWithFocus(activeBlockId);
-    };
+    return definitions;
+  }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, isActiveBlockFocused, shortcuts]);
 
-    window.addEventListener("keydown", onKeyDown, true);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown, true);
-    };
-  }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, shortcuts]);
+  useHotkeys(hotkeyDefinitions, {
+    ignoreInputs: false,
+    preventDefault: false,
+    stopPropagation: false,
+  });
 
   return {
     createBlockWithFocus,

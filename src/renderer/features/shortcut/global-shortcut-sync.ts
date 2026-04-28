@@ -4,9 +4,11 @@ import {
   unregister,
   type ShortcutEvent,
 } from "@renderer/clients/global-shortcut";
+import { toElectronAccelerator } from "@renderer/features/shortcut/electron-accelerator";
+import type { Hotkey } from "@tanstack/react-hotkeys";
 
 interface RegisterGlobalShortcutOptions {
-  shortcut: string;
+  shortcut: Hotkey;
   onPressed: () => void;
 }
 
@@ -15,8 +17,8 @@ export type RegisterGlobalShortcutResult =
   | { type: "recoverable-error"; error: unknown }
   | { type: "unavailable"; error: unknown };
 
-async function isShortcutRegistered(shortcut: string): Promise<boolean> {
-  return isRegistered(shortcut).catch(() => false);
+async function isShortcutRegistered(accelerator: string): Promise<boolean> {
+  return isRegistered(accelerator).catch(() => false);
 }
 
 function handleShortcutEvent(event: ShortcutEvent, onPressed: () => void) {
@@ -31,20 +33,22 @@ export async function registerGlobalShortcut(
   options: RegisterGlobalShortcutOptions,
 ): Promise<RegisterGlobalShortcutResult> {
   const { onPressed, shortcut } = options;
-  const alreadyRegistered = await isShortcutRegistered(shortcut);
+  const accelerator = toElectronAccelerator(shortcut);
+
+  const alreadyRegistered = await isShortcutRegistered(accelerator);
 
   if (alreadyRegistered) {
-    await unregister(shortcut).catch(() => {});
+    await unregister(accelerator).catch(() => {});
   }
 
   try {
-    await register(shortcut, (event) => {
+    await register(accelerator, (event) => {
       handleShortcutEvent(event, onPressed);
     });
 
     return { type: "registered" };
   } catch (error) {
-    const stillRegistered = await isShortcutRegistered(shortcut);
+    const stillRegistered = await isShortcutRegistered(accelerator);
 
     if (stillRegistered) {
       return { type: "recoverable-error", error };
@@ -54,6 +58,8 @@ export async function registerGlobalShortcut(
   }
 }
 
-export async function unregisterGlobalShortcut(shortcut: string): Promise<void> {
-  await unregister(shortcut).catch(() => {});
+export async function unregisterGlobalShortcut(shortcut: Hotkey): Promise<void> {
+  const accelerator = toElectronAccelerator(shortcut);
+
+  await unregister(accelerator).catch(() => {});
 }
