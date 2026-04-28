@@ -1,8 +1,7 @@
-import { hideWindow, onWindowCloseRequested } from "@renderer/clients/window";
 import { RouterErrorFallback } from "@renderer/features/error-boundary";
-import { WindowTitleBar } from "@renderer/routes/-features/window-title-bar";
+import { useBindWindowCloseRequest } from "@renderer/routes/-layout/use-bind-window-close-request";
+import { WindowTitleBar } from "@renderer/routes/-layout/window-title-bar";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -10,14 +9,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  useEffect(() => {
-    const unlisten = onWindowCloseRequested(() => {
-      void hideWindow();
-    });
-    return () => {
-      unlisten();
-    };
-  }, []);
+  useBindWindowCloseRequest();
 
   return (
     <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">

@@ -1,4 +1,4 @@
-import { blockNavigationReducer } from "@renderer/routes/-features/use-block-navigation";
+import { blockNavigationReducer } from "@renderer/routes/_workspace/-features/use-block-navigation";
 import { describe, expect, it } from "vite-plus/test";
 
 type NavigationState = Parameters<typeof blockNavigationReducer>[0];

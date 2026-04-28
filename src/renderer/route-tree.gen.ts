@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PreferencesRouteImport } from './routes/preferences'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceRouteRouteImport } from './routes/_workspace/route'
+import { Route as PreferencesIndexRouteImport } from './routes/preferences/index'
 import { Route as LabIndexRouteImport } from './routes/lab/index'
+import { Route as WorkspaceIndexRouteImport } from './routes/_workspace/index'
 
-const PreferencesRoute = PreferencesRouteImport.update({
-  id: '/preferences',
-  path: '/preferences',
+const WorkspaceRouteRoute = WorkspaceRouteRouteImport.update({
+  id: '/_workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PreferencesIndexRoute = PreferencesIndexRouteImport.update({
+  id: '/preferences/',
+  path: '/preferences/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabIndexRoute = LabIndexRouteImport.update({
@@ -28,51 +28,57 @@ const LabIndexRoute = LabIndexRouteImport.update({
   path: '/lab/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkspaceRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/preferences': typeof PreferencesRoute
+  '/': typeof WorkspaceIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/preferences/': typeof PreferencesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/preferences': typeof PreferencesRoute
+  '/': typeof WorkspaceIndexRoute
   '/lab': typeof LabIndexRoute
+  '/preferences': typeof PreferencesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/preferences': typeof PreferencesRoute
+  '/_workspace': typeof WorkspaceRouteRouteWithChildren
+  '/_workspace/': typeof WorkspaceIndexRoute
   '/lab/': typeof LabIndexRoute
+  '/preferences/': typeof PreferencesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/preferences' | '/lab/'
+  fullPaths: '/' | '/lab/' | '/preferences/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/preferences' | '/lab'
-  id: '__root__' | '/' | '/preferences' | '/lab/'
+  to: '/' | '/lab' | '/preferences'
+  id: '__root__' | '/_workspace' | '/_workspace/' | '/lab/' | '/preferences/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PreferencesRoute: typeof PreferencesRoute
+  WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
   LabIndexRoute: typeof LabIndexRoute
+  PreferencesIndexRoute: typeof PreferencesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/preferences': {
-      id: '/preferences'
-      path: '/preferences'
-      fullPath: '/preferences'
-      preLoaderRoute: typeof PreferencesRouteImport
+    '/_workspace': {
+      id: '/_workspace'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof WorkspaceRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/preferences/': {
+      id: '/preferences/'
+      path: '/preferences'
+      fullPath: '/preferences/'
+      preLoaderRoute: typeof PreferencesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lab/': {
@@ -82,13 +88,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LabIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_workspace/': {
+      id: '/_workspace/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
+    }
   }
 }
 
+interface WorkspaceRouteRouteChildren {
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+}
+
+const WorkspaceRouteRouteChildren: WorkspaceRouteRouteChildren = {
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
+}
+
+const WorkspaceRouteRouteWithChildren = WorkspaceRouteRoute._addFileChildren(
+  WorkspaceRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PreferencesRoute: PreferencesRoute,
+  WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
   LabIndexRoute: LabIndexRoute,
+  PreferencesIndexRoute: PreferencesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
