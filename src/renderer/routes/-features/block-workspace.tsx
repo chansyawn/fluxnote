@@ -3,21 +3,20 @@ import { useTagData } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { BlockListItemActionsProvider, type BlockListItemActions } from "./block-list-context";
 import { EditorRegistryProvider } from "./editor-registry-context";
-import { useOpenBlockTarget } from "./open-block-target";
-import { useBlockFocus } from "./use-block-focus";
 import { useBlockList } from "./use-block-list";
 import { useBlockMutations } from "./use-block-mutations";
+import { useBlockNavigation } from "./use-block-navigation";
 import { useBlockShortcuts } from "./use-block-shortcuts";
 import { useEditorRegistry } from "./use-editor-registry";
 import { useExternalEditActions } from "./use-external-edit-actions";
 import { useExternalEditSessions } from "./use-external-edit-sessions";
 import { useOpenBlockRequest } from "./use-open-block-request";
 import { useWorkspaceViewState } from "./use-workspace-view-state";
-import { VirtualBlockList, type VirtualBlockListHandle } from "./virtual-block-list";
+import { VirtualBlockList } from "./virtual-block-list";
 import { WorkspaceTagFilterPortal } from "./workspace-tag-filter-portal";
 
 function LoadingState(): ReactElement {
@@ -80,11 +79,6 @@ function ArchivedEmptyState() {
 }
 
 export function BlockWorkspace() {
-  const blockListRef = useRef<VirtualBlockListHandle | null>(null);
-  const scrollToBlockIndex = useCallback((index: number) => {
-    blockListRef.current?.scrollToIndex(index);
-  }, []);
-
   const viewState = useWorkspaceViewState();
   const blockList = useBlockList({
     visibility: viewState.visibility,
@@ -95,18 +89,19 @@ export function BlockWorkspace() {
   const { sessionsByBlockId } = useExternalEditSessions();
 
   const editorRegistry = useEditorRegistry();
-
-  const blockFocus = useBlockFocus({
+  const blockNavigation = useBlockNavigation({
     registry: editorRegistry,
-    loadedBlocks: blockList.loadedBlocks,
+    visibility: viewState.visibility,
+    selectedTagIds: viewState.selectedTagIds,
+    setVisibility: viewState.setVisibility,
+    setSelectedTagIds: viewState.setSelectedTagIds,
     getBlockAtIndex: blockList.getBlockAtIndex,
     ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
     locateBlockInView: blockList.locateBlockInView,
-    scrollToBlockIndex,
   });
 
   const { createBlockWithFocus, deleteBlockWithFocus } = useBlockShortcuts({
-    activeBlockId: blockFocus.activeBlockId,
+    activeBlockId: blockNavigation.activeBlockId,
     totalBlockCount: blockList.totalBlockCount,
     createBlock: async () => {
       const block = await blockMutations.createBlock();
@@ -116,25 +111,32 @@ export function BlockWorkspace() {
       return block;
     },
     deleteBlock: blockMutations.deleteBlock,
-    requestFocus: blockFocus.requestFocus,
-    requestFocusAtIndex: blockFocus.requestFocusAtIndex,
+    navigateToBlock: blockNavigation.navigateToBlock,
+    navigateToIndex: blockNavigation.navigateToIndex,
     locateBlockInView: blockList.locateBlockInView,
-    setActiveBlockId: blockFocus.setActiveBlockId,
+    setActiveBlockId: blockNavigation.setActiveBlockId,
   });
 
   const externalEditActions = useExternalEditActions({
     getEditor: editorRegistry.getEditor,
+    navigateToBlock: blockNavigation.navigateToBlock,
   });
 
   const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
 
-  useOpenBlockTarget({
-    pendingBlockId,
-    onSetVisibility: viewState.setVisibility,
-    onClearFilters: () => viewState.setSelectedTagIds([]),
-    onFocus: blockFocus.requestLocatedFocus,
-    onAcknowledge: acknowledgePendingBlockId,
-  });
+  useEffect(() => {
+    if (!pendingBlockId) {
+      return;
+    }
+
+    blockNavigation.navigateToBlock(pendingBlockId, {
+      acknowledge: () => {
+        acknowledgePendingBlockId(pendingBlockId);
+      },
+      onNotFound: () => undefined,
+      viewMode: "active-unfiltered",
+    });
+  }, [acknowledgePendingBlockId, blockNavigation.navigateToBlock, pendingBlockId]);
 
   const handleArchiveBlock = useCallback(
     (blockId: string) => {
@@ -202,7 +204,7 @@ export function BlockWorkspace() {
       onAssignTags: blockMutations.assignBlockTags,
       onCancelExternalEdit: externalEditActions.handleCancelExternalEdit,
       onSubmitExternalEdit: externalEditActions.handleSubmitExternalEdit,
-      onFocus: blockFocus.setActiveBlockId,
+      onFocus: blockNavigation.setActiveBlockId,
     }),
     [
       tagData.tags,
@@ -219,7 +221,7 @@ export function BlockWorkspace() {
       blockMutations.assignBlockTags,
       externalEditActions.handleCancelExternalEdit,
       externalEditActions.handleSubmitExternalEdit,
-      blockFocus.setActiveBlockId,
+      blockNavigation.setActiveBlockId,
     ],
   );
 
@@ -294,10 +296,11 @@ export function BlockWorkspace() {
         <EditorRegistryProvider value={registryContextValue}>
           <BlockListItemActionsProvider value={itemActions}>
             <VirtualBlockList
-              ref={blockListRef}
               totalCount={totalBlockCount}
               getBlockAtIndex={blockList.getBlockAtIndex}
               ensureBlockIndex={blockList.ensureBlockIndex}
+              scrollTarget={blockNavigation.scrollTarget}
+              onScrollTargetRendered={blockNavigation.targetRendered}
             />
           </BlockListItemActionsProvider>
         </EditorRegistryProvider>
