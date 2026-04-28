@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
+import { getSqliteChangedRows } from "@main/core/database/db-utils";
 import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
@@ -109,12 +110,12 @@ export class AutoArchiveRuntime {
     }
 
     const protectedIds = this.getProtectedBlockIds();
-    const staleBlockIds = listStaleActiveBlockIds(db, cutoffTime).filter(
+    const staleBlockIds = (await listStaleActiveBlockIds(db, cutoffTime)).filter(
       (id) => !protectedIds.has(id),
     );
     let archivedCount = 0;
     if (forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0) {
-      archivedCount = archiveBlocks(db, staleBlockIds, now.toISOString());
+      archivedCount = await archiveBlocks(db, staleBlockIds, now.toISOString());
     }
 
     this.emitIfChanged({
@@ -164,21 +165,26 @@ export class AutoArchiveRuntime {
   }
 }
 
-function listStaleActiveBlockIds(db: AppDatabase, cutoffIso: string): string[] {
-  return db
-    .select({ id: blocks.id })
-    .from(blocks)
-    .where(and(isNull(blocks.archivedAt), lt(blocks.updatedAt, cutoffIso)))
-    .all()
-    .map((row: { id: string }) => row.id);
+async function listStaleActiveBlockIds(db: AppDatabase, cutoffIso: string): Promise<string[]> {
+  return (
+    await db
+      .select({ id: blocks.id })
+      .from(blocks)
+      .where(and(isNull(blocks.archivedAt), lt(blocks.updatedAt, cutoffIso)))
+      .all()
+  ).map((row: { id: string }) => row.id);
 }
 
-function archiveBlocks(db: AppDatabase, blockIds: readonly string[], archivedAt: string): number {
+async function archiveBlocks(
+  db: AppDatabase,
+  blockIds: readonly string[],
+  archivedAt: string,
+): Promise<number> {
   if (blockIds.length === 0) {
     return 0;
   }
 
-  const result = db
+  const result = await db
     .update(blocks)
     .set({
       archivedAt,
@@ -186,5 +192,5 @@ function archiveBlocks(db: AppDatabase, blockIds: readonly string[], archivedAt:
     })
     .where(and(isNull(blocks.archivedAt), inArray(blocks.id, [...blockIds])))
     .run();
-  return result.changes;
+  return getSqliteChangedRows(result);
 }

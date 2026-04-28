@@ -9,9 +9,6 @@ export default defineConfig({
       fileName: () => "main.cjs",
       formats: ["cjs"],
     },
-    rolldownOptions: {
-      external: ["better-sqlite3"],
-    },
   },
   resolve: {
     alias: viteAliases,

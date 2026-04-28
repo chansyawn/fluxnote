@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database/database-schema";
-import { nowIsoString } from "@main/core/database/db-utils";
+import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
 import { businessError } from "@shared/ipc/errors";
@@ -30,12 +30,15 @@ function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
   };
 }
 
-function getTagsForBlocks(db: AppDatabase, blockIds: readonly string[]): Map<string, Tag[]> {
+async function getTagsForBlocks(
+  db: AppDatabase,
+  blockIds: readonly string[],
+): Promise<Map<string, Tag[]>> {
   if (blockIds.length === 0) {
     return new Map();
   }
 
-  const rows = db
+  const rows = await db
     .select({
       blockId: blockTags.blockId,
       id: tags.id,
@@ -58,8 +61,8 @@ function getTagsForBlocks(db: AppDatabase, blockIds: readonly string[]): Map<str
   return grouped;
 }
 
-function getNextBlockPosition(db: AppDatabase): number {
-  const row = db
+async function getNextBlockPosition(db: AppDatabase): Promise<number> {
+  const row = await db
     .select({
       maxPosition: sql<number>`coalesce(max(${blocks.position}), 0)`,
     })
@@ -68,47 +71,48 @@ function getNextBlockPosition(db: AppDatabase): number {
   return (row?.maxPosition ?? 0) + 1;
 }
 
-export function createBlockRecord(db: AppDatabase, content = ""): Block {
+export async function createBlockRecord(db: AppDatabase, content = ""): Promise<Block> {
   const now = nowIsoString();
   const blockId = crypto.randomUUID();
 
-  db.insert(blocks)
+  await db
+    .insert(blocks)
     .values({
       archivedAt: null,
       content,
       createdAt: now,
       id: blockId,
-      position: getNextBlockPosition(db),
+      position: await getNextBlockPosition(db),
       updatedAt: now,
     })
     .run();
 
-  return getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId);
 }
 
-export function assertBlockExists(db: AppDatabase, blockId: string): void {
-  const row = db.select({ id: blocks.id }).from(blocks).where(eq(blocks.id, blockId)).get();
+export async function assertBlockExists(db: AppDatabase, blockId: string): Promise<void> {
+  const row = await db.select({ id: blocks.id }).from(blocks).where(eq(blocks.id, blockId)).get();
   if (!row) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 }
 
-export function getPublicBlockById(db: AppDatabase, blockId: string): Block {
-  const block = db.select().from(blocks).where(eq(blocks.id, blockId)).get();
+export async function getPublicBlockById(db: AppDatabase, blockId: string): Promise<Block> {
+  const block = await db.select().from(blocks).where(eq(blocks.id, blockId)).get();
   if (!block) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  const tagsByBlockId = getTagsForBlocks(db, [blockId]);
+  const tagsByBlockId = await getTagsForBlocks(db, [blockId]);
   return mapBlockRow(block, tagsByBlockId.get(blockId) ?? []);
 }
 
-function countBlocks(
+async function countBlocks(
   db: AppDatabase,
   tagIds: readonly string[],
   visibility: "active" | "archived",
   beforePosition?: { position: number; id: string },
-): number {
+): Promise<number> {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
   const beforePredicate = beforePosition
@@ -116,7 +120,7 @@ function countBlocks(
     : undefined;
 
   if (tagIds.length === 0) {
-    const row = db
+    const row = await db
       .select({ totalCount: sql<number>`count(*)` })
       .from(blocks)
       .where(and(archivedPredicate, beforePredicate))
@@ -132,14 +136,14 @@ function countBlocks(
     .groupBy(blocks.id)
     .having(sql`count(distinct ${blockTags.tagId}) = ${tagIds.length}`)
     .as("filtered");
-  const row = db
+  const row = await db
     .select({ totalCount: sql<number>`count(*)` })
     .from(filtered)
     .get();
   return row?.totalCount ?? 0;
 }
 
-export function listBlocks(
+export async function listBlocks(
   db: AppDatabase,
   tagIds: string[] | undefined,
   visibility: "active" | "archived",
@@ -160,7 +164,7 @@ export function listBlocks(
   let blockRows: BlockRecord[];
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
   if (uniqueTagIds.length > 0) {
-    blockRows = db
+    blockRows = await db
       .select(selectedFields)
       .from(blocks)
       .innerJoin(blockTags, eq(blockTags.blockId, blocks.id))
@@ -179,7 +183,7 @@ export function listBlocks(
       .offset(offset)
       .all();
   } else {
-    blockRows = db
+    blockRows = await db
       .select(selectedFields)
       .from(blocks)
       .where(archivedPredicate)
@@ -190,16 +194,16 @@ export function listBlocks(
   }
 
   const blockIds = blockRows.map((block) => block.id);
-  const tagsByBlockId = getTagsForBlocks(db, blockIds);
+  const tagsByBlockId = await getTagsForBlocks(db, blockIds);
   return {
     blocks: blockRows.map((block) => mapBlockRow(block, tagsByBlockId.get(block.id) ?? [])),
     offset,
     limit,
-    totalCount: countBlocks(db, uniqueTagIds, visibility),
+    totalCount: await countBlocks(db, uniqueTagIds, visibility),
   };
 }
 
-export function locateBlock(
+export async function locateBlock(
   db: AppDatabase,
   blockId: string,
   tagIds: string[] | undefined,
@@ -209,7 +213,7 @@ export function locateBlock(
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
 
-  const targetBlock = db
+  const targetBlock = await db
     .select({ id: blocks.id, position: blocks.position })
     .from(blocks)
     .where(and(archivedPredicate, eq(blocks.id, blockId)))
@@ -219,7 +223,7 @@ export function locateBlock(
   }
 
   if (uniqueTagIds.length > 0) {
-    const tagMatch = db
+    const tagMatch = await db
       .select({ matchCount: sql<number>`count(distinct ${blockTags.tagId})` })
       .from(blockTags)
       .where(and(eq(blockTags.blockId, blockId), inArray(blockTags.tagId, uniqueTagIds)))
@@ -229,19 +233,23 @@ export function locateBlock(
     }
   }
 
-  const index = countBlocks(db, uniqueTagIds, visibility, {
+  const index = await countBlocks(db, uniqueTagIds, visibility, {
     position: targetBlock.position,
     id: targetBlock.id,
   });
 
   return {
-    block: getPublicBlockById(db, blockId),
+    block: await getPublicBlockById(db, blockId),
     index,
   };
 }
 
-export function updateBlockContent(db: AppDatabase, blockId: string, content: string): Block {
-  const result = db
+export async function updateBlockContent(
+  db: AppDatabase,
+  blockId: string,
+  content: string,
+): Promise<Block> {
+  const result = await db
     .update(blocks)
     .set({
       content,
@@ -249,16 +257,16 @@ export function updateBlockContent(db: AppDatabase, blockId: string, content: st
     })
     .where(eq(blocks.id, blockId))
     .run();
-  if (result.changes === 0) {
+  if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId);
 }
 
-export function archiveBlock(db: AppDatabase, blockId: string): Block {
+export async function archiveBlock(db: AppDatabase, blockId: string): Promise<Block> {
   const now = nowIsoString();
-  const result = db
+  const result = await db
     .update(blocks)
     .set({
       archivedAt: now,
@@ -266,15 +274,15 @@ export function archiveBlock(db: AppDatabase, blockId: string): Block {
     })
     .where(eq(blocks.id, blockId))
     .run();
-  if (result.changes === 0) {
+  if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId);
 }
 
-export function restoreBlock(db: AppDatabase, blockId: string): Block {
-  const result = db
+export async function restoreBlock(db: AppDatabase, blockId: string): Promise<Block> {
+  const result = await db
     .update(blocks)
     .set({
       archivedAt: null,
@@ -282,11 +290,11 @@ export function restoreBlock(db: AppDatabase, blockId: string): Block {
     })
     .where(eq(blocks.id, blockId))
     .run();
-  if (result.changes === 0) {
+  if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId);
 }
 
 export async function deleteBlock(
@@ -294,8 +302,8 @@ export async function deleteBlock(
   blockId: string,
   assetPath: string,
 ): Promise<{ deletedBlockId: string }> {
-  const result = db.delete(blocks).where(eq(blocks.id, blockId)).run();
-  if (result.changes === 0) {
+  const result = await db.delete(blocks).where(eq(blocks.id, blockId)).run();
+  if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 

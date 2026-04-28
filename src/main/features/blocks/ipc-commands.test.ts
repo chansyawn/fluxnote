@@ -10,10 +10,10 @@ import { afterEach, describe, expect, it } from "vite-plus/test";
 
 import { createBlocksIpcCommands } from "./ipc-commands";
 
-function createTestDatabaseClient(): DatabaseClient {
+async function createTestDatabaseClient(): Promise<DatabaseClient> {
   const client = createDatabaseClient(":memory:");
 
-  client.db.run(sql`
+  await client.db.run(sql`
     CREATE TABLE blocks (
       id text PRIMARY KEY NOT NULL,
       position integer NOT NULL,
@@ -23,9 +23,9 @@ function createTestDatabaseClient(): DatabaseClient {
       updated_at text NOT NULL
     )
   `);
-  client.db.run(sql`CREATE INDEX idx_blocks_archived_at ON blocks (archived_at)`);
-  client.db.run(sql`CREATE INDEX idx_blocks_position ON blocks (position)`);
-  client.db.run(sql`
+  await client.db.run(sql`CREATE INDEX idx_blocks_archived_at ON blocks (archived_at)`);
+  await client.db.run(sql`CREATE INDEX idx_blocks_position ON blocks (position)`);
+  await client.db.run(sql`
     CREATE TABLE tags (
       id text PRIMARY KEY NOT NULL,
       name text NOT NULL,
@@ -33,8 +33,8 @@ function createTestDatabaseClient(): DatabaseClient {
       updated_at text NOT NULL
     )
   `);
-  client.db.run(sql`CREATE UNIQUE INDEX uq_tags_name_lower ON tags (lower("name"))`);
-  client.db.run(sql`
+  await client.db.run(sql`CREATE UNIQUE INDEX uq_tags_name_lower ON tags (lower("name"))`);
+  await client.db.run(sql`
     CREATE TABLE block_tags (
       block_id text NOT NULL,
       tag_id text NOT NULL,
@@ -43,8 +43,8 @@ function createTestDatabaseClient(): DatabaseClient {
       FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
     )
   `);
-  client.db.run(sql`CREATE INDEX idx_block_tags_tag_id ON block_tags (tag_id)`);
-  client.db.run(sql`CREATE INDEX idx_block_tags_block_id ON block_tags (block_id)`);
+  await client.db.run(sql`CREATE INDEX idx_block_tags_tag_id ON block_tags (tag_id)`);
+  await client.db.run(sql`CREATE INDEX idx_block_tags_block_id ON block_tags (block_id)`);
 
   return client;
 }
@@ -123,13 +123,13 @@ describe("blocks ipc commands", () => {
     client = null;
   });
 
-  function getDb(): AppDatabase {
-    client = createTestDatabaseClient();
+  async function getDb(): Promise<AppDatabase> {
+    client = await createTestDatabaseClient();
     return client.db;
   }
 
   it("lists active blocks from oldest to newest so new blocks render at the bottom", async () => {
-    const db = getDb();
+    const db = await getDb();
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
@@ -148,7 +148,7 @@ describe("blocks ipc commands", () => {
   });
 
   it("returns later pages with the same total count", async () => {
-    const db = getDb();
+    const db = await getDb();
     const createdBlocks = [];
     for (let index = 0; index < 5; index += 1) {
       createdBlocks.push(await createBlock(db));
@@ -166,13 +166,14 @@ describe("blocks ipc commands", () => {
   });
 
   it("keeps tag-filtered blocks from oldest to newest", async () => {
-    const db = getDb();
+    const db = await getDb();
     const firstBlock = await createBlock(db);
     await createBlock(db);
     const thirdBlock = await createBlock(db);
     const now = new Date().toISOString();
 
-    db.insert(tags)
+    await db
+      .insert(tags)
       .values({
         createdAt: now,
         id: "tag-feature",
@@ -180,7 +181,8 @@ describe("blocks ipc commands", () => {
         updatedAt: now,
       })
       .run();
-    db.insert(blockTags)
+    await db
+      .insert(blockTags)
       .values([
         { blockId: firstBlock.id, tagId: "tag-feature" },
         { blockId: thirdBlock.id, tagId: "tag-feature" },
@@ -194,13 +196,14 @@ describe("blocks ipc commands", () => {
   });
 
   it("paginates tag-filtered blocks with the correct total count", async () => {
-    const db = getDb();
+    const db = await getDb();
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
     const now = new Date().toISOString();
 
-    db.insert(tags)
+    await db
+      .insert(tags)
       .values({
         createdAt: now,
         id: "tag-feature",
@@ -208,7 +211,8 @@ describe("blocks ipc commands", () => {
         updatedAt: now,
       })
       .run();
-    db.insert(blockTags)
+    await db
+      .insert(blockTags)
       .values([
         { blockId: firstBlock.id, tagId: "tag-feature" },
         { blockId: secondBlock.id, tagId: "tag-feature" },
@@ -223,11 +227,11 @@ describe("blocks ipc commands", () => {
   });
 
   it("paginates active and archived blocks independently", async () => {
-    const db = getDb();
+    const db = await getDb();
     const activeBlock = await createBlock(db);
     const archivedBlock = await createBlock(db);
 
-    db.run(
+    await db.run(
       sql`UPDATE blocks SET archived_at = ${new Date().toISOString()} WHERE id = ${archivedBlock.id}`,
     );
 
@@ -241,13 +245,14 @@ describe("blocks ipc commands", () => {
   });
 
   it("locates blocks by zero-based index with the current filters", async () => {
-    const db = getDb();
+    const db = await getDb();
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
     const now = new Date().toISOString();
 
-    db.insert(tags)
+    await db
+      .insert(tags)
       .values({
         createdAt: now,
         id: "tag-feature",
@@ -255,7 +260,8 @@ describe("blocks ipc commands", () => {
         updatedAt: now,
       })
       .run();
-    db.insert(blockTags)
+    await db
+      .insert(blockTags)
       .values([
         { blockId: firstBlock.id, tagId: "tag-feature" },
         { blockId: thirdBlock.id, tagId: "tag-feature" },
@@ -278,12 +284,12 @@ describe("blocks ipc commands", () => {
   });
 
   it("locates archived blocks when visibility is archived", async () => {
-    const db = getDb();
+    const db = await getDb();
     const activeBlock = await createBlock(db);
     const archivedBlockA = await createBlock(db);
     const archivedBlockB = await createBlock(db);
 
-    db.run(
+    await db.run(
       sql`UPDATE blocks SET archived_at = ${new Date().toISOString()} WHERE id IN (${archivedBlockA.id}, ${archivedBlockB.id})`,
     );
 
@@ -297,15 +303,16 @@ describe("blocks ipc commands", () => {
   });
 
   it("returns the correct total count from tag-filtered pages", async () => {
-    const db = getDb();
+    const db = await getDb();
     const now = new Date().toISOString();
     const createdBlocks = [];
     for (let index = 0; index < 4; index += 1) {
       createdBlocks.push(await createBlock(db));
     }
 
-    db.insert(tags).values({ createdAt: now, id: "tag-a", name: "A", updatedAt: now }).run();
-    db.insert(blockTags)
+    await db.insert(tags).values({ createdAt: now, id: "tag-a", name: "A", updatedAt: now }).run();
+    await db
+      .insert(blockTags)
       .values([
         { blockId: createdBlocks[0].id, tagId: "tag-a" },
         { blockId: createdBlocks[1].id, tagId: "tag-a" },

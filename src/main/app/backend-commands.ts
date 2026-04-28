@@ -38,13 +38,13 @@ export function createBackendCommandDispatcher(services: BackendCommandServices)
       }
       case "block.createFromText": {
         const { content } = request as ParsedBackendCommandRequest<"block.createFromText">;
-        const block = createBlockRecord(await services.getDb(), content);
+        const block = await createBlockRecord(await services.getDb(), content);
         services.requestOpenBlock(block.id);
         return contract.response.parse({ blockId: block.id }) as BackendCommandResponse<TKey>;
       }
       case "block.createExternalEdit": {
         const { content } = request as ParsedBackendCommandRequest<"block.createExternalEdit">;
-        const block = createBlockRecord(await services.getDb(), content);
+        const block = await createBlockRecord(await services.getDb(), content);
         const result = services.createExternalEditSession(block.id, content, signal);
         services.requestOpenBlock(block.id);
         return contract.response.parse(await result) as BackendCommandResponse<TKey>;

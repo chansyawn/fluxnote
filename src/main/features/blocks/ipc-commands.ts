@@ -27,7 +27,7 @@ export function createBlocksIpcCommands(
     defineIpcCommandDefinition({
       key: "blocksList",
       async handle(request) {
-        return listBlocks(
+        return await listBlocks(
           await services.getDb(),
           request.tagIds,
           request.visibility,
@@ -39,7 +39,7 @@ export function createBlocksIpcCommands(
     defineIpcCommandDefinition({
       key: "blocksLocate",
       async handle(request) {
-        return locateBlock(
+        return await locateBlock(
           await services.getDb(),
           request.blockId,
           request.tagIds,
@@ -50,13 +50,13 @@ export function createBlocksIpcCommands(
     defineIpcCommandDefinition({
       key: "blocksCreate",
       async handle() {
-        return createBlockRecord(await services.getDb());
+        return await createBlockRecord(await services.getDb());
       },
     }),
     defineIpcCommandDefinition({
       key: "blocksUpdateContent",
       async handle(request) {
-        return updateBlockContent(await services.getDb(), request.blockId, request.content);
+        return await updateBlockContent(await services.getDb(), request.blockId, request.content);
       },
     }),
     defineIpcCommandDefinition({
@@ -72,13 +72,13 @@ export function createBlocksIpcCommands(
     defineIpcCommandDefinition({
       key: "blocksArchive",
       async handle(request) {
-        return archiveBlock(await services.getDb(), request.blockId);
+        return await archiveBlock(await services.getDb(), request.blockId);
       },
     }),
     defineIpcCommandDefinition({
       key: "blocksRestore",
       async handle(request) {
-        return restoreBlock(await services.getDb(), request.blockId);
+        return await restoreBlock(await services.getDb(), request.blockId);
       },
     }),
   ] as const;

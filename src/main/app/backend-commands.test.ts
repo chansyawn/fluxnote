@@ -38,7 +38,7 @@ describe("backend command dispatcher", () => {
   });
 
   it("creates a text block and requests it to open", async () => {
-    createBlockRecordMock.mockReturnValue({
+    createBlockRecordMock.mockResolvedValue({
       archivedAt: null,
       content: "hello",
       createdAt: "now",
@@ -66,7 +66,7 @@ describe("backend command dispatcher", () => {
   });
 
   it("creates a file-backed block and waits for external edit completion", async () => {
-    createBlockRecordMock.mockReturnValue({
+    createBlockRecordMock.mockResolvedValue({
       archivedAt: null,
       content: "draft",
       createdAt: "now",

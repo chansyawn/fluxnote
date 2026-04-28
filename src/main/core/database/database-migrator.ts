@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
 import { app } from "electron";
 
 import type { AppDatabase } from "./database-client";
@@ -14,6 +14,16 @@ export function resolveMigrationsFolder(): string {
     : path.resolve(process.cwd(), SOURCE_MIGRATIONS_DIR);
 }
 
-export function migrateDatabase(db: AppDatabase): void {
-  migrate(db, { migrationsFolder: resolveMigrationsFolder() });
+export async function migrateDatabase(db: AppDatabase): Promise<void> {
+  await migrate(
+    db,
+    async (migrationQueries) => {
+      await db.transaction(async (tx) => {
+        for (const migrationQuery of migrationQueries) {
+          await tx.run(migrationQuery);
+        }
+      });
+    },
+    { migrationsFolder: resolveMigrationsFolder() },
+  );
 }
