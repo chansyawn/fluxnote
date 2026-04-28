@@ -3,9 +3,9 @@ import path from "node:path";
 import { app, Menu, nativeImage, type NativeImage, Tray } from "electron";
 
 interface TrayManagerServices {
+  openMainWindowDevTools: () => void;
   requestQuit: () => void;
   showMainWindow: () => void;
-  toggleMainWindow: () => void;
 }
 
 export interface TrayManager {
@@ -41,20 +41,26 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
     const icon = createTrayIcon();
     tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
     tray.setToolTip("FluxNote");
-    tray.setContextMenu(
-      Menu.buildFromTemplate([
-        {
-          click: services.showMainWindow,
-          label: "Show FluxNote",
-        },
-        { type: "separator" },
-        {
-          click: services.requestQuit,
-          label: "Quit",
-        },
-      ]),
-    );
-    tray.on("click", services.toggleMainWindow);
+    const menuTemplate = [
+      {
+        click: services.showMainWindow,
+        label: "Show FluxNote",
+      },
+      { type: "separator" as const },
+      {
+        click: services.requestQuit,
+        label: "Quit",
+      },
+    ];
+
+    if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+      menuTemplate.splice(1, 0, {
+        click: services.openMainWindowDevTools,
+        label: "Open DevTools",
+      });
+    }
+
+    tray.setContextMenu(Menu.buildFromTemplate(menuTemplate));
   }
 
   function destroyTray(): void {
