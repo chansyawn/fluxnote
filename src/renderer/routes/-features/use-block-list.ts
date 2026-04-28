@@ -27,7 +27,7 @@ interface UseBlockListResult {
   isRefreshing: boolean;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
-  ensureBlockIndexLoaded: (index: number) => Promise<void>;
+  ensureBlockIndexLoaded: (index: number) => Promise<Block | undefined>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
 }
 
@@ -128,7 +128,7 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
 
       ensureBlockIndex(index);
       const offset = getBlockPageOffset(index);
-      await queryClient.fetchQuery({
+      const page = await queryClient.fetchQuery({
         queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
         queryFn: async () =>
           await listBlocks({
@@ -139,6 +139,7 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
           }),
         staleTime: 0,
       });
+      return page.blocks[index - offset];
     },
     [ensureBlockIndex, normalizedTagIds, visibility],
   );

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 interface UseExternalEditActionsParams {
   getEditor: (blockId: string) => NoteBlockEditorHandle | undefined;
+  navigateToBlock?: (blockId: string) => void;
 }
 
 interface UseExternalEditActionsResult {
@@ -17,6 +18,7 @@ interface UseExternalEditActionsResult {
 
 export function useExternalEditActions({
   getEditor,
+  navigateToBlock,
 }: UseExternalEditActionsParams): UseExternalEditActionsResult {
   const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
     () => new Set(),
@@ -61,6 +63,7 @@ export function useExternalEditActions({
         }
         await submitExternalEdit({ content, editId });
         void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+        navigateToBlock?.(blockId);
       } catch (error) {
         toast.error(toAppInvokeError(error).message);
       } finally {
@@ -71,7 +74,7 @@ export function useExternalEditActions({
         });
       }
     },
-    [getEditor],
+    [getEditor, navigateToBlock],
   );
 
   return {

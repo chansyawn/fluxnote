@@ -4,18 +4,25 @@ import { useCallback, useRef } from "react";
 export interface EditorRegistry {
   registerEditor: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
   getEditor: (blockId: string) => NoteBlockEditorHandle | undefined;
-  requestEditorFocus: (blockId: string | null) => void;
+  requestEditorFocus: (blockId: string | null, requestId?: number) => boolean;
+}
+
+interface PendingFocusRequest {
+  blockId: string;
+  requestId: number;
 }
 
 export function useEditorRegistry(): EditorRegistry {
   const editorsRef = useRef(new Map<string, NoteBlockEditorHandle>());
-  const focusTargetRef = useRef<string | null>(null);
+  const focusTargetRef = useRef<PendingFocusRequest | null>(null);
+  const fallbackRequestIdRef = useRef(0);
 
-  const tryFocus = useCallback((blockId: string) => {
-    const editor = editorsRef.current.get(blockId);
+  const tryFocus = useCallback((request: PendingFocusRequest) => {
+    const editor = editorsRef.current.get(request.blockId);
     if (!editor) return false;
+    if (focusTargetRef.current?.requestId !== request.requestId) return false;
     focusTargetRef.current = null;
-    setTimeout(() => editor.focus(), 0);
+    editor.focus();
     return true;
   }, []);
 
@@ -23,12 +30,16 @@ export function useEditorRegistry(): EditorRegistry {
     (blockId: string, handle: NoteBlockEditorHandle | null) => {
       if (handle) {
         editorsRef.current.set(blockId, handle);
-        if (focusTargetRef.current === blockId) {
-          tryFocus(blockId);
+        const pendingFocus = focusTargetRef.current;
+        if (pendingFocus?.blockId === blockId) {
+          queueMicrotask(() => {
+            tryFocus(pendingFocus);
+          });
         }
-      } else {
-        editorsRef.current.delete(blockId);
+        return;
       }
+
+      editorsRef.current.delete(blockId);
     },
     [tryFocus],
   );
@@ -38,11 +49,18 @@ export function useEditorRegistry(): EditorRegistry {
   }, []);
 
   const requestEditorFocus = useCallback(
-    (blockId: string | null) => {
-      focusTargetRef.current = blockId;
-      if (blockId) {
-        tryFocus(blockId);
+    (blockId: string | null, requestId?: number) => {
+      if (!blockId) {
+        focusTargetRef.current = null;
+        return false;
       }
+
+      const request = {
+        blockId,
+        requestId: requestId ?? (fallbackRequestIdRef.current += 1),
+      };
+      focusTargetRef.current = request;
+      return tryFocus(request);
     },
     [tryFocus],
   );

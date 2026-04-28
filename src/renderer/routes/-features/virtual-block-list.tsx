@@ -6,20 +6,11 @@ import {
   type NoteBlockEditorHandle,
 } from "@renderer/features/note-block/note-block-editor";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import {
-  memo,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type Ref,
-} from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useBlockListItemActions } from "./block-list-context";
 import { useEditorRegistryContext } from "./editor-registry-context";
+import type { BlockScrollTarget, BlockScrollTargetRenderedPayload } from "./use-block-navigation";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
@@ -46,15 +37,12 @@ function findNearestScrollElement(element: HTMLElement): HTMLElement | null {
   return document.documentElement;
 }
 
-export interface VirtualBlockListHandle {
-  scrollToIndex: (index: number) => void;
-}
-
 interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
-  ref?: Ref<VirtualBlockListHandle>;
+  onScrollTargetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
+  scrollTarget: BlockScrollTarget | null;
 }
 
 const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Block }) {
@@ -152,7 +140,8 @@ export function VirtualBlockList({
   totalCount,
   getBlockAtIndex,
   ensureBlockIndex,
-  ref,
+  onScrollTargetRendered,
+  scrollTarget,
 }: VirtualBlockListProps) {
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
   const listElementRef = useRef<HTMLDivElement | null>(null);
@@ -217,19 +206,19 @@ export function VirtualBlockList({
     };
   }, [scrollElement]);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      scrollToIndex: (index: number) => {
-        if (index < 0 || index >= totalCount) {
-          return;
-        }
+  useEffect(() => {
+    if (!scrollTarget || !scrollElement) {
+      return;
+    }
+    if (scrollTarget.index < 0 || scrollTarget.index >= totalCount) {
+      return;
+    }
 
-        blockVirtualizer.scrollToIndex(index, { align: "center" });
-      },
-    }),
-    [blockVirtualizer, totalCount],
-  );
+    blockVirtualizer.scrollToIndex(scrollTarget.index, {
+      align: scrollTarget.align,
+      behavior: "auto",
+    });
+  }, [blockVirtualizer, scrollElement, scrollTarget, totalCount]);
 
   const virtualBlocks = blockVirtualizer.getVirtualItems();
   const visibleRange = useMemo(() => {
@@ -253,6 +242,32 @@ export function VirtualBlockList({
     }
   }, [ensureBlockIndex, visibleRange]);
 
+  useEffect(() => {
+    if (!scrollTarget) {
+      return;
+    }
+
+    const renderedTarget = virtualBlocks.find(
+      (virtualBlock) => virtualBlock.index === scrollTarget.index,
+    );
+    if (!renderedTarget) {
+      return;
+    }
+
+    const block = getBlockAtIndex(scrollTarget.index);
+    if (!block) {
+      return;
+    }
+
+    onScrollTargetRendered({
+      blockId: block.id,
+      index: scrollTarget.index,
+      requestId: scrollTarget.requestId,
+    });
+  }, [getBlockAtIndex, onScrollTargetRendered, scrollTarget, virtualBlocks]);
+
+  const firstVirtualBlock = virtualBlocks[0];
+
   return (
     <div ref={setListElement} className="pt-2">
       <div
@@ -261,27 +276,32 @@ export function VirtualBlockList({
           height: `${blockVirtualizer.getTotalSize()}px`,
         }}
       >
-        {virtualBlocks.map((virtualBlock) => {
-          const block = getBlockAtIndex(virtualBlock.index);
+        <div
+          className="absolute top-0 left-0 flex w-full flex-col gap-3"
+          style={{
+            transform: firstVirtualBlock
+              ? `translateY(${firstVirtualBlock.start - blockVirtualizer.options.scrollMargin}px)`
+              : undefined,
+          }}
+        >
+          {virtualBlocks.map((virtualBlock) => {
+            const block = getBlockAtIndex(virtualBlock.index);
 
-          return (
-            <div
-              key={virtualBlock.key}
-              ref={blockVirtualizer.measureElement}
-              className="absolute inset-x-0 top-0 w-full"
-              data-index={virtualBlock.index}
-              style={{
-                transform: `translateY(${virtualBlock.start - blockVirtualizer.options.scrollMargin}px)`,
-              }}
-            >
-              {block ? (
-                <VirtualBlockItem block={block} />
-              ) : (
-                <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
-              )}
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={virtualBlock.key}
+                ref={blockVirtualizer.measureElement}
+                data-index={virtualBlock.index}
+              >
+                {block ? (
+                  <VirtualBlockItem block={block} />
+                ) : (
+                  <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -8,8 +8,8 @@ interface UseBlockShortcutsParams {
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
-  requestFocus: (blockId: string) => void;
-  requestFocusAtIndex: (index: number) => void;
+  navigateToBlock: (blockId: string) => void;
+  navigateToIndex: (index: number) => void;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   setActiveBlockId: (blockId: string | null) => void;
 }
@@ -24,8 +24,8 @@ export function useBlockShortcuts({
   totalBlockCount,
   createBlock,
   deleteBlock,
-  requestFocus,
-  requestFocusAtIndex,
+  navigateToBlock,
+  navigateToIndex,
   locateBlockInView,
   setActiveBlockId,
 }: UseBlockShortcutsParams): UseBlockShortcutsResult {
@@ -33,7 +33,7 @@ export function useBlockShortcuts({
 
   const createBlockWithFocus = useEffectEvent(async () => {
     const newBlock = await createBlock();
-    requestFocus(newBlock.id);
+    navigateToBlock(newBlock.id);
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
@@ -56,7 +56,7 @@ export function useBlockShortcuts({
       currentLocation.index >= countBeforeDelete - 1
         ? currentLocation.index - 1
         : currentLocation.index;
-    requestFocusAtIndex(nextIndex);
+    navigateToIndex(nextIndex);
   });
 
   useEffect(() => {
