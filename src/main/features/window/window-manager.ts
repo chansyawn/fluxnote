@@ -21,6 +21,7 @@ export interface WindowManager {
   createMainWindow: () => void;
   getMainWindow: () => BrowserWindow | null;
   hideMainWindow: () => void;
+  openMainWindowDevTools: () => void;
   prepareToQuit: () => void;
   requestQuit: () => void;
   showMainWindow: () => void;
@@ -64,6 +65,15 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
 
     saveWindowPosition(currentWindow);
     currentWindow.hide();
+  }
+
+  function openMainWindowDevTools(): void {
+    const currentWindow = getMainWindow();
+    if (!currentWindow) {
+      return;
+    }
+
+    currentWindow.webContents.openDevTools({ mode: "detach" });
   }
 
   function toggleMainWindow(): void {
@@ -191,6 +201,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     createMainWindow,
     getMainWindow,
     hideMainWindow,
+    openMainWindowDevTools,
     prepareToQuit,
     requestQuit,
     showMainWindow,

@@ -63,9 +63,9 @@ export function createBackendRuntime() {
     onOpenBlockReady: () => openBlockService.emitPending(),
   });
   const trayManager = createTrayManager({
+    openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
     requestQuit: () => windowManager.requestQuit(),
     showMainWindow: () => windowManager.showMainWindow(),
-    toggleMainWindow: () => windowManager.toggleMainWindow(),
   });
 
   function registerRuntimeIpcCommands(): void {
