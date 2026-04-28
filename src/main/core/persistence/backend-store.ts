@@ -20,7 +20,7 @@ export class BackendStore {
 
     const dbPath = this.getDatabasePath();
     const client = createDatabaseClient(dbPath);
-    migrateDatabase(client.db);
+    await migrateDatabase(client.db);
     this.db = client.db;
     this.closeDb = client.close;
     this.initialized = true;

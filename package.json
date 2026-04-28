@@ -41,7 +41,6 @@
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-router": "^1.168.10",
     "@tanstack/react-virtual": "^3.13.24",
-    "better-sqlite3": "^12.9.0",
     "cac": "^7.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -64,7 +63,6 @@
   "devDependencies": {
     "@electron-forge/cli": "8.0.0-alpha.8",
     "@electron-forge/maker-zip": "8.0.0-alpha.8",
-    "@electron-forge/plugin-auto-unpack-natives": "8.0.0-alpha.8",
     "@electron-forge/plugin-fuses": "8.0.0-alpha.8",
     "@electron-forge/plugin-vite": "8.0.0-alpha.8",
     "@electron-forge/shared-types": "8.0.0-alpha.8",
@@ -75,7 +73,6 @@
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -92,7 +89,6 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "better-sqlite3",
       "electron"
     ]
   },

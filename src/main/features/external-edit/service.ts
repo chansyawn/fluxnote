@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
-import { nowIsoString } from "@main/core/database/db-utils";
+import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import { businessError } from "@shared/ipc/errors";
 import { eq } from "drizzle-orm";
@@ -20,7 +20,7 @@ async function deleteBlockAndAssets(
   store: BackendStore,
   blockId: string,
 ): Promise<void> {
-  db.delete(blocks).where(eq(blocks.id, blockId)).run();
+  await db.delete(blocks).where(eq(blocks.id, blockId)).run();
   await fs.rm(store.getAssetPathForBlock(blockId), {
     force: true,
     recursive: true,
@@ -31,7 +31,7 @@ export function createExternalEditService(options: ExternalEditServiceOptions) {
   async function submitEdit(db: AppDatabase, editId: string, content: string) {
     const claimed = options.manager.claim(editId);
     try {
-      const result = db
+      const result = await db
         .update(blocks)
         .set({
           content,
@@ -39,7 +39,7 @@ export function createExternalEditService(options: ExternalEditServiceOptions) {
         })
         .where(eq(blocks.id, claimed.session.blockId))
         .run();
-      if (result.changes === 0) {
+      if (getSqliteChangedRows(result) === 0) {
         throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${claimed.session.blockId}`);
       }
 
@@ -48,7 +48,7 @@ export function createExternalEditService(options: ExternalEditServiceOptions) {
         content,
         status: "submitted",
       });
-      return getPublicBlockById(db, claimed.session.blockId);
+      return await getPublicBlockById(db, claimed.session.blockId);
     } catch (error) {
       claimed.resolve({
         blockId: claimed.session.blockId,

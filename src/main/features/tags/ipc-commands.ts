@@ -17,26 +17,26 @@ export function createTagsIpcCommands(
     defineIpcCommandDefinition({
       key: "tagsList",
       async handle() {
-        return listTags(await services.getDb());
+        return await listTags(await services.getDb());
       },
     }),
     defineIpcCommandDefinition({
       key: "tagsCreate",
       async handle(request) {
-        return createTag(await services.getDb(), request.name);
+        return await createTag(await services.getDb(), request.name);
       },
     }),
     defineIpcCommandDefinition({
       key: "tagsDelete",
       async handle(request) {
-        deleteTag(await services.getDb(), request.tagId);
+        await deleteTag(await services.getDb(), request.tagId);
         return undefined;
       },
     }),
     defineIpcCommandDefinition({
       key: "tagsSetBlockTags",
       async handle(request) {
-        return setBlockTags(await services.getDb(), request.blockId, request.tagIds);
+        return await setBlockTags(await services.getDb(), request.blockId, request.tagIds);
       },
     }),
   ] as const;

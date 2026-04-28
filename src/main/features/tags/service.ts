@@ -1,6 +1,10 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blockTags, blocks, tags, type TagRecord } from "@main/core/database/database-schema";
-import { isSqliteUniqueConstraint, nowIsoString } from "@main/core/database/db-utils";
+import {
+  getSqliteChangedRows,
+  isSqliteUniqueConstraint,
+  nowIsoString,
+} from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
 import { businessError, internalError } from "@shared/ipc/errors";
@@ -17,8 +21,8 @@ function mapTagRow(tag: TagRecord): Tag {
   };
 }
 
-export function listTags(db: AppDatabase): Tag[] {
-  const rows = db
+export async function listTags(db: AppDatabase): Promise<Tag[]> {
+  const rows = await db
     .select()
     .from(tags)
     .orderBy(sql`lower(${tags.name})`)
@@ -26,13 +30,14 @@ export function listTags(db: AppDatabase): Tag[] {
   return rows.map(mapTagRow);
 }
 
-export function createTag(db: AppDatabase, name: string): Tag {
+export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
   const now = nowIsoString();
   const tagId = crypto.randomUUID();
   const trimmedName = name.trim();
 
   try {
-    db.insert(tags)
+    await db
+      .insert(tags)
       .values({
         createdAt: now,
         id: tagId,
@@ -49,7 +54,7 @@ export function createTag(db: AppDatabase, name: string): Tag {
     throw error;
   }
 
-  const tagRow = db.select().from(tags).where(eq(tags.id, tagId)).get();
+  const tagRow = await db.select().from(tags).where(eq(tags.id, tagId)).get();
   if (!tagRow) {
     throw internalError("Failed to read created tag");
   }
@@ -57,28 +62,37 @@ export function createTag(db: AppDatabase, name: string): Tag {
   return mapTagRow(tagRow);
 }
 
-export function deleteTag(db: AppDatabase, tagId: string): void {
-  const result = db.delete(tags).where(eq(tags.id, tagId)).run();
-  if (result.changes === 0) {
+export async function deleteTag(db: AppDatabase, tagId: string): Promise<void> {
+  const result = await db.delete(tags).where(eq(tags.id, tagId)).run();
+  if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${tagId}`);
   }
 }
 
-export function setBlockTags(db: AppDatabase, blockId: string, tagIds: string[]): Block {
-  assertBlockExists(db, blockId);
+export async function setBlockTags(
+  db: AppDatabase,
+  blockId: string,
+  tagIds: string[],
+): Promise<Block> {
+  await assertBlockExists(db, blockId);
 
   const uniqueRequestedTagIds = Array.from(new Set(tagIds));
   const existingTagRows =
     uniqueRequestedTagIds.length > 0
-      ? db.select({ id: tags.id }).from(tags).where(inArray(tags.id, uniqueRequestedTagIds)).all()
+      ? await db
+          .select({ id: tags.id })
+          .from(tags)
+          .where(inArray(tags.id, uniqueRequestedTagIds))
+          .all()
       : [];
   const existingTagIds = new Set(existingTagRows.map((row) => row.id));
   const nextTagIds = uniqueRequestedTagIds.filter((tagId) => existingTagIds.has(tagId));
 
-  db.transaction((tx) => {
-    tx.delete(blockTags).where(eq(blockTags.blockId, blockId)).run();
+  await db.transaction(async (tx) => {
+    await tx.delete(blockTags).where(eq(blockTags.blockId, blockId)).run();
     if (nextTagIds.length > 0) {
-      tx.insert(blockTags)
+      await tx
+        .insert(blockTags)
         .values(
           nextTagIds.map((tagId) => ({
             blockId,
@@ -87,8 +101,8 @@ export function setBlockTags(db: AppDatabase, blockId: string, tagIds: string[])
         )
         .run();
     }
-    tx.update(blocks).set({ updatedAt: nowIsoString() }).where(eq(blocks.id, blockId)).run();
+    await tx.update(blocks).set({ updatedAt: nowIsoString() }).where(eq(blocks.id, blockId)).run();
   });
 
-  return getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId);
 }

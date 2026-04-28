@@ -37,7 +37,7 @@ export function createAssetService(options: AssetServiceOptions) {
   async function createAsset(db: AppDatabase, input: CreateAssetInput) {
     const fileNameCandidate =
       input.fileName && input.fileName.trim().length > 0 ? input.fileName : null;
-    assertBlockExists(db, input.blockId);
+    await assertBlockExists(db, input.blockId);
 
     const ext = extFromMimeType(input.mimeType);
     const baseName = fileNameCandidate ?? `${Date.now()}-${crypto.randomUUID()}.${ext}`;
@@ -54,8 +54,8 @@ export function createAssetService(options: AssetServiceOptions) {
   }
 
   async function copyAsset(db: AppDatabase, input: CopyAssetInput) {
-    assertBlockExists(db, input.sourceBlockId);
-    assertBlockExists(db, input.targetBlockId);
+    await assertBlockExists(db, input.sourceBlockId);
+    await assertBlockExists(db, input.targetBlockId);
 
     const parsed = splitAssetUrl(input.assetUrl);
     if (parsed.blockId !== input.sourceBlockId) {

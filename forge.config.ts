@@ -2,27 +2,10 @@ import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
 
 import { MakerZIP } from "@electron-forge/maker-zip";
-import { AutoUnpackNativesPlugin } from "@electron-forge/plugin-auto-unpack-natives";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
-
-const NATIVE_RUNTIME_DEPENDENCIES = ["better-sqlite3", "bindings", "file-uri-to-path"];
-
-async function copyNativeRuntimeDependencies(buildPath: string): Promise<void> {
-  const buildNodeModulesPath = path.join(buildPath, "node_modules");
-
-  await mkdir(buildNodeModulesPath, { recursive: true });
-  await Promise.all(
-    NATIVE_RUNTIME_DEPENDENCIES.map((dependency) =>
-      cp(path.join("node_modules", dependency), path.join(buildNodeModulesPath, dependency), {
-        dereference: true,
-        recursive: true,
-      }),
-    ),
-  );
-}
 
 async function copyCliResources(buildPath: string): Promise<void> {
   const resourcesCliPath = path.resolve(buildPath, "..", "cli");
@@ -48,14 +31,12 @@ const config: ForgeConfig = {
   },
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
-      await copyNativeRuntimeDependencies(buildPath);
       await copyCliResources(buildPath);
     },
   },
   rebuildConfig: {},
   makers: [new MakerZIP({}, ["darwin"])],
   plugins: [
-    new AutoUnpackNativesPlugin({}),
     new VitePlugin({
       build: [
         {
