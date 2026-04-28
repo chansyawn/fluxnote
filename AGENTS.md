@@ -110,6 +110,7 @@ After any code change, run:
 
 ```bash
 vp check
+vp test
 vp run package
 ```
 
