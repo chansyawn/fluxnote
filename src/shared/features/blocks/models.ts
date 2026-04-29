@@ -4,7 +4,6 @@ import { tagSchema } from "../tags/models";
 
 export const blockSchema = z.object({
   id: z.string(),
-  position: z.number(),
   content: z.string(),
   contentUpdatedAt: z.string(),
   archivedAt: z.string().nullable(),

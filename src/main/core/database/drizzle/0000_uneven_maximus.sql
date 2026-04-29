@@ -10,7 +10,6 @@ CREATE INDEX `idx_block_tags_tag_id` ON `block_tags` (`tag_id`);--> statement-br
 CREATE INDEX `idx_block_tags_block_id` ON `block_tags` (`block_id`);--> statement-breakpoint
 CREATE TABLE `blocks` (
 	`id` text PRIMARY KEY NOT NULL,
-	`position` integer NOT NULL,
 	`content` text DEFAULT '' NOT NULL,
 	`content_updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
 	`archived_at` text,
@@ -19,7 +18,7 @@ CREATE TABLE `blocks` (
 );
 --> statement-breakpoint
 CREATE INDEX `idx_blocks_archived_at` ON `blocks` (`archived_at`);--> statement-breakpoint
-CREATE INDEX `idx_blocks_position` ON `blocks` (`position`);--> statement-breakpoint
+CREATE INDEX `idx_blocks_created_at` ON `blocks` (`created_at`);--> statement-breakpoint
 CREATE TABLE `tags` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,

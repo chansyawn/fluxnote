@@ -6,7 +6,7 @@ import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
 import { businessError } from "@shared/ipc/errors";
-import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
 function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt: string }): Tag {
   return {
@@ -20,7 +20,6 @@ function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt
 function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
   return {
     id: block.id,
-    position: block.position,
     content: block.content,
     contentUpdatedAt: block.contentUpdatedAt,
     archivedAt: block.archivedAt,
@@ -71,7 +70,6 @@ export async function createBlockRecord(db: AppDatabase, content = ""): Promise<
       archivedAt: null,
       content,
       id: blockId,
-      position: sql<number>`(select coalesce(max(${blocks.position}), 0) + 1 from ${blocks})`,
     })
     .run();
 
@@ -99,12 +97,12 @@ async function countBlocks(
   db: AppDatabase,
   tagIds: readonly string[],
   visibility: "active" | "archived",
-  beforePosition?: { position: number; id: string },
+  beforeCreatedAt?: { createdAt: string; id: string },
 ): Promise<number> {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
-  const beforePredicate = beforePosition
-    ? sql`(${blocks.position} < ${beforePosition.position} OR (${blocks.position} = ${beforePosition.position} AND ${blocks.id} < ${beforePosition.id}))`
+  const beforePredicate = beforeCreatedAt
+    ? sql`(${blocks.createdAt} > ${beforeCreatedAt.createdAt} OR (${blocks.createdAt} = ${beforeCreatedAt.createdAt} AND ${blocks.id} > ${beforeCreatedAt.id}))`
     : undefined;
 
   if (tagIds.length === 0) {
@@ -146,7 +144,6 @@ export async function listBlocks(
     contentUpdatedAt: blocks.contentUpdatedAt,
     createdAt: blocks.createdAt,
     id: blocks.id,
-    position: blocks.position,
     updatedAt: blocks.updatedAt,
   } satisfies Record<string, unknown>;
 
@@ -160,7 +157,6 @@ export async function listBlocks(
       .where(and(archivedPredicate, inArray(blockTags.tagId, uniqueTagIds)))
       .groupBy(
         blocks.id,
-        blocks.position,
         blocks.content,
         blocks.contentUpdatedAt,
         blocks.archivedAt,
@@ -168,7 +164,7 @@ export async function listBlocks(
         blocks.updatedAt,
       )
       .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
-      .orderBy(asc(blocks.position), asc(blocks.id))
+      .orderBy(desc(blocks.createdAt), desc(blocks.id))
       .limit(limit)
       .offset(offset)
       .all();
@@ -177,7 +173,7 @@ export async function listBlocks(
       .select(selectedFields)
       .from(blocks)
       .where(archivedPredicate)
-      .orderBy(asc(blocks.position), asc(blocks.id))
+      .orderBy(desc(blocks.createdAt), desc(blocks.id))
       .limit(limit)
       .offset(offset)
       .all();
@@ -204,7 +200,7 @@ export async function locateBlock(
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
 
   const targetBlock = await db
-    .select({ id: blocks.id, position: blocks.position })
+    .select({ id: blocks.id, createdAt: blocks.createdAt })
     .from(blocks)
     .where(and(archivedPredicate, eq(blocks.id, blockId)))
     .get();
@@ -224,7 +220,7 @@ export async function locateBlock(
   }
 
   const index = await countBlocks(db, uniqueTagIds, visibility, {
-    position: targetBlock.position,
+    createdAt: targetBlock.createdAt,
     id: targetBlock.id,
   });
 

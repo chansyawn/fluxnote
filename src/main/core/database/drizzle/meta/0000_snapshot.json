@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "06bbf93a-2694-4683-b052-addf3191feeb",
+  "id": "b665dc12-eea2-45b3-bf55-ced3c9f3debb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "block_tags": {
@@ -88,13 +88,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "position": {
-          "name": "position",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "content": {
           "name": "content",
           "type": "text",
@@ -143,10 +136,10 @@
           ],
           "isUnique": false
         },
-        "idx_blocks_position": {
-          "name": "idx_blocks_position",
+        "idx_blocks_created_at": {
+          "name": "idx_blocks_created_at",
           "columns": [
-            "position"
+            "created_at"
           ],
           "isUnique": false
         }

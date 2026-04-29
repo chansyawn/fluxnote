@@ -35,6 +35,10 @@ async function createBlock(db: AppDatabase) {
   return await command.handle(undefined, {} as never);
 }
 
+async function setBlockCreatedAt(db: AppDatabase, blockId: string, createdAt: string) {
+  await db.run(sql`UPDATE blocks SET created_at = ${createdAt} WHERE id = ${blockId}`);
+}
+
 async function listBlocks(
   db: AppDatabase,
   request: {
@@ -96,20 +100,22 @@ describe("blocks ipc commands", () => {
     return client.db;
   }
 
-  it("lists active blocks from oldest to newest so new blocks render at the bottom", async () => {
+  it("lists active blocks from newest to oldest so new blocks render at the top", async () => {
     const db = await getDb();
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
+    await setBlockCreatedAt(db, firstBlock.id, "2026-01-01T00:00:00.000Z");
+    await setBlockCreatedAt(db, secondBlock.id, "2026-01-02T00:00:00.000Z");
+    await setBlockCreatedAt(db, thirdBlock.id, "2026-01-03T00:00:00.000Z");
 
     const page = await listBlocks(db);
 
     expect(page.blocks.map((block) => block.id)).toEqual([
-      firstBlock.id,
-      secondBlock.id,
       thirdBlock.id,
+      secondBlock.id,
+      firstBlock.id,
     ]);
-    expect(page.blocks.map((block) => block.position)).toEqual([1, 2, 3]);
     expect(page.totalCount).toBe(3);
     expect(page.offset).toBe(0);
     expect(page.limit).toBe(50);
@@ -120,24 +126,27 @@ describe("blocks ipc commands", () => {
     const createdBlocks = [];
     for (let index = 0; index < 5; index += 1) {
       createdBlocks.push(await createBlock(db));
+      await setBlockCreatedAt(db, createdBlocks[index]!.id, `2026-01-0${index + 1}T00:00:00.000Z`);
     }
 
     const page = await listBlocks(db, { limit: 2, offset: 2 });
 
     expect(page.blocks.map((block) => block.id)).toEqual([
-      createdBlocks[2].id,
-      createdBlocks[3].id,
+      createdBlocks[2]!.id,
+      createdBlocks[1]!.id,
     ]);
     expect(page.totalCount).toBe(5);
     expect(page.offset).toBe(2);
     expect(page.limit).toBe(2);
   });
 
-  it("keeps tag-filtered blocks from oldest to newest", async () => {
+  it("keeps tag-filtered blocks from newest to oldest", async () => {
     const db = await getDb();
     const firstBlock = await createBlock(db);
     await createBlock(db);
     const thirdBlock = await createBlock(db);
+    await setBlockCreatedAt(db, firstBlock.id, "2026-01-01T00:00:00.000Z");
+    await setBlockCreatedAt(db, thirdBlock.id, "2026-01-03T00:00:00.000Z");
     const now = new Date().toISOString();
 
     await db
@@ -159,7 +168,7 @@ describe("blocks ipc commands", () => {
 
     const page = await listBlocks(db, { tagIds: ["tag-feature"] });
 
-    expect(page.blocks.map((block) => block.id)).toEqual([firstBlock.id, thirdBlock.id]);
+    expect(page.blocks.map((block) => block.id)).toEqual([thirdBlock.id, firstBlock.id]);
     expect(page.totalCount).toBe(2);
   });
 
@@ -168,6 +177,9 @@ describe("blocks ipc commands", () => {
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
+    await setBlockCreatedAt(db, firstBlock.id, "2026-01-01T00:00:00.000Z");
+    await setBlockCreatedAt(db, secondBlock.id, "2026-01-02T00:00:00.000Z");
+    await setBlockCreatedAt(db, thirdBlock.id, "2026-01-03T00:00:00.000Z");
     const now = new Date().toISOString();
 
     await db
@@ -217,6 +229,9 @@ describe("blocks ipc commands", () => {
     const firstBlock = await createBlock(db);
     const secondBlock = await createBlock(db);
     const thirdBlock = await createBlock(db);
+    await setBlockCreatedAt(db, firstBlock.id, "2026-01-01T00:00:00.000Z");
+    await setBlockCreatedAt(db, secondBlock.id, "2026-01-02T00:00:00.000Z");
+    await setBlockCreatedAt(db, thirdBlock.id, "2026-01-03T00:00:00.000Z");
     const now = new Date().toISOString();
 
     await db
@@ -244,7 +259,7 @@ describe("blocks ipc commands", () => {
       locateBlock(db, { blockId: thirdBlock.id, tagIds: ["tag-feature"] }),
     ).resolves.toMatchObject({
       block: { id: thirdBlock.id },
-      index: 1,
+      index: 0,
     });
     await expect(
       locateBlock(db, { blockId: secondBlock.id, tagIds: ["tag-feature"] }),
@@ -263,7 +278,7 @@ describe("blocks ipc commands", () => {
 
     await expect(
       locateBlock(db, { blockId: archivedBlockB.id, visibility: "archived" }),
-    ).resolves.toMatchObject({ block: { id: archivedBlockB.id }, index: 1 });
+    ).resolves.toMatchObject({ block: { id: archivedBlockB.id }, index: 0 });
 
     await expect(
       locateBlock(db, { blockId: activeBlock.id, visibility: "archived" }),
@@ -293,14 +308,18 @@ describe("blocks ipc commands", () => {
     expect(page.blocks).toHaveLength(1);
   });
 
-  it("creates blocks concurrently with unique ascending positions", async () => {
+  it("creates blocks concurrently and can locate every block", async () => {
     const db = await getDb();
     const created = await Promise.all(
       Array.from({ length: 10 }, async () => await createBlock(db)),
     );
 
-    const sortedPositions = created.map((block) => block.position).toSorted((a, b) => a - b);
-    expect(sortedPositions).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-    expect(new Set(sortedPositions).size).toBe(10);
+    const page = await listBlocks(db);
+    expect(page.blocks).toHaveLength(10);
+    for (const block of created) {
+      await expect(locateBlock(db, { blockId: block.id })).resolves.toMatchObject({
+        block: { id: block.id },
+      });
+    }
   });
 });
