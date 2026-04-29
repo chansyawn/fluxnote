@@ -3,33 +3,43 @@ import type { BlockVisibility, Tag } from "@renderer/clients";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import type { TagMutationOperation } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
-import { ArchiveIcon, ArchiveRestoreIcon, TagsIcon } from "lucide-react";
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  LoaderCircleIcon,
+  PlusIcon,
+  TagsIcon,
+} from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { createPortal } from "react-dom";
 
 const TITLEBAR_ACTIONS_ID = "titlebar-workspace-actions";
 
-interface WorkspaceTagFilterPortalProps {
+interface WorkspaceTitlebarActionsPortalProps {
   tags: Tag[];
   visibility: BlockVisibility;
+  isCreatingBlock: boolean;
   selectedTagIds: string[];
   isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
+  onCreateBlock: () => Promise<void>;
   onSetVisibility: (v: BlockVisibility) => void;
   onSetSelectedTagIds: Dispatch<SetStateAction<string[]>>;
   onCreateTag: (name: string) => Promise<void>;
   onDeleteTag: (tagId: string) => Promise<void>;
 }
 
-export function WorkspaceTagFilterPortal({
+export function WorkspaceTitlebarActionsPortal({
   tags,
   visibility,
+  isCreatingBlock,
   selectedTagIds,
   isTagOpPending,
+  onCreateBlock,
   onSetVisibility,
   onSetSelectedTagIds,
   onCreateTag,
   onDeleteTag,
-}: WorkspaceTagFilterPortalProps) {
+}: WorkspaceTitlebarActionsPortalProps) {
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +52,25 @@ export function WorkspaceTagFilterPortal({
 
   return createPortal(
     <div className="flex shrink-0 items-center gap-1 [-webkit-app-region:no-drag]">
+      {visibility === "active" ? (
+        <Button
+          disabled={isCreatingBlock}
+          size="icon"
+          variant="ghost"
+          onClick={() => {
+            void onCreateBlock();
+          }}
+        >
+          {isCreatingBlock ? (
+            <LoaderCircleIcon className="size-3.5 animate-spin" />
+          ) : (
+            <PlusIcon className="size-3.5" />
+          )}
+          <span className="sr-only">
+            <Trans id="workspace.add-block">Add block</Trans>
+          </span>
+        </Button>
+      ) : null}
       <Button
         size="icon"
         variant="ghost"

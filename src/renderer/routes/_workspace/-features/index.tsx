@@ -1,12 +1,10 @@
 import { Trans } from "@lingui/react/macro";
-import { Button } from "@renderer/ui/components/button";
-import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import { useMemo } from "react";
 
 import { EditorRegistryProvider } from "./editing/editor-registry-context";
 import { VirtualBlockList } from "./list/virtual-block-list";
 import { ArchivedEmptyState, EmptyWorkspace, LoadingState } from "./view/workspace-empty-state";
-import { WorkspaceTagFilterPortal } from "./view/workspace-tag-filter-portal";
+import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-actions-portal";
 import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
 import { WorkspaceRuntimeProvider } from "./workspace-runtime-context";
 
@@ -36,11 +34,13 @@ export function BlockWorkspace() {
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
   const tagFilter = (
-    <WorkspaceTagFilterPortal
+    <WorkspaceTitlebarActionsPortal
       tags={tagData.tags}
       visibility={visibility}
+      isCreatingBlock={blockMutations.isCreatingBlock}
       selectedTagIds={selectedTagIds}
       isTagOpPending={tagData.isTagOpPending}
+      onCreateBlock={commands.createBlockWithFocus}
       onSetVisibility={viewState.setVisibility}
       onSetSelectedTagIds={viewState.setSelectedTagIds}
       onCreateTag={async (name) => {
@@ -114,25 +114,6 @@ export function BlockWorkspace() {
           </EditorRegistryProvider>
         </WorkspaceRuntimeProvider>
       )}
-
-      {visibility === "active" ? (
-        <div className="flex justify-center">
-          <Button
-            className="gap-2"
-            disabled={blockMutations.isCreatingBlock}
-            onClick={() => {
-              void commands.createBlockWithFocus();
-            }}
-          >
-            {blockMutations.isCreatingBlock ? (
-              <LoaderCircleIcon className="size-4 animate-spin" />
-            ) : (
-              <PlusIcon className="size-4" />
-            )}
-            <Trans id="workspace.add-block">Add block</Trans>
-          </Button>
-        </div>
-      ) : null}
     </section>
   );
 }
