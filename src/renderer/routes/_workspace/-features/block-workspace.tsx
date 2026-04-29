@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo } from "react";
 
 import { BlockListItemActionsProvider, type BlockListItemActions } from "./block-list-context";
 import { EditorRegistryProvider } from "./editor-registry-context";
+import { useBlockFocusActions } from "./use-block-focus-actions";
 import { useBlockList } from "./use-block-list";
 import { useBlockMutations } from "./use-block-mutations";
 import { useBlockNavigation } from "./use-block-navigation";
@@ -100,7 +101,7 @@ export function BlockWorkspace() {
     locateBlockInView: blockList.locateBlockInView,
   });
 
-  const { createBlockWithFocus, deleteBlockWithFocus } = useBlockShortcuts({
+  const { createBlockWithFocus, deleteBlockWithFocus } = useBlockFocusActions({
     activeBlockId: blockNavigation.activeBlockId,
     totalBlockCount: blockList.totalBlockCount,
     createBlock: async () => {
@@ -115,6 +116,12 @@ export function BlockWorkspace() {
     navigateToIndex: blockNavigation.navigateToIndex,
     locateBlockInView: blockList.locateBlockInView,
     setActiveBlockId: blockNavigation.setActiveBlockId,
+  });
+
+  useBlockShortcuts({
+    activeBlockId: blockNavigation.activeBlockId,
+    createBlockWithFocus,
+    deleteBlockWithFocus,
   });
 
   const externalEditActions = useExternalEditActions({
