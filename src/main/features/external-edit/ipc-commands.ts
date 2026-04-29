@@ -3,7 +3,6 @@ import {
   defineIpcCommandDefinition,
   type AnyIpcCommandDefinition,
 } from "@main/core/ipc/ipc-command-definition";
-import type { BackendStore } from "@main/core/persistence/backend-store";
 
 import type { ExternalEditManager } from "./manager";
 import { createExternalEditService } from "./service";
@@ -11,7 +10,6 @@ import { createExternalEditService } from "./service";
 interface ExternalEditCommandServices {
   getDb: () => Promise<AppDatabase>;
   manager: ExternalEditManager;
-  store: BackendStore;
 }
 
 export function createExternalEditIpcCommands(
@@ -19,7 +17,6 @@ export function createExternalEditIpcCommands(
 ): readonly AnyIpcCommandDefinition[] {
   const externalEditService = createExternalEditService({
     manager: services.manager,
-    store: services.store,
   });
 
   return [
@@ -42,7 +39,7 @@ export function createExternalEditIpcCommands(
     defineIpcCommandDefinition({
       key: "externalEditsCancel",
       async handle(request) {
-        await externalEditService.cancelEdit(await services.getDb(), request.editId);
+        await externalEditService.cancelEdit(request.editId);
         return undefined;
       },
     }),

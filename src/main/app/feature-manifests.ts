@@ -25,7 +25,6 @@ export function createBackendFeatureManifests(
     createExternalEditFeature({
       getDb,
       manager: options.externalEditManager,
-      store: options.store,
     }),
     createTagsFeature({
       getDb,
