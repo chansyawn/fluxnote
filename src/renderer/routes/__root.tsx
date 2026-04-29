@@ -15,12 +15,10 @@ function RootComponent() {
     <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
       <WindowTitleBar />
       <main
-        className="me-1 min-h-0 flex-1 overflow-y-auto overscroll-contain focus:outline-none"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 focus:outline-none"
         tabIndex={-1}
       >
-        <div className="mx-auto w-full max-w-5xl px-3 pb-6">
-          <Outlet />
-        </div>
+        <Outlet />
       </main>
     </div>
   );

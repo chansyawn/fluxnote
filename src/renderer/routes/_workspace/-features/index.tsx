@@ -1,9 +1,13 @@
-import { Trans } from "@lingui/react/macro";
 import { useMemo } from "react";
 
 import { EditorRegistryProvider } from "./editing/editor-registry-context";
 import { VirtualBlockList } from "./list/virtual-block-list";
-import { ArchivedEmptyState, EmptyWorkspace, LoadingState } from "./view/workspace-empty-state";
+import {
+  LoadingState,
+  WorkspaceArchivedEmptyState,
+  WorkspaceEmptyState,
+  WorkspaceFilteredEmptyState,
+} from "./view/workspace-empty-state";
 import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-actions-portal";
 import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
 import { WorkspaceRuntimeProvider } from "./workspace-runtime-context";
@@ -61,9 +65,9 @@ export function BlockWorkspace() {
 
   if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
     return (
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col gap-4">
         {tagFilter}
-        <EmptyWorkspace
+        <WorkspaceEmptyState
           isCreatingBlock={blockMutations.isCreatingBlock}
           onCreateBlock={commands.createBlockWithFocus}
         />
@@ -72,34 +76,13 @@ export function BlockWorkspace() {
   }
 
   return (
-    <section className="z-10 mx-auto flex w-full max-w-4xl flex-col gap-4">
+    <section className="z-10 mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col gap-4">
       {tagFilter}
       {totalBlockCount === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
-          <ArchivedEmptyState />
+          <WorkspaceArchivedEmptyState />
         ) : (
-          <div className="border-border/70 bg-card rounded-xl border border-dashed p-6 text-center">
-            <p className="text-sm font-medium">
-              {visibility === "active" ? (
-                <Trans id="workspace.filtered.empty.title">No blocks match the selected tags</Trans>
-              ) : (
-                <Trans id="workspace.archived.filtered.empty.title">
-                  No archived blocks match the selected tags
-                </Trans>
-              )}
-            </p>
-            <p className="text-muted-foreground mt-2 text-sm">
-              {visibility === "active" ? (
-                <Trans id="workspace.filtered.empty.description">
-                  Clear one of the filters or create a new block outside the current tag selection.
-                </Trans>
-              ) : (
-                <Trans id="workspace.archived.filtered.empty.description">
-                  Clear one of the filters or switch back to active blocks.
-                </Trans>
-              )}
-            </p>
-          </div>
+          <WorkspaceFilteredEmptyState visibility={visibility} />
         )
       ) : (
         <WorkspaceRuntimeProvider value={runtimeContextValue}>

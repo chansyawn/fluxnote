@@ -1,5 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@renderer/ui/components/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from "@renderer/ui/components/empty";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
@@ -14,7 +21,7 @@ export function LoadingState(): ReactElement {
   );
 }
 
-export function EmptyWorkspace({
+export function WorkspaceEmptyState({
   onCreateBlock,
   isCreatingBlock,
 }: {
@@ -22,42 +29,72 @@ export function EmptyWorkspace({
   isCreatingBlock: boolean;
 }) {
   return (
-    <section className="border-border/70 bg-card mx-auto flex min-h-[40dvh] w-full max-w-4xl flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center">
-      <h1 className="text-lg font-semibold">
-        <Trans id="workspace.empty.title">No blocks yet</Trans>
-      </h1>
-      <p className="text-muted-foreground mt-2 max-w-md text-sm">
-        <Trans id="workspace.empty.description">Start with an empty block.</Trans>
-      </p>
-      <Button
-        className="mt-5 gap-2"
-        disabled={isCreatingBlock}
-        onClick={() => {
-          void onCreateBlock();
-        }}
-      >
-        {isCreatingBlock ? (
-          <LoaderCircleIcon className="size-4 animate-spin" />
-        ) : (
-          <PlusIcon className="size-4" />
-        )}
-        <Trans id="workspace.empty.action">Create first block</Trans>
-      </Button>
-    </section>
+    <Empty className="bg-card border border-dashed">
+      <EmptyHeader>
+        <EmptyTitle>
+          <Trans id="workspace.empty.title">No blocks yet</Trans>
+        </EmptyTitle>
+        <EmptyDescription>
+          <Trans id="workspace.empty.description">Start with an empty block.</Trans>
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button
+          disabled={isCreatingBlock}
+          onClick={() => {
+            void onCreateBlock();
+          }}
+        >
+          {isCreatingBlock ? <LoaderCircleIcon className="animate-spin" /> : <PlusIcon />}
+          <Trans id="workspace.empty.action">Create first block</Trans>
+        </Button>
+      </EmptyContent>
+    </Empty>
   );
 }
 
-export function ArchivedEmptyState() {
+export function WorkspaceArchivedEmptyState() {
   return (
-    <section className="border-border/70 bg-card mx-auto flex min-h-[40dvh] w-full max-w-4xl flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center">
-      <h1 className="text-lg font-semibold">
-        <Trans id="workspace.archived.empty.title">No archived blocks</Trans>
-      </h1>
-      <p className="text-muted-foreground mt-2 max-w-md text-sm">
-        <Trans id="workspace.archived.empty.description">
-          Archived blocks will appear here until you restore them.
-        </Trans>
-      </p>
-    </section>
+    <Empty className="bg-card border border-dashed">
+      <EmptyHeader>
+        <EmptyTitle>
+          <Trans id="workspace.archived.empty.title">No archived blocks</Trans>
+        </EmptyTitle>
+        <EmptyDescription>
+          <Trans id="workspace.archived.empty.description">
+            Archived blocks will appear here until you restore them.
+          </Trans>
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+export function WorkspaceFilteredEmptyState({ visibility }: { visibility: "active" | "archived" }) {
+  return (
+    <Empty className="bg-card border border-dashed">
+      <EmptyHeader>
+        <EmptyTitle>
+          {visibility === "active" ? (
+            <Trans id="workspace.filtered.empty.title">No blocks match the selected tags</Trans>
+          ) : (
+            <Trans id="workspace.archived.filtered.empty.title">
+              No archived blocks match the selected tags
+            </Trans>
+          )}
+        </EmptyTitle>
+        <EmptyDescription>
+          {visibility === "active" ? (
+            <Trans id="workspace.filtered.empty.description">
+              Clear one of the filters or create a new block outside the current tag selection.
+            </Trans>
+          ) : (
+            <Trans id="workspace.archived.filtered.empty.description">
+              Clear one of the filters or switch back to active blocks.
+            </Trans>
+          )}
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }

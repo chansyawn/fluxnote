@@ -38,12 +38,12 @@ export function NoteBlockEditorView({
       onFocusCapture={onFocus}
     >
       {actions ? (
-        <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/3 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+        <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
           {actions}
         </div>
       ) : null}
       {leadingActions ? (
-        <div className="absolute top-0 left-1 z-10 -translate-y-1/3">{leadingActions}</div>
+        <div className="absolute top-0 left-1 z-10 -translate-y-1/2">{leadingActions}</div>
       ) : null}
 
       <div className="min-h-16 px-3 pt-3 pb-2">

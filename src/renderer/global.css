@@ -122,16 +122,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    font-size: 16px;
+    @apply text-foreground font-sans;
+  }
+
   html,
   body,
   #root {
-    @apply bg-background h-full overflow-hidden rounded-xl;
-  }
-  body {
-    @apply text-foreground bg-transparent;
-  }
-  html {
-    @apply font-sans;
+    @apply h-full;
   }
 
   .lucide {

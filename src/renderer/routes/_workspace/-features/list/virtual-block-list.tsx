@@ -201,7 +201,7 @@ export function VirtualBlockList({
   const firstVirtualBlock = virtualBlocks[0];
 
   return (
-    <div ref={setListElement} className="pt-2">
+    <div ref={setListElement} className="py-3">
       <div
         className="relative w-full"
         style={{
