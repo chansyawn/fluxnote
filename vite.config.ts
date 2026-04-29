@@ -14,7 +14,7 @@ export const viteAliases = {
 };
 
 // ignore these files for linting and formatting
-const ignorePatterns = ["*.gen.ts", "src/renderer/locales/**"];
+const ignorePatterns = ["*.gen.ts", "src/renderer/locales/**", "src/main/core/database/drizzle/**"];
 
 export default defineConfig({
   fmt: {
