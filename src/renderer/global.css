@@ -50,6 +50,7 @@
 }
 
 :root {
+  --app-font-size-px: 16px;
   --background: oklch(1 0 0 / 20%);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0 / 60%);
@@ -124,7 +125,6 @@
   }
 
   html {
-    font-size: 16px;
     @apply text-foreground font-sans;
   }
 

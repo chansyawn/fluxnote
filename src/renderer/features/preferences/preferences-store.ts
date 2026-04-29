@@ -3,6 +3,7 @@ import {
   DEFAULT_SETTINGS,
   normalizeSettings,
   type AutoArchiveSettings,
+  type FontSize,
   type LocaleCode,
   type Settings,
   type ShortcutAction,
@@ -23,6 +24,7 @@ const settingsStore = new LazyStore(SETTINGS_STORE_PATH, {
     locale: DEFAULT_SETTINGS.locale,
     autoArchive: DEFAULT_SETTINGS.autoArchive,
     shortcuts: DEFAULT_SETTINGS.shortcuts,
+    fontSize: DEFAULT_SETTINGS.fontSize,
   },
 });
 
@@ -63,6 +65,7 @@ const settingsStateStorage: StateStorage = {
       locale: await settingsStore.get("locale"),
       autoArchive: await settingsStore.get("autoArchive"),
       shortcuts: await settingsStore.get("shortcuts"),
+      fontSize: await settingsStore.get("fontSize"),
     });
 
     return JSON.stringify({ state: settings, version: 1 });
@@ -75,6 +78,7 @@ const settingsStateStorage: StateStorage = {
     await settingsStore.set("locale", nextSettings.locale);
     await settingsStore.set("autoArchive", nextSettings.autoArchive);
     await settingsStore.set("shortcuts", nextSettings.shortcuts);
+    await settingsStore.set("fontSize", nextSettings.fontSize);
     await settingsStore.save();
   },
   removeItem: async () => {
@@ -82,6 +86,7 @@ const settingsStateStorage: StateStorage = {
     await settingsStore.set("locale", DEFAULT_SETTINGS.locale);
     await settingsStore.set("autoArchive", DEFAULT_SETTINGS.autoArchive);
     await settingsStore.set("shortcuts", DEFAULT_SETTINGS.shortcuts);
+    await settingsStore.set("fontSize", DEFAULT_SETTINGS.fontSize);
     await settingsStore.save();
   },
 };
@@ -92,6 +97,7 @@ interface SettingsStoreState extends NormalizedSettings {
   setShortcut: (action: ShortcutAction, shortcut: ShortcutBinding) => void;
   clearShortcut: (action: ShortcutAction) => void;
   resetShortcut: (action: ShortcutAction) => void;
+  setFontSize: (fontSize: FontSize) => void;
 }
 
 const usePreferencesStore = create<SettingsStoreState>()(
@@ -123,6 +129,9 @@ const usePreferencesStore = create<SettingsStoreState>()(
           },
         }));
       },
+      setFontSize: (fontSize) => {
+        set({ fontSize });
+      },
     }),
     {
       name: "settings",
@@ -132,6 +141,7 @@ const usePreferencesStore = create<SettingsStoreState>()(
         locale: state.locale,
         autoArchive: state.autoArchive,
         shortcuts: state.shortcuts,
+        fontSize: state.fontSize,
       }),
       merge: (persistedState, currentState) => {
         const normalized = normalizeStoredSettings(persistedState);
@@ -169,6 +179,15 @@ export function useShortcutPreferences() {
       setShortcut: state.setShortcut,
       clearShortcut: state.clearShortcut,
       resetShortcut: state.resetShortcut,
+    })),
+  );
+}
+
+export function useFontSizePreference() {
+  return usePreferencesStore(
+    useShallow((state) => ({
+      fontSize: state.fontSize,
+      setFontSize: state.setFontSize,
     })),
   );
 }

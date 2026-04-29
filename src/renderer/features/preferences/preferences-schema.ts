@@ -9,8 +9,18 @@ export const LANGUAGE_OPTIONS = [
 export const localeSchema = z.enum(["en", "zh-Hans", "pseudo"]);
 export type LocaleCode = z.infer<typeof localeSchema>;
 export type LanguageOption = (typeof LANGUAGE_OPTIONS)[number];
+export const FONT_SIZE_OPTIONS = [12, 14, 16, 18, 20] as const;
+export type FontSize = (typeof FONT_SIZE_OPTIONS)[number];
 export const AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS = [1440, 4320, 10080, 43200] as const;
 export type AutoArchiveIdleMinute = (typeof AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS)[number];
+
+export const fontSizeSchema = z.union([
+  z.literal(FONT_SIZE_OPTIONS[0]),
+  z.literal(FONT_SIZE_OPTIONS[1]),
+  z.literal(FONT_SIZE_OPTIONS[2]),
+  z.literal(FONT_SIZE_OPTIONS[3]),
+  z.literal(FONT_SIZE_OPTIONS[4]),
+]);
 
 const autoArchiveIdleMinutesSchema = z.union([
   z.literal(AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS[0]),
@@ -51,12 +61,14 @@ const DEFAULT_SETTINGS_VALUE = {
     "create-block": "Mod+N",
     "delete-block": "Mod+W",
   },
+  fontSize: 16,
 } as const;
 
 export const settingsSchema = z.object({
   locale: localeSchema.catch(DEFAULT_SETTINGS_VALUE.locale),
   autoArchive: autoArchiveSettingsSchema.catch(DEFAULT_SETTINGS_VALUE.autoArchive),
   shortcuts: shortcutPreferencesSchema.catch(DEFAULT_SETTINGS_VALUE.shortcuts),
+  fontSize: fontSizeSchema.catch(DEFAULT_SETTINGS_VALUE.fontSize),
 });
 
 export type Settings = z.infer<typeof settingsSchema>;
@@ -66,6 +78,10 @@ export const DEFAULT_AUTO_ARCHIVE_SETTINGS: AutoArchiveSettings = DEFAULT_SETTIN
 
 export function isLocaleCode(value: string): value is LocaleCode {
   return LANGUAGE_OPTIONS.some((option) => option.key === value);
+}
+
+export function isFontSize(value: number): value is FontSize {
+  return FONT_SIZE_OPTIONS.some((size) => size === value);
 }
 
 export function normalizeSettings(input: unknown): Settings {

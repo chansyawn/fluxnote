@@ -4,6 +4,7 @@ import { queryClient } from "@renderer/app/query";
 import { ThemeStateProvider } from "@renderer/app/theme";
 import { AutoArchiveSync } from "@renderer/features/auto-archive/auto-archive-sync";
 import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-boundary";
+import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-state";
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
@@ -35,11 +36,13 @@ export function App() {
           <QueryClientProvider client={queryClient}>
             <HotkeysProvider>
               <ShortcutStateProvider>
-                <DirectionStateProvider>
-                  <AutoArchiveSync />
-                  <RouterProvider router={router} />
-                  <Toaster />
-                </DirectionStateProvider>
+                <FontSizeStateProvider>
+                  <DirectionStateProvider>
+                    <AutoArchiveSync />
+                    <RouterProvider router={router} />
+                    <Toaster />
+                  </DirectionStateProvider>
+                </FontSizeStateProvider>
               </ShortcutStateProvider>
             </HotkeysProvider>
           </QueryClientProvider>

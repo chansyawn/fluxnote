@@ -161,7 +161,7 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:65
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:75
 msgid "preferences.app.title"
 msgstr "App"
 
@@ -201,22 +201,22 @@ msgid "preferences.auto-archive.title"
 msgstr "Auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:108
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
 msgid "preferences.cli.install"
 msgstr "Install"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:113
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
 msgid "preferences.cli.path.description"
 msgstr "Install the flux command for terminal workflows."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:118
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:161
 msgid "preferences.cli.path.label"
 msgstr "flux command"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:104
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:147
 msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
@@ -226,12 +226,17 @@ msgid "preferences.description"
 msgstr "Configure language, auto-archive, and shortcuts."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:93
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
+msgid "preferences.font-size.label"
+msgstr "Font size"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:103
 msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:110
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:113
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
@@ -246,7 +251,7 @@ msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:81
 msgid "preferences.shortcuts.empty"
 msgstr "Not set"
 
@@ -276,12 +281,12 @@ msgid "preferences.shortcuts.recording.title"
 msgstr "Recording..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:95
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:98
 msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:58
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
@@ -301,27 +306,27 @@ msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:323
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:70
 msgid "workspace.add-block"
 msgstr "Add block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:73
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:64
 msgid "workspace.archived.empty.description"
 msgstr "Archived blocks will appear here until you restore them."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:70
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:61
 msgid "workspace.archived.empty.title"
 msgstr "No archived blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:288
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:92
 msgid "workspace.archived.filtered.empty.description"
 msgstr "Clear one of the filters or switch back to active blocks."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:277
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:81
 msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
@@ -336,32 +341,32 @@ msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:60
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
 msgid "workspace.empty.action"
 msgstr "Create first block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:46
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:38
 msgid "workspace.empty.description"
 msgstr "Start with an empty block."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:43
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:35
 msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:284
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:88
 msgid "workspace.filtered.empty.description"
 msgstr "Clear one of the filters or create a new block outside the current tag selection."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:275
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:79
 msgid "workspace.filtered.empty.title"
 msgstr "No blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-workspace.tsx:27
+#: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:18
 msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
@@ -381,7 +386,7 @@ msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/workspace-tag-filter-portal.tsx:75
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:104
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
 
@@ -391,11 +396,11 @@ msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/workspace-tag-filter-portal.tsx:61
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
 msgid "workspace.visibility.show-active"
 msgstr "Show active blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/workspace-tag-filter-portal.tsx:59
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
 msgid "workspace.visibility.show-archived"
 msgstr "Show archived blocks"

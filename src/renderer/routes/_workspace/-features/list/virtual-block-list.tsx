@@ -1,4 +1,5 @@
 import type { Block } from "@renderer/clients";
+import { useFontSizePreference } from "@renderer/features/preferences/preferences-store";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
@@ -8,9 +9,17 @@ import type {
 } from "../navigation/use-block-navigation";
 import { BlockListRow } from "./block-list-row";
 
-const BLOCK_ESTIMATED_SIZE_PX = 140;
-const BLOCK_GAP_PX = 12;
+const BLOCK_ESTIMATED_SIZE_AT_BASE_PX = 140;
+const BLOCK_GAP_AT_BASE_PX = 12;
 const BLOCK_OVERSCAN = 5;
+
+function getBlockListSizing(fontSize: number) {
+  const scale = fontSize / 16;
+  return {
+    blockEstimatedSizePx: BLOCK_ESTIMATED_SIZE_AT_BASE_PX * scale,
+    blockGapPx: BLOCK_GAP_AT_BASE_PX * scale,
+  };
+}
 
 function isScrollableOverflow(overflowValue: string): boolean {
   return overflowValue === "auto" || overflowValue === "scroll" || overflowValue === "overlay";
@@ -48,6 +57,9 @@ export function VirtualBlockList({
   onScrollTargetRendered,
   scrollTarget,
 }: VirtualBlockListProps) {
+  const { fontSize } = useFontSizePreference();
+  const { blockEstimatedSizePx, blockGapPx } = getBlockListSizing(fontSize);
+
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
   const listElementRef = useRef<HTMLDivElement | null>(null);
   const navigationAnchorRef = useRef<HTMLSpanElement | null>(null);
@@ -60,8 +72,8 @@ export function VirtualBlockList({
 
   const blockVirtualizer = useVirtualizer({
     count: totalCount,
-    estimateSize: () => BLOCK_ESTIMATED_SIZE_PX,
-    gap: BLOCK_GAP_PX,
+    estimateSize: () => blockEstimatedSizePx,
+    gap: blockGapPx,
     getItemKey: getBlockItemKey,
     getScrollElement: () => scrollElement,
     overscan: BLOCK_OVERSCAN,

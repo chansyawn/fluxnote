@@ -3,7 +3,12 @@ import { useI18nState } from "@renderer/app/i18n";
 import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
 import { getCliStatus, installCli, uninstallCli } from "@renderer/clients";
-import { isLocaleCode } from "@renderer/features/preferences/preferences-schema";
+import {
+  FONT_SIZE_OPTIONS,
+  isFontSize,
+  isLocaleCode,
+} from "@renderer/features/preferences/preferences-schema";
+import { useFontSizePreference } from "@renderer/features/preferences/preferences-store";
 import {
   SettingsGroup,
   SettingsRow,
@@ -19,12 +24,13 @@ import {
   SelectValue,
 } from "@renderer/ui/components/select";
 import { useQuery } from "@tanstack/react-query";
-import { LanguagesIcon, TerminalIcon } from "lucide-react";
+import { LanguagesIcon, TerminalIcon, TypeIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 export function AppSettingsSection() {
   const { locale, setLocale, localeOptions } = useI18nState();
+  const { fontSize, setFontSize } = useFontSizePreference();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
     queryKey: ["cli", "status"],
     queryFn: getCliStatus,
@@ -33,6 +39,10 @@ export function AppSettingsSection() {
   const languageItems = localeOptions.map((localeOption) => ({
     value: localeOption.key,
     label: localeOption.name,
+  }));
+  const fontSizeItems = FONT_SIZE_OPTIONS.map((size) => ({
+    value: String(size),
+    label: String(size),
   }));
   const cliInstalled = cliStatus?.installed === true;
   const cliDisabled = isCliStatusLoading || isCliPending;
@@ -91,6 +101,39 @@ export function AppSettingsSection() {
           }
           icon={LanguagesIcon}
           label={<Trans id="preferences.language.label">Language</Trans>}
+        />
+        <SettingsRow
+          control={
+            <Select
+              items={fontSizeItems}
+              value={String(fontSize)}
+              onValueChange={(value) => {
+                if (!value) {
+                  return;
+                }
+
+                const parsed = Number(value);
+                if (isFontSize(parsed)) {
+                  setFontSize(parsed);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end" alignItemWithTrigger={false}>
+                <SelectGroup>
+                  {FONT_SIZE_OPTIONS.map((size) => (
+                    <SelectItem key={size} value={String(size)}>
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          }
+          icon={TypeIcon}
+          label={<Trans id="preferences.font-size.label">Font size</Trans>}
         />
         <SettingsRow
           control={
