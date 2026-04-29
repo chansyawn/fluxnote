@@ -32,7 +32,7 @@ const electronMock = vi.hoisted(() => {
 
   return {
     BrowserWindow: BrowserWindowMock,
-    app: { quit: vi.fn() },
+    app: { focus: vi.fn(), quit: vi.fn() },
     loadFile,
     loadURL,
     openDevTools,
@@ -75,5 +75,32 @@ describe("window manager devtools", () => {
     manager.openMainWindowDevTools();
 
     expect(electronMock.openDevTools).toHaveBeenCalledWith({ mode: "detach" });
+  });
+});
+
+describe("window manager visibility", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "http://localhost:5173");
+  });
+
+  it("focuses app and window when showing an existing window on macOS", () => {
+    const platformSpy = vi.spyOn(process, "platform", "get").mockReturnValue("darwin");
+
+    const manager = createWindowManager({
+      emitEvent: vi.fn(() => true),
+      onAutoArchiveTrigger: vi.fn(),
+      onOpenBlockReady: vi.fn(),
+    });
+    manager.createMainWindow();
+
+    const mainWindow = manager.getMainWindow();
+    expect(mainWindow).not.toBeNull();
+    const focusSpy = vi.spyOn(mainWindow!, "focus");
+    manager.showMainWindow();
+
+    expect(electronMock.app.focus).toHaveBeenCalledWith({ steal: true });
+    expect(focusSpy).toHaveBeenCalledTimes(1);
+    platformSpy.mockRestore();
   });
 });

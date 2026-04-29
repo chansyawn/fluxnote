@@ -46,6 +46,10 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       return;
     }
 
+    if (process.platform === "darwin") {
+      app.focus({ steal: true });
+    }
+
     if (currentWindow.isMinimized()) {
       currentWindow.restore();
     }
