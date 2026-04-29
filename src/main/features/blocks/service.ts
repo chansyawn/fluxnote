@@ -22,6 +22,7 @@ function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
     id: block.id,
     position: block.position,
     content: block.content,
+    contentUpdatedAt: block.contentUpdatedAt,
     archivedAt: block.archivedAt,
     createdAt: block.createdAt,
     updatedAt: block.updatedAt,
@@ -62,7 +63,6 @@ async function getTagsForBlocks(
 }
 
 export async function createBlockRecord(db: AppDatabase, content = ""): Promise<Block> {
-  const now = nowIsoString();
   const blockId = crypto.randomUUID();
 
   await db
@@ -70,10 +70,8 @@ export async function createBlockRecord(db: AppDatabase, content = ""): Promise<
     .values({
       archivedAt: null,
       content,
-      createdAt: now,
       id: blockId,
       position: sql<number>`(select coalesce(max(${blocks.position}), 0) + 1 from ${blocks})`,
-      updatedAt: now,
     })
     .run();
 
@@ -145,6 +143,7 @@ export async function listBlocks(
   const selectedFields = {
     archivedAt: blocks.archivedAt,
     content: blocks.content,
+    contentUpdatedAt: blocks.contentUpdatedAt,
     createdAt: blocks.createdAt,
     id: blocks.id,
     position: blocks.position,
@@ -163,6 +162,7 @@ export async function listBlocks(
         blocks.id,
         blocks.position,
         blocks.content,
+        blocks.contentUpdatedAt,
         blocks.archivedAt,
         blocks.createdAt,
         blocks.updatedAt,
@@ -243,6 +243,7 @@ export async function updateBlockContent(
     .update(blocks)
     .set({
       content,
+      contentUpdatedAt: nowIsoString(),
     })
     .where(eq(blocks.id, blockId))
     .run();

@@ -12,9 +12,10 @@ CREATE TABLE `blocks` (
 	`id` text PRIMARY KEY NOT NULL,
 	`position` integer NOT NULL,
 	`content` text DEFAULT '' NOT NULL,
+	`content_updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
 	`archived_at` text,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
 );
 --> statement-breakpoint
 CREATE INDEX `idx_blocks_archived_at` ON `blocks` (`archived_at`);--> statement-breakpoint
@@ -22,8 +23,8 @@ CREATE INDEX `idx_blocks_position` ON `blocks` (`position`);--> statement-breakp
 CREATE TABLE `tags` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
+	`created_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+	`updated_at` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `uq_tags_name_lower` ON `tags` (lower("name"));

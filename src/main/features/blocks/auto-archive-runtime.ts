@@ -170,7 +170,7 @@ async function listStaleActiveBlockIds(db: AppDatabase, cutoffIso: string): Prom
     await db
       .select({ id: blocks.id })
       .from(blocks)
-      .where(and(isNull(blocks.archivedAt), lt(blocks.updatedAt, cutoffIso)))
+      .where(and(isNull(blocks.archivedAt), lt(blocks.contentUpdatedAt, cutoffIso)))
       .all()
   ).map((row: { id: string }) => row.id);
 }
@@ -188,7 +188,6 @@ async function archiveBlocks(
     .update(blocks)
     .set({
       archivedAt,
-      updatedAt: archivedAt,
     })
     .where(and(isNull(blocks.archivedAt), inArray(blocks.id, [...blockIds])))
     .run();

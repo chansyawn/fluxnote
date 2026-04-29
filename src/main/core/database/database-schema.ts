@@ -16,10 +16,12 @@ export const blocks = sqliteTable(
     id: text("id").primaryKey(),
     position: integer("position").notNull(),
     content: text("content").notNull().default(""),
+    contentUpdatedAt: text("content_updated_at").notNull().default(sqliteNowIsoExpression),
     archivedAt: text("archived_at"),
-    createdAt: text("created_at").notNull(),
+    createdAt: text("created_at").notNull().default(sqliteNowIsoExpression),
     updatedAt: text("updated_at")
       .notNull()
+      .default(sqliteNowIsoExpression)
       .$onUpdateFn(() => sqliteNowIsoExpression),
   },
   (table) => [
@@ -33,9 +35,10 @@ export const tags = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    createdAt: text("created_at").notNull(),
+    createdAt: text("created_at").notNull().default(sqliteNowIsoExpression),
     updatedAt: text("updated_at")
       .notNull()
+      .default(sqliteNowIsoExpression)
       .$onUpdateFn(() => sqliteNowIsoExpression),
   },
   (table) => [uniqueIndex("uq_tags_name_lower").on(sql`lower(${table.name})`)],

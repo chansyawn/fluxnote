@@ -41,6 +41,7 @@ describe("backend command dispatcher", () => {
     createBlockRecordMock.mockResolvedValue({
       archivedAt: null,
       content: "hello",
+      contentUpdatedAt: "now",
       createdAt: "now",
       id: "block-1",
       position: 1,
@@ -69,6 +70,7 @@ describe("backend command dispatcher", () => {
     createBlockRecordMock.mockResolvedValue({
       archivedAt: null,
       content: "draft",
+      contentUpdatedAt: "now",
       createdAt: "now",
       id: "block-1",
       position: 1,

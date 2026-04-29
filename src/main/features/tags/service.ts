@@ -1,10 +1,6 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blockTags, blocks, tags, type TagRecord } from "@main/core/database/database-schema";
-import {
-  getSqliteChangedRows,
-  isSqliteUniqueConstraint,
-  nowIsoString,
-} from "@main/core/database/db-utils";
+import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
 import { businessError, internalError } from "@shared/ipc/errors";
@@ -31,7 +27,6 @@ export async function listTags(db: AppDatabase): Promise<Tag[]> {
 }
 
 export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
-  const now = nowIsoString();
   const tagId = crypto.randomUUID();
   const trimmedName = name.trim();
 
@@ -39,10 +34,8 @@ export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
     await db
       .insert(tags)
       .values({
-        createdAt: now,
         id: tagId,
         name: trimmedName,
-        updatedAt: now,
       })
       .run();
   } catch (error) {

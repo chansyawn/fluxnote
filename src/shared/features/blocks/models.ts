@@ -6,6 +6,7 @@ export const blockSchema = z.object({
   id: z.string(),
   position: z.number(),
   content: z.string(),
+  contentUpdatedAt: z.string(),
   archivedAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),

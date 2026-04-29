@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "bb63925d-1ea7-45fc-9bab-181f44787022",
+  "id": "06bbf93a-2694-4683-b052-addf3191feeb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "block_tags": {
@@ -25,12 +25,16 @@
       "indexes": {
         "idx_block_tags_tag_id": {
           "name": "idx_block_tags_tag_id",
-          "columns": ["tag_id"],
+          "columns": [
+            "tag_id"
+          ],
           "isUnique": false
         },
         "idx_block_tags_block_id": {
           "name": "idx_block_tags_block_id",
-          "columns": ["block_id"],
+          "columns": [
+            "block_id"
+          ],
           "isUnique": false
         }
       },
@@ -39,8 +43,12 @@
           "name": "block_tags_block_id_blocks_id_fk",
           "tableFrom": "block_tags",
           "tableTo": "blocks",
-          "columnsFrom": ["block_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "block_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -48,15 +56,22 @@
           "name": "block_tags_tag_id_tags_id_fk",
           "tableFrom": "block_tags",
           "tableTo": "tags",
-          "columnsFrom": ["tag_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "tag_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "block_tags_block_id_tag_id_pk": {
-          "columns": ["block_id", "tag_id"],
+          "columns": [
+            "block_id",
+            "tag_id"
+          ],
           "name": "block_tags_block_id_tag_id_pk"
         }
       },
@@ -88,6 +103,14 @@
           "autoincrement": false,
           "default": "''"
         },
+        "content_updated_at": {
+          "name": "content_updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
+        },
         "archived_at": {
           "name": "archived_at",
           "type": "text",
@@ -100,25 +123,31 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
         }
       },
       "indexes": {
         "idx_blocks_archived_at": {
           "name": "idx_blocks_archived_at",
-          "columns": ["archived_at"],
+          "columns": [
+            "archived_at"
+          ],
           "isUnique": false
         },
         "idx_blocks_position": {
           "name": "idx_blocks_position",
-          "columns": ["position"],
+          "columns": [
+            "position"
+          ],
           "isUnique": false
         }
       },
@@ -149,20 +178,24 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
         }
       },
       "indexes": {
         "uq_tags_name_lower": {
           "name": "uq_tags_name_lower",
-          "columns": ["lower(\"name\")"],
+          "columns": [
+            "lower(\"name\")"
+          ],
           "isUnique": true
         }
       },
