@@ -6,6 +6,10 @@ import { getSqliteChangedRows } from "@main/core/database/db-utils";
 import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
+import {
+  AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
+  normalizeAutoArchiveIdleMinutes,
+} from "@shared/features/preferences";
 import { and, inArray, isNull, lt } from "drizzle-orm";
 
 interface AutoArchiveConfig {
@@ -24,7 +28,7 @@ interface AutoArchiveRuntimeOptions {
 
 const DEFAULT_CONFIG: AutoArchiveConfig = {
   enabled: true,
-  idleMinutes: 7 * 24 * 60,
+  idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
   scanIntervalSeconds: 300,
 };
 const MIN_SCAN_INTERVAL_SECONDS = 30;
@@ -150,10 +154,7 @@ export class AutoArchiveRuntime {
 
       return {
         enabled: typeof fromFile.enabled === "boolean" ? fromFile.enabled : DEFAULT_CONFIG.enabled,
-        idleMinutes:
-          typeof fromFile.idleMinutes === "number" && fromFile.idleMinutes > 0
-            ? fromFile.idleMinutes
-            : DEFAULT_CONFIG.idleMinutes,
+        idleMinutes: normalizeAutoArchiveIdleMinutes(fromFile.idleMinutes),
         scanIntervalSeconds:
           typeof fromFile.scanIntervalSeconds === "number" && fromFile.scanIntervalSeconds > 0
             ? fromFile.scanIntervalSeconds

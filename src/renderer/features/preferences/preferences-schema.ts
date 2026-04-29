@@ -1,3 +1,7 @@
+import {
+  AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
+  normalizeAutoArchiveIdleMinutes,
+} from "@shared/features/preferences";
 import { z } from "zod";
 
 export const LANGUAGE_OPTIONS = [
@@ -11,8 +15,6 @@ export type LocaleCode = z.infer<typeof localeSchema>;
 export type LanguageOption = (typeof LANGUAGE_OPTIONS)[number];
 export const FONT_SIZE_OPTIONS = [12, 14, 16, 18, 20] as const;
 export type FontSize = (typeof FONT_SIZE_OPTIONS)[number];
-export const AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS = [1440, 4320, 10080, 43200] as const;
-export type AutoArchiveIdleMinute = (typeof AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS)[number];
 
 export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[0]),
@@ -22,16 +24,14 @@ export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[4]),
 ]);
 
-const autoArchiveIdleMinutesSchema = z.union([
-  z.literal(AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS[0]),
-  z.literal(AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS[1]),
-  z.literal(AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS[2]),
-  z.literal(AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS[3]),
-]);
+const autoArchiveIdleMinutesSchema = z.preprocess(
+  normalizeAutoArchiveIdleMinutes,
+  z.number().int(),
+);
 
 export const autoArchiveSettingsSchema = z.object({
   enabled: z.boolean().catch(true),
-  idleMinutes: autoArchiveIdleMinutesSchema.catch(10080),
+  idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
   scanIntervalSeconds: z.int().positive().catch(300),
 });
 
@@ -53,7 +53,7 @@ const DEFAULT_SETTINGS_VALUE = {
   locale: "en",
   autoArchive: {
     enabled: true,
-    idleMinutes: 10080,
+    idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
     scanIntervalSeconds: 300,
   },
   shortcuts: {

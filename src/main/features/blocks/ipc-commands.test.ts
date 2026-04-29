@@ -271,6 +271,8 @@ describe("blocks ipc commands", () => {
     const activeBlock = await createBlock(db);
     const archivedBlockA = await createBlock(db);
     const archivedBlockB = await createBlock(db);
+    await setBlockCreatedAt(db, archivedBlockA.id, "2026-01-01T00:00:00.000Z");
+    await setBlockCreatedAt(db, archivedBlockB.id, "2026-01-02T00:00:00.000Z");
 
     await db.run(
       sql`UPDATE blocks SET archived_at = ${new Date().toISOString()} WHERE id IN (${archivedBlockA.id}, ${archivedBlockB.id})`,

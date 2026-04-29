@@ -168,37 +168,27 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:74
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:150
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:116
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:207
 msgid "preferences.auto-archive.threshold.label"
 msgstr "归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:40
-msgid "preferences.auto-archive.threshold.option.1-day"
-msgstr "1 天"
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:168
+msgid "preferences.auto-archive.threshold.range-tooltip"
+msgstr "范围：1-20160 M、1-336 H 或 1-14 D。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:44
-msgid "preferences.auto-archive.threshold.option.3-days"
-msgstr "3 天"
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:158
+msgid "preferences.auto-archive.threshold.range-tooltip.label"
+msgstr "自动归档范围"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:52
-msgid "preferences.auto-archive.threshold.option.30-days"
-msgstr "30 天"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:48
-msgid "preferences.auto-archive.threshold.option.7-days"
-msgstr "7 天"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:135
 msgid "preferences.auto-archive.title"
 msgstr "自动归档"
 

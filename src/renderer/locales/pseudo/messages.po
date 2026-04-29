@@ -168,37 +168,27 @@ msgid "preferences.app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:74
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:150
 msgid "preferences.auto-archive.enable.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:116
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:207
 msgid "preferences.auto-archive.threshold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:40
-msgid "preferences.auto-archive.threshold.option.1-day"
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:168
+msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:44
-msgid "preferences.auto-archive.threshold.option.3-days"
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:158
+msgid "preferences.auto-archive.threshold.range-tooltip.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:52
-msgid "preferences.auto-archive.threshold.option.30-days"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:48
-msgid "preferences.auto-archive.threshold.option.7-days"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:135
 msgid "preferences.auto-archive.title"
 msgstr ""
 

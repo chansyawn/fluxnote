@@ -8,6 +8,7 @@ import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
+import { TooltipProvider } from "@renderer/ui/components/tooltip";
 import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createMemoryHistory, createRouter } from "@tanstack/react-router";
@@ -38,9 +39,11 @@ export function App() {
               <ShortcutStateProvider>
                 <FontSizeStateProvider>
                   <DirectionStateProvider>
-                    <AutoArchiveSync />
-                    <RouterProvider router={router} />
-                    <Toaster />
+                    <TooltipProvider>
+                      <AutoArchiveSync />
+                      <RouterProvider router={router} />
+                      <Toaster />
+                    </TooltipProvider>
                   </DirectionStateProvider>
                 </FontSizeStateProvider>
               </ShortcutStateProvider>

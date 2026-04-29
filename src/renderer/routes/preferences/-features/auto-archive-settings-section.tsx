@@ -1,17 +1,15 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { queryClient } from "@renderer/app/query";
-import {
-  AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS,
-  DEFAULT_AUTO_ARCHIVE_SETTINGS,
-  type AutoArchiveIdleMinute,
-} from "@renderer/features/preferences/preferences-schema";
+import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@renderer/features/preferences/preferences-schema";
 import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-store";
 import {
   SettingsGroup,
   SettingsRow,
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
+import { ButtonGroup } from "@renderer/ui/components/button-group";
+import { InputGroup, InputGroupInput } from "@renderer/ui/components/input-group";
 import {
   Select,
   SelectContent,
@@ -21,12 +19,61 @@ import {
   SelectValue,
 } from "@renderer/ui/components/select";
 import { Switch } from "@renderer/ui/components/switch";
-import { ArchiveIcon, ClockIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
+import {
+  AUTO_ARCHIVE_DURATION_UNITS,
+  AUTO_ARCHIVE_MAX_IDLE_MINUTES,
+  convertAutoArchiveDurationUnit,
+  toAutoArchiveDurationViewModel,
+  toAutoArchiveIdleMinutes,
+  type AutoArchiveDurationUnit,
+} from "@shared/features/preferences";
+import { ArchiveIcon, CircleHelpIcon, ClockIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+
+const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
+  days: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / (24 * 60)),
+  hours: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / 60),
+  minutes: AUTO_ARCHIVE_MAX_IDLE_MINUTES,
+};
+
+const UNIT_LABELS: Record<AutoArchiveDurationUnit, string> = {
+  days: "D",
+  hours: "H",
+  minutes: "M",
+};
+
+const UNIT_ITEMS = AUTO_ARCHIVE_DURATION_UNITS.map((unit) => ({
+  label: UNIT_LABELS[unit],
+  value: unit,
+}));
+
+function parseAmountText(value: string): number | null {
+  const trimmedValue = value.trim();
+  if (!/^\d+$/.test(trimmedValue)) {
+    return null;
+  }
+
+  return Number(trimmedValue);
+}
+
+function clampAmount(amount: number, unit: AutoArchiveDurationUnit): number {
+  return Math.min(Math.max(amount, 1), MAX_DURATION_BY_UNIT[unit]);
+}
 
 export function AutoArchiveSettingsSection() {
   const { i18n } = useLingui();
   const { autoArchive, patchAutoArchive } = useAutoArchivePreference();
   const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_SETTINGS;
+  const duration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
+  const [amountText, setAmountText] = useState(String(duration.amount));
+  const [unit, setUnit] = useState<AutoArchiveDurationUnit>(duration.unit);
+
+  useEffect(() => {
+    const nextDuration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
+    setAmountText(String(nextDuration.amount));
+    setUnit(nextDuration.unit);
+  }, [preferences.idleMinutes]);
 
   const savePreferences = (
     updater: (currentPreferences: typeof preferences) => typeof preferences,
@@ -36,23 +83,47 @@ export function AutoArchiveSettingsSection() {
     void queryClient.invalidateQueries({ queryKey: ["blocks"] });
   };
 
-  const durationLabels: Record<number, string> = {
-    1440: i18n._({
-      id: "preferences.auto-archive.threshold.option.1-day",
-      message: "1 day",
-    }),
-    4320: i18n._({
-      id: "preferences.auto-archive.threshold.option.3-days",
-      message: "3 days",
-    }),
-    10080: i18n._({
-      id: "preferences.auto-archive.threshold.option.7-days",
-      message: "7 days",
-    }),
-    43200: i18n._({
-      id: "preferences.auto-archive.threshold.option.30-days",
-      message: "30 days",
-    }),
+  const saveIdleMinutes = (idleMinutes: number) => {
+    savePreferences((currentPreferences) => ({
+      ...currentPreferences,
+      idleMinutes,
+    }));
+  };
+
+  const handleAmountChange = (value: string) => {
+    const nextAmount = parseAmountText(value);
+    if (nextAmount === null) {
+      return;
+    }
+
+    const clampedAmount = clampAmount(nextAmount, unit);
+    const nextIdleMinutes = toAutoArchiveIdleMinutes({ amount: clampedAmount, unit });
+    if (nextIdleMinutes === null) {
+      return;
+    }
+
+    setAmountText(String(clampedAmount));
+    saveIdleMinutes(nextIdleMinutes);
+  };
+
+  const handleUnitChange = (value: AutoArchiveDurationUnit | null) => {
+    if (!value) {
+      return;
+    }
+
+    const nextDuration = convertAutoArchiveDurationUnit(preferences.idleMinutes, value);
+    const clampedAmount = clampAmount(nextDuration.amount, nextDuration.unit);
+    const nextIdleMinutes = toAutoArchiveIdleMinutes({
+      amount: clampedAmount,
+      unit: nextDuration.unit,
+    });
+    if (nextIdleMinutes === null) {
+      return;
+    }
+
+    setAmountText(String(clampedAmount));
+    setUnit(nextDuration.unit);
+    saveIdleMinutes(nextIdleMinutes);
   };
 
   return (
@@ -75,43 +146,57 @@ export function AutoArchiveSettingsSection() {
         />
         <SettingsRow
           control={
-            <Select
-              items={AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS.map((minutes) => ({
-                value: String(minutes),
-                label: durationLabels[minutes],
-              }))}
-              value={String(preferences.idleMinutes)}
-              onValueChange={(value) => {
-                const nextIdleMinutes = Number(value);
-
-                if (
-                  !AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS.includes(
-                    nextIdleMinutes as AutoArchiveIdleMinute,
-                  )
-                ) {
-                  return;
-                }
-
-                savePreferences((currentPreferences) => ({
-                  ...currentPreferences,
-                  idleMinutes: nextIdleMinutes as AutoArchiveIdleMinute,
-                }));
-              }}
-            >
-              <SelectTrigger disabled={!preferences.enabled}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent align="end" alignItemWithTrigger={false}>
-                <SelectGroup>
-                  {AUTO_ARCHIVE_IDLE_MINUTE_OPTIONS.map((minutes) => (
-                    <SelectItem key={minutes} value={String(minutes)}>
-                      {durationLabels[minutes]}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger
+                  aria-label={i18n._({
+                    id: "preferences.auto-archive.threshold.range-tooltip.label",
+                    message: "Auto-archive range",
+                  })}
+                  render={
+                    <CircleHelpIcon className="text-muted-foreground size-3" aria-hidden="true" />
+                  }
+                />
+                <TooltipContent side="top" sideOffset={8}>
+                  <Trans id="preferences.auto-archive.threshold.range-tooltip">
+                    Range: 1-20160 M, 1-336 H, or 1-14 D.
+                  </Trans>
+                </TooltipContent>
+              </Tooltip>
+              <ButtonGroup>
+                <InputGroup>
+                  <InputGroupInput
+                    className="w-fit"
+                    disabled={!preferences.enabled}
+                    inputMode="numeric"
+                    max={MAX_DURATION_BY_UNIT[unit]}
+                    min={1}
+                    onChange={(event) => {
+                      handleAmountChange(event.target.value);
+                    }}
+                    step={1}
+                    type="number"
+                    value={amountText}
+                  />
+                </InputGroup>
+                <Select items={UNIT_ITEMS} value={unit} onValueChange={handleUnitChange}>
+                  <SelectTrigger className="w-12" disabled={!preferences.enabled}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="end" alignItemWithTrigger={false}>
+                    <SelectGroup>
+                      {AUTO_ARCHIVE_DURATION_UNITS.map((durationUnit) => (
+                        <SelectItem key={durationUnit} value={durationUnit}>
+                          {UNIT_LABELS[durationUnit]}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </ButtonGroup>
+            </div>
           }
+          controlClassName="min-w-0"
           icon={ClockIcon}
           label={<Trans id="preferences.auto-archive.threshold.label">Archive after</Trans>}
         />
