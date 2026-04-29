@@ -10,7 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import type { EditorRegistry } from "./use-editor-registry";
+import type { EditorRegistry } from "../editing/use-editor-registry";
 
 export type BlockNavigationAlign = "start" | "auto";
 export type BlockNavigationFocus = "editor" | "block" | "none";

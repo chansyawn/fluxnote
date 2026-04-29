@@ -1,7 +1,7 @@
 import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { BlockMutationOperation } from "./use-block-mutations";
+import type { BlockMutationOperation } from "../use-block-mutations";
 
 export interface BlockListItemActions {
   tags: Tag[];

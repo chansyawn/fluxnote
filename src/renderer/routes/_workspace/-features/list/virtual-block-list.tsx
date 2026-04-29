@@ -8,9 +8,12 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+import { useEditorRegistryContext } from "../editing/editor-registry-context";
+import type {
+  BlockScrollTarget,
+  BlockScrollTargetRenderedPayload,
+} from "../navigation/use-block-navigation";
 import { useBlockListItemActions } from "./block-list-context";
-import { useEditorRegistryContext } from "./editor-registry-context";
-import type { BlockScrollTarget, BlockScrollTargetRenderedPayload } from "./use-block-navigation";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
