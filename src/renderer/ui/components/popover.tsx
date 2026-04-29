@@ -1,3 +1,5 @@
+"use client";
+
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import { cn } from "@renderer/ui/lib/utils";
 import * as React from "react";
