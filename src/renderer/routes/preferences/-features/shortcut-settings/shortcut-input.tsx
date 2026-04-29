@@ -1,6 +1,5 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { ShortcutAction } from "@renderer/features/preferences/preferences-schema";
 import {
   formatShortcutTokens,
   type ShortcutBinding,
@@ -9,6 +8,7 @@ import { Button } from "@renderer/ui/components/button";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@renderer/ui/components/popover";
 import { cn } from "@renderer/ui/lib/utils";
+import type { ShortcutAction } from "@shared/features/preferences";
 import { RotateCcwIcon, XIcon } from "lucide-react";
 
 import { ShortcutRecordingPopover } from "./shortcut-recording-popover";

@@ -45,9 +45,6 @@ export function createBackendFeatureManifests(
     createShortcutFeature({
       emitEvent: options.emitEvent,
     }),
-    createPreferencesFeature({
-      readPreferences: options.readPreferences,
-      writePreferences: options.writePreferences,
-    }),
+    createPreferencesFeature(options.preferencesService),
   ];
 }

@@ -1,43 +1,27 @@
-import fs from "node:fs/promises";
-
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import { getSqliteChangedRows } from "@main/core/database/db-utils";
 import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
-import {
-  AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
-  normalizeAutoArchiveIdleMinutes,
-} from "@shared/features/preferences";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 import { and, inArray, isNull, lt } from "drizzle-orm";
-
-interface AutoArchiveConfig {
-  enabled: boolean;
-  idleMinutes: number;
-  scanIntervalSeconds: number;
-}
 
 interface AutoArchiveRuntimeOptions {
   emitEvent: EmitIpcEvent;
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
-  settingsFilePath: string;
+  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
   store: BackendStore;
 }
 
-const DEFAULT_CONFIG: AutoArchiveConfig = {
-  enabled: true,
-  idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
-  scanIntervalSeconds: 300,
-};
 const MIN_SCAN_INTERVAL_SECONDS = 30;
 
 export class AutoArchiveRuntime {
   private readonly emitEvent: EmitIpcEvent;
   private readonly getProtectedBlockIds: () => Set<string>;
   private readonly getWindowVisible: AutoArchiveRuntimeOptions["getWindowVisible"];
-  private readonly settingsFilePath: string;
+  private readonly readAutoArchiveSettings: AutoArchiveRuntimeOptions["readAutoArchiveSettings"];
   private readonly store: BackendStore;
   private running = false;
   private timer: NodeJS.Timeout | null = null;
@@ -47,7 +31,7 @@ export class AutoArchiveRuntime {
     this.emitEvent = options.emitEvent;
     this.getProtectedBlockIds = options.getProtectedBlockIds ?? (() => new Set());
     this.getWindowVisible = options.getWindowVisible;
-    this.settingsFilePath = options.settingsFilePath;
+    this.readAutoArchiveSettings = options.readAutoArchiveSettings;
     this.store = options.store;
   }
 
@@ -144,24 +128,11 @@ export class AutoArchiveRuntime {
     this.emitEvent("autoArchiveStateChanged", payload);
   }
 
-  private async readConfig(): Promise<AutoArchiveConfig> {
+  private async readConfig(): Promise<AutoArchiveSettings> {
     try {
-      const content = await fs.readFile(this.settingsFilePath, "utf8");
-      const parsed = JSON.parse(content) as {
-        autoArchive?: Partial<AutoArchiveConfig>;
-      };
-      const fromFile = parsed.autoArchive ?? {};
-
-      return {
-        enabled: typeof fromFile.enabled === "boolean" ? fromFile.enabled : DEFAULT_CONFIG.enabled,
-        idleMinutes: normalizeAutoArchiveIdleMinutes(fromFile.idleMinutes),
-        scanIntervalSeconds:
-          typeof fromFile.scanIntervalSeconds === "number" && fromFile.scanIntervalSeconds > 0
-            ? fromFile.scanIntervalSeconds
-            : DEFAULT_CONFIG.scanIntervalSeconds,
-      };
+      return await this.readAutoArchiveSettings();
     } catch {
-      return DEFAULT_CONFIG;
+      return DEFAULT_SETTINGS.autoArchive;
     }
   }
 }

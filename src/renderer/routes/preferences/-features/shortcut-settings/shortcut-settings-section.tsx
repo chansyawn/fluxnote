@@ -1,14 +1,11 @@
 import { Trans } from "@lingui/react/macro";
-import {
-  DEFAULT_SETTINGS,
-  type ShortcutAction,
-} from "@renderer/features/preferences/preferences-schema";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   SettingsGroup,
   SettingsRow,
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
+import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences";
 import { KeyboardIcon, PanelTopOpenIcon, PlusCircleIcon } from "lucide-react";
 import { type ReactElement } from "react";
 

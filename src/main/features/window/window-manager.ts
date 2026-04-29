@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import { APP_PRODUCT_NAME } from "@shared/app/app-config";
 import { app, BrowserWindow } from "electron";
 
 import { calculateWindowPosition, saveWindowPosition } from "./window-position";
@@ -132,7 +133,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       resizable: true,
       show: false,
       skipTaskbar: true,
-      title: "fluxnote",
+      title: APP_PRODUCT_NAME,
       transparent: true,
       webPreferences: {
         contextIsolation: true,

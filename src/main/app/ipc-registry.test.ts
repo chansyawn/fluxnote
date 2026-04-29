@@ -4,6 +4,7 @@ import {
   type RegisterIpcCommandsOptions,
 } from "@main/app/ipc-registry";
 import type { BackendStore } from "@main/core/persistence/backend-store";
+import { createPreferencesService } from "@main/features/preferences";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 function createOptions(): RegisterIpcCommandsOptions {
@@ -18,8 +19,8 @@ function createOptions(): RegisterIpcCommandsOptions {
     },
     getMainWindow: () => null,
     hideMainWindow: vi.fn(),
+    preferencesService: createPreferencesService({ store: {} }),
     readPendingOpenBlock: () => ({ blockId: null }),
-    readPreferences: () => ({}),
     requestQuit: vi.fn(),
     store: {
       getAssetPathForBlock: vi.fn(),
@@ -27,7 +28,6 @@ function createOptions(): RegisterIpcCommandsOptions {
       init: vi.fn(),
     } as unknown as BackendStore,
     toggleMainWindow: vi.fn(),
-    writePreferences: vi.fn(),
   };
 }
 

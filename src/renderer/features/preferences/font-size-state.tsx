@@ -1,4 +1,4 @@
-import { useFontSizePreference } from "@renderer/features/preferences/preferences-store";
+import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import { useEffect, type ReactNode } from "react";
 
 interface FontSizeStateProviderProps {

@@ -1,12 +1,13 @@
 import {
   AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
+  DEFAULT_SETTINGS,
   normalizeAutoArchiveIdleMinutes,
+  settingsPatchSchema,
   toAutoArchiveDurationViewModel,
   toAutoArchiveIdleMinutes,
 } from "@shared/features/preferences";
+import { normalizeSettings } from "@shared/features/preferences";
 import { describe, expect, it } from "vite-plus/test";
-
-import { normalizeSettings } from "./preferences-schema";
 
 describe("auto archive preferences", () => {
   it("converts custom duration inputs to idle minutes", () => {
@@ -27,23 +28,77 @@ describe("auto archive preferences", () => {
   it("normalizes settings with custom idle minutes", () => {
     expect(
       normalizeSettings({
+        schemaVersion: 1,
+        appearance: {
+          locale: "en",
+          fontSize: 16,
+        },
         autoArchive: {
           enabled: true,
           idleMinutes: 90,
           scanIntervalSeconds: 300,
         },
+        shortcuts: DEFAULT_SETTINGS.shortcuts,
       }).autoArchive.idleMinutes,
     ).toBe(90);
 
     expect(
       normalizeSettings({
+        schemaVersion: 1,
+        appearance: {
+          locale: "en",
+          fontSize: 16,
+        },
         autoArchive: {
           enabled: true,
           idleMinutes: 0,
           scanIntervalSeconds: 300,
         },
+        shortcuts: DEFAULT_SETTINGS.shortcuts,
       }).autoArchive.idleMinutes,
     ).toBe(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES);
+  });
+
+  it("resets old settings shapes to the default settings", () => {
+    expect(
+      normalizeSettings({
+        locale: "zh-Hans",
+        fontSize: 20,
+      }),
+    ).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("validates partial settings patches", () => {
+    expect(
+      settingsPatchSchema.parse({
+        appearance: {
+          locale: "zh-Hans",
+        },
+        shortcuts: {
+          "create-block": null,
+        },
+      }),
+    ).toEqual({
+      appearance: {
+        locale: "zh-Hans",
+      },
+      shortcuts: {
+        "create-block": null,
+      },
+    });
+
+    expect(() =>
+      settingsPatchSchema.parse({
+        appearance: {
+          locale: "fr",
+        },
+      }),
+    ).toThrow();
+    expect(() =>
+      settingsPatchSchema.parse({
+        unknown: true,
+      }),
+    ).toThrow();
   });
 
   it("formats idle minutes for the most compact whole unit", () => {

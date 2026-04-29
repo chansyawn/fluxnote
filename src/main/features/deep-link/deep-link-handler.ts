@@ -1,6 +1,5 @@
+import { APP_PROTOCOL } from "@shared/app/app-config";
 import type { BackendCommandKey } from "@shared/backend-entrypoint/commands";
-
-const DEEP_LINK_PROTOCOL = "fluxnote";
 
 type DeepLinkCommand =
   | {
@@ -17,13 +16,13 @@ interface DeepLinkHandlerServices {
 }
 
 export function extractDeepLinkFromArgv(argv: readonly string[]): string | null {
-  return argv.find((arg) => arg.startsWith(`${DEEP_LINK_PROTOCOL}://`)) ?? null;
+  return argv.find((arg) => arg.startsWith(`${APP_PROTOCOL}://`)) ?? null;
 }
 
 export function parseDeepLinkCommand(urlText: string): DeepLinkCommand | null {
   try {
     const parsed = new URL(urlText);
-    if (parsed.protocol !== `${DEEP_LINK_PROTOCOL}:`) {
+    if (parsed.protocol !== `${APP_PROTOCOL}:`) {
       return null;
     }
 

@@ -1,14 +1,14 @@
 import { i18n, type Messages } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
+import { useLocalePreference } from "@renderer/features/preferences/preferences-query";
+import { messages as enMessages } from "@renderer/locales/en/messages.po";
+import { messages as pseudoMessages } from "@renderer/locales/pseudo/messages.po";
+import { messages as zhHansMessages } from "@renderer/locales/zh-Hans/messages.po";
 import {
   LANGUAGE_OPTIONS,
   type LanguageOption,
   type LocaleCode,
-} from "@renderer/features/preferences/preferences-schema";
-import { useLocalePreference } from "@renderer/features/preferences/preferences-store";
-import { messages as enMessages } from "@renderer/locales/en/messages.po";
-import { messages as pseudoMessages } from "@renderer/locales/pseudo/messages.po";
-import { messages as zhHansMessages } from "@renderer/locales/zh-Hans/messages.po";
+} from "@shared/features/preferences";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 
 const DEV_ONLY_LOCALE = "pseudo";

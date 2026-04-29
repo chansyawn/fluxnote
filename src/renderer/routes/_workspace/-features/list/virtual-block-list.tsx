@@ -1,5 +1,5 @@
 import type { Block } from "@renderer/clients";
-import { useFontSizePreference } from "@renderer/features/preferences/preferences-store";
+import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 

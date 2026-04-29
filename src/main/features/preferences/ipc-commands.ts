@@ -2,27 +2,28 @@ import {
   defineIpcCommandDefinition,
   type AnyIpcCommandDefinition,
 } from "@main/core/ipc/ipc-command-definition";
-
-interface PreferencesCommandServices {
-  readPreferences: () => Record<string, unknown>;
-  writePreferences: (value: Record<string, unknown>) => void;
-}
+import type { PreferencesService } from "@main/features/preferences/service";
 
 export function createPreferencesIpcCommands(
-  services: PreferencesCommandServices,
+  service: PreferencesService,
 ): readonly AnyIpcCommandDefinition[] {
   return [
     defineIpcCommandDefinition({
       key: "preferencesRead",
       handle() {
-        return services.readPreferences();
+        return service.readSettings();
       },
     }),
     defineIpcCommandDefinition({
-      key: "preferencesWrite",
+      key: "preferencesPatch",
       handle(request) {
-        services.writePreferences(request);
-        return undefined;
+        return service.patchSettings(request);
+      },
+    }),
+    defineIpcCommandDefinition({
+      key: "preferencesReset",
+      handle() {
+        return service.resetSettings();
       },
     }),
   ] as const;

@@ -11,16 +11,14 @@ import {
 } from "../features/deep-link/deep-link-handler";
 import { createExternalEditManager } from "../features/external-edit";
 import { createOpenBlockService } from "../features/open-block";
-import { getConfigStore } from "../features/preferences";
+import { createPreferencesService } from "../features/preferences";
 import { createTrayManager, createWindowManager } from "../features/window";
 import { createBackendCommandDispatcher } from "./backend-commands";
 import { registerIpcCommands } from "./ipc-registry";
 
-const SETTINGS_STORE_NAME = "settings.json";
-
 export function createBackendRuntime() {
   const backendStore = new BackendStore();
-  const settingsStore = getConfigStore(SETTINGS_STORE_NAME, {});
+  const preferencesService = createPreferencesService();
   let windowManager: ReturnType<typeof createWindowManager>;
   const emitIpcEvent = createEmitIpcEvent({
     getMainWindow: () => windowManager.getMainWindow(),
@@ -32,7 +30,7 @@ export function createBackendRuntime() {
     emitEvent: emitIpcEvent,
     getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
-    settingsFilePath: settingsStore.path,
+    readAutoArchiveSettings: preferencesService.readAutoArchiveSettings,
     store: backendStore,
   });
   const openBlockService = createOpenBlockService({
@@ -75,15 +73,11 @@ export function createBackendRuntime() {
       externalEditManager,
       getMainWindow: () => windowManager.getMainWindow(),
       hideMainWindow: () => windowManager.hideMainWindow(),
+      preferencesService,
       readPendingOpenBlock: () => openBlockService.readPending(),
-      readPreferences: () =>
-        getConfigStore(SETTINGS_STORE_NAME, {}).store as Record<string, unknown>,
       requestQuit: () => windowManager.requestQuit(),
       store: backendStore,
       toggleMainWindow: () => windowManager.toggleMainWindow(),
-      writePreferences: (value) => {
-        getConfigStore(SETTINGS_STORE_NAME, {}).store = value;
-      },
     });
   }
 

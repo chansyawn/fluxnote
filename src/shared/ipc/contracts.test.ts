@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences";
 import {
   ipcCommandContracts,
   ipcCommandKeys,
@@ -32,6 +33,30 @@ describe("ipc contracts", () => {
     ).toEqual({
       blockId: "block-1",
     });
+    expect(ipcCommandContracts.preferencesRead.response.parse(DEFAULT_SETTINGS)).toEqual(
+      DEFAULT_SETTINGS,
+    );
+    expect(
+      ipcCommandContracts.preferencesPatch.request.parse({
+        appearance: {
+          fontSize: 20,
+        },
+      }),
+    ).toEqual({
+      appearance: {
+        fontSize: 20,
+      },
+    });
+    expect(ipcCommandContracts.preferencesReset.response.parse(DEFAULT_SETTINGS)).toEqual(
+      DEFAULT_SETTINGS,
+    );
+    expect(() =>
+      ipcCommandContracts.preferencesPatch.request.parse({
+        appearance: {
+          fontSize: 21,
+        },
+      }),
+    ).toThrow();
   });
 
   it("validates event payload schemas", () => {

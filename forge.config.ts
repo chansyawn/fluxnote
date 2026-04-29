@@ -7,6 +7,14 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
+import {
+  APP_BUNDLE_ID,
+  APP_CATEGORY_TYPE,
+  APP_DISPLAY_NAME,
+  APP_PRODUCT_NAME,
+  APP_PROTOCOL,
+} from "./src/shared/app/app-config";
+
 async function copyCliResources(buildPath: string): Promise<void> {
   const resourcesCliPath = path.resolve(buildPath, "..", "cli");
   await mkdir(resourcesCliPath, { recursive: true });
@@ -16,16 +24,16 @@ async function copyCliResources(buildPath: string): Promise<void> {
 
 const config: ForgeConfig = {
   packagerConfig: {
-    appBundleId: "app.fluxnote",
-    appCategoryType: "public.app-category.productivity",
+    appBundleId: APP_BUNDLE_ID,
+    appCategoryType: APP_CATEGORY_TYPE,
     asar: true,
     extraResource: ["src/main/core/database/drizzle", "src/assets"],
     icon: "src/assets/icons/icon",
-    name: "fluxnote",
+    name: APP_PRODUCT_NAME,
     protocols: [
       {
-        name: "FluxNote",
-        schemes: ["fluxnote"],
+        name: APP_DISPLAY_NAME,
+        schemes: [APP_PROTOCOL],
       },
     ],
   },

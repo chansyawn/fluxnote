@@ -3,12 +3,7 @@ import { useI18nState } from "@renderer/app/i18n";
 import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
 import { getCliStatus, installCli, uninstallCli } from "@renderer/clients";
-import {
-  FONT_SIZE_OPTIONS,
-  isFontSize,
-  isLocaleCode,
-} from "@renderer/features/preferences/preferences-schema";
-import { useFontSizePreference } from "@renderer/features/preferences/preferences-store";
+import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
   SettingsRow,
@@ -23,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
+import { FONT_SIZE_OPTIONS, isFontSize, isLocaleCode } from "@shared/features/preferences";
 import { useQuery } from "@tanstack/react-query";
 import { LanguagesIcon, TerminalIcon, TypeIcon } from "lucide-react";
 import { useCallback, useState } from "react";

@@ -1,8 +1,7 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { queryClient } from "@renderer/app/query";
-import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@renderer/features/preferences/preferences-schema";
-import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-store";
+import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
   SettingsRow,
@@ -23,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components
 import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,
+  DEFAULT_AUTO_ARCHIVE_SETTINGS,
   convertAutoArchiveDurationUnit,
   toAutoArchiveDurationViewModel,
   toAutoArchiveIdleMinutes,

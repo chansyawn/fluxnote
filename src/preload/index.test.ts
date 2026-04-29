@@ -1,4 +1,5 @@
 import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import { DEFAULT_SETTINGS } from "@shared/features/preferences";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const electronMock = vi.hoisted(() => ({
@@ -36,12 +37,12 @@ describe("preload runtime", () => {
   it("validates invoke responses against the shared command contract", async () => {
     electronMock.invoke.mockResolvedValue({
       ok: true,
-      data: {},
+      data: DEFAULT_SETTINGS,
     });
 
     const result = await getRuntime().invoke("preferencesRead", undefined);
 
-    expect(result).toEqual({});
+    expect(result).toEqual(DEFAULT_SETTINGS);
   });
 
   it("drops invalid event payloads before invoking listeners", () => {

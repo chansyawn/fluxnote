@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
 import { app } from "electron";
 import ElectronStore from "electron-store";
 
@@ -16,7 +17,7 @@ function toStoreSnapshot(value: unknown): StoreSnapshot | null {
 }
 
 function normalizeStoreConfig(name: string): { fileExtension: string; name: string } {
-  const normalizedName = path.basename(name.trim() || "settings.json");
+  const normalizedName = path.basename(name.trim() || APP_SETTINGS_STORE_FILE);
   const dotIndex = normalizedName.lastIndexOf(".");
   if (dotIndex <= 0 || dotIndex >= normalizedName.length - 1) {
     return {
@@ -32,7 +33,7 @@ function normalizeStoreConfig(name: string): { fileExtension: string; name: stri
 }
 
 export function getConfigStore(name: string, defaults: unknown): ElectronStore<StoreSnapshot> {
-  const cacheKey = path.basename(name.trim() || "settings.json");
+  const cacheKey = path.basename(name.trim() || APP_SETTINGS_STORE_FILE);
   const existingStore = stores.get(cacheKey);
   if (existingStore) {
     return existingStore;

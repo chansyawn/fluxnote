@@ -31,10 +31,10 @@ declare module "@tanstack/react-router" {
 
 export function App() {
   return (
-    <ThemeStateProvider>
-      <I18nStateProvider>
-        <AppErrorBoundary>
-          <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ThemeStateProvider>
+        <I18nStateProvider>
+          <AppErrorBoundary>
             <HotkeysProvider>
               <ShortcutStateProvider>
                 <FontSizeStateProvider>
@@ -48,9 +48,9 @@ export function App() {
                 </FontSizeStateProvider>
               </ShortcutStateProvider>
             </HotkeysProvider>
-          </QueryClientProvider>
-        </AppErrorBoundary>
-      </I18nStateProvider>
-    </ThemeStateProvider>
+          </AppErrorBoundary>
+        </I18nStateProvider>
+      </ThemeStateProvider>
+    </QueryClientProvider>
   );
 }

@@ -16,6 +16,35 @@ export {
   type AutoArchiveDurationUnit,
 } from "./auto-archive";
 export { preferencesIpcCommandContracts } from "./ipc-commands";
+export {
+  DEFAULT_AUTO_ARCHIVE_SETTINGS,
+  DEFAULT_SETTINGS,
+  FONT_SIZE_OPTIONS,
+  LANGUAGE_OPTIONS,
+  SETTINGS_SCHEMA_VERSION,
+  appearanceSettingsSchema,
+  autoArchiveSettingsSchema,
+  fontSizeSchema,
+  isFontSize,
+  isLocaleCode,
+  localeSchema,
+  normalizeSettings,
+  normalizeSettingsPatch,
+  settingsPatchSchema,
+  settingsSchema,
+  shortcutActionSchema,
+  shortcutBindingSchema,
+  shortcutPreferencesSchema,
+  type AutoArchiveSettings,
+  type FontSize,
+  type LanguageOption,
+  type LocaleCode,
+  type Settings,
+  type SettingsPatch,
+  type ShortcutAction,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "./settings";
 
 export type PreferencesSnapshot = z.infer<
   (typeof preferencesIpcCommandContracts)["preferencesRead"]["response"]

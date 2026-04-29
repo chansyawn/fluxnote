@@ -1,4 +1,5 @@
 export { getCliStatus, installCli, uninstallCli } from "@renderer/clients/cli";
+export { patchSettings, readSettings, resetSettings } from "@renderer/clients/preferences-client";
 export { convertFileSrc, copyAsset, createAsset } from "@renderer/clients/assets";
 export {
   cancelExternalEdit,
