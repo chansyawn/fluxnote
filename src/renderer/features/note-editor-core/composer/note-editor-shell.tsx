@@ -5,6 +5,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { useLingui } from "@lingui/react";
 import { copyEditorContentToClipboard } from "@renderer/features/note-editor-core/clipboard/note-editor-clipboard-utils";
 import { NOTE_EDITOR_MARKDOWN_TRANSFORMERS } from "@renderer/features/note-editor-core/markdown/note-editor-markdown";
 import { NoteEditorPlaceholder } from "@renderer/features/note-editor-core/rich-text/note-editor-placeholder";
@@ -40,6 +41,11 @@ function NoteEditorShellContent({
   onMarkdownUpdated: (markdown: string) => void;
   ref?: React.Ref<NoteEditorShellHandle>;
 }) {
+  const { i18n } = useLingui();
+  const placeholderText = i18n._({
+    id: "home-note.block.placeholder",
+    message: "Write something...",
+  });
   const [editor] = useLexicalComposerContext();
 
   useImperativeHandle(ref, () => ({
@@ -61,7 +67,7 @@ function NoteEditorShellContent({
       <RichTextPlugin
         contentEditable={
           <ContentEditable
-            aria-placeholder="Write something..."
+            aria-placeholder={placeholderText}
             className="text-foreground relative z-20 min-h-16 resize-none text-sm outline-none"
             data-note-editor-input
             onBlur={onBlur}

@@ -14,106 +14,107 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
-#: src/renderer/routes/-layout/window-title-bar.tsx:88
+#: src/renderer/features/error-boundary/error-title-bar.tsx:35
+#: src/renderer/routes/-layout/window-title-bar.tsx:94
 msgid "app.title"
 msgstr "FluxNote"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:236
 msgid "editor.code-block.language.label"
-msgstr ""
+msgstr "代码语言"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:125
 msgid "editor.code-block.language.option.plain-text"
-msgstr ""
+msgstr "纯文本"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:291
 msgid "editor.code-block.language.search.empty"
-msgstr ""
+msgstr "没有匹配的语言"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:283
 msgid "editor.code-block.language.search.placeholder"
-msgstr ""
+msgstr "搜索语言"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/image/note-editor-image-plugin.tsx:76
 msgid "editor.image.insert-error"
-msgstr ""
+msgstr "插入图片失败"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/image/note-editor-image-component.tsx:183
 msgid "editor.image.load-error"
-msgstr ""
+msgstr "图片不可用"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
 msgid "error.block.delete"
-msgstr ""
+msgstr "删除区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:47
 msgid "error.block.description"
-msgstr ""
+msgstr "重试此区块；如果内容已损坏，可以将其删除。"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:65
 msgid "error.block.retry"
-msgstr ""
+msgstr "重试区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:44
 msgid "error.block.title"
-msgstr ""
+msgstr "此区块渲染失败"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:41
 msgid "error.global.description"
-msgstr ""
+msgstr "FluxNote 遇到了意外错误。你可以重试或退出应用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:23
+#: src/renderer/features/error-boundary/error-title-bar.tsx:14
+#: src/renderer/features/error-boundary/error-title-bar.tsx:29
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
-msgstr ""
+msgstr "退出应用"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:52
 msgid "error.global.retry"
-msgstr ""
+msgstr "重试"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:38
 msgid "error.global.title"
-msgstr ""
+msgstr "出了点问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:25
+#: src/renderer/routes/-layout/window-title-bar.tsx:26
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:54
+#: src/renderer/routes/-layout/window-title-bar.tsx:55
 msgid "header.go-lab"
-msgstr ""
+msgstr "前往实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:52
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "header.open-lab"
-msgstr ""
+msgstr "打开实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:27
+#: src/renderer/routes/-layout/window-title-bar.tsx:28
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-copy-action.tsx:31
 msgid "home-note.block.copy"
-msgstr ""
+msgstr "复制区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-delete-action.tsx:20
@@ -123,42 +124,43 @@ msgstr "删除区块"
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-external-edit-actions.tsx:33
 msgid "home-note.block.external-edit.cancel"
-msgstr ""
+msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-external-edit-actions.tsx:27
 msgid "home-note.block.external-edit.submit"
-msgstr ""
+msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/composer/note-editor-shell.tsx:45
 #: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
-msgstr ""
+msgstr "写点什么..."
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
 msgid "lab.description"
-msgstr ""
+msgstr "用于基础设施与集成演示的实验区域。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:77
 msgid "lab.playground.description"
-msgstr ""
+msgstr "纯前端演练区。编辑这段预设 Markdown 来验证笔记区块行为。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:90
 msgid "lab.playground.reset"
-msgstr ""
+msgstr "重置预设"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:74
 msgid "lab.playground.title"
-msgstr ""
+msgstr "笔记区块编辑器演练区"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:14
 msgid "lab.title"
-msgstr ""
+msgstr "实验室"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:75
@@ -168,37 +170,37 @@ msgstr "应用"
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:74
 msgid "preferences.auto-archive.enable.label"
-msgstr ""
+msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:116
 msgid "preferences.auto-archive.threshold.label"
-msgstr ""
+msgstr "归档时间"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:40
 msgid "preferences.auto-archive.threshold.option.1-day"
-msgstr ""
+msgstr "1 天"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:44
 msgid "preferences.auto-archive.threshold.option.3-days"
-msgstr ""
+msgstr "3 天"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:52
 msgid "preferences.auto-archive.threshold.option.30-days"
-msgstr ""
+msgstr "30 天"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:48
 msgid "preferences.auto-archive.threshold.option.7-days"
-msgstr ""
+msgstr "7 天"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
 msgid "preferences.auto-archive.title"
-msgstr ""
+msgstr "自动归档"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
@@ -221,14 +223,9 @@ msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:19
-msgid "preferences.description"
-msgstr "配置语言与外观。"
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
 msgid "preferences.font-size.label"
-msgstr ""
+msgstr "字号"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:103
@@ -236,7 +233,8 @@ msgid "preferences.language.label"
 msgstr "语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:113
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
@@ -251,7 +249,8 @@ msgid "preferences.shortcuts.delete-block.label"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:44
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:95
 msgid "preferences.shortcuts.empty"
 msgstr "未设置"
 
@@ -281,7 +280,8 @@ msgid "preferences.shortcuts.recording.title"
 msgstr "正在录制..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
@@ -301,106 +301,117 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:73
+#: src/renderer/routes/-layout/window-title-bar.tsx:67
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:70
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
 msgid "workspace.add-block"
-msgstr ""
+msgstr "添加区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:64
 msgid "workspace.archived.empty.description"
-msgstr ""
+msgstr "归档的区块会显示在这里，直到你恢复它们。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:61
 msgid "workspace.archived.empty.title"
-msgstr ""
+msgstr "暂无归档区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:92
 msgid "workspace.archived.filtered.empty.description"
-msgstr ""
+msgstr "清除一个筛选条件，或切回活跃区块。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:81
 msgid "workspace.archived.filtered.empty.title"
-msgstr ""
+msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-archive-action.tsx:30
 msgid "workspace.blocks.archive"
-msgstr ""
+msgstr "归档区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-block/block-archive-action.tsx:32
 msgid "workspace.blocks.restore"
-msgstr ""
+msgstr "恢复区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
 msgid "workspace.empty.action"
-msgstr ""
+msgstr "创建第一个区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:38
 msgid "workspace.empty.description"
-msgstr ""
+msgstr "从一个空白区块开始。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:35
 msgid "workspace.empty.title"
-msgstr ""
+msgstr "还没有区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:88
 msgid "workspace.filtered.empty.description"
-msgstr ""
+msgstr "清除一个筛选条件，或在当前标签选择之外创建新区块。"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:79
 msgid "workspace.filtered.empty.title"
-msgstr ""
+msgstr "没有符合所选标签的区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:18
 msgid "workspace.loading"
-msgstr ""
+msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:38
+#: src/renderer/features/note-block/block-tag-action.tsx:44
 msgid "workspace.tags.assign.button"
-msgstr ""
+msgstr "分配标签"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-tag-action.tsx:30
+msgid "workspace.tags.assign.placeholder"
+msgstr "搜索或分配标签"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/tag/tag-combobox-popover.tsx:154
 msgid "workspace.tags.create-inline"
-msgstr ""
+msgstr "创建标签"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/tag/tag-combobox-popover.tsx:196
 msgid "workspace.tags.delete-inline"
-msgstr ""
+msgstr "删除标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:104
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:109
 msgid "workspace.tags.filter.button"
-msgstr ""
+msgstr "筛选标签"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:97
+msgid "workspace.tags.filter.placeholder"
+msgstr "搜索或创建标签"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/tag/tag-combobox-popover.tsx:163
 msgid "workspace.tags.search.empty"
-msgstr ""
+msgstr "没有匹配的标签"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:92
+msgid "workspace.visibility.show-active"
+msgstr "显示活跃区块"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
-msgid "workspace.visibility.show-active"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
 msgid "workspace.visibility.show-archived"
-msgstr ""
+msgstr "显示归档区块"

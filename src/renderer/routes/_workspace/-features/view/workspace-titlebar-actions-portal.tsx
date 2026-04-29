@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { BlockVisibility, Tag } from "@renderer/clients";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
@@ -40,6 +41,7 @@ export function WorkspaceTitlebarActionsPortal({
   onCreateTag,
   onDeleteTag,
 }: WorkspaceTitlebarActionsPortalProps) {
+  const { i18n } = useLingui();
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -92,7 +94,10 @@ export function WorkspaceTitlebarActionsPortal({
         </span>
       </Button>
       <TagComboboxPopover
-        placeholder="Search or create tags"
+        placeholder={i18n._({
+          id: "workspace.tags.filter.placeholder",
+          message: "Search or create tags",
+        })}
         isCreatingTag={isTagOpPending("create")}
         isDeletingTag={(tagId) => isTagOpPending("delete", tagId)}
         selectedTagIds={selectedTagIds}

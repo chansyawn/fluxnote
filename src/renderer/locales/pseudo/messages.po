@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
-#: src/renderer/routes/-layout/window-title-bar.tsx:88
+#: src/renderer/features/error-boundary/error-title-bar.tsx:35
+#: src/renderer/routes/-layout/window-title-bar.tsx:94
 msgid "app.title"
 msgstr ""
 
@@ -75,7 +75,8 @@ msgid "error.global.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:23
+#: src/renderer/features/error-boundary/error-title-bar.tsx:14
+#: src/renderer/features/error-boundary/error-title-bar.tsx:29
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr ""
@@ -91,22 +92,22 @@ msgid "error.global.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:25
+#: src/renderer/routes/-layout/window-title-bar.tsx:26
 msgid "header.go-home"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:54
+#: src/renderer/routes/-layout/window-title-bar.tsx:55
 msgid "header.go-lab"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:52
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "header.open-lab"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:27
+#: src/renderer/routes/-layout/window-title-bar.tsx:28
 msgid "header.open-preferences"
 msgstr ""
 
@@ -131,6 +132,7 @@ msgid "home-note.block.external-edit.submit"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/composer/note-editor-shell.tsx:45
 #: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
 msgstr ""
@@ -221,11 +223,6 @@ msgid "preferences.cli.uninstall"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:19
-msgid "preferences.description"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
 msgid "preferences.font-size.label"
 msgstr ""
@@ -236,7 +233,8 @@ msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:113
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr ""
 
@@ -251,7 +249,8 @@ msgid "preferences.shortcuts.delete-block.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:44
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:95
 msgid "preferences.shortcuts.empty"
 msgstr ""
 
@@ -281,7 +280,8 @@ msgid "preferences.shortcuts.recording.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
 msgstr ""
 
@@ -301,12 +301,13 @@ msgid "preferences.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:73
+#: src/renderer/routes/-layout/window-title-bar.tsx:67
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:70
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
 msgid "workspace.add-block"
 msgstr ""
 
@@ -371,8 +372,13 @@ msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:38
+#: src/renderer/features/note-block/block-tag-action.tsx:44
 msgid "workspace.tags.assign.button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-tag-action.tsx:30
+msgid "workspace.tags.assign.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -386,8 +392,13 @@ msgid "workspace.tags.delete-inline"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:104
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:109
 msgid "workspace.tags.filter.button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:97
+msgid "workspace.tags.filter.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -396,11 +407,11 @@ msgid "workspace.tags.search.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:92
 msgid "workspace.visibility.show-active"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
 msgid "workspace.visibility.show-archived"
 msgstr ""

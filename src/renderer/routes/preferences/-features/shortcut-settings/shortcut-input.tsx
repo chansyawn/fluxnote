@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { ShortcutAction } from "@renderer/features/preferences/preferences-schema";
 import {
@@ -36,9 +37,22 @@ export function ShortcutInput({
   onReset,
   onClear,
 }: ShortcutInputProps) {
+  const { i18n } = useLingui();
   const shortcutTokens = formatShortcutTokens(shortcut);
   const isRecording = feedback !== null;
   const isInvalid = Boolean(error);
+  const emptyShortcutLabel = i18n._({
+    id: "preferences.shortcuts.empty",
+    message: "Not set",
+  });
+  const resetShortcutLabel = i18n._({
+    id: "preferences.shortcuts.reset",
+    message: "Reset shortcut",
+  });
+  const clearShortcutLabel = i18n._({
+    id: "preferences.shortcuts.clear",
+    message: "Clear shortcut",
+  });
 
   return (
     <Popover
@@ -54,7 +68,7 @@ export function ShortcutInput({
           render={
             <Button
               aria-invalid={isInvalid ? true : undefined}
-              aria-label={shortcutTokens.join("+") || "Not set"}
+              aria-label={shortcutTokens.join("+") || emptyShortcutLabel}
               className={cn(
                 "w-full justify-start pe-10 text-xs text-muted-foreground",
                 isRecording && "border-ring ring-ring/30 ring-2",
@@ -87,7 +101,7 @@ export function ShortcutInput({
         <div className="absolute top-1/2 right-1 flex -translate-y-1/2 items-center opacity-0 transition-opacity group-focus-within/shortcut:opacity-100 group-hover/shortcut:opacity-100">
           {shouldShowReset ? (
             <Button
-              aria-label="Reset shortcut"
+              aria-label={resetShortcutLabel}
               className="w-4"
               size="icon-sm"
               variant="ghost"
@@ -102,7 +116,7 @@ export function ShortcutInput({
 
           {shortcut ? (
             <Button
-              aria-label="Clear shortcut"
+              aria-label={clearShortcutLabel}
               className="w-4"
               size="icon-sm"
               variant="ghost"

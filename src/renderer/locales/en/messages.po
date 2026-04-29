@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
-#: src/renderer/routes/-layout/window-title-bar.tsx:88
+#: src/renderer/features/error-boundary/error-title-bar.tsx:35
+#: src/renderer/routes/-layout/window-title-bar.tsx:94
 msgid "app.title"
 msgstr "FluxNote"
 
@@ -75,7 +75,8 @@ msgid "error.global.description"
 msgstr "FluxNote encountered an unexpected error. You can retry or exit the app."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:23
+#: src/renderer/features/error-boundary/error-title-bar.tsx:14
+#: src/renderer/features/error-boundary/error-title-bar.tsx:29
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr "Exit app"
@@ -91,22 +92,22 @@ msgid "error.global.title"
 msgstr "Something went wrong"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:25
+#: src/renderer/routes/-layout/window-title-bar.tsx:26
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:54
+#: src/renderer/routes/-layout/window-title-bar.tsx:55
 msgid "header.go-lab"
 msgstr "Go to lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:52
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "header.open-lab"
 msgstr "Open lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:27
+#: src/renderer/routes/-layout/window-title-bar.tsx:28
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
@@ -131,6 +132,7 @@ msgid "home-note.block.external-edit.submit"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/note-editor-core/composer/note-editor-shell.tsx:45
 #: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
 msgid "home-note.block.placeholder"
 msgstr "Write something..."
@@ -221,11 +223,6 @@ msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:19
-msgid "preferences.description"
-msgstr "Configure language, auto-archive, and shortcuts."
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
 msgid "preferences.font-size.label"
 msgstr "Font size"
@@ -236,7 +233,8 @@ msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:113
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
@@ -251,7 +249,8 @@ msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:44
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:95
 msgid "preferences.shortcuts.empty"
 msgstr "Not set"
 
@@ -281,7 +280,8 @@ msgid "preferences.shortcuts.recording.title"
 msgstr "Recording..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
@@ -301,12 +301,13 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:73
+#: src/renderer/routes/-layout/window-title-bar.tsx:67
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:70
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
 msgid "workspace.add-block"
 msgstr "Add block"
 
@@ -371,9 +372,14 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:38
+#: src/renderer/features/note-block/block-tag-action.tsx:44
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/note-block/block-tag-action.tsx:30
+msgid "workspace.tags.assign.placeholder"
+msgstr "Search or assign tags"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/tag/tag-combobox-popover.tsx:154
@@ -386,9 +392,14 @@ msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:104
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:109
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:97
+msgid "workspace.tags.filter.placeholder"
+msgstr "Search or create tags"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/tag/tag-combobox-popover.tsx:163
@@ -396,11 +407,11 @@ msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:92
 msgid "workspace.visibility.show-active"
 msgstr "Show active blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
 msgid "workspace.visibility.show-archived"
 msgstr "Show archived blocks"

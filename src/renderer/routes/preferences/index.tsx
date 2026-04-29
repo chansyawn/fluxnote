@@ -15,11 +15,6 @@ function RouteComponent() {
         <h1 className="text-2xl font-semibold">
           <Trans id="preferences.title">Preferences</Trans>
         </h1>
-        <p className="text-muted-foreground text-xs">
-          <Trans id="preferences.description">
-            Configure language, auto-archive, and shortcuts.
-          </Trans>
-        </p>
       </div>
 
       <div className="flex flex-col gap-2">

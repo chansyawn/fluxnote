@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { Tag } from "@renderer/clients";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
@@ -22,9 +23,14 @@ export function BlockTagAction({
   onCreateTag,
   onSelectedTagIdsChange,
 }: BlockTagActionProps) {
+  const { i18n } = useLingui();
+
   return (
     <TagComboboxPopover
-      placeholder="Search or assign tags"
+      placeholder={i18n._({
+        id: "workspace.tags.assign.placeholder",
+        message: "Search or assign tags",
+      })}
       disabled={isDisabled}
       isCreatingTag={isCreatingTag}
       popupContainer={popupContainer}

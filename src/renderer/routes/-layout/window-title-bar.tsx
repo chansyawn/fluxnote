@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { hideWindow } from "@renderer/clients/window";
 import { Button } from "@renderer/ui/components/button";
@@ -59,9 +60,14 @@ function HeaderLabButton() {
 }
 
 function HeaderCloseButton() {
+  const { i18n } = useLingui();
+
   return (
     <button
-      aria-label="Hide window"
+      aria-label={i18n._({
+        id: "window.hide",
+        message: "Hide window",
+      })}
       className="group flex size-3 items-center justify-center rounded-full bg-red-500/85 text-red-950 transition-all [-webkit-app-region:no-drag] hover:brightness-95 dark:bg-red-400/85 dark:text-red-950"
       type="button"
       onClick={() => {
