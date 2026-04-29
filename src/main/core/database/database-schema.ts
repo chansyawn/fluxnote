@@ -8,6 +8,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
+const sqliteNowIsoExpression = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
+
 export const blocks = sqliteTable(
   "blocks",
   {
@@ -16,7 +18,9 @@ export const blocks = sqliteTable(
     content: text("content").notNull().default(""),
     archivedAt: text("archived_at"),
     createdAt: text("created_at").notNull(),
-    updatedAt: text("updated_at").notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .$onUpdateFn(() => sqliteNowIsoExpression),
   },
   (table) => [
     index("idx_blocks_archived_at").on(table.archivedAt),
@@ -30,7 +34,9 @@ export const tags = sqliteTable(
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     createdAt: text("created_at").notNull(),
-    updatedAt: text("updated_at").notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .$onUpdateFn(() => sqliteNowIsoExpression),
   },
   (table) => [uniqueIndex("uq_tags_name_lower").on(sql`lower(${table.name})`)],
 );

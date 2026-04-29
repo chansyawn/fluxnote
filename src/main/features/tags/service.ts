@@ -101,7 +101,7 @@ export async function setBlockTags(
         )
         .run();
     }
-    await tx.update(blocks).set({ updatedAt: nowIsoString() }).where(eq(blocks.id, blockId)).run();
+    await tx.update(blocks).set({}).where(eq(blocks.id, blockId)).run();
   });
 
   return await getPublicBlockById(db, blockId);

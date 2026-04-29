@@ -243,7 +243,6 @@ export async function updateBlockContent(
     .update(blocks)
     .set({
       content,
-      updatedAt: nowIsoString(),
     })
     .where(eq(blocks.id, blockId))
     .run();
@@ -260,7 +259,6 @@ export async function archiveBlock(db: AppDatabase, blockId: string): Promise<Bl
     .update(blocks)
     .set({
       archivedAt: now,
-      updatedAt: now,
     })
     .where(eq(blocks.id, blockId))
     .run();
@@ -276,7 +274,6 @@ export async function restoreBlock(db: AppDatabase, blockId: string): Promise<Bl
     .update(blocks)
     .set({
       archivedAt: null,
-      updatedAt: nowIsoString(),
     })
     .where(eq(blocks.id, blockId))
     .run();
