@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 export type BlockMutationOperation = "archive" | "restore" | "delete" | "setTags";
 
-interface UseBlockMutationsResult {
+export interface UseBlockMutationsResult {
   createBlock: () => Promise<Block>;
   archiveBlock: (blockId: string) => Promise<Block>;
   restoreBlock: (blockId: string) => Promise<Block>;
@@ -22,6 +22,7 @@ interface UseBlockMutationsResult {
   isCreatingBlock: boolean;
   isBlockLocked: (blockId: string) => boolean;
   isBlockOpPending: (blockId: string, op: BlockMutationOperation) => boolean;
+  pendingBlockIdsByOperation: ReturnType<typeof usePendingBlockIdsByOperation>;
 }
 
 function handleMutationError(message: string, error: unknown): void {
@@ -29,7 +30,7 @@ function handleMutationError(message: string, error: unknown): void {
   toast.error(message);
 }
 
-function usePendingBlockIdsByOperation() {
+export function usePendingBlockIdsByOperation() {
   const pendingArchiveBlockIds = useMutationState<string>({
     filters: { mutationKey: ["blocks", "archive"], status: "pending" },
     select: (mutation) => mutation.state.variables as string,
@@ -153,5 +154,6 @@ export function useBlockMutations(): UseBlockMutationsResult {
       ),
     isBlockOpPending: (blockId: string, op: BlockMutationOperation) =>
       pendingBlockIdsByOperation[op].has(blockId),
+    pendingBlockIdsByOperation,
   };
 }

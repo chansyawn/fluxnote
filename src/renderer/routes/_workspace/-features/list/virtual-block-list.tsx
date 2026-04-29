@@ -1,19 +1,12 @@
 import type { Block } from "@renderer/clients";
-import { BlockActions } from "@renderer/features/note-block/block-actions";
-import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
-import {
-  NoteBlockEditor,
-  type NoteBlockEditorHandle,
-} from "@renderer/features/note-block/note-block-editor";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { useEditorRegistryContext } from "../editing/editor-registry-context";
 import type {
   BlockScrollTarget,
   BlockScrollTargetRenderedPayload,
 } from "../navigation/use-block-navigation";
-import { useBlockListItemActions } from "./block-list-context";
+import { BlockListRow } from "./block-list-row";
 
 const BLOCK_ESTIMATED_SIZE_PX = 140;
 const BLOCK_GAP_PX = 12;
@@ -43,106 +36,15 @@ function findNearestScrollElement(element: HTMLElement): HTMLElement | null {
 interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
-  ensureBlockIndex: (index: number) => void;
+  ensureBlockRange: (startIndex: number, endIndex: number) => void;
   onScrollTargetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
   scrollTarget: BlockScrollTarget | null;
 }
 
-const VirtualBlockItem = memo(function VirtualBlockItem({ block }: { block: Block }) {
-  const actions = useBlockListItemActions();
-  const registry = useEditorRegistryContext();
-
-  const setEditorRef = useCallback(
-    (handle: NoteBlockEditorHandle | null) => {
-      registry.registerEditor(block.id, handle);
-    },
-    [block.id, registry.registerEditor],
-  );
-
-  const handleCopy = useCallback(() => {
-    void registry.getEditor(block.id)?.copy();
-  }, [block.id, registry.getEditor]);
-
-  const externalEditSession = actions.sessionsByBlockId.get(block.id);
-  const isExternalEditPending = externalEditSession
-    ? actions.pendingExternalEditIds.has(externalEditSession.editId)
-    : false;
-  const isLocked = actions.isBlockLocked(block.id);
-
-  const handleCreateTag = useCallback(
-    async (name: string) => {
-      const tag = await actions.onCreateTag(name);
-      const currentTagIds = block.tags.map((t) => t.id);
-      await actions.onAssignTags(block.id, [...new Set([...currentTagIds, tag.id])]);
-    },
-    [actions.onCreateTag, actions.onAssignTags, block.id, block.tags],
-  );
-
-  const handleAssignTags = useCallback(
-    async (tagIds: string[]) => {
-      await actions.onAssignTags(block.id, tagIds);
-    },
-    [actions.onAssignTags, block.id],
-  );
-
-  return (
-    <NoteBlockEditor
-      ref={setEditorRef}
-      actions={
-        <BlockActions
-          block={block}
-          visibility={actions.visibility}
-          tags={actions.tags}
-          isDisabled={isLocked || isExternalEditPending}
-          isArchivePending={actions.isBlockOpPending(
-            block.id,
-            actions.visibility === "active" ? "archive" : "restore",
-          )}
-          isDeletePending={actions.isBlockOpPending(block.id, "delete")}
-          isTagOpPending={actions.isTagCreatePending}
-          onArchive={() => {
-            actions.onArchive(block.id);
-          }}
-          onRestore={() => {
-            actions.onRestore(block.id);
-          }}
-          onDelete={() => {
-            if (externalEditSession) {
-              actions.onCancelExternalEdit(externalEditSession.editId);
-              return;
-            }
-
-            actions.onDelete(block.id);
-          }}
-          onCopy={handleCopy}
-          onCreateTag={handleCreateTag}
-          onAssignTags={handleAssignTags}
-        />
-      }
-      isExternalEditPending={Boolean(externalEditSession)}
-      leadingActions={
-        externalEditSession ? (
-          <BlockExternalEditActions
-            isPending={isExternalEditPending}
-            onCancel={() => {
-              actions.onCancelExternalEdit(externalEditSession.editId);
-            }}
-            onSubmit={() => {
-              actions.onSubmitExternalEdit(block.id, externalEditSession.editId);
-            }}
-          />
-        ) : null
-      }
-      block={block}
-      onFocus={actions.onFocus}
-    />
-  );
-});
-
 export function VirtualBlockList({
   totalCount,
   getBlockAtIndex,
-  ensureBlockIndex,
+  ensureBlockRange,
   onScrollTargetRendered,
   scrollTarget,
 }: VirtualBlockListProps) {
@@ -211,6 +113,28 @@ export function VirtualBlockList({
   }, [scrollElement]);
 
   const virtualBlocks = blockVirtualizer.getVirtualItems();
+  const visibleRange = useMemo(() => {
+    if (virtualBlocks.length === 0) {
+      return null;
+    }
+
+    return {
+      start: virtualBlocks[0].index,
+      end: virtualBlocks[virtualBlocks.length - 1].index,
+    };
+  }, [virtualBlocks]);
+
+  useEffect(() => {
+    if (!visibleRange) {
+      return;
+    }
+
+    ensureBlockRange(visibleRange.start, visibleRange.end);
+  }, [ensureBlockRange, visibleRange]);
+
+  const scrollRequestId = scrollTarget?.requestId;
+  const scrollIndex = scrollTarget?.index;
+  const scrollAlign = scrollTarget?.align;
 
   useEffect(() => {
     if (!scrollTarget || !scrollElement) {
@@ -236,7 +160,7 @@ export function VirtualBlockList({
     if (!anchorElement || !targetElement) {
       blockVirtualizer.scrollToIndex(scrollTarget.index, {
         align: "start",
-        behavior: "auto",
+        behavior: "smooth",
       });
       return;
     }
@@ -248,28 +172,7 @@ export function VirtualBlockList({
       top: Math.max(0, nextScrollTop),
       behavior: "smooth",
     });
-  }, [blockVirtualizer, scrollElement, scrollTarget, totalCount, virtualBlocks]);
-
-  const visibleRange = useMemo(() => {
-    if (virtualBlocks.length === 0) {
-      return null;
-    }
-
-    return {
-      start: virtualBlocks[0].index,
-      end: virtualBlocks[virtualBlocks.length - 1].index,
-    };
-  }, [virtualBlocks]);
-
-  useEffect(() => {
-    if (!visibleRange) {
-      return;
-    }
-
-    for (let index = visibleRange.start; index <= visibleRange.end; index += 1) {
-      ensureBlockIndex(index);
-    }
-  }, [ensureBlockIndex, visibleRange]);
+  }, [blockVirtualizer, scrollAlign, scrollElement, scrollIndex, scrollRequestId, totalCount]);
 
   useEffect(() => {
     if (!scrollTarget) {
@@ -318,23 +221,15 @@ export function VirtualBlockList({
               : undefined,
           }}
         >
-          {virtualBlocks.map((virtualBlock) => {
-            const block = getBlockAtIndex(virtualBlock.index);
-
-            return (
-              <div
-                key={virtualBlock.key}
-                ref={blockVirtualizer.measureElement}
-                data-index={virtualBlock.index}
-              >
-                {block ? (
-                  <VirtualBlockItem block={block} />
-                ) : (
-                  <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />
-                )}
-              </div>
-            );
-          })}
+          {virtualBlocks.map((virtualBlock) => (
+            <div
+              key={virtualBlock.key}
+              ref={blockVirtualizer.measureElement}
+              data-index={virtualBlock.index}
+            >
+              <BlockListRow block={getBlockAtIndex(virtualBlock.index)} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -1,0 +1,159 @@
+import type { BlockVisibility } from "@renderer/clients";
+import { useTagData } from "@renderer/features/tag/use-tag-data";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useBlockShortcuts } from "./editing/use-block-shortcuts";
+import { useEditorRegistry } from "./editing/use-editor-registry";
+import { useExternalEditActions } from "./external-edit/use-external-edit-actions";
+import { useExternalEditSessions } from "./external-edit/use-external-edit-sessions";
+import { useBlockList } from "./list/use-block-list";
+import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
+import { useBlockNavigation } from "./navigation/use-block-navigation";
+import { useOpenBlockRequest } from "./navigation/use-open-block-request";
+import { useBlockMutations } from "./use-block-mutations";
+import { type WorkspaceCommands } from "./workspace-runtime-context";
+
+export function useWorkspaceDataBoundary() {
+  const [visibility, setVisibility] = useState<BlockVisibility>("active");
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+
+  const blockList = useBlockList({ visibility, tagIds: selectedTagIds });
+  const blockMutations = useBlockMutations();
+  const tagData = useTagData();
+  const editorRegistry = useEditorRegistry();
+  const { sessionsByBlockId } = useExternalEditSessions();
+
+  const blockNavigation = useBlockNavigation({
+    registry: editorRegistry,
+    visibility,
+    selectedTagIds,
+    setVisibility,
+    setSelectedTagIds,
+    getBlockAtIndex: blockList.getBlockAtIndex,
+    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
+    locateBlockInView: blockList.locateBlockInView,
+  });
+
+  const focusBlock = useCallback(
+    (blockId: string | null) => {
+      blockNavigation.setActiveBlockId(blockId);
+    },
+    [blockNavigation.setActiveBlockId],
+  );
+
+  const { createBlockWithFocus, deleteBlockWithFocus } = useBlockFocusActions({
+    activeBlockId: blockNavigation.activeBlockId,
+    totalBlockCount: blockList.totalBlockCount,
+    createBlock: async () => {
+      const block = await blockMutations.createBlock();
+      if (selectedTagIds.length > 0) {
+        return await blockMutations.assignBlockTags(block.id, selectedTagIds);
+      }
+      return block;
+    },
+    deleteBlock: blockMutations.deleteBlock,
+    navigateToBlock: blockNavigation.navigateToBlock,
+    navigateToIndex: blockNavigation.navigateToIndex,
+    locateBlockInView: blockList.locateBlockInView,
+    setActiveBlockId: focusBlock,
+  });
+
+  useBlockShortcuts({
+    activeBlockId: blockNavigation.activeBlockId,
+    createBlockWithFocus,
+    deleteBlockWithFocus,
+  });
+
+  const externalEditActions = useExternalEditActions({
+    getEditor: editorRegistry.getEditor,
+    navigateToBlock: blockNavigation.navigateToBlock,
+  });
+
+  const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
+  useEffect(() => {
+    if (!pendingBlockId) {
+      return;
+    }
+
+    blockNavigation.navigateToBlock(pendingBlockId, {
+      acknowledge: () => {
+        acknowledgePendingBlockId(pendingBlockId);
+      },
+      onNotFound: () => undefined,
+      viewMode: "active-unfiltered",
+    });
+  }, [acknowledgePendingBlockId, blockNavigation.navigateToBlock, pendingBlockId]);
+
+  const commands = useMemo<WorkspaceCommands>(
+    () => ({
+      archiveBlock: (blockId) => {
+        void blockMutations.archiveBlock(blockId);
+      },
+      assignBlockTags: blockMutations.assignBlockTags,
+      cancelExternalEdit: (editId) => {
+        void externalEditActions.handleCancelExternalEdit(editId);
+      },
+      createBlockWithFocus,
+      createTag: tagData.createTag,
+      deleteBlock: (blockId) => {
+        void deleteBlockWithFocus(blockId);
+      },
+      deleteTag: tagData.deleteTag,
+      focusBlock,
+      restoreBlock: (blockId) => {
+        void blockMutations.restoreBlock(blockId);
+      },
+      submitExternalEdit: (blockId, editId) => {
+        void externalEditActions.handleSubmitExternalEdit(blockId, editId);
+      },
+    }),
+    [
+      blockMutations.archiveBlock,
+      blockMutations.assignBlockTags,
+      blockMutations.restoreBlock,
+      createBlockWithFocus,
+      deleteBlockWithFocus,
+      externalEditActions.handleCancelExternalEdit,
+      externalEditActions.handleSubmitExternalEdit,
+      focusBlock,
+      tagData.createTag,
+      tagData.deleteTag,
+    ],
+  );
+
+  const runtimeContextValue = useMemo(
+    () => ({
+      commands,
+      isTagCreatePending: tagData.isTagOpPending("create"),
+      pendingBlockOps: blockMutations.pendingBlockIdsByOperation,
+      pendingExternalEditIds: externalEditActions.pendingExternalEditIds,
+      sessionsByBlockId,
+      tags: tagData.tags,
+      visibility,
+    }),
+    [
+      blockMutations.pendingBlockIdsByOperation,
+      commands,
+      externalEditActions.pendingExternalEditIds,
+      sessionsByBlockId,
+      tagData,
+      visibility,
+    ],
+  );
+
+  return {
+    blockList,
+    blockMutations,
+    blockNavigation,
+    commands,
+    editorRegistry,
+    runtimeContextValue,
+    tagData,
+    viewState: {
+      selectedTagIds,
+      setSelectedTagIds,
+      setVisibility,
+      visibility,
+    },
+  };
+}

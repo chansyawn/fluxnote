@@ -21,12 +21,12 @@ interface UseBlockListParams {
 }
 
 interface UseBlockListResult {
-  loadedBlocks: Block[];
   totalBlockCount: number;
   isInitialLoading: boolean;
   isRefreshing: boolean;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
+  ensureBlockRange: (startIndex: number, endIndex: number) => void;
   ensureBlockIndexLoaded: (index: number) => Promise<Block | undefined>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
 }
@@ -65,6 +65,29 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
     });
   }, []);
 
+  const ensureBlockRange = useCallback((startIndex: number, endIndex: number) => {
+    if (endIndex < 0 || startIndex > endIndex) {
+      return;
+    }
+
+    const startOffset = getBlockPageOffset(Math.max(0, startIndex));
+    const endOffset = getBlockPageOffset(endIndex);
+
+    setRequestedPageOffsets((currentOffsets) => {
+      let changed = false;
+      const nextOffsets = new Set(currentOffsets);
+
+      for (let offset = startOffset; offset <= endOffset; offset += BLOCKS_PAGE_SIZE) {
+        if (!nextOffsets.has(offset)) {
+          nextOffsets.add(offset);
+          changed = true;
+        }
+      }
+
+      return changed ? nextOffsets : currentOffsets;
+    });
+  }, []);
+
   const pageQueries = useQueries({
     queries: requestedOffsets.map((offset) => ({
       queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
@@ -90,13 +113,6 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
     return pages;
   }, [pageQueries, requestedOffsets]);
 
-  const loadedBlocks = useMemo(
-    () =>
-      [...pagesByOffset.values()]
-        .sort((left, right) => left.offset - right.offset)
-        .flatMap((page) => page.blocks),
-    [pagesByOffset],
-  );
   const totalBlockCount = useMemo(() => {
     let latest: ListBlocksResult | undefined;
     for (const query of pageQueries) {
@@ -155,12 +171,12 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
   );
 
   return {
-    loadedBlocks,
     totalBlockCount,
     isInitialLoading: pagesByOffset.get(0) === undefined,
     isRefreshing: pageQueries.some((query) => query.isFetching),
     getBlockAtIndex,
     ensureBlockIndex,
+    ensureBlockRange,
     ensureBlockIndexLoaded,
     locateBlockInView,
   };

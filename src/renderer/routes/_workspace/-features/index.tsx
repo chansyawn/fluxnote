@@ -1,27 +1,33 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@renderer/ui/components/button";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
+import { useMemo } from "react";
 
 import { EditorRegistryProvider } from "./editing/editor-registry-context";
-import { BlockListItemActionsProvider } from "./list/block-list-context";
 import { VirtualBlockList } from "./list/virtual-block-list";
-import { useWorkspaceBlockOrchestrator } from "./use-workspace-block-orchestrator";
 import { ArchivedEmptyState, EmptyWorkspace, LoadingState } from "./view/workspace-empty-state";
 import { WorkspaceTagFilterPortal } from "./view/workspace-tag-filter-portal";
+import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
+import { WorkspaceRuntimeProvider } from "./workspace-runtime-context";
 
 export function BlockWorkspace() {
   const {
     blockList,
     blockMutations,
     blockNavigation,
-    createBlockWithFocus,
-    handleCreateTagForFilter,
-    handleDeleteTag,
-    itemActions,
-    registryContextValue,
+    commands,
+    editorRegistry,
+    runtimeContextValue,
     tagData,
     viewState,
-  } = useWorkspaceBlockOrchestrator();
+  } = useWorkspaceDataBoundary();
+  const registryContextValue = useMemo(
+    () => ({
+      getEditor: editorRegistry.getEditor,
+      registerEditor: editorRegistry.registerEditor,
+    }),
+    [editorRegistry.getEditor, editorRegistry.registerEditor],
+  );
 
   if (blockList.isInitialLoading) {
     return <LoadingState />;
@@ -29,23 +35,37 @@ export function BlockWorkspace() {
 
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
+  const tagFilter = (
+    <WorkspaceTagFilterPortal
+      tags={tagData.tags}
+      visibility={visibility}
+      selectedTagIds={selectedTagIds}
+      isTagOpPending={tagData.isTagOpPending}
+      onSetVisibility={viewState.setVisibility}
+      onSetSelectedTagIds={viewState.setSelectedTagIds}
+      onCreateTag={async (name) => {
+        const createdTag = await commands.createTag(name);
+        viewState.setSelectedTagIds((currentTagIds) => {
+          if (currentTagIds.includes(createdTag.id)) {
+            return currentTagIds;
+          }
+          return [...currentTagIds, createdTag.id];
+        });
+      }}
+      onDeleteTag={async (tagId) => {
+        await commands.deleteTag(tagId);
+        viewState.setSelectedTagIds((currentTagIds) => currentTagIds.filter((id) => id !== tagId));
+      }}
+    />
+  );
 
   if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
     return (
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-        <WorkspaceTagFilterPortal
-          tags={tagData.tags}
-          visibility={visibility}
-          selectedTagIds={selectedTagIds}
-          isTagOpPending={tagData.isTagOpPending}
-          onSetVisibility={viewState.setVisibility}
-          onSetSelectedTagIds={viewState.setSelectedTagIds}
-          onCreateTag={handleCreateTagForFilter}
-          onDeleteTag={handleDeleteTag}
-        />
+        {tagFilter}
         <EmptyWorkspace
           isCreatingBlock={blockMutations.isCreatingBlock}
-          onCreateBlock={createBlockWithFocus}
+          onCreateBlock={commands.createBlockWithFocus}
         />
       </div>
     );
@@ -53,16 +73,7 @@ export function BlockWorkspace() {
 
   return (
     <section className="z-10 mx-auto flex w-full max-w-4xl flex-col gap-4">
-      <WorkspaceTagFilterPortal
-        tags={tagData.tags}
-        visibility={visibility}
-        selectedTagIds={selectedTagIds}
-        isTagOpPending={tagData.isTagOpPending}
-        onSetVisibility={viewState.setVisibility}
-        onSetSelectedTagIds={viewState.setSelectedTagIds}
-        onCreateTag={handleCreateTagForFilter}
-        onDeleteTag={handleDeleteTag}
-      />
+      {tagFilter}
       {totalBlockCount === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
           <ArchivedEmptyState />
@@ -91,17 +102,17 @@ export function BlockWorkspace() {
           </div>
         )
       ) : (
-        <EditorRegistryProvider value={registryContextValue}>
-          <BlockListItemActionsProvider value={itemActions}>
+        <WorkspaceRuntimeProvider value={runtimeContextValue}>
+          <EditorRegistryProvider value={registryContextValue}>
             <VirtualBlockList
               totalCount={totalBlockCount}
               getBlockAtIndex={blockList.getBlockAtIndex}
-              ensureBlockIndex={blockList.ensureBlockIndex}
+              ensureBlockRange={blockList.ensureBlockRange}
               scrollTarget={blockNavigation.scrollTarget}
               onScrollTargetRendered={blockNavigation.targetRendered}
             />
-          </BlockListItemActionsProvider>
-        </EditorRegistryProvider>
+          </EditorRegistryProvider>
+        </WorkspaceRuntimeProvider>
       )}
 
       {visibility === "active" ? (
@@ -110,7 +121,7 @@ export function BlockWorkspace() {
             className="gap-2"
             disabled={blockMutations.isCreatingBlock}
             onClick={() => {
-              void createBlockWithFocus();
+              void commands.createBlockWithFocus();
             }}
           >
             {blockMutations.isCreatingBlock ? (

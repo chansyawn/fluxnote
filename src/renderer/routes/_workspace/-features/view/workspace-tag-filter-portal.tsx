@@ -4,7 +4,7 @@ import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover"
 import type { TagMutationOperation } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
 import { ArchiveIcon, ArchiveRestoreIcon, TagsIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { createPortal } from "react-dom";
 
 const TITLEBAR_ACTIONS_ID = "titlebar-workspace-actions";
@@ -15,7 +15,7 @@ interface WorkspaceTagFilterPortalProps {
   selectedTagIds: string[];
   isTagOpPending: (op: TagMutationOperation, tagId?: string) => boolean;
   onSetVisibility: (v: BlockVisibility) => void;
-  onSetSelectedTagIds: (ids: string[]) => void;
+  onSetSelectedTagIds: Dispatch<SetStateAction<string[]>>;
   onCreateTag: (name: string) => Promise<void>;
   onDeleteTag: (tagId: string) => Promise<void>;
 }
