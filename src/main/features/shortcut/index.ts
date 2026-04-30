@@ -1,1 +1,1 @@
-export { createShortcutFeature } from "./manifest";
+export { createShortcutFeature } from "./feature";

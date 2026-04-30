@@ -1,5 +1,5 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { ExternalEditManager } from "@main/features/external-edit/manager";
 import type { PendingOpenBlockRequest } from "@main/features/open-block/service";

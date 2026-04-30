@@ -6,11 +6,12 @@ import {
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blockTags, tags } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { Block, ListBlocksResult, LocateBlockResult } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
-import { createBlocksIpcCommands } from "./ipc-commands";
+import { createBlocksFeature } from "./feature";
 
 async function createTestDatabaseClient(): Promise<DatabaseClient> {
   const client = createDatabaseClient(":memory:");
@@ -25,7 +26,7 @@ interface TestCommandOptions {
 }
 
 function createHandlers(db: AppDatabase, options: TestCommandOptions = {}) {
-  return createBlocksIpcCommands({
+  return createBlocksFeature({
     getDb: async () => db,
     getProtectedBlockIds: () => options.protectedBlockIds ?? new Set(),
     now: () => options.now ?? new Date(),
@@ -33,16 +34,18 @@ function createHandlers(db: AppDatabase, options: TestCommandOptions = {}) {
     store: {
       getAssetPathForBlock: () => "",
     } as unknown as BackendStore,
-  });
+  }).commands;
 }
 
-async function createBlock(db: AppDatabase) {
-  const command = createHandlers(db).find((definition) => definition.key === "blocksCreate");
-  if (!command || command.key !== "blocksCreate") {
-    throw new Error("blocksCreate command not found");
+async function createBlock(db: AppDatabase): Promise<Block> {
+  const command = createHandlers(db).find(
+    (definition) => definition.contract.key === "blocks.create",
+  );
+  if (!command || command.contract.key !== "blocks.create") {
+    throw new Error("blocks.create command not found");
   }
 
-  return await command.handle(undefined, {} as never);
+  return (await command.handle(undefined, {} as never)) as Block;
 }
 
 async function setBlockCreatedAt(db: AppDatabase, blockId: string, createdAt: string) {
@@ -68,13 +71,15 @@ async function listBlocks(
     limit?: number;
   } = {},
   options: TestCommandOptions = {},
-) {
-  const command = createHandlers(db, options).find((definition) => definition.key === "blocksList");
-  if (!command || command.key !== "blocksList") {
-    throw new Error("blocksList command not found");
+): Promise<ListBlocksResult> {
+  const command = createHandlers(db, options).find(
+    (definition) => definition.contract.key === "blocks.list",
+  );
+  if (!command || command.contract.key !== "blocks.list") {
+    throw new Error("blocks.list command not found");
   }
 
-  return await command.handle(
+  return (await command.handle(
     {
       limit: request.limit ?? 50,
       offset: request.offset ?? 0,
@@ -82,7 +87,7 @@ async function listBlocks(
       visibility: request.visibility ?? "active",
     },
     {} as never,
-  );
+  )) as ListBlocksResult;
 }
 
 async function locateBlock(
@@ -93,22 +98,22 @@ async function locateBlock(
     visibility?: "active" | "archived";
   },
   options: TestCommandOptions = {},
-) {
+): Promise<LocateBlockResult> {
   const command = createHandlers(db, options).find(
-    (definition) => definition.key === "blocksLocate",
+    (definition) => definition.contract.key === "blocks.locate",
   );
-  if (!command || command.key !== "blocksLocate") {
-    throw new Error("blocksLocate command not found");
+  if (!command || command.contract.key !== "blocks.locate") {
+    throw new Error("blocks.locate command not found");
   }
 
-  return await command.handle(
+  return (await command.handle(
     {
       blockId: request.blockId,
       tagIds: request.tagIds,
       visibility: request.visibility ?? "active",
     },
     {} as never,
-  );
+  )) as LocateBlockResult;
 }
 
 describe("blocks ipc commands", () => {

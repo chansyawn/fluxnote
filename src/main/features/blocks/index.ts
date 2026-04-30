@@ -1,4 +1,4 @@
-export { createBlocksFeature } from "./manifest";
+export { createBlocksFeature } from "./feature";
 export {
   archiveBlock,
   assertBlockExists,

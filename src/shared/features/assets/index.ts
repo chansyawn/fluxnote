@@ -1,14 +1,10 @@
 import type { z } from "zod";
 
-import type { assetsIpcCommandContracts } from "./ipc-commands";
+import type { assetsApi } from "./api";
 
-export { assetsIpcCommandContracts } from "./ipc-commands";
+export { assetsApi } from "./api";
 
-export type CreateAssetRequest = z.input<
-  (typeof assetsIpcCommandContracts)["assetsCreate"]["request"]
->;
-export type CreateAssetResult = z.infer<
-  (typeof assetsIpcCommandContracts)["assetsCreate"]["response"]
->;
-export type CopyAssetRequest = z.input<(typeof assetsIpcCommandContracts)["assetsCopy"]["request"]>;
-export type CopyAssetResult = z.infer<(typeof assetsIpcCommandContracts)["assetsCopy"]["response"]>;
+export type CreateAssetRequest = z.input<(typeof assetsApi)["commands"]["create"]["request"]>;
+export type CreateAssetResult = z.infer<(typeof assetsApi)["commands"]["create"]["response"]>;
+export type CopyAssetRequest = z.input<(typeof assetsApi)["commands"]["copy"]["request"]>;
+export type CopyAssetResult = z.infer<(typeof assetsApi)["commands"]["copy"]["response"]>;

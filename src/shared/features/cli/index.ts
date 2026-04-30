@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
-import type { cliIpcCommandContracts } from "./ipc-commands";
+import type { cliApi } from "./api";
 
-export { cliIpcCommandContracts } from "./ipc-commands";
+export { cliApi } from "./api";
 
-export type CliInstallRequest = z.input<(typeof cliIpcCommandContracts)["cliInstall"]["request"]>;
-export type CliStatusResult = z.infer<(typeof cliIpcCommandContracts)["cliStatus"]["response"]>;
+export type CliInstallRequest = z.input<(typeof cliApi)["commands"]["install"]["request"]>;
+export type CliStatusResult = z.infer<(typeof cliApi)["commands"]["status"]["response"]>;

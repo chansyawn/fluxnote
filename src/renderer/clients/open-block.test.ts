@@ -3,9 +3,20 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 const invokeCommandMock = vi.hoisted(() => vi.fn());
 const subscribeEventMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@renderer/app/invoke", () => ({
-  invokeCommand: invokeCommandMock,
-  subscribeEvent: subscribeEventMock,
+vi.mock("@renderer/app/ipc-client", () => ({
+  createFeatureClient: () => ({
+    commands: {
+      acknowledgePending: (request: { blockId: string }) =>
+        invokeCommandMock("openBlock.acknowledgePending", request),
+      readPending: () => invokeCommandMock("openBlock.readPending", undefined),
+    },
+    events: {
+      requested: {
+        subscribe: (handler: (payload: { blockId: string }) => void) =>
+          subscribeEventMock("openBlock.requested", handler),
+      },
+    },
+  }),
 }));
 
 import {
@@ -29,8 +40,8 @@ describe("open block client helpers", () => {
     await acknowledgePendingOpenBlock("block-1");
 
     expect(invokeCommandMock.mock.calls).toEqual([
-      ["openBlockPendingRead", undefined],
-      ["openBlockPendingAcknowledge", { blockId: "block-1" }],
+      ["openBlock.readPending", undefined],
+      ["openBlock.acknowledgePending", { blockId: "block-1" }],
     ]);
   });
 
@@ -39,7 +50,7 @@ describe("open block client helpers", () => {
     let runtimeHandler: ((payload: { blockId: string }) => void) | undefined;
     const unlisten = vi.fn();
     subscribeEventMock.mockImplementation((key, callback) => {
-      if (key === "openBlockRequested") {
+      if (key === "openBlock.requested") {
         runtimeHandler = callback as (payload: { blockId: string }) => void;
       }
       return unlisten;

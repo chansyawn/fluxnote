@@ -1,6 +1,1 @@
-import type { AnyIpcCommandDefinition } from "../ipc/ipc-command-definition";
-
-export interface BackendFeatureManifest {
-  ipcCommands?: readonly AnyIpcCommandDefinition[];
-  name: string;
-}
+export type { BackendFeature as BackendFeatureManifest } from "../ipc/backend-feature";

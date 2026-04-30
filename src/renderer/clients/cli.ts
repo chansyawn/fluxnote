@@ -1,17 +1,20 @@
-import { invokeCommand } from "@renderer/app/invoke";
+import { createFeatureClient } from "@renderer/app/ipc-client";
+import { cliApi } from "@shared/features/cli";
 
 export interface CliStatus {
   installed: boolean;
 }
 
+const cliClient = createFeatureClient(cliApi);
+
 export async function getCliStatus(): Promise<CliStatus> {
-  return await invokeCommand("cliStatus", undefined);
+  return await cliClient.commands.status(undefined);
 }
 
 export async function installCli(): Promise<void> {
-  await invokeCommand("cliInstall", undefined);
+  await cliClient.commands.install(undefined);
 }
 
 export async function uninstallCli(): Promise<void> {
-  await invokeCommand("cliUninstall", undefined);
+  await cliClient.commands.uninstall(undefined);
 }

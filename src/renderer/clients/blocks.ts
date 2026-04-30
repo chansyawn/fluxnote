@@ -1,4 +1,4 @@
-import { invokeCommand } from "@renderer/app/invoke";
+import { createFeatureClient } from "@renderer/app/ipc-client";
 import type {
   Block,
   BlockMutationRequest,
@@ -10,6 +10,7 @@ import type {
   LocateBlockResult,
   UpdateBlockContentRequest,
 } from "@shared/features/blocks";
+import { blocksApi } from "@shared/features/blocks";
 
 export type {
   Block,
@@ -24,22 +25,24 @@ export type {
   UpdateBlockContentRequest,
 } from "@shared/features/blocks";
 
+const blocksClient = createFeatureClient(blocksApi);
+
 export const listBlocks = (req: ListBlocksRequest = {}): Promise<ListBlocksResult> =>
-  invokeCommand("blocksList", req);
+  blocksClient.commands.list(req);
 
 export const locateBlock = (req: LocateBlockRequest): Promise<LocateBlockResult> =>
-  invokeCommand("blocksLocate", req);
+  blocksClient.commands.locate(req);
 
-export const createBlock = (): Promise<Block> => invokeCommand("blocksCreate", undefined);
+export const createBlock = (): Promise<Block> => blocksClient.commands.create(undefined);
 
 export const updateBlockContent = (req: UpdateBlockContentRequest): Promise<Block> =>
-  invokeCommand("blocksUpdateContent", req);
+  blocksClient.commands.updateContent(req);
 
 export const deleteBlock = (req: DeleteBlockRequest): Promise<DeleteBlockResult> =>
-  invokeCommand("blocksDelete", req);
+  blocksClient.commands.delete(req);
 
 export const archiveBlock = (req: BlockMutationRequest): Promise<Block> =>
-  invokeCommand("blocksArchive", req);
+  blocksClient.commands.archive(req);
 
 export const restoreBlock = (req: BlockMutationRequest): Promise<Block> =>
-  invokeCommand("blocksRestore", req);
+  blocksClient.commands.restore(req);

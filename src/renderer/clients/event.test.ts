@@ -2,8 +2,20 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const subscribeEventMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@renderer/app/invoke", () => ({
-  subscribeEvent: subscribeEventMock,
+vi.mock("@renderer/app/ipc-client", () => ({
+  createFeatureClient: () => ({
+    events: {
+      autoArchiveStateChanged: {
+        subscribe: (
+          handler: (payload: {
+            archivedCount: number;
+            pendingCount: number;
+            windowVisible: boolean;
+          }) => void,
+        ) => subscribeEventMock("blocks.autoArchiveStateChanged", handler),
+      },
+    },
+  }),
 }));
 
 import { onAutoArchiveStateChanged } from "@renderer/clients/event";
@@ -20,7 +32,7 @@ describe("event client helpers", () => {
       | undefined;
     const unlisten = vi.fn();
     subscribeEventMock.mockImplementation((key, callback) => {
-      if (key === "autoArchiveStateChanged") {
+      if (key === "blocks.autoArchiveStateChanged") {
         runtimeHandler = callback as typeof runtimeHandler;
       }
       return unlisten;

@@ -1,3 +1,3 @@
 export { createExternalEditManager, type ExternalEditManager } from "./manager";
-export { createExternalEditFeature } from "./manifest";
+export { createExternalEditFeature } from "./feature";
 export { createExternalEditService } from "./service";

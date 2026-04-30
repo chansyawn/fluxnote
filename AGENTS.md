@@ -22,18 +22,21 @@ src/
     core/                 # platform core shared by backend features
       database/
       features/
-      ipc/
+      ipc/                # backend IPC registration, backend feature binding, event bus
+        backend-feature.ts
+        define-ipc-command.ts
+        event-bus.ts
       persistence/
     features/             # feature-first backend domains
       <feature>/
         index.ts          # stable feature export
-        manifest.ts       # feature contribution to app assembly
+        feature.ts        # bind shared feature API to main-process handlers
         service.ts        # feature business logic, data access, and DTO mapping by default
-        ipc-commands.ts   # renderer IPC command implementations
         *.test.ts            # colocated tests when feature-scoped
 
   renderer/
     app/                  # renderer bootstrapping and global cross-feature content
+      ipc-client.ts       # typed feature client factory and runtime bridge helpers
     clients/              # typed renderer-side IPC clients
     features/             # shared frontend business logic and reusable feature-level components
       <feature>/
@@ -52,11 +55,10 @@ src/
       <feature>/
         index.ts          # stable feature-level contract export
         models.ts         # optional: shared DTO schemas and inferred public types
-        ipc-commands.ts   # optional: request/response schemas for renderer-to-main commands
-        ipc-events.ts     # optional: payload schemas for main-to-renderer events
-    ipc/                  # merged IPC registries and generic IPC types
-      commands.ts         # merged IPC command registry
-      events.ts           # merged IPC event registry
+        api.ts            # feature API contract: commands, events, and derived channels
+    ipc/                  # feature API definitions, registries, and generic IPC types
+      feature-api.ts      # defineFeatureApi / command / event / type inference helpers
+      registry.ts         # all feature APIs and flattened command/event registries
       contracts.ts        # stable generic IPC surface
       errors.ts           # flat IPC error payload model
     electron-runtime.ts   # preload-exposed renderer runtime contract

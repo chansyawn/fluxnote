@@ -1,4 +1,4 @@
-export { createOpenBlockFeature } from "./manifest";
+export { createOpenBlockFeature } from "./feature";
 export {
   createOpenBlockService,
   type OpenBlockService,

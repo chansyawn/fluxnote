@@ -14,30 +14,30 @@ describe("ipc contracts", () => {
   });
 
   it("parses defaulted command inputs", () => {
-    expect(ipcCommandContracts.blocksList.request.parse({})).toEqual({
+    expect(ipcCommandContracts["blocks.list"].request.parse({})).toEqual({
       limit: 50,
       offset: 0,
       visibility: "active",
     });
-    expect(ipcCommandContracts.blocksList.request.parse({ limit: 200, offset: 10 })).toEqual({
+    expect(ipcCommandContracts["blocks.list"].request.parse({ limit: 200, offset: 10 })).toEqual({
       limit: 200,
       offset: 10,
       visibility: "active",
     });
-    expect(() => ipcCommandContracts.blocksList.request.parse({ limit: 201 })).toThrow();
-    expect(ipcCommandContracts.openBlockPendingRead.response.parse({ blockId: null })).toEqual({
+    expect(() => ipcCommandContracts["blocks.list"].request.parse({ limit: 201 })).toThrow();
+    expect(ipcCommandContracts["openBlock.readPending"].response.parse({ blockId: null })).toEqual({
       blockId: null,
     });
     expect(
-      ipcCommandContracts.openBlockPendingAcknowledge.request.parse({ blockId: "block-1" }),
+      ipcCommandContracts["openBlock.acknowledgePending"].request.parse({ blockId: "block-1" }),
     ).toEqual({
       blockId: "block-1",
     });
-    expect(ipcCommandContracts.preferencesRead.response.parse(DEFAULT_SETTINGS)).toEqual(
+    expect(ipcCommandContracts["preferences.read"].response.parse(DEFAULT_SETTINGS)).toEqual(
       DEFAULT_SETTINGS,
     );
     expect(
-      ipcCommandContracts.preferencesPatch.request.parse({
+      ipcCommandContracts["preferences.patch"].request.parse({
         appearance: {
           fontSize: 20,
         },
@@ -47,11 +47,11 @@ describe("ipc contracts", () => {
         fontSize: 20,
       },
     });
-    expect(ipcCommandContracts.preferencesReset.response.parse(DEFAULT_SETTINGS)).toEqual(
+    expect(ipcCommandContracts["preferences.reset"].response.parse(DEFAULT_SETTINGS)).toEqual(
       DEFAULT_SETTINGS,
     );
     expect(() =>
-      ipcCommandContracts.preferencesPatch.request.parse({
+      ipcCommandContracts["preferences.patch"].request.parse({
         appearance: {
           fontSize: 21,
         },
@@ -61,7 +61,7 @@ describe("ipc contracts", () => {
 
   it("validates event payload schemas", () => {
     expect(
-      ipcEventContracts.autoArchiveStateChanged.payload.parse({
+      ipcEventContracts["blocks.autoArchiveStateChanged"].payload.parse({
         archivedCount: 1,
         pendingCount: 2,
         windowVisible: true,
@@ -71,6 +71,6 @@ describe("ipc contracts", () => {
       pendingCount: 2,
       windowVisible: true,
     });
-    expect(() => ipcEventContracts.openBlockRequested.payload.parse({})).toThrow();
+    expect(() => ipcEventContracts["openBlock.requested"].payload.parse({})).toThrow();
   });
 });

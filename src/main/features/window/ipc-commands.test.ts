@@ -1,7 +1,9 @@
-import { createWindowIpcCommands } from "@main/features/window/ipc-commands";
+import { createWindowFeature } from "@main/features/window/feature";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-function invokeHandler(command: ReturnType<typeof createWindowIpcCommands>[number]): void {
+type WindowCommand = ReturnType<typeof createWindowFeature>["commands"][number];
+
+function invokeHandler(command: WindowCommand): void {
   void command.handle(undefined as never, {} as never);
 }
 
@@ -12,7 +14,7 @@ describe("window ipc commands", () => {
       requestQuit: vi.fn(),
       toggleMainWindow: vi.fn(),
     };
-    const commands = createWindowIpcCommands(services);
+    const commands = createWindowFeature(services).commands;
 
     invokeHandler(commands[0]);
     invokeHandler(commands[1]);

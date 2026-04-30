@@ -1,7 +1,8 @@
 import type { z } from "zod";
 
-import type { preferencesIpcCommandContracts } from "./ipc-commands";
+import type { preferencesApi } from "./api";
 
+export { preferencesApi } from "./api";
 export {
   AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
   AUTO_ARCHIVE_DURATION_UNITS,
@@ -15,7 +16,6 @@ export {
   type AutoArchiveDuration,
   type AutoArchiveDurationUnit,
 } from "./auto-archive";
-export { preferencesIpcCommandContracts } from "./ipc-commands";
 export {
   DEFAULT_AUTO_ARCHIVE_SETTINGS,
   DEFAULT_SETTINGS,
@@ -46,6 +46,4 @@ export {
   type ShortcutPreferences,
 } from "./settings";
 
-export type PreferencesSnapshot = z.infer<
-  (typeof preferencesIpcCommandContracts)["preferencesRead"]["response"]
->;
+export type PreferencesSnapshot = z.infer<(typeof preferencesApi)["commands"]["read"]["response"]>;

@@ -1,10 +1,11 @@
-import { invokeCommand } from "@renderer/app/invoke";
+import { createFeatureClient } from "@renderer/app/ipc-client";
 import type {
   CopyAssetRequest,
   CopyAssetResult,
   CreateAssetRequest,
   CreateAssetResult,
 } from "@shared/features/assets";
+import { assetsApi } from "@shared/features/assets";
 
 export type {
   CopyAssetRequest,
@@ -13,11 +14,13 @@ export type {
   CreateAssetResult,
 } from "@shared/features/assets";
 
+const assetsClient = createFeatureClient(assetsApi);
+
 export const createAsset = (req: CreateAssetRequest): Promise<CreateAssetResult> =>
-  invokeCommand("assetsCreate", req);
+  assetsClient.commands.create(req);
 
 export const copyAsset = (req: CopyAssetRequest): Promise<CopyAssetResult> =>
-  invokeCommand("assetsCopy", req);
+  assetsClient.commands.copy(req);
 
 export function convertFileSrc(path: string): string {
   if (path.startsWith("file://")) {

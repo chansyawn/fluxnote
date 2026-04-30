@@ -1,4 +1,5 @@
-import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
+import { externalEditApi } from "@shared/features/external-edit";
 import type {
   ExternalEditResult,
   ExternalEditSession,
@@ -38,7 +39,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
   }
 
   function emitSessionsChanged(): void {
-    services.emitEvent("externalEditSessionsChanged", listSessions());
+    services.emitEvent(externalEditApi.events.sessionsChanged, listSessions());
   }
 
   function begin(

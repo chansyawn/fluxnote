@@ -1,1 +1,1 @@
-export { createCliFeature } from "./manifest";
+export { createCliFeature } from "./feature";

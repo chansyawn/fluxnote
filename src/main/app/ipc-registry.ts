@@ -1,11 +1,8 @@
-import { ipcCommandContracts, ipcCommandKeys, type IpcCommandKey } from "@shared/ipc/contracts";
+import { ipcCommandKeys } from "@shared/ipc/contracts";
 import type { WebContents } from "electron";
 
+import type { AnyBackendCommandDefinition } from "../core/ipc/backend-feature";
 import { defineIpcCommand } from "../core/ipc/define-ipc-command";
-import type {
-  AnyIpcCommandDefinition,
-  IpcCommandDefinition,
-} from "../core/ipc/ipc-command-definition";
 import { createBackendFeatureManifests } from "./feature-manifests";
 import type { RegisterIpcCommandsOptions } from "./ipc-command-services";
 
@@ -13,21 +10,22 @@ export type { RegisterIpcCommandsOptions } from "./ipc-command-services";
 
 interface DuplicateCommandKeyEntry {
   count: number;
-  key: IpcCommandKey;
+  key: string;
 }
 
 export function collectIpcCommandDefinitions(
   options: RegisterIpcCommandsOptions,
-): readonly AnyIpcCommandDefinition[] {
-  return createBackendFeatureManifests(options).flatMap((manifest) => manifest.ipcCommands ?? []);
+): readonly AnyBackendCommandDefinition[] {
+  return createBackendFeatureManifests(options).flatMap((feature) => feature.commands);
 }
 
 function findDuplicateCommandKeys(
-  definitions: readonly AnyIpcCommandDefinition[],
+  definitions: readonly AnyBackendCommandDefinition[],
 ): DuplicateCommandKeyEntry[] {
-  const counts = new Map<IpcCommandKey, number>();
+  const counts = new Map<string, number>();
   for (const definition of definitions) {
-    counts.set(definition.key, (counts.get(definition.key) ?? 0) + 1);
+    const key = definition.contract.key;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
   }
 
   return Array.from(counts.entries())
@@ -35,14 +33,16 @@ function findDuplicateCommandKeys(
     .map(([key, count]) => ({ count, key }));
 }
 
-export function assertIpcCommandCoverage(definitions: readonly AnyIpcCommandDefinition[]): void {
+export function assertIpcCommandCoverage(
+  definitions: readonly AnyBackendCommandDefinition[],
+): void {
   const duplicateEntries = findDuplicateCommandKeys(definitions);
   if (duplicateEntries.length > 0) {
     const summary = duplicateEntries.map((entry) => `${entry.key} (${entry.count})`).join(", ");
     throw new Error(`Duplicate IPC commands found: ${summary}`);
   }
 
-  const registeredKeys = new Set(definitions.map((definition) => definition.key));
+  const registeredKeys = new Set(definitions.map((definition) => definition.contract.key));
   const missingKeys = ipcCommandKeys.filter((key) => !registeredKeys.has(key));
   if (missingKeys.length > 0) {
     throw new Error(`Missing IPC commands for keys: ${missingKeys.join(", ")}`);
@@ -59,12 +59,12 @@ export function registerIpcCommands(options: RegisterIpcCommandsOptions): void {
   }
 }
 
-function registerIpcCommandDefinition<TKey extends IpcCommandKey>(
-  definition: IpcCommandDefinition<TKey>,
+function registerIpcCommandDefinition(
+  definition: AnyBackendCommandDefinition,
   getTrustedWebContents: () => WebContents | null,
 ): void {
   defineIpcCommand({
-    command: ipcCommandContracts[definition.key],
+    command: definition.contract,
     getTrustedWebContents,
     run: definition.handle,
   });

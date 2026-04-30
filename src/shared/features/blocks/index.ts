@@ -1,14 +1,13 @@
 import type { z } from "zod";
 
-import type { blocksIpcCommandContracts } from "./ipc-commands";
+import type { blocksApi } from "./api";
 import { blockVisibilitySchema } from "./models";
 
-export { blocksIpcCommandContracts } from "./ipc-commands";
 export {
   autoArchiveStateChangedPayloadSchema,
-  blocksIpcEventContracts,
+  blocksApi,
   type AutoArchiveStateChangedPayload,
-} from "./ipc-events";
+} from "./api";
 export {
   blockMutationRequestSchema,
   blockSchema,
@@ -21,30 +20,14 @@ export {
 } from "./models";
 
 export type BlockVisibility = z.infer<typeof blockVisibilitySchema>;
-export type ListBlocksRequest = z.input<
-  (typeof blocksIpcCommandContracts)["blocksList"]["request"]
->;
-export type ParsedListBlocksRequest = z.infer<
-  (typeof blocksIpcCommandContracts)["blocksList"]["request"]
->;
-export type ListBlocksResult = z.infer<
-  (typeof blocksIpcCommandContracts)["blocksList"]["response"]
->;
-export type LocateBlockRequest = z.input<
-  (typeof blocksIpcCommandContracts)["blocksLocate"]["request"]
->;
-export type LocateBlockResult = z.infer<
-  (typeof blocksIpcCommandContracts)["blocksLocate"]["response"]
->;
+export type ListBlocksRequest = z.input<(typeof blocksApi)["commands"]["list"]["request"]>;
+export type ParsedListBlocksRequest = z.infer<(typeof blocksApi)["commands"]["list"]["request"]>;
+export type ListBlocksResult = z.infer<(typeof blocksApi)["commands"]["list"]["response"]>;
+export type LocateBlockRequest = z.input<(typeof blocksApi)["commands"]["locate"]["request"]>;
+export type LocateBlockResult = z.infer<(typeof blocksApi)["commands"]["locate"]["response"]>;
 export type UpdateBlockContentRequest = z.input<
-  (typeof blocksIpcCommandContracts)["blocksUpdateContent"]["request"]
+  (typeof blocksApi)["commands"]["updateContent"]["request"]
 >;
-export type BlockMutationRequest = z.input<
-  (typeof blocksIpcCommandContracts)["blocksArchive"]["request"]
->;
-export type DeleteBlockRequest = z.input<
-  (typeof blocksIpcCommandContracts)["blocksDelete"]["request"]
->;
-export type DeleteBlockResult = z.infer<
-  (typeof blocksIpcCommandContracts)["blocksDelete"]["response"]
->;
+export type BlockMutationRequest = z.input<(typeof blocksApi)["commands"]["archive"]["request"]>;
+export type DeleteBlockRequest = z.input<(typeof blocksApi)["commands"]["delete"]["request"]>;
+export type DeleteBlockResult = z.infer<(typeof blocksApi)["commands"]["delete"]["response"]>;

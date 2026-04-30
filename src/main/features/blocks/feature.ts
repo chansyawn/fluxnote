@@ -1,9 +1,7 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import {
-  defineIpcCommandDefinition,
-  type AnyIpcCommandDefinition,
-} from "@main/core/ipc/ipc-command-definition";
+import { defineBackendFeature } from "@main/core/ipc/backend-feature";
 import type { BackendStore } from "@main/core/persistence/backend-store";
+import { blocksApi } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 
 import {
@@ -20,7 +18,7 @@ import {
   updateBlockContent,
 } from "./service";
 
-interface BlocksCommandServices {
+interface BlocksServices {
   getDb: () => Promise<AppDatabase>;
   getProtectedBlockIds?: () => ReadonlySet<string>;
   now?: () => Date;
@@ -28,9 +26,7 @@ interface BlocksCommandServices {
   store: BackendStore;
 }
 
-export function createBlocksIpcCommands(
-  services: BlocksCommandServices,
-): readonly AnyIpcCommandDefinition[] {
+export function createBlocksFeature(services: BlocksServices) {
   async function getAutoArchiveEvaluationContext(): Promise<AutoArchiveEvaluationContext> {
     let settings = DEFAULT_SETTINGS.autoArchive;
     try {
@@ -48,10 +44,23 @@ export function createBlocksIpcCommands(
     });
   }
 
-  return [
-    defineIpcCommandDefinition({
-      key: "blocksList",
-      async handle(request) {
+  return defineBackendFeature(blocksApi, {
+    commands: {
+      async archive(request) {
+        const autoArchiveContext = await getAutoArchiveEvaluationContext();
+        return await archiveBlock(await services.getDb(), request.blockId, autoArchiveContext);
+      },
+      async create() {
+        return await createBlockRecord(await services.getDb());
+      },
+      async delete(request) {
+        return deleteBlock(
+          await services.getDb(),
+          request.blockId,
+          services.store.getAssetPathForBlock(request.blockId),
+        );
+      },
+      async list(request) {
         const autoArchiveContext = await getAutoArchiveEvaluationContext();
         return await listBlocks(
           await services.getDb(),
@@ -62,10 +71,7 @@ export function createBlocksIpcCommands(
           autoArchiveContext,
         );
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksLocate",
-      async handle(request) {
+      async locate(request) {
         const autoArchiveContext = await getAutoArchiveEvaluationContext();
         return await locateBlock(
           await services.getDb(),
@@ -75,16 +81,11 @@ export function createBlocksIpcCommands(
           autoArchiveContext,
         );
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksCreate",
-      async handle() {
-        return await createBlockRecord(await services.getDb());
+      async restore(request) {
+        const autoArchiveContext = await getAutoArchiveEvaluationContext();
+        return await restoreBlock(await services.getDb(), request.blockId, autoArchiveContext);
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksUpdateContent",
-      async handle(request) {
+      async updateContent(request) {
         const autoArchiveContext = await getAutoArchiveEvaluationContext();
         return await updateBlockContent(
           await services.getDb(),
@@ -93,30 +94,6 @@ export function createBlocksIpcCommands(
           autoArchiveContext,
         );
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksDelete",
-      async handle(request) {
-        return deleteBlock(
-          await services.getDb(),
-          request.blockId,
-          services.store.getAssetPathForBlock(request.blockId),
-        );
-      },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksArchive",
-      async handle(request) {
-        const autoArchiveContext = await getAutoArchiveEvaluationContext();
-        return await archiveBlock(await services.getDb(), request.blockId, autoArchiveContext);
-      },
-    }),
-    defineIpcCommandDefinition({
-      key: "blocksRestore",
-      async handle(request) {
-        const autoArchiveContext = await getAutoArchiveEvaluationContext();
-        return await restoreBlock(await services.getDb(), request.blockId, autoArchiveContext);
-      },
-    }),
-  ] as const;
+    },
+  });
 }

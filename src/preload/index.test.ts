@@ -40,7 +40,7 @@ describe("preload runtime", () => {
       data: DEFAULT_SETTINGS,
     });
 
-    const result = await getRuntime().invoke("preferencesRead", undefined);
+    const result = await getRuntime().invoke("preferences.read", undefined);
 
     expect(result).toEqual(DEFAULT_SETTINGS);
   });
@@ -51,7 +51,7 @@ describe("preload runtime", () => {
       listener({}, { wrong: true });
     });
 
-    getRuntime().subscribe("openBlockRequested", handler);
+    getRuntime().subscribe("openBlock.requested", handler);
 
     expect(handler).not.toHaveBeenCalled();
   });

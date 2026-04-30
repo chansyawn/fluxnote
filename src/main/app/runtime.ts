@@ -1,6 +1,6 @@
 import { app, globalShortcut } from "electron";
 
-import { createEmitIpcEvent } from "../core/ipc/emit-ipc-event";
+import { createIpcEventBus } from "../core/ipc/event-bus";
 import { BackendStore } from "../core/persistence/backend-store";
 import { registerAssetProtocol } from "../features/assets/asset-protocol";
 import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
@@ -20,7 +20,7 @@ export function createBackendRuntime() {
   const backendStore = new BackendStore();
   const preferencesService = createPreferencesService();
   let windowManager: ReturnType<typeof createWindowManager>;
-  const emitIpcEvent = createEmitIpcEvent({
+  const emitIpcEvent = createIpcEventBus({
     getMainWindow: () => windowManager.getMainWindow(),
   });
   const externalEditManager = createExternalEditManager({

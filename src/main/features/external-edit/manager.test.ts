@@ -1,3 +1,4 @@
+import { externalEditApi } from "@shared/features/external-edit";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createExternalEditManager } from "./manager";
@@ -24,7 +25,7 @@ describe("external edit manager", () => {
       status: "submitted",
     });
     expect(manager.listSessions()).toEqual([]);
-    expect(emitEvent).toHaveBeenLastCalledWith("externalEditSessionsChanged", []);
+    expect(emitEvent).toHaveBeenLastCalledWith(externalEditApi.events.sessionsChanged, []);
   });
 
   it("resolves cancelled edits and rejects double claim", async () => {

@@ -1,36 +1,27 @@
-import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
-import {
-  defineIpcCommandDefinition,
-  type AnyIpcCommandDefinition,
-} from "@main/core/ipc/ipc-command-definition";
-import type { ShortcutPressedPayload } from "@shared/features/shortcut";
+import { defineBackendFeature } from "@main/core/ipc/backend-feature";
+import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
+import { shortcutApi, type ShortcutPressedPayload } from "@shared/features/shortcut";
 import { businessError } from "@shared/ipc/errors";
 import { globalShortcut } from "electron";
 
-interface ShortcutCommandServices {
+interface ShortcutServices {
   emitEvent: EmitIpcEvent;
 }
 
 function emitShortcutPressed(emitEvent: EmitIpcEvent, shortcut: string): void {
-  emitEvent("shortcutPressed", {
+  emitEvent(shortcutApi.events.pressed, {
     shortcut,
     state: "Pressed",
   } satisfies ShortcutPressedPayload);
 }
 
-export function createShortcutIpcCommands(
-  services: ShortcutCommandServices,
-): readonly AnyIpcCommandDefinition[] {
-  return [
-    defineIpcCommandDefinition({
-      key: "shortcutIsRegistered",
-      handle(request) {
+export function createShortcutFeature(services: ShortcutServices) {
+  return defineBackendFeature(shortcutApi, {
+    commands: {
+      isRegistered(request) {
         return globalShortcut.isRegistered(request.shortcut);
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "shortcutRegister",
-      handle(request) {
+      register(request) {
         if (globalShortcut.isRegistered(request.shortcut)) {
           globalShortcut.unregister(request.shortcut);
         }
@@ -48,13 +39,10 @@ export function createShortcutIpcCommands(
 
         return undefined;
       },
-    }),
-    defineIpcCommandDefinition({
-      key: "shortcutUnregister",
-      handle(request) {
+      unregister(request) {
         globalShortcut.unregister(request.shortcut);
         return undefined;
       },
-    }),
-  ] as const;
+    },
+  });
 }

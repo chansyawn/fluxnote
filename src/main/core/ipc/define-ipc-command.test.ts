@@ -20,8 +20,8 @@ describe("defineIpcCommand", () => {
 
   it("rejects invocations from untrusted senders", async () => {
     const trustedSender = {};
-    defineIpcCommand<"windowDestroy">({
-      command: ipcCommandContracts.windowDestroy,
+    defineIpcCommand({
+      command: ipcCommandContracts["window.destroy"],
       getTrustedWebContents: () => trustedSender as never,
       run: async () => undefined,
     });
@@ -42,8 +42,8 @@ describe("defineIpcCommand", () => {
 
   it("parses requests and returns successful responses for trusted senders", async () => {
     const trustedSender = {};
-    defineIpcCommand<"windowDestroy">({
-      command: ipcCommandContracts.windowDestroy,
+    defineIpcCommand({
+      command: ipcCommandContracts["window.destroy"],
       getTrustedWebContents: () => trustedSender as never,
       run: async () => undefined,
     });

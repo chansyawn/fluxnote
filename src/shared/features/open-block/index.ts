@@ -1,18 +1,17 @@
 import type { z } from "zod";
 
-import type { openBlockIpcCommandContracts } from "./ipc-commands";
+import type { openBlockApi } from "./api";
 
-export { openBlockIpcCommandContracts } from "./ipc-commands";
 export {
   openBlockRequestedPayloadSchema,
-  openBlockIpcEventContracts,
+  openBlockApi,
   type OpenBlockRequestedPayload,
-} from "./ipc-events";
+} from "./api";
 export { openBlockPendingSchema } from "./models";
 
 export type OpenBlockPending = z.infer<
-  (typeof openBlockIpcCommandContracts)["openBlockPendingRead"]["response"]
+  (typeof openBlockApi)["commands"]["readPending"]["response"]
 >;
 export type OpenBlockPendingAcknowledgeRequest = z.input<
-  (typeof openBlockIpcCommandContracts)["openBlockPendingAcknowledge"]["request"]
+  (typeof openBlockApi)["commands"]["acknowledgePending"]["request"]
 >;

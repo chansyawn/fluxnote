@@ -1,14 +1,16 @@
-import { invokeCommand } from "@renderer/app/invoke";
-import type { Settings, SettingsPatch } from "@shared/features/preferences";
+import { createFeatureClient } from "@renderer/app/ipc-client";
+import { preferencesApi, type Settings, type SettingsPatch } from "@shared/features/preferences";
+
+const preferencesClient = createFeatureClient(preferencesApi);
 
 export async function readSettings(): Promise<Settings> {
-  return await invokeCommand("preferencesRead", undefined);
+  return await preferencesClient.commands.read(undefined);
 }
 
 export async function patchSettings(patch: SettingsPatch): Promise<Settings> {
-  return await invokeCommand("preferencesPatch", patch);
+  return await preferencesClient.commands.patch(patch);
 }
 
 export async function resetSettings(): Promise<Settings> {
-  return await invokeCommand("preferencesReset", undefined);
+  return await preferencesClient.commands.reset(undefined);
 }

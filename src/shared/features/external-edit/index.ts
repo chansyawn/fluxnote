@@ -1,13 +1,12 @@
 import type { z } from "zod";
 
-import type { externalEditIpcCommandContracts } from "./ipc-commands";
+import type { externalEditApi } from "./api";
 
-export { externalEditIpcCommandContracts } from "./ipc-commands";
 export {
   externalEditSessionsChangedPayloadSchema,
-  externalEditIpcEventContracts,
+  externalEditApi,
   type ExternalEditSessionsChangedPayload,
-} from "./ipc-events";
+} from "./api";
 export {
   externalEditResultSchema,
   externalEditSessionSchema,
@@ -16,8 +15,8 @@ export {
 } from "./session-contracts";
 
 export type ExternalEditCancelRequest = z.input<
-  (typeof externalEditIpcCommandContracts)["externalEditsCancel"]["request"]
+  (typeof externalEditApi)["commands"]["cancel"]["request"]
 >;
 export type ExternalEditSubmitRequest = z.input<
-  (typeof externalEditIpcCommandContracts)["externalEditsSubmit"]["request"]
+  (typeof externalEditApi)["commands"]["submit"]["request"]
 >;

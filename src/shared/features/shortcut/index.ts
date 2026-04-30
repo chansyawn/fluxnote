@@ -1,14 +1,7 @@
 import type { z } from "zod";
 
-import type { shortcutIpcCommandContracts } from "./ipc-commands";
+import type { shortcutApi } from "./api";
 
-export { shortcutIpcCommandContracts } from "./ipc-commands";
-export {
-  shortcutIpcEventContracts,
-  shortcutPressedPayloadSchema,
-  type ShortcutPressedPayload,
-} from "./ipc-events";
+export { shortcutApi, shortcutPressedPayloadSchema, type ShortcutPressedPayload } from "./api";
 
-export type ShortcutRequest = z.input<
-  (typeof shortcutIpcCommandContracts)["shortcutRegister"]["request"]
->;
+export type ShortcutRequest = z.input<(typeof shortcutApi)["commands"]["register"]["request"]>;

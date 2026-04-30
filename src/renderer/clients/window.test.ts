@@ -3,9 +3,23 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 const invokeCommandMock = vi.hoisted(() => vi.fn());
 const subscribeEventMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@renderer/app/invoke", () => ({
-  invokeCommand: invokeCommandMock,
-  subscribeEvent: subscribeEventMock,
+vi.mock("@renderer/app/ipc-client", () => ({
+  createFeatureClient: () => ({
+    commands: {
+      destroy: () => invokeCommandMock("window.destroy", undefined),
+      hide: () => invokeCommandMock("window.hide", undefined),
+      toggle: () => invokeCommandMock("window.toggle", undefined),
+    },
+    events: {
+      closeRequested: {
+        subscribe: (handler: () => void) => subscribeEventMock("window.closeRequested", handler),
+      },
+      focusChanged: {
+        subscribe: (handler: (payload: boolean) => void) =>
+          subscribeEventMock("window.focusChanged", handler),
+      },
+    },
+  }),
 }));
 
 import {
@@ -30,9 +44,9 @@ describe("window client helpers", () => {
     await toggleMainWindowVisibility();
 
     expect(invokeCommandMock.mock.calls).toEqual([
-      ["windowHide", undefined],
-      ["windowDestroy", undefined],
-      ["windowToggle", undefined],
+      ["window.hide", undefined],
+      ["window.destroy", undefined],
+      ["window.toggle", undefined],
     ]);
   });
 
@@ -43,10 +57,10 @@ describe("window client helpers", () => {
     let focusListener: ((payload: boolean) => void) | undefined;
 
     subscribeEventMock.mockImplementation((key, handler) => {
-      if (key === "windowCloseRequested") {
+      if (key === "window.closeRequested") {
         closeListener = handler as () => void;
       }
-      if (key === "windowFocusChanged") {
+      if (key === "window.focusChanged") {
         focusListener = handler as (payload: boolean) => void;
       }
       return vi.fn();

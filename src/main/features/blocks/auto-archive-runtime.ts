@@ -1,9 +1,9 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import { getSqliteChangedRows } from "@main/core/database/db-utils";
-import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
+import { blocksApi, type AutoArchiveStateChangedPayload } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 import { and, inArray, isNull } from "drizzle-orm";
 
@@ -152,7 +152,7 @@ export class AutoArchiveRuntime {
 
     this.lastPayload = payload;
     this.lastCandidateFingerprint = candidateFingerprint;
-    this.emitEvent("autoArchiveStateChanged", payload);
+    this.emitEvent(blocksApi.events.autoArchiveStateChanged, payload);
   }
 
   private async readConfig(): Promise<AutoArchiveSettings> {

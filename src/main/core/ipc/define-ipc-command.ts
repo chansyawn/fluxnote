@@ -1,20 +1,19 @@
-import type {
-  IpcCommandContract,
-  IpcCommandKey,
-  IpcResponse,
-  ParsedIpcRequest,
-} from "@shared/ipc/contracts";
 import { businessError, toIpcErrorPayload, type IpcResult } from "@shared/ipc/errors";
+import type {
+  FeatureCommandContract,
+  FeatureCommandOutput,
+  ParsedFeatureCommandInput,
+} from "@shared/ipc/feature-api";
 import type { IpcMainInvokeEvent, WebContents } from "electron";
 import { ipcMain } from "electron";
 
-interface DefineIpcCommandOptions<TKey extends IpcCommandKey> {
-  command: IpcCommandContract<TKey>;
+interface DefineIpcCommandOptions<TContract extends FeatureCommandContract> {
+  command: TContract;
   getTrustedWebContents: () => WebContents | null;
   run: (
-    request: ParsedIpcRequest<TKey>,
+    request: ParsedFeatureCommandInput<TContract>,
     event: IpcMainInvokeEvent,
-  ) => Promise<IpcResponse<TKey>> | IpcResponse<TKey>;
+  ) => Promise<FeatureCommandOutput<TContract>> | FeatureCommandOutput<TContract>;
 }
 
 const shouldValidateResponse = process.env.NODE_ENV !== "production";
@@ -29,18 +28,20 @@ function assertTrustedSender(
   }
 }
 
-export function defineIpcCommand<TKey extends IpcCommandKey>(
-  options: DefineIpcCommandOptions<TKey>,
+export function defineIpcCommand<TContract extends FeatureCommandContract>(
+  options: DefineIpcCommandOptions<TContract>,
 ): void {
   ipcMain.handle(
     options.command.channel,
-    async (event, payload: unknown): Promise<IpcResult<IpcResponse<TKey>>> => {
+    async (event, payload: unknown): Promise<IpcResult<FeatureCommandOutput<TContract>>> => {
       try {
         assertTrustedSender(event, options.getTrustedWebContents);
-        const request = options.command.request.parse(payload) as ParsedIpcRequest<TKey>;
+        const request = options.command.request.parse(
+          payload,
+        ) as ParsedFeatureCommandInput<TContract>;
         const response = await options.run(request, event);
         const data = shouldValidateResponse
-          ? (options.command.response.parse(response) as IpcResponse<TKey>)
+          ? (options.command.response.parse(response) as FeatureCommandOutput<TContract>)
           : response;
         return {
           ok: true,

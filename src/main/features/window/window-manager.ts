@@ -1,6 +1,7 @@
 import path from "node:path";
 
-import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
+import { windowApi } from "@shared/features/window";
 import { app, BrowserWindow } from "electron";
 
 import { calculateWindowPosition, saveWindowPosition } from "./window-position";
@@ -152,7 +153,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         return;
       }
 
-      services.emitEvent("windowCloseRequested", null);
+      services.emitEvent(windowApi.events.closeRequested, null);
       event.preventDefault();
       hideMainWindow();
     });
@@ -164,12 +165,12 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     });
 
     createdWindow.on("focus", () => {
-      services.emitEvent("windowFocusChanged", true);
+      services.emitEvent(windowApi.events.focusChanged, true);
       services.onAutoArchiveTrigger(false);
     });
 
     createdWindow.on("blur", () => {
-      services.emitEvent("windowFocusChanged", false);
+      services.emitEvent(windowApi.events.focusChanged, false);
     });
 
     createdWindow.on("hide", () => {
@@ -186,7 +187,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         createdWindow.setPosition(x, y);
         createdWindow.show();
       }
-      services.emitEvent("windowFocusChanged", true);
+      services.emitEvent(windowApi.events.focusChanged, true);
       services.onOpenBlockReady();
     });
 

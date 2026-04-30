@@ -1,11 +1,13 @@
-import { createEmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
+import { createIpcEventBus } from "@main/core/ipc/event-bus";
+import { openBlockApi } from "@shared/features/open-block";
+import { windowApi } from "@shared/features/window";
 import type { BrowserWindow } from "electron";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-describe("createEmitIpcEvent", () => {
+describe("createIpcEventBus", () => {
   it("sends validated payloads to the configured event channel", () => {
     const send = vi.fn();
-    const emitEvent = createEmitIpcEvent({
+    const emitEvent = createIpcEventBus({
       getMainWindow: () =>
         ({
           isDestroyed: () => false,
@@ -13,15 +15,15 @@ describe("createEmitIpcEvent", () => {
         }) as unknown as BrowserWindow,
     });
 
-    const emitted = emitEvent("windowFocusChanged", true);
+    const emitted = emitEvent(windowApi.events.focusChanged, true);
 
     expect(emitted).toBe(true);
-    expect(send).toHaveBeenCalledWith("fluxnotes:event:window://focus-changed", true);
+    expect(send).toHaveBeenCalledWith("fluxnotes:window:event:focusChanged", true);
   });
 
   it("drops invalid payloads", () => {
     const send = vi.fn();
-    const emitEvent = createEmitIpcEvent({
+    const emitEvent = createIpcEventBus({
       getMainWindow: () =>
         ({
           isDestroyed: () => false,
@@ -29,7 +31,7 @@ describe("createEmitIpcEvent", () => {
         }) as unknown as BrowserWindow,
     });
 
-    const emitted = emitEvent("openBlockRequested", { nope: true } as never);
+    const emitted = emitEvent(openBlockApi.events.requested, { nope: true } as never);
 
     expect(emitted).toBe(false);
     expect(send).not.toHaveBeenCalled();

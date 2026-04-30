@@ -26,8 +26,8 @@ describe("renderer invoke transport", () => {
       subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
     } as FluxnotesRuntime);
 
-    await expect(invokeCommand("windowDestroy", undefined)).resolves.toBeUndefined();
-    expect(invoke).toHaveBeenCalledWith("windowDestroy", undefined);
+    await expect(invokeCommand("window.destroy", undefined)).resolves.toBeUndefined();
+    expect(invoke).toHaveBeenCalledWith("window.destroy", undefined);
   });
 
   it("wraps payload-shaped runtime failures into AppInvokeError", async () => {
@@ -42,7 +42,7 @@ describe("renderer invoke transport", () => {
       subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
     } as FluxnotesRuntime);
 
-    await expect(invokeCommand("windowDestroy", undefined)).rejects.toMatchObject({
+    await expect(invokeCommand("window.destroy", undefined)).rejects.toMatchObject({
       details: { id: "1" },
       message: "Missing",
       type: "BUSINESS.NOT_FOUND",
@@ -58,9 +58,9 @@ describe("renderer invoke transport", () => {
       subscribe: subscribe as unknown as FluxnotesRuntime["subscribe"],
     } as FluxnotesRuntime);
 
-    const returnedUnlisten = subscribeEvent("windowFocusChanged", handler);
+    const returnedUnlisten = subscribeEvent("window.focusChanged", handler);
 
-    expect(subscribe).toHaveBeenCalledWith("windowFocusChanged", handler);
+    expect(subscribe).toHaveBeenCalledWith("window.focusChanged", handler);
     expect(returnedUnlisten).toBe(unlisten);
   });
 

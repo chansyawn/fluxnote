@@ -1,16 +1,15 @@
 export {
+  allFeatureApis,
   ipcCommandContracts,
   ipcCommandKeys,
-  type IpcCommandContract,
-  type IpcCommandKey,
-  type IpcRequest,
-  type IpcResponse,
-  type ParsedIpcRequest,
-} from "./commands";
-export {
   ipcEventContracts,
   ipcEventKeys,
+  type IpcCommandContract,
+  type IpcCommandKey,
   type IpcEventContract,
   type IpcEventKey,
   type IpcEventPayload,
-} from "./events";
+  type IpcRequest,
+  type IpcResponse,
+  type ParsedIpcRequest,
+} from "./registry";

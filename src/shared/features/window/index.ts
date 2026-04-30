@@ -1,8 +1,7 @@
-export { windowIpcCommandContracts } from "./ipc-commands";
 export {
+  windowApi,
   windowCloseRequestedPayloadSchema,
   windowFocusChangedPayloadSchema,
-  windowIpcEventContracts,
   type WindowCloseRequestedPayload,
   type WindowFocusChangedPayload,
-} from "./ipc-events";
+} from "./api";
