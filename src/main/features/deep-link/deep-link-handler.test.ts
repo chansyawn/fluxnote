@@ -6,26 +6,26 @@ import {
 import { describe, expect, it, vi } from "vite-plus/test";
 
 describe("deep link command", () => {
-  it("extracts fluxnote urls from argv", () => {
-    expect(extractDeepLinkFromArgv(["--flag", "fluxnote://block/block-1"])).toBe(
-      "fluxnote://block/block-1",
+  it("extracts flux urls from argv", () => {
+    expect(extractDeepLinkFromArgv(["--flag", "flux://block/block-1"])).toBe(
+      "flux://block/block-1",
     );
     expect(extractDeepLinkFromArgv(["--flag"])).toBeNull();
   });
 
   it("parses app open deep links", () => {
-    expect(parseDeepLinkCommand("fluxnote://app/open")).toEqual({
+    expect(parseDeepLinkCommand("flux://app/open")).toEqual({
       command: "app.open",
       payload: null,
     });
   });
 
   it("parses block open deep links", () => {
-    expect(parseDeepLinkCommand("fluxnote://block/block-1")).toEqual({
+    expect(parseDeepLinkCommand("flux://block/block-1")).toEqual({
       command: "block.open",
       payload: { blockId: "block-1" },
     });
-    expect(parseDeepLinkCommand("fluxnote://block/folder%2Fblock-1")).toEqual({
+    expect(parseDeepLinkCommand("flux://block/folder%2Fblock-1")).toEqual({
       command: "block.open",
       payload: { blockId: "folder%2Fblock-1" },
     });
@@ -33,7 +33,7 @@ describe("deep link command", () => {
 
   it("rejects invalid deep links", () => {
     expect(parseDeepLinkCommand("https://block/block-1")).toBeNull();
-    expect(parseDeepLinkCommand("fluxnote://tag/tag-1")).toBeNull();
+    expect(parseDeepLinkCommand("flux://tag/tag-1")).toBeNull();
     expect(parseDeepLinkCommand("not a url")).toBeNull();
   });
 
@@ -41,7 +41,7 @@ describe("deep link command", () => {
     const dispatchCommand = vi.fn(async () => null);
     const command = createDeepLinkHandler({ dispatchCommand });
 
-    await expect(command.handle("fluxnote://block/block-1")).resolves.toBe(true);
+    await expect(command.handle("flux://block/block-1")).resolves.toBe(true);
 
     expect(dispatchCommand).toHaveBeenCalledWith("block.open", { blockId: "block-1" });
   });
@@ -50,7 +50,7 @@ describe("deep link command", () => {
     const dispatchCommand = vi.fn(async () => null);
     const command = createDeepLinkHandler({ dispatchCommand });
 
-    await expect(command.handle("fluxnote://tag/tag-1")).resolves.toBe(false);
+    await expect(command.handle("flux://tag/tag-1")).resolves.toBe(false);
 
     expect(dispatchCommand).not.toHaveBeenCalled();
   });

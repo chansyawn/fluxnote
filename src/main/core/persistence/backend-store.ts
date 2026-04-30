@@ -1,12 +1,10 @@
 import path from "node:path";
 
+import { APP_ASSETS_DIR_NAME, APP_DATABASE_FILE } from "@shared/app/app-config";
 import { app } from "electron";
 
 import { createDatabaseClient, type AppDatabase } from "../database/database-client";
 import { migrateDatabase } from "../database/database-migrator";
-
-const DATABASE_FILE_NAME = "fluxnote.sqlite3";
-const ASSETS_DIR_NAME = "assets";
 
 export class BackendStore {
   private closeDb: (() => void) | null = null;
@@ -46,7 +44,7 @@ export class BackendStore {
   }
 
   getDatabasePath(): string {
-    return path.join(app.getPath("userData"), DATABASE_FILE_NAME);
+    return path.join(app.getPath("userData"), APP_DATABASE_FILE);
   }
 
   getAssetPathForBlock(blockId: string): string {
@@ -54,6 +52,6 @@ export class BackendStore {
   }
 
   getAssetsRootPath(): string {
-    return path.join(app.getPath("userData"), ASSETS_DIR_NAME);
+    return path.join(app.getPath("userData"), APP_ASSETS_DIR_NAME);
   }
 }

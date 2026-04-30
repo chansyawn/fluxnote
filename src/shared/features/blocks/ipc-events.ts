@@ -9,7 +9,7 @@ export type AutoArchiveStateChangedPayload = z.infer<typeof autoArchiveStateChan
 
 export const blocksIpcEventContracts = {
   autoArchiveStateChanged: {
-    channel: "fluxnote:event:auto-archive://state-changed",
+    channel: "fluxnotes:event:auto-archive://state-changed",
     payload: autoArchiveStateChangedPayloadSchema,
   },
 } as const;

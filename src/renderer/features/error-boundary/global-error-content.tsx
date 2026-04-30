@@ -39,7 +39,7 @@ export function GlobalErrorContent({ error, onRetry }: GlobalErrorContentProps) 
         </ItemTitle>
         <ItemDescription className="line-clamp-none leading-relaxed">
           <Trans id="error.global.description">
-            FluxNote encountered an unexpected error. You can retry or exit the app.
+            Fluxnotes encountered an unexpected error. You can retry or exit the app.
           </Trans>
         </ItemDescription>
         <ItemDescription className="line-clamp-1 font-mono text-[11px] break-all">

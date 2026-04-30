@@ -1,16 +1,16 @@
-# FluxNote
+# Fluxnotes
 
 <p align="center">
-  <img src="./src/assets/icons/icon.png" alt="FluxNote Logo" height="96" />
+  <img src="./src/assets/icons/icon.png" alt="Fluxnotes Logo" height="96" />
 </p>
 
 [English](./README.md) | [中文](./README.zh.md)
 
-FluxNote is a lightweight, always-on-top editor designed for AI-first workflows.
+Fluxnotes is a lightweight, always-on-top editor designed for AI-first workflows.
 
-It was built from a real daily problem: AI input boxes are rarely good at long prompt drafting, structured organization, and multi-round iteration. FluxNote acts as a lightweight drafting layer for AI workflows, especially for CLI agents while still fitting web chat tools.
+It was built from a real daily problem: AI input boxes are rarely good at long prompt drafting, structured organization, and multi-round iteration. Fluxnotes acts as a lightweight drafting layer for AI workflows, especially for CLI agents while still fitting web chat tools.
 
-## Why FluxNote
+## Why Fluxnotes
 
 If you work with AI every day, prompt quality and iteration speed matter, but most AI input boxes are optimized for quick messages, not serious drafting.
 
@@ -20,7 +20,7 @@ That creates predictable friction:
 - structure gets lost across iterations
 - parallel tasks get mixed together in one document
 
-FluxNote gives you a lightweight drafting pad before final submission to any AI tool:
+Fluxnotes gives you a lightweight drafting pad before final submission to any AI tool:
 
 - draft and polish long prompts comfortably
 - separate parallel tasks with blocks instead of forcing everything into one document
@@ -28,7 +28,7 @@ FluxNote gives you a lightweight drafting pad before final submission to any AI 
 
 ## Product Direction
 
-FluxNote aims to be a lightweight, global, workflow-friendly Markdown / Block editor for AI work.
+Fluxnotes aims to be a lightweight, global, workflow-friendly Markdown / Block editor for AI work.
 
 Core design goals:
 
@@ -52,9 +52,9 @@ Core design goals:
 - **Browser integration** through plugins, URL schema, and Native Message
 - **Smoother editing flow inside web AI tools**
 
-## Use FluxNote as `$EDITOR` (Claude Code / Codex)
+## Use Fluxnotes as `$EDITOR` (Claude Code / Codex)
 
-If you want Claude Code or Codex to open external edits in FluxNote, set your shell editor to:
+If you want Claude Code or Codex to open external edits in Fluxnotes, set your shell editor to:
 
 ```bash
 export EDITOR="flux --edit"
@@ -67,7 +67,7 @@ echo 'export EDITOR="flux --edit"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-Then when Claude Code or Codex triggers an external editor flow, the target file will open in FluxNote for editing and submit/cancel handling.
+Then when Claude Code or Codex triggers an external editor flow, the target file will open in Fluxnotes for editing and submit/cancel handling.
 
 If you prefer enabling this only for Codex / Claude commands (without changing global `EDITOR`), add aliases:
 
@@ -76,11 +76,11 @@ alias cdx='EDITOR="flux --edit" codex'
 alias cld='EDITOR="flux --edit" claude'
 ```
 
-Then use `cdx` or `cld` when you want FluxNote-backed external editing.
+Then use `cdx` or `cld` when you want Fluxnotes-backed external editing.
 
 ## Who It Is For
 
-FluxNote is for builders, developers, and AI power users who:
+Fluxnotes is for builders, developers, and AI power users who:
 
 - rely heavily on CLI agents (Codex, Claude Code, etc.) and need a better external editing experience
 - use web chat AI tools but prefer drafting and structuring input before pasting
@@ -88,6 +88,6 @@ FluxNote is for builders, developers, and AI power users who:
 
 ## Current Stage
 
-FluxNote is under active early development.
+Fluxnotes is under active early development.
 
 Some capabilities are already usable, while others are being completed incrementally based on real usage feedback.

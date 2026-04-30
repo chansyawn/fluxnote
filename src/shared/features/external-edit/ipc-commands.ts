@@ -7,19 +7,19 @@ const voidSchema = z.undefined();
 
 export const externalEditIpcCommandContracts = {
   externalEditsCancel: {
-    channel: "fluxnote:external-edits:cancel",
+    channel: "fluxnotes:external-edits:cancel",
     request: z.object({
       editId: z.string().min(1),
     }),
     response: voidSchema,
   },
   externalEditsList: {
-    channel: "fluxnote:external-edits:list",
+    channel: "fluxnotes:external-edits:list",
     request: voidSchema,
     response: z.array(externalEditSessionSchema),
   },
   externalEditsSubmit: {
-    channel: "fluxnote:external-edits:submit",
+    channel: "fluxnotes:external-edits:submit",
     request: z.object({
       editId: z.string().min(1),
       content: z.string(),

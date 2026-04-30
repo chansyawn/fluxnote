@@ -4,17 +4,17 @@ const voidSchema = z.undefined();
 
 export const windowIpcCommandContracts = {
   windowDestroy: {
-    channel: "fluxnote:window:destroy",
+    channel: "fluxnotes:window:destroy",
     request: voidSchema,
     response: voidSchema,
   },
   windowHide: {
-    channel: "fluxnote:window:hide",
+    channel: "fluxnotes:window:hide",
     request: voidSchema,
     response: voidSchema,
   },
   windowToggle: {
-    channel: "fluxnote:window:toggle",
+    channel: "fluxnotes:window:toggle",
     request: voidSchema,
     response: voidSchema,
   },

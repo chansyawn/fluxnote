@@ -1,4 +1,4 @@
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import { DEFAULT_SETTINGS } from "@shared/features/preferences";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -30,8 +30,8 @@ describe("preload runtime", () => {
     await import("@preload/index");
   });
 
-  function getRuntime(): FluxnoteRuntime {
-    return electronMock.exposeInMainWorld.mock.calls[0]?.[1] as FluxnoteRuntime;
+  function getRuntime(): FluxnotesRuntime {
+    return electronMock.exposeInMainWorld.mock.calls[0]?.[1] as FluxnotesRuntime;
   }
 
   it("validates invoke responses against the shared command contract", async () => {

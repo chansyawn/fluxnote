@@ -7,7 +7,7 @@ export type OpenBlockRequestedPayload = z.infer<typeof openBlockRequestedPayload
 
 export const openBlockIpcEventContracts = {
   openBlockRequested: {
-    channel: "fluxnote:event:open-block://requested",
+    channel: "fluxnotes:event:open-block://requested",
     payload: openBlockRequestedPayloadSchema,
   },
 } as const;

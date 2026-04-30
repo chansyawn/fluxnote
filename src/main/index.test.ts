@@ -4,10 +4,10 @@ const startPrimaryInstance = vi.fn();
 const app = {
   getPath: vi.fn((name: string) => {
     if (name === "sessionData") {
-      return "/Users/tester/Library/Application Support/Fluxnote";
+      return "/Users/tester/Library/Application Support/Fluxnotes";
     }
     if (name === "logs") {
-      return "/Users/tester/Library/Logs/Fluxnote";
+      return "/Users/tester/Library/Logs/Fluxnotes";
     }
     return "";
   }),
@@ -55,9 +55,9 @@ describe("main process entry", () => {
     expect(app.setPath).toHaveBeenCalledWith("userData", "/Users/tester/.flux");
     expect(app.setPath).toHaveBeenCalledWith(
       "sessionData",
-      "/Users/tester/Library/Application Support/Fluxnote",
+      "/Users/tester/Library/Application Support/Fluxnotes",
     );
-    expect(app.setPath).toHaveBeenCalledWith("logs", "/Users/tester/Library/Logs/Fluxnote");
+    expect(app.setPath).toHaveBeenCalledWith("logs", "/Users/tester/Library/Logs/Fluxnotes");
     expect(app.setPath.mock.invocationCallOrder[0]).toBeLessThan(
       app.requestSingleInstanceLock.mock.invocationCallOrder[0]!,
     );

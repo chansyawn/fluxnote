@@ -16,7 +16,7 @@ type ThemeStateProviderProps = {
 export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
   // macOS vibrancy does not reliably follow an app-forced light/dark override,
-  // so FluxNote stays pinned to the OS appearance to keep window chrome and
+  // so Fluxnotes stays pinned to the OS appearance to keep window chrome and
   // document surfaces visually consistent.
   const themeMode: ThemeMode = "system";
 

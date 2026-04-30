@@ -4,13 +4,13 @@ import {
   subscribeEvent,
   toAppInvokeError,
 } from "@renderer/app/invoke";
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-function setRuntime(runtime: FluxnoteRuntime): void {
+function setRuntime(runtime: FluxnotesRuntime): void {
   Object.defineProperty(globalThis, "window", {
     configurable: true,
-    value: { fluxnote: runtime },
+    value: { fluxnotes: runtime },
   });
 }
 
@@ -22,9 +22,9 @@ describe("renderer invoke transport", () => {
   it("invokes commands through the runtime transport", async () => {
     const invoke = vi.fn(async () => undefined);
     setRuntime({
-      invoke: invoke as unknown as FluxnoteRuntime["invoke"],
-      subscribe: vi.fn(() => () => {}) as unknown as FluxnoteRuntime["subscribe"],
-    } as FluxnoteRuntime);
+      invoke: invoke as unknown as FluxnotesRuntime["invoke"],
+      subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
+    } as FluxnotesRuntime);
 
     await expect(invokeCommand("windowDestroy", undefined)).resolves.toBeUndefined();
     expect(invoke).toHaveBeenCalledWith("windowDestroy", undefined);
@@ -38,9 +38,9 @@ describe("renderer invoke transport", () => {
           message: "Missing",
           details: { id: "1" },
         };
-      }) as unknown as FluxnoteRuntime["invoke"],
-      subscribe: vi.fn(() => () => {}) as unknown as FluxnoteRuntime["subscribe"],
-    } as FluxnoteRuntime);
+      }) as unknown as FluxnotesRuntime["invoke"],
+      subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
+    } as FluxnotesRuntime);
 
     await expect(invokeCommand("windowDestroy", undefined)).rejects.toMatchObject({
       details: { id: "1" },
@@ -54,9 +54,9 @@ describe("renderer invoke transport", () => {
     const subscribe = vi.fn(() => unlisten);
     const handler = vi.fn();
     setRuntime({
-      invoke: vi.fn(async () => undefined) as unknown as FluxnoteRuntime["invoke"],
-      subscribe: subscribe as unknown as FluxnoteRuntime["subscribe"],
-    } as FluxnoteRuntime);
+      invoke: vi.fn(async () => undefined) as unknown as FluxnotesRuntime["invoke"],
+      subscribe: subscribe as unknown as FluxnotesRuntime["subscribe"],
+    } as FluxnotesRuntime);
 
     const returnedUnlisten = subscribeEvent("windowFocusChanged", handler);
 

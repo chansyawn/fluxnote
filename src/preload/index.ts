@@ -1,4 +1,4 @@
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import {
   ipcCommandContracts,
   ipcEventContracts,
@@ -78,9 +78,9 @@ function subscribe<TKey extends IpcEventKey>(
   };
 }
 
-const runtime: FluxnoteRuntime = {
+const runtime: FluxnotesRuntime = {
   invoke,
   subscribe,
 };
 
-contextBridge.exposeInMainWorld("fluxnote", runtime);
+contextBridge.exposeInMainWorld("fluxnotes", runtime);

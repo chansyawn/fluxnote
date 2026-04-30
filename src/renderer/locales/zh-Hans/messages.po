@@ -17,7 +17,7 @@ msgstr ""
 #: src/renderer/features/error-boundary/error-title-bar.tsx:35
 #: src/renderer/routes/-layout/window-title-bar.tsx:94
 msgid "app.title"
-msgstr "FluxNote"
+msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:236
@@ -72,7 +72,7 @@ msgstr "此区块渲染失败"
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:41
 msgid "error.global.description"
-msgstr "FluxNote 遇到了意外错误。你可以重试或退出应用。"
+msgstr "Fluxnotes 遇到了意外错误。你可以重试或退出应用。"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:14

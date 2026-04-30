@@ -1,4 +1,4 @@
-import type { FluxnoteRuntime } from "@shared/electron-runtime";
+import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import type {
   IpcCommandKey,
   IpcEventKey,
@@ -8,7 +8,7 @@ import type {
 } from "@shared/ipc/contracts";
 import type { IpcErrorPayload } from "@shared/ipc/errors";
 
-export type RuntimeBridge = FluxnoteRuntime;
+export type RuntimeBridge = FluxnotesRuntime;
 export type AppInvokeErrorPayload = IpcErrorPayload;
 
 export class AppInvokeError extends Error {
@@ -65,13 +65,13 @@ export function toAppInvokeError(error: unknown): AppInvokeError {
 
 export function getRuntimeBridge(): RuntimeBridge {
   if (typeof window === "undefined") {
-    throw new Error("Fluxnote runtime bridge is unavailable: window is undefined");
+    throw new Error("Fluxnotes runtime bridge is unavailable: window is undefined");
   }
 
-  const runtimeValue = window.fluxnote;
+  const runtimeValue = window.fluxnotes;
   if (!isRecord(runtimeValue)) {
     throw new Error(
-      "Fluxnote runtime bridge is unavailable: window.fluxnote is missing. Check preload bridge injection.",
+      "Fluxnotes runtime bridge is unavailable: window.fluxnotes is missing. Check preload bridge injection.",
     );
   }
 

@@ -8,11 +8,11 @@ export type WindowFocusChangedPayload = z.infer<typeof windowFocusChangedPayload
 
 export const windowIpcEventContracts = {
   windowCloseRequested: {
-    channel: "fluxnote:event:window://close-requested",
+    channel: "fluxnotes:event:window://close-requested",
     payload: windowCloseRequestedPayloadSchema,
   },
   windowFocusChanged: {
-    channel: "fluxnote:event:window://focus-changed",
+    channel: "fluxnotes:event:window://focus-changed",
     payload: windowFocusChangedPayloadSchema,
   },
 } as const;

@@ -16,7 +16,7 @@ describe("createEmitIpcEvent", () => {
     const emitted = emitEvent("windowFocusChanged", true);
 
     expect(emitted).toBe(true);
-    expect(send).toHaveBeenCalledWith("fluxnote:event:window://focus-changed", true);
+    expect(send).toHaveBeenCalledWith("fluxnotes:event:window://focus-changed", true);
   });
 
   it("drops invalid payloads", () => {

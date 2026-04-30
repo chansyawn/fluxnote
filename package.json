@@ -1,5 +1,5 @@
 {
-  "name": "fluxnote",
+  "name": "fluxnotes",
   "version": "0.0.0",
   "private": true,
   "bin": {
@@ -92,5 +92,5 @@
       "electron"
     ]
   },
-  "productName": "fluxnote"
+  "productName": "fluxnotes"
 }

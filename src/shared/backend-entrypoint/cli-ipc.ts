@@ -57,10 +57,10 @@ export function resolveCliIpcSocketPath(): string {
       : sanitizePipeSegment(os.userInfo().username);
 
   if (process.platform === "win32") {
-    return `\\\\.\\pipe\\fluxnote-${sanitizePipeSegment(userId)}`;
+    return `\\\\.\\pipe\\fluxnotes-${sanitizePipeSegment(userId)}`;
   }
 
-  return path.join(os.tmpdir(), `fluxnote-${sanitizePipeSegment(userId)}.sock`);
+  return path.join(os.tmpdir(), `fluxnotes-${sanitizePipeSegment(userId)}.sock`);
 }
 
 export function createCliIpcRequest(

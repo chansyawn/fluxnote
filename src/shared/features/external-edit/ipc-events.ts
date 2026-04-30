@@ -9,7 +9,7 @@ export type ExternalEditSessionsChangedPayload = z.infer<
 
 export const externalEditIpcEventContracts = {
   externalEditSessionsChanged: {
-    channel: "fluxnote:event:external-edit://sessions-changed",
+    channel: "fluxnotes:event:external-edit://sessions-changed",
     payload: externalEditSessionsChangedPayloadSchema,
   },
 } as const;

@@ -98,7 +98,7 @@ async function waitForServer(timeoutMs: number): Promise<void> {
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Timed out waiting for FluxNote.");
+  throw lastError instanceof Error ? lastError : new Error("Timed out waiting for Fluxnotes.");
 }
 
 type CliContext =
@@ -108,7 +108,7 @@ type CliContext =
 async function detectCliContext(): Promise<CliContext> {
   const cliDir = path.dirname(fileURLToPath(import.meta.url));
   const rootDir = path.resolve(cliDir, "../..");
-  const electronBinary = path.join(rootDir, "MacOS", "fluxnote");
+  const electronBinary = path.join(rootDir, "MacOS", "fluxnotes");
 
   try {
     const s = await stat(electronBinary);
@@ -127,7 +127,7 @@ async function detectCliContext(): Promise<CliContext> {
     // Not in a dev repo either
   }
 
-  throw new Error("Cannot determine FluxNote location. Reinstall the application.");
+  throw new Error("Cannot determine Fluxnotes location. Reinstall the application.");
 }
 
 function launchApp(context: CliContext): void {

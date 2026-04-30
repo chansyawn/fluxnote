@@ -58,7 +58,7 @@ export async function runFluxCli(argv: readonly string[] = process.argv): Promis
 
   if (command.kind === "open") {
     await dispatchCommand("app.open", null);
-    console.log("Opened FluxNote.");
+    console.log("Opened Fluxnotes.");
     return 0;
   }
 

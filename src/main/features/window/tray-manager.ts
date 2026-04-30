@@ -1,6 +1,5 @@
 import path from "node:path";
 
-import { APP_DISPLAY_NAME } from "@shared/app/app-config";
 import { app, Menu, nativeImage, type NativeImage, Tray } from "electron";
 
 interface TrayManagerServices {
@@ -41,11 +40,11 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
 
     const icon = createTrayIcon();
     tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
-    tray.setToolTip(APP_DISPLAY_NAME);
+    tray.setToolTip("Fluxnotes");
     const menuTemplate = [
       {
         click: services.showMainWindow,
-        label: `Show ${APP_DISPLAY_NAME}`,
+        label: `Show Fluxnotes`,
       },
       { type: "separator" as const },
       {

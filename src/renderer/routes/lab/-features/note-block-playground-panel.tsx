@@ -40,7 +40,7 @@ type User = {
   name: string;
 };
 
-const demoUser: User = { id: "u_1", name: "FluxNote" };
+const demoUser: User = { id: "u_1", name: "Fluxnotes" };
 console.log(demoUser);
 \`\`\`
 

@@ -6,7 +6,7 @@ import type {
   IpcResponse,
 } from "@shared/ipc/contracts";
 
-export interface FluxnoteRuntime {
+export interface FluxnotesRuntime {
   invoke<TKey extends IpcCommandKey>(
     key: TKey,
     payload: IpcRequest<TKey>,
@@ -17,10 +17,10 @@ export interface FluxnoteRuntime {
   ): () => void;
 }
 
-export interface FluxnoteRuntimeGlobal {
-  fluxnote?: FluxnoteRuntime;
+export interface FluxnotesRuntimeGlobal {
+  fluxnotes?: FluxnotesRuntime;
 }
 
 declare global {
-  interface Window extends FluxnoteRuntimeGlobal {}
+  interface Window extends FluxnotesRuntimeGlobal {}
 }

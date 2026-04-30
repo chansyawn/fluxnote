@@ -6,17 +6,17 @@ const voidSchema = z.undefined();
 
 export const preferencesIpcCommandContracts = {
   preferencesRead: {
-    channel: "fluxnote:preferences:read",
+    channel: "fluxnotes:preferences:read",
     request: voidSchema,
     response: settingsSchema,
   },
   preferencesPatch: {
-    channel: "fluxnote:preferences:patch",
+    channel: "fluxnotes:preferences:patch",
     request: settingsPatchSchema,
     response: settingsSchema,
   },
   preferencesReset: {
-    channel: "fluxnote:preferences:reset",
+    channel: "fluxnotes:preferences:reset",
     request: voidSchema,
     response: settingsSchema,
   },

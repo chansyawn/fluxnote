@@ -4,19 +4,19 @@ const voidSchema = z.undefined();
 
 export const cliIpcCommandContracts = {
   cliInstall: {
-    channel: "fluxnote:cli:install",
+    channel: "fluxnotes:cli:install",
     request: voidSchema,
     response: voidSchema,
   },
   cliStatus: {
-    channel: "fluxnote:cli:status",
+    channel: "fluxnotes:cli:status",
     request: voidSchema,
     response: z.object({
       installed: z.boolean(),
     }),
   },
   cliUninstall: {
-    channel: "fluxnote:cli:uninstall",
+    channel: "fluxnotes:cli:uninstall",
     request: voidSchema,
     response: voidSchema,
   },

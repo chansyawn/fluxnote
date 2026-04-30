@@ -91,7 +91,7 @@ export function WindowTitleBar() {
         </div>
 
         <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
-          <Trans id="app.title">FluxNote</Trans>
+          <Trans id="app.title">Fluxnotes</Trans>
         </div>
 
         {import.meta.env.DEV ? <HeaderLabButton /> : null}

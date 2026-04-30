@@ -8,7 +8,7 @@ export type ShortcutPressedPayload = z.infer<typeof shortcutPressedPayloadSchema
 
 export const shortcutIpcEventContracts = {
   shortcutPressed: {
-    channel: "fluxnote:event:shortcut://pressed",
+    channel: "fluxnotes:event:shortcut://pressed",
     payload: shortcutPressedPayloadSchema,
   },
 } as const;

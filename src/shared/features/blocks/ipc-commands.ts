@@ -13,37 +13,37 @@ const voidSchema = z.undefined();
 
 export const blocksIpcCommandContracts = {
   blocksArchive: {
-    channel: "fluxnote:blocks:archive",
+    channel: "fluxnotes:blocks:archive",
     request: blockMutationRequestSchema,
     response: blockSchema,
   },
   blocksCreate: {
-    channel: "fluxnote:blocks:create",
+    channel: "fluxnotes:blocks:create",
     request: voidSchema,
     response: blockSchema,
   },
   blocksDelete: {
-    channel: "fluxnote:blocks:delete",
+    channel: "fluxnotes:blocks:delete",
     request: blockMutationRequestSchema,
     response: z.object({ deletedBlockId: z.string() }),
   },
   blocksList: {
-    channel: "fluxnote:blocks:list",
+    channel: "fluxnotes:blocks:list",
     request: blocksListRequestSchema,
     response: blocksListResponseSchema,
   },
   blocksLocate: {
-    channel: "fluxnote:blocks:locate",
+    channel: "fluxnotes:blocks:locate",
     request: blocksLocateRequestSchema,
     response: blocksLocateResponseSchema,
   },
   blocksRestore: {
-    channel: "fluxnote:blocks:restore",
+    channel: "fluxnotes:blocks:restore",
     request: blockMutationRequestSchema,
     response: blockSchema,
   },
   blocksUpdateContent: {
-    channel: "fluxnote:blocks:update-content",
+    channel: "fluxnotes:blocks:update-content",
     request: z.object({
       blockId: z.string().min(1),
       content: z.string(),
