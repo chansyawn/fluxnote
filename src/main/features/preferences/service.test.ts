@@ -83,7 +83,6 @@ describe("preferences service", () => {
       autoArchive: {
         enabled: false,
         idleMinutes: 90,
-        scanIntervalSeconds: 60,
       },
     });
     const service = createPreferencesService(storage);
@@ -91,7 +90,6 @@ describe("preferences service", () => {
     expect(service.readAutoArchiveSettings()).toEqual({
       enabled: false,
       idleMinutes: 90,
-      scanIntervalSeconds: 60,
     });
   });
 });

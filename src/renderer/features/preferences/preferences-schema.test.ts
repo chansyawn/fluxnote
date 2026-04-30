@@ -36,7 +36,6 @@ describe("auto archive preferences", () => {
         autoArchive: {
           enabled: true,
           idleMinutes: 90,
-          scanIntervalSeconds: 300,
         },
         shortcuts: DEFAULT_SETTINGS.shortcuts,
       }).autoArchive.idleMinutes,
@@ -52,7 +51,6 @@ describe("auto archive preferences", () => {
         autoArchive: {
           enabled: true,
           idleMinutes: 0,
-          scanIntervalSeconds: 300,
         },
         shortcuts: DEFAULT_SETTINGS.shortcuts,
       }).autoArchive.idleMinutes,

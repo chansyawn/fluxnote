@@ -37,7 +37,6 @@ export const autoArchiveSettingsSchema = z
   .object({
     enabled: z.boolean().catch(true),
     idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
-    scanIntervalSeconds: z.int().positive().catch(300),
   })
   .strict();
 
@@ -72,7 +71,6 @@ const autoArchiveSettingsPatchSchema = z
       .min(AUTO_ARCHIVE_MIN_IDLE_MINUTES)
       .max(AUTO_ARCHIVE_MAX_IDLE_MINUTES)
       .optional(),
-    scanIntervalSeconds: z.int().positive().optional(),
   })
   .strict();
 
@@ -93,7 +91,6 @@ const defaultSettingsValue = {
   autoArchive: {
     enabled: true,
     idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
-    scanIntervalSeconds: 300,
   },
   shortcuts: {
     "toggle-window": "Alt+N",

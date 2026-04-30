@@ -16,6 +16,13 @@ interface AutoArchiveRuntimeOptions {
 }
 
 const MIN_SCAN_INTERVAL_SECONDS = 30;
+const MAX_SCAN_INTERVAL_SECONDS = 15 * 60;
+const SCAN_INTERVAL_RATIO = 0.1;
+
+export function deriveScanIntervalSeconds(idleMinutes: number): number {
+  const derivedSeconds = Math.floor(idleMinutes * 60 * SCAN_INTERVAL_RATIO);
+  return Math.min(Math.max(derivedSeconds, MIN_SCAN_INTERVAL_SECONDS), MAX_SCAN_INTERVAL_SECONDS);
+}
 
 export class AutoArchiveRuntime {
   private readonly emitEvent: EmitIpcEvent;
@@ -67,7 +74,7 @@ export class AutoArchiveRuntime {
     }
 
     const config = await this.readConfig();
-    const delayMs = Math.max(config.scanIntervalSeconds, MIN_SCAN_INTERVAL_SECONDS) * 1000;
+    const delayMs = deriveScanIntervalSeconds(config.idleMinutes) * 1000;
     this.timer = setTimeout(async () => {
       if (!this.running) {
         return;
