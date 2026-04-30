@@ -1,5 +1,6 @@
 import { queryClient } from "@renderer/app/query";
 import { onAutoArchiveStateChanged } from "@renderer/clients/event";
+import { onExternalEditSessionsChanged } from "@renderer/clients/external-edits";
 import { onWindowFocusChanged } from "@renderer/clients/window";
 import { useEffect } from "react";
 
@@ -12,6 +13,9 @@ export function AutoArchiveSync() {
     const unlistenStateChanged = onAutoArchiveStateChanged(() => {
       invalidateBlockQueries();
     });
+    const unlistenExternalEditSessionsChanged = onExternalEditSessionsChanged(() => {
+      invalidateBlockQueries();
+    });
     const unlistenFocusChanged = onWindowFocusChanged((focused) => {
       if (!focused) {
         return;
@@ -21,6 +25,7 @@ export function AutoArchiveSync() {
     });
     return () => {
       unlistenStateChanged();
+      unlistenExternalEditSessionsChanged();
       unlistenFocusChanged();
     };
   }, []);

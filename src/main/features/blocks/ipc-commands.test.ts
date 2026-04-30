@@ -6,6 +6,7 @@ import {
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blockTags, tags } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
@@ -17,9 +18,18 @@ async function createTestDatabaseClient(): Promise<DatabaseClient> {
   return client;
 }
 
-function createHandlers(db: AppDatabase) {
+interface TestCommandOptions {
+  now?: Date;
+  protectedBlockIds?: Set<string>;
+  settings?: AutoArchiveSettings;
+}
+
+function createHandlers(db: AppDatabase, options: TestCommandOptions = {}) {
   return createBlocksIpcCommands({
     getDb: async () => db,
+    getProtectedBlockIds: () => options.protectedBlockIds ?? new Set(),
+    now: () => options.now ?? new Date(),
+    readAutoArchiveSettings: () => options.settings ?? DEFAULT_SETTINGS.autoArchive,
     store: {
       getAssetPathForBlock: () => "",
     } as unknown as BackendStore,
@@ -39,6 +49,16 @@ async function setBlockCreatedAt(db: AppDatabase, blockId: string, createdAt: st
   await db.run(sql`UPDATE blocks SET created_at = ${createdAt} WHERE id = ${blockId}`);
 }
 
+async function setBlockContentUpdatedAt(
+  db: AppDatabase,
+  blockId: string,
+  contentUpdatedAt: string,
+) {
+  await db.run(
+    sql`UPDATE blocks SET content_updated_at = ${contentUpdatedAt} WHERE id = ${blockId}`,
+  );
+}
+
 async function listBlocks(
   db: AppDatabase,
   request: {
@@ -47,8 +67,9 @@ async function listBlocks(
     offset?: number;
     limit?: number;
   } = {},
+  options: TestCommandOptions = {},
 ) {
-  const command = createHandlers(db).find((definition) => definition.key === "blocksList");
+  const command = createHandlers(db, options).find((definition) => definition.key === "blocksList");
   if (!command || command.key !== "blocksList") {
     throw new Error("blocksList command not found");
   }
@@ -71,8 +92,11 @@ async function locateBlock(
     tagIds?: string[];
     visibility?: "active" | "archived";
   },
+  options: TestCommandOptions = {},
 ) {
-  const command = createHandlers(db).find((definition) => definition.key === "blocksLocate");
+  const command = createHandlers(db, options).find(
+    (definition) => definition.key === "blocksLocate",
+  );
   if (!command || command.key !== "blocksLocate") {
     throw new Error("blocksLocate command not found");
   }
@@ -222,6 +246,56 @@ describe("blocks ipc commands", () => {
     expect(activePage.totalCount).toBe(1);
     expect(archivedPage.blocks.map((block) => block.id)).toEqual([archivedBlock.id]);
     expect(archivedPage.totalCount).toBe(1);
+  });
+
+  it("marks listed blocks that will be archived by the next auto-archive trigger", async () => {
+    const db = await getDb();
+    const staleBlock = await createBlock(db);
+    const protectedBlock = await createBlock(db);
+    const freshBlock = await createBlock(db);
+    const options = {
+      now: new Date("2026-01-01T12:00:00.000Z"),
+      protectedBlockIds: new Set([protectedBlock.id]),
+      settings: {
+        enabled: true,
+        idleMinutes: 60,
+      },
+    } satisfies TestCommandOptions;
+    await setBlockContentUpdatedAt(db, staleBlock.id, "2026-01-01T10:00:00.000Z");
+    await setBlockContentUpdatedAt(db, protectedBlock.id, "2026-01-01T10:00:00.000Z");
+    await setBlockContentUpdatedAt(db, freshBlock.id, "2026-01-01T11:30:00.000Z");
+
+    const page = await listBlocks(db, {}, options);
+    const blocksById = new Map(page.blocks.map((block) => [block.id, block]));
+
+    expect(blocksById.get(staleBlock.id)?.willArchive).toBe(true);
+    expect(blocksById.get(protectedBlock.id)?.willArchive).toBe(false);
+    expect(blocksById.get(freshBlock.id)?.willArchive).toBe(false);
+  });
+
+  it("marks located blocks with the same auto-archive evaluation", async () => {
+    const db = await getDb();
+    const staleBlock = await createBlock(db);
+    await setBlockContentUpdatedAt(db, staleBlock.id, "2026-01-01T10:00:00.000Z");
+
+    await expect(
+      locateBlock(
+        db,
+        { blockId: staleBlock.id },
+        {
+          now: new Date("2026-01-01T12:00:00.000Z"),
+          settings: {
+            enabled: true,
+            idleMinutes: 60,
+          },
+        },
+      ),
+    ).resolves.toMatchObject({
+      block: {
+        id: staleBlock.id,
+        willArchive: true,
+      },
+    });
   });
 
   it("locates blocks by zero-based index with the current filters", async () => {

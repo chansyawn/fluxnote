@@ -8,6 +8,8 @@ import type { Tag } from "@shared/features/tags";
 import { businessError } from "@shared/ipc/errors";
 import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
+import { blockWillAutoArchive, type AutoArchiveEvaluationContext } from "./auto-archive-policy";
+
 function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt: string }): Tag {
   return {
     id: tag.id,
@@ -17,7 +19,11 @@ function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt
   };
 }
 
-function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
+function mapBlockRow(
+  block: BlockRecord,
+  tags: Tag[],
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Block {
   return {
     id: block.id,
     content: block.content,
@@ -25,7 +31,7 @@ function mapBlockRow(block: BlockRecord, tags: Tag[]): Block {
     archivedAt: block.archivedAt,
     createdAt: block.createdAt,
     updatedAt: block.updatedAt,
-    willArchive: false,
+    willArchive: autoArchiveContext ? blockWillAutoArchive(block, autoArchiveContext) : false,
     tags,
   };
 }
@@ -83,14 +89,18 @@ export async function assertBlockExists(db: AppDatabase, blockId: string): Promi
   }
 }
 
-export async function getPublicBlockById(db: AppDatabase, blockId: string): Promise<Block> {
+export async function getPublicBlockById(
+  db: AppDatabase,
+  blockId: string,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<Block> {
   const block = await db.select().from(blocks).where(eq(blocks.id, blockId)).get();
   if (!block) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
   const tagsByBlockId = await getTagsForBlocks(db, [blockId]);
-  return mapBlockRow(block, tagsByBlockId.get(blockId) ?? []);
+  return mapBlockRow(block, tagsByBlockId.get(blockId) ?? [], autoArchiveContext);
 }
 
 async function countBlocks(
@@ -135,6 +145,7 @@ export async function listBlocks(
   visibility: "active" | "archived",
   offset: number,
   limit: number,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
 ) {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
@@ -182,7 +193,9 @@ export async function listBlocks(
   const blockIds = blockRows.map((block) => block.id);
   const tagsByBlockId = await getTagsForBlocks(db, blockIds);
   return {
-    blocks: blockRows.map((block) => mapBlockRow(block, tagsByBlockId.get(block.id) ?? [])),
+    blocks: blockRows.map((block) =>
+      mapBlockRow(block, tagsByBlockId.get(block.id) ?? [], autoArchiveContext),
+    ),
     offset,
     limit,
     totalCount: await countBlocks(db, uniqueTagIds, visibility),
@@ -194,6 +207,7 @@ export async function locateBlock(
   blockId: string,
   tagIds: string[] | undefined,
   visibility: "active" | "archived",
+  autoArchiveContext?: AutoArchiveEvaluationContext,
 ) {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
@@ -225,7 +239,7 @@ export async function locateBlock(
   });
 
   return {
-    block: await getPublicBlockById(db, blockId),
+    block: await getPublicBlockById(db, blockId, autoArchiveContext),
     index,
   };
 }
@@ -234,6 +248,7 @@ export async function updateBlockContent(
   db: AppDatabase,
   blockId: string,
   content: string,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
 ): Promise<Block> {
   const result = await db
     .update(blocks)
@@ -247,10 +262,14 @@ export async function updateBlockContent(
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return await getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId, autoArchiveContext);
 }
 
-export async function archiveBlock(db: AppDatabase, blockId: string): Promise<Block> {
+export async function archiveBlock(
+  db: AppDatabase,
+  blockId: string,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<Block> {
   const now = nowIsoString();
   const result = await db
     .update(blocks)
@@ -263,10 +282,14 @@ export async function archiveBlock(db: AppDatabase, blockId: string): Promise<Bl
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return await getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId, autoArchiveContext);
 }
 
-export async function restoreBlock(db: AppDatabase, blockId: string): Promise<Block> {
+export async function restoreBlock(
+  db: AppDatabase,
+  blockId: string,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<Block> {
   const result = await db
     .update(blocks)
     .set({
@@ -278,7 +301,7 @@ export async function restoreBlock(db: AppDatabase, blockId: string): Promise<Bl
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
 
-  return await getPublicBlockById(db, blockId);
+  return await getPublicBlockById(db, blockId, autoArchiveContext);
 }
 
 export async function deleteBlock(

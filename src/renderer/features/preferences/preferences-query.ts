@@ -35,8 +35,11 @@ export function usePatchSettingsMutation() {
   return useMutation({
     mutationFn: patchSettings,
     onError: showSettingsError,
-    onSuccess: (settings) => {
+    onSuccess: (settings, patch) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+      if (patch.autoArchive) {
+        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      }
     },
   });
 }
@@ -49,6 +52,7 @@ export function useResetSettingsMutation() {
     onError: showSettingsError,
     onSuccess: (settings) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
     },
   });
 }

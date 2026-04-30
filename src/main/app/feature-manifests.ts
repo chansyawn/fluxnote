@@ -20,6 +20,9 @@ export function createBackendFeatureManifests(
     createCliFeature(),
     createBlocksFeature({
       getDb,
+      getProtectedBlockIds: () =>
+        new Set(options.externalEditManager.listSessions().map((session) => session.blockId)),
+      readAutoArchiveSettings: options.preferencesService.readAutoArchiveSettings,
       store: options.store,
     }),
     createExternalEditFeature({

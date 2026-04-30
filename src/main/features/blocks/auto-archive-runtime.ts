@@ -5,7 +5,13 @@ import type { EmitIpcEvent } from "@main/core/ipc/emit-ipc-event";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
-import { and, inArray, isNull, lt } from "drizzle-orm";
+import { and, inArray, isNull } from "drizzle-orm";
+
+import {
+  createAutoArchiveEvaluationContext,
+  fingerprintAutoArchiveCandidateBlockIds,
+  listAutoArchiveCandidateBlockIds,
+} from "./auto-archive-policy";
 
 interface AutoArchiveRuntimeOptions {
   emitEvent: EmitIpcEvent;
@@ -33,6 +39,7 @@ export class AutoArchiveRuntime {
   private running = false;
   private timer: NodeJS.Timeout | null = null;
   private lastPayload: AutoArchiveStateChangedPayload | null = null;
+  private lastCandidateFingerprint: string | null = null;
 
   constructor(options: AutoArchiveRuntimeOptions) {
     this.emitEvent = options.emitEvent;
@@ -92,46 +99,59 @@ export class AutoArchiveRuntime {
     const config = await this.readConfig();
     const windowVisible = this.getWindowVisible();
     const now = new Date();
-    const cutoffTime = new Date(now.getTime() - config.idleMinutes * 60_000).toISOString();
     const db = this.store.getDb();
+    const evaluationContext = createAutoArchiveEvaluationContext({
+      now,
+      protectedBlockIds: this.getProtectedBlockIds(),
+      settings: config,
+    });
 
     if (!config.enabled) {
-      this.emitIfChanged({
-        archivedCount: 0,
-        pendingCount: 0,
-        windowVisible,
-      });
+      this.emitIfChanged(
+        {
+          archivedCount: 0,
+          pendingCount: 0,
+          windowVisible,
+        },
+        "",
+      );
       return;
     }
 
-    const protectedIds = this.getProtectedBlockIds();
-    const staleBlockIds = (await listStaleActiveBlockIds(db, cutoffTime)).filter(
-      (id) => !protectedIds.has(id),
-    );
+    const staleBlockIds = await listAutoArchiveCandidateBlockIds(db, evaluationContext);
+    const candidateFingerprint = fingerprintAutoArchiveCandidateBlockIds(staleBlockIds);
     let archivedCount = 0;
     if (forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0) {
       archivedCount = await archiveBlocks(db, staleBlockIds, now.toISOString());
     }
 
-    this.emitIfChanged({
-      archivedCount,
-      pendingCount: staleBlockIds.length,
-      windowVisible,
-    });
+    this.emitIfChanged(
+      {
+        archivedCount,
+        pendingCount: staleBlockIds.length,
+        windowVisible,
+      },
+      candidateFingerprint,
+    );
   }
 
-  private emitIfChanged(payload: AutoArchiveStateChangedPayload): void {
+  private emitIfChanged(
+    payload: AutoArchiveStateChangedPayload,
+    candidateFingerprint: string,
+  ): void {
     const last = this.lastPayload;
     const changed =
       !last ||
       last.archivedCount !== payload.archivedCount ||
       last.pendingCount !== payload.pendingCount ||
-      last.windowVisible !== payload.windowVisible;
+      last.windowVisible !== payload.windowVisible ||
+      this.lastCandidateFingerprint !== candidateFingerprint;
     if (!changed) {
       return;
     }
 
     this.lastPayload = payload;
+    this.lastCandidateFingerprint = candidateFingerprint;
     this.emitEvent("autoArchiveStateChanged", payload);
   }
 
@@ -142,16 +162,6 @@ export class AutoArchiveRuntime {
       return DEFAULT_SETTINGS.autoArchive;
     }
   }
-}
-
-async function listStaleActiveBlockIds(db: AppDatabase, cutoffIso: string): Promise<string[]> {
-  return (
-    await db
-      .select({ id: blocks.id })
-      .from(blocks)
-      .where(and(isNull(blocks.archivedAt), lt(blocks.contentUpdatedAt, cutoffIso)))
-      .all()
-  ).map((row: { id: string }) => row.id);
 }
 
 async function archiveBlocks(
