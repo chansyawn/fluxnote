@@ -7,7 +7,6 @@ import { TagIcon } from "lucide-react";
 interface BlockTagActionProps {
   tags: Tag[];
   selectedTagIds: string[];
-  popupContainer?: HTMLElement | null;
   isDisabled: boolean;
   isCreatingTag: boolean;
   onCreateTag: (name: string) => Promise<void>;
@@ -17,7 +16,6 @@ interface BlockTagActionProps {
 export function BlockTagAction({
   tags,
   selectedTagIds,
-  popupContainer,
   isDisabled,
   isCreatingTag,
   onCreateTag,
@@ -33,7 +31,6 @@ export function BlockTagAction({
       })}
       disabled={isDisabled}
       isCreatingTag={isCreatingTag}
-      popupContainer={popupContainer}
       selectedTagIds={selectedTagIds}
       tags={tags}
       triggerSize="icon-xs"

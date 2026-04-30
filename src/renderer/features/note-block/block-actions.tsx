@@ -1,5 +1,4 @@
 import type { Block, BlockVisibility, Tag } from "@renderer/clients";
-import { useState } from "react";
 
 import { BlockActionBar } from "./block-action-bar";
 import { BlockArchiveAction } from "./block-archive-action";
@@ -38,16 +37,13 @@ export function BlockActions({
   onCreateTag,
   onAssignTags,
 }: BlockActionsProps) {
-  const [popupContainer, setPopupContainer] = useState<HTMLElement | null>(null);
-
   return (
-    <div ref={setPopupContainer}>
+    <div>
       <BlockActionBar disabled={isDisabled}>
         <BlockCopyAction isDisabled={isDisabled} onCopy={onCopy} />
         <BlockTagAction
           isCreatingTag={isTagOpPending}
           isDisabled={isDisabled}
-          popupContainer={popupContainer}
           selectedTagIds={block.tags.map((tag) => tag.id)}
           tags={tags}
           onCreateTag={onCreateTag}

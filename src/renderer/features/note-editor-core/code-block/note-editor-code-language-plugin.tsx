@@ -32,7 +32,6 @@ type CodeLanguageControlState = {
   language: string;
   top: number;
   inlineEnd: number;
-  popupContainer: HTMLElement | null;
 };
 
 function findCodeNode(node: LexicalNode | null): CodeNode | null {
@@ -94,7 +93,6 @@ function getControlPosition(editor: LexicalEditor, nodeKey: NodeKey) {
   return {
     top: Math.round(codeRect.top - containerRect.top + containerElement.scrollTop + 6),
     inlineEnd: Math.round(containerRect.right - codeRect.right + containerElement.scrollLeft + 6),
-    popupContainer: containerElement,
   };
 }
 
@@ -110,8 +108,7 @@ function isControlStateEqual(
     currentState.codeNodeKey === nextState.codeNodeKey &&
     currentState.language === nextState.language &&
     currentState.top === nextState.top &&
-    currentState.inlineEnd === nextState.inlineEnd &&
-    currentState.popupContainer === nextState.popupContainer
+    currentState.inlineEnd === nextState.inlineEnd
   );
 }
 
@@ -161,7 +158,6 @@ export function NoteEditorCodeLanguagePlugin() {
           normalizeCodeLanguage(activeCodeNode.language),
         top: position.top,
         inlineEnd: position.inlineEnd,
-        popupContainer: position.popupContainer,
       };
 
       setControlState((currentState) =>
@@ -286,7 +282,7 @@ export function NoteEditorCodeLanguagePlugin() {
           })}
           showTrigger={false}
         />
-        <ComboboxContent align="center" container={controlState.popupContainer ?? undefined}>
+        <ComboboxContent align="center">
           <ComboboxEmpty>
             {i18n._({
               id: "editor.code-block.language.search.empty",
