@@ -1,5 +1,5 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import { blockTags, blocks, tags, type TagRecord } from "@main/core/database/database-schema";
+import { blockTags, tags, type TagRecord } from "@main/core/database/database-schema";
 import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
@@ -94,7 +94,6 @@ export async function setBlockTags(
         )
         .run();
     }
-    await tx.update(blocks).set({}).where(eq(blocks.id, blockId)).run();
   });
 
   return await getPublicBlockById(db, blockId);
