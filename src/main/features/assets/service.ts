@@ -2,7 +2,7 @@ import path from "node:path";
 
 import type { AppDatabase } from "@main/core/database/database-client";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import { businessError } from "@shared/ipc/errors";
+import { businessError } from "@shared/ipc/result";
 
 import { assertBlockExists } from "../blocks/service";
 import {

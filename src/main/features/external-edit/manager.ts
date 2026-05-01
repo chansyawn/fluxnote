@@ -1,10 +1,9 @@
-import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
-import { externalEditApi } from "@shared/features/external-edit";
+import type { EventBus } from "@main/core/ipc/event-bus";
 import type {
   ExternalEditResult,
   ExternalEditSession,
 } from "@shared/features/external-edit/session-contracts";
-import { businessError } from "@shared/ipc/errors";
+import { businessError } from "@shared/ipc/result";
 
 interface PendingExternalEdit {
   originalContent: string;
@@ -24,7 +23,7 @@ interface BeginExternalEditResult {
 }
 
 interface ExternalEditManagerServices {
-  emitEvent: EmitIpcEvent;
+  emitEvent: EventBus["emit"];
 }
 
 function nowIsoString(): string {
@@ -39,7 +38,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
   }
 
   function emitSessionsChanged(): void {
-    services.emitEvent(externalEditApi.events.sessionsChanged, listSessions());
+    services.emitEvent("externalEdit.sessionsChanged", listSessions());
   }
 
   function begin(

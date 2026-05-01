@@ -1,4 +1,4 @@
-import { businessError } from "@shared/ipc/errors";
+import { businessError } from "@shared/ipc/result";
 
 export const assetUrlScheme = "assets://";
 

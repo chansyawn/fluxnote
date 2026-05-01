@@ -1,4 +1,4 @@
-import { createAsset } from "@renderer/clients";
+import { createAsset } from "@renderer/features/ipc";
 
 const IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 const ASSET_URL_PREFIX = "assets://";

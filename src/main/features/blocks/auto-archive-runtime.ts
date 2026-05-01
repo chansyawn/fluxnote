@@ -1,9 +1,9 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import { getSqliteChangedRows } from "@main/core/database/db-utils";
-import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import { blocksApi, type AutoArchiveStateChangedPayload } from "@shared/features/blocks";
+import type { EventBus } from "@main/core/ipc/event-bus";
+import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
 import { and, inArray, isNull } from "drizzle-orm";
 
@@ -14,7 +14,7 @@ import {
 } from "./auto-archive-policy";
 
 interface AutoArchiveRuntimeOptions {
-  emitEvent: EmitIpcEvent;
+  emitEvent: EventBus["emit"];
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
   readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
@@ -31,7 +31,7 @@ export function deriveScanIntervalSeconds(idleMinutes: number): number {
 }
 
 export class AutoArchiveRuntime {
-  private readonly emitEvent: EmitIpcEvent;
+  private readonly emitEvent: EventBus["emit"];
   private readonly getProtectedBlockIds: () => Set<string>;
   private readonly getWindowVisible: AutoArchiveRuntimeOptions["getWindowVisible"];
   private readonly readAutoArchiveSettings: AutoArchiveRuntimeOptions["readAutoArchiveSettings"];
@@ -152,7 +152,7 @@ export class AutoArchiveRuntime {
 
     this.lastPayload = payload;
     this.lastCandidateFingerprint = candidateFingerprint;
-    this.emitEvent(blocksApi.events.autoArchiveStateChanged, payload);
+    this.emitEvent("blocks.autoArchiveStateChanged", payload);
   }
 
   private async readConfig(): Promise<AutoArchiveSettings> {

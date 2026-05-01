@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
-import { getCliStatus, installCli, uninstallCli } from "@renderer/clients";
+import { getCliStatus, installCli, uninstallCli } from "@renderer/features/ipc";
 import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,

@@ -2,7 +2,6 @@ import { createDatabaseClient, type DatabaseClient } from "@main/core/database/d
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blocks } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import { blocksApi } from "@shared/features/blocks";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -77,12 +76,12 @@ describe("AutoArchiveRuntime", () => {
     runtime.stop();
 
     expect(emitEvent).toHaveBeenCalledTimes(2);
-    expect(emitEvent).toHaveBeenNthCalledWith(1, blocksApi.events.autoArchiveStateChanged, {
+    expect(emitEvent).toHaveBeenNthCalledWith(1, "blocks.autoArchiveStateChanged", {
       archivedCount: 0,
       pendingCount: 1,
       windowVisible: true,
     });
-    expect(emitEvent).toHaveBeenNthCalledWith(2, blocksApi.events.autoArchiveStateChanged, {
+    expect(emitEvent).toHaveBeenNthCalledWith(2, "blocks.autoArchiveStateChanged", {
       archivedCount: 0,
       pendingCount: 1,
       windowVisible: true,

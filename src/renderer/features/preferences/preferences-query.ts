@@ -1,5 +1,9 @@
 import { toAppInvokeError } from "@renderer/app/invoke";
-import { patchSettings, readSettings, resetSettings } from "@renderer/clients/preferences-client";
+import {
+  patchSettings,
+  readSettings,
+  resetSettings,
+} from "@renderer/features/preferences/preferences-api";
 import {
   DEFAULT_SETTINGS,
   type AutoArchiveSettings,

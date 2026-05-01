@@ -1,3 +1,4 @@
+import type { AppContext } from "@main/app-context";
 import {
   createDatabaseClient,
   type DatabaseClient,
@@ -8,10 +9,11 @@ import { blockTags, tags } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { Block, ListBlocksResult, LocateBlockResult } from "@shared/features/blocks";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
+import type { CommandInput, CommandName, CommandOutput } from "@shared/ipc/types";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 
-import { createBlocksFeature } from "./feature";
+import { registerBlocksCommands } from "./blocks-command";
 
 async function createTestDatabaseClient(): Promise<DatabaseClient> {
   const client = createDatabaseClient(":memory:");
@@ -25,27 +27,79 @@ interface TestCommandOptions {
   settings?: AutoArchiveSettings;
 }
 
-function createHandlers(db: AppDatabase, options: TestCommandOptions = {}) {
-  return createBlocksFeature({
+type CommandHandler<T extends CommandName> = (
+  input: CommandInput<T>,
+  ctx: AppContext,
+) => Promise<CommandOutput<T>> | CommandOutput<T>;
+
+function createContext(db: AppDatabase, options: TestCommandOptions): AppContext {
+  return {
+    externalEditManager: {
+      listSessions: () =>
+        Array.from(options.protectedBlockIds ?? new Set()).map((blockId) => ({
+          blockId,
+          createdAt: new Date().toISOString(),
+          editId: blockId,
+        })),
+    } as AppContext["externalEditManager"],
+    events: {
+      emit: () => true,
+      isSenderTrusted: () => true,
+      registerWindow: () => {},
+    },
     getDb: async () => db,
-    getProtectedBlockIds: () => options.protectedBlockIds ?? new Set(),
     now: () => options.now ?? new Date(),
-    readAutoArchiveSettings: () => options.settings ?? DEFAULT_SETTINGS.autoArchive,
+    openBlockService: {
+      acknowledgePending: () => {},
+      emitPending: () => true,
+      readPending: () => ({ blockId: null }),
+      requestOpen: () => true,
+    },
+    preferencesService: {
+      patchSettings: () => DEFAULT_SETTINGS,
+      readAutoArchiveSettings: () => options.settings ?? DEFAULT_SETTINGS.autoArchive,
+      readSettings: () => DEFAULT_SETTINGS,
+      resetSettings: () => DEFAULT_SETTINGS,
+    },
     store: {
       getAssetPathForBlock: () => "",
     } as unknown as BackendStore,
-  }).commands;
+    windowManager: {
+      createMainWindow: () => {},
+      getMainWindow: () => null,
+      hideMainWindow: () => {},
+      openMainWindowDevTools: () => {},
+      prepareToQuit: () => {},
+      requestQuit: () => {},
+      showMainWindow: () => {},
+      toggleMainWindow: () => {},
+    },
+  };
+}
+
+function createHandlers(db: AppDatabase, options: TestCommandOptions = {}) {
+  const handlers = new Map<CommandName, CommandHandler<CommandName>>();
+  registerBlocksCommands({
+    command<T extends CommandName>(name: T, handler: CommandHandler<T>) {
+      handlers.set(name, handler as CommandHandler<CommandName>);
+    },
+    register() {},
+  } as never);
+
+  return {
+    ctx: createContext(db, options),
+    handlers,
+  };
 }
 
 async function createBlock(db: AppDatabase): Promise<Block> {
-  const command = createHandlers(db).find(
-    (definition) => definition.contract.key === "blocks.create",
-  );
-  if (!command || command.contract.key !== "blocks.create") {
+  const { handlers, ctx } = createHandlers(db);
+  const command = handlers.get("blocks.create");
+  if (!command) {
     throw new Error("blocks.create command not found");
   }
 
-  return (await command.handle(undefined, {} as never)) as Block;
+  return (await command(undefined, ctx)) as Block;
 }
 
 async function setBlockCreatedAt(db: AppDatabase, blockId: string, createdAt: string) {
@@ -72,21 +126,20 @@ async function listBlocks(
   } = {},
   options: TestCommandOptions = {},
 ): Promise<ListBlocksResult> {
-  const command = createHandlers(db, options).find(
-    (definition) => definition.contract.key === "blocks.list",
-  );
-  if (!command || command.contract.key !== "blocks.list") {
+  const { handlers, ctx } = createHandlers(db, options);
+  const command = handlers.get("blocks.list");
+  if (!command) {
     throw new Error("blocks.list command not found");
   }
 
-  return (await command.handle(
+  return (await command(
     {
       limit: request.limit ?? 50,
       offset: request.offset ?? 0,
       tagIds: request.tagIds,
       visibility: request.visibility ?? "active",
     },
-    {} as never,
+    ctx,
   )) as ListBlocksResult;
 }
 
@@ -99,20 +152,19 @@ async function locateBlock(
   },
   options: TestCommandOptions = {},
 ): Promise<LocateBlockResult> {
-  const command = createHandlers(db, options).find(
-    (definition) => definition.contract.key === "blocks.locate",
-  );
-  if (!command || command.contract.key !== "blocks.locate") {
+  const { handlers, ctx } = createHandlers(db, options);
+  const command = handlers.get("blocks.locate");
+  if (!command) {
     throw new Error("blocks.locate command not found");
   }
 
-  return (await command.handle(
+  return (await command(
     {
       blockId: request.blockId,
       tagIds: request.tagIds,
       visibility: request.visibility ?? "active",
     },
-    {} as never,
+    ctx,
   )) as LocateBlockResult;
 }
 

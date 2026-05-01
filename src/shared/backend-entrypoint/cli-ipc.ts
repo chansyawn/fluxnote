@@ -1,7 +1,7 @@
 import os from "node:os";
 import path from "node:path";
 
-import type { IpcErrorPayload } from "@shared/ipc/errors";
+import type { IpcErrorPayload } from "@shared/ipc/result";
 import { z } from "zod";
 
 import { backendCommandKeySchema } from "./commands";
@@ -18,7 +18,7 @@ export type CliIpcRequestEnvelope = z.infer<typeof cliIpcRequestEnvelopeSchema>;
 const cliIpcErrorPayloadSchema = z.object({
   details: z.unknown().optional(),
   message: z.string(),
-  type: z.string(),
+  code: z.string(),
 });
 
 export const cliIpcResponseEnvelopeSchema = z.discriminatedUnion("ok", [

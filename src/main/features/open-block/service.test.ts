@@ -1,5 +1,4 @@
 import { createOpenBlockService } from "@main/features/open-block/service";
-import { openBlockApi } from "@shared/features/open-block";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 function createTestHandler() {
@@ -17,7 +16,7 @@ describe("open block command", () => {
     expect(command.requestOpen("block-1")).toBe(true);
 
     expect(showWindow).toHaveBeenCalledTimes(1);
-    expect(emitEvent).toHaveBeenCalledWith(openBlockApi.events.requested, { blockId: "block-1" });
+    expect(emitEvent).toHaveBeenCalledWith("openBlock.requested", { blockId: "block-1" });
     expect(command.readPending()).toEqual({ blockId: "block-1" });
 
     command.acknowledgePending("block-1");

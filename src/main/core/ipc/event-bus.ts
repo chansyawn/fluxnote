@@ -1,33 +1,58 @@
-import type { FeatureEventContract, FeatureEventPayload } from "@shared/ipc/feature-api";
-import type { BrowserWindow } from "electron";
+import { contracts, type EventName, type EventPayload } from "@shared/ipc/types";
+import type { BrowserWindow, WebContents } from "electron";
 
 const shouldLogInvalidEventPayload = process.env.NODE_ENV !== "production" && !process.env.VITEST;
 
-export type EmitIpcEvent = <TContract extends FeatureEventContract>(
-  contract: TContract,
-  payload: FeatureEventPayload<TContract>,
-) => boolean;
-
-interface CreateIpcEventBusOptions {
-  getMainWindow: () => BrowserWindow | null;
+export interface EventBus {
+  registerWindow: (win: BrowserWindow) => void;
+  emit: <T extends EventName>(name: T, payload: EventPayload<T>) => boolean;
+  isSenderTrusted: (sender: WebContents) => boolean;
 }
 
-export function createIpcEventBus(options: CreateIpcEventBusOptions): EmitIpcEvent {
-  return (contract, payload) => {
-    const mainWindow = options.getMainWindow();
-    if (!mainWindow || mainWindow.isDestroyed()) {
-      return false;
+export function createEventBus(): EventBus {
+  const windows = new Set<BrowserWindow>();
+
+  function registerWindow(win: BrowserWindow): void {
+    windows.add(win);
+    win.on("closed", () => {
+      windows.delete(win);
+    });
+  }
+
+  function isSenderTrusted(sender: WebContents): boolean {
+    for (const win of windows) {
+      if (!win.isDestroyed() && win.webContents === sender) {
+        return true;
+      }
     }
 
-    const parsedPayload = contract.payload.safeParse(payload);
+    return false;
+  }
+
+  function emit<T extends EventName>(name: T, payload: EventPayload<T>): boolean {
+    const schema = contracts.events[name];
+    const parsedPayload = schema.safeParse(payload);
     if (!parsedPayload.success) {
       if (shouldLogInvalidEventPayload) {
-        console.error(`Invalid IPC event payload for ${contract.key}`, parsedPayload.error.issues);
+        console.error(`Invalid IPC event payload for ${name}`, parsedPayload.error.issues);
       }
       return false;
     }
 
-    mainWindow.webContents.send(contract.channel, parsedPayload.data);
-    return true;
+    let sent = false;
+    for (const win of windows) {
+      if (!win.isDestroyed()) {
+        win.webContents.send(name, parsedPayload.data);
+        sent = true;
+      }
+    }
+
+    return sent;
+  }
+
+  return {
+    registerWindow,
+    emit,
+    isSenderTrusted,
   };
 }

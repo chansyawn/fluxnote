@@ -1,4 +1,4 @@
-import type { BlockVisibility } from "@renderer/clients";
+import type { BlockVisibility } from "@renderer/features/ipc";
 import { useTagData } from "@renderer/features/tag/use-tag-data";
 import { useCallback, useEffect, useMemo, useState } from "react";
 

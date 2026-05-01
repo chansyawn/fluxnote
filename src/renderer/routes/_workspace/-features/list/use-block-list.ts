@@ -6,7 +6,7 @@ import {
   type BlockVisibility,
   type ListBlocksResult,
   type LocateBlockResult,
-} from "@renderer/clients";
+} from "@renderer/features/ipc";
 import {
   BLOCKS_PAGE_SIZE,
   blockListPageQueryKey,

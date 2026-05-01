@@ -1,4 +1,4 @@
-export { createBlocksFeature } from "./feature";
+export { registerBlocksCommands } from "./blocks-command";
 export {
   archiveBlock,
   assertBlockExists,

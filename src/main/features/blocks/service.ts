@@ -5,7 +5,7 @@ import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database/d
 import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
-import { businessError } from "@shared/ipc/errors";
+import { businessError } from "@shared/ipc/result";
 import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 
 import { blockWillAutoArchive, type AutoArchiveEvaluationContext } from "./auto-archive-policy";

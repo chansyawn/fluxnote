@@ -1,3 +1,3 @@
 export { getConfigStore } from "./config-store";
-export { createPreferencesFeature } from "./feature";
+export { registerPreferencesCommands } from "./preferences-command";
 export { createPreferencesService, type PreferencesService } from "./service";

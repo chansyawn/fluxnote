@@ -1,4 +1,4 @@
-import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
+import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/features/ipc";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { BlockMutationOperation } from "./use-block-mutations";

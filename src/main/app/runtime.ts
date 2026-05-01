@@ -1,6 +1,7 @@
+import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
-import { createIpcEventBus } from "../core/ipc/event-bus";
+import { createAppContext, type AppContext } from "../app-context";
 import { BackendStore } from "../core/persistence/backend-store";
 import { registerAssetProtocol } from "../features/assets/asset-protocol";
 import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
@@ -13,30 +14,34 @@ import { createExternalEditManager } from "../features/external-edit";
 import { createOpenBlockService } from "../features/open-block";
 import { createPreferencesService } from "../features/preferences";
 import { createTrayManager, createWindowManager } from "../features/window";
+import { createIpcRouter } from "../core/ipc/create-ipc-router";
+import { registerIpc } from "../core/ipc/register-ipc";
 import { createBackendCommandDispatcher } from "./backend-commands";
-import { registerIpcCommands } from "./ipc-registry";
 
 export function createBackendRuntime() {
   const backendStore = new BackendStore();
   const preferencesService = createPreferencesService();
+
+  let appContext: AppContext | null = null;
+  const emitEvent = <T extends EventName>(name: T, payload: EventPayload<T>): boolean => {
+    return appContext ? appContext.events.emit(name, payload) : false;
+  };
+
   let windowManager: ReturnType<typeof createWindowManager>;
-  const emitIpcEvent = createIpcEventBus({
-    getMainWindow: () => windowManager.getMainWindow(),
-  });
-  const externalEditManager = createExternalEditManager({
-    emitEvent: emitIpcEvent,
-  });
+
+  const externalEditManager = createExternalEditManager({ emitEvent });
   const autoArchiveRuntime = new AutoArchiveRuntime({
-    emitEvent: emitIpcEvent,
+    emitEvent,
     getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
     readAutoArchiveSettings: preferencesService.readAutoArchiveSettings,
     store: backendStore,
   });
   const openBlockService = createOpenBlockService({
-    emitEvent: emitIpcEvent,
+    emitEvent,
     showWindow: () => windowManager.showMainWindow(),
   });
+
   const backendCommandDispatcher = createBackendCommandDispatcher({
     createExternalEditSession: (blockId, originalContent, signal) =>
       externalEditManager.begin(blockId, originalContent, { signal }).result,
@@ -55,38 +60,43 @@ export function createBackendRuntime() {
   const cliIpcServer = createCliIpcServer({
     dispatchCommand: backendCommandDispatcher.dispatch,
   });
+
   windowManager = createWindowManager({
-    emitEvent: emitIpcEvent,
+    emitEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
     onOpenBlockReady: () => openBlockService.emitPending(),
   });
+
+  appContext = createAppContext({
+    externalEditManager,
+    openBlockService,
+    preferencesService,
+    store: backendStore,
+    windowManager,
+  });
+
+  const ipc = createIpcRouter(appContext);
+  registerIpc(ipc);
+
   const trayManager = createTrayManager({
     openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
     requestQuit: () => windowManager.requestQuit(),
     showMainWindow: () => windowManager.showMainWindow(),
   });
 
-  function registerRuntimeIpcCommands(): void {
-    registerIpcCommands({
-      acknowledgePendingOpenBlock: (blockId) => openBlockService.acknowledgePending(blockId),
-      emitEvent: emitIpcEvent,
-      externalEditManager,
-      getMainWindow: () => windowManager.getMainWindow(),
-      hideMainWindow: () => windowManager.hideMainWindow(),
-      preferencesService,
-      readPendingOpenBlock: () => openBlockService.readPending(),
-      requestQuit: () => windowManager.requestQuit(),
-      store: backendStore,
-      toggleMainWindow: () => windowManager.toggleMainWindow(),
-    });
+  function registerMainWindowToEventBus(): void {
+    const mainWindow = windowManager.getMainWindow();
+    if (mainWindow && appContext) {
+      appContext.events.registerWindow(mainWindow);
+    }
   }
 
   async function start(): Promise<void> {
     await backendStore.init();
     registerAssetProtocol(backendStore);
-    registerRuntimeIpcCommands();
     await cliIpcServer.start();
     windowManager.createMainWindow();
+    registerMainWindowToEventBus();
     trayManager.createTray();
     await autoArchiveRuntime.start();
 
@@ -121,6 +131,7 @@ export function createBackendRuntime() {
   function activate(): void {
     if (windowManager.getMainWindow() === null) {
       windowManager.createMainWindow();
+      registerMainWindowToEventBus();
       return;
     }
 

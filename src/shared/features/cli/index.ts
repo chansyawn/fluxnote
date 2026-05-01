@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
-import type { cliApi } from "./api";
+import type { cliContract } from "./contract";
 
-export { cliApi } from "./api";
+export { cliContract } from "./contract";
 
-export type CliInstallRequest = z.input<(typeof cliApi)["commands"]["install"]["request"]>;
-export type CliStatusResult = z.infer<(typeof cliApi)["commands"]["status"]["response"]>;
+export type CliInstallRequest = z.input<(typeof cliContract)["commands"]["cli.install"]["input"]>;
+export type CliStatusResult = z.infer<(typeof cliContract)["commands"]["cli.status"]["output"]>;

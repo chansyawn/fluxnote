@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { Tag } from "@renderer/clients";
+import type { Tag } from "@renderer/features/ipc";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { TagIcon } from "lucide-react";
 

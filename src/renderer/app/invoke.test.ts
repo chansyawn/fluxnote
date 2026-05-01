@@ -4,13 +4,15 @@ import {
   subscribeEvent,
   toAppInvokeError,
 } from "@renderer/app/invoke";
-import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-function setRuntime(runtime: FluxnotesRuntime): void {
+function setIpcBridge(bridge: {
+  command: (name: string, input: unknown) => Promise<unknown>;
+  on: (name: string, handler: (payload: unknown) => void) => () => void;
+}): void {
   Object.defineProperty(globalThis, "window", {
     configurable: true,
-    value: { fluxnotes: runtime },
+    value: { ipc: bridge },
   });
 }
 
@@ -19,48 +21,48 @@ describe("renderer invoke transport", () => {
     Reflect.deleteProperty(globalThis, "window");
   });
 
-  it("invokes commands through the runtime transport", async () => {
-    const invoke = vi.fn(async () => undefined);
-    setRuntime({
-      invoke: invoke as unknown as FluxnotesRuntime["invoke"],
-      subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
-    } as FluxnotesRuntime);
+  it("invokes commands through window.ipc", async () => {
+    const command = vi.fn(async () => undefined);
+    setIpcBridge({
+      command,
+      on: vi.fn(() => () => {}),
+    });
 
     await expect(invokeCommand("window.destroy", undefined)).resolves.toBeUndefined();
-    expect(invoke).toHaveBeenCalledWith("window.destroy", undefined);
+    expect(command).toHaveBeenCalledWith("window.destroy", undefined);
   });
 
   it("wraps payload-shaped runtime failures into AppInvokeError", async () => {
-    setRuntime({
-      invoke: vi.fn(async () => {
+    setIpcBridge({
+      command: vi.fn(async () => {
         throw {
-          type: "BUSINESS.NOT_FOUND",
+          code: "BUSINESS.NOT_FOUND",
           message: "Missing",
           details: { id: "1" },
         };
-      }) as unknown as FluxnotesRuntime["invoke"],
-      subscribe: vi.fn(() => () => {}) as unknown as FluxnotesRuntime["subscribe"],
-    } as FluxnotesRuntime);
+      }),
+      on: vi.fn(() => () => {}),
+    });
 
     await expect(invokeCommand("window.destroy", undefined)).rejects.toMatchObject({
+      code: "BUSINESS.NOT_FOUND",
       details: { id: "1" },
       message: "Missing",
-      type: "BUSINESS.NOT_FOUND",
     });
   });
 
-  it("subscribes to events through the runtime transport", () => {
+  it("subscribes to events through window.ipc", () => {
     const unlisten = vi.fn();
-    const subscribe = vi.fn(() => unlisten);
+    const on = vi.fn(() => unlisten);
     const handler = vi.fn();
-    setRuntime({
-      invoke: vi.fn(async () => undefined) as unknown as FluxnotesRuntime["invoke"],
-      subscribe: subscribe as unknown as FluxnotesRuntime["subscribe"],
-    } as FluxnotesRuntime);
+    setIpcBridge({
+      command: vi.fn(async () => undefined),
+      on,
+    });
 
     const returnedUnlisten = subscribeEvent("window.focusChanged", handler);
 
-    expect(subscribe).toHaveBeenCalledWith("window.focusChanged", handler);
+    expect(on).toHaveBeenCalledWith("window.focusChanged", handler);
     expect(returnedUnlisten).toBe(unlisten);
   });
 
@@ -69,9 +71,9 @@ describe("renderer invoke transport", () => {
 
     expect(error).toBeInstanceOf(AppInvokeError);
     expect(error).toMatchObject({
+      code: "INTERNAL",
       details: "boom",
       message: "Unknown invoke error",
-      type: "INTERNAL",
     });
   });
 });

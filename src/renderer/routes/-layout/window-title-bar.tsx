@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { hideWindow } from "@renderer/clients/window";
+import { hideWindow } from "@renderer/features/window/window-api";
 import { Button } from "@renderer/ui/components/button";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { FlaskConicalIcon, HouseIcon, Settings2Icon, XIcon } from "lucide-react";

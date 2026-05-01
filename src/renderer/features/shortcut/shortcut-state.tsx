@@ -1,4 +1,3 @@
-import { toggleMainWindowVisibility } from "@renderer/clients/window";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
   normalizeShortcutBinding,
@@ -8,6 +7,7 @@ import {
   validateShortcutUpdate,
 } from "@renderer/features/shortcut/shortcut-utils";
 import { useGlobalShortcutSync } from "@renderer/features/shortcut/use-global-shortcut-sync";
+import { toggleMainWindowVisibility } from "@renderer/features/window/window-api";
 import { type ShortcutAction } from "@shared/features/preferences";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { createContext, useContext, useEffectEvent, useMemo, type ReactNode } from "react";

@@ -2,7 +2,7 @@ import {
   acknowledgePendingOpenBlock,
   onOpenBlockRequested,
   readPendingOpenBlock,
-} from "@renderer/clients/open-block";
+} from "@renderer/features/open-block/open-block-api";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseOpenBlockRequestResult {

@@ -10,7 +10,7 @@ import {
   backendCommandContracts,
   type BackendCommandKey,
 } from "@shared/backend-entrypoint/commands";
-import { toIpcErrorPayload } from "@shared/ipc/errors";
+import { toIpcErrorPayload } from "@shared/ipc/result";
 
 interface CliIpcServerServices {
   dispatchCommand: (

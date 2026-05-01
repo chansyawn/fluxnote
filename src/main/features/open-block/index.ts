@@ -1,4 +1,4 @@
-export { createOpenBlockFeature } from "./feature";
+export { registerOpenBlockCommands } from "./open-block-command";
 export {
   createOpenBlockService,
   type OpenBlockService,

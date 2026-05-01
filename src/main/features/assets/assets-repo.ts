@@ -1,0 +1,1 @@
+export { createAssetService } from "./service";

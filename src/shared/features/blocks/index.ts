@@ -1,13 +1,13 @@
 import type { z } from "zod";
 
-import type { blocksApi } from "./api";
+import type { blocksContract } from "./contract";
 import { blockVisibilitySchema } from "./models";
 
 export {
   autoArchiveStateChangedPayloadSchema,
-  blocksApi,
+  blocksContract,
   type AutoArchiveStateChangedPayload,
-} from "./api";
+} from "./contract";
 export {
   blockMutationRequestSchema,
   blockSchema,
@@ -20,14 +20,30 @@ export {
 } from "./models";
 
 export type BlockVisibility = z.infer<typeof blockVisibilitySchema>;
-export type ListBlocksRequest = z.input<(typeof blocksApi)["commands"]["list"]["request"]>;
-export type ParsedListBlocksRequest = z.infer<(typeof blocksApi)["commands"]["list"]["request"]>;
-export type ListBlocksResult = z.infer<(typeof blocksApi)["commands"]["list"]["response"]>;
-export type LocateBlockRequest = z.input<(typeof blocksApi)["commands"]["locate"]["request"]>;
-export type LocateBlockResult = z.infer<(typeof blocksApi)["commands"]["locate"]["response"]>;
-export type UpdateBlockContentRequest = z.input<
-  (typeof blocksApi)["commands"]["updateContent"]["request"]
+export type ListBlocksRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.list"]["input"]
 >;
-export type BlockMutationRequest = z.input<(typeof blocksApi)["commands"]["archive"]["request"]>;
-export type DeleteBlockRequest = z.input<(typeof blocksApi)["commands"]["delete"]["request"]>;
-export type DeleteBlockResult = z.infer<(typeof blocksApi)["commands"]["delete"]["response"]>;
+export type ParsedListBlocksRequest = z.infer<
+  (typeof blocksContract)["commands"]["blocks.list"]["input"]
+>;
+export type ListBlocksResult = z.infer<
+  (typeof blocksContract)["commands"]["blocks.list"]["output"]
+>;
+export type LocateBlockRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.locate"]["input"]
+>;
+export type LocateBlockResult = z.infer<
+  (typeof blocksContract)["commands"]["blocks.locate"]["output"]
+>;
+export type UpdateBlockContentRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.updateContent"]["input"]
+>;
+export type BlockMutationRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.archive"]["input"]
+>;
+export type DeleteBlockRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.delete"]["input"]
+>;
+export type DeleteBlockResult = z.infer<
+  (typeof blocksContract)["commands"]["blocks.delete"]["output"]
+>;

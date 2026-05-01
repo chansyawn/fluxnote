@@ -1,7 +1,6 @@
 import path from "node:path";
 
-import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
-import { windowApi } from "@shared/features/window";
+import type { EventBus } from "@main/core/ipc/event-bus";
 import { app, BrowserWindow } from "electron";
 
 import { calculateWindowPosition, saveWindowPosition } from "./window-position";
@@ -13,7 +12,7 @@ const MAIN_WINDOW_WIDTH = 640;
 const MAIN_WINDOW_VIBRANCY = "under-window" as const;
 
 interface WindowManagerServices {
-  emitEvent: EmitIpcEvent;
+  emitEvent: EventBus["emit"];
   onAutoArchiveTrigger: (force: boolean) => void;
   onOpenBlockReady: () => void;
 }
@@ -153,7 +152,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         return;
       }
 
-      services.emitEvent(windowApi.events.closeRequested, null);
+      services.emitEvent("window.closeRequested", null);
       event.preventDefault();
       hideMainWindow();
     });
@@ -165,12 +164,12 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     });
 
     createdWindow.on("focus", () => {
-      services.emitEvent(windowApi.events.focusChanged, true);
+      services.emitEvent("window.focusChanged", true);
       services.onAutoArchiveTrigger(false);
     });
 
     createdWindow.on("blur", () => {
-      services.emitEvent(windowApi.events.focusChanged, false);
+      services.emitEvent("window.focusChanged", false);
     });
 
     createdWindow.on("hide", () => {
@@ -187,7 +186,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         createdWindow.setPosition(x, y);
         createdWindow.show();
       }
-      services.emitEvent(windowApi.events.focusChanged, true);
+      services.emitEvent("window.focusChanged", true);
       services.onOpenBlockReady();
     });
 

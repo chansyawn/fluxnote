@@ -4,7 +4,7 @@ import {
 } from "@renderer/features/shortcut/global-shortcut-sync";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-vi.mock("@renderer/clients/global-shortcut", () => ({
+vi.mock("@renderer/features/shortcut/shortcut-api", () => ({
   isRegistered: vi.fn(),
   register: vi.fn(),
   unregister: vi.fn(),
@@ -15,7 +15,7 @@ import {
   register,
   unregister,
   type ShortcutEvent,
-} from "@renderer/clients/global-shortcut";
+} from "@renderer/features/shortcut/shortcut-api";
 
 const mockedIsRegistered = vi.mocked(isRegistered);
 const mockedRegister = vi.mocked(register);

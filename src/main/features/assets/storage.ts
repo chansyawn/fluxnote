@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { internalError } from "@shared/ipc/errors";
+import { internalError } from "@shared/ipc/result";
 
 export interface AssetStorage {
   copyFile: (sourcePath: string, targetPath: string) => Promise<void>;

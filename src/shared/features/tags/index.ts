@@ -1,10 +1,12 @@
 import type { z } from "zod";
 
-import type { tagsApi } from "./api";
+import type { tagsContract } from "./contract";
 
-export { tagsApi } from "./api";
+export { tagsContract } from "./contract";
 export { tagSchema, type Tag } from "./models";
 
-export type CreateTagRequest = z.input<(typeof tagsApi)["commands"]["create"]["request"]>;
-export type DeleteTagRequest = z.input<(typeof tagsApi)["commands"]["delete"]["request"]>;
-export type SetBlockTagsRequest = z.input<(typeof tagsApi)["commands"]["setBlockTags"]["request"]>;
+export type CreateTagRequest = z.input<(typeof tagsContract)["commands"]["tags.create"]["input"]>;
+export type DeleteTagRequest = z.input<(typeof tagsContract)["commands"]["tags.delete"]["input"]>;
+export type SetBlockTagsRequest = z.input<
+  (typeof tagsContract)["commands"]["tags.setBlockTags"]["input"]
+>;

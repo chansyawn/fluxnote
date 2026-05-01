@@ -1,7 +1,7 @@
 export {
-  windowApi,
+  windowContract,
   windowCloseRequestedPayloadSchema,
   windowFocusChangedPayloadSchema,
   type WindowCloseRequestedPayload,
   type WindowFocusChangedPayload,
-} from "./api";
+} from "./contract";

@@ -1,8 +1,7 @@
-import type { EmitIpcEvent } from "@main/core/ipc/event-bus";
-import { openBlockApi } from "@shared/features/open-block";
+import type { EventBus } from "@main/core/ipc/event-bus";
 
 interface OpenBlockServiceOptions {
-  emitEvent: EmitIpcEvent;
+  emitEvent: EventBus["emit"];
   showWindow: () => void;
 }
 
@@ -28,7 +27,7 @@ export function createOpenBlockService(services: OpenBlockServiceOptions) {
       return false;
     }
 
-    return services.emitEvent(openBlockApi.events.requested, { blockId: pendingBlockId });
+    return services.emitEvent("openBlock.requested", { blockId: pendingBlockId });
   }
 
   function requestOpen(blockId: string): boolean {

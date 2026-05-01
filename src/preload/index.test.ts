@@ -1,11 +1,10 @@
-import type { FluxnotesRuntime } from "@shared/electron-runtime";
 import { DEFAULT_SETTINGS } from "@shared/features/preferences";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const electronMock = vi.hoisted(() => ({
   exposeInMainWorld: vi.fn(),
   invoke: vi.fn(),
-  off: vi.fn(),
+  removeListener: vi.fn(),
   on: vi.fn(),
 }));
 
@@ -15,7 +14,7 @@ vi.mock("electron", () => ({
   },
   ipcRenderer: {
     invoke: electronMock.invoke,
-    off: electronMock.off,
+    removeListener: electronMock.removeListener,
     on: electronMock.on,
   },
 }));
@@ -26,33 +25,56 @@ describe("preload runtime", () => {
     electronMock.exposeInMainWorld.mockClear();
     electronMock.invoke.mockReset();
     electronMock.on.mockReset();
-    electronMock.off.mockReset();
+    electronMock.removeListener.mockReset();
     await import("@preload/index");
   });
 
-  function getRuntime(): FluxnotesRuntime {
-    return electronMock.exposeInMainWorld.mock.calls[0]?.[1] as FluxnotesRuntime;
+  function getRuntime() {
+    return electronMock.exposeInMainWorld.mock.calls[0]?.[1] as {
+      command: (name: string, input: unknown) => Promise<unknown>;
+      on: (name: string, listener: (payload: unknown) => void) => () => void;
+    };
   }
 
-  it("validates invoke responses against the shared command contract", async () => {
+  it("returns data from successful command invocations", async () => {
     electronMock.invoke.mockResolvedValue({
       ok: true,
       data: DEFAULT_SETTINGS,
     });
 
-    const result = await getRuntime().invoke("preferences.read", undefined);
+    const result = await getRuntime().command("preferences.read", undefined);
 
     expect(result).toEqual(DEFAULT_SETTINGS);
+    expect(electronMock.invoke).toHaveBeenCalledWith("preferences.read", undefined);
   });
 
-  it("drops invalid event payloads before invoking listeners", () => {
-    const handler = vi.fn();
-    electronMock.on.mockImplementation((_channel, listener) => {
-      listener({}, { wrong: true });
+  it("throws payload errors from failed command invocations", async () => {
+    electronMock.invoke.mockResolvedValue({
+      ok: false,
+      error: {
+        code: "BUSINESS.NOT_FOUND",
+        message: "Missing",
+      },
     });
 
-    getRuntime().subscribe("openBlock.requested", handler);
+    await expect(getRuntime().command("window.destroy", undefined)).rejects.toMatchObject({
+      code: "BUSINESS.NOT_FOUND",
+      message: "Missing",
+    });
+  });
 
-    expect(handler).not.toHaveBeenCalled();
+  it("subscribes and unsubscribes with the event key", () => {
+    const handler = vi.fn();
+    let listener: ((_event: unknown, payload: unknown) => void) | undefined;
+    electronMock.on.mockImplementation((_channel, nextListener) => {
+      listener = nextListener as (_event: unknown, payload: unknown) => void;
+    });
+
+    const off = getRuntime().on("openBlock.requested", handler);
+    listener?.({}, { blockId: "block-1" });
+    off();
+
+    expect(handler).toHaveBeenCalledWith({ blockId: "block-1" });
+    expect(electronMock.removeListener).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,7 +3,7 @@ import { blockTags, tags, type TagRecord } from "@main/core/database/database-sc
 import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database/db-utils";
 import type { Block } from "@shared/features/blocks";
 import type { Tag } from "@shared/features/tags";
-import { businessError, internalError } from "@shared/ipc/errors";
+import { businessError, internalError } from "@shared/ipc/result";
 import { eq, inArray, sql } from "drizzle-orm";
 
 import { assertBlockExists, getPublicBlockById } from "../blocks/service";

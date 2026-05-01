@@ -6,7 +6,7 @@ import {
   restoreBlock,
   setBlockTags,
   type Block,
-} from "@renderer/clients";
+} from "@renderer/features/ipc";
 import { useMutation, useMutationState } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";

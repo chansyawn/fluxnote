@@ -1,1 +1,1 @@
-export { createShortcutFeature } from "./feature";
+export { registerShortcutCommands } from "./shortcut-command";

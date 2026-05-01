@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+export const assetsContract = {
+  commands: {
+    "assets.copy": {
+      input: z.object({
+        sourceBlockId: z.string().min(1),
+        targetBlockId: z.string().min(1),
+        assetUrl: z.string().min(1),
+      }),
+      output: z.object({ assetUrl: z.string() }),
+    },
+    "assets.create": {
+      input: z.object({
+        blockId: z.string().min(1),
+        mimeType: z.string().min(1),
+        fileName: z.string().optional(),
+        dataBase64: z.string().min(1),
+      }),
+      output: z.object({
+        assetUrl: z.string(),
+        altText: z.string(),
+      }),
+    },
+  },
+  events: {},
+} as const;

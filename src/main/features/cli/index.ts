@@ -1,1 +1,1 @@
-export { createCliFeature } from "./feature";
+export { registerCliCommands } from "./cli-command";

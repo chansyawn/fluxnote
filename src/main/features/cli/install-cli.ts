@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import { businessError } from "@shared/ipc/errors";
+import { businessError } from "@shared/ipc/result";
 import { app } from "electron";
 
 const execAsync = promisify(exec);

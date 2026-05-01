@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
-import type { preferencesApi } from "./api";
+import type { preferencesContract } from "./contract";
 
-export { preferencesApi } from "./api";
+export { preferencesContract } from "./contract";
 export {
   AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
   AUTO_ARCHIVE_DURATION_UNITS,
@@ -46,4 +46,6 @@ export {
   type ShortcutPreferences,
 } from "./settings";
 
-export type PreferencesSnapshot = z.infer<(typeof preferencesApi)["commands"]["read"]["response"]>;
+export type PreferencesSnapshot = z.infer<
+  (typeof preferencesContract)["commands"]["preferences.read"]["output"]
+>;

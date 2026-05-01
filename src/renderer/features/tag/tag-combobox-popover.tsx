@@ -1,6 +1,6 @@
 import type { BaseUIEvent } from "@base-ui/react/types";
 import { Trans } from "@lingui/react/macro";
-import type { Tag } from "@renderer/clients";
+import type { Tag } from "@renderer/features/ipc";
 import { Button, buttonVariants } from "@renderer/ui/components/button";
 import {
   Combobox,

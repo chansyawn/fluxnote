@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import type { BlockVisibility } from "@renderer/clients";
+import type { BlockVisibility } from "@renderer/features/ipc";
 import { Button } from "@renderer/ui/components/button";
 import { ArchiveIcon, ArchiveRestoreIcon, LoaderCircleIcon } from "lucide-react";
 
