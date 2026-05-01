@@ -26,56 +26,56 @@ export interface CopyAssetInput {
   targetBlockId: string;
 }
 
-export function createAssetService(options: AssetServiceOptions) {
-  const storage = options.storage ?? nodeAssetStorage;
+export async function createAsset(
+  deps: AssetServiceOptions,
+  db: AppDatabase,
+  input: CreateAssetInput,
+) {
+  const storage = deps.storage ?? nodeAssetStorage;
+  const fileNameCandidate =
+    input.fileName && input.fileName.trim().length > 0 ? input.fileName : null;
+  await assertBlockExists(db, input.blockId);
 
-  async function createAsset(db: AppDatabase, input: CreateAssetInput) {
-    const fileNameCandidate =
-      input.fileName && input.fileName.trim().length > 0 ? input.fileName : null;
-    await assertBlockExists(db, input.blockId);
+  const ext = extFromMimeType(input.mimeType);
+  const baseName = fileNameCandidate ?? `${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const fileName = sanitizeFileName(baseName);
+  const blockDir = deps.paths.getAssetPathForBlock(input.blockId);
+  const filePath = path.join(blockDir, fileName);
 
-    const ext = extFromMimeType(input.mimeType);
-    const baseName = fileNameCandidate ?? `${Date.now()}-${crypto.randomUUID()}.${ext}`;
-    const fileName = sanitizeFileName(baseName);
-    const blockDir = options.paths.getAssetPathForBlock(input.blockId);
-    const filePath = path.join(blockDir, fileName);
+  await storage.writeFile(filePath, Buffer.from(input.dataBase64, "base64"));
 
-    await storage.writeFile(filePath, Buffer.from(input.dataBase64, "base64"));
+  return {
+    assetUrl: `${assetUrlScheme}${input.blockId}/${fileName}`,
+    altText: fileNameCandidate ?? fileName,
+  };
+}
 
-    return {
-      assetUrl: `${assetUrlScheme}${input.blockId}/${fileName}`,
-      altText: fileNameCandidate ?? fileName,
-    };
+export async function copyAsset(deps: AssetServiceOptions, db: AppDatabase, input: CopyAssetInput) {
+  const storage = deps.storage ?? nodeAssetStorage;
+  await assertBlockExists(db, input.sourceBlockId);
+  await assertBlockExists(db, input.targetBlockId);
+
+  const parsed = splitAssetUrl(input.assetUrl);
+  if (parsed.blockId !== input.sourceBlockId) {
+    throw businessError("BUSINESS.INVALID_OPERATION", "Asset source block mismatch", {
+      assetBlockId: parsed.blockId,
+      sourceBlockId: input.sourceBlockId,
+    });
   }
 
-  async function copyAsset(db: AppDatabase, input: CopyAssetInput) {
-    await assertBlockExists(db, input.sourceBlockId);
-    await assertBlockExists(db, input.targetBlockId);
+  const sourcePath = path.join(
+    deps.paths.getAssetPathForBlock(input.sourceBlockId),
+    sanitizeFileName(parsed.fileName),
+  );
+  const targetFileName = sanitizeFileName(`${Date.now()}-${parsed.fileName}`);
+  const targetPath = path.join(
+    deps.paths.getAssetPathForBlock(input.targetBlockId),
+    targetFileName,
+  );
 
-    const parsed = splitAssetUrl(input.assetUrl);
-    if (parsed.blockId !== input.sourceBlockId) {
-      throw businessError("BUSINESS.INVALID_OPERATION", "Asset source block mismatch", {
-        assetBlockId: parsed.blockId,
-        sourceBlockId: input.sourceBlockId,
-      });
-    }
+  await storage.copyFile(sourcePath, targetPath);
 
-    const sourcePath = path.join(
-      options.paths.getAssetPathForBlock(input.sourceBlockId),
-      sanitizeFileName(parsed.fileName),
-    );
-    const targetFileName = sanitizeFileName(`${Date.now()}-${parsed.fileName}`);
-    const targetPath = path.join(
-      options.paths.getAssetPathForBlock(input.targetBlockId),
-      targetFileName,
-    );
-
-    await storage.copyFile(sourcePath, targetPath);
-
-    return {
-      assetUrl: `${assetUrlScheme}${input.targetBlockId}/${targetFileName}`,
-    };
-  }
-
-  return { copyAsset, createAsset };
+  return {
+    assetUrl: `${assetUrlScheme}${input.targetBlockId}/${targetFileName}`,
+  };
 }

@@ -1,11 +1,15 @@
+import type { AppContext } from "@main/core/context";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 
-import { createExternalEditService } from "./service";
+import { cancelEdit, submitEdit } from "./service";
 
 export function registerExternalEditCommands(ipc: IpcRouter): void {
+  const getDeps = (ctx: AppContext) => ({
+    manager: ctx.externalEditManager,
+  });
+
   ipc.command("external-edit.cancel", async (input, ctx) => {
-    const service = createExternalEditService({ manager: ctx.externalEditManager });
-    await service.cancelEdit(input.editId);
+    await cancelEdit(getDeps(ctx), input.editId);
     return undefined;
   });
 
@@ -14,7 +18,6 @@ export function registerExternalEditCommands(ipc: IpcRouter): void {
   });
 
   ipc.command("external-edit.submit", async (input, ctx) => {
-    const service = createExternalEditService({ manager: ctx.externalEditManager });
-    return await service.submitEdit(await ctx.getDb(), input.editId, input.content);
+    return await submitEdit(getDeps(ctx), await ctx.getDb(), input.editId, input.content);
   });
 }

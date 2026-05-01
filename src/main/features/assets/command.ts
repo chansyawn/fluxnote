@@ -1,15 +1,18 @@
+import type { AppContext } from "@main/core/context";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 
-import { createAssetService } from "./service";
+import { copyAsset, createAsset } from "./service";
 
 export function registerAssetsCommands(ipc: IpcRouter): void {
+  const getDeps = (ctx: AppContext) => ({
+    paths: ctx.persistence.paths,
+  });
+
   ipc.command("assets.copy", async (input, ctx) => {
-    const service = createAssetService({ paths: ctx.persistence.paths });
-    return await service.copyAsset(await ctx.getDb(), input);
+    return await copyAsset(getDeps(ctx), await ctx.getDb(), input);
   });
 
   ipc.command("assets.create", async (input, ctx) => {
-    const service = createAssetService({ paths: ctx.persistence.paths });
-    return await service.createAsset(await ctx.getDb(), input);
+    return await createAsset(getDeps(ctx), await ctx.getDb(), input);
   });
 }

@@ -11,44 +11,45 @@ interface ExternalEditServiceOptions {
   manager: ExternalEditManager;
 }
 
-export function createExternalEditService(options: ExternalEditServiceOptions) {
-  async function submitEdit(db: AppDatabase, editId: string, content: string) {
-    const claimed = options.manager.claim(editId);
-    try {
-      const result = await db
-        .update(blocks)
-        .set({
-          content,
-          updatedAt: nowIsoString(),
-        })
-        .where(eq(blocks.id, claimed.session.blockId))
-        .run();
-      if (getSqliteChangedRows(result) === 0) {
-        throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${claimed.session.blockId}`);
-      }
-
-      claimed.resolve({
-        blockId: claimed.session.blockId,
+export async function submitEdit(
+  deps: ExternalEditServiceOptions,
+  db: AppDatabase,
+  editId: string,
+  content: string,
+) {
+  const claimed = deps.manager.claim(editId);
+  try {
+    const result = await db
+      .update(blocks)
+      .set({
         content,
-        status: "submitted",
-      });
-      return await getPublicBlockById(db, claimed.session.blockId);
-    } catch (error) {
-      claimed.resolve({
-        blockId: claimed.session.blockId,
-        status: "cancelled",
-      });
-      throw error;
+        updatedAt: nowIsoString(),
+      })
+      .where(eq(blocks.id, claimed.session.blockId))
+      .run();
+    if (getSqliteChangedRows(result) === 0) {
+      throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${claimed.session.blockId}`);
     }
-  }
 
-  async function cancelEdit(editId: string): Promise<void> {
-    const claimed = options.manager.claim(editId);
+    claimed.resolve({
+      blockId: claimed.session.blockId,
+      content,
+      status: "submitted",
+    });
+    return await getPublicBlockById(db, claimed.session.blockId);
+  } catch (error) {
     claimed.resolve({
       blockId: claimed.session.blockId,
       status: "cancelled",
     });
+    throw error;
   }
+}
 
-  return { cancelEdit, submitEdit };
+export async function cancelEdit(deps: ExternalEditServiceOptions, editId: string): Promise<void> {
+  const claimed = deps.manager.claim(editId);
+  claimed.resolve({
+    blockId: claimed.session.blockId,
+    status: "cancelled",
+  });
 }
