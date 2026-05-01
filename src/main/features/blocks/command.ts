@@ -1,5 +1,6 @@
-import type { AppContext } from "@main/core/context";
+import type { AppDatabase } from "@main/core/database/database-client";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
+import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 
 import {
@@ -16,48 +17,50 @@ import {
   updateBlockContent,
 } from "./service";
 
+interface BlocksCommandDeps {
+  db: AppDatabase;
+  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
+  listExternalEditSessions: () => ExternalEditSession[];
+  getAssetPathForBlock: (blockId: string) => string;
+  now: () => Date;
+}
+
 async function getAutoArchiveEvaluationContext(
-  ctx: AppContext,
+  deps: BlocksCommandDeps,
 ): Promise<AutoArchiveEvaluationContext> {
   const settings = await (async (): Promise<AutoArchiveSettings> => {
     try {
-      return await Promise.resolve(ctx.preferencesService.readAutoArchiveSettings());
+      return await Promise.resolve(deps.readAutoArchiveSettings());
     } catch {
       return DEFAULT_SETTINGS.autoArchive;
     }
   })();
 
   return createAutoArchiveEvaluationContext({
-    now: ctx.now(),
-    protectedBlockIds: new Set(
-      ctx.externalEditManager.listSessions().map((session) => session.blockId),
-    ),
+    now: deps.now(),
+    protectedBlockIds: new Set(deps.listExternalEditSessions().map((session) => session.blockId)),
     settings,
   });
 }
 
-export function registerBlocksCommands(ipc: IpcRouter): void {
-  ipc.command("blocks.archive", async (input, ctx) => {
-    const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
-    return await archiveBlock(await ctx.getDb(), input.blockId, autoArchiveContext);
+export function registerBlocksCommands(ipc: IpcRouter, deps: BlocksCommandDeps): void {
+  ipc.command("blocks.archive", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await archiveBlock(deps.db, input.blockId, autoArchiveContext);
   });
 
-  ipc.command("blocks.create", async (_input, ctx) => {
-    return await createBlockRecord(await ctx.getDb());
+  ipc.command("blocks.create", async () => {
+    return await createBlockRecord(deps.db);
   });
 
-  ipc.command("blocks.delete", async (input, ctx) => {
-    return await deleteBlock(
-      await ctx.getDb(),
-      input.blockId,
-      ctx.persistence.paths.getAssetPathForBlock(input.blockId),
-    );
+  ipc.command("blocks.delete", async (input) => {
+    return await deleteBlock(deps.db, input.blockId, deps.getAssetPathForBlock(input.blockId));
   });
 
-  ipc.command("blocks.list", async (input, ctx) => {
-    const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
+  ipc.command("blocks.list", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
     return await listBlocks(
-      await ctx.getDb(),
+      deps.db,
       input.tagIds,
       input.visibility ?? "active",
       input.offset,
@@ -66,10 +69,10 @@ export function registerBlocksCommands(ipc: IpcRouter): void {
     );
   });
 
-  ipc.command("blocks.locate", async (input, ctx) => {
-    const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
+  ipc.command("blocks.locate", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
     return await locateBlock(
-      await ctx.getDb(),
+      deps.db,
       input.blockId,
       input.tagIds,
       input.visibility ?? "active",
@@ -77,18 +80,13 @@ export function registerBlocksCommands(ipc: IpcRouter): void {
     );
   });
 
-  ipc.command("blocks.restore", async (input, ctx) => {
-    const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
-    return await restoreBlock(await ctx.getDb(), input.blockId, autoArchiveContext);
+  ipc.command("blocks.restore", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await restoreBlock(deps.db, input.blockId, autoArchiveContext);
   });
 
-  ipc.command("blocks.update-content", async (input, ctx) => {
-    const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
-    return await updateBlockContent(
-      await ctx.getDb(),
-      input.blockId,
-      input.content,
-      autoArchiveContext,
-    );
+  ipc.command("blocks.update-content", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await updateBlockContent(deps.db, input.blockId, input.content, autoArchiveContext);
   });
 }

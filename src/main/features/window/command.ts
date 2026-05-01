@@ -1,18 +1,24 @@
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 
-export function registerWindowCommands(ipc: IpcRouter): void {
-  ipc.command("window.destroy", (_input, ctx) => {
-    ctx.windowManager.requestQuit();
+import type { WindowManager } from "./manager";
+
+interface WindowCommandDeps {
+  windowManager: WindowManager;
+}
+
+export function registerWindowCommands(ipc: IpcRouter, deps: WindowCommandDeps): void {
+  ipc.command("window.destroy", () => {
+    deps.windowManager.requestQuit();
     return undefined;
   });
 
-  ipc.command("window.hide", (_input, ctx) => {
-    ctx.windowManager.hideMainWindow();
+  ipc.command("window.hide", () => {
+    deps.windowManager.hideMainWindow();
     return undefined;
   });
 
-  ipc.command("window.toggle", (_input, ctx) => {
-    ctx.windowManager.toggleMainWindow();
+  ipc.command("window.toggle", () => {
+    deps.windowManager.toggleMainWindow();
     return undefined;
   });
 }

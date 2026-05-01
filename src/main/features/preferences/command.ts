@@ -1,15 +1,21 @@
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 
-export function registerPreferencesCommands(ipc: IpcRouter): void {
-  ipc.command("preferences.patch", (input, ctx) => {
-    return ctx.preferencesService.patchSettings(input);
+import type { PreferencesService } from "./service";
+
+interface PreferencesCommandDeps {
+  preferencesService: PreferencesService;
+}
+
+export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCommandDeps): void {
+  ipc.command("preferences.patch", (input) => {
+    return deps.preferencesService.patchSettings(input);
   });
 
-  ipc.command("preferences.read", (_input, ctx) => {
-    return ctx.preferencesService.readSettings();
+  ipc.command("preferences.read", () => {
+    return deps.preferencesService.readSettings();
   });
 
-  ipc.command("preferences.reset", (_input, ctx) => {
-    return ctx.preferencesService.resetSettings();
+  ipc.command("preferences.reset", () => {
+    return deps.preferencesService.resetSettings();
   });
 }

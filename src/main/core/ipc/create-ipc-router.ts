@@ -1,20 +1,17 @@
-import type { AppContext } from "@main/core/context";
-import { businessError, toIpcErrorPayload, type IpcResult } from "@shared/ipc/result";
-import {
-  contracts,
-  type CommandInput,
-  type CommandName,
-  type CommandOutput,
-} from "@shared/ipc/types";
+import type { RuntimePorts } from "@main/core/context";
+import { businessError, type IpcResult } from "@shared/ipc/result";
+import { type CommandInput, type CommandName, type CommandOutput } from "@shared/ipc/types";
 import { ipcMain } from "electron";
 
-type CommandHandler<T extends CommandName> = (
-  input: CommandInput<T>,
-  ctx: AppContext,
-) => Promise<CommandOutput<T>> | CommandOutput<T>;
+import { createIpcMiddlewareContext } from "./ipc-middleware";
 
-export function createIpcRouter(ctx: AppContext) {
+type IpcHandler<I, O> = (input: I) => Promise<O> | O;
+
+type CommandHandler<T extends CommandName> = IpcHandler<CommandInput<T>, CommandOutput<T>>;
+
+export function createIpcRouter(ports: RuntimePorts) {
   const handlers = new Map<CommandName, CommandHandler<CommandName>>();
+  const middleware = createIpcMiddlewareContext(ports);
 
   function command<T extends CommandName>(name: T, handler: CommandHandler<T>): void {
     handlers.set(name, handler as CommandHandler<CommandName>);
@@ -24,24 +21,20 @@ export function createIpcRouter(ctx: AppContext) {
     for (const [name, handler] of handlers) {
       ipcMain.handle(name, async (event, rawInput): Promise<IpcResult<unknown>> => {
         try {
-          if (!ctx.events.isSenderTrusted(event.sender)) {
+          if (!middleware.isTrustedSender(event)) {
             throw businessError("BUSINESS.INVALID_INVOKE", "Untrusted IPC sender");
           }
 
-          const contract = contracts.commands[name];
-          const input = contract.input.parse(rawInput) as CommandInput<typeof name>;
-          const output = await handler(input, ctx);
-          const data = contract.output.parse(output);
+          const input = middleware.parseInput(name, rawInput);
+          const output = await handler(input);
+          const data = middleware.parseOutput(name, output);
 
           return {
             ok: true,
             data,
           };
         } catch (error) {
-          return {
-            ok: false,
-            error: toIpcErrorPayload(error),
-          };
+          return middleware.mapError(error);
         }
       });
     }

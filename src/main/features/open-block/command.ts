@@ -1,12 +1,18 @@
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 
-export function registerOpenBlockCommands(ipc: IpcRouter): void {
-  ipc.command("open-block.acknowledge-pending", (input, ctx) => {
-    ctx.openBlockService.acknowledgePending(input.blockId);
+import type { OpenBlockService } from "./service";
+
+interface OpenBlockCommandDeps {
+  openBlockService: OpenBlockService;
+}
+
+export function registerOpenBlockCommands(ipc: IpcRouter, deps: OpenBlockCommandDeps): void {
+  ipc.command("open-block.acknowledge-pending", (input) => {
+    deps.openBlockService.acknowledgePending(input.blockId);
     return undefined;
   });
 
-  ipc.command("open-block.read-pending", (_input, ctx) => {
-    return ctx.openBlockService.readPending();
+  ipc.command("open-block.read-pending", () => {
+    return deps.openBlockService.readPending();
   });
 }

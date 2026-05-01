@@ -1,7 +1,7 @@
 import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
-import { createAppContext, type AppContext } from "../core/context";
+import { createRuntimePorts } from "../core/context";
 import { createEntrypointRuntime } from "../core/entrypoints/create-entrypoint-runtime";
 import { createIpcRouter } from "../core/ipc/create-ipc-router";
 import { registerIpc } from "../core/ipc/register-ipc";
@@ -17,10 +17,10 @@ import { createTrayManager, createWindowManager } from "../features/window";
 export function createBackendRuntime() {
   const persistence = createPersistenceRuntime();
   const preferencesService = createPreferencesService();
+  let ports: ReturnType<typeof createRuntimePorts> | null = null;
 
-  let appContext: AppContext | null = null;
   const emitEvent = <T extends EventName>(name: T, payload: EventPayload<T>): boolean => {
-    return appContext ? appContext.events.emit(name, payload) : false;
+    return ports ? ports.events.emit(name, payload) : false;
   };
 
   let windowManager: ReturnType<typeof createWindowManager>;
@@ -38,35 +38,13 @@ export function createBackendRuntime() {
     showWindow: () => windowManager.showMainWindow(),
   });
 
-  const entrypointRuntime = createEntrypointRuntime({
-    createExternalEditSession: (blockId, originalContent, signal) =>
-      externalEditManager.begin(blockId, originalContent, { signal }).result,
-    getDb: async () => {
-      await persistence.init();
-      return persistence.getDb();
-    },
-    requestOpenBlock: (blockId) => {
-      openBlockService.requestOpen(blockId);
-    },
-    showMainWindow: () => windowManager.showMainWindow(),
-  });
+  let entrypointRuntime: ReturnType<typeof createEntrypointRuntime> | null = null;
 
   windowManager = createWindowManager({
     emitEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
     onOpenBlockReady: () => openBlockService.emitPending(),
   });
-
-  appContext = createAppContext({
-    externalEditManager,
-    openBlockService,
-    preferencesService,
-    persistence,
-    windowManager,
-  });
-
-  const ipc = createIpcRouter(appContext);
-  registerIpc(ipc);
 
   const trayManager = createTrayManager({
     openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
@@ -76,13 +54,36 @@ export function createBackendRuntime() {
 
   function registerMainWindowToEventBus(): void {
     const mainWindow = windowManager.getMainWindow();
-    if (mainWindow && appContext) {
-      appContext.events.registerWindow(mainWindow);
+    if (mainWindow && ports) {
+      ports.events.registerWindow(mainWindow);
     }
   }
 
   async function start(): Promise<void> {
     await persistence.init();
+    const db = persistence.getDb();
+    ports = createRuntimePorts({
+      db,
+      persistence,
+    });
+    entrypointRuntime = createEntrypointRuntime({
+      createExternalEditSession: (blockId, originalContent, signal) =>
+        externalEditManager.begin(blockId, originalContent, { signal }).result,
+      getDb: async () => db,
+      requestOpenBlock: (blockId) => {
+        openBlockService.requestOpen(blockId);
+      },
+      showMainWindow: () => windowManager.showMainWindow(),
+    });
+    const ipc = createIpcRouter(ports);
+    registerIpc(ipc, {
+      externalEditManager,
+      openBlockService,
+      ports,
+      preferencesService,
+      windowManager,
+    });
+
     registerAssetProtocol(persistence.paths);
     await entrypointRuntime.startCliServer();
     windowManager.createMainWindow();
@@ -102,20 +103,24 @@ export function createBackendRuntime() {
     globalShortcut.unregisterAll();
     trayManager.destroyTray();
     externalEditManager.cancelAll();
-    await entrypointRuntime.stopCliServer();
+    if (entrypointRuntime) {
+      await entrypointRuntime.stopCliServer();
+    }
     await persistence.close();
   }
 
   function handleSecondInstance(argv: readonly string[]): void {
     windowManager.showMainWindow();
     const deepLink = extractDeepLinkFromArgv(argv);
-    if (deepLink) {
+    if (deepLink && entrypointRuntime) {
       void entrypointRuntime.handleDeepLink(deepLink);
     }
   }
 
   function handleOpenUrl(urlText: string): void {
-    void entrypointRuntime.handleDeepLink(urlText);
+    if (entrypointRuntime) {
+      void entrypointRuntime.handleDeepLink(urlText);
+    }
   }
 
   function activate(): void {

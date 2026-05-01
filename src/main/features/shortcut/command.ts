@@ -1,19 +1,24 @@
+import type { EventBus } from "@main/core/ipc/event-bus";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 import { businessError } from "@shared/ipc/result";
 import { globalShortcut } from "electron";
 
-export function registerShortcutCommands(ipc: IpcRouter): void {
+interface ShortcutCommandDeps {
+  events: EventBus;
+}
+
+export function registerShortcutCommands(ipc: IpcRouter, deps: ShortcutCommandDeps): void {
   ipc.command("shortcut.is-registered", (input) => {
     return globalShortcut.isRegistered(input.shortcut);
   });
 
-  ipc.command("shortcut.register", (input, ctx) => {
+  ipc.command("shortcut.register", (input) => {
     if (globalShortcut.isRegistered(input.shortcut)) {
       globalShortcut.unregister(input.shortcut);
     }
 
     const ok = globalShortcut.register(input.shortcut, () => {
-      ctx.events.emit("shortcut.pressed", {
+      deps.events.emit("shortcut.pressed", {
         shortcut: input.shortcut,
         state: "Pressed",
       });
