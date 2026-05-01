@@ -5,9 +5,7 @@ import {
   type CommandName,
   type CommandOutput,
 } from "@shared/ipc/types";
-import type { IpcMainInvokeEvent } from "electron";
-
-import type { RuntimePorts } from "../context";
+import type { IpcMainInvokeEvent, WebContents } from "electron";
 
 export interface IpcMiddlewareContext {
   isTrustedSender: (event: IpcMainInvokeEvent) => boolean;
@@ -16,9 +14,15 @@ export interface IpcMiddlewareContext {
   mapError: (error: unknown) => IpcResult<unknown>;
 }
 
-export function createIpcMiddlewareContext(ports: RuntimePorts): IpcMiddlewareContext {
+interface CreateIpcMiddlewareContextOptions {
+  isSenderTrusted: (sender: WebContents) => boolean;
+}
+
+export function createIpcMiddlewareContext(
+  options: CreateIpcMiddlewareContextOptions,
+): IpcMiddlewareContext {
   return {
-    isTrustedSender: (event) => ports.events.isSenderTrusted(event.sender),
+    isTrustedSender: (event) => options.isSenderTrusted(event.sender),
     parseInput: (name, rawInput) => {
       const parseResult = contracts.commands[name].input.safeParse(rawInput);
       if (!parseResult.success) {

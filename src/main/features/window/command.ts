@@ -1,4 +1,4 @@
-import type { IpcRouter } from "@main/core/ipc/register-ipc";
+import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
 
 import type { WindowManager } from "./manager";
 

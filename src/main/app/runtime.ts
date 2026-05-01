@@ -1,95 +1,55 @@
-import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
-import { createRuntimePorts } from "../core/context";
-import { createEntrypointRuntime } from "../core/entrypoints/create-entrypoint-runtime";
 import { createIpcRouter } from "../core/ipc/create-ipc-router";
-import { registerIpc } from "../core/ipc/register-ipc";
-import { createPersistenceRuntime } from "../core/persistence";
 import { registerAssetProtocol } from "../features/assets/protocol";
-import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
 import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
-import { createExternalEditManager } from "../features/external-edit";
-import { createOpenBlockService } from "../features/open-block";
-import { createPreferencesService } from "../features/preferences";
-import { createTrayManager, createWindowManager } from "../features/window";
+import { createEntrypointRuntime } from "./entrypoints";
+import { registerFeatureCommands } from "./register-commands";
+import { createMainServices } from "./services";
 
 export function createBackendRuntime() {
-  const persistence = createPersistenceRuntime();
-  const preferencesService = createPreferencesService();
-  let ports: ReturnType<typeof createRuntimePorts> | null = null;
-
-  const emitEvent = <T extends EventName>(name: T, payload: EventPayload<T>): boolean => {
-    return ports ? ports.events.emit(name, payload) : false;
-  };
-
-  let windowManager: ReturnType<typeof createWindowManager>;
-
-  const externalEditManager = createExternalEditManager({ emitEvent });
-  const autoArchiveRuntime = new AutoArchiveRuntime({
-    emitEvent,
-    getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
-    getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
-    readAutoArchiveSettings: preferencesService.readAutoArchiveSettings,
-    persistence,
-  });
-  const openBlockService = createOpenBlockService({
-    emitEvent,
-    showWindow: () => windowManager.showMainWindow(),
-  });
-
+  const services = createMainServices();
   let entrypointRuntime: ReturnType<typeof createEntrypointRuntime> | null = null;
 
-  windowManager = createWindowManager({
-    emitEvent,
-    onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
-    onOpenBlockReady: () => openBlockService.emitPending(),
-  });
-
-  const trayManager = createTrayManager({
-    openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
-    requestQuit: () => windowManager.requestQuit(),
-    showMainWindow: () => windowManager.showMainWindow(),
-  });
-
   function registerMainWindowToEventBus(): void {
-    const mainWindow = windowManager.getMainWindow();
-    if (mainWindow && ports) {
-      ports.events.registerWindow(mainWindow);
+    const mainWindow = services.windowManager.getMainWindow();
+    if (mainWindow) {
+      services.events.registerWindow(mainWindow);
     }
   }
 
   async function start(): Promise<void> {
-    await persistence.init();
-    const db = persistence.getDb();
-    ports = createRuntimePorts({
-      db,
-      persistence,
-    });
+    await services.persistence.init();
+    const db = services.db;
     entrypointRuntime = createEntrypointRuntime({
       createExternalEditSession: (blockId, originalContent, signal) =>
-        externalEditManager.begin(blockId, originalContent, { signal }).result,
+        services.externalEditManager.begin(blockId, originalContent, { signal }).result,
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
-        openBlockService.requestOpen(blockId);
+        services.openBlockService.requestOpen(blockId);
       },
-      showMainWindow: () => windowManager.showMainWindow(),
+      showMainWindow: () => services.windowManager.showMainWindow(),
     });
-    const ipc = createIpcRouter(ports);
-    registerIpc(ipc, {
-      externalEditManager,
-      openBlockService,
-      ports,
-      preferencesService,
-      windowManager,
+    const ipc = createIpcRouter({
+      isSenderTrusted: services.events.isSenderTrusted,
+    });
+    registerFeatureCommands(ipc, {
+      db,
+      events: services.events,
+      externalEditManager: services.externalEditManager,
+      now: () => new Date(),
+      openBlockService: services.openBlockService,
+      persistence: services.persistence,
+      preferencesService: services.preferencesService,
+      windowManager: services.windowManager,
     });
 
-    registerAssetProtocol(persistence.paths);
+    registerAssetProtocol(services.persistence.paths);
     await entrypointRuntime.startCliServer();
-    windowManager.createMainWindow();
+    services.windowManager.createMainWindow();
     registerMainWindowToEventBus();
-    trayManager.createTray();
-    await autoArchiveRuntime.start();
+    services.trayManager.createTray();
+    await services.autoArchiveRuntime.start();
 
     const startupDeepLink = extractDeepLinkFromArgv(process.argv);
     if (startupDeepLink) {
@@ -98,19 +58,19 @@ export function createBackendRuntime() {
   }
 
   async function stop(): Promise<void> {
-    windowManager.prepareToQuit();
-    autoArchiveRuntime.stop();
+    services.windowManager.prepareToQuit();
+    services.autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
-    trayManager.destroyTray();
-    externalEditManager.cancelAll();
+    services.trayManager.destroyTray();
+    services.externalEditManager.cancelAll();
     if (entrypointRuntime) {
       await entrypointRuntime.stopCliServer();
     }
-    await persistence.close();
+    await services.persistence.close();
   }
 
   function handleSecondInstance(argv: readonly string[]): void {
-    windowManager.showMainWindow();
+    services.windowManager.showMainWindow();
     const deepLink = extractDeepLinkFromArgv(argv);
     if (deepLink && entrypointRuntime) {
       void entrypointRuntime.handleDeepLink(deepLink);
@@ -124,13 +84,13 @@ export function createBackendRuntime() {
   }
 
   function activate(): void {
-    if (windowManager.getMainWindow() === null) {
-      windowManager.createMainWindow();
+    if (services.windowManager.getMainWindow() === null) {
+      services.windowManager.createMainWindow();
       registerMainWindowToEventBus();
       return;
     }
 
-    windowManager.showMainWindow();
+    services.windowManager.showMainWindow();
   }
 
   function quitWhenAllWindowsClosed(): void {

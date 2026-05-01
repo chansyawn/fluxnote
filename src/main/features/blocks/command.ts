@@ -1,5 +1,5 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import type { IpcRouter } from "@main/core/ipc/register-ipc";
+import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
 import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 
