@@ -22,7 +22,7 @@ async function runExternalEdit(filePath: string): Promise<void> {
   const originalContent = await readFile(resolvedPath, "utf8");
 
   try {
-    const result = await dispatchCommand("block.createExternalEdit", {
+    const result = await dispatchCommand("block.create-external-edit", {
       content: originalContent,
     });
     if (result.status === "submitted") {
@@ -71,7 +71,7 @@ export async function runFluxCli(argv: readonly string[] = process.argv): Promis
     command.source.type === "text"
       ? command.source.text
       : await readTextFile(command.source.filePath);
-  const result = await dispatchCommand("block.createFromText", { content });
+  const result = await dispatchCommand("block.create-from-text", { content });
   console.log(`Created block: ${result.blockId}`);
   return 0;
 }

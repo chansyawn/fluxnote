@@ -2,18 +2,17 @@ import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
 import { createAppContext, type AppContext } from "../app-context";
+import { createEntrypointRuntime } from "../core/entrypoints/create-entrypoint-runtime";
 import { createIpcRouter } from "../core/ipc/create-ipc-router";
 import { registerIpc } from "../core/ipc/register-ipc";
 import { BackendStore } from "../core/persistence/backend-store";
 import { registerAssetProtocol } from "../features/assets/protocol";
 import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
-import { createCliIpcServer } from "../features/cli/ipc-server";
-import { createDeepLinkHandler, extractDeepLinkFromArgv } from "../features/deep-link/handler";
+import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
 import { createExternalEditManager } from "../features/external-edit";
 import { createOpenBlockService } from "../features/open-block";
 import { createPreferencesService } from "../features/preferences";
 import { createTrayManager, createWindowManager } from "../features/window";
-import { createBackendCommandDispatcher } from "./backend-commands";
 
 export function createBackendRuntime() {
   const backendStore = new BackendStore();
@@ -39,7 +38,7 @@ export function createBackendRuntime() {
     showWindow: () => windowManager.showMainWindow(),
   });
 
-  const backendCommandDispatcher = createBackendCommandDispatcher({
+  const entrypointRuntime = createEntrypointRuntime({
     createExternalEditSession: (blockId, originalContent, signal) =>
       externalEditManager.begin(blockId, originalContent, { signal }).result,
     getDb: async () => {
@@ -50,12 +49,6 @@ export function createBackendRuntime() {
       openBlockService.requestOpen(blockId);
     },
     showMainWindow: () => windowManager.showMainWindow(),
-  });
-  const deepLinkHandler = createDeepLinkHandler({
-    dispatchCommand: backendCommandDispatcher.dispatch,
-  });
-  const cliIpcServer = createCliIpcServer({
-    dispatchCommand: backendCommandDispatcher.dispatch,
   });
 
   windowManager = createWindowManager({
@@ -91,7 +84,7 @@ export function createBackendRuntime() {
   async function start(): Promise<void> {
     await backendStore.init();
     registerAssetProtocol(backendStore);
-    await cliIpcServer.start();
+    await entrypointRuntime.startCliServer();
     windowManager.createMainWindow();
     registerMainWindowToEventBus();
     trayManager.createTray();
@@ -99,7 +92,7 @@ export function createBackendRuntime() {
 
     const startupDeepLink = extractDeepLinkFromArgv(process.argv);
     if (startupDeepLink) {
-      void deepLinkHandler.handle(startupDeepLink);
+      void entrypointRuntime.handleDeepLink(startupDeepLink);
     }
   }
 
@@ -109,7 +102,7 @@ export function createBackendRuntime() {
     globalShortcut.unregisterAll();
     trayManager.destroyTray();
     externalEditManager.cancelAll();
-    await cliIpcServer.close();
+    await entrypointRuntime.stopCliServer();
     await backendStore.close();
   }
 
@@ -117,12 +110,12 @@ export function createBackendRuntime() {
     windowManager.showMainWindow();
     const deepLink = extractDeepLinkFromArgv(argv);
     if (deepLink) {
-      void deepLinkHandler.handle(deepLink);
+      void entrypointRuntime.handleDeepLink(deepLink);
     }
   }
 
   function handleOpenUrl(urlText: string): void {
-    void deepLinkHandler.handle(urlText);
+    void entrypointRuntime.handleDeepLink(urlText);
   }
 
   function activate(): void {

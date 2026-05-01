@@ -50,7 +50,7 @@ describe("flux cli runtime", () => {
     await expect(runFluxCli([...baseArgv, "--edit", filePath])).resolves.toBe(0);
 
     await expect(readFile(filePath, "utf8")).resolves.toBe("submitted");
-    expect(dispatchCommandMock).toHaveBeenCalledWith("block.createExternalEdit", {
+    expect(dispatchCommandMock).toHaveBeenCalledWith("block.create-external-edit", {
       content: "draft",
     });
   });

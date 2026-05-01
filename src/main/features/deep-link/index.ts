@@ -1,6 +1,6 @@
 export {
   createDeepLinkHandler,
   extractDeepLinkFromArgv,
-  parseDeepLinkCommand,
+  parseDeepLinkEnvelope,
   type DeepLinkHandler,
 } from "./handler";

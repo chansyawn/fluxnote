@@ -1,25 +1,27 @@
 import { APP_PROTOCOL } from "@shared/app/app-config";
-import type { BackendCommandKey } from "@shared/backend-entrypoint/commands";
+import type {
+  BackendCommandKey,
+  BackendCommandResponse,
+} from "@shared/features/entrypoints/commands";
+import {
+  createEntrypointEnvelope,
+  type EntrypointEnvelope,
+} from "@shared/features/entrypoints/envelope";
+import type { IpcResult } from "@shared/ipc/result";
 
-type DeepLinkCommand =
-  | {
-      command: "app.open";
-      payload: null;
-    }
-  | {
-      command: "block.open";
-      payload: { blockId: string };
-    };
+type DeepLinkEnvelope = EntrypointEnvelope<BackendCommandKey>;
 
 interface DeepLinkHandlerServices {
-  dispatchCommand: (command: BackendCommandKey, payload: unknown) => Promise<unknown>;
+  dispatchEnvelope: <TKey extends BackendCommandKey>(
+    envelope: EntrypointEnvelope<TKey>,
+  ) => Promise<IpcResult<BackendCommandResponse<TKey>>>;
 }
 
 export function extractDeepLinkFromArgv(argv: readonly string[]): string | null {
   return argv.find((arg) => arg.startsWith(`${APP_PROTOCOL}://`)) ?? null;
 }
 
-export function parseDeepLinkCommand(urlText: string): DeepLinkCommand | null {
+export function parseDeepLinkEnvelope(urlText: string): DeepLinkEnvelope | null {
   try {
     const parsed = new URL(urlText);
     if (parsed.protocol !== `${APP_PROTOCOL}:`) {
@@ -28,14 +30,19 @@ export function parseDeepLinkCommand(urlText: string): DeepLinkCommand | null {
 
     const cleanPath = parsed.pathname.replace(/^\/+/, "");
     if (parsed.hostname === "app" && cleanPath === "open") {
-      return { command: "app.open", payload: null };
+      return createEntrypointEnvelope({
+        command: "app.open",
+        payload: null,
+        source: "deep-link",
+      });
     }
 
     if (parsed.hostname === "block" && cleanPath) {
-      return {
+      return createEntrypointEnvelope({
         command: "block.open",
         payload: { blockId: cleanPath },
-      };
+        source: "deep-link",
+      });
     }
 
     return null;
@@ -46,12 +53,12 @@ export function parseDeepLinkCommand(urlText: string): DeepLinkCommand | null {
 
 export function createDeepLinkHandler(services: DeepLinkHandlerServices) {
   async function handle(urlText: string): Promise<boolean> {
-    const parsedCommand = parseDeepLinkCommand(urlText);
-    if (!parsedCommand) {
+    const envelope = parseDeepLinkEnvelope(urlText);
+    if (!envelope) {
       return false;
     }
 
-    await services.dispatchCommand(parsedCommand.command, parsedCommand.payload);
+    await services.dispatchEnvelope(envelope);
     return true;
   }
 

@@ -1,7 +1,8 @@
-import { createBackendCommandDispatcher } from "@main/app/backend-commands";
 import type { AppDatabase } from "@main/core/database/database-client";
 import { createBlockRecord } from "@main/features/blocks/service";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+
+import { createEntrypointCommandExecutor } from "./execute-entrypoint-command";
 
 vi.mock("@main/features/blocks/service", () => ({
   createBlockRecord: vi.fn(),
@@ -9,7 +10,7 @@ vi.mock("@main/features/blocks/service", () => ({
 
 const createBlockRecordMock = vi.mocked(createBlockRecord);
 
-describe("backend command dispatcher", () => {
+describe("entrypoint command executor", () => {
   const db = {} as AppDatabase;
   const createExternalEditSession = vi.fn();
   const getDb = vi.fn(async () => db);
@@ -25,14 +26,14 @@ describe("backend command dispatcher", () => {
   });
 
   it("opens the main window", async () => {
-    const dispatcher = createBackendCommandDispatcher({
+    const executor = createEntrypointCommandExecutor({
       getDb,
       createExternalEditSession,
       requestOpenBlock,
       showMainWindow,
     });
 
-    await expect(dispatcher.dispatch("app.open", null)).resolves.toBeNull();
+    await expect(executor.execute("app.open", null)).resolves.toBeNull();
 
     expect(showMainWindow).toHaveBeenCalledTimes(1);
   });
@@ -48,18 +49,18 @@ describe("backend command dispatcher", () => {
       updatedAt: "now",
       willArchive: false,
     });
-    const dispatcher = createBackendCommandDispatcher({
+    const executor = createEntrypointCommandExecutor({
       getDb,
       createExternalEditSession,
       requestOpenBlock,
       showMainWindow,
     });
 
-    await expect(
-      dispatcher.dispatch("block.createFromText", { content: "hello" }),
-    ).resolves.toEqual({
-      blockId: "block-1",
-    });
+    await expect(executor.execute("block.create-from-text", { content: "hello" })).resolves.toEqual(
+      {
+        blockId: "block-1",
+      },
+    );
 
     expect(createBlockRecordMock).toHaveBeenCalledWith(db, "hello");
     expect(requestOpenBlock).toHaveBeenCalledWith("block-1");
@@ -81,7 +82,7 @@ describe("backend command dispatcher", () => {
       content: "submitted",
       status: "submitted",
     });
-    const dispatcher = createBackendCommandDispatcher({
+    const executor = createEntrypointCommandExecutor({
       createExternalEditSession,
       getDb,
       requestOpenBlock,
@@ -89,7 +90,7 @@ describe("backend command dispatcher", () => {
     });
 
     await expect(
-      dispatcher.dispatch("block.createExternalEdit", { content: "draft" }),
+      executor.execute("block.create-external-edit", { content: "draft" }),
     ).resolves.toEqual({
       blockId: "block-1",
       content: "submitted",
@@ -102,14 +103,14 @@ describe("backend command dispatcher", () => {
   });
 
   it("requests an existing block to open", async () => {
-    const dispatcher = createBackendCommandDispatcher({
+    const executor = createEntrypointCommandExecutor({
       createExternalEditSession,
       getDb,
       requestOpenBlock,
       showMainWindow,
     });
 
-    await expect(dispatcher.dispatch("block.open", { blockId: "block-1" })).resolves.toBeNull();
+    await expect(executor.execute("block.open", { blockId: "block-1" })).resolves.toBeNull();
 
     expect(requestOpenBlock).toHaveBeenCalledWith("block-1");
   });

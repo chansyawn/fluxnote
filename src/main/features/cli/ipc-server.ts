@@ -2,14 +2,11 @@ import fs from "node:fs/promises";
 import net from "node:net";
 
 import {
-  cliIpcRequestEnvelopeSchema,
+  cliEntrypointEnvelopeSchema,
   resolveCliIpcSocketPath,
   type CliIpcResponseEnvelope,
-} from "@shared/backend-entrypoint/cli-ipc";
-import {
-  backendCommandContracts,
-  type BackendCommandKey,
-} from "@shared/backend-entrypoint/commands";
+} from "@shared/features/cli/cli-transport";
+import { type BackendCommandKey } from "@shared/features/entrypoints/commands";
 import { toIpcErrorPayload } from "@shared/ipc/result";
 
 interface CliIpcServerServices {
@@ -17,7 +14,9 @@ interface CliIpcServerServices {
     command: BackendCommandKey,
     payload: unknown,
     signal?: AbortSignal,
-  ) => Promise<unknown>;
+  ) => Promise<
+    { data: unknown; ok: true } | { error: ReturnType<typeof toIpcErrorPayload>; ok: false }
+  >;
 }
 
 export interface CliIpcServer {
@@ -74,15 +73,20 @@ export function createCliIpcServer(services: CliIpcServerServices): CliIpcServer
     let requestId = "unknown";
 
     try {
-      const envelope = cliIpcRequestEnvelopeSchema.parse(JSON.parse(line));
+      const envelope = cliEntrypointEnvelopeSchema.parse(JSON.parse(line));
       requestId = envelope.id;
-      const contract = backendCommandContracts[envelope.command];
-      const request = contract.request.parse(envelope.payload);
-      const response = await services.dispatchCommand(envelope.command, request, signal);
-      const data = contract.response.parse(response);
+      const result = await services.dispatchCommand(envelope.command, envelope.payload, signal);
+
+      if (!result.ok) {
+        return {
+          error: result.error,
+          id: envelope.id,
+          ok: false,
+        };
+      }
 
       return {
-        data,
+        data: result.data,
         id: envelope.id,
         ok: true,
       };

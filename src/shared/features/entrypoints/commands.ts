@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { externalEditResultSchema } from "../features/external-edit/session-contracts";
+import { externalEditResultSchema } from "../external-edit/session-contracts";
 
 export const backendCommandKeys = [
   "app.open",
-  "block.createExternalEdit",
-  "block.createFromText",
+  "block.create-external-edit",
+  "block.create-from-text",
   "block.open",
 ] as const;
 export type BackendCommandKey = (typeof backendCommandKeys)[number];
@@ -17,7 +17,7 @@ export const backendCommandContracts = {
     request: nullSchema,
     response: nullSchema,
   },
-  "block.createFromText": {
+  "block.create-from-text": {
     request: z.object({
       content: z.string(),
     }),
@@ -25,7 +25,7 @@ export const backendCommandContracts = {
       blockId: z.string().min(1),
     }),
   },
-  "block.createExternalEdit": {
+  "block.create-external-edit": {
     request: z.object({
       content: z.string(),
     }),

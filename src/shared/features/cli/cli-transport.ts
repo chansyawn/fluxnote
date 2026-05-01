@@ -4,16 +4,12 @@ import path from "node:path";
 import type { IpcErrorPayload } from "@shared/ipc/result";
 import { z } from "zod";
 
-import { backendCommandKeySchema } from "./commands";
-import type { BackendCommandKey } from "./commands";
+import { backendCommandKeySchema, type BackendCommandKey } from "../entrypoints/commands";
+import { createEntrypointEnvelope, createEntrypointEnvelopeSchema } from "../entrypoints/envelope";
 
-export const cliIpcRequestEnvelopeSchema = z.object({
-  id: z.string().min(1),
-  command: backendCommandKeySchema,
-  payload: z.unknown(),
-});
+export const cliEntrypointEnvelopeSchema = createEntrypointEnvelopeSchema(backendCommandKeySchema);
 
-export type CliIpcRequestEnvelope = z.infer<typeof cliIpcRequestEnvelopeSchema>;
+export type CliEntrypointEnvelope = z.infer<typeof cliEntrypointEnvelopeSchema>;
 
 const cliIpcErrorPayloadSchema = z.object({
   details: z.unknown().optional(),
@@ -63,13 +59,13 @@ export function resolveCliIpcSocketPath(): string {
   return path.join(os.tmpdir(), `fluxnotes-${sanitizePipeSegment(userId)}.sock`);
 }
 
-export function createCliIpcRequest(
+export function createCliEntrypointEnvelope(
   command: BackendCommandKey,
   payload: unknown,
-): CliIpcRequestEnvelope {
-  return {
+): CliEntrypointEnvelope {
+  return createEntrypointEnvelope({
     command,
-    id: crypto.randomUUID(),
     payload,
-  };
+    source: "cli",
+  });
 }

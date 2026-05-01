@@ -6,14 +6,14 @@ import { fileURLToPath } from "node:url";
 
 import {
   cliIpcResponseEnvelopeSchema,
-  createCliIpcRequest,
+  createCliEntrypointEnvelope,
   resolveCliIpcSocketPath,
-} from "@shared/backend-entrypoint/cli-ipc";
+} from "@shared/features/cli/cli-transport";
 import {
   backendCommandContracts,
   type BackendCommandKey,
   type BackendCommandResponse,
-} from "@shared/backend-entrypoint/commands";
+} from "@shared/features/entrypoints/commands";
 
 const INITIAL_SERVER_WAIT_MS = 3_000;
 const DEV_SERVER_WAIT_MS = 15_000;
@@ -32,7 +32,7 @@ async function sendCommand<TKey extends BackendCommandKey>(
   command: TKey,
   payload: unknown,
 ): Promise<BackendCommandResponse<TKey>> {
-  const request = createCliIpcRequest(command, payload);
+  const request = createCliEntrypointEnvelope(command, payload);
   const socketPath = resolveCliIpcSocketPath();
 
   return await new Promise<BackendCommandResponse<TKey>>((resolve, reject) => {
