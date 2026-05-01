@@ -2,7 +2,7 @@ import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import { getSqliteChangedRows } from "@main/core/database/db-utils";
 import type { EventBus } from "@main/core/ipc/event-bus";
-import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { PersistenceRuntime } from "@main/core/persistence";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, inArray, isNull } from "drizzle-orm";
@@ -17,8 +17,8 @@ interface AutoArchiveRuntimeOptions {
   emitEvent: EventBus["emit"];
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
+  persistence: PersistenceRuntime;
   readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
-  store: BackendStore;
 }
 
 const MIN_SCAN_INTERVAL_SECONDS = 30;
@@ -34,8 +34,8 @@ export class AutoArchiveRuntime {
   private readonly emitEvent: EventBus["emit"];
   private readonly getProtectedBlockIds: () => Set<string>;
   private readonly getWindowVisible: AutoArchiveRuntimeOptions["getWindowVisible"];
+  private readonly persistence: PersistenceRuntime;
   private readonly readAutoArchiveSettings: AutoArchiveRuntimeOptions["readAutoArchiveSettings"];
-  private readonly store: BackendStore;
   private running = false;
   private timer: NodeJS.Timeout | null = null;
   private lastPayload: AutoArchiveStateChangedPayload | null = null;
@@ -45,8 +45,8 @@ export class AutoArchiveRuntime {
     this.emitEvent = options.emitEvent;
     this.getProtectedBlockIds = options.getProtectedBlockIds ?? (() => new Set());
     this.getWindowVisible = options.getWindowVisible;
+    this.persistence = options.persistence;
     this.readAutoArchiveSettings = options.readAutoArchiveSettings;
-    this.store = options.store;
   }
 
   async start(): Promise<void> {
@@ -99,7 +99,7 @@ export class AutoArchiveRuntime {
     const config = await this.readConfig();
     const windowVisible = this.getWindowVisible();
     const now = new Date();
-    const db = this.store.getDb();
+    const db = this.persistence.getDb();
     const evaluationContext = createAutoArchiveEvaluationContext({
       now,
       protectedBlockIds: this.getProtectedBlockIds(),

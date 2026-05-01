@@ -1,4 +1,4 @@
-import type { AppContext } from "@main/app-context";
+import type { AppContext } from "@main/core/context";
 import {
   createDatabaseClient,
   type DatabaseClient,
@@ -6,7 +6,7 @@ import {
 } from "@main/core/database/database-client";
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blockTags, tags } from "@main/core/database/database-schema";
-import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { PersistenceRuntime } from "@main/core/persistence";
 import { blocksContract } from "@shared/features/blocks/contract";
 import { blockSchema } from "@shared/features/blocks/models";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
@@ -67,9 +67,16 @@ function createContext(db: AppDatabase, options: TestCommandOptions): AppContext
       readSettings: () => DEFAULT_SETTINGS,
       resetSettings: () => DEFAULT_SETTINGS,
     },
-    store: {
-      getAssetPathForBlock: () => "",
-    } as unknown as BackendStore,
+    persistence: {
+      close: async () => {},
+      getDb: () => db,
+      init: async () => {},
+      paths: {
+        getAssetPathForBlock: () => "",
+        getAssetsRootPath: () => "",
+        getDatabasePath: () => "",
+      },
+    } as unknown as PersistenceRuntime,
     windowManager: {
       createMainWindow: () => {},
       getMainWindow: () => null,

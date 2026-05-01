@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import type { AppDatabase } from "@main/core/database/database-client";
-import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { PersistencePaths } from "@main/core/persistence";
 import { businessError } from "@shared/ipc/result";
 
 import { assertBlockExists } from "../blocks/service";
@@ -9,8 +9,8 @@ import { nodeAssetStorage, type AssetStorage } from "./storage";
 import { assetUrlScheme, extFromMimeType, sanitizeFileName, splitAssetUrl } from "./url-utils";
 
 interface AssetServiceOptions {
+  paths: PersistencePaths;
   storage?: AssetStorage;
-  store: BackendStore;
 }
 
 export interface CreateAssetInput {
@@ -37,7 +37,7 @@ export function createAssetService(options: AssetServiceOptions) {
     const ext = extFromMimeType(input.mimeType);
     const baseName = fileNameCandidate ?? `${Date.now()}-${crypto.randomUUID()}.${ext}`;
     const fileName = sanitizeFileName(baseName);
-    const blockDir = options.store.getAssetPathForBlock(input.blockId);
+    const blockDir = options.paths.getAssetPathForBlock(input.blockId);
     const filePath = path.join(blockDir, fileName);
 
     await storage.writeFile(filePath, Buffer.from(input.dataBase64, "base64"));
@@ -61,12 +61,12 @@ export function createAssetService(options: AssetServiceOptions) {
     }
 
     const sourcePath = path.join(
-      options.store.getAssetPathForBlock(input.sourceBlockId),
+      options.paths.getAssetPathForBlock(input.sourceBlockId),
       sanitizeFileName(parsed.fileName),
     );
     const targetFileName = sanitizeFileName(`${Date.now()}-${parsed.fileName}`);
     const targetPath = path.join(
-      options.store.getAssetPathForBlock(input.targetBlockId),
+      options.paths.getAssetPathForBlock(input.targetBlockId),
       targetFileName,
     );
 

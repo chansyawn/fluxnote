@@ -1,11 +1,11 @@
 import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
-import { createAppContext, type AppContext } from "../app-context";
+import { createAppContext, type AppContext } from "../core/context";
 import { createEntrypointRuntime } from "../core/entrypoints/create-entrypoint-runtime";
 import { createIpcRouter } from "../core/ipc/create-ipc-router";
 import { registerIpc } from "../core/ipc/register-ipc";
-import { BackendStore } from "../core/persistence/backend-store";
+import { createPersistenceRuntime } from "../core/persistence";
 import { registerAssetProtocol } from "../features/assets/protocol";
 import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
 import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
@@ -15,7 +15,7 @@ import { createPreferencesService } from "../features/preferences";
 import { createTrayManager, createWindowManager } from "../features/window";
 
 export function createBackendRuntime() {
-  const backendStore = new BackendStore();
+  const persistence = createPersistenceRuntime();
   const preferencesService = createPreferencesService();
 
   let appContext: AppContext | null = null;
@@ -31,7 +31,7 @@ export function createBackendRuntime() {
     getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
     readAutoArchiveSettings: preferencesService.readAutoArchiveSettings,
-    store: backendStore,
+    persistence,
   });
   const openBlockService = createOpenBlockService({
     emitEvent,
@@ -42,8 +42,8 @@ export function createBackendRuntime() {
     createExternalEditSession: (blockId, originalContent, signal) =>
       externalEditManager.begin(blockId, originalContent, { signal }).result,
     getDb: async () => {
-      await backendStore.init();
-      return backendStore.getDb();
+      await persistence.init();
+      return persistence.getDb();
     },
     requestOpenBlock: (blockId) => {
       openBlockService.requestOpen(blockId);
@@ -61,7 +61,7 @@ export function createBackendRuntime() {
     externalEditManager,
     openBlockService,
     preferencesService,
-    store: backendStore,
+    persistence,
     windowManager,
   });
 
@@ -82,8 +82,8 @@ export function createBackendRuntime() {
   }
 
   async function start(): Promise<void> {
-    await backendStore.init();
-    registerAssetProtocol(backendStore);
+    await persistence.init();
+    registerAssetProtocol(persistence.paths);
     await entrypointRuntime.startCliServer();
     windowManager.createMainWindow();
     registerMainWindowToEventBus();
@@ -103,7 +103,7 @@ export function createBackendRuntime() {
     trayManager.destroyTray();
     externalEditManager.cancelAll();
     await entrypointRuntime.stopCliServer();
-    await backendStore.close();
+    await persistence.close();
   }
 
   function handleSecondInstance(argv: readonly string[]): void {

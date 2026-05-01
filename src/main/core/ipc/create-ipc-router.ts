@@ -1,4 +1,4 @@
-import type { AppContext } from "@main/app-context";
+import type { AppContext } from "@main/core/context";
 import { businessError, toIpcErrorPayload, type IpcResult } from "@shared/ipc/result";
 import {
   contracts,

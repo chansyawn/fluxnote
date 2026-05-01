@@ -1,7 +1,7 @@
 import { createDatabaseClient, type DatabaseClient } from "@main/core/database/database-client";
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blocks } from "@main/core/database/database-schema";
-import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { PersistenceRuntime } from "@main/core/persistence";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -64,9 +64,16 @@ describe("AutoArchiveRuntime", () => {
         enabled: true,
         idleMinutes: 60,
       }),
-      store: {
+      persistence: {
+        close: async () => {},
         getDb: () => db,
-      } as unknown as BackendStore,
+        init: async () => {},
+        paths: {
+          getAssetPathForBlock: () => "",
+          getAssetsRootPath: () => "",
+          getDatabasePath: () => "",
+        },
+      } as unknown as PersistenceRuntime,
     });
 
     await runtime.start();

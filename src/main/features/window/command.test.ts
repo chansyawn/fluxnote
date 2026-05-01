@@ -1,4 +1,4 @@
-import type { AppContext } from "@main/app-context";
+import type { AppContext } from "@main/core/context";
 import type { CommandInput, CommandName, CommandOutput } from "@shared/ipc/types";
 import { describe, expect, it, vi } from "vite-plus/test";
 

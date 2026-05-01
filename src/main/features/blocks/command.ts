@@ -1,4 +1,4 @@
-import type { AppContext } from "@main/app-context";
+import type { AppContext } from "@main/core/context";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 
@@ -50,7 +50,7 @@ export function registerBlocksCommands(ipc: IpcRouter): void {
     return await deleteBlock(
       await ctx.getDb(),
       input.blockId,
-      ctx.store.getAssetPathForBlock(input.blockId),
+      ctx.persistence.paths.getAssetPathForBlock(input.blockId),
     );
   });
 

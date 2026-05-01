@@ -1,14 +1,14 @@
 import type { AppDatabase } from "@main/core/database/database-client";
-import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { PersistenceRuntime } from "@main/core/persistence";
 import type { ExternalEditManager } from "@main/features/external-edit";
 import type { OpenBlockService } from "@main/features/open-block";
 import type { PreferencesService } from "@main/features/preferences";
 import type { WindowManager } from "@main/features/window";
 
-import { createEventBus, type EventBus } from "./core/ipc/event-bus";
+import { createEventBus, type EventBus } from "../ipc/event-bus";
 
 export interface AppContext {
-  store: BackendStore;
+  persistence: PersistenceRuntime;
   getDb: () => Promise<AppDatabase>;
   now: () => Date;
   preferencesService: PreferencesService;
@@ -19,7 +19,7 @@ export interface AppContext {
 }
 
 interface CreateAppContextOptions {
-  store: BackendStore;
+  persistence: PersistenceRuntime;
   preferencesService: PreferencesService;
   externalEditManager: ExternalEditManager;
   openBlockService: OpenBlockService;
@@ -30,10 +30,10 @@ export function createAppContext(options: CreateAppContextOptions): AppContext {
   const events = createEventBus();
 
   return {
-    store: options.store,
+    persistence: options.persistence,
     getDb: async () => {
-      await options.store.init();
-      return options.store.getDb();
+      await options.persistence.init();
+      return options.persistence.getDb();
     },
     now: () => new Date(),
     preferencesService: options.preferencesService,
