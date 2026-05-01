@@ -11,18 +11,18 @@ export type OpenBlockRequestedPayload = z.infer<typeof openBlockRequestedPayload
 
 export const openBlockContract = {
   commands: {
-    "openBlock.acknowledgePending": {
+    "open-block.acknowledge-pending": {
       input: z.object({
         blockId: z.string().min(1),
       }),
       output: voidSchema,
     },
-    "openBlock.readPending": {
+    "open-block.read-pending": {
       input: voidSchema,
       output: openBlockPendingSchema,
     },
   },
   events: {
-    "openBlock.requested": openBlockRequestedPayloadSchema,
+    "open-block.requested": openBlockRequestedPayloadSchema,
   },
 } as const;

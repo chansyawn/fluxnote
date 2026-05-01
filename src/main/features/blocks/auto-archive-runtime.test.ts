@@ -76,12 +76,12 @@ describe("AutoArchiveRuntime", () => {
     runtime.stop();
 
     expect(emitEvent).toHaveBeenCalledTimes(2);
-    expect(emitEvent).toHaveBeenNthCalledWith(1, "blocks.autoArchiveStateChanged", {
+    expect(emitEvent).toHaveBeenNthCalledWith(1, "blocks.auto-archive-state-changed", {
       archivedCount: 0,
       pendingCount: 1,
       windowVisible: true,
     });
-    expect(emitEvent).toHaveBeenNthCalledWith(2, "blocks.autoArchiveStateChanged", {
+    expect(emitEvent).toHaveBeenNthCalledWith(2, "blocks.auto-archive-state-changed", {
       archivedCount: 0,
       pendingCount: 1,
       windowVisible: true,

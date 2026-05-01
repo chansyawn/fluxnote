@@ -152,7 +152,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         return;
       }
 
-      services.emitEvent("window.closeRequested", null);
+      services.emitEvent("window.close-requested", null);
       event.preventDefault();
       hideMainWindow();
     });
@@ -164,12 +164,12 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     });
 
     createdWindow.on("focus", () => {
-      services.emitEvent("window.focusChanged", true);
+      services.emitEvent("window.focus-changed", true);
       services.onAutoArchiveTrigger(false);
     });
 
     createdWindow.on("blur", () => {
-      services.emitEvent("window.focusChanged", false);
+      services.emitEvent("window.focus-changed", false);
     });
 
     createdWindow.on("hide", () => {
@@ -186,7 +186,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         createdWindow.setPosition(x, y);
         createdWindow.show();
       }
-      services.emitEvent("window.focusChanged", true);
+      services.emitEvent("window.focus-changed", true);
       services.onOpenBlockReady();
     });
 

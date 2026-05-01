@@ -5,5 +5,5 @@ import { subscribeEvent } from "./invoke";
 export function onAutoArchiveStateChanged(
   handler: (payload: AutoArchiveStateChangedPayload) => void,
 ): () => void {
-  return subscribeEvent("blocks.autoArchiveStateChanged", handler);
+  return subscribeEvent("blocks.auto-archive-state-changed", handler);
 }

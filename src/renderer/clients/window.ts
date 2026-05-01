@@ -13,11 +13,11 @@ export async function toggleMainWindowVisibility(): Promise<void> {
 }
 
 export function onWindowCloseRequested(handler: () => void): () => void {
-  return subscribeEvent("window.closeRequested", () => {
+  return subscribeEvent("window.close-requested", () => {
     handler();
   });
 }
 
 export function onWindowFocusChanged(handler: (focused: boolean) => void): () => void {
-  return subscribeEvent("window.focusChanged", handler);
+  return subscribeEvent("window.focus-changed", handler);
 }

@@ -16,7 +16,7 @@ export function registerTagsCommands(ipc: IpcRouter): void {
     return await listTags(await ctx.getDb());
   });
 
-  ipc.command("tags.setBlockTags", async (input, ctx) => {
+  ipc.command("tags.set-block-tags", async (input, ctx) => {
     return await setBlockTags(await ctx.getDb(), input.blockId, input.tagIds);
   });
 }

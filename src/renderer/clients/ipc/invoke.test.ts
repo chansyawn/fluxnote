@@ -56,9 +56,9 @@ describe("renderer invoke transport", () => {
       on,
     });
 
-    const returnedUnlisten = subscribeEvent("window.focusChanged", handler);
+    const returnedUnlisten = subscribeEvent("window.focus-changed", handler);
 
-    expect(on).toHaveBeenCalledWith("window.focusChanged", handler);
+    expect(on).toHaveBeenCalledWith("window.focus-changed", handler);
     expect(returnedUnlisten).toBe(unlisten);
   });
 

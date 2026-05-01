@@ -152,7 +152,7 @@ export class AutoArchiveRuntime {
 
     this.lastPayload = payload;
     this.lastCandidateFingerprint = candidateFingerprint;
-    this.emitEvent("blocks.autoArchiveStateChanged", payload);
+    this.emitEvent("blocks.auto-archive-state-changed", payload);
   }
 
   private async readConfig(): Promise<AutoArchiveSettings> {

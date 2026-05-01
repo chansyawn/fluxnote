@@ -34,7 +34,7 @@ function maybeDisposeShortcutPressSubscription(): void {
 }
 
 export async function isRegistered(shortcut: string): Promise<boolean> {
-  return await invokeCommand("shortcut.isRegistered", { shortcut });
+  return await invokeCommand("shortcut.is-registered", { shortcut });
 }
 
 export async function register(

@@ -19,7 +19,7 @@ export type LocateBlockResult = z.infer<
   (typeof blocksContract)["commands"]["blocks.locate"]["output"]
 >;
 export type UpdateBlockContentRequest = z.input<
-  (typeof blocksContract)["commands"]["blocks.updateContent"]["input"]
+  (typeof blocksContract)["commands"]["blocks.update-content"]["input"]
 >;
 export type BlockMutationRequest = z.input<
   (typeof blocksContract)["commands"]["blocks.archive"]["input"]
@@ -49,7 +49,7 @@ export const locateBlock = (req: LocateBlockRequest): Promise<LocateBlockResult>
 export const createBlock = (): Promise<Block> => invokeCommand("blocks.create", undefined);
 
 export const updateBlockContent = (req: UpdateBlockContentRequest): Promise<Block> =>
-  invokeCommand("blocks.updateContent", req);
+  invokeCommand("blocks.update-content", req);
 
 export const deleteBlock = (req: DeleteBlockRequest): Promise<DeleteBlockResult> =>
   invokeCommand("blocks.delete", req);

@@ -27,7 +27,7 @@ export function createOpenBlockService(services: OpenBlockServiceOptions) {
       return false;
     }
 
-    return services.emitEvent("openBlock.requested", { blockId: pendingBlockId });
+    return services.emitEvent("open-block.requested", { blockId: pendingBlockId });
   }
 
   function requestOpen(blockId: string): boolean {

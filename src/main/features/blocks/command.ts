@@ -82,7 +82,7 @@ export function registerBlocksCommands(ipc: IpcRouter): void {
     return await restoreBlock(await ctx.getDb(), input.blockId, autoArchiveContext);
   });
 
-  ipc.command("blocks.updateContent", async (input, ctx) => {
+  ipc.command("blocks.update-content", async (input, ctx) => {
     const autoArchiveContext = await getAutoArchiveEvaluationContext(ctx);
     return await updateBlockContent(
       await ctx.getDb(),

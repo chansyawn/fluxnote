@@ -11,7 +11,7 @@ export type ShortcutPressedPayload = z.infer<typeof shortcutPressedPayloadSchema
 
 export const shortcutContract = {
   commands: {
-    "shortcut.isRegistered": {
+    "shortcut.is-registered": {
       input: shortcutRequestSchema,
       output: z.boolean(),
     },

@@ -18,10 +18,10 @@ describe("createEventBus", () => {
     const bus = createEventBus();
     bus.registerWindow(win as never);
 
-    const emitted = bus.emit("window.focusChanged", true);
+    const emitted = bus.emit("window.focus-changed", true);
 
     expect(emitted).toBe(true);
-    expect(send).toHaveBeenCalledWith("window.focusChanged", true);
+    expect(send).toHaveBeenCalledWith("window.focus-changed", true);
 
     if (onClosed) {
       onClosed();
@@ -38,7 +38,7 @@ describe("createEventBus", () => {
       webContents: { send },
     } as never);
 
-    const emitted = bus.emit("openBlock.requested", { nope: true } as never);
+    const emitted = bus.emit("open-block.requested", { nope: true } as never);
 
     expect(emitted).toBe(false);
     expect(send).not.toHaveBeenCalled();

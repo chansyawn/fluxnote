@@ -18,13 +18,13 @@ describe("ipc contracts", () => {
 
   it("parses event payloads", () => {
     expect(
-      contracts.events["blocks.autoArchiveStateChanged"].parse({
+      contracts.events["blocks.auto-archive-state-changed"].parse({
         archivedCount: 1,
         pendingCount: 2,
         windowVisible: false,
       }),
     ).toEqual({ archivedCount: 1, pendingCount: 2, windowVisible: false });
 
-    expect(() => contracts.events["openBlock.requested"].parse({})).toThrow();
+    expect(() => contracts.events["open-block.requested"].parse({})).toThrow();
   });
 });

@@ -19,7 +19,7 @@ export const tagsContract = {
       input: voidSchema,
       output: z.array(tagSchema),
     },
-    "tags.setBlockTags": {
+    "tags.set-block-tags": {
       input: z.object({
         blockId: z.string().min(1),
         tagIds: z.array(z.string()),

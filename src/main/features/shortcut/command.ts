@@ -3,7 +3,7 @@ import { businessError } from "@shared/ipc/result";
 import { globalShortcut } from "electron";
 
 export function registerShortcutCommands(ipc: IpcRouter): void {
-  ipc.command("shortcut.isRegistered", (input) => {
+  ipc.command("shortcut.is-registered", (input) => {
     return globalShortcut.isRegistered(input.shortcut);
   });
 

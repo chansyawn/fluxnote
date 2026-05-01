@@ -24,7 +24,7 @@ describe("external edit manager", () => {
       status: "submitted",
     });
     expect(manager.listSessions()).toEqual([]);
-    expect(emitEvent).toHaveBeenLastCalledWith("externalEdit.sessionsChanged", []);
+    expect(emitEvent).toHaveBeenLastCalledWith("external-edit.sessions-changed", []);
   });
 
   it("resolves cancelled edits and rejects double claim", async () => {

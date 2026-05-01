@@ -12,17 +12,17 @@ export type ExternalEditSessionsChangedPayload = z.infer<
 
 export const externalEditContract = {
   commands: {
-    "externalEdit.cancel": {
+    "external-edit.cancel": {
       input: z.object({
         editId: z.string().min(1),
       }),
       output: voidSchema,
     },
-    "externalEdit.list": {
+    "external-edit.list": {
       input: voidSchema,
       output: z.array(externalEditSessionSchema),
     },
-    "externalEdit.submit": {
+    "external-edit.submit": {
       input: z.object({
         editId: z.string().min(1),
         content: z.string(),
@@ -31,6 +31,6 @@ export const externalEditContract = {
     },
   },
   events: {
-    "externalEdit.sessionsChanged": externalEditSessionsChangedPayloadSchema,
+    "external-edit.sessions-changed": externalEditSessionsChangedPayloadSchema,
   },
 } as const;

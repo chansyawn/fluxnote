@@ -16,7 +16,7 @@ describe("open block command", () => {
     expect(command.requestOpen("block-1")).toBe(true);
 
     expect(showWindow).toHaveBeenCalledTimes(1);
-    expect(emitEvent).toHaveBeenCalledWith("openBlock.requested", { blockId: "block-1" });
+    expect(emitEvent).toHaveBeenCalledWith("open-block.requested", { blockId: "block-1" });
     expect(command.readPending()).toEqual({ blockId: "block-1" });
 
     command.acknowledgePending("block-1");

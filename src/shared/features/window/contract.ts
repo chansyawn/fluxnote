@@ -24,7 +24,7 @@ export const windowContract = {
     },
   },
   events: {
-    "window.closeRequested": windowCloseRequestedPayloadSchema,
-    "window.focusChanged": windowFocusChangedPayloadSchema,
+    "window.close-requested": windowCloseRequestedPayloadSchema,
+    "window.focus-changed": windowFocusChangedPayloadSchema,
   },
 } as const;

@@ -44,7 +44,7 @@ export const blocksContract = {
       input: blockMutationRequestSchema,
       output: blockSchema,
     },
-    "blocks.updateContent": {
+    "blocks.update-content": {
       input: z.object({
         blockId: z.string().min(1),
         content: z.string(),
@@ -53,6 +53,6 @@ export const blocksContract = {
     },
   },
   events: {
-    "blocks.autoArchiveStateChanged": autoArchiveStateChangedPayloadSchema,
+    "blocks.auto-archive-state-changed": autoArchiveStateChangedPayloadSchema,
   },
 } as const;

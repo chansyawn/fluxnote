@@ -38,7 +38,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
   }
 
   function emitSessionsChanged(): void {
-    services.emitEvent("externalEdit.sessionsChanged", listSessions());
+    services.emitEvent("external-edit.sessions-changed", listSessions());
   }
 
   function begin(

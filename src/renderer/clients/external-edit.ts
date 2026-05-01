@@ -9,24 +9,24 @@ import type { z } from "zod";
 import { invokeCommand, subscribeEvent } from "./ipc/invoke";
 
 export type ExternalEditCancelRequest = z.input<
-  (typeof externalEditContract)["commands"]["externalEdit.cancel"]["input"]
+  (typeof externalEditContract)["commands"]["external-edit.cancel"]["input"]
 >;
 export type ExternalEditSubmitRequest = z.input<
-  (typeof externalEditContract)["commands"]["externalEdit.submit"]["input"]
+  (typeof externalEditContract)["commands"]["external-edit.submit"]["input"]
 >;
 export type { ExternalEditSession, ExternalEditSessionsChangedPayload };
 
 export const listExternalEditSessions = (): Promise<ExternalEditSession[]> =>
-  invokeCommand("externalEdit.list", undefined);
+  invokeCommand("external-edit.list", undefined);
 
 export const submitExternalEdit = (req: ExternalEditSubmitRequest): Promise<Block> =>
-  invokeCommand("externalEdit.submit", req);
+  invokeCommand("external-edit.submit", req);
 
 export const cancelExternalEdit = (req: ExternalEditCancelRequest): Promise<void> =>
-  invokeCommand("externalEdit.cancel", req);
+  invokeCommand("external-edit.cancel", req);
 
 export function onExternalEditSessionsChanged(
   handler: (payload: ExternalEditSessionsChangedPayload) => void,
 ): () => void {
-  return subscribeEvent("externalEdit.sessionsChanged", handler);
+  return subscribeEvent("external-edit.sessions-changed", handler);
 }

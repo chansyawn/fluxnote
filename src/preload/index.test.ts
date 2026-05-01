@@ -70,7 +70,7 @@ describe("preload runtime", () => {
       listener = nextListener as (_event: unknown, payload: unknown) => void;
     });
 
-    const off = getRuntime().on("openBlock.requested", handler);
+    const off = getRuntime().on("open-block.requested", handler);
     listener?.({}, { blockId: "block-1" });
     off();
 
