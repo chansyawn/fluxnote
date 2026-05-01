@@ -1,4 +1,4 @@
-import type { Block, BlockVisibility, Tag } from "@renderer/features/ipc";
+import type { Block, BlockVisibility, Tag } from "@renderer/clients";
 
 import { BlockActionBar } from "./block-action-bar";
 import { BlockArchiveAction } from "./block-archive-action";

@@ -1,1 +1,1 @@
-export { registerCliCommands } from "./cli-command";
+export { registerCliCommands } from "./command";

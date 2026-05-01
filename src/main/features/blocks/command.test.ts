@@ -7,13 +7,19 @@ import {
 import { migrateDatabase } from "@main/core/database/database-migrator";
 import { blockTags, tags } from "@main/core/database/database-schema";
 import type { BackendStore } from "@main/core/persistence/backend-store";
-import type { Block, ListBlocksResult, LocateBlockResult } from "@shared/features/blocks";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
+import { blocksContract } from "@shared/features/blocks/contract";
+import { blockSchema } from "@shared/features/blocks/models";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 import type { CommandInput, CommandName, CommandOutput } from "@shared/ipc/types";
 import { sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vite-plus/test";
+import type { z } from "zod";
 
-import { registerBlocksCommands } from "./blocks-command";
+import { registerBlocksCommands } from "./command";
+
+type Block = z.infer<typeof blockSchema>;
+type ListBlocksResult = z.infer<(typeof blocksContract)["commands"]["blocks.list"]["output"]>;
+type LocateBlockResult = z.infer<(typeof blocksContract)["commands"]["blocks.locate"]["output"]>;
 
 async function createTestDatabaseClient(): Promise<DatabaseClient> {
   const client = createDatabaseClient(":memory:");

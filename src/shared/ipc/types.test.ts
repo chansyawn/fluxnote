@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences";
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { contracts } from "@shared/ipc/types";
 import { describe, expect, it } from "vite-plus/test";
 

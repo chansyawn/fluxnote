@@ -1,0 +1,32 @@
+import type { Block } from "@shared/features/blocks/models";
+import {
+  externalEditContract,
+  type ExternalEditSessionsChangedPayload,
+} from "@shared/features/external-edit/contract";
+import { type ExternalEditSession } from "@shared/features/external-edit/session-contracts";
+import type { z } from "zod";
+
+import { invokeCommand, subscribeEvent } from "./ipc/invoke";
+
+export type ExternalEditCancelRequest = z.input<
+  (typeof externalEditContract)["commands"]["externalEdit.cancel"]["input"]
+>;
+export type ExternalEditSubmitRequest = z.input<
+  (typeof externalEditContract)["commands"]["externalEdit.submit"]["input"]
+>;
+export type { ExternalEditSession, ExternalEditSessionsChangedPayload };
+
+export const listExternalEditSessions = (): Promise<ExternalEditSession[]> =>
+  invokeCommand("externalEdit.list", undefined);
+
+export const submitExternalEdit = (req: ExternalEditSubmitRequest): Promise<Block> =>
+  invokeCommand("externalEdit.submit", req);
+
+export const cancelExternalEdit = (req: ExternalEditCancelRequest): Promise<void> =>
+  invokeCommand("externalEdit.cancel", req);
+
+export function onExternalEditSessionsChanged(
+  handler: (payload: ExternalEditSessionsChangedPayload) => void,
+): () => void {
+  return subscribeEvent("externalEdit.sessionsChanged", handler);
+}

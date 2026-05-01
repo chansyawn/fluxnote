@@ -2,7 +2,7 @@ import {
   listExternalEditSessions,
   onExternalEditSessionsChanged,
   type ExternalEditSession,
-} from "@renderer/features/ipc";
+} from "@renderer/clients";
 import { useEffect, useMemo, useState } from "react";
 
 interface UseExternalEditSessionsResult {

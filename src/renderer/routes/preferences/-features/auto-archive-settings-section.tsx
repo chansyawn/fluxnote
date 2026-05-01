@@ -22,12 +22,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components
 import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,
-  DEFAULT_AUTO_ARCHIVE_SETTINGS,
   convertAutoArchiveDurationUnit,
   toAutoArchiveDurationViewModel,
   toAutoArchiveIdleMinutes,
   type AutoArchiveDurationUnit,
-} from "@shared/features/preferences";
+} from "@shared/features/preferences/auto-archive";
+import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@shared/features/preferences/settings";
 import { ArchiveIcon, CircleHelpIcon, ClockIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 

@@ -1,4 +1,4 @@
-export { registerBlocksCommands } from "./blocks-command";
+export { registerBlocksCommands } from "./command";
 export {
   archiveBlock,
   assertBlockExists,

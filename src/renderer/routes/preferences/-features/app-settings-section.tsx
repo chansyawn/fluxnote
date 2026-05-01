@@ -1,8 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
-import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
-import { getCliStatus, installCli, uninstallCli } from "@renderer/features/ipc";
+import { getCliStatus, installCli, toAppInvokeError, uninstallCli } from "@renderer/clients";
 import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
@@ -18,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
-import { FONT_SIZE_OPTIONS, isFontSize, isLocaleCode } from "@shared/features/preferences";
+import { FONT_SIZE_OPTIONS, isFontSize, isLocaleCode } from "@shared/features/preferences/settings";
 import { useQuery } from "@tanstack/react-query";
 import { LanguagesIcon, TerminalIcon, TypeIcon } from "lucide-react";
 import { useCallback, useState } from "react";

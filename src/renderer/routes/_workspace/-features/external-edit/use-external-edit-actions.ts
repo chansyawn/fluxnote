@@ -1,10 +1,10 @@
-import { toAppInvokeError } from "@renderer/app/invoke";
 import { queryClient } from "@renderer/app/query";
 import {
   cancelExternalEdit,
   submitExternalEdit,
   type ListBlocksResult,
-} from "@renderer/features/ipc";
+  toAppInvokeError,
+} from "@renderer/clients";
 import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";

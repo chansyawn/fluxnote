@@ -1,6 +1,6 @@
 import type { AppContext } from "@main/app-context";
 import type { IpcRouter } from "@main/core/ipc/register-ipc";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 
 import {
   createAutoArchiveEvaluationContext,

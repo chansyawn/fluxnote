@@ -1,5 +1,5 @@
 import { queryClient } from "@renderer/app/query";
-import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/features/ipc";
+import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/clients";
 import { NoteBlockEditorView } from "@renderer/features/note-block/note-block-editor-view";
 import { type NoteEditorShellHandle } from "@renderer/features/note-editor-core";
 import { useDebouncer } from "@tanstack/react-pacer";

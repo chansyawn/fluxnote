@@ -1,6 +1,6 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks, type BlockRecord } from "@main/core/database/database-schema";
-import type { AutoArchiveSettings } from "@shared/features/preferences";
+import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, isNull, lt } from "drizzle-orm";
 
 export interface AutoArchiveEvaluationContext {

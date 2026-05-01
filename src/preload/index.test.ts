@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences";
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const electronMock = vi.hoisted(() => ({

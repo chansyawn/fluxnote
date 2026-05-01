@@ -1,5 +1,6 @@
-import { invokeCommand } from "@renderer/ipc-client";
-import type { Settings, SettingsPatch } from "@shared/features/preferences";
+import type { Settings, SettingsPatch } from "@shared/features/preferences/settings";
+
+import { invokeCommand } from "./ipc/invoke";
 
 export async function readSettings(): Promise<Settings> {
   return await invokeCommand("preferences.read", undefined);

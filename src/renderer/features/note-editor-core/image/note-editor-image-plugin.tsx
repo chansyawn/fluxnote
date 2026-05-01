@@ -1,7 +1,7 @@
 import { $generateNodesFromSerializedNodes } from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { i18n } from "@lingui/core";
-import { copyAsset } from "@renderer/features/ipc";
+import { copyAsset } from "@renderer/clients";
 import { useNoteEditorBlockId } from "@renderer/features/note-editor-core/composer/note-editor-block-context";
 import {
   $insertNodes,

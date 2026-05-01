@@ -5,7 +5,7 @@ import {
   SettingsRow,
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
-import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences";
+import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences/settings";
 import { KeyboardIcon, PanelTopOpenIcon, PlusCircleIcon } from "lucide-react";
 import { type ReactElement } from "react";
 

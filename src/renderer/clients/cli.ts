@@ -1,4 +1,4 @@
-import { invokeCommand } from "@renderer/ipc-client";
+import { invokeCommand } from "./ipc/invoke";
 
 export interface CliStatus {
   installed: boolean;

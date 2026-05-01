@@ -1,10 +1,10 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks } from "@main/core/database/database-schema";
 import { getSqliteChangedRows } from "@main/core/database/db-utils";
-import type { BackendStore } from "@main/core/persistence/backend-store";
 import type { EventBus } from "@main/core/ipc/event-bus";
-import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences";
+import type { BackendStore } from "@main/core/persistence/backend-store";
+import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, inArray, isNull } from "drizzle-orm";
 
 import {

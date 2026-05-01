@@ -1,10 +1,5 @@
+import { isRegistered, register, unregister, type ShortcutEvent } from "@renderer/clients";
 import { toElectronAccelerator } from "@renderer/features/shortcut/electron-accelerator";
-import {
-  isRegistered,
-  register,
-  unregister,
-  type ShortcutEvent,
-} from "@renderer/features/shortcut/shortcut-api";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 
 interface RegisterGlobalShortcutOptions {

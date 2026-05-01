@@ -1,4 +1,4 @@
-import type { Block, Tag } from "@renderer/features/ipc";
+import type { Block, Tag } from "@renderer/clients";
 import { BlockActions } from "@renderer/features/note-block/block-actions";
 import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
 import {

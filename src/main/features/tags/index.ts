@@ -1,2 +1,2 @@
-export { registerTagsCommands } from "./tags-command";
+export { registerTagsCommands } from "./command";
 export { createTag, deleteTag, listTags, setBlockTags } from "./service";

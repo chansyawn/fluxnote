@@ -8,7 +8,7 @@ import { Button } from "@renderer/ui/components/button";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Popover, PopoverContent, PopoverTrigger } from "@renderer/ui/components/popover";
 import { cn } from "@renderer/ui/lib/utils";
-import type { ShortcutAction } from "@shared/features/preferences";
+import type { ShortcutAction } from "@shared/features/preferences/settings";
 import { RotateCcwIcon, XIcon } from "lucide-react";
 
 import { ShortcutRecordingPopover } from "./shortcut-recording-popover";

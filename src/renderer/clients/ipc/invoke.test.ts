@@ -1,10 +1,6 @@
-import {
-  AppInvokeError,
-  invokeCommand,
-  subscribeEvent,
-  toAppInvokeError,
-} from "@renderer/app/invoke";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+
+import { AppInvokeError, invokeCommand, subscribeEvent, toAppInvokeError } from "./invoke";
 
 function setIpcBridge(bridge: {
   command: (name: string, input: unknown) => Promise<unknown>;

@@ -1,4 +1,4 @@
-import type { Block, LocateBlockResult } from "@renderer/features/ipc";
+import type { Block, LocateBlockResult } from "@renderer/clients";
 import { useEffectEvent } from "react";
 
 import type { BlockNavigationAlign } from "./use-block-navigation";

@@ -3,4 +3,4 @@ export {
   extractDeepLinkFromArgv,
   parseDeepLinkCommand,
   type DeepLinkHandler,
-} from "./deep-link-handler";
+} from "./handler";

@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { destroyWindow, hideWindow } from "@renderer/features/window/window-api";
+import { destroyWindow, hideWindow } from "@renderer/clients";
 import { XIcon } from "lucide-react";
 
 export function ErrorTitleBar() {

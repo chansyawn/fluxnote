@@ -1,5 +1,5 @@
 import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
-import type { ShortcutAction } from "@shared/features/preferences";
+import type { ShortcutAction } from "@shared/features/preferences/settings";
 import { useHotkeyRecorder, type Hotkey } from "@tanstack/react-hotkeys";
 import { useCallback, useEffect, useRef, useState } from "react";
 

@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { tagSchema } from "../tags/models";
+const blockTagSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
 export const blockSchema = z.object({
   id: z.string(),
@@ -10,7 +15,7 @@ export const blockSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   willArchive: z.boolean(),
-  tags: z.array(tagSchema),
+  tags: z.array(blockTagSchema),
 });
 export type Block = z.infer<typeof blockSchema>;
 

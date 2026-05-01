@@ -1,3 +1,3 @@
-export { registerWindowCommands } from "./window-command";
+export { registerWindowCommands } from "./command";
 export { createTrayManager } from "./tray-manager";
-export { createWindowManager, type WindowManager } from "./window-manager";
+export { createWindowManager, type WindowManager } from "./manager";

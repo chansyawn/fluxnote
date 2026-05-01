@@ -1,4 +1,4 @@
-import type { Block } from "@renderer/features/ipc";
+import type { Block } from "@renderer/clients";
 import { memo } from "react";
 
 import { WorkspaceBlockEditor } from "../editing/workspace-block-editor";

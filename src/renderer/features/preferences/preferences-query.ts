@@ -1,9 +1,4 @@
-import { toAppInvokeError } from "@renderer/app/invoke";
-import {
-  patchSettings,
-  readSettings,
-  resetSettings,
-} from "@renderer/features/preferences/preferences-api";
+import { patchSettings, readSettings, resetSettings, toAppInvokeError } from "@renderer/clients";
 import {
   DEFAULT_SETTINGS,
   type AutoArchiveSettings,
@@ -12,7 +7,7 @@ import {
   type Settings,
   type SettingsPatch,
   type ShortcutAction,
-} from "@shared/features/preferences";
+} from "@shared/features/preferences/settings";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";

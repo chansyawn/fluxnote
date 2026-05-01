@@ -1,12 +1,11 @@
 import {
   AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
-  DEFAULT_SETTINGS,
   normalizeAutoArchiveIdleMinutes,
-  settingsPatchSchema,
   toAutoArchiveDurationViewModel,
   toAutoArchiveIdleMinutes,
-} from "@shared/features/preferences";
-import { normalizeSettings } from "@shared/features/preferences";
+} from "@shared/features/preferences/auto-archive";
+import { DEFAULT_SETTINGS, settingsPatchSchema } from "@shared/features/preferences/settings";
+import { normalizeSettings } from "@shared/features/preferences/settings";
 import { describe, expect, it } from "vite-plus/test";
 
 describe("auto archive preferences", () => {

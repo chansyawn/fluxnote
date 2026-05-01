@@ -5,13 +5,8 @@ import type { BackendStore } from "@main/core/persistence/backend-store";
 import { businessError } from "@shared/ipc/result";
 
 import { assertBlockExists } from "../blocks/service";
-import {
-  assetUrlScheme,
-  extFromMimeType,
-  sanitizeFileName,
-  splitAssetUrl,
-} from "./asset-url-utils";
 import { nodeAssetStorage, type AssetStorage } from "./storage";
+import { assetUrlScheme, extFromMimeType, sanitizeFileName, splitAssetUrl } from "./url-utils";
 
 interface AssetServiceOptions {
   storage?: AssetStorage;

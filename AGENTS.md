@@ -5,7 +5,6 @@
 ### Architecture
 
 - Use **Vite+** as the primary toolchain.
-- File naming must use `kebab-case` by default (auto-generated files are excluded), for example `user-profile.tsx`.
 
 ### File Organization
 
@@ -16,28 +15,30 @@ src/
       bootstrap.ts
       runtime.ts
       protocols.ts
-      ipc-registry.ts
-      feature-manifests.ts
       backend-commands.ts
     core/                 # platform core shared by backend features
       database/
       features/
-      ipc/                # backend IPC registration, backend feature binding, event bus
-        backend-feature.ts
-        define-ipc-command.ts
+      ipc/                # backend IPC router/event bus
+        create-ipc-router.ts
+        register-ipc.ts
         event-bus.ts
       persistence/
     features/             # feature-first backend domains
       <feature>/
         index.ts          # stable feature export
-        feature.ts        # bind shared feature API to main-process handlers
-        service.ts        # feature business logic, data access, and DTO mapping by default
-        *.test.ts            # colocated tests when feature-scoped
+        command.ts        # IPC command registration and routing only
+        service.ts        # feature business logic + data access (default)
+        *.test.ts         # colocated tests when feature-scoped
 
   renderer/
+    clients/
+      index.ts          # renderer-facing public entry; consumer imports from @renderer/clients
+      ipc/
+        invoke.ts       # invokeCommand / subscribeEvent / AppInvokeError
+        events.ts       # cross-feature event subscriptions
+      *.ts              # feature client implementation, no "-api" suffix
     app/                  # renderer bootstrapping and global cross-feature content
-      ipc-client.ts       # typed feature client factory and runtime bridge helpers
-    clients/              # typed renderer-side IPC clients
     features/             # shared frontend business logic and reusable feature-level components
       <feature>/
     routes/
@@ -51,17 +52,14 @@ src/
     backend-entrypoint/   # non-renderer backend entrypoint contracts
       commands.ts         # CLI / deep-link backend command contracts
       cli-ipc.ts          # CLI socket transport envelopes
-    features/             # cross-process feature DTOs, schemas, and IPC fragments
+    features/             # cross-process feature contracts and DTO schemas
       <feature>/
-        index.ts          # stable feature-level contract export
-        models.ts         # optional: shared DTO schemas and inferred public types
-        api.ts            # feature API contract: commands, events, and derived channels
-    ipc/                  # feature API definitions, registries, and generic IPC types
-      feature-api.ts      # defineFeatureApi / command / event / type inference helpers
-      registry.ts         # all feature APIs and flattened command/event registries
-      contracts.ts        # stable generic IPC surface
-      errors.ts           # flat IPC error payload model
-    electron-runtime.ts   # preload-exposed renderer runtime contract
+        contract.ts       # required: commands/events schema (single source of truth)
+        models.ts         # optional: shared DTO schemas
+        *.ts              # optional domain helpers (如 settings.ts)
+    ipc/
+      result.ts           # IpcResult + IpcError
+      types.ts            # contracts aggregation + typed command/event inference
 ```
 
 - Use `kebab-case` file names by default.
@@ -93,7 +91,7 @@ src/
 
 ```ts
 {
-  type: string;
+  code: string;
   message: string;
   details: any;
 }

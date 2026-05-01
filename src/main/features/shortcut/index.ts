@@ -1,1 +1,1 @@
-export { registerShortcutCommands } from "./shortcut-command";
+export { registerShortcutCommands } from "./command";

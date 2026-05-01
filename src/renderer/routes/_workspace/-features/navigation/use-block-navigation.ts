@@ -1,4 +1,4 @@
-import type { Block, BlockVisibility, LocateBlockResult } from "@renderer/features/ipc";
+import type { Block, BlockVisibility, LocateBlockResult } from "@renderer/clients";
 import {
   useCallback,
   useEffect,

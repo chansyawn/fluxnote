@@ -1,7 +1,9 @@
 import { queryClient } from "@renderer/app/query";
-import { onExternalEditSessionsChanged } from "@renderer/features/external-edit/external-edit-api";
-import { onAutoArchiveStateChanged } from "@renderer/features/ipc/events-api";
-import { onWindowFocusChanged } from "@renderer/features/window/window-api";
+import {
+  onAutoArchiveStateChanged,
+  onExternalEditSessionsChanged,
+  onWindowFocusChanged,
+} from "@renderer/clients";
 import { useEffect } from "react";
 
 export function AutoArchiveSync() {

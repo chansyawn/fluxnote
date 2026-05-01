@@ -1,5 +1,6 @@
-import { invokeCommand, subscribeEvent } from "@renderer/ipc-client";
-import type { ShortcutPressedPayload } from "@shared/features/shortcut";
+import type { ShortcutPressedPayload } from "@shared/features/shortcut/contract";
+
+import { invokeCommand, subscribeEvent } from "./ipc/invoke";
 
 export interface ShortcutEvent {
   state: ShortcutPressedPayload["state"];

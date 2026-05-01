@@ -1,4 +1,4 @@
-import { invokeCommand, subscribeEvent } from "@renderer/ipc-client";
+import { invokeCommand, subscribeEvent } from "./ipc/invoke";
 
 export async function destroyWindow(): Promise<void> {
   await invokeCommand("window.destroy", undefined);

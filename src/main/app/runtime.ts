@@ -2,20 +2,17 @@ import type { EventName, EventPayload } from "@shared/ipc/types";
 import { app, globalShortcut } from "electron";
 
 import { createAppContext, type AppContext } from "../app-context";
+import { createIpcRouter } from "../core/ipc/create-ipc-router";
+import { registerIpc } from "../core/ipc/register-ipc";
 import { BackendStore } from "../core/persistence/backend-store";
-import { registerAssetProtocol } from "../features/assets/asset-protocol";
+import { registerAssetProtocol } from "../features/assets/protocol";
 import { AutoArchiveRuntime } from "../features/blocks/auto-archive-runtime";
-import { createCliIpcServer } from "../features/cli/cli-ipc-server";
-import {
-  createDeepLinkHandler,
-  extractDeepLinkFromArgv,
-} from "../features/deep-link/deep-link-handler";
+import { createCliIpcServer } from "../features/cli/ipc-server";
+import { createDeepLinkHandler, extractDeepLinkFromArgv } from "../features/deep-link/handler";
 import { createExternalEditManager } from "../features/external-edit";
 import { createOpenBlockService } from "../features/open-block";
 import { createPreferencesService } from "../features/preferences";
 import { createTrayManager, createWindowManager } from "../features/window";
-import { createIpcRouter } from "../core/ipc/create-ipc-router";
-import { registerIpc } from "../core/ipc/register-ipc";
 import { createBackendCommandDispatcher } from "./backend-commands";
 
 export function createBackendRuntime() {

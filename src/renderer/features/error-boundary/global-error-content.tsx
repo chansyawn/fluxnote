@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
+import { destroyWindow, hideWindow } from "@renderer/clients";
 import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
-import { destroyWindow, hideWindow } from "@renderer/features/window/window-api";
 import { Button } from "@renderer/ui/components/button";
 import {
   Item,

@@ -1,4 +1,4 @@
-import type { BlockVisibility } from "@renderer/features/ipc";
+import type { BlockVisibility } from "@renderer/clients";
 
 export const BLOCKS_PAGE_SIZE = 10;
 

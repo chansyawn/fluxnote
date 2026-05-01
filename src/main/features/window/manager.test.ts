@@ -45,7 +45,7 @@ vi.mock("electron", () => ({
   app: electronMock.app,
 }));
 
-import { createWindowManager } from "./window-manager";
+import { createWindowManager } from "./manager";
 
 describe("window manager devtools", () => {
   beforeEach(() => {

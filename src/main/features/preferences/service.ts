@@ -6,7 +6,7 @@ import {
   type AutoArchiveSettings,
   type Settings,
   type SettingsPatch,
-} from "@shared/features/preferences";
+} from "@shared/features/preferences/settings";
 
 import { getConfigStore } from "./config-store";
 

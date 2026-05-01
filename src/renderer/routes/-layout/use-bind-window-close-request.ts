@@ -1,4 +1,4 @@
-import { hideWindow, onWindowCloseRequested } from "@renderer/features/window/window-api";
+import { hideWindow, onWindowCloseRequested } from "@renderer/clients";
 import { useEffect } from "react";
 
 export function useBindWindowCloseRequest() {

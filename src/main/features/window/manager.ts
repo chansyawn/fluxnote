@@ -3,7 +3,7 @@ import path from "node:path";
 import type { EventBus } from "@main/core/ipc/event-bus";
 import { app, BrowserWindow } from "electron";
 
-import { calculateWindowPosition, saveWindowPosition } from "./window-position";
+import { calculateWindowPosition, saveWindowPosition } from "./position";
 
 const MAIN_WINDOW_HEIGHT = 600;
 const MAIN_WINDOW_MAX_WIDTH = 640;

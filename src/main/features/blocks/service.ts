@@ -3,8 +3,8 @@ import fs from "node:fs/promises";
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database/database-schema";
 import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils";
-import type { Block } from "@shared/features/blocks";
-import type { Tag } from "@shared/features/tags";
+import type { Block } from "@shared/features/blocks/models";
+import type { Tag } from "@shared/features/tags/models";
 import { businessError } from "@shared/ipc/result";
 import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 

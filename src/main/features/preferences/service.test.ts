@@ -2,7 +2,7 @@ import {
   DEFAULT_SETTINGS,
   SETTINGS_SCHEMA_VERSION,
   type Settings,
-} from "@shared/features/preferences";
+} from "@shared/features/preferences/settings";
 import { describe, expect, it } from "vite-plus/test";
 
 import { createPreferencesService } from "./service";

@@ -1,4 +1,4 @@
-export { registerOpenBlockCommands } from "./open-block-command";
+export { registerOpenBlockCommands } from "./command";
 export {
   createOpenBlockService,
   type OpenBlockService,

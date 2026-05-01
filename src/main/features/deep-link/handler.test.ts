@@ -2,7 +2,7 @@ import {
   createDeepLinkHandler,
   extractDeepLinkFromArgv,
   parseDeepLinkCommand,
-} from "@main/features/deep-link/deep-link-handler";
+} from "@main/features/deep-link/handler";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 describe("deep link command", () => {

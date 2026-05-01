@@ -1,5 +1,6 @@
-import { subscribeEvent } from "@renderer/ipc-client";
-import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks";
+import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
+
+import { subscribeEvent } from "./invoke";
 
 export function onAutoArchiveStateChanged(
   handler: (payload: AutoArchiveStateChangedPayload) => void,
