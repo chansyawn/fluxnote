@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@renderer/ui/components/select";
 import { Switch } from "@renderer/ui/components/switch";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,
@@ -27,7 +26,7 @@ import {
   type AutoArchiveDurationUnit,
 } from "@shared/features/preferences/auto-archive";
 import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@shared/features/preferences/settings";
-import { ArchiveIcon, CircleHelpIcon, ClockIcon } from "lucide-react";
+import { ArchiveIcon, ClockIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
@@ -148,22 +147,6 @@ export function AutoArchiveSettingsSection() {
         <SettingsRow
           control={
             <div className="flex items-center gap-2">
-              <Tooltip>
-                <TooltipTrigger
-                  aria-label={i18n._({
-                    id: "preferences.auto-archive.threshold.range-tooltip.label",
-                    message: "Auto-archive range",
-                  })}
-                  render={
-                    <CircleHelpIcon className="text-muted-foreground size-3" aria-hidden="true" />
-                  }
-                />
-                <TooltipContent side="top" sideOffset={8}>
-                  <Trans id="preferences.auto-archive.threshold.range-tooltip">
-                    Range: 1-20160 minutes, 1-336 hours, or 1-14 days.
-                  </Trans>
-                </TooltipContent>
-              </Tooltip>
               <ButtonGroup>
                 <InputGroup>
                   <InputGroupInput
@@ -198,6 +181,11 @@ export function AutoArchiveSettingsSection() {
             </div>
           }
           controlClassName="min-w-0"
+          description={
+            <Trans id="preferences.auto-archive.threshold.range-tooltip">
+              Range: 1-20160 minutes, 1-336 hours, or 1-14 days.
+            </Trans>
+          }
           icon={ClockIcon}
           label={<Trans id="preferences.auto-archive.threshold.label">Archive after</Trans>}
         />

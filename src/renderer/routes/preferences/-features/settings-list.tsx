@@ -1,8 +1,8 @@
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/ui/components/hover-card";
 import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemGroup,
   ItemMedia,
   ItemTitle,
@@ -67,24 +67,33 @@ function SettingsRow({
   controlClassName,
 }: SettingsRowProps) {
   return (
-    <Item
-      className={cn(
-        "flex-nowrap rounded-none border-none",
-        description ? "min-h-14 py-2" : "h-10",
-        className,
-      )}
-    >
-      <ItemMedia
-        className="text-foreground group-has-data-[slot=item-description]/item:translate-y-0 group-has-data-[slot=item-description]/item:self-center"
-        variant="icon"
-      >
+    <Item className={cn("h-10 flex-nowrap rounded-none border-none", className)}>
+      <ItemMedia className="text-foreground" variant="icon">
         <Icon aria-hidden="true" className="size-3.5" />
       </ItemMedia>
       <ItemContent className="min-w-0 flex-1 gap-0">
-        <ItemTitle className="w-full truncate font-medium">{label}</ItemTitle>
-        {description ? (
-          <ItemDescription className="w-full truncate">{description}</ItemDescription>
-        ) : null}
+        <HoverCard>
+          <ItemTitle className="w-full">
+            <HoverCardTrigger
+              delay={100}
+              closeDelay={200}
+              className={cn(
+                "truncate text-start outline-hidden",
+                description
+                  ? "decoration-ring decoration-dashed underline underline-offset-3"
+                  : undefined,
+              )}
+            >
+              {label}
+            </HoverCardTrigger>
+          </ItemTitle>
+          {description ? (
+            <HoverCardContent side="top">
+              <p className="font-semibold">{label}</p>
+              <p>{description}</p>
+            </HoverCardContent>
+          ) : null}
+        </HoverCard>
       </ItemContent>
       <ItemActions className={cn("ms-auto shrink-0 justify-end", controlClassName)}>
         {control}
