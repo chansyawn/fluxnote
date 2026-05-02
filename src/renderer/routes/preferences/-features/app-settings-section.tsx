@@ -149,11 +149,12 @@ export function AppSettingsSection() {
           }
           description={
             <Trans id="preferences.cli.path.description">
-              Install the flux command for terminal workflows.
+              Install the Flux CLI for terminal workflows. After installation, run `flux --help` to
+              view available commands and usage.
             </Trans>
           }
           icon={TerminalIcon}
-          label={<Trans id="preferences.cli.path.label">flux command</Trans>}
+          label={<Trans id="preferences.cli.path.label">Flux CLI</Trans>}
         />
       </SettingsGroup>
     </SettingsSection>

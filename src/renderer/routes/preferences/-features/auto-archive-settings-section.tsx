@@ -141,6 +141,13 @@ export function AutoArchiveSettingsSection() {
               }}
             />
           }
+          description={
+            <Trans id="preferences.auto-archive.enable.description">
+              When enabled, blocks with no content changes for the configured duration enter a
+              pending state. Actual archiving runs when the window is hidden, and pending blocks
+              appear dimmed.
+            </Trans>
+          }
           icon={ArchiveIcon}
           label={<Trans id="preferences.auto-archive.enable.label">Enable auto-archive</Trans>}
         />

@@ -168,42 +168,42 @@ msgid "preferences.app.title"
 msgstr "App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:146
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:145
+msgid "preferences.auto-archive.enable.description"
+msgstr "When enabled, blocks with no content changes for the configured duration enter a pending state. Actual archiving runs when the window is hidden, and pending blocks appear dimmed."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:152
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:202
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:197
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Archive after"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:162
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:192
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "Range: 1-20160 minutes, 1-336 hours, or 1-14 days."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:153
-msgid "preferences.auto-archive.threshold.range-tooltip.label"
-msgstr "Auto-archive range"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:131
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:130
 msgid "preferences.auto-archive.title"
 msgstr "Auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
 msgid "preferences.auto-archive.unit.days"
 msgstr "days"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
 msgid "preferences.auto-archive.unit.hours"
 msgstr "hours"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:62
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
@@ -215,12 +215,12 @@ msgstr "Install"
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
 msgid "preferences.cli.path.description"
-msgstr "Install the flux command for terminal workflows."
+msgstr "Install the Flux CLI for terminal workflows. After installation, run `flux --help` to view available commands and usage."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:157
 msgid "preferences.cli.path.label"
-msgstr "flux command"
+msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:142

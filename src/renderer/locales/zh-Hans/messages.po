@@ -168,42 +168,42 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:146
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:145
+msgid "preferences.auto-archive.enable.description"
+msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:152
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:202
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:197
 msgid "preferences.auto-archive.threshold.label"
 msgstr "归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:162
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:192
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:153
-msgid "preferences.auto-archive.threshold.range-tooltip.label"
-msgstr "自动归档范围"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:131
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:130
 msgid "preferences.auto-archive.title"
 msgstr "自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
 msgid "preferences.auto-archive.unit.days"
 msgstr "天"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
 msgid "preferences.auto-archive.unit.hours"
 msgstr "小时"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:62
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
@@ -215,12 +215,12 @@ msgstr "安装"
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
 msgid "preferences.cli.path.description"
-msgstr "安装 flux 命令，用于终端工作流。"
+msgstr "安装 Flux CLI 以支持终端工作流。安装后可运行 `flux --help` 查看可用命令与用法。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:157
 msgid "preferences.cli.path.label"
-msgstr "flux 命令"
+msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:142

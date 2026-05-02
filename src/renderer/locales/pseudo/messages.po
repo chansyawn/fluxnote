@@ -168,42 +168,42 @@ msgid "preferences.app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:146
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:145
+msgid "preferences.auto-archive.enable.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:152
 msgid "preferences.auto-archive.enable.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:202
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:197
 msgid "preferences.auto-archive.threshold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:162
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:192
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:153
-msgid "preferences.auto-archive.threshold.range-tooltip.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:131
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:130
 msgid "preferences.auto-archive.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
 msgid "preferences.auto-archive.unit.days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
 msgid "preferences.auto-archive.unit.hours"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:62
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
 msgid "preferences.auto-archive.unit.minutes"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgid "preferences.cli.path.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:157
 msgid "preferences.cli.path.label"
 msgstr ""
 
