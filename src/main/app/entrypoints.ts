@@ -9,7 +9,7 @@ import type { IpcResult } from "@shared/ipc/result";
 import { businessError, toIpcErrorPayload } from "@shared/ipc/result";
 import { ZodError } from "zod";
 
-import type { AppDatabase } from "../core/database/database-client";
+import type { AppDatabase } from "../core/database";
 import { createBlockRecord } from "../features/blocks/service";
 import { createCliIpcServer } from "../features/cli/ipc-server";
 import { createDeepLinkHandler } from "../features/deep-link/handler";

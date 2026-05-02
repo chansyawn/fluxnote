@@ -1,6 +1,6 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
-import type { EventBus } from "@main/core/ipc/event-bus";
+import type { AppDatabase } from "@main/core/database";
+import type { IpcRouter } from "@main/core/ipc";
+import type { EventBus } from "@main/core/ipc";
 import type { PersistenceRuntime } from "@main/core/persistence";
 
 import { registerAssetsCommands } from "../features/assets/command";

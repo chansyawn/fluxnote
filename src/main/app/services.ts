@@ -1,5 +1,5 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import { createEventBus, type EventBus } from "@main/core/ipc/event-bus";
+import type { AppDatabase } from "@main/core/database";
+import { createEventBus, type EventBus } from "@main/core/ipc";
 import { createPersistenceRuntime, type PersistenceRuntime } from "@main/core/persistence";
 import {
   createAutoArchiveRuntime,

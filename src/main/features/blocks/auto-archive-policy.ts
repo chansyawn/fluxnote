@@ -1,5 +1,5 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import { blocks, type BlockRecord } from "@main/core/database/database-schema";
+import type { AppDatabase } from "@main/core/database";
+import { blocks, type BlockRecord } from "@main/core/database";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, isNull, lt } from "drizzle-orm";
 

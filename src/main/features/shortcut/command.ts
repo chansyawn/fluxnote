@@ -1,5 +1,5 @@
-import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
-import type { EventBus } from "@main/core/ipc/event-bus";
+import type { IpcRouter } from "@main/core/ipc";
+import type { EventBus } from "@main/core/ipc";
 import { businessError } from "@shared/ipc/result";
 import { globalShortcut } from "electron";
 

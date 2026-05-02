@@ -1,4 +1,4 @@
-import type { AppDatabase, DatabaseClient } from "@main/core/database/database-client";
+import type { AppDatabase, DatabaseClient } from "@main/core/database";
 
 interface CreateDbRuntimeDependencies {
   createDatabaseClient: (databasePath: string) => DatabaseClient;

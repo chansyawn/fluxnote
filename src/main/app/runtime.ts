@@ -1,6 +1,6 @@
 import { app, globalShortcut } from "electron";
 
-import { createIpcRouter } from "../core/ipc/create-ipc-router";
+import { createIpcRouter } from "../core/ipc";
 import { registerAssetProtocol } from "../features/assets/protocol";
 import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
 import { createEntrypointRuntime } from "./entrypoints";

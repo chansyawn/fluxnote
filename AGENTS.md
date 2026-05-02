@@ -118,6 +118,14 @@ vp run package
 
 - For database schema changes, run `vp run db:generate` before verification and commit the generated migration files.
 
+## Test
+
+- Use the Arrange-Act-Assert structure for readability.
+- Tests must be isolated and must not depend on execution order or shared state.
+- Use descriptive test names, preferably following `action state expected` or `given when then`.
+- Add comments only when they clarify non-obvious intent or setup.
+- Use `vp test --coverage` as a reference, not as the primary quality target.
+
 ## Appendix
 
 ### Spec Maintenance

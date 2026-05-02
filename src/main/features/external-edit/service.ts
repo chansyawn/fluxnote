@@ -1,6 +1,6 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import { blocks } from "@main/core/database/database-schema";
-import { getSqliteChangedRows, nowIsoString } from "@main/core/database/db-utils";
+import type { AppDatabase } from "@main/core/database";
+import { blocks } from "@main/core/database";
+import { getSqliteChangedRows, nowIsoString } from "@main/core/database";
 import { businessError } from "@shared/ipc/result";
 import { eq } from "drizzle-orm";
 

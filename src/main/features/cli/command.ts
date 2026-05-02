@@ -1,4 +1,4 @@
-import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
+import type { IpcRouter } from "@main/core/ipc";
 
 import { installCli, isCliInstalled, uninstallCli } from "./install-cli";
 

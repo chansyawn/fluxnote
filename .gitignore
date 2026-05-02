@@ -24,6 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Build
 .vite
-
 out
+
+# Test
+coverage

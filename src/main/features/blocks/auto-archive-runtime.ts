@@ -1,7 +1,7 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import { blocks } from "@main/core/database/database-schema";
-import { getSqliteChangedRows } from "@main/core/database/db-utils";
-import type { EventBus } from "@main/core/ipc/event-bus";
+import type { AppDatabase } from "@main/core/database";
+import { blocks } from "@main/core/database";
+import { getSqliteChangedRows } from "@main/core/database";
+import type { EventBus } from "@main/core/ipc";
 import type { PersistenceRuntime } from "@main/core/persistence";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
 import type { AutoArchiveSettings } from "@shared/features/preferences/settings";

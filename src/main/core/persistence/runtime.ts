@@ -5,10 +5,10 @@ import {
   createDatabaseClient as defaultCreateDatabaseClient,
   type AppDatabase,
   type DatabaseClient,
-} from "../database/database-client";
-import { migrateDatabase as defaultMigrateDatabase } from "../database/database-migrator";
-import { createDbRuntime } from "./create-db-runtime";
-import { createPersistencePaths, type PersistencePaths } from "./create-persistence-paths";
+} from "../database";
+import { migrateDatabase as defaultMigrateDatabase } from "../database";
+import { createDbRuntime } from "../database";
+import { createPersistencePaths, type PersistencePaths } from "./paths";
 
 interface CreatePersistenceRuntimeOptions {
   assetsDirName?: string;

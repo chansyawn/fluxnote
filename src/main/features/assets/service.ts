@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { AppDatabase } from "@main/core/database/database-client";
+import type { AppDatabase } from "@main/core/database";
 import type { PersistencePaths } from "@main/core/persistence";
 import { businessError } from "@shared/ipc/result";
 

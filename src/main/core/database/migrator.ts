@@ -3,7 +3,7 @@ import path from "node:path";
 import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
 import { app } from "electron";
 
-import type { AppDatabase } from "./database-client";
+import type { AppDatabase } from "./client";
 
 const MIGRATIONS_DIR_NAME = "drizzle";
 const SOURCE_MIGRATIONS_DIR = "src/main/core/database/drizzle";

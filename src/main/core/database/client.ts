@@ -2,7 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 
 import { drizzle, type RemoteCallback, type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 
-import * as schema from "./database-schema";
+import * as schema from "./schema";
 
 export type AppDatabase = SqliteRemoteDatabase<typeof schema>;
 

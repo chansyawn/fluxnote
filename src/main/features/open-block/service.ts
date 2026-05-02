@@ -1,4 +1,4 @@
-import type { EventBus } from "@main/core/ipc/event-bus";
+import type { EventBus } from "@main/core/ipc";
 
 interface OpenBlockServiceOptions {
   emitEvent: EventBus["emit"];

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { EventBus } from "@main/core/ipc/event-bus";
+import type { EventBus } from "@main/core/ipc";
 import { app, BrowserWindow } from "electron";
 
 import { calculateWindowPosition, saveWindowPosition } from "./position";

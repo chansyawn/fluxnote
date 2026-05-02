@@ -1,5 +1,5 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
+import type { AppDatabase } from "@main/core/database";
+import type { IpcRouter } from "@main/core/ipc";
 
 import type { ExternalEditManager } from "./manager";
 import { cancelEdit, submitEdit } from "./service";

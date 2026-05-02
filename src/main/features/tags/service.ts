@@ -1,6 +1,6 @@
-import type { AppDatabase } from "@main/core/database/database-client";
-import { blockTags, tags, type TagRecord } from "@main/core/database/database-schema";
-import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database/db-utils";
+import type { AppDatabase } from "@main/core/database";
+import { blockTags, tags, type TagRecord } from "@main/core/database";
+import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database";
 import type { Block } from "@shared/features/blocks/models";
 import type { Tag } from "@shared/features/tags/models";
 import { businessError, internalError } from "@shared/ipc/result";
