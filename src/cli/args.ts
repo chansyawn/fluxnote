@@ -3,14 +3,13 @@ import { cac } from "cac";
 export type FluxCliCommand =
   | {
       kind: "create";
+      edit: boolean;
       source:
         | {
-            edit: false;
             text: string;
             type: "text";
           }
         | {
-            edit: boolean;
             filePath: string;
             type: "file";
           };
@@ -106,8 +105,8 @@ export function parseFluxArgs(argv: readonly string[]): FluxCliCommand {
 
     return {
       kind: "create",
+      edit: false,
       source: {
-        edit: false,
         text,
         type: "text",
       },
@@ -116,8 +115,8 @@ export function parseFluxArgs(argv: readonly string[]): FluxCliCommand {
 
   return {
     kind: "create",
+    edit,
     source: {
-      edit,
       filePath: file ?? positionalFiles[0],
       type: "file",
     },
