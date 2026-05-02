@@ -1,10 +1,10 @@
 import type { Block, Tag } from "@renderer/clients";
-import { BlockActions } from "@renderer/features/note-block/block-actions";
-import { BlockExternalEditActions } from "@renderer/features/note-block/block-external-edit-actions";
 import {
-  NoteBlockEditor,
-  type NoteBlockEditorHandle,
-} from "@renderer/features/note-block/note-block-editor";
+  BlockActions,
+  BlockEditorController,
+  BlockExternalEditActions,
+  type BlockEditorControllerHandle,
+} from "@renderer/features/block";
 import { memo, useCallback, useRef, useState } from "react";
 
 import type { WorkspaceBlockRuntimeState, WorkspaceCommands } from "../workspace-runtime-context";
@@ -105,7 +105,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   const registry = useEditorRegistryContext();
 
   const setEditorRef = useCallback(
-    (handle: NoteBlockEditorHandle | null) => {
+    (handle: BlockEditorControllerHandle | null) => {
       registry.registerEditor(block.id, handle);
     },
     [block.id, registry],
@@ -135,7 +135,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         setIsActionAreaActive(false);
       }}
     >
-      <NoteBlockEditor
+      <BlockEditorController
         ref={setEditorRef}
         actions={
           shouldRenderActions ? (

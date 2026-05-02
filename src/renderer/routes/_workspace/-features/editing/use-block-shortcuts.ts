@@ -20,9 +20,9 @@ export function useBlockShortcuts({
       return false;
     }
 
-    const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-note-block-id]");
+    const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-block-id]");
 
-    return focusedBlockEditor?.dataset.noteBlockId === activeBlockId;
+    return focusedBlockEditor?.dataset.blockId === activeBlockId;
   });
 
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {

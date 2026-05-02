@@ -29,7 +29,7 @@ export function BlockErrorFallback({
   return (
     <Item
       className="bg-card text-card-foreground rounded-xl p-4"
-      data-note-block-id={blockId}
+      data-block-id={blockId}
       role="status"
       variant="outline"
     >

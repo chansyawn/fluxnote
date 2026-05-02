@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { NoteBlockPlaygroundPanel } from "@renderer/routes/lab/-features/note-block-playground-panel";
+import { BlockEditorPlaygroundPanel } from "@renderer/routes/lab/-features/block-editor-playground-panel";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/lab/")({
@@ -21,7 +21,7 @@ function RouteComponent() {
       </div>
 
       <div className="pt-2">
-        <NoteBlockPlaygroundPanel />
+        <BlockEditorPlaygroundPanel />
       </div>
     </section>
   );

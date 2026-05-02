@@ -1,0 +1,317 @@
+@reference "#global.css";
+
+[data-block-editor-input]::selection,
+[data-block-editor-input] *::selection {
+  background: transparent;
+  color: inherit;
+}
+
+[data-block-editor-input]::-moz-selection,
+[data-block-editor-input] *::-moz-selection {
+  background: transparent;
+  color: inherit;
+}
+
+.block-editor__paragraph {
+  @apply my-0;
+}
+
+.block-editor__paragraph:not(:first-child) {
+  @apply mt-1.5;
+}
+
+.block-editor__heading {
+  @apply font-heading text-foreground font-semibold tracking-tight;
+}
+
+.block-editor__heading--h1 {
+  @apply mt-3 mb-1 text-2xl first:mt-0;
+}
+
+.block-editor__heading--h2 {
+  @apply mt-3 mb-1 text-xl first:mt-0;
+}
+
+.block-editor__heading--h3 {
+  @apply mt-2.5 mb-1 text-lg first:mt-0;
+}
+
+.block-editor__heading--h4 {
+  @apply mt-2.5 mb-0.5 text-base first:mt-0;
+}
+
+.block-editor__heading--h5,
+.block-editor__heading--h6 {
+  @apply mt-2 mb-0.5 text-sm first:mt-0;
+}
+
+.block-editor__quote {
+  @apply border-border text-muted-foreground my-2.5 border-s-4 ps-2.5 text-sm italic;
+}
+
+.block-editor__list {
+  @apply my-1.5 ps-5;
+}
+
+.block-editor__list--unordered {
+  @apply list-disc;
+}
+
+.block-editor__list--unordered .block-editor__list--unordered {
+  list-style-type: circle;
+}
+
+.block-editor__list--unordered .block-editor__list--unordered .block-editor__list--unordered {
+  list-style-type: square;
+}
+
+.block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered {
+  list-style-type: disc;
+}
+
+.block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered {
+  list-style-type: circle;
+}
+
+.block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered
+  .block-editor__list--unordered {
+  list-style-type: square;
+}
+
+.block-editor__list--ordered {
+  @apply list-decimal;
+}
+
+.block-editor__list--ordered .block-editor__list--ordered {
+  list-style-type: lower-alpha;
+}
+
+.block-editor__list--ordered .block-editor__list--ordered .block-editor__list--ordered {
+  list-style-type: lower-roman;
+}
+
+.block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered {
+  list-style-type: decimal;
+}
+
+.block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered {
+  list-style-type: lower-alpha;
+}
+
+.block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered
+  .block-editor__list--ordered {
+  list-style-type: lower-roman;
+}
+
+.block-editor__list--ordered.block-editor__list--nested {
+  list-style-type: inherit;
+}
+
+.block-editor__list--checklist {
+  @apply list-none ps-0;
+}
+
+.block-editor__list-item {
+  @apply ps-1 text-sm/5.5;
+}
+
+.block-editor__list-item--checked,
+.block-editor__list-item--unchecked {
+  --block-editor-checklist-box-size: 1rem;
+  --block-editor-checklist-box-top: calc((1.5rem - var(--block-editor-checklist-box-size)) / 2);
+  @apply relative list-none ps-7 outline-none;
+}
+
+.block-editor__list-item--checked::before,
+.block-editor__list-item--unchecked::before {
+  @apply border-border bg-background absolute inset-s-0 size-4 rounded-[0.3rem] border content-[''];
+  top: var(--block-editor-checklist-box-top);
+}
+
+.block-editor__list-item--checked::before {
+  @apply border-primary bg-primary;
+}
+
+.block-editor__list-item--checked::after {
+  @apply border-primary-foreground absolute h-2 w-[0.35rem] rotate-45 border-r-2 border-b-2 content-[''];
+  inset-inline-start: 0.34rem;
+  top: 0.42rem;
+}
+
+.block-editor__list-item--checked[role="checkbox"],
+.block-editor__list-item--unchecked[role="checkbox"] {
+  @apply cursor-pointer;
+  outline: none;
+}
+
+.block-editor__list-item--checked[role="checkbox"]:focus,
+.block-editor__list-item--unchecked[role="checkbox"]:focus {
+  outline: none;
+}
+
+.block-editor__list-item--checked[role="checkbox"]:focus-visible::before,
+.block-editor__list-item--unchecked[role="checkbox"]:focus-visible::before {
+  @apply ring-primary/25 ring-4;
+}
+
+.block-editor__list-item::marker {
+  @apply text-muted-foreground;
+}
+
+.block-editor__list-item--nested {
+  @apply mt-1 list-none;
+}
+
+.block-editor__list-item--nested::before,
+.block-editor__list-item--nested::after {
+  display: none;
+}
+
+.block-editor__text--bold {
+  @apply font-semibold;
+}
+
+.block-editor__text--italic {
+  @apply italic;
+}
+
+.block-editor__text--strikethrough {
+  @apply line-through;
+}
+
+.block-editor__text--code {
+  @apply bg-muted text-muted-foreground border-border rounded-md border px-1 py-0.5 font-mono text-xs;
+}
+
+.block-editor__code {
+  @apply bg-muted text-foreground my-2.5 block overflow-x-auto rounded-lg border px-3 py-2 font-mono text-xs;
+}
+
+.block-editor__hr {
+  @apply border-border my-2.5 block border-t;
+}
+
+.block-editor__hr--selected {
+  @apply border-primary ring-primary/25 rounded-sm ring-4;
+}
+
+.block-editor__link {
+  @apply text-primary decoration-primary/35 hover:decoration-primary underline underline-offset-3 transition-colors;
+}
+
+.block-editor__table-scroll {
+  @apply my-2.5 overflow-x-auto rounded-lg border;
+}
+
+.block-editor__table {
+  @apply bg-background w-full min-w-full border-collapse text-xs;
+}
+
+.block-editor__table-row {
+  @apply border-border border-b;
+}
+
+.block-editor__table-cell {
+  @apply border-border min-w-28 border-e px-2 py-1.5 align-top;
+}
+
+.block-editor__table-cell--header {
+  @apply bg-muted/80 font-semibold;
+}
+
+.block-editor__table-cell .block-editor__paragraph:not(:first-child) {
+  @apply mt-1.5;
+}
+
+.block-editor__table-cell .block-editor__paragraph {
+  @apply text-xs;
+}
+
+.block-editor__token--keyword,
+.block-editor__token--tag {
+  @apply text-orange-600 dark:text-orange-300;
+}
+
+.block-editor__token--attr,
+.block-editor__token--property,
+.block-editor__token--class,
+.block-editor__token--function {
+  @apply text-sky-700 dark:text-sky-300;
+}
+
+.block-editor__token--string,
+.block-editor__token--selector,
+.block-editor__token--inserted {
+  @apply text-emerald-700 dark:text-emerald-300;
+}
+
+.block-editor__token--number,
+.block-editor__token--constant,
+.block-editor__token--builtin,
+.block-editor__token--variable {
+  @apply text-fuchsia-700 dark:text-fuchsia-300;
+}
+
+.block-editor__token--comment {
+  @apply text-muted-foreground italic;
+}
+
+.block-editor__token--operator,
+.block-editor__token--punctuation {
+  @apply text-foreground/75;
+}
+
+.block-editor__token--deleted,
+.block-editor__token--regex {
+  @apply text-rose-700 dark:text-rose-300;
+}
+
+.block-editor__image-node {
+  @apply last:mb-0;
+}
+
+.block-editor__image-shell {
+  @apply relative inline-block cursor-pointer rounded-md transition-all outline-none;
+}
+
+.block-editor__image-shell:hover:not([data-selected="true"]) {
+  @apply ring-border ring-1;
+}
+
+[data-block-editor-input]:focus-within .block-editor__image-shell[data-selected="true"] {
+  @apply ring-primary ring-offset-background shadow-lg ring-2 ring-offset-2;
+}
+
+.block-editor__image-shell:focus-visible {
+  @apply ring-ring ring-2 ring-offset-2;
+}
+
+.block-editor__image {
+  @apply block h-auto max-w-full rounded-md select-none;
+}
+
+.block-editor__image--error {
+  @apply bg-muted text-muted-foreground inline-flex items-center justify-center rounded-md px-4 py-8 text-sm;
+}

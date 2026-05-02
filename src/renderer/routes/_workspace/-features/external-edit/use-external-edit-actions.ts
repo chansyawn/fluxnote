@@ -5,12 +5,12 @@ import {
   type ListBlocksResult,
   toAppInvokeError,
 } from "@renderer/clients";
-import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
+import type { BlockEditorControllerHandle } from "@renderer/features/block";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 interface UseExternalEditActionsParams {
-  getEditor: (blockId: string) => NoteBlockEditorHandle | undefined;
+  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
   navigateToBlock?: (blockId: string) => void;
 }
 

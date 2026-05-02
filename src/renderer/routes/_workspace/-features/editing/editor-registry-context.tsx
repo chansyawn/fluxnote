@@ -1,9 +1,9 @@
-import type { NoteBlockEditorHandle } from "@renderer/features/note-block/note-block-editor";
+import type { BlockEditorControllerHandle } from "@renderer/features/block";
 import { createContext, useContext, type ReactNode } from "react";
 
 export interface EditorRegistryContextValue {
-  registerEditor: (blockId: string, handle: NoteBlockEditorHandle | null) => void;
-  getEditor: (blockId: string) => NoteBlockEditorHandle | undefined;
+  registerEditor: (blockId: string, handle: BlockEditorControllerHandle | null) => void;
+  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
 }
 
 const EditorRegistryContext = createContext<EditorRegistryContextValue | null>(null);
