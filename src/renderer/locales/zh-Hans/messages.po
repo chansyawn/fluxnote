@@ -20,22 +20,22 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:236
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:232
 msgid "editor.code-block.language.label"
 msgstr "代码语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:125
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:122
 msgid "editor.code-block.language.option.plain-text"
 msgstr "纯文本"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:291
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:287
 msgid "editor.code-block.language.search.empty"
 msgstr "没有匹配的语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:283
+#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:279
 msgid "editor.code-block.language.search.placeholder"
 msgstr "搜索语言"
 
@@ -163,62 +163,77 @@ msgid "lab.title"
 msgstr "实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:75
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:70
 msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:150
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:146
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:207
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:202
 msgid "preferences.auto-archive.threshold.label"
 msgstr "归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:168
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:162
 msgid "preferences.auto-archive.threshold.range-tooltip"
-msgstr "范围：1-20160 M、1-336 H 或 1-14 D。"
+msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:158
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:153
 msgid "preferences.auto-archive.threshold.range-tooltip.label"
 msgstr "自动归档范围"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:135
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:131
 msgid "preferences.auto-archive.title"
 msgstr "自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
+msgid "preferences.auto-archive.unit.days"
+msgstr "天"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
+msgid "preferences.auto-archive.unit.hours"
+msgstr "小时"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:62
+msgid "preferences.auto-archive.unit.minutes"
+msgstr "分钟"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:146
 msgid "preferences.cli.install"
 msgstr "安装"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
 msgid "preferences.cli.path.description"
 msgstr "安装 flux 命令，用于终端工作流。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:161
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:156
 msgid "preferences.cli.path.label"
 msgstr "flux 命令"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:147
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:142
 msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:131
 msgid "preferences.font-size.label"
 msgstr "字号"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:103
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:98
 msgid "preferences.language.label"
 msgstr "语言"
 
@@ -229,12 +244,12 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:33
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:30
 msgid "preferences.shortcuts.create-block.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:38
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:35
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "删除区块"
 
@@ -276,12 +291,12 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:58
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:55
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:28
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:25
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "开启/关闭窗口"
 
@@ -362,22 +377,22 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:44
+#: src/renderer/features/note-block/block-tag-action.tsx:41
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:30
+#: src/renderer/features/note-block/block-tag-action.tsx:28
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:154
+#: src/renderer/features/tag/tag-combobox-popover.tsx:148
 msgid "workspace.tags.create-inline"
 msgstr "创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:196
+#: src/renderer/features/tag/tag-combobox-popover.tsx:190
 msgid "workspace.tags.delete-inline"
 msgstr "删除标签"
 
@@ -392,7 +407,7 @@ msgid "workspace.tags.filter.placeholder"
 msgstr "搜索或创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:163
+#: src/renderer/features/tag/tag-combobox-popover.tsx:157
 msgid "workspace.tags.search.empty"
 msgstr "没有匹配的标签"
 

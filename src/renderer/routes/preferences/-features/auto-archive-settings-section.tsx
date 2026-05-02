@@ -22,7 +22,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components
 import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,
-  convertAutoArchiveDurationUnit,
   toAutoArchiveDurationViewModel,
   toAutoArchiveIdleMinutes,
   type AutoArchiveDurationUnit,
@@ -36,17 +35,6 @@ const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
   hours: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / 60),
   minutes: AUTO_ARCHIVE_MAX_IDLE_MINUTES,
 };
-
-const UNIT_LABELS: Record<AutoArchiveDurationUnit, string> = {
-  days: "D",
-  hours: "H",
-  minutes: "M",
-};
-
-const UNIT_ITEMS = AUTO_ARCHIVE_DURATION_UNITS.map((unit) => ({
-  label: UNIT_LABELS[unit],
-  value: unit,
-}));
 
 function parseAmountText(value: string): number | null {
   const trimmedValue = value.trim();
@@ -68,6 +56,15 @@ export function AutoArchiveSettingsSection() {
   const duration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
   const [amountText, setAmountText] = useState(String(duration.amount));
   const [unit, setUnit] = useState<AutoArchiveDurationUnit>(duration.unit);
+  const unitLabels: Record<AutoArchiveDurationUnit, string> = {
+    days: i18n._({ id: "preferences.auto-archive.unit.days", message: "days" }),
+    hours: i18n._({ id: "preferences.auto-archive.unit.hours", message: "hours" }),
+    minutes: i18n._({ id: "preferences.auto-archive.unit.minutes", message: "minutes" }),
+  };
+  const unitItems = AUTO_ARCHIVE_DURATION_UNITS.map((durationUnit) => ({
+    label: unitLabels[durationUnit],
+    value: durationUnit,
+  }));
 
   useEffect(() => {
     const nextDuration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
@@ -111,18 +108,22 @@ export function AutoArchiveSettingsSection() {
       return;
     }
 
-    const nextDuration = convertAutoArchiveDurationUnit(preferences.idleMinutes, value);
-    const clampedAmount = clampAmount(nextDuration.amount, nextDuration.unit);
+    const currentAmount = parseAmountText(amountText);
+    if (currentAmount === null) {
+      return;
+    }
+
+    const clampedAmount = clampAmount(currentAmount, value);
     const nextIdleMinutes = toAutoArchiveIdleMinutes({
       amount: clampedAmount,
-      unit: nextDuration.unit,
+      unit: value,
     });
     if (nextIdleMinutes === null) {
       return;
     }
 
     setAmountText(String(clampedAmount));
-    setUnit(nextDuration.unit);
+    setUnit(value);
     saveIdleMinutes(nextIdleMinutes);
   };
 
@@ -159,7 +160,7 @@ export function AutoArchiveSettingsSection() {
                 />
                 <TooltipContent side="top" sideOffset={8}>
                   <Trans id="preferences.auto-archive.threshold.range-tooltip">
-                    Range: 1-20160 M, 1-336 H, or 1-14 D.
+                    Range: 1-20160 minutes, 1-336 hours, or 1-14 days.
                   </Trans>
                 </TooltipContent>
               </Tooltip>
@@ -179,15 +180,15 @@ export function AutoArchiveSettingsSection() {
                     value={amountText}
                   />
                 </InputGroup>
-                <Select items={UNIT_ITEMS} value={unit} onValueChange={handleUnitChange}>
-                  <SelectTrigger className="w-12" disabled={!preferences.enabled}>
+                <Select items={unitItems} value={unit} onValueChange={handleUnitChange}>
+                  <SelectTrigger disabled={!preferences.enabled}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent align="end" alignItemWithTrigger={false}>
                     <SelectGroup>
                       {AUTO_ARCHIVE_DURATION_UNITS.map((durationUnit) => (
                         <SelectItem key={durationUnit} value={durationUnit}>
-                          {UNIT_LABELS[durationUnit]}
+                          {unitLabels[durationUnit]}
                         </SelectItem>
                       ))}
                     </SelectGroup>
