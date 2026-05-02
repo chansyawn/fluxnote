@@ -34,7 +34,7 @@ export function useBlockShortcuts({
       definitions.push({
         hotkey: createBlockShortcut,
         callback: (event) => {
-          if (event.repeat || !isActiveBlockFocused()) {
+          if (event.repeat) {
             return;
           }
 
