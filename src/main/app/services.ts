@@ -1,7 +1,10 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { createEventBus, type EventBus } from "@main/core/ipc/event-bus";
 import { createPersistenceRuntime, type PersistenceRuntime } from "@main/core/persistence";
-import { AutoArchiveRuntime } from "@main/features/blocks/auto-archive-runtime";
+import {
+  createAutoArchiveRuntime,
+  type AutoArchiveRuntime,
+} from "@main/features/blocks/auto-archive-runtime";
 import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
@@ -29,7 +32,7 @@ export function createMainServices(): MainServices {
 
   let windowManager: WindowManager;
   const externalEditManager = createExternalEditManager({ emitEvent });
-  const autoArchiveRuntime = new AutoArchiveRuntime({
+  const autoArchiveRuntime = createAutoArchiveRuntime({
     emitEvent,
     getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),

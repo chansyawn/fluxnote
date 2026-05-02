@@ -4,13 +4,14 @@ import { getSqliteChangedRows } from "@main/core/database/db-utils";
 import type { EventBus } from "@main/core/ipc/event-bus";
 import type { PersistenceRuntime } from "@main/core/persistence";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
+import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, inArray, isNull } from "drizzle-orm";
 
 import {
   createAutoArchiveEvaluationContext,
   fingerprintAutoArchiveCandidateBlockIds,
   listAutoArchiveCandidateBlockIds,
+  resolveAutoArchiveSettings,
 } from "./auto-archive-policy";
 
 interface AutoArchiveRuntimeOptions {
@@ -19,6 +20,12 @@ interface AutoArchiveRuntimeOptions {
   getWindowVisible: () => boolean;
   persistence: PersistenceRuntime;
   readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
+}
+
+export interface AutoArchiveRuntime {
+  start: () => Promise<void>;
+  stop: () => void;
+  trigger: (forceArchiveWhenHidden: boolean) => Promise<void>;
 }
 
 const MIN_SCAN_INTERVAL_SECONDS = 30;
@@ -30,84 +37,39 @@ export function deriveScanIntervalSeconds(idleMinutes: number): number {
   return Math.min(Math.max(derivedSeconds, MIN_SCAN_INTERVAL_SECONDS), MAX_SCAN_INTERVAL_SECONDS);
 }
 
-export class AutoArchiveRuntime {
-  private readonly emitEvent: EventBus["emit"];
-  private readonly getProtectedBlockIds: () => Set<string>;
-  private readonly getWindowVisible: AutoArchiveRuntimeOptions["getWindowVisible"];
-  private readonly persistence: PersistenceRuntime;
-  private readonly readAutoArchiveSettings: AutoArchiveRuntimeOptions["readAutoArchiveSettings"];
-  private running = false;
-  private timer: NodeJS.Timeout | null = null;
-  private lastPayload: AutoArchiveStateChangedPayload | null = null;
-  private lastCandidateFingerprint: string | null = null;
+export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): AutoArchiveRuntime {
+  const getProtectedBlockIds = options.getProtectedBlockIds ?? (() => new Set<string>());
+  let running = false;
+  let timer: NodeJS.Timeout | null = null;
+  let lastState: {
+    candidateFingerprint: string;
+    payload: AutoArchiveStateChangedPayload;
+  } | null = null;
 
-  constructor(options: AutoArchiveRuntimeOptions) {
-    this.emitEvent = options.emitEvent;
-    this.getProtectedBlockIds = options.getProtectedBlockIds ?? (() => new Set());
-    this.getWindowVisible = options.getWindowVisible;
-    this.persistence = options.persistence;
-    this.readAutoArchiveSettings = options.readAutoArchiveSettings;
-  }
-
-  async start(): Promise<void> {
-    if (this.running) {
+  function emitIfChanged(
+    payload: AutoArchiveStateChangedPayload,
+    candidateFingerprint: string,
+  ): void {
+    const changed =
+      lastState === null ||
+      lastState.payload.archivedCount !== payload.archivedCount ||
+      lastState.payload.pendingCount !== payload.pendingCount ||
+      lastState.payload.windowVisible !== payload.windowVisible ||
+      lastState.candidateFingerprint !== candidateFingerprint;
+    if (!changed) {
       return;
     }
 
-    this.running = true;
-    await this.scan(false);
-    await this.scheduleNextTick();
+    lastState = { candidateFingerprint, payload };
+    options.emitEvent("blocks.auto-archive-state-changed", payload);
   }
 
-  stop(): void {
-    this.running = false;
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-  }
-
-  async trigger(forceArchiveWhenHidden: boolean): Promise<void> {
-    if (!this.running) {
-      return;
-    }
-
-    await this.scan(forceArchiveWhenHidden);
-  }
-
-  private async scheduleNextTick(): Promise<void> {
-    if (!this.running) {
-      return;
-    }
-
-    const config = await this.readConfig();
-    const delayMs = deriveScanIntervalSeconds(config.idleMinutes) * 1000;
-    this.timer = setTimeout(async () => {
-      if (!this.running) {
-        return;
-      }
-
-      try {
-        await this.scan(false);
-      } finally {
-        await this.scheduleNextTick();
-      }
-    }, delayMs);
-  }
-
-  private async scan(forceArchiveWhenHidden: boolean): Promise<void> {
-    const config = await this.readConfig();
-    const windowVisible = this.getWindowVisible();
-    const now = new Date();
-    const db = this.persistence.getDb();
-    const evaluationContext = createAutoArchiveEvaluationContext({
-      now,
-      protectedBlockIds: this.getProtectedBlockIds(),
-      settings: config,
-    });
+  async function scan(forceArchiveWhenHidden: boolean): Promise<void> {
+    const config = await resolveAutoArchiveSettings(options.readAutoArchiveSettings);
+    const windowVisible = options.getWindowVisible();
 
     if (!config.enabled) {
-      this.emitIfChanged(
+      emitIfChanged(
         {
           archivedCount: 0,
           pendingCount: 0,
@@ -118,50 +80,95 @@ export class AutoArchiveRuntime {
       return;
     }
 
+    const now = new Date();
+    const db = options.persistence.getDb();
+    const evaluationContext = createAutoArchiveEvaluationContext({
+      now,
+      protectedBlockIds: getProtectedBlockIds(),
+      settings: config,
+    });
     const staleBlockIds = await listAutoArchiveCandidateBlockIds(db, evaluationContext);
-    const candidateFingerprint = fingerprintAutoArchiveCandidateBlockIds(staleBlockIds);
-    let archivedCount = 0;
-    if (forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0) {
-      archivedCount = await archiveBlocks(db, staleBlockIds, now.toISOString());
-    }
+    const shouldArchive = forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0;
 
-    this.emitIfChanged(
-      {
-        archivedCount,
-        pendingCount: staleBlockIds.length,
-        windowVisible,
-      },
-      candidateFingerprint,
-    );
-  }
-
-  private emitIfChanged(
-    payload: AutoArchiveStateChangedPayload,
-    candidateFingerprint: string,
-  ): void {
-    const last = this.lastPayload;
-    const changed =
-      !last ||
-      last.archivedCount !== payload.archivedCount ||
-      last.pendingCount !== payload.pendingCount ||
-      last.windowVisible !== payload.windowVisible ||
-      this.lastCandidateFingerprint !== candidateFingerprint;
-    if (!changed) {
+    if (!shouldArchive) {
+      emitIfChanged(
+        {
+          archivedCount: 0,
+          pendingCount: staleBlockIds.length,
+          windowVisible,
+        },
+        fingerprintAutoArchiveCandidateBlockIds(staleBlockIds),
+      );
       return;
     }
 
-    this.lastPayload = payload;
-    this.lastCandidateFingerprint = candidateFingerprint;
-    this.emitEvent("blocks.auto-archive-state-changed", payload);
+    const archivedCount = await archiveBlocks(db, staleBlockIds, now.toISOString());
+    const remainingBlockIds = await listAutoArchiveCandidateBlockIds(db, evaluationContext);
+    emitIfChanged(
+      {
+        archivedCount,
+        pendingCount: remainingBlockIds.length,
+        windowVisible,
+      },
+      fingerprintAutoArchiveCandidateBlockIds(remainingBlockIds),
+    );
   }
 
-  private async readConfig(): Promise<AutoArchiveSettings> {
-    try {
-      return await this.readAutoArchiveSettings();
-    } catch {
-      return DEFAULT_SETTINGS.autoArchive;
+  async function scheduleNextTick(): Promise<void> {
+    if (!running) {
+      return;
+    }
+
+    const config = await resolveAutoArchiveSettings(options.readAutoArchiveSettings);
+    timer = setTimeout(
+      () => {
+        void (async () => {
+          if (!running) {
+            return;
+          }
+
+          try {
+            await scan(false);
+          } finally {
+            await scheduleNextTick();
+          }
+        })();
+      },
+      deriveScanIntervalSeconds(config.idleMinutes) * 1000,
+    );
+  }
+
+  async function start(): Promise<void> {
+    if (running) {
+      return;
+    }
+
+    running = true;
+    await scan(false);
+    await scheduleNextTick();
+  }
+
+  function stop(): void {
+    running = false;
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
   }
+
+  async function trigger(forceArchiveWhenHidden: boolean): Promise<void> {
+    if (!running) {
+      return;
+    }
+
+    await scan(forceArchiveWhenHidden);
+  }
+
+  return {
+    start,
+    stop,
+    trigger,
+  };
 }
 
 async function archiveBlocks(

@@ -1,10 +1,11 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import type { IpcRouter } from "@main/core/ipc/create-ipc-router";
 import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
+import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
 
 import {
   createAutoArchiveEvaluationContext,
+  resolveAutoArchiveSettings,
   type AutoArchiveEvaluationContext,
 } from "./auto-archive-policy";
 import {
@@ -28,13 +29,7 @@ interface BlocksCommandDeps {
 async function getAutoArchiveEvaluationContext(
   deps: BlocksCommandDeps,
 ): Promise<AutoArchiveEvaluationContext> {
-  const settings = await (async (): Promise<AutoArchiveSettings> => {
-    try {
-      return await Promise.resolve(deps.readAutoArchiveSettings());
-    } catch {
-      return DEFAULT_SETTINGS.autoArchive;
-    }
-  })();
+  const settings = await resolveAutoArchiveSettings(deps.readAutoArchiveSettings);
 
   return createAutoArchiveEvaluationContext({
     now: deps.now(),

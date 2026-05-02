@@ -1,11 +1,10 @@
 import type { AppDatabase } from "@main/core/database/database-client";
 import { blocks, type BlockRecord } from "@main/core/database/database-schema";
-import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
+import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, isNull, lt } from "drizzle-orm";
 
 export interface AutoArchiveEvaluationContext {
   cutoffIso: string | null;
-  enabled: boolean;
   protectedBlockIds: ReadonlySet<string>;
 }
 
@@ -13,6 +12,16 @@ export interface AutoArchiveEvaluationInput {
   now: Date;
   protectedBlockIds: ReadonlySet<string>;
   settings: AutoArchiveSettings;
+}
+
+export async function resolveAutoArchiveSettings(
+  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>,
+): Promise<AutoArchiveSettings> {
+  try {
+    return await readAutoArchiveSettings();
+  } catch {
+    return DEFAULT_SETTINGS.autoArchive;
+  }
 }
 
 export function createAutoArchiveEvaluationContext({
@@ -25,14 +34,12 @@ export function createAutoArchiveEvaluationContext({
   if (!settings.enabled) {
     return {
       cutoffIso: null,
-      enabled: false,
       protectedBlockIds: normalizedProtectedBlockIds,
     };
   }
 
   return {
     cutoffIso: new Date(now.getTime() - settings.idleMinutes * 60_000).toISOString(),
-    enabled: true,
     protectedBlockIds: normalizedProtectedBlockIds,
   };
 }
@@ -42,7 +49,6 @@ export function blockWillAutoArchive(
   context: AutoArchiveEvaluationContext,
 ): boolean {
   return (
-    context.enabled &&
     context.cutoffIso !== null &&
     block.archivedAt === null &&
     block.contentUpdatedAt < context.cutoffIso &&
@@ -54,7 +60,7 @@ export async function listAutoArchiveCandidateBlockIds(
   db: AppDatabase,
   context: AutoArchiveEvaluationContext,
 ): Promise<string[]> {
-  if (!context.enabled || context.cutoffIso === null) {
+  if (context.cutoffIso === null) {
     return [];
   }
 
