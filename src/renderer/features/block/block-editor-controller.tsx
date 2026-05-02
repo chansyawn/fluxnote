@@ -1,6 +1,6 @@
 import { queryClient } from "@renderer/app/query";
 import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/clients";
-import { type BlockEditorShellHandle } from "@renderer/features/block-editor";
+import { type BlockEditorHandle } from "@renderer/features/block-editor";
 import { BlockEditorView } from "@renderer/features/block/block-editor-view";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { useMutation } from "@tanstack/react-query";
@@ -22,7 +22,7 @@ interface BlockEditorControllerProps {
   ref?: Ref<BlockEditorControllerHandle>;
 }
 
-export interface BlockEditorControllerHandle extends BlockEditorShellHandle {
+export interface BlockEditorControllerHandle extends BlockEditorHandle {
   getLatestMarkdown: () => Promise<string>;
 }
 
@@ -47,7 +47,7 @@ export function BlockEditorController({
   onFocus,
   ref,
 }: BlockEditorControllerProps) {
-  const editorShellRef = useRef<BlockEditorShellHandle | null>(null);
+  const editorShellRef = useRef<BlockEditorHandle | null>(null);
   const blockIdRef = useRef(block.id);
   blockIdRef.current = block.id;
   const latestContentRef = useRef(block.content);

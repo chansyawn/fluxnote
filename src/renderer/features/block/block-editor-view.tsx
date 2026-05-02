@@ -1,4 +1,4 @@
-import { BlockEditorShell, type BlockEditorShellHandle } from "@renderer/features/block-editor";
+import { BlockEditor, type BlockEditorHandle } from "@renderer/features/block-editor";
 import { cn } from "@renderer/ui/lib/utils";
 import type { ReactNode, Ref } from "react";
 
@@ -12,7 +12,7 @@ interface BlockEditorViewProps {
   onMarkdownUpdated: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
-  ref?: Ref<BlockEditorShellHandle>;
+  ref?: Ref<BlockEditorHandle>;
 }
 
 export function BlockEditorView({
@@ -47,7 +47,7 @@ export function BlockEditorView({
       ) : null}
 
       <div className="min-h-16 px-3 pt-3 pb-2">
-        <BlockEditorShell
+        <BlockEditor
           blockId={blockId}
           ref={ref}
           initialMarkdown={initialMarkdown}
