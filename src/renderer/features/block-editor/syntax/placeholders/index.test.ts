@@ -1,9 +1,9 @@
 import { createEditor } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
-import { collectLexicalNodeTypes } from "../../utils/lexical-shape-utils";
-import { collectMdastNodeTypes } from "../../utils/mdast-shape-utils";
+import { createMarkdownSyntaxSnapshot } from "../../test-helper/headless-editor-test-utils";
+import { collectLexicalNodeTypes } from "../../test-helper/lexical-shape-utils";
+import { collectMdastNodeTypes } from "../../test-helper/mdast-shape-utils";
 import {
   $createPlaceholderBlockNode,
   PlaceholderBlockNode,

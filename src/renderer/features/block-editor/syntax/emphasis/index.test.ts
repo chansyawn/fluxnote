@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
+import { createMarkdownSyntaxSnapshot } from "../../test-helper/headless-editor-test-utils";
 
 interface LexicalInlineNode {
   type: string;
