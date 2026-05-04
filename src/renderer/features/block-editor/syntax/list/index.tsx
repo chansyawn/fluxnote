@@ -11,25 +11,12 @@ import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import type { BlockContent, ListContent, Parent } from "mdast";
-import { createElement, Fragment } from "react";
 
 import type { MarkdownSyntaxModule } from "../../core/syntax-module";
 import { $createPlaceholderBlockNode } from "../placeholders/placeholder-block-node";
 
 function isCheckedValue(value: unknown): value is boolean {
   return typeof value === "boolean";
-}
-
-function ListSyntaxPlugin() {
-  return createElement(
-    Fragment,
-    null,
-    createElement(ListPlugin, {
-      hasStrictIndent: false,
-      shouldPreserveNumbering: true,
-    }),
-    createElement(CheckListPlugin),
-  );
 }
 
 export const listModule: MarkdownSyntaxModule = {
@@ -91,7 +78,16 @@ export const listModule: MarkdownSyntaxModule = {
     },
   },
   lexicalNodes: [ListNode, ListItemNode],
-  lexicalPlugins: [ListSyntaxPlugin],
+  lexicalPlugins: [
+    {
+      key: "list",
+      element: <ListPlugin hasStrictIndent={false} shouldPreserveNumbering />,
+    },
+    {
+      key: "check-list",
+      element: <CheckListPlugin />,
+    },
+  ],
   markdownTransformers: [UNORDERED_LIST, ORDERED_LIST, CHECK_LIST],
   name: "list",
   theme: {

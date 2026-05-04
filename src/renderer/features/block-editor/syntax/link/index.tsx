@@ -3,13 +3,8 @@ import { $createLinkNode, $isLinkNode, LinkNode } from "@lexical/link";
 import { LINK } from "@lexical/markdown";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import type { Parent, PhrasingContent } from "mdast";
-import { createElement } from "react";
 
 import type { MarkdownSyntaxModule } from "../../core/syntax-module";
-
-function LinkSyntaxPlugin() {
-  return createElement(LinkPlugin);
-}
 
 export const linkModule: MarkdownSyntaxModule = {
   exportMdast: {
@@ -41,7 +36,12 @@ export const linkModule: MarkdownSyntaxModule = {
     },
   },
   lexicalNodes: [LinkNode],
-  lexicalPlugins: [LinkSyntaxPlugin],
+  lexicalPlugins: [
+    {
+      key: "link",
+      element: <LinkPlugin />,
+    },
+  ],
   markdownTransformers: [LINK],
   name: "link",
   theme: {

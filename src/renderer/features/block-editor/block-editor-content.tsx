@@ -7,7 +7,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { EditorState } from "lexical";
-import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
+import { Fragment, useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 
 import { exportLexicalToMdast } from "./core/export-lexical-to-mdast";
 import { stringifyMdastToMarkdown } from "./core/markdown-processor";
@@ -67,8 +67,8 @@ export function BlockEditorContent({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
-      {syntaxPlugins.map((SyntaxPlugin) => (
-        <SyntaxPlugin key={SyntaxPlugin.name} />
+      {syntaxPlugins.map((plugin) => (
+        <Fragment key={plugin.key}>{plugin.element}</Fragment>
       ))}
       <MarkdownShortcutPlugin transformers={liveInputTransformers} />
       <OnChangePlugin

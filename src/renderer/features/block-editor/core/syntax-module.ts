@@ -1,7 +1,7 @@
 import type { Transformer } from "@lexical/markdown";
 import type { EditorThemeClasses, Klass, LexicalNode, TextFormatType } from "lexical";
 import type { Content, Parent, Root } from "mdast";
-import type { ComponentType } from "react";
+import type { ReactNode } from "react";
 
 export interface RawMarkdownMdastNode {
   type: "rawMarkdown";
@@ -35,12 +35,16 @@ export type MdastImporter = (
 ) => LexicalNode[];
 
 export type LexicalExporter = (node: LexicalNode, ctx: ExportContext) => ExportedMdastNode[];
-export type SyntaxPluginComponent = ComponentType<Record<never, never>>;
+
+export interface SyntaxPluginContribution {
+  key: string;
+  element: ReactNode;
+}
 
 export interface MarkdownSyntaxModule {
   name: string;
   lexicalNodes?: ReadonlyArray<Klass<LexicalNode>>;
-  lexicalPlugins?: ReadonlyArray<SyntaxPluginComponent>;
+  lexicalPlugins?: ReadonlyArray<SyntaxPluginContribution>;
   theme?: EditorThemeClasses;
   importMdast?: Readonly<Record<string, MdastImporter>>;
   exportMdast?: Readonly<Record<string, LexicalExporter>>;

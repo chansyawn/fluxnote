@@ -13,7 +13,7 @@ import type {
   LexicalExporter,
   MarkdownSyntaxModule,
   MdastImporter,
-  SyntaxPluginComponent,
+  SyntaxPluginContribution,
 } from "./syntax-module";
 
 export const syntaxModules: ReadonlyArray<MarkdownSyntaxModule> = [
@@ -36,8 +36,12 @@ export const liveInputTransformers = syntaxModules.flatMap(
   (module) => module.markdownTransformers ?? [],
 );
 
-export const syntaxPlugins: ReadonlyArray<SyntaxPluginComponent> = syntaxModules.flatMap(
-  (module) => module.lexicalPlugins ?? [],
+export const syntaxPlugins: ReadonlyArray<SyntaxPluginContribution> = syntaxModules.flatMap(
+  (module) =>
+    (module.lexicalPlugins ?? []).map((plugin) => ({
+      key: `${module.name}:${plugin.key}`,
+      element: plugin.element,
+    })),
 );
 
 type ThemeObject = Record<string, unknown>;
