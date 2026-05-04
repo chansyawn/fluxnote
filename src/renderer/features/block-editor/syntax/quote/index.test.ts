@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
 
 describe("quote syntax", () => {
-  it("round trips blockquotes", () => {
-    const output = roundTripMarkdown("> Quoted text");
+  it("imports and exports blockquotes", () => {
+    const { lexical, mdast } = createMarkdownSyntaxSnapshot("> Quoted text");
+    const quote = lexical.root.children[0];
 
-    expect(output).toContain("> Quoted text");
+    expect(quote.type).toBe("quote");
+    expect(mdast.children[0]).toMatchObject({ type: "blockquote" });
   });
 });

@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
 
 describe("code syntax", () => {
-  it("round trips fenced code blocks", () => {
-    const output = roundTripMarkdown("```ts\ntype Id = string;\n```");
+  it("imports and exports fenced code blocks", () => {
+    const { lexical, mdast } = createMarkdownSyntaxSnapshot("```ts\ntype Id = string;\n```");
+    const code = lexical.root.children[0];
 
-    expect(output).toContain("```ts");
-    expect(output).toContain("type Id = string;");
+    expect(code).toMatchObject({
+      language: "ts",
+      type: "code",
+    });
+    expect(mdast.children[0]).toMatchObject({
+      lang: "ts",
+      type: "code",
+      value: "type Id = string;",
+    });
   });
 });

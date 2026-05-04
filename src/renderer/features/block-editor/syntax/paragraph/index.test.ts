@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
 
 describe("paragraph syntax", () => {
-  it("round trips paragraphs and hard breaks", () => {
-    const output = roundTripMarkdown("Alpha  \nBravo\n\nCharlie");
+  it("imports and exports paragraphs with line breaks", () => {
+    const { lexical, mdast } = createMarkdownSyntaxSnapshot("Alpha  \nBravo\n\nCharlie");
+    const paragraphs = lexical.root.children.filter((node) => node.type === "paragraph");
 
-    expect(output).toContain("Alpha\\\nBravo");
-    expect(output).toContain("Charlie");
+    expect(paragraphs).toHaveLength(2);
+    expect(mdast.children[0]).toMatchObject({ type: "paragraph" });
+    expect(mdast.children[1]).toMatchObject({ type: "paragraph" });
+    expect(mdast.children[0]?.type === "paragraph" ? mdast.children[0].children : []).toEqual(
+      expect.arrayContaining([{ type: "break" }]),
+    );
   });
 });

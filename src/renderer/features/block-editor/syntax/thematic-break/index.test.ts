@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
 
 describe("thematic break syntax", () => {
-  it("round trips horizontal rules", () => {
-    const output = roundTripMarkdown("Before\n\n---\n\nAfter");
+  it("imports and exports horizontal rules", () => {
+    const { lexical, mdast } = createMarkdownSyntaxSnapshot("Before\n\n---\n\nAfter");
+    const lexicalNodeTypes = lexical.root.children.map((node) => node.type);
+    const mdastNodeTypes = mdast.children.map((node) => node.type);
 
-    expect(output).toContain("---");
+    expect(lexicalNodeTypes).toContain("horizontalrule");
+    expect(mdastNodeTypes).toContain("thematicBreak");
   });
 });

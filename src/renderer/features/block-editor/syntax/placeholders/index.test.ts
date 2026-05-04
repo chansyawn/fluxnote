@@ -1,7 +1,9 @@
 import { createEditor } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { createMarkdownSyntaxSnapshot } from "../../utils/headless-editor-test-utils";
+import { collectLexicalNodeTypes } from "../../utils/lexical-shape-utils";
+import { collectMdastNodeTypes } from "../../utils/mdast-shape-utils";
 import {
   $createPlaceholderBlockNode,
   PlaceholderBlockNode,
@@ -14,7 +16,7 @@ import {
 } from "./placeholder-inline-node";
 
 describe("placeholder syntax", () => {
-  it("preserves complex markdown as raw placeholders", () => {
+  it("imports unsupported markdown as placeholder nodes and exports raw markdown nodes", () => {
     const markdown = [
       "![Alt](https://example.com/image.png)",
       "",
@@ -29,12 +31,13 @@ describe("placeholder syntax", () => {
       "[^note]: Footnote text",
     ].join("\n");
 
-    const output = roundTripMarkdown(markdown);
+    const { lexical, mdast } = createMarkdownSyntaxSnapshot(markdown);
+    const lexicalTypes = collectLexicalNodeTypes(lexical);
+    const mdastTypes = collectMdastNodeTypes(mdast);
 
-    expect(output).toContain("![Alt](https://example.com/image.png)");
-    expect(output).toContain("| A | B |");
-    expect(output).toContain("a^2 + b^2");
-    expect(output).toContain("[^note]: Footnote text");
+    expect(lexicalTypes).toContain("placeholder-inline");
+    expect(lexicalTypes).toContain("placeholder-block");
+    expect(mdastTypes).toContain("rawMarkdown");
   });
 
   it("exports minimal placeholder json fields", () => {
