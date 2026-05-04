@@ -1,0 +1,5 @@
+@reference "#global.css";
+
+.block-editor__horizontal-rule {
+  @apply border-border my-2 border-0 border-t;
+}

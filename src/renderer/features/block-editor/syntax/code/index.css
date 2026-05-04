@@ -1,0 +1,5 @@
+@reference "#global.css";
+
+.block-editor__code {
+  @apply border-border bg-muted/80 block w-full overflow-x-auto rounded-lg border p-3 font-mono whitespace-pre;
+}

@@ -1,0 +1,17 @@
+@reference "#global.css";
+
+.block-editor {
+  @apply min-h-16 text-sm;
+}
+
+.block-editor__shell {
+  @apply relative;
+}
+
+.block-editor__content {
+  @apply min-h-16 resize-none outline-none;
+}
+
+.block-editor__placeholder {
+  @apply text-muted-foreground pointer-events-none absolute top-[0.2rem] left-0 text-[0.95rem];
+}

@@ -1,0 +1,5 @@
+@reference "#global.css";
+
+.block-editor__link {
+  @apply text-primary decoration-primary underline;
+}

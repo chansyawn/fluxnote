@@ -1,4 +1,11 @@
-import { useImperativeHandle } from "react";
+import "./index.css";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import type { LexicalEditor } from "lexical";
+import { useMemo } from "react";
+
+import { BlockEditorContent } from "./block-editor-content";
+import { importMarkdownToEditor } from "./core/editor-state";
+import { blockEditorTheme, lexicalNodes } from "./core/syntax-registry";
 
 export interface BlockEditorHandle {
   copy: () => Promise<void>;
@@ -13,11 +20,38 @@ interface BlockEditorProps {
   onBlur?: () => void;
 }
 
-export function BlockEditor({ ref }: BlockEditorProps) {
-  useImperativeHandle(ref, () => ({
-    copy: async () => {},
-    focus: () => {},
-  }));
+export function BlockEditor({
+  ref,
+  blockId,
+  initialMarkdown,
+  onBlur,
+  onMarkdownUpdated,
+}: BlockEditorProps) {
+  const initialConfig = useMemo(
+    () => ({
+      editorState: (editor: LexicalEditor) => {
+        importMarkdownToEditor(editor, initialMarkdown);
+      },
+      namespace: `BlockEditor:${blockId}`,
+      nodes: [...lexicalNodes],
+      onError(error: Error) {
+        throw error;
+      },
+      theme: blockEditorTheme,
+    }),
+    [blockId, initialMarkdown],
+  );
 
-  return <div className="block-editor min-h-16" />;
+  return (
+    <div className="block-editor">
+      <LexicalComposer initialConfig={initialConfig}>
+        <BlockEditorContent
+          ref={ref}
+          initialMarkdown={initialMarkdown}
+          onBlur={onBlur}
+          onMarkdownUpdated={onMarkdownUpdated}
+        />
+      </LexicalComposer>
+    </div>
+  );
 }

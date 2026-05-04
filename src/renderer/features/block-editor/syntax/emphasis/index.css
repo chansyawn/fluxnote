@@ -1,0 +1,13 @@
+@reference "#global.css";
+
+.block-editor__text--strong {
+  @apply font-bold;
+}
+
+.block-editor__text--emphasis {
+  @apply italic;
+}
+
+.block-editor__text--strikethrough {
+  @apply line-through;
+}

@@ -1,0 +1,5 @@
+@reference "#global.css";
+
+.block-editor__quote {
+  @apply border-border text-muted-foreground my-2 border-l-4 pl-3;
+}

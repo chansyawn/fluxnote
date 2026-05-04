@@ -20,34 +20,14 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:232
-msgid "editor.code-block.language.label"
-msgstr "代码语言"
+#: src/renderer/features/block-editor/block-editor-content.tsx:83
+msgid "block-editor.content.label"
+msgstr "Markdown 块编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:122
-msgid "editor.code-block.language.option.plain-text"
-msgstr "纯文本"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:287
-msgid "editor.code-block.language.search.empty"
-msgstr "没有匹配的语言"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:279
-msgid "editor.code-block.language.search.placeholder"
-msgstr "搜索语言"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/image/note-editor-image-plugin.tsx:76
-msgid "editor.image.insert-error"
-msgstr "插入图片失败"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/image/note-editor-image-component.tsx:183
-msgid "editor.image.load-error"
-msgstr "图片不可用"
+#: src/renderer/features/block-editor/block-editor-content.tsx:31
+msgid "block-editor.placeholder"
+msgstr "写一条笔记..."
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
@@ -112,30 +92,24 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-copy-action.tsx:31
+#: src/renderer/features/block/block-copy-action.tsx:31
 msgid "home-note.block.copy"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-delete-action.tsx:20
+#: src/renderer/features/block/block-delete-action.tsx:20
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-external-edit-actions.tsx:33
+#: src/renderer/features/block/block-external-edit-actions.tsx:33
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-external-edit-actions.tsx:27
+#: src/renderer/features/block/block-external-edit-actions.tsx:27
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/composer/note-editor-shell.tsx:45
-#: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
-msgid "home-note.block.placeholder"
-msgstr "写点什么..."
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
@@ -143,17 +117,17 @@ msgid "lab.description"
 msgstr "用于基础设施与集成演示的实验区域。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:77
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:77
 msgid "lab.playground.description"
 msgstr "纯前端演练区。编辑这段预设 Markdown 来验证笔记区块行为。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:90
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:90
 msgid "lab.playground.reset"
 msgstr "重置预设"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:74
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:74
 msgid "lab.playground.title"
 msgstr "笔记区块编辑器演练区"
 
@@ -337,12 +311,12 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-archive-action.tsx:30
+#: src/renderer/features/block/block-archive-action.tsx:30
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-archive-action.tsx:32
+#: src/renderer/features/block/block-archive-action.tsx:32
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
@@ -377,12 +351,12 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:41
+#: src/renderer/features/block/block-tag-action.tsx:41
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:28
+#: src/renderer/features/block/block-tag-action.tsx:28
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 

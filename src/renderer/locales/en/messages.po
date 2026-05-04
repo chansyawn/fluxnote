@@ -20,34 +20,14 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:232
-msgid "editor.code-block.language.label"
-msgstr "Code language"
+#: src/renderer/features/block-editor/block-editor-content.tsx:83
+msgid "block-editor.content.label"
+msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:122
-msgid "editor.code-block.language.option.plain-text"
-msgstr "Plain text"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:287
-msgid "editor.code-block.language.search.empty"
-msgstr "No matching language"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/code-block/note-editor-code-language-plugin.tsx:279
-msgid "editor.code-block.language.search.placeholder"
-msgstr "Search language"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/image/note-editor-image-plugin.tsx:76
-msgid "editor.image.insert-error"
-msgstr "Failed to insert image"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/image/note-editor-image-component.tsx:183
-msgid "editor.image.load-error"
-msgstr "Image unavailable"
+#: src/renderer/features/block-editor/block-editor-content.tsx:31
+msgid "block-editor.placeholder"
+msgstr "Write a note..."
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
@@ -112,30 +92,24 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-copy-action.tsx:31
+#: src/renderer/features/block/block-copy-action.tsx:31
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-delete-action.tsx:20
+#: src/renderer/features/block/block-delete-action.tsx:20
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-external-edit-actions.tsx:33
+#: src/renderer/features/block/block-external-edit-actions.tsx:33
 msgid "home-note.block.external-edit.cancel"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-external-edit-actions.tsx:27
+#: src/renderer/features/block/block-external-edit-actions.tsx:27
 msgid "home-note.block.external-edit.submit"
 msgstr "Submit external edit"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/note-editor-core/composer/note-editor-shell.tsx:45
-#: src/renderer/features/note-editor-core/rich-text/note-editor-placeholder.tsx:6
-msgid "home-note.block.placeholder"
-msgstr "Write something..."
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
@@ -143,17 +117,17 @@ msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:77
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:77
 msgid "lab.playground.description"
 msgstr "Frontend-only playground. Edit this preset markdown to verify note block behavior."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:90
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:90
 msgid "lab.playground.reset"
 msgstr "Reset preset"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/note-block-playground-panel.tsx:74
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:74
 msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 
@@ -337,12 +311,12 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-archive-action.tsx:30
+#: src/renderer/features/block/block-archive-action.tsx:30
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-archive-action.tsx:32
+#: src/renderer/features/block/block-archive-action.tsx:32
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
@@ -377,12 +351,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:41
+#: src/renderer/features/block/block-tag-action.tsx:41
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/note-block/block-tag-action.tsx:28
+#: src/renderer/features/block/block-tag-action.tsx:28
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

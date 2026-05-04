@@ -1,0 +1,13 @@
+@reference "#global.css";
+
+.block-editor__list {
+  @apply my-1 ps-6;
+}
+
+.block-editor__list-item {
+  @apply my-1;
+}
+
+.block-editor__list-item--checked {
+  @apply text-muted-foreground line-through;
+}
