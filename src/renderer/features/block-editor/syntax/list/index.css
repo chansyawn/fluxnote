@@ -31,7 +31,3 @@
 .block-editor__list-item::marker {
   @apply text-muted-foreground;
 }
-
-.block-editor__list-item--checked {
-  @apply text-muted-foreground line-through;
-}
