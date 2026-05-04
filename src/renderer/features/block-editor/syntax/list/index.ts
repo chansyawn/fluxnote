@@ -105,6 +105,11 @@ export const listModule: MarkdownSyntaxModule = {
       },
       ol: "block-editor__list block-editor__list--ordered",
       ul: "block-editor__list block-editor__list--unordered",
+      ulDepth: [
+        "block-editor__list--unordered-depth-disc",
+        "block-editor__list--unordered-depth-circle",
+        "block-editor__list--unordered-depth-square",
+      ],
     },
   },
 };

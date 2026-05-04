@@ -4,8 +4,32 @@
   @apply my-1 ps-6;
 }
 
+.block-editor__list--ordered {
+  list-style-type: decimal;
+}
+
+.block-editor__list--unordered {
+  list-style-type: disc;
+}
+
+.block-editor__list--unordered-depth-disc {
+  list-style-type: disc;
+}
+
+.block-editor__list--unordered-depth-circle {
+  list-style-type: circle;
+}
+
+.block-editor__list--unordered-depth-square {
+  list-style-type: square;
+}
+
 .block-editor__list-item {
   @apply my-1;
+}
+
+.block-editor__list-item::marker {
+  @apply text-muted-foreground;
 }
 
 .block-editor__list-item--checked {
