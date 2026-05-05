@@ -1,13 +1,3 @@
-@import "./syntax/code/index.css";
-@import "./syntax/heading/index.css";
-@import "./syntax/inline-mark/index.css";
-@import "./syntax/link/index.css";
-@import "./syntax/list/index.css";
-@import "./syntax/paragraph/index.css";
-@import "./syntax/placeholders/index.css";
-@import "./syntax/quote/index.css";
-@import "./syntax/thematic-break/index.css";
-
 @reference "#global.css";
 
 .block-editor {

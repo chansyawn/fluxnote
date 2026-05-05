@@ -1,7 +1,7 @@
 import { createEditor, type EditorState, type LexicalEditor } from "lexical";
 
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
-import { blockEditorNodes } from "./runtime";
+import { SYNTAX_NODES } from "../syntax/registry";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
@@ -11,7 +11,7 @@ import { mdastToSemanticDocument, semanticDocumentToMdast } from "./semantic/mda
 export function createMarkdownEditor(namespace = "BlockEditorTest"): LexicalEditor {
   return createEditor({
     namespace,
-    nodes: [...blockEditorNodes],
+    nodes: [...SYNTAX_NODES],
     onError(error) {
       throw error;
     },

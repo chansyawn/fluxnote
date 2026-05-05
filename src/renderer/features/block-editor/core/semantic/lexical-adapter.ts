@@ -25,26 +25,20 @@ import type {
   SemanticListItem,
 } from "../../model";
 import { normalizeSemanticDocument } from "../../model";
+import { codeBlockFromLexical, codeBlockToLexical } from "../../syntax/code";
+import { headingTagToDepth, headingToLexical } from "../../syntax/heading";
+import { listFromLexical, listItemFromLexical, listToLexical } from "../../syntax/list";
+import { paragraphToLexical } from "../../syntax/paragraph";
 import {
   $isPlaceholderBlockNode,
   $isPlaceholderInlineNode,
-  codeBlockFromLexical,
-  codeBlockToLexical,
-  headingTagToDepth,
-  headingToLexical,
-  listFromLexical,
-  listItemFromLexical,
-  listToLexical,
   opaqueBlockFromLexical,
   opaqueBlockToLexical,
   opaqueInlineFromLexical,
   opaqueInlineToLexical,
-  paragraphToLexical,
-  quoteFromLexical,
-  quoteToLexical,
-  thematicBreakFromLexical,
-  thematicBreakToLexical,
-} from "../../syntax/lexical";
+} from "../../syntax/placeholders";
+import { quoteFromLexical, quoteToLexical } from "../../syntax/quote";
+import { thematicBreakFromLexical, thematicBreakToLexical } from "../../syntax/thematic-break";
 import { lexicalContainerChildrenToBlocks } from "./lexical-container";
 
 function applyTextFormats(node: TextNode, formats: ReadonlyArray<TextFormatType>): TextNode {

@@ -1,0 +1,29 @@
+import type { Transformer } from "@lexical/markdown";
+import type { EditorThemeClasses, LexicalNodeConfig } from "lexical";
+import type { ReactNode } from "react";
+
+import type { SemanticBlock, SemanticInline, SemanticListItem } from "../model";
+
+export type SyntaxRegistrationId =
+  | "code"
+  | "heading"
+  | "inline-mark"
+  | "link"
+  | "list"
+  | "paragraph"
+  | "placeholders"
+  | "quote"
+  | "thematic-break";
+
+export interface SyntaxRegistration {
+  id: SyntaxRegistrationId;
+  nodes?: ReadonlyArray<LexicalNodeConfig>;
+  markdownShortcuts?: ReadonlyArray<Transformer>;
+  runtimePlugins?: () => ReactNode[];
+  theme?: Partial<EditorThemeClasses>;
+  semanticTypes?: ReadonlyArray<
+    SemanticBlock["type"] | SemanticInline["type"] | SemanticListItem["type"]
+  >;
+  mdastTypes?: ReadonlyArray<string>;
+  lexicalNodeNames?: ReadonlyArray<string>;
+}

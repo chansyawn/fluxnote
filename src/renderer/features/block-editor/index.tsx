@@ -5,7 +5,7 @@ import { useMemo, useRef } from "react";
 
 import { BlockEditorContent } from "./block-editor-content";
 import { importMarkdownToEditor } from "./core/editor-state";
-import { blockEditorNodes, blockEditorTheme } from "./core/runtime";
+import { SYNTAX_NODES, SYNTAX_THEME } from "./syntax/registry";
 import type { BlockEditorProps } from "./types";
 export type { BlockEditorHandle, BlockEditorProps } from "./types";
 
@@ -25,11 +25,11 @@ export function BlockEditor({
         importMarkdownToEditor(editor, initialMarkdownRef.current);
       },
       namespace: `BlockEditor:${blockId}`,
-      nodes: [...blockEditorNodes],
+      nodes: [...SYNTAX_NODES],
       onError(error: Error) {
         throw error;
       },
-      theme: blockEditorTheme,
+      theme: SYNTAX_THEME,
     }),
     [blockId],
   );

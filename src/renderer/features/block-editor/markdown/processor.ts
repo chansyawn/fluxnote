@@ -5,9 +5,9 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
-const parser = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
+const MARKDOWN_PARSER = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
 
-const stringifier = unified().use(remarkGfm).use(remarkMath).use(remarkStringify, {
+const MARKDOWN_STRINGIFIER = unified().use(remarkGfm).use(remarkMath).use(remarkStringify, {
   bullet: "-",
   emphasis: "*",
   fences: true,
@@ -18,9 +18,9 @@ const stringifier = unified().use(remarkGfm).use(remarkMath).use(remarkStringify
 });
 
 export function parseMarkdownToMdast(markdown: string): Root {
-  return parser.parse(markdown);
+  return MARKDOWN_PARSER.parse(markdown);
 }
 
 export function stringifyMdastToMarkdown(mdast: Root): string {
-  return String(stringifier.stringify(mdast));
+  return String(MARKDOWN_STRINGIFIER.stringify(mdast));
 }

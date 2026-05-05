@@ -1,15 +1,15 @@
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import { describe, expect, it } from "vite-plus/test";
 
+import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../syntax/registry";
 import { createHeadlessMarkdownEditor } from "../test-helper/headless-editor-test-utils";
 import { exportLexicalToSemanticDocument } from "./semantic/lexical-adapter";
-import { markdownShortcutTransformers } from "./shortcuts";
 
 function shortcutSemantic(markdown: string) {
   const editor = createHeadlessMarkdownEditor();
   editor.update(
     () => {
-      $convertFromMarkdownString(markdown, markdownShortcutTransformers);
+      $convertFromMarkdownString(markdown, MARKDOWN_SHORTCUT_TRANSFORMERS);
     },
     { discrete: true },
   );

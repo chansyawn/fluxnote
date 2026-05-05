@@ -10,8 +10,7 @@ import type { EditorState } from "lexical";
 import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 
 import { exportEditorStateToMarkdown } from "./core/editor-state";
-import { blockEditorPlugins } from "./core/runtime";
-import { markdownShortcutTransformers } from "./core/shortcuts";
+import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_RUNTIME_PLUGINS } from "./syntax/registry";
 import type { BlockEditorHandle } from "./types";
 
 interface BlockEditorContentProps {
@@ -67,8 +66,8 @@ export function BlockEditorContent({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
-      {blockEditorPlugins}
-      <MarkdownShortcutPlugin transformers={markdownShortcutTransformers} />
+      {SYNTAX_RUNTIME_PLUGINS}
+      <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />
       <OnChangePlugin
         ignoreSelectionChange
         onChange={(editorState) => {
