@@ -2,7 +2,6 @@ import { ListItemNode, ListNode } from "@lexical/list";
 import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { createElement } from "react";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
@@ -18,16 +17,9 @@ export const LIST_SYNTAX = {
   nodes: [ListNode, ListItemNode],
   markdownShortcuts: [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST],
   runtimePlugins: () => [
-    createElement(ListPlugin, {
-      hasStrictIndent: false,
-      key: "list",
-      shouldPreserveNumbering: true,
-    }),
-    createElement(CheckListPlugin, {
-      disableTakeFocusOnClick: true,
-      key: "check-list",
-    }),
-    createElement(TaskListShortcutPlugin, { key: "task-list-shortcut" }),
+    <ListPlugin key="list" hasStrictIndent={false} shouldPreserveNumbering />,
+    <CheckListPlugin key="check-list" disableTakeFocusOnClick />,
+    <TaskListShortcutPlugin key="task-list-shortcut" />,
   ],
   semanticTypes: ["list", "listItem"],
   theme: {
