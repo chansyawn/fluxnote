@@ -4,8 +4,8 @@ import type { SemanticOpaqueBlock, SemanticOpaqueInline } from "../../core/seman
 import {
   canonicalMarkdownForInline,
   canonicalMarkdownForNode,
-  isBlockContent,
-  isPhrasingContentInInlineContext,
+  isFlowBlockContent,
+  isPhrasingContent,
   parseOpaqueMarkdown,
 } from "../../core/semantic/mdast-utils";
 
@@ -27,7 +27,7 @@ export function opaqueInlineFromMdast(node: PhrasingContent): SemanticOpaqueInli
 
 export function opaqueBlockToMdast(node: SemanticOpaqueBlock): BlockContent[] {
   const parsed = parseOpaqueMarkdown(node.markdown);
-  return parsed.children.filter(isBlockContent);
+  return parsed.children.filter(isFlowBlockContent);
 }
 
 export function opaqueInlineToMdast(node: SemanticOpaqueInline): PhrasingContent[] {
@@ -38,7 +38,7 @@ export function opaqueInlineToMdast(node: SemanticOpaqueInline): PhrasingContent
     return first.children;
   }
 
-  if (first && isPhrasingContentInInlineContext(first)) {
+  if (first && isPhrasingContent(first)) {
     return [first];
   }
 

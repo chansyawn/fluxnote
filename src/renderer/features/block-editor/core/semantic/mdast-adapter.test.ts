@@ -115,6 +115,27 @@ describe("semantic mdast adapter", () => {
     expect(canonicalMarkdown).toContain("2. Fourth");
   });
 
+  it("removes task checked state from ordered lists", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      ["1. [x] Done", "2. Normal"].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [
+          expect.not.objectContaining({ checked: expect.any(Boolean) }),
+          expect.not.objectContaining({ checked: expect.any(Boolean) }),
+        ],
+        ordered: true,
+        type: "list",
+      }),
+    );
+    expect(canonicalMarkdown).toContain("1. Done");
+    expect(canonicalMarkdown).toContain("2. Normal");
+    expect(canonicalMarkdown).not.toContain("1. [x] Done");
+  });
+
   it("classifies block html as opaqueBlock", () => {
     const semantic = mdastToSemanticDocument(parseMarkdownToMdast("<section>HTML</section>"));
 
@@ -136,6 +157,44 @@ describe("semantic mdast adapter", () => {
     );
     expect(JSON.stringify(semantic.children[0])).toContain('"type":"opaqueInline"');
     expect(JSON.stringify(semantic.children[0])).not.toContain('"type":"opaqueBlock"');
+  });
+
+  it("roundtrips opaque block math without dropping it", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      ["$$", "a^2 + b^2 = c^2", "$$"].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual(
+      expect.objectContaining({
+        kind: "math",
+        type: "opaqueBlock",
+      }),
+    );
+    expect(canonicalMarkdown).toContain("a^2 + b^2 = c^2");
+  });
+
+  it("roundtrips opaque inline math without dropping it", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } =
+      roundTripSemantic("Inline $x^2$ math.");
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(JSON.stringify(firstSemantic)).toContain('"kind":"inlineMath"');
+    expect(JSON.stringify(firstSemantic)).toContain('"type":"opaqueInline"');
+    expect(canonicalMarkdown).toContain("$x^2$");
+  });
+
+  it("roundtrips inline code combined with marks", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      ["**`code`**", "", "***bold italic***", "", "~~**deleted strong**~~"].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(JSON.stringify(firstSemantic)).toContain('"type":"inlineCode"');
+    expect(JSON.stringify(firstSemantic)).toContain('"type":"strong"');
+    expect(JSON.stringify(firstSemantic)).toContain('"type":"emphasis"');
+    expect(JSON.stringify(firstSemantic)).toContain('"type":"delete"');
+    expect(canonicalMarkdown).toContain("`code`");
   });
 
   it("roundtrips nested quote list and task list semantics", () => {

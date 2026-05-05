@@ -1,6 +1,6 @@
 import "../syntax/code/index.css";
-import "../syntax/emphasis/index.css";
 import "../syntax/heading/index.css";
+import "../syntax/inline-mark/index.css";
 import "../syntax/link/index.css";
 import "../syntax/list/index.css";
 import "../syntax/paragraph/index.css";

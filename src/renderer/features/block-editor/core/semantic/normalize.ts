@@ -102,7 +102,11 @@ function normalizeListItems(
   ordered: boolean,
 ): SemanticListItem[] {
   const normalized = children.map(normalizeListItem);
-  if (ordered || !normalized.some((item) => typeof item.checked === "boolean")) {
+  if (ordered) {
+    return normalized.map(({ children }) => ({ children, type: "listItem" }));
+  }
+
+  if (!normalized.some((item) => typeof item.checked === "boolean")) {
     return normalized;
   }
 

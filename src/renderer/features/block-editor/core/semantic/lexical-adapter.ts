@@ -101,19 +101,17 @@ function textToInline(node: TextNode): SemanticInline[] {
     return [];
   }
 
-  if (node.hasFormat("code")) {
-    return [{ type: "inlineCode", value }];
-  }
-
-  let current: SemanticInline = { type: "text", value };
-  if (node.hasFormat("strikethrough")) {
-    current = { children: [current], type: "delete" };
+  let current: SemanticInline = node.hasFormat("code")
+    ? { type: "inlineCode", value }
+    : { type: "text", value };
+  if (node.hasFormat("bold")) {
+    current = { children: [current], type: "strong" };
   }
   if (node.hasFormat("italic")) {
     current = { children: [current], type: "emphasis" };
   }
-  if (node.hasFormat("bold")) {
-    current = { children: [current], type: "strong" };
+  if (node.hasFormat("strikethrough")) {
+    current = { children: [current], type: "delete" };
   }
 
   return [current];

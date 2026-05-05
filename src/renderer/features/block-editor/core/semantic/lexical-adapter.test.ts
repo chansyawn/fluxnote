@@ -110,4 +110,31 @@ describe("semantic lexical adapter", () => {
       }),
     );
   });
+
+  it("removes ordered list checked state through Lexical normalization", () => {
+    const semantic = markdownToSemantic(["1. [x] Done", "2. Normal"].join("\n"));
+    const roundTripped = roundTripLexical(semantic);
+
+    expect(roundTripped).toEqual(semantic);
+    expect(JSON.stringify(roundTripped)).not.toContain('"checked"');
+    expect(roundTripped.children[0]).toEqual(
+      expect.objectContaining({
+        ordered: true,
+        type: "list",
+      }),
+    );
+  });
+
+  it("preserves inline code combined with marks through Lexical", () => {
+    const semantic = markdownToSemantic(
+      ["**`code`**", "", "***bold italic***", "", "~~**deleted strong**~~"].join("\n"),
+    );
+    const roundTripped = roundTripLexical(semantic);
+
+    expect(roundTripped).toEqual(semantic);
+    expect(JSON.stringify(roundTripped)).toContain('"type":"inlineCode"');
+    expect(JSON.stringify(roundTripped)).toContain('"type":"strong"');
+    expect(JSON.stringify(roundTripped)).toContain('"type":"emphasis"');
+    expect(JSON.stringify(roundTripped)).toContain('"type":"delete"');
+  });
 });
