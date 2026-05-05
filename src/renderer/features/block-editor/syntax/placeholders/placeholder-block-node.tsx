@@ -8,6 +8,8 @@ import {
 } from "lexical";
 import type { JSX } from "react";
 
+import { createPlaceholderPayload } from "./placeholder-payload";
+
 export type SerializedPlaceholderBlockNode = Spread<
   {
     kind: string;
@@ -69,9 +71,7 @@ export class PlaceholderBlockNode extends DecoratorNode<JSX.Element> {
 
   exportJSON(): SerializedPlaceholderBlockNode {
     return {
-      kind: this.__kind,
-      markdown: this.__markdown,
-      ...(this.__metadata ? { metadata: this.__metadata } : {}),
+      ...createPlaceholderPayload(this.__markdown, this.__kind, this.__metadata),
       type: "placeholder-block",
       version: 1,
     };

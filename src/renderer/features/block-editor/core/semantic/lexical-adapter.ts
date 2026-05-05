@@ -1,23 +1,10 @@
-import { $createCodeNode, $isCodeNode } from "@lexical/code";
-import { $createHorizontalRuleNode, $isHorizontalRuleNode } from "@lexical/extension";
+import { $isCodeNode } from "@lexical/code";
+import { $isHorizontalRuleNode } from "@lexical/extension";
 import { $createLinkNode, $isLinkNode } from "@lexical/link";
-import {
-  $createListItemNode,
-  $createListNode,
-  $isListItemNode,
-  $isListNode,
-  type ListType,
-} from "@lexical/list";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-  $isQuoteNode,
-  type HeadingTagType,
-} from "@lexical/rich-text";
+import { $isListItemNode, $isListNode } from "@lexical/list";
+import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import {
   $createLineBreakNode,
-  $createParagraphNode,
   $createTextNode,
   $getRoot,
   $isElementNode,
@@ -31,30 +18,26 @@ import {
   type TextNode,
 } from "lexical";
 
+import { codeBlockFromLexical, codeBlockToLexical } from "../../syntax/code/lexical";
+import { headingTagToDepth, headingToLexical } from "../../syntax/heading/lexical";
+import { listFromLexical, listItemFromLexical, listToLexical } from "../../syntax/list/lexical";
+import { paragraphToLexical } from "../../syntax/paragraph/lexical";
 import {
-  $createPlaceholderBlockNode,
-  $isPlaceholderBlockNode,
-} from "../../syntax/placeholders/placeholder-block-node";
+  opaqueBlockFromLexical,
+  opaqueBlockToLexical,
+  opaqueInlineFromLexical,
+  opaqueInlineToLexical,
+} from "../../syntax/placeholders/lexical";
+import { $isPlaceholderBlockNode } from "../../syntax/placeholders/placeholder-block-node";
+import { $isPlaceholderInlineNode } from "../../syntax/placeholders/placeholder-inline-node";
+import { quoteFromLexical, quoteToLexical } from "../../syntax/quote/lexical";
 import {
-  $createPlaceholderInlineNode,
-  $isPlaceholderInlineNode,
-} from "../../syntax/placeholders/placeholder-inline-node";
-import type {
-  HeadingDepth,
-  SemanticBlock,
-  SemanticDocument,
-  SemanticInline,
-  SemanticListItem,
-} from "./document";
+  thematicBreakFromLexical,
+  thematicBreakToLexical,
+} from "../../syntax/thematic-break/lexical";
+import type { SemanticBlock, SemanticDocument, SemanticInline, SemanticListItem } from "./document";
+import { lexicalContainerChildrenToBlocks } from "./lexical-container";
 import { normalizeSemanticDocument } from "./normalize";
-
-function toHeadingTag(depth: HeadingDepth): HeadingTagType {
-  return `h${depth}` as HeadingTagType;
-}
-
-function toHeadingDepth(tag: HeadingTagType): HeadingDepth {
-  return Number(tag.slice(1)) as HeadingDepth;
-}
 
 function applyTextFormats(node: TextNode, formats: ReadonlyArray<TextFormatType>): TextNode {
   for (const format of formats) {
@@ -89,52 +72,27 @@ function inlineToLexical(
       return [link];
     }
     case "opaqueInline":
-      return [$createPlaceholderInlineNode(node.markdown, node.kind, node.metadata)];
+      return [opaqueInlineToLexical(node)];
   }
 }
 
 function blockToLexical(node: SemanticBlock): LexicalNode[] {
   switch (node.type) {
-    case "paragraph": {
-      const paragraph = $createParagraphNode();
-      paragraph.append(...node.children.flatMap((child) => inlineToLexical(child)));
-      return [paragraph];
-    }
-    case "heading": {
-      const heading = $createHeadingNode(toHeadingTag(node.depth));
-      heading.append(...node.children.flatMap((child) => inlineToLexical(child)));
-      return [heading];
-    }
-    case "blockquote": {
-      const quote = $createQuoteNode();
-      quote.append(...node.children.flatMap(blockToLexical));
-      return [quote];
-    }
-    case "list": {
-      const hasTaskItems = node.children.some((item) => typeof item.checked === "boolean");
-      const listType: ListType = node.ordered ? "number" : hasTaskItems ? "check" : "bullet";
-      const list = $createListNode(listType, node.ordered ? node.start : 1);
-      list.append(...node.children.map((item) => listItemToLexical(item, listType)));
-      return [list];
-    }
-    case "listItem":
-      return [listItemToLexical(node, typeof node.checked === "boolean" ? "check" : "bullet")];
-    case "codeBlock": {
-      const code = $createCodeNode(node.lang ?? undefined);
-      code.append($createTextNode(node.value));
-      return [code];
-    }
+    case "paragraph":
+      return [paragraphToLexical(node, inlineToLexical)];
+    case "heading":
+      return [headingToLexical(node, inlineToLexical)];
+    case "blockquote":
+      return [quoteToLexical(node, blockToLexical)];
+    case "list":
+      return [listToLexical(node, blockToLexical)];
+    case "codeBlock":
+      return [codeBlockToLexical(node)];
     case "thematicBreak":
-      return [$createHorizontalRuleNode()];
+      return [thematicBreakToLexical()];
     case "opaqueBlock":
-      return [$createPlaceholderBlockNode(node.markdown, node.kind, node.metadata)];
+      return [opaqueBlockToLexical(node)];
   }
-}
-
-function listItemToLexical(item: SemanticListItem, listType: ListType): LexicalNode {
-  const listItem = $createListItemNode(listType === "check" ? item.checked === true : undefined);
-  listItem.append(...item.children.flatMap(blockToLexical));
-  return listItem;
 }
 
 function textToInline(node: TextNode): SemanticInline[] {
@@ -182,14 +140,7 @@ function inlineFromLexical(node: LexicalNode): SemanticInline[] {
   }
 
   if ($isPlaceholderInlineNode(node)) {
-    return [
-      {
-        kind: node.getKind(),
-        markdown: node.getMarkdown(),
-        ...(node.getMetadata() ? { metadata: node.getMetadata() } : {}),
-        type: "opaqueInline",
-      },
-    ];
+    return [opaqueInlineFromLexical(node)];
   }
 
   return [];
@@ -199,47 +150,20 @@ function childrenToInline(children: ReadonlyArray<LexicalNode>): SemanticInline[
   return children.flatMap(inlineFromLexical);
 }
 
-function isInlineRuntimeNode(node: LexicalNode): boolean {
-  return node.isInline() || $isTextNode(node) || $isLineBreakNode(node);
+function containerChildrenToBlocks(children: ReadonlyArray<LexicalNode>): SemanticBlock[] {
+  return lexicalContainerChildrenToBlocks({
+    blockFromLexical,
+    children,
+    inlineFromLexical,
+  });
 }
 
-function flushInlineParagraph(
-  children: SemanticBlock[],
-  inlineBuffer: SemanticInline[],
-): SemanticInline[] {
-  if (inlineBuffer.length === 0) {
-    return inlineBuffer;
-  }
-
-  children.push({ children: inlineBuffer, type: "paragraph" });
-  return [];
-}
-
-function listItemFromLexical(node: LexicalNode): SemanticListItem | null {
+function semanticListItemFromLexical(node: LexicalNode): SemanticListItem | null {
   if (!$isListItemNode(node)) {
     return null;
   }
 
-  const children: SemanticBlock[] = [];
-  let inlineBuffer: SemanticInline[] = [];
-
-  for (const child of node.getChildren()) {
-    if (isInlineRuntimeNode(child)) {
-      inlineBuffer.push(...inlineFromLexical(child));
-      continue;
-    }
-
-    inlineBuffer = flushInlineParagraph(children, inlineBuffer);
-    children.push(...blockFromLexical(child));
-  }
-
-  flushInlineParagraph(children, inlineBuffer);
-
-  return {
-    ...(typeof node.getChecked() === "boolean" ? { checked: node.getChecked() } : {}),
-    children,
-    type: "listItem",
-  };
+  return listItemFromLexical(node, containerChildrenToBlocks);
 }
 
 function blockFromLexical(node: LexicalNode): SemanticBlock[] {
@@ -251,53 +175,34 @@ function blockFromLexical(node: LexicalNode): SemanticBlock[] {
     return [
       {
         children: childrenToInline(node.getChildren()),
-        depth: toHeadingDepth(node.getTag()),
+        depth: headingTagToDepth(node.getTag()),
         type: "heading",
       },
     ];
   }
 
   if ($isQuoteNode(node)) {
-    return [{ children: node.getChildren().flatMap(blockFromLexical), type: "blockquote" }];
+    return [quoteFromLexical(node, containerChildrenToBlocks)];
   }
 
   if ($isListNode(node)) {
-    const ordered = node.getListType() === "number";
-    const children = node.getChildren().flatMap((child) => {
-      const item = listItemFromLexical(child);
-      return item ? [item] : [];
-    });
-    return [{ children, ordered, start: ordered ? node.getStart() : 1, type: "list" }];
+    return [listFromLexical(node, semanticListItemFromLexical)];
   }
 
   if ($isListItemNode(node)) {
-    const item = listItemFromLexical(node);
-    return item ? [item] : [];
+    return [];
   }
 
   if ($isCodeNode(node)) {
-    return [
-      {
-        lang: node.getLanguage() ?? null,
-        type: "codeBlock",
-        value: node.getTextContent(),
-      },
-    ];
+    return [codeBlockFromLexical(node)];
   }
 
   if ($isHorizontalRuleNode(node)) {
-    return [{ type: "thematicBreak" }];
+    return [thematicBreakFromLexical(node)];
   }
 
   if ($isPlaceholderBlockNode(node)) {
-    return [
-      {
-        kind: node.getKind(),
-        markdown: node.getMarkdown(),
-        ...(node.getMetadata() ? { metadata: node.getMetadata() } : {}),
-        type: "opaqueBlock",
-      },
-    ];
+    return [opaqueBlockFromLexical(node)];
   }
 
   if ($isElementNode(node)) {

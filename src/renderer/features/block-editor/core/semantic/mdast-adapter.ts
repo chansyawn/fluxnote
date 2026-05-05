@@ -1,70 +1,37 @@
 import type {
   BlockContent,
   Break,
-  Code,
-  Delete,
-  Emphasis,
-  Heading,
   InlineCode,
-  Link,
-  List,
-  ListContent,
-  ListItem,
-  Paragraph,
   PhrasingContent,
   Root,
   RootContent,
-  Strong,
   Text,
 } from "mdast";
 
-import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown-processor";
-import type {
-  HeadingDepth,
-  SemanticBlock,
-  SemanticDocument,
-  SemanticInline,
-  SemanticListItem,
-} from "./document";
+import { codeBlockFromMdast, codeBlockToMdast } from "../../syntax/code/mdast";
+import { headingFromMdast, headingToMdast } from "../../syntax/heading/mdast";
+import {
+  deleteFromMdast,
+  deleteToMdast,
+  emphasisFromMdast,
+  emphasisToMdast,
+  strongFromMdast,
+  strongToMdast,
+} from "../../syntax/inline-mark/mdast";
+import { linkFromMdast, linkToMdast } from "../../syntax/link/mdast";
+import { listFromMdast, listToMdast } from "../../syntax/list/mdast";
+import { paragraphFromMdast, paragraphToMdast } from "../../syntax/paragraph/mdast";
+import {
+  opaqueBlockFromMdast,
+  opaqueBlockToMdast,
+  opaqueInlineFromMdast,
+  opaqueInlineToMdast,
+  opaqueInlineFallbackParagraph,
+} from "../../syntax/placeholders/mdast";
+import { quoteFromMdast, quoteToMdast } from "../../syntax/quote/mdast";
+import { thematicBreakFromMdast, thematicBreakToMdast } from "../../syntax/thematic-break/mdast";
+import type { SemanticBlock, SemanticDocument, SemanticInline } from "./document";
 import { normalizeSemanticDocument } from "./normalize";
-
-function fallbackMarkdown(kind: string): string {
-  return `<!-- unsupported:${kind} -->`;
-}
-
-function canonicalMarkdownForNode(node: RootContent): string {
-  try {
-    return stringifyMdastToMarkdown({ children: [node], type: "root" }).trim();
-  } catch {
-    return fallbackMarkdown(node.type);
-  }
-}
-
-function canonicalMarkdownForInline(node: PhrasingContent): string {
-  const paragraph: Paragraph = { children: [node], type: "paragraph" };
-  return canonicalMarkdownForNode(paragraph).trim();
-}
-
-function isPhrasingContent(node: RootContent): node is PhrasingContent {
-  return (
-    node.type === "break" ||
-    node.type === "delete" ||
-    node.type === "emphasis" ||
-    node.type === "footnoteReference" ||
-    node.type === "html" ||
-    node.type === "image" ||
-    node.type === "imageReference" ||
-    node.type === "inlineCode" ||
-    node.type === "link" ||
-    node.type === "linkReference" ||
-    node.type === "strong" ||
-    node.type === "text"
-  );
-}
-
-function toHeadingDepth(depth: number): HeadingDepth {
-  return Math.min(Math.max(Math.trunc(depth), 1), 6) as HeadingDepth;
-}
 
 function inlineFromMdast(node: PhrasingContent): SemanticInline[] {
   switch (node.type) {
@@ -73,30 +40,17 @@ function inlineFromMdast(node: PhrasingContent): SemanticInline[] {
     case "break":
       return [{ type: "hardBreak" }];
     case "emphasis":
-      return [{ children: inlinesFromMdast(node.children), type: "emphasis" }];
+      return [emphasisFromMdast(node, inlinesFromMdast)];
     case "strong":
-      return [{ children: inlinesFromMdast(node.children), type: "strong" }];
+      return [strongFromMdast(node, inlinesFromMdast)];
     case "delete":
-      return [{ children: inlinesFromMdast(node.children), type: "delete" }];
+      return [deleteFromMdast(node, inlinesFromMdast)];
     case "inlineCode":
       return [{ type: "inlineCode", value: node.value }];
     case "link":
-      return [
-        {
-          children: inlinesFromMdast(node.children),
-          title: node.title ?? null,
-          type: "link",
-          url: node.url,
-        },
-      ];
+      return [linkFromMdast(node, inlinesFromMdast)];
     default:
-      return [
-        {
-          kind: node.type,
-          markdown: canonicalMarkdownForInline(node),
-          type: "opaqueInline",
-        },
-      ];
+      return [opaqueInlineFromMdast(node)];
   }
 }
 
@@ -104,55 +58,24 @@ function inlinesFromMdast(children: ReadonlyArray<PhrasingContent>): SemanticInl
   return children.flatMap(inlineFromMdast);
 }
 
-function listItemFromMdast(node: ListItem): SemanticListItem {
-  return {
-    ...("checked" in node && typeof node.checked === "boolean" ? { checked: node.checked } : {}),
-    children: blocksFromMdast(node.children),
-    type: "listItem",
-  };
-}
-
 function blockFromMdast(node: RootContent): SemanticBlock[] {
   switch (node.type) {
     case "paragraph":
-      return [{ children: inlinesFromMdast(node.children), type: "paragraph" }];
+      return [paragraphFromMdast(node, inlinesFromMdast)];
     case "heading":
-      return [
-        {
-          children: inlinesFromMdast(node.children),
-          depth: toHeadingDepth(node.depth),
-          type: "heading",
-        },
-      ];
+      return [headingFromMdast(node, inlinesFromMdast)];
     case "blockquote":
-      return [{ children: blocksFromMdast(node.children), type: "blockquote" }];
+      return [quoteFromMdast(node, blocksFromMdast)];
     case "list":
-      return [
-        {
-          children: node.children.map(listItemFromMdast),
-          ordered: node.ordered === true,
-          start: typeof node.start === "number" ? node.start : 1,
-          type: "list",
-        },
-      ];
+      return [listFromMdast(node, blocksFromMdast)];
     case "listItem":
-      return [listItemFromMdast(node)];
+      return [];
     case "code":
-      return [{ lang: node.lang ?? null, type: "codeBlock", value: node.value }];
+      return [codeBlockFromMdast(node)];
     case "thematicBreak":
-      return [{ type: "thematicBreak" }];
+      return [thematicBreakFromMdast()];
     default:
-      if (isPhrasingContent(node)) {
-        return [{ children: inlineFromMdast(node), type: "paragraph" }];
-      }
-
-      return [
-        {
-          kind: node.type,
-          markdown: canonicalMarkdownForNode(node),
-          type: "opaqueBlock",
-        },
-      ];
+      return [opaqueBlockFromMdast(node)];
   }
 }
 
@@ -167,24 +90,17 @@ function inlineToMdast(node: SemanticInline): PhrasingContent[] {
     case "hardBreak":
       return [{ type: "break" } satisfies Break];
     case "emphasis":
-      return [{ children: inlinesToMdast(node.children), type: "emphasis" } satisfies Emphasis];
+      return [emphasisToMdast(node, inlinesToMdast)];
     case "strong":
-      return [{ children: inlinesToMdast(node.children), type: "strong" } satisfies Strong];
+      return [strongToMdast(node, inlinesToMdast)];
     case "delete":
-      return [{ children: inlinesToMdast(node.children), type: "delete" } satisfies Delete];
+      return [deleteToMdast(node, inlinesToMdast)];
     case "inlineCode":
       return [{ type: "inlineCode", value: node.value } satisfies InlineCode];
     case "link":
-      return [
-        {
-          children: inlinesToMdast(node.children),
-          title: node.title,
-          type: "link",
-          url: node.url,
-        } satisfies Link,
-      ];
+      return [linkToMdast(node, inlinesToMdast)];
     case "opaqueInline":
-      return opaqueInlineToMdast(node.markdown);
+      return opaqueInlineToMdast(node);
   }
 }
 
@@ -192,77 +108,23 @@ function inlinesToMdast(children: ReadonlyArray<SemanticInline>): PhrasingConten
   return children.flatMap(inlineToMdast);
 }
 
-function opaqueInlineToMdast(markdown: string): PhrasingContent[] {
-  const parsed = parseMarkdownToMdast(markdown);
-  const first = parsed.children[0];
-
-  if (first?.type === "paragraph") {
-    return first.children;
-  }
-
-  if (first && isPhrasingContent(first)) {
-    return [first];
-  }
-
-  return [{ type: "inlineCode", value: markdown.trim() }];
-}
-
-function opaqueBlockToMdast(markdown: string): BlockContent[] {
-  const parsed = parseMarkdownToMdast(markdown);
-  return parsed.children.filter((node): node is BlockContent => !isPhrasingContent(node));
-}
-
-function listItemToMdast(item: SemanticListItem): ListItem {
-  return {
-    checked: typeof item.checked === "boolean" ? item.checked : null,
-    children: blocksToMdast(item.children),
-    spread: item.children.length > 1,
-    type: "listItem",
-  };
-}
-
 function blockToMdast(node: SemanticBlock): BlockContent[] {
   switch (node.type) {
     case "paragraph":
-      return [{ children: inlinesToMdast(node.children), type: "paragraph" } satisfies Paragraph];
+      return [paragraphToMdast(node, inlinesToMdast)];
     case "heading":
-      return [
-        {
-          children: inlinesToMdast(node.children),
-          depth: node.depth,
-          type: "heading",
-        } satisfies Heading,
-      ];
+      return [headingToMdast(node, inlinesToMdast)];
     case "blockquote":
-      return [{ children: blocksToMdast(node.children), type: "blockquote" }];
+      return [quoteToMdast(node, blocksToMdast)];
     case "list":
-      return [
-        {
-          children: node.children.map(listItemToMdast) as ListContent[],
-          ordered: node.ordered,
-          spread: node.children.some((item) => item.children.length > 1),
-          start: node.ordered ? 1 : null,
-          type: "list",
-        } satisfies List,
-      ];
-    case "listItem":
-      return blocksToMdast(node.children);
+      return [listToMdast(node, blocksToMdast)];
     case "codeBlock":
-      return [
-        {
-          lang: node.lang,
-          meta: null,
-          type: "code",
-          value: node.value,
-        } satisfies Code,
-      ];
+      return [codeBlockToMdast(node)];
     case "thematicBreak":
-      return [{ type: "thematicBreak" }];
+      return [thematicBreakToMdast()];
     case "opaqueBlock": {
-      const parsed = opaqueBlockToMdast(node.markdown);
-      return parsed.length > 0
-        ? parsed
-        : [{ children: [{ type: "inlineCode", value: node.markdown }], type: "paragraph" }];
+      const parsed = opaqueBlockToMdast(node);
+      return parsed.length > 0 ? parsed : [opaqueInlineFallbackParagraph(node.markdown)];
     }
   }
 }

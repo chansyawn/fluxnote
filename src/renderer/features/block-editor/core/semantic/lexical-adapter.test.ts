@@ -79,7 +79,6 @@ describe("semantic lexical adapter", () => {
                     },
                   ],
                   ordered: false,
-                  start: 1,
                   type: "list",
                 },
               ],
@@ -87,7 +86,6 @@ describe("semantic lexical adapter", () => {
             },
           ],
           ordered: false,
-          start: 1,
           type: "list",
         },
       ],
@@ -95,5 +93,21 @@ describe("semantic lexical adapter", () => {
     });
 
     expect(roundTripLexical(semantic)).toEqual(semantic);
+  });
+
+  it("keeps normalized mixed task lists stable through Lexical", () => {
+    const semantic = markdownToSemantic(["- Normal", "- [x] Done"].join("\n"));
+
+    expect(roundTripLexical(semantic)).toEqual(semantic);
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [
+          expect.objectContaining({ checked: false }),
+          expect.objectContaining({ checked: true }),
+        ],
+        ordered: false,
+        type: "list",
+      }),
+    );
   });
 });

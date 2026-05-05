@@ -11,7 +11,7 @@ const stringifier = unified().use(remarkGfm).use(remarkMath).use(remarkStringify
   bullet: "-",
   emphasis: "*",
   fences: true,
-  incrementListMarker: false,
+  incrementListMarker: true,
   rule: "-",
   ruleRepetition: 3,
   strong: "*",

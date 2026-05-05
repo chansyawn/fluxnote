@@ -10,3 +10,4 @@ export {
   PlaceholderInlineNode,
   type SerializedPlaceholderInlineNode,
 } from "./placeholder-inline-node";
+export { createPlaceholderPayload, type PlaceholderPayload } from "./placeholder-payload";

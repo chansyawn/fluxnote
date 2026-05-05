@@ -1,29 +1,12 @@
-import { $createHorizontalRuleNode, HorizontalRuleNode } from "@lexical/extension";
-import {
-  BOLD_STAR,
-  CHECK_LIST,
-  CODE,
-  HEADING,
-  INLINE_CODE,
-  ITALIC_STAR,
-  LINK,
-  ORDERED_LIST,
-  QUOTE,
-  STRIKETHROUGH,
-  UNORDERED_LIST,
-  type ElementTransformer,
-  type Transformer,
-} from "@lexical/markdown";
+import type { Transformer } from "@lexical/markdown";
 
-export const THEMATIC_BREAK: ElementTransformer = {
-  dependencies: [HorizontalRuleNode],
-  export: () => null,
-  regExp: /^---\s?$/,
-  replace: (parentNode) => {
-    parentNode.replace($createHorizontalRuleNode());
-  },
-  type: "element",
-};
+import { CODE } from "../syntax/code/shortcut";
+import { HEADING } from "../syntax/heading/shortcut";
+import { BOLD_STAR, INLINE_CODE, ITALIC_STAR, STRIKETHROUGH } from "../syntax/inline-mark/shortcut";
+import { LINK } from "../syntax/link/shortcut";
+import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "../syntax/list/shortcut";
+import { QUOTE } from "../syntax/quote/shortcut";
+import { THEMATIC_BREAK } from "../syntax/thematic-break/shortcut";
 
 export const markdownShortcutTransformers: Transformer[] = [
   HEADING,

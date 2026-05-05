@@ -26,7 +26,15 @@ describe("markdown shortcuts", () => {
       depth: 2,
       type: "heading",
     });
-    expect(shortcutSemantic("> Quote").children[0]).toMatchObject({ type: "blockquote" });
+    expect(shortcutSemantic("> Quote").children[0]).toEqual({
+      children: [
+        {
+          children: [{ type: "text", value: "Quote" }],
+          type: "paragraph",
+        },
+      ],
+      type: "blockquote",
+    });
     expect(shortcutSemantic("- Bullet").children[0]).toMatchObject({
       ordered: false,
       type: "list",
@@ -37,6 +45,10 @@ describe("markdown shortcuts", () => {
     });
     expect(shortcutSemantic("- [x] Done").children[0]).toMatchObject({
       children: [expect.objectContaining({ checked: true })],
+      type: "list",
+    });
+    expect(shortcutSemantic("- [ ] Todo").children[0]).toMatchObject({
+      children: [expect.objectContaining({ checked: false })],
       type: "list",
     });
     expect(shortcutSemantic("```\ncode\n```").children[0]).toMatchObject({

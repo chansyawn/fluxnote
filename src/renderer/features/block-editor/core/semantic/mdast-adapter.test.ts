@@ -71,6 +71,97 @@ describe("semantic mdast adapter", () => {
     );
   });
 
+  it("does not treat mdast listItem as a standalone semantic block", () => {
+    const semantic = mdastToSemanticDocument({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "Orphan" }], type: "paragraph" }],
+          type: "listItem",
+        },
+      ],
+      type: "root",
+    } as Root);
+
+    expect(JSON.stringify(semantic)).not.toContain("listItem");
+    expect(semantic).toEqual({ children: [{ children: [], type: "paragraph" }], type: "root" });
+  });
+
+  it("normalizes mixed unordered task lists to homogeneous task lists", () => {
+    const { firstSemantic, secondSemantic } = roundTripSemantic(
+      ["- Normal", "- [x] Done"].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [
+          expect.objectContaining({ checked: false }),
+          expect.objectContaining({ checked: true }),
+        ],
+        ordered: false,
+        type: "list",
+      }),
+    );
+  });
+
+  it("does not preserve ordered list start numbers", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      ["3. Third", "4. Fourth"].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(JSON.stringify(firstSemantic)).not.toContain("start");
+    expect(canonicalMarkdown).toContain("1. Third");
+    expect(canonicalMarkdown).toContain("2. Fourth");
+  });
+
+  it("classifies block html as opaqueBlock", () => {
+    const semantic = mdastToSemanticDocument(parseMarkdownToMdast("<section>HTML</section>"));
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        kind: "html",
+        type: "opaqueBlock",
+      }),
+    );
+  });
+
+  it("classifies inline html as opaqueInline", () => {
+    const semantic = mdastToSemanticDocument(parseMarkdownToMdast("hello <span>HTML</span> world"));
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        type: "paragraph",
+      }),
+    );
+    expect(JSON.stringify(semantic.children[0])).toContain('"type":"opaqueInline"');
+    expect(JSON.stringify(semantic.children[0])).not.toContain('"type":"opaqueBlock"');
+  });
+
+  it("roundtrips nested quote list and task list semantics", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      [
+        "> - [x] Task",
+        ">   ",
+        ">   Task detail",
+        "",
+        "- Parent",
+        "  ",
+        "  > Nested quote",
+        "  ",
+        "  - Nested list",
+        "",
+        "3. Third",
+        "4. Fourth",
+      ].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(canonicalMarkdown).toContain("> - [x] Task");
+    expect(canonicalMarkdown).toContain("1. Third");
+    expect(canonicalMarkdown).toContain("2. Fourth");
+  });
+
   it("imports unsupported syntax as opaque nodes without source offsets", () => {
     const semantic = mdastToSemanticDocument(
       parseMarkdownToMdast(

@@ -97,6 +97,22 @@ function normalizeListItem(item: SemanticListItem): SemanticListItem {
   };
 }
 
+function normalizeListItems(
+  children: ReadonlyArray<SemanticListItem>,
+  ordered: boolean,
+): SemanticListItem[] {
+  const normalized = children.map(normalizeListItem);
+  if (ordered || !normalized.some((item) => typeof item.checked === "boolean")) {
+    return normalized;
+  }
+
+  return normalized.map((item) => ({
+    checked: item.checked === true,
+    children: item.children,
+    type: "listItem",
+  }));
+}
+
 function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
   switch (node.type) {
     case "paragraph":
@@ -112,20 +128,17 @@ function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
     case "blockquote":
       return [{ children: normalizeContainerChildren(node.children), type: "blockquote" }];
     case "list": {
-      const children = node.children.map(normalizeListItem);
+      const children = normalizeListItems(node.children, node.ordered);
       return children.length > 0
         ? [
             {
               children,
               ordered: node.ordered,
-              start: node.ordered ? Math.max(1, Math.trunc(node.start || 1)) : 1,
               type: "list",
             },
           ]
         : [];
     }
-    case "listItem":
-      return [normalizeListItem(node)];
     case "codeBlock":
       return [{ lang: node.lang || null, type: "codeBlock", value: node.value }];
     case "thematicBreak":

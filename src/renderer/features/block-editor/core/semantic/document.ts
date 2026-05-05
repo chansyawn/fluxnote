@@ -10,7 +10,6 @@ export type SemanticBlock =
   | SemanticHeading
   | SemanticBlockquote
   | SemanticList
-  | SemanticListItem
   | SemanticCodeBlock
   | SemanticThematicBreak
   | SemanticOpaqueBlock;
@@ -34,7 +33,6 @@ export interface SemanticBlockquote {
 export interface SemanticList {
   type: "list";
   ordered: boolean;
-  start: number;
   children: SemanticListItem[];
 }
 
