@@ -1,4 +1,5 @@
 import { createHeadlessEditor } from "@lexical/headless";
+import { $convertFromMarkdownString } from "@lexical/markdown";
 import type { LexicalEditor, SerializedEditorState } from "lexical";
 
 import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/editor-state";
@@ -6,7 +7,7 @@ import { exportLexicalToSemanticDocument } from "../core/semantic/lexical-adapte
 import { mdastToSemanticDocument } from "../core/semantic/mdast-adapter";
 import { parseMarkdownToMdast } from "../markdown/processor";
 import type { SemanticDocument } from "../model";
-import { SYNTAX_NODES } from "../syntax/registry";
+import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_NODES } from "../syntax/registry";
 
 export interface MarkdownSyntaxSnapshot {
   lexical: SerializedEditorState;
@@ -38,4 +39,15 @@ export function createMarkdownSyntaxSnapshot(markdown: string): MarkdownSyntaxSn
 
 export function markdownToSemantic(markdown: string): SemanticDocument {
   return mdastToSemanticDocument(parseMarkdownToMdast(markdown));
+}
+
+export function parseMarkdownWithShortcuts(markdown: string): SemanticDocument {
+  const editor = createHeadlessMarkdownEditor();
+  editor.update(
+    () => {
+      $convertFromMarkdownString(markdown, MARKDOWN_SHORTCUT_TRANSFORMERS);
+    },
+    { discrete: true },
+  );
+  return exportLexicalToSemanticDocument(editor.getEditorState());
 }
