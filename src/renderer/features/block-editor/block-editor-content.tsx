@@ -7,11 +7,11 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { EditorState } from "lexical";
-import { Fragment, useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
+import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 
-import { exportLexicalToMdast } from "./core/export-lexical-to-mdast";
-import { stringifyMdastToMarkdown } from "./core/markdown-processor";
-import { liveInputTransformers, syntaxPlugins } from "./core/syntax-registry";
+import { exportEditorStateToMarkdown } from "./core/editor-state";
+import { blockEditorPlugins } from "./core/runtime";
+import { markdownShortcutTransformers } from "./core/shortcuts";
 import type { BlockEditorHandle } from "./index";
 
 interface BlockEditorContentProps {
@@ -30,7 +30,7 @@ function Placeholder() {
 }
 
 function exportMarkdownFromState(editorState: EditorState): string {
-  return stringifyMdastToMarkdown(exportLexicalToMdast(editorState));
+  return exportEditorStateToMarkdown(editorState);
 }
 
 export function BlockEditorContent({
@@ -67,10 +67,8 @@ export function BlockEditorContent({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
-      {syntaxPlugins.map((plugin) => (
-        <Fragment key={plugin.key}>{plugin.element}</Fragment>
-      ))}
-      <MarkdownShortcutPlugin transformers={liveInputTransformers} />
+      {blockEditorPlugins}
+      <MarkdownShortcutPlugin transformers={markdownShortcutTransformers} />
       <OnChangePlugin
         ignoreSelectionChange
         onChange={(editorState) => {

@@ -1,60 +1,36 @@
 # Block Editor Architecture
 
-`block-editor` is a renderer feature that provides a block-level Markdown editing surface on top of Lexical. It owns the Markdown parsing/export pipeline, Lexical runtime composition, and feature-local Markdown syntax modules.
-
-This feature does not own block persistence, workspace state, or backend IPC. Those concerns live in the surrounding block and workspace features.
-
-## Directory Shape
+`block-editor` is a Markdown-first WYSIWYG editor built on Lexical. Markdown and mdast are boundary formats only; the editor's stable internal contract is a normalized semantic document.
 
 ```text
-src/renderer/features/block-editor/
-  index.tsx                 # Public BlockEditor entry and LexicalComposer config
-  block-editor-content.tsx  # Lexical plugin composition and change export
-  core/                     # Markdown, mdast, Lexical conversion and registry
-  syntax/                   # Feature-local Markdown syntax modules
-  test-helper/             # Headless editor and snapshot test helpers
+Markdown string
+  -> mdast
+  -> normalized semantic document
+  -> Lexical editor state
+  -> normalized semantic document
+  -> mdast
+  -> canonical Markdown string
 ```
 
 ## Runtime Composition
 
-`BlockEditor` is the public React entry point. It accepts a `blockId`, `initialMarkdown`, and change/blur callbacks, then creates a Lexical editor namespace and initial state.
+`BlockEditor` owns the Lexical composer configuration and imports initial Markdown through the semantic pipeline. `BlockEditorContent` mounts the editable surface, history, the minimal Lexical plugins required for links/lists, Markdown shortcuts, and the change exporter.
 
-`BlockEditorContent` mounts the editable surface and the shared Lexical plugins:
-
-- rich text content editing
-- undo/redo history
-- syntax-contributed plugins
-- live Markdown shortcut transformers
-- `onChange` export back to Markdown
-
-The editor reports content changes through `onMarkdownUpdated(markdown)`. It does not persist the Markdown itself.
+Lexical is used for selection, composition, undo/redo, DOM reconciliation, keyboard behavior, and clipboard behavior. It does not define Markdown semantics.
 
 ## Core Layer
 
-The `core/` directory keeps the conversion pipeline and extension registry separate from React UI code.
+- `markdown-processor.ts` parses Markdown to mdast and stringifies mdast to canonical Markdown.
+- `semantic/document.ts` defines the internal Markdown semantic document.
+- `semantic/normalize.ts` keeps structural repair centralized.
+- `semantic/mdast-adapter.ts` converts between mdast and semantic documents.
+- `semantic/lexical-adapter.ts` projects semantic documents into Lexical and reads semantic documents back.
+- `runtime.tsx` lists Lexical nodes, theme classes, and required React plugins.
+- `shortcuts.ts` contains live Markdown shortcuts only.
 
-- `markdown-processor.ts` parses Markdown to mdast and stringifies mdast back to Markdown with unified/remark.
-- `import-mdast-to-lexical.ts` imports mdast nodes into Lexical nodes through registered importers.
-- `export-lexical-to-mdast.ts` exports Lexical nodes back into mdast through registered exporters.
-- `syntax-registry.ts` aggregates all syntax module contributions into Lexical nodes, plugins, theme classes, importers, exporters, and Markdown transformers.
-- `raw-markdown.ts` preserves source Markdown slices for nodes that are not rendered as rich editable content yet.
+Unsupported syntax is represented by opaque inline/block placeholder nodes. Placeholders store `kind`, canonical `markdown`, and optional metadata; they do not store source offsets or original Markdown slices.
 
-## Syntax Modules
-
-Each folder under `syntax/` defines one `MarkdownSyntaxModule`. A module may contribute:
-
-- Lexical node classes
-- React plugins
-- editor theme classes
-- mdast importers
-- Lexical exporters
-- live Markdown shortcut transformers
-
-This keeps Markdown support incremental: adding or changing a syntax usually means updating one syntax module and letting `syntax-registry.ts` compose it into the editor.
-
-Unsupported rich-edit syntax is handled by the placeholders module. Placeholder nodes render the original Markdown as non-editable inline or block decorations and export it back unchanged where possible.
-
-## Public Contracts
+## Public Contract
 
 `BlockEditor` is the only public UI component exported by this feature.
 
@@ -65,8 +41,6 @@ interface BlockEditorHandle {
 }
 ```
 
-`MarkdownSyntaxModule` is the internal extension contract for Markdown syntax support. Its inputs are mdast nodes, Lexical nodes, and conversion contexts; its outputs are registry contributions consumed by the editor runtime.
+## Testing
 
-## Testing Helpers
-
-The `test-helper/` directory provides headless editor helpers for syntax tests. Tests can import Markdown, inspect serialized Lexical state, export mdast, and verify Markdown round trips without mounting the React editor.
+Tests should assert semantic document equality and canonical Markdown behavior. Lexical JSON is an implementation detail except for the minimal serialized placeholder fields.

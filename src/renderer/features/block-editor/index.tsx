@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 import { BlockEditorContent } from "./block-editor-content";
 import { importMarkdownToEditor } from "./core/editor-state";
-import { blockEditorTheme, lexicalNodes } from "./core/syntax-registry";
+import { blockEditorNodes, blockEditorTheme } from "./core/runtime";
 
 export interface BlockEditorHandle {
   copy: () => Promise<void>;
@@ -33,7 +33,7 @@ export function BlockEditor({
         importMarkdownToEditor(editor, initialMarkdown);
       },
       namespace: `BlockEditor:${blockId}`,
-      nodes: [...lexicalNodes],
+      nodes: [...blockEditorNodes],
       onError(error: Error) {
         throw error;
       },

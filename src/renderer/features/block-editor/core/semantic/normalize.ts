@@ -1,0 +1,156 @@
+import type {
+  HeadingDepth,
+  SemanticBlock,
+  SemanticDocument,
+  SemanticInline,
+  SemanticListItem,
+} from "./document";
+import { createEmptyDocument } from "./document";
+
+function normalizeHeadingDepth(depth: number): HeadingDepth {
+  return Math.min(Math.max(Math.trunc(depth), 1), 6) as HeadingDepth;
+}
+
+function isEmptyInline(node: SemanticInline): boolean {
+  if (node.type === "text") {
+    return node.value.length === 0;
+  }
+
+  if (
+    node.type === "emphasis" ||
+    node.type === "strong" ||
+    node.type === "delete" ||
+    node.type === "link"
+  ) {
+    return node.children.length === 0;
+  }
+
+  return false;
+}
+
+function normalizeInlineChildren(children: ReadonlyArray<SemanticInline>): SemanticInline[] {
+  const normalized: SemanticInline[] = [];
+
+  for (const child of children) {
+    const nodes = normalizeInline(child);
+    for (const node of nodes) {
+      const previous = normalized.at(-1);
+      if (previous?.type === "text" && node.type === "text") {
+        previous.value += node.value;
+      } else if (!isEmptyInline(node)) {
+        normalized.push(node);
+      }
+    }
+  }
+
+  return normalized;
+}
+
+function normalizeInline(node: SemanticInline): SemanticInline[] {
+  switch (node.type) {
+    case "text":
+      return node.value.length > 0 ? [{ type: "text", value: node.value }] : [];
+    case "emphasis": {
+      const children = normalizeInlineChildren(node.children);
+      return children.length > 0 ? [{ children, type: "emphasis" }] : [];
+    }
+    case "strong": {
+      const children = normalizeInlineChildren(node.children);
+      return children.length > 0 ? [{ children, type: "strong" }] : [];
+    }
+    case "delete": {
+      const children = normalizeInlineChildren(node.children);
+      return children.length > 0 ? [{ children, type: "delete" }] : [];
+    }
+    case "inlineCode":
+      return [{ type: "inlineCode", value: node.value }];
+    case "link": {
+      const children = normalizeInlineChildren(node.children);
+      return children.length > 0
+        ? [{ children, title: node.title ?? null, type: "link", url: node.url }]
+        : [];
+    }
+    case "hardBreak":
+      return [{ type: "hardBreak" }];
+    case "opaqueInline":
+      return [
+        {
+          kind: node.kind || "unknown",
+          markdown: node.markdown.trim(),
+          ...(node.metadata ? { metadata: node.metadata } : {}),
+          type: "opaqueInline",
+        },
+      ];
+  }
+}
+
+function normalizeContainerChildren(children: ReadonlyArray<SemanticBlock>): SemanticBlock[] {
+  const blocks = children.flatMap(normalizeBlock);
+  return blocks.length > 0 ? blocks : [{ children: [], type: "paragraph" }];
+}
+
+function normalizeListItem(item: SemanticListItem): SemanticListItem {
+  return {
+    ...(typeof item.checked === "boolean" ? { checked: item.checked } : {}),
+    children: normalizeContainerChildren(item.children),
+    type: "listItem",
+  };
+}
+
+function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
+  switch (node.type) {
+    case "paragraph":
+      return [{ children: normalizeInlineChildren(node.children), type: "paragraph" }];
+    case "heading":
+      return [
+        {
+          children: normalizeInlineChildren(node.children),
+          depth: normalizeHeadingDepth(node.depth),
+          type: "heading",
+        },
+      ];
+    case "blockquote":
+      return [{ children: normalizeContainerChildren(node.children), type: "blockquote" }];
+    case "list": {
+      const children = node.children.map(normalizeListItem);
+      return children.length > 0
+        ? [
+            {
+              children,
+              ordered: node.ordered,
+              start: node.ordered ? Math.max(1, Math.trunc(node.start || 1)) : 1,
+              type: "list",
+            },
+          ]
+        : [];
+    }
+    case "listItem":
+      return [normalizeListItem(node)];
+    case "codeBlock":
+      return [{ lang: node.lang || null, type: "codeBlock", value: node.value }];
+    case "thematicBreak":
+      return [{ type: "thematicBreak" }];
+    case "opaqueBlock":
+      return [
+        {
+          kind: node.kind || "unknown",
+          markdown: node.markdown.trim(),
+          ...(node.metadata ? { metadata: node.metadata } : {}),
+          type: "opaqueBlock",
+        },
+      ];
+  }
+}
+
+export function normalizeSemanticDocument(document: SemanticDocument): SemanticDocument {
+  const children = document.children.flatMap(normalizeBlock);
+
+  if (children.length === 0) {
+    return createEmptyDocument();
+  }
+
+  return {
+    children,
+    type: "root",
+  };
+}

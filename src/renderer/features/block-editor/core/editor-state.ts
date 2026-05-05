@@ -1,14 +1,17 @@
 import { createEditor, type EditorState, type LexicalEditor } from "lexical";
 
-import { exportLexicalToMdast } from "./export-lexical-to-mdast";
-import { importMdastToLexical } from "./import-mdast-to-lexical";
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "./markdown-processor";
-import { lexicalNodes } from "./syntax-registry";
+import { blockEditorNodes } from "./runtime";
+import {
+  exportLexicalToSemanticDocument,
+  importSemanticDocumentToLexical,
+} from "./semantic/lexical-adapter";
+import { mdastToSemanticDocument, semanticDocumentToMdast } from "./semantic/mdast-adapter";
 
 export function createMarkdownEditor(namespace = "BlockEditorTest"): LexicalEditor {
   return createEditor({
     namespace,
-    nodes: [...lexicalNodes],
+    nodes: [...blockEditorNodes],
     onError(error) {
       throw error;
     },
@@ -16,11 +19,13 @@ export function createMarkdownEditor(namespace = "BlockEditorTest"): LexicalEdit
 }
 
 export function importMarkdownToEditor(editor: LexicalEditor, markdown: string): void {
-  importMdastToLexical(parseMarkdownToMdast(markdown), editor, markdown);
+  importSemanticDocumentToLexical(mdastToSemanticDocument(parseMarkdownToMdast(markdown)), editor);
 }
 
 export function exportEditorStateToMarkdown(editorState: EditorState): string {
-  return stringifyMdastToMarkdown(exportLexicalToMdast(editorState));
+  return stringifyMdastToMarkdown(
+    semanticDocumentToMdast(exportLexicalToSemanticDocument(editorState)),
+  );
 }
 
 export function roundTripMarkdown(markdown: string): string {

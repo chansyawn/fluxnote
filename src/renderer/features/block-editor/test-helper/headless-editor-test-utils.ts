@@ -1,22 +1,23 @@
 import { createHeadlessEditor } from "@lexical/headless";
 import type { LexicalEditor, SerializedEditorState } from "lexical";
-import type { Root } from "mdast";
 
-import { importMarkdownToEditor } from "../core/editor-state";
-import { exportLexicalToMdast } from "../core/export-lexical-to-mdast";
-import { stringifyMdastToMarkdown } from "../core/markdown-processor";
-import { lexicalNodes } from "../core/syntax-registry";
+import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/editor-state";
+import { parseMarkdownToMdast } from "../core/markdown-processor";
+import { blockEditorNodes } from "../core/runtime";
+import type { SemanticDocument } from "../core/semantic/document";
+import { exportLexicalToSemanticDocument } from "../core/semantic/lexical-adapter";
+import { mdastToSemanticDocument } from "../core/semantic/mdast-adapter";
 
 export interface MarkdownSyntaxSnapshot {
   lexical: SerializedEditorState;
-  mdast: Root;
   markdown: string;
+  semantic: SemanticDocument;
 }
 
 export function createHeadlessMarkdownEditor(namespace = "BlockEditorHeadlessTest"): LexicalEditor {
   return createHeadlessEditor({
     namespace,
-    nodes: [...lexicalNodes],
+    nodes: [...blockEditorNodes],
     onError(error) {
       throw error;
     },
@@ -27,11 +28,14 @@ export function createMarkdownSyntaxSnapshot(markdown: string): MarkdownSyntaxSn
   const editor = createHeadlessMarkdownEditor();
   importMarkdownToEditor(editor, markdown);
   const editorState = editor.getEditorState();
-  const mdast = exportLexicalToMdast(editorState);
 
   return {
     lexical: editorState.toJSON(),
-    markdown: stringifyMdastToMarkdown(mdast),
-    mdast,
+    markdown: exportEditorStateToMarkdown(editorState),
+    semantic: exportLexicalToSemanticDocument(editorState),
   };
+}
+
+export function markdownToSemantic(markdown: string): SemanticDocument {
+  return mdastToSemanticDocument(parseMarkdownToMdast(markdown));
 }

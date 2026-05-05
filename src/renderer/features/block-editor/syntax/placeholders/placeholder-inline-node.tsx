@@ -10,40 +10,47 @@ import type { JSX } from "react";
 
 export type SerializedPlaceholderInlineNode = Spread<
   {
-    mdastType: string;
-    raw: string;
+    kind: string;
+    markdown: string;
+    metadata?: Record<string, unknown>;
   },
   SerializedLexicalNode
 >;
 
-function PlaceholderInline({ raw }: { raw: string }): JSX.Element {
+function PlaceholderInline({ markdown }: { markdown: string }): JSX.Element {
   return (
     <span className="block-editor__placeholder-inline" contentEditable={false}>
-      {raw}
+      {markdown}
     </span>
   );
 }
 
 export class PlaceholderInlineNode extends DecoratorNode<JSX.Element> {
-  __raw: string;
-  __mdastType: string;
+  __markdown: string;
+  __kind: string;
+  __metadata: Record<string, unknown> | undefined;
 
   static getType(): string {
     return "placeholder-inline";
   }
 
   static clone(node: PlaceholderInlineNode): PlaceholderInlineNode {
-    return new PlaceholderInlineNode(node.__raw, node.__mdastType, node.__key);
+    return new PlaceholderInlineNode(node.__markdown, node.__kind, node.__metadata, node.__key);
   }
 
   static importJSON(serializedNode: SerializedPlaceholderInlineNode): PlaceholderInlineNode {
-    return $createPlaceholderInlineNode(serializedNode.raw, serializedNode.mdastType);
+    return $createPlaceholderInlineNode(
+      serializedNode.markdown,
+      serializedNode.kind,
+      serializedNode.metadata,
+    );
   }
 
-  constructor(raw: string, mdastType: string, key?: NodeKey) {
+  constructor(markdown: string, kind: string, metadata?: Record<string, unknown>, key?: NodeKey) {
     super(key);
-    this.__raw = raw;
-    this.__mdastType = mdastType;
+    this.__markdown = markdown;
+    this.__kind = kind;
+    this.__metadata = metadata;
   }
 
   createDOM(_: EditorConfig): HTMLElement {
@@ -56,24 +63,29 @@ export class PlaceholderInlineNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(): JSX.Element {
-    return <PlaceholderInline raw={this.__raw} />;
+    return <PlaceholderInline markdown={this.__markdown} />;
   }
 
   exportJSON(): SerializedPlaceholderInlineNode {
     return {
-      mdastType: this.__mdastType,
-      raw: this.__raw,
+      kind: this.__kind,
+      markdown: this.__markdown,
+      ...(this.__metadata ? { metadata: this.__metadata } : {}),
       type: "placeholder-inline",
       version: 1,
     };
   }
 
-  getRawMarkdown(): string {
-    return this.__raw;
+  getMarkdown(): string {
+    return this.__markdown;
   }
 
-  getMdastType(): string {
-    return this.__mdastType;
+  getKind(): string {
+    return this.__kind;
+  }
+
+  getMetadata(): Record<string, unknown> | undefined {
+    return this.__metadata;
   }
 
   isInline(): true {
@@ -82,10 +94,11 @@ export class PlaceholderInlineNode extends DecoratorNode<JSX.Element> {
 }
 
 export function $createPlaceholderInlineNode(
-  raw: string,
-  mdastType: string,
+  markdown: string,
+  kind: string,
+  metadata?: Record<string, unknown>,
 ): PlaceholderInlineNode {
-  return new PlaceholderInlineNode(raw, mdastType);
+  return new PlaceholderInlineNode(markdown, kind, metadata);
 }
 
 export function $isPlaceholderInlineNode(
