@@ -115,7 +115,7 @@ describe("semantic mdast adapter", () => {
     expect(canonicalMarkdown).toContain("2. Fourth");
   });
 
-  it("removes task checked state from ordered lists", () => {
+  it("normalizes ordered task lists to task lists", () => {
     const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
       ["1. [x] Done", "2. Normal"].join("\n"),
     );
@@ -124,16 +124,15 @@ describe("semantic mdast adapter", () => {
     expect(firstSemantic.children[0]).toEqual(
       expect.objectContaining({
         children: [
-          expect.not.objectContaining({ checked: expect.any(Boolean) }),
-          expect.not.objectContaining({ checked: expect.any(Boolean) }),
+          expect.objectContaining({ checked: true }),
+          expect.objectContaining({ checked: false }),
         ],
-        ordered: true,
+        ordered: false,
         type: "list",
       }),
     );
-    expect(canonicalMarkdown).toContain("1. Done");
-    expect(canonicalMarkdown).toContain("2. Normal");
-    expect(canonicalMarkdown).not.toContain("1. [x] Done");
+    expect(canonicalMarkdown).toContain("- [x] Done");
+    expect(canonicalMarkdown).toContain("- [ ] Normal");
   });
 
   it("classifies block html as opaqueBlock", () => {

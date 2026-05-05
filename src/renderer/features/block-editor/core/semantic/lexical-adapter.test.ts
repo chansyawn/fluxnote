@@ -111,15 +111,18 @@ describe("semantic lexical adapter", () => {
     );
   });
 
-  it("removes ordered list checked state through Lexical normalization", () => {
+  it("normalizes ordered task lists through Lexical", () => {
     const semantic = markdownToSemantic(["1. [x] Done", "2. Normal"].join("\n"));
     const roundTripped = roundTripLexical(semantic);
 
     expect(roundTripped).toEqual(semantic);
-    expect(JSON.stringify(roundTripped)).not.toContain('"checked"');
     expect(roundTripped.children[0]).toEqual(
       expect.objectContaining({
-        ordered: true,
+        children: [
+          expect.objectContaining({ checked: true }),
+          expect.objectContaining({ checked: false }),
+        ],
+        ordered: false,
         type: "list",
       }),
     );

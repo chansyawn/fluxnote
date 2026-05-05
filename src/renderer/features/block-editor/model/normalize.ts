@@ -97,15 +97,8 @@ function normalizeListItem(item: SemanticListItem): SemanticListItem {
   };
 }
 
-function normalizeListItems(
-  children: ReadonlyArray<SemanticListItem>,
-  ordered: boolean,
-): SemanticListItem[] {
+function normalizeListItems(children: ReadonlyArray<SemanticListItem>): SemanticListItem[] {
   const normalized = children.map(normalizeListItem);
-  if (ordered) {
-    return normalized.map(({ children }) => ({ children, type: "listItem" }));
-  }
-
   if (!normalized.some((item) => typeof item.checked === "boolean")) {
     return normalized;
   }
@@ -132,12 +125,13 @@ function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
     case "blockquote":
       return [{ children: normalizeContainerChildren(node.children), type: "blockquote" }];
     case "list": {
-      const children = normalizeListItems(node.children, node.ordered);
+      const children = normalizeListItems(node.children);
+      const hasTaskItems = children.some((item) => typeof item.checked === "boolean");
       return children.length > 0
         ? [
             {
               children,
-              ordered: node.ordered,
+              ordered: hasTaskItems ? false : node.ordered,
               type: "list",
             },
           ]

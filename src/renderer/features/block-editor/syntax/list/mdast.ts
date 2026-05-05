@@ -2,6 +2,12 @@ import type { List, ListContent, ListItem, RootContent } from "mdast";
 
 import type { SemanticBlock, SemanticList, SemanticListItem } from "../../model";
 
+export const EMPTY_TASK_ITEM_PLACEHOLDER = "\u00A0";
+
+function hasVisibleChildren(children: ListItem["children"]): boolean {
+  return children.some((child) => child.type !== "paragraph" || child.children.length > 0);
+}
+
 export function listItemFromMdast(
   node: ListItem,
   readBlocks: (children: ReadonlyArray<RootContent>) => SemanticBlock[],
@@ -28,9 +34,20 @@ export function listItemToMdast(
   item: SemanticListItem,
   writeBlocks: (children: ReadonlyArray<SemanticBlock>) => ListItem["children"],
 ): ListItem {
+  const children = writeBlocks(item.children);
+  const isTaskItem = typeof item.checked === "boolean";
+
   return {
-    checked: typeof item.checked === "boolean" ? item.checked : null,
-    children: writeBlocks(item.children),
+    checked: isTaskItem ? item.checked : null,
+    children:
+      isTaskItem && !hasVisibleChildren(children)
+        ? [
+            {
+              children: [{ type: "text", value: EMPTY_TASK_ITEM_PLACEHOLDER }],
+              type: "paragraph",
+            },
+          ]
+        : children,
     spread: item.children.length > 1,
     type: "listItem",
   };

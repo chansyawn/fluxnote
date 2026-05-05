@@ -5,6 +5,8 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
+import { EMPTY_TASK_ITEM_PLACEHOLDER } from "../syntax/list/mdast";
+
 const MARKDOWN_PARSER = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
 
 const MARKDOWN_STRINGIFIER = unified().use(remarkGfm).use(remarkMath).use(remarkStringify, {
@@ -22,5 +24,7 @@ export function parseMarkdownToMdast(markdown: string): Root {
 }
 
 export function stringifyMdastToMarkdown(mdast: Root): string {
-  return String(MARKDOWN_STRINGIFIER.stringify(mdast));
+  return String(MARKDOWN_STRINGIFIER.stringify(mdast))
+    .replace(new RegExp(`^(\\s*[-*+] \\[[ x]\\]) ${EMPTY_TASK_ITEM_PLACEHOLDER}$`, "gm"), "$1")
+    .replace(/^(\s*)\* (\[[ x]\] )/gm, "$1- $2");
 }

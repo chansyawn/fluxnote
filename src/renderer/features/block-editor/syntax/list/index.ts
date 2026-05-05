@@ -1,10 +1,12 @@
 import { ListItemNode, ListNode } from "@lexical/list";
 import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { createElement } from "react";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
+import { TaskListShortcutPlugin } from "./task-list-shortcut-plugin";
 
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
 export { listFromMdast, listItemFromMdast, listItemToMdast, listToMdast } from "./mdast";
@@ -21,6 +23,11 @@ export const LIST_SYNTAX = {
       key: "list",
       shouldPreserveNumbering: true,
     }),
+    createElement(CheckListPlugin, {
+      disableTakeFocusOnClick: true,
+      key: "check-list",
+    }),
+    createElement(TaskListShortcutPlugin, { key: "task-list-shortcut" }),
   ],
   semanticTypes: ["list", "listItem"],
   theme: {

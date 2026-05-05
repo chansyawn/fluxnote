@@ -28,6 +28,26 @@
   @apply my-1;
 }
 
+.block-editor__list-item--checked,
+.block-editor__list-item--unchecked {
+  @apply relative list-none ps-6 outline-none;
+}
+
+.block-editor__list-item--checked::before,
+.block-editor__list-item--unchecked::before {
+  @apply border-muted-foreground/70 bg-background text-primary absolute inset-s-0 top-[0.35em] size-3.5 rounded-[3px] border text-[10px] leading-[12px];
+  content: "";
+}
+
+.block-editor__list-item--checked::before {
+  @apply border-primary bg-primary/10 text-center;
+  content: "✓";
+}
+
+.block-editor__list-item--checked {
+  @apply text-muted-foreground;
+}
+
 .block-editor__list-item::marker {
   @apply text-muted-foreground;
 }
