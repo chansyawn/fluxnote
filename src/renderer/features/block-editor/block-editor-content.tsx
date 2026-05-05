@@ -12,7 +12,7 @@ import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 import { exportEditorStateToMarkdown } from "./core/editor-state";
 import { blockEditorPlugins } from "./core/runtime";
 import { markdownShortcutTransformers } from "./core/shortcuts";
-import type { BlockEditorHandle } from "./index";
+import type { BlockEditorHandle } from "./types";
 
 interface BlockEditorContentProps {
   initialMarkdown: string;

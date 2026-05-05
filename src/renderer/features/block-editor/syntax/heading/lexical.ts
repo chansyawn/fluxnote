@@ -1,7 +1,7 @@
 import { $createHeadingNode, type HeadingTagType } from "@lexical/rich-text";
 import type { LexicalNode } from "lexical";
 
-import type { HeadingDepth, SemanticHeading, SemanticInline } from "../../core/semantic/document";
+import type { HeadingDepth, SemanticHeading, SemanticInline } from "../../model";
 
 export function toHeadingTag(depth: HeadingDepth): HeadingTagType {
   return `h${depth}` as HeadingTagType;

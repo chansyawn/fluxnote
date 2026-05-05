@@ -1,11 +1,6 @@
 import type { Delete, Emphasis, Strong } from "mdast";
 
-import type {
-  SemanticDelete,
-  SemanticEmphasis,
-  SemanticInline,
-  SemanticStrong,
-} from "../../core/semantic/document";
+import type { SemanticDelete, SemanticEmphasis, SemanticInline, SemanticStrong } from "../../model";
 
 export function emphasisFromMdast(
   node: Emphasis,

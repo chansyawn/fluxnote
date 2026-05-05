@@ -1,7 +1,7 @@
 import { $createHorizontalRuleNode, type HorizontalRuleNode } from "@lexical/extension";
 import type { LexicalNode } from "lexical";
 
-import type { SemanticThematicBreak } from "../../core/semantic/document";
+import type { SemanticThematicBreak } from "../../model";
 
 export function thematicBreakToLexical(): LexicalNode {
   return $createHorizontalRuleNode();

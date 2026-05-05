@@ -1,6 +1,6 @@
 import type { Code } from "mdast";
 
-import type { SemanticCodeBlock } from "../../core/semantic/document";
+import type { SemanticCodeBlock } from "../../model";
 
 export function codeBlockFromMdast(node: Code): SemanticCodeBlock {
   return {

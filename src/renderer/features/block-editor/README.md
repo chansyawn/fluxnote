@@ -20,13 +20,15 @@ Lexical is used for selection, composition, undo/redo, DOM reconciliation, keybo
 
 ## Core Layer
 
-- `markdown-processor.ts` parses Markdown to mdast and stringifies mdast to canonical Markdown.
-- `semantic/document.ts` defines the internal Markdown semantic document.
-- `semantic/normalize.ts` keeps structural repair centralized.
+- `model/document.ts` defines the internal Markdown semantic document.
+- `model/normalize.ts` keeps structural repair centralized.
+- `markdown/processor.ts` parses Markdown to mdast and stringifies mdast to canonical Markdown.
+- `markdown/mdast-utils.ts` contains mdast boundary helpers used by opaque placeholders.
 - `semantic/mdast-adapter.ts` converts between mdast and semantic documents.
 - `semantic/lexical-adapter.ts` projects semantic documents into Lexical and reads semantic documents back.
-- `runtime.tsx` lists Lexical nodes, theme classes, and required React plugins.
+- `runtime/` lists Lexical nodes, theme classes, and required React plugins.
 - `shortcuts.ts` contains live Markdown shortcuts only.
+- `syntax/` is organized as light vertical slices, with explicit local entries and capability entries for mdast, Lexical, shortcuts, and nodes.
 
 Unsupported syntax is represented by opaque inline/block placeholder nodes. Placeholders store `kind`, canonical `markdown`, and optional metadata; they do not store source offsets or original Markdown slices.
 

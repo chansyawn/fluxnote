@@ -1,6 +1,6 @@
 import type { List, ListContent, ListItem, RootContent } from "mdast";
 
-import type { SemanticBlock, SemanticList, SemanticListItem } from "../../core/semantic/document";
+import type { SemanticBlock, SemanticList, SemanticListItem } from "../../model";
 
 export function listItemFromMdast(
   node: ListItem,

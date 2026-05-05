@@ -1,6 +1,6 @@
 import type { ThematicBreak } from "mdast";
 
-import type { SemanticThematicBreak } from "../../core/semantic/document";
+import type { SemanticThematicBreak } from "../../model";
 
 export function thematicBreakFromMdast(): SemanticThematicBreak {
   return { type: "thematicBreak" };

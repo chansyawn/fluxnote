@@ -1,6 +1,6 @@
 import type { Heading } from "mdast";
 
-import type { HeadingDepth, SemanticHeading, SemanticInline } from "../../core/semantic/document";
+import type { HeadingDepth, SemanticHeading, SemanticInline } from "../../model";
 
 function toHeadingDepth(depth: number): HeadingDepth {
   return Math.min(Math.max(Math.trunc(depth), 1), 6) as HeadingDepth;

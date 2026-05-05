@@ -10,4 +10,17 @@ export {
   PlaceholderInlineNode,
   type SerializedPlaceholderInlineNode,
 } from "./placeholder-inline-node";
+export {
+  opaqueBlockFromLexical,
+  opaqueBlockToLexical,
+  opaqueInlineFromLexical,
+  opaqueInlineToLexical,
+} from "./lexical";
+export {
+  opaqueBlockFromMdast,
+  opaqueBlockToMdast,
+  opaqueInlineFallbackParagraph,
+  opaqueInlineFromMdast,
+  opaqueInlineToMdast,
+} from "./mdast";
 export { createPlaceholderPayload, type PlaceholderPayload } from "./placeholder-payload";

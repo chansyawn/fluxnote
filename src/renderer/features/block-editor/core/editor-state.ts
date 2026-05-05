@@ -1,6 +1,6 @@
 import { createEditor, type EditorState, type LexicalEditor } from "lexical";
 
-import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "./markdown-processor";
+import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
 import { blockEditorNodes } from "./runtime";
 import {
   exportLexicalToSemanticDocument,

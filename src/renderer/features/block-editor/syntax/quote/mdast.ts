@@ -1,6 +1,6 @@
 import type { Blockquote, RootContent } from "mdast";
 
-import type { SemanticBlock, SemanticBlockquote } from "../../core/semantic/document";
+import type { SemanticBlock, SemanticBlockquote } from "../../model";
 
 export function quoteFromMdast(
   node: Blockquote,

@@ -1,6 +1,6 @@
 import type { Paragraph } from "mdast";
 
-import type { SemanticInline, SemanticParagraph } from "../../core/semantic/document";
+import type { SemanticInline, SemanticParagraph } from "../../model";
 
 export function paragraphFromMdast(
   node: Paragraph,

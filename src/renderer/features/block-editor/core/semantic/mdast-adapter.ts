@@ -8,30 +8,35 @@ import type {
   Text,
 } from "mdast";
 
-import { codeBlockFromMdast, codeBlockToMdast } from "../../syntax/code/mdast";
-import { headingFromMdast, headingToMdast } from "../../syntax/heading/mdast";
+import type { SemanticBlock, SemanticDocument, SemanticInline } from "../../model";
+import { normalizeSemanticDocument } from "../../model";
 import {
+  codeBlockFromMdast,
+  codeBlockToMdast,
   deleteFromMdast,
   deleteToMdast,
   emphasisFromMdast,
   emphasisToMdast,
-  strongFromMdast,
-  strongToMdast,
-} from "../../syntax/inline-mark/mdast";
-import { linkFromMdast, linkToMdast } from "../../syntax/link/mdast";
-import { listFromMdast, listToMdast } from "../../syntax/list/mdast";
-import { paragraphFromMdast, paragraphToMdast } from "../../syntax/paragraph/mdast";
-import {
+  headingFromMdast,
+  headingToMdast,
+  linkFromMdast,
+  linkToMdast,
+  listFromMdast,
+  listToMdast,
   opaqueBlockFromMdast,
   opaqueBlockToMdast,
+  opaqueInlineFallbackParagraph,
   opaqueInlineFromMdast,
   opaqueInlineToMdast,
-  opaqueInlineFallbackParagraph,
-} from "../../syntax/placeholders/mdast";
-import { quoteFromMdast, quoteToMdast } from "../../syntax/quote/mdast";
-import { thematicBreakFromMdast, thematicBreakToMdast } from "../../syntax/thematic-break/mdast";
-import type { SemanticBlock, SemanticDocument, SemanticInline } from "./document";
-import { normalizeSemanticDocument } from "./normalize";
+  paragraphFromMdast,
+  paragraphToMdast,
+  quoteFromMdast,
+  quoteToMdast,
+  strongFromMdast,
+  strongToMdast,
+  thematicBreakFromMdast,
+  thematicBreakToMdast,
+} from "../../syntax/mdast";
 
 function inlineFromMdast(node: PhrasingContent): SemanticInline[] {
   switch (node.type) {

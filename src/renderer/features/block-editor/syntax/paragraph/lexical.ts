@@ -1,6 +1,6 @@
 import { $createParagraphNode, type LexicalNode } from "lexical";
 
-import type { SemanticInline, SemanticParagraph } from "../../core/semantic/document";
+import type { SemanticInline, SemanticParagraph } from "../../model";
 
 export function paragraphToLexical(
   node: SemanticParagraph,

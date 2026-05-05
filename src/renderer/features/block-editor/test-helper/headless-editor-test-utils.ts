@@ -2,11 +2,11 @@ import { createHeadlessEditor } from "@lexical/headless";
 import type { LexicalEditor, SerializedEditorState } from "lexical";
 
 import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/editor-state";
-import { parseMarkdownToMdast } from "../core/markdown-processor";
 import { blockEditorNodes } from "../core/runtime";
-import type { SemanticDocument } from "../core/semantic/document";
 import { exportLexicalToSemanticDocument } from "../core/semantic/lexical-adapter";
 import { mdastToSemanticDocument } from "../core/semantic/mdast-adapter";
+import { parseMarkdownToMdast } from "../markdown/processor";
+import type { SemanticDocument } from "../model";
 
 export interface MarkdownSyntaxSnapshot {
   lexical: SerializedEditorState;

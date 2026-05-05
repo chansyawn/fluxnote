@@ -1,7 +1,7 @@
 import { $createCodeNode, type CodeNode } from "@lexical/code";
 import { $createTextNode, type LexicalNode } from "lexical";
 
-import type { SemanticCodeBlock } from "../../core/semantic/document";
+import type { SemanticCodeBlock } from "../../model";
 
 export function codeBlockToLexical(node: SemanticCodeBlock): LexicalNode {
   const code = $createCodeNode(node.lang ?? undefined);

@@ -1,6 +1,6 @@
 import type { LexicalNode } from "lexical";
 
-import type { SemanticOpaqueBlock, SemanticOpaqueInline } from "../../core/semantic/document";
+import type { SemanticOpaqueBlock, SemanticOpaqueInline } from "../../model";
 import { $createPlaceholderBlockNode, type PlaceholderBlockNode } from "./placeholder-block-node";
 import {
   $createPlaceholderInlineNode,

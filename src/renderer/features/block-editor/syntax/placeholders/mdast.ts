@@ -1,13 +1,13 @@
 import type { BlockContent, Paragraph, PhrasingContent, RootContent } from "mdast";
 
-import type { SemanticOpaqueBlock, SemanticOpaqueInline } from "../../core/semantic/document";
 import {
   canonicalMarkdownForInline,
   canonicalMarkdownForNode,
   isFlowBlockContent,
   isPhrasingContent,
   parseOpaqueMarkdown,
-} from "../../core/semantic/mdast-utils";
+} from "../../markdown/mdast-utils";
+import type { SemanticOpaqueBlock, SemanticOpaqueInline } from "../../model";
 
 export function opaqueBlockFromMdast(node: RootContent): SemanticOpaqueBlock {
   return {

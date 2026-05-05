@@ -6,19 +6,8 @@ import { useMemo, useRef } from "react";
 import { BlockEditorContent } from "./block-editor-content";
 import { importMarkdownToEditor } from "./core/editor-state";
 import { blockEditorNodes, blockEditorTheme } from "./core/runtime";
-
-export interface BlockEditorHandle {
-  copy: () => Promise<void>;
-  focus: () => void;
-}
-
-interface BlockEditorProps {
-  ref?: React.Ref<BlockEditorHandle>;
-  blockId: string;
-  initialMarkdown: string;
-  onMarkdownUpdated: (markdown: string) => void;
-  onBlur?: () => void;
-}
+import type { BlockEditorProps } from "./types";
+export type { BlockEditorHandle, BlockEditorProps } from "./types";
 
 export function BlockEditor({
   ref,

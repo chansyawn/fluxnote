@@ -1,6 +1,6 @@
 import type { BlockContent, Paragraph, PhrasingContent, Root, RootContent } from "mdast";
 
-import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown-processor";
+import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "./processor";
 
 export function fallbackMarkdown(kind: string): string {
   return `<!-- unsupported:${kind} -->`;

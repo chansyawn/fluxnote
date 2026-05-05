@@ -1,40 +1,4 @@
-import "../syntax/code/index.css";
-import "../syntax/heading/index.css";
-import "../syntax/inline-mark/index.css";
-import "../syntax/link/index.css";
-import "../syntax/list/index.css";
-import "../syntax/paragraph/index.css";
-import "../syntax/placeholders/index.css";
-import "../syntax/quote/index.css";
-import "../syntax/thematic-break/index.css";
-import { CodeNode } from "@lexical/code";
-import { HorizontalRuleNode } from "@lexical/extension";
-import { LinkNode } from "@lexical/link";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import type { EditorThemeClasses, LexicalNodeConfig } from "lexical";
-import type { ReactNode } from "react";
-
-import { PlaceholderBlockNode, PlaceholderInlineNode } from "../syntax/placeholders";
-
-export const blockEditorNodes: ReadonlyArray<LexicalNodeConfig> = [
-  CodeNode,
-  HorizontalRuleNode,
-  HeadingNode,
-  LinkNode,
-  ListNode,
-  ListItemNode,
-  QuoteNode,
-  PlaceholderBlockNode,
-  PlaceholderInlineNode,
-];
-
-export const blockEditorPlugins: ReadonlyArray<ReactNode> = [
-  <ListPlugin hasStrictIndent={false} key="list" shouldPreserveNumbering />,
-  <LinkPlugin key="link" />,
-];
+import type { EditorThemeClasses } from "lexical";
 
 export const blockEditorTheme: EditorThemeClasses = {
   code: "block-editor__code",

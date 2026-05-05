@@ -7,7 +7,7 @@ import {
 } from "@lexical/list";
 import type { LexicalNode } from "lexical";
 
-import type { SemanticBlock, SemanticList, SemanticListItem } from "../../core/semantic/document";
+import type { SemanticBlock, SemanticList, SemanticListItem } from "../../model";
 
 export function listItemToLexical(
   item: SemanticListItem,

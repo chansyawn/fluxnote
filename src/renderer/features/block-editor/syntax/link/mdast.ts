@@ -1,6 +1,6 @@
 import type { Link } from "mdast";
 
-import type { SemanticInline, SemanticLink } from "../../core/semantic/document";
+import type { SemanticInline, SemanticLink } from "../../model";
 
 export function linkFromMdast(
   node: Link,

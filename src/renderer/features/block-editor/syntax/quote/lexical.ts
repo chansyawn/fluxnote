@@ -1,7 +1,7 @@
 import { $createQuoteNode, type QuoteNode } from "@lexical/rich-text";
 import type { LexicalNode } from "lexical";
 
-import type { SemanticBlock, SemanticBlockquote } from "../../core/semantic/document";
+import type { SemanticBlock, SemanticBlockquote } from "../../model";
 
 export function quoteToLexical(
   node: SemanticBlockquote,
