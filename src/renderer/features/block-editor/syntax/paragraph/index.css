@@ -1,7 +1,7 @@
 @reference "#global.css";
 
 .block-editor__paragraph {
-  @apply leading-normal;
+  @apply my-2 leading-normal first:mt-0 last:mb-0;
 }
 
 .block-editor__inline-code {

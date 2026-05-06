@@ -140,4 +140,24 @@ describe("semantic lexical adapter", () => {
     expect(JSON.stringify(roundTripped)).toContain('"type":"emphasis"');
     expect(JSON.stringify(roundTripped)).toContain('"type":"delete"');
   });
+
+  it("keeps soft and hard breaks distinct through Lexical", () => {
+    const semantic = normalizeSemanticDocument({
+      children: [
+        {
+          children: [
+            { type: "text", value: "Alpha" },
+            { type: "softBreak" },
+            { type: "text", value: "Beta" },
+            { type: "hardBreak" },
+            { type: "text", value: "Gamma" },
+          ],
+          type: "paragraph",
+        },
+      ],
+      type: "root",
+    });
+
+    expect(roundTripLexical(semantic)).toEqual(semantic);
+  });
 });

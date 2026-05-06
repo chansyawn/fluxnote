@@ -2,6 +2,7 @@ import type { Transformer } from "@lexical/markdown";
 import type { EditorThemeClasses, LexicalNodeConfig } from "lexical";
 import type { ReactNode } from "react";
 
+import { BREAK_SYNTAX } from "./break";
 import { CODE_SYNTAX } from "./code";
 import { HEADING_SYNTAX } from "./heading";
 import { INLINE_MARK_SYNTAX } from "./inline-mark";
@@ -14,6 +15,7 @@ import type { SyntaxRegistration, SyntaxRegistrationId } from "./registration";
 import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
 
 const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
+  BREAK_SYNTAX,
   HEADING_SYNTAX,
   QUOTE_SYNTAX,
   LIST_SYNTAX,
@@ -26,6 +28,7 @@ const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
 ] satisfies ReadonlyArray<SyntaxRegistration>;
 
 const SYNTAX_NODE_REGISTRATION_ORDER = [
+  "break",
   "code",
   "thematic-break",
   "heading",

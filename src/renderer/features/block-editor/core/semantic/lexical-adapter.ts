@@ -25,6 +25,7 @@ import type {
   SemanticListItem,
 } from "../../model";
 import { normalizeSemanticDocument } from "../../model";
+import { $createSoftBreakNode, $isSoftBreakNode } from "../../syntax/break";
 import { codeBlockFromLexical, codeBlockToLexical } from "../../syntax/code";
 import { headingTagToDepth, headingToLexical } from "../../syntax/heading";
 import { listFromLexical, listItemFromLexical, listToLexical } from "../../syntax/list";
@@ -49,13 +50,32 @@ function applyTextFormats(node: TextNode, formats: ReadonlyArray<TextFormatType>
   return node;
 }
 
+function textToLexicalNodes(value: string, formats: ReadonlyArray<TextFormatType>): LexicalNode[] {
+  const parts = value.split("\n");
+  const nodes: LexicalNode[] = [];
+
+  parts.forEach((part, index) => {
+    if (index > 0) {
+      nodes.push($createSoftBreakNode());
+    }
+
+    if (part.length > 0) {
+      nodes.push(applyTextFormats($createTextNode(part), formats));
+    }
+  });
+
+  return nodes;
+}
+
 function inlineToLexical(
   node: SemanticInline,
   formats: ReadonlyArray<TextFormatType> = [],
 ): LexicalNode[] {
   switch (node.type) {
     case "text":
-      return node.value.length > 0 ? [applyTextFormats($createTextNode(node.value), formats)] : [];
+      return textToLexicalNodes(node.value, formats);
+    case "softBreak":
+      return [$createSoftBreakNode()];
     case "hardBreak":
       return [$createLineBreakNode()];
     case "emphasis":
@@ -97,31 +117,48 @@ function blockToLexical(node: SemanticBlock): LexicalNode[] {
   }
 }
 
+function applyInlineFormats(node: SemanticInline, textNode: TextNode): SemanticInline {
+  let current = node;
+  if (textNode.hasFormat("bold")) {
+    current = { children: [current], type: "strong" };
+  }
+  if (textNode.hasFormat("italic")) {
+    current = { children: [current], type: "emphasis" };
+  }
+  if (textNode.hasFormat("strikethrough")) {
+    current = { children: [current], type: "delete" };
+  }
+
+  return current;
+}
+
 function textToInline(node: TextNode): SemanticInline[] {
   const value = node.getTextContent();
   if (value.length === 0) {
     return [];
   }
 
-  let current: SemanticInline = node.hasFormat("code")
-    ? { type: "inlineCode", value }
-    : { type: "text", value };
-  if (node.hasFormat("bold")) {
-    current = { children: [current], type: "strong" };
-  }
-  if (node.hasFormat("italic")) {
-    current = { children: [current], type: "emphasis" };
-  }
-  if (node.hasFormat("strikethrough")) {
-    current = { children: [current], type: "delete" };
-  }
+  return value.split("\n").flatMap((part, index): SemanticInline[] => {
+    const inlines: SemanticInline[] = index > 0 ? [{ type: "softBreak" }] : [];
+    if (part.length === 0) {
+      return inlines;
+    }
 
-  return [current];
+    const textInline: SemanticInline = node.hasFormat("code")
+      ? { type: "inlineCode", value: part }
+      : { type: "text", value: part };
+    inlines.push(applyInlineFormats(textInline, node));
+    return inlines;
+  });
 }
 
 function inlineFromLexical(node: LexicalNode): SemanticInline[] {
   if ($isTextNode(node)) {
     return textToInline(node);
+  }
+
+  if ($isSoftBreakNode(node)) {
+    return [{ type: "softBreak" }];
   }
 
   if ($isLineBreakNode(node)) {

@@ -7,7 +7,7 @@ export { paragraphFromMdast, paragraphToMdast } from "./mdast";
 export const PARAGRAPH_SYNTAX = {
   id: "paragraph",
   mdastTypes: ["paragraph"],
-  semanticTypes: ["paragraph", "text", "hardBreak"],
+  semanticTypes: ["paragraph", "text"],
   theme: {
     paragraph: "block-editor__paragraph",
   },

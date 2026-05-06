@@ -16,6 +16,7 @@ export type {
   SemanticOpaqueBlock,
   SemanticOpaqueInline,
   SemanticParagraph,
+  SemanticSoftBreak,
   SemanticStrong,
   SemanticText,
   SemanticThematicBreak,

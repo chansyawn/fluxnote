@@ -196,6 +196,36 @@ describe("semantic mdast adapter", () => {
     expect(canonicalMarkdown).toContain("`code`");
   });
 
+  it("classifies plain markdown newlines as soft breaks", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic("Alpha\nBeta");
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual({
+      children: [
+        { type: "text", value: "Alpha" },
+        { type: "softBreak" },
+        { type: "text", value: "Beta" },
+      ],
+      type: "paragraph",
+    });
+    expect(canonicalMarkdown).toBe("Alpha\nBeta\n");
+  });
+
+  it("keeps markdown hard breaks distinct from soft breaks", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic("Alpha\\\nBeta");
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual({
+      children: [
+        { type: "text", value: "Alpha" },
+        { type: "hardBreak" },
+        { type: "text", value: "Beta" },
+      ],
+      type: "paragraph",
+    });
+    expect(canonicalMarkdown).toBe("Alpha\\\nBeta\n");
+  });
+
   it("roundtrips nested quote list and task list semantics", () => {
     const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
       [

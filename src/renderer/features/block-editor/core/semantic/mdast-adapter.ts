@@ -33,10 +33,27 @@ import {
 import { quoteFromMdast, quoteToMdast } from "../../syntax/quote";
 import { thematicBreakFromMdast, thematicBreakToMdast } from "../../syntax/thematic-break";
 
+function textFromMdast(value: string): SemanticInline[] {
+  const parts = value.split("\n");
+  const inlines: SemanticInline[] = [];
+
+  parts.forEach((part, index) => {
+    if (index > 0) {
+      inlines.push({ type: "softBreak" });
+    }
+
+    if (part.length > 0) {
+      inlines.push({ type: "text", value: part });
+    }
+  });
+
+  return inlines;
+}
+
 function inlineFromMdast(node: PhrasingContent): SemanticInline[] {
   switch (node.type) {
     case "text":
-      return [{ type: "text", value: node.value }];
+      return textFromMdast(node.value);
     case "break":
       return [{ type: "hardBreak" }];
     case "emphasis":
@@ -87,6 +104,8 @@ function inlineToMdast(node: SemanticInline): PhrasingContent[] {
   switch (node.type) {
     case "text":
       return [{ type: "text", value: node.value } satisfies Text];
+    case "softBreak":
+      return [{ type: "text", value: "\n" } satisfies Text];
     case "hardBreak":
       return [{ type: "break" } satisfies Break];
     case "emphasis":

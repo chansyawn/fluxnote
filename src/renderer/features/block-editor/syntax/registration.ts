@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { SemanticBlock, SemanticInline, SemanticListItem } from "../model";
 
 export type SyntaxRegistrationId =
+  | "break"
   | "code"
   | "heading"
   | "inline-mark"
