@@ -10,6 +10,10 @@ const MAIN_WINDOW_MAX_WIDTH = 640;
 const MAIN_WINDOW_MIN_WIDTH = 320;
 const MAIN_WINDOW_WIDTH = 640;
 const MAIN_WINDOW_VIBRANCY = "under-window" as const;
+const MAIN_WINDOW_WORKSPACE_OPTIONS = {
+  visibleOnFullScreen: true,
+  skipTransformProcessType: true,
+} as const;
 
 interface WindowManagerServices {
   emitEvent: EventBus["emit"];
@@ -31,6 +35,14 @@ export interface WindowManager {
 export function createWindowManager(services: WindowManagerServices): WindowManager {
   let mainWindow: BrowserWindow | null = null;
   let isQuitting = false;
+
+  function keepWindowVisibleAcrossWorkspaces(window: BrowserWindow): void {
+    if (process.platform !== "darwin") {
+      return;
+    }
+
+    window.setVisibleOnAllWorkspaces(true, MAIN_WINDOW_WORKSPACE_OPTIONS);
+  }
 
   function getMainWindow(): BrowserWindow | null {
     if (mainWindow?.isDestroyed()) {
@@ -56,8 +68,10 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     if (!currentWindow.isVisible()) {
       const { x, y } = calculateWindowPosition(currentWindow);
       currentWindow.setPosition(x, y);
+      keepWindowVisibleAcrossWorkspaces(currentWindow);
       currentWindow.show();
     }
+    keepWindowVisibleAcrossWorkspaces(currentWindow);
     currentWindow.focus();
   }
 
@@ -145,7 +159,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     });
     mainWindow = createdWindow;
 
-    createdWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    keepWindowVisibleAcrossWorkspaces(createdWindow);
 
     createdWindow.on("close", (event) => {
       if (isQuitting) {

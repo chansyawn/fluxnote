@@ -3,6 +3,15 @@ import { app } from "electron";
 import { registerPrivilegedSchemes } from "./protocols";
 import { createBackendRuntime } from "./runtime";
 
+function configureMacOSAppBehavior(): void {
+  if (process.platform !== "darwin") {
+    return;
+  }
+
+  app.setActivationPolicy("accessory");
+  app.dock?.hide();
+}
+
 export function startPrimaryInstance(): void {
   registerPrivilegedSchemes();
 
@@ -18,7 +27,7 @@ export function startPrimaryInstance(): void {
   });
 
   void app.whenReady().then(async () => {
-    app.dock?.hide();
+    configureMacOSAppBehavior();
     await runtime.start();
 
     app.on("activate", () => {

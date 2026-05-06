@@ -72,6 +72,7 @@ const mocks = vi.hoisted(() => {
     BrowserWindow: FakeBrowserWindow,
     appFocus: vi.fn(),
     appQuit: vi.fn(),
+    setActivationPolicy: vi.fn(),
     emitEvent: vi.fn(() => true),
     onAutoArchiveTrigger: vi.fn(),
     onOpenBlockReady: vi.fn(),
@@ -98,6 +99,7 @@ import { createWindowManager } from "./manager";
 describe("window manager", () => {
   beforeEach(() => {
     vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
+    vi.stubGlobal("process", process);
     mocks.BrowserWindow.instances.length = 0;
     mocks.appFocus.mockReset();
     mocks.appQuit.mockReset();
@@ -132,6 +134,40 @@ describe("window manager", () => {
     expect(mocks.onAutoArchiveTrigger).toHaveBeenCalledWith(false);
     expect(mocks.onAutoArchiveTrigger).toHaveBeenCalledWith(true);
     expect(mocks.onOpenBlockReady).toHaveBeenCalled();
+  });
+
+  it("keeps the main window visible across macOS workspaces", () => {
+    const platform = process.platform;
+    Object.defineProperty(process, "platform", {
+      configurable: true,
+      value: "darwin",
+    });
+
+    try {
+      const manager = createWindowManager({
+        emitEvent: mocks.emitEvent,
+        onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onOpenBlockReady: mocks.onOpenBlockReady,
+      });
+
+      manager.createMainWindow();
+      const win = mocks.BrowserWindow.instances[0];
+      expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledWith(true, {
+        visibleOnFullScreen: true,
+        skipTransformProcessType: true,
+      });
+
+      win.visible = false;
+      manager.showMainWindow();
+
+      expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledTimes(3);
+      expect(win.show).toHaveBeenCalled();
+    } finally {
+      Object.defineProperty(process, "platform", {
+        configurable: true,
+        value: platform,
+      });
+    }
   });
 
   it("toggles and quits via manager", () => {

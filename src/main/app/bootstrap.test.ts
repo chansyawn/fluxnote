@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   createBackendRuntime: vi.fn(),
   dockHide: vi.fn(),
+  setActivationPolicy: vi.fn(),
   on: vi.fn(),
   registerPrivilegedSchemes: vi.fn(),
   whenReady: vi.fn(() => Promise.resolve()),
@@ -11,6 +12,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("electron", () => ({
   app: {
     dock: { hide: mocks.dockHide },
+    setActivationPolicy: mocks.setActivationPolicy,
     on: mocks.on,
     whenReady: mocks.whenReady,
   },
@@ -48,6 +50,7 @@ describe("startPrimaryInstance", () => {
     await Promise.resolve();
     await Promise.resolve();
 
+    expect(mocks.setActivationPolicy).toHaveBeenCalledWith("accessory");
     expect(mocks.dockHide).toHaveBeenCalledTimes(1);
     expect(runtime.start).toHaveBeenCalledTimes(1);
     expect(mocks.on).toHaveBeenCalledWith("activate", expect.any(Function));
