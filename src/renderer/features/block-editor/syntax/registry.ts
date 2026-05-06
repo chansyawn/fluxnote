@@ -86,7 +86,8 @@ export const MARKDOWN_SHORTCUT_TRANSFORMERS: Transformer[] = SYNTAX_REGISTRY.fla
 );
 
 export const SYNTAX_RUNTIME_PLUGINS: ReadonlyArray<ReactNode> = SYNTAX_REGISTRY.flatMap(
-  (syntax): ReactNode[] => syntax.runtimePlugins?.() ?? [],
+  (syntax): ReactNode[] =>
+    syntax.runtimePlugins?.({ markdownShortcuts: MARKDOWN_SHORTCUT_TRANSFORMERS }) ?? [],
 );
 
 export const SYNTAX_THEME: EditorThemeClasses = mergeThemeFragments(SYNTAX_REGISTRY);

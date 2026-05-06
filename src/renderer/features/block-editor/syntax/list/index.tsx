@@ -5,6 +5,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
+import { ListKeyboardPlugin } from "./list-keyboard-plugin";
 import { TaskListShortcutPlugin } from "./task-list-shortcut-plugin";
 
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
@@ -16,10 +17,11 @@ export const LIST_SYNTAX = {
   mdastTypes: ["list", "listItem"],
   nodes: [ListNode, ListItemNode],
   markdownShortcuts: [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST],
-  runtimePlugins: () => [
+  runtimePlugins: ({ markdownShortcuts }) => [
     <ListPlugin key="list" hasStrictIndent={false} shouldPreserveNumbering />,
     <CheckListPlugin key="check-list" disableTakeFocusOnClick />,
     <TaskListShortcutPlugin key="task-list-shortcut" />,
+    <ListKeyboardPlugin key="list-keyboard" markdownShortcuts={markdownShortcuts} />,
   ],
   semanticTypes: ["list", "listItem"],
   theme: {

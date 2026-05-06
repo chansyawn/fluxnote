@@ -118,6 +118,50 @@ describe("list shortcut", () => {
     expect(markdown).toBe("- [ ] existing text");
   });
 
+  it("creates task list from a multi-block list item shortcut without dropping blocks", () => {
+    const { markdown, semantic } = applyTaskListShortcut({
+      children: [
+        {
+          children: [
+            {
+              children: [
+                textParagraph("[] existing text"),
+                {
+                  children: [textParagraph("quote")],
+                  type: "blockquote",
+                },
+              ],
+              type: "listItem",
+            },
+          ],
+          ordered: false,
+          type: "list",
+        },
+      ],
+      type: "root",
+    });
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [
+          expect.objectContaining({
+            checked: false,
+            children: [
+              textParagraph("existing text"),
+              {
+                children: [textParagraph("quote")],
+                type: "blockquote",
+              },
+            ],
+          }),
+        ],
+        ordered: false,
+        type: "list",
+      }),
+    );
+    expect(markdown).toBe(["- [ ] existing text", "", "  > quote"].join("\n"));
+  });
+
   it("creates task list from ordered list item shortcut", () => {
     const { markdown, semantic } = applyTaskListShortcut({
       children: [

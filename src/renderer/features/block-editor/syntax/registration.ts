@@ -20,11 +20,15 @@ export interface SyntaxRegistration {
   id: SyntaxRegistrationId;
   nodes?: ReadonlyArray<LexicalNodeConfig>;
   markdownShortcuts?: ReadonlyArray<Transformer>;
-  runtimePlugins?: () => ReactNode[];
+  runtimePlugins?: (context: SyntaxRuntimeContext) => ReactNode[];
   theme?: Partial<EditorThemeClasses>;
   semanticTypes?: ReadonlyArray<
     SemanticBlock["type"] | SemanticInline["type"] | SemanticListItem["type"]
   >;
   mdastTypes?: ReadonlyArray<string>;
   lexicalNodeNames?: ReadonlyArray<string>;
+}
+
+export interface SyntaxRuntimeContext {
+  markdownShortcuts: ReadonlyArray<Transformer>;
 }

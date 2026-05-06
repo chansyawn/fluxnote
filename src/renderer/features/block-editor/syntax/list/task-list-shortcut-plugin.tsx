@@ -92,9 +92,9 @@ function createTaskListFromParagraph(textNode: TextNode): boolean {
 
   const taskList = $createListNode("check", 1);
   const taskItem = $createListItemNode(false);
-  taskItem.append(...paragraph.getChildren());
-  taskList.append(taskItem);
   paragraph.replace(taskList);
+  taskList.append(taskItem);
+  taskItem.splice(0, 0, [paragraph]);
   taskItem.selectStart();
   return true;
 }
@@ -109,7 +109,7 @@ function createTaskListFromListItem(textNode: TextNode, listItem: ListItemNode):
 
   const taskList = $createListNode("check", 1);
   const taskItem = $createListItemNode(false);
-  taskItem.append(...listItem.getChildren());
+  taskItem.splice(0, 0, listItem.getChildren());
   taskList.append(taskItem);
 
   listItem.insertAfter(taskList);

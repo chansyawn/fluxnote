@@ -15,7 +15,11 @@ export function listItemToLexical(
   writeBlock: (node: SemanticBlock) => LexicalNode[],
 ): LexicalNode {
   const listItem = $createListItemNode(listType === "check" ? item.checked === true : undefined);
-  listItem.append(...item.children.flatMap((child) => writeBlock(child)));
+  listItem.splice(
+    0,
+    0,
+    item.children.flatMap((child) => writeBlock(child)),
+  );
   return listItem;
 }
 
