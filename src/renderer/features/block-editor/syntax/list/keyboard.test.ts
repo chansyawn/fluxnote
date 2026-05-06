@@ -1,8 +1,11 @@
+import { $createListItemNode, $createListNode, $isListItemNode } from "@lexical/list";
 import {
   $createRangeSelection,
+  $getSelection,
   $getRoot,
   $isElementNode,
   $isParagraphNode,
+  $isRangeSelection,
   $isTextNode,
   $setSelection,
   KEY_BACKSPACE_COMMAND,
@@ -225,6 +228,58 @@ function applyShortcut(editor: LexicalEditor): boolean {
   return handled;
 }
 
+function createRawListEditor() {
+  const editor = createHeadlessMarkdownEditor();
+  const unregister = registerListKeyboardCommands(editor, MARKDOWN_SHORTCUT_TRANSFORMERS);
+
+  editor.update(
+    () => {
+      const root = $getRoot();
+      const listNode = $createListNode("bullet", 1);
+      const listItem = $createListItemNode();
+      root.clear();
+      listNode.append(listItem);
+      root.append(listNode);
+      listItem.select(0, 0);
+    },
+    { discrete: true },
+  );
+
+  return { editor, unregister };
+}
+
+function insertText(editor: LexicalEditor, value: string): void {
+  editor.update(
+    () => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) {
+        throw new Error("Missing range selection for text insertion");
+      }
+      selection.insertText(value);
+    },
+    { discrete: true },
+  );
+}
+
+function createNestedRawList(editor: LexicalEditor): void {
+  editor.update(
+    () => {
+      const rootChild = $getRoot().getFirstChild();
+      const listItem = $isElementNode(rootChild) ? rootChild.getFirstChild() : null;
+      if (!$isListItemNode(listItem)) {
+        throw new Error("Missing list item for nested raw shortcut setup");
+      }
+
+      const nestedList = $createListNode("bullet", 1);
+      const nestedItem = $createListItemNode();
+      nestedList.append(nestedItem);
+      listItem.splice(listItem.getChildrenSize(), 0, [nestedList]);
+      nestedItem.select(0, 0);
+    },
+    { discrete: true },
+  );
+}
+
 describe("list keyboard", () => {
   it("inserts soft break from shift enter without creating list items or blocks", () => {
     const { editor, unregister } = createEditor(
@@ -253,6 +308,63 @@ describe("list keyboard", () => {
           ]),
         ]),
       ]),
+    );
+    unregister();
+  });
+
+  it("continues typing inside a freshly created raw list item", () => {
+    const { editor, unregister } = createRawListEditor();
+
+    insertText(editor, "A");
+
+    expect(semantic(editor)).toEqual(document([list([item([paragraph("A")])])]));
+    unregister();
+  });
+
+  it("splits a freshly created raw list item on enter after typing", () => {
+    const { editor, unregister } = createRawListEditor();
+    insertText(editor, "A");
+
+    expect(dispatchEnter(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(
+      document([list([item([paragraph("A")]), item([paragraph()])])]),
+    );
+    unregister();
+  });
+
+  it("unwraps a freshly created empty raw list item on backspace", () => {
+    const { editor, unregister } = createRawListEditor();
+
+    expect(dispatchBackspace(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(document([paragraph()]));
+    unregister();
+  });
+
+  it("continues editing a nested raw list created from a list-item shortcut", () => {
+    const { editor, unregister } = createEditor(document([list([item([paragraph("A")])])]));
+    createNestedRawList(editor);
+    insertText(editor, "B");
+
+    expect(dispatchEnter(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(
+      document([
+        list([item([paragraph("A"), list([item([paragraph("B")]), item([paragraph()])])])]),
+      ]),
+    );
+    unregister();
+  });
+
+  it("outdents a freshly created empty nested raw list item on backspace", () => {
+    const { editor, unregister } = createEditor(document([list([item([paragraph("A")])])]));
+    createNestedRawList(editor);
+
+    expect(dispatchBackspace(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(
+      document([list([item([paragraph("A")]), item([paragraph()])])]),
     );
     unregister();
   });

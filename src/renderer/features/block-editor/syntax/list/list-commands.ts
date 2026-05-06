@@ -1,5 +1,5 @@
 import { $isCodeNode } from "@lexical/code";
-import { $isListItemNode } from "@lexical/list";
+import { $isListItemNode, ListItemNode } from "@lexical/list";
 import {
   CHECK_LIST,
   type ElementTransformer,
@@ -42,6 +42,7 @@ import {
   isSingleParagraphListItem,
   isStructuredListItemBlock,
   mergeListItemIntoPreviousSibling,
+  normalizeListItemForEditing,
   outdentListItemSubtree,
   splitListItemBlocksAtSelection,
   splitListItemAtSelection,
@@ -277,7 +278,7 @@ function handleAltEnter(selection: RangeSelection): boolean {
     return false;
   }
 
-  ensureListItemHasParagraph(listItem);
+  normalizeListItemForEditing(listItem, selection);
   const currentBlock = getCurrentListItemBlock(selection, listItem);
   /*
    * Alt+Enter rules:
@@ -321,6 +322,8 @@ function handleEnter(
   if (!listItem) {
     return false;
   }
+
+  normalizeListItemForEditing(listItem, selection);
 
   if (applyListContainerMultilineShortcutAtSelection(selection, transformers)) {
     event?.preventDefault();
@@ -417,7 +420,7 @@ function handleBackspace(event: KeyboardEvent): boolean {
     return false;
   }
 
-  ensureListItemHasParagraph(listItem);
+  normalizeListItemForEditing(listItem, selection);
   /*
    * Backspace at structured block start:
    *
@@ -506,6 +509,20 @@ export function registerListKeyboardCommands(
     ),
     editor.registerCommand(KEY_TAB_COMMAND, handleTab, COMMAND_PRIORITY_HIGH),
     editor.registerCommand(KEY_BACKSPACE_COMMAND, handleBackspace, COMMAND_PRIORITY_HIGH),
+    editor.registerNodeTransform(ListItemNode, (listItem) => {
+      /*
+       * Fresh Markdown shortcuts create Lexical-native list items first. The
+       * runtime transform immediately aligns them with the block-container
+       * model used by imported Markdown:
+       *
+       * - inline text under ListItemNode becomes a paragraph child;
+       * - empty items receive an editable paragraph;
+       * - a collapsed cursor on the list item moves into that paragraph;
+       * - existing structured children are left untouched.
+       */
+      const selection = $getSelection();
+      normalizeListItemForEditing(listItem, $isRangeSelection(selection) ? selection : null);
+    }),
     editor.registerUpdateListener(({ dirtyLeaves, editorState, tags }) => {
       if (tags.has(COLLABORATION_TAG) || tags.has(HISTORIC_TAG) || dirtyLeaves.size === 0) {
         return;

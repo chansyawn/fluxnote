@@ -14,7 +14,6 @@ import {
   $isElementNode,
   $isParagraphNode,
   $isRootOrShadowRoot,
-  type ElementNode,
   type LexicalNode,
   type RangeSelection,
 } from "lexical";
@@ -44,12 +43,6 @@ function getListType(item: ListItemNode): ListType {
 
 function createListItemForList(list: ListNode): ListItemNode {
   return $createListItemNode(list.getListType() === "check" ? false : undefined);
-}
-
-function createParagraphWithChildren(children: LexicalNode[]): ElementNode {
-  const paragraph = $createParagraphNode();
-  paragraph.splice(0, 0, children);
-  return paragraph;
 }
 
 function isTextualBlockEmpty(node: LexicalNode): boolean {
@@ -115,12 +108,14 @@ function removeListIfEmpty(list: ListNode): void {
   }
 }
 
-export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): void {
+export function normalizeListItemBlockChildren(listItem: ListItemNode): boolean {
   /*
    * Lexical's list plugin can leave raw inline nodes directly under a list item.
    * The editor's semantic model treats list items as block containers, so inline
-   * runs are wrapped into paragraphs before shortcuts or structural operations.
+   * runs are wrapped into paragraphs before shortcuts, typing or structural
+   * operations.
    */
+  let changed = false;
   let index = 0;
 
   while (index < listItem.getChildrenSize()) {
@@ -137,17 +132,78 @@ export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): 
       next = next.getNextSibling();
     }
 
-    listItem.splice(index, inlineChildren.length, [createParagraphWithChildren(inlineChildren)]);
+    const paragraph = $createParagraphNode();
+    listItem.splice(index, inlineChildren.length, [paragraph]);
+    paragraph.splice(0, 0, inlineChildren);
+    changed = true;
     index += 1;
   }
+
+  return changed;
 }
 
-export function ensureListItemHasParagraph(listItem: ListItemNode): void {
+export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): void {
+  normalizeListItemBlockChildren(listItem);
+}
+
+export function ensureListItemHasParagraph(listItem: ListItemNode): boolean {
   if (listItem.getChildrenSize() === 0) {
     listItem.splice(0, 0, [$createParagraphNode()]);
-  } else {
-    wrapListItemInlineChildrenInParagraphs(listItem);
+    return true;
   }
+
+  return normalizeListItemBlockChildren(listItem);
+}
+
+export function repairListItemSelection(
+  listItem: ListItemNode,
+  selection: RangeSelection,
+): boolean {
+  /*
+   * Fresh Markdown-created list items can leave the collapsed cursor on the
+   * ListItemNode itself. That element point is valid to Lexical, but it is not a
+   * text-editing location for this editor because list items are block
+   * containers. Move it into the nearest paragraph child so typing, Enter and
+   * Backspace all see the same shape as imported Markdown lists.
+   */
+  if (!selection.isCollapsed()) {
+    return false;
+  }
+
+  const anchorNode = selection.anchor.getNode();
+  if (!anchorNode.is(listItem)) {
+    return false;
+  }
+
+  ensureListItemHasParagraph(listItem);
+  const preferredChild =
+    listItem.getChildAtIndex(selection.anchor.offset) ??
+    listItem.getChildAtIndex(Math.max(0, selection.anchor.offset - 1)) ??
+    listItem.getFirstChild();
+
+  if ($isElementNode(preferredChild)) {
+    preferredChild.selectStart();
+    return true;
+  }
+
+  return false;
+}
+
+export function normalizeListItemForEditing(
+  listItem: ListItemNode,
+  selection: RangeSelection | null,
+): boolean {
+  /*
+   * Runtime list normalization rules:
+   *
+   * - empty list items receive an editable paragraph child;
+   * - raw inline children are wrapped into paragraph blocks;
+   * - collapsed selection on the ListItemNode is moved into a child block;
+   * - existing paragraph, quote, code and nested-list children are preserved.
+   */
+  const changed = ensureListItemHasParagraph(listItem);
+  const selectionChanged = selection ? repairListItemSelection(listItem, selection) : false;
+  return changed || selectionChanged;
 }
 
 export function isEmptyListItem(listItem: ListItemNode): boolean {
