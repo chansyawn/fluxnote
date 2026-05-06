@@ -1,4 +1,4 @@
-import { $createQuoteNode } from "@lexical/rich-text";
+import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $createTextNode, $getRoot } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -18,6 +18,7 @@ import type {
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../registry";
 import { registerQuoteKeyboardCommands } from "./quote-commands";
+import { isEmptyQuote } from "./quote-structure";
 
 function paragraph(value = ""): SemanticParagraph {
   return {
@@ -91,5 +92,24 @@ describe("quote structure", () => {
       document([quote([paragraph("raw")])]),
     );
     unregister();
+  });
+
+  it("treats empty heading children as empty quote content", () => {
+    const editor = createHeadlessMarkdownEditor();
+    let isEmpty = false;
+
+    editor.update(
+      () => {
+        const root = $getRoot();
+        const quoteNode = $createQuoteNode();
+        root.clear();
+        quoteNode.append($createHeadingNode("h1"));
+        root.append(quoteNode);
+        isEmpty = isEmptyQuote(quoteNode);
+      },
+      { discrete: true },
+    );
+
+    expect(isEmpty).toBe(true);
   });
 });

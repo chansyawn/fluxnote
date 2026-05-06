@@ -1,38 +1,28 @@
 import { $isListItemNode, type ListItemNode } from "@lexical/list";
+import type { LexicalNode, RangeSelection } from "lexical";
+
 import {
-  $isElementNode,
-  $isLineBreakNode,
-  $isTextNode,
-  type ElementNode,
-  type LexicalNode,
-  type RangeSelection,
-} from "lexical";
+  getDirectContainerChild,
+  getNearestAncestor,
+  getSelectionAnchorNode,
+  isCursorAtElementEnd,
+  isCursorAtElementStart,
+  isInlineRuntimeNode,
+} from "../container/selection";
 
 /*
  * Selection helpers translate Lexical's point/range model into list-container
  * concepts. Keyboard commands should reason about ListItemNode subtrees and
  * direct block children, not visual lines or Markdown text prefixes.
  */
-
-export function isInlineRuntimeNode(node: LexicalNode): boolean {
-  return node.isInline() || $isTextNode(node) || $isLineBreakNode(node);
-}
+export { isCursorAtElementEnd, isCursorAtElementStart, isInlineRuntimeNode };
 
 export function getContainingListItem(node: LexicalNode): ListItemNode | null {
   /*
    * The cursor can be inside deeply nested text, quote or code nodes. Walking
    * parents gives the structural list item that owns the current edit.
    */
-  let current: LexicalNode | null = node;
-
-  while (current) {
-    if ($isListItemNode(current)) {
-      return current;
-    }
-    current = current.getParent();
-  }
-
-  return null;
+  return getNearestAncestor(node, $isListItemNode);
 }
 
 function isListItemAncestor(ancestor: ListItemNode, item: ListItemNode): boolean {
@@ -77,7 +67,8 @@ export function getSelectedListItems(selection: RangeSelection): ListItemNode[] 
   }
 
   if (items.length === 0) {
-    const item = getContainingListItem(selection.anchor.getNode());
+    const anchorNode = getSelectionAnchorNode(selection);
+    const item = anchorNode ? getContainingListItem(anchorNode) : null;
     if (item) {
       items.push(item);
     }
@@ -87,7 +78,8 @@ export function getSelectedListItems(selection: RangeSelection): ListItemNode[] 
 }
 
 export function getCurrentListItem(selection: RangeSelection): ListItemNode | null {
-  return getContainingListItem(selection.anchor.getNode());
+  const anchorNode = getSelectionAnchorNode(selection);
+  return anchorNode ? getContainingListItem(anchorNode) : null;
 }
 
 export function getDirectListItemChild(
@@ -99,113 +91,13 @@ export function getDirectListItemChild(
    * opaque block children. Keyboard rules need the direct child to decide
    * whether the list owns the key or the child block should handle it.
    */
-  if (node.is(listItem)) {
-    return null;
-  }
-
-  let current: LexicalNode | null = node;
-  while (current) {
-    const parent: LexicalNode | null = current.getParent();
-    if (parent?.is(listItem)) {
-      return current;
-    }
-    current = parent;
-  }
-
-  return null;
+  return getDirectContainerChild(node, listItem);
 }
 
 export function getCurrentListItemBlock(
   selection: RangeSelection,
   listItem: ListItemNode,
 ): LexicalNode | null {
-  return getDirectListItemChild(selection.anchor.getNode(), listItem);
-}
-
-function hasNodeBeforePoint(pointNode: LexicalNode, boundary: ElementNode): boolean {
-  /*
-   * Start/end checks must account for sibling content at every level between
-   * the cursor and the boundary block. Text offsets alone are not enough for
-   * nested inline nodes or formatted text spans.
-   */
-  let current: LexicalNode | null = pointNode;
-
-  while (current && !current.is(boundary)) {
-    const previousSiblings = current.getPreviousSiblings();
-    if (previousSiblings.some((sibling) => sibling.getTextContentSize() > 0)) {
-      return true;
-    }
-    current = current.getParent();
-  }
-
-  return false;
-}
-
-function hasNodeAfterPoint(pointNode: LexicalNode, boundary: ElementNode): boolean {
-  let current: LexicalNode | null = pointNode;
-
-  while (current && !current.is(boundary)) {
-    const nextSiblings = current.getNextSiblings();
-    if (nextSiblings.some((sibling) => sibling.getTextContentSize() > 0)) {
-      return true;
-    }
-    current = current.getParent();
-  }
-
-  return false;
-}
-
-function isNodeInsideBoundary(node: LexicalNode, boundary: ElementNode): boolean {
-  let current: LexicalNode | null = node;
-
-  while (current) {
-    if (current.is(boundary)) {
-      return true;
-    }
-    current = current.getParent();
-  }
-
-  return false;
-}
-
-export function isCursorAtElementStart(selection: RangeSelection, element: ElementNode): boolean {
-  if (!selection.isCollapsed()) {
-    return false;
-  }
-
-  const { anchor } = selection;
-  const anchorNode = anchor.getNode();
-  if (!isNodeInsideBoundary(anchorNode, element)) {
-    return false;
-  }
-
-  if (anchor.type === "text") {
-    return anchor.offset === 0 && !hasNodeBeforePoint(anchorNode, element);
-  }
-
-  return anchor.offset === 0 && !hasNodeBeforePoint(anchorNode, element);
-}
-
-export function isCursorAtElementEnd(selection: RangeSelection, element: ElementNode): boolean {
-  if (!selection.isCollapsed()) {
-    return false;
-  }
-
-  const { anchor } = selection;
-  const anchorNode = anchor.getNode();
-  if (!isNodeInsideBoundary(anchorNode, element)) {
-    return false;
-  }
-
-  if (anchor.type === "text") {
-    return (
-      anchor.offset === anchorNode.getTextContentSize() && !hasNodeAfterPoint(anchorNode, element)
-    );
-  }
-
-  if (!$isElementNode(anchorNode)) {
-    return false;
-  }
-
-  return anchor.offset === anchorNode.getChildrenSize() && !hasNodeAfterPoint(anchorNode, element);
+  const anchorNode = getSelectionAnchorNode(selection);
+  return anchorNode ? getDirectListItemChild(anchorNode, listItem) : null;
 }

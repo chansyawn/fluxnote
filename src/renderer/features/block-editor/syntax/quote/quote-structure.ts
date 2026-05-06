@@ -1,6 +1,4 @@
-import { $isCodeNode } from "@lexical/code";
-import { $isListNode } from "@lexical/list";
-import { $isQuoteNode, type QuoteNode } from "@lexical/rich-text";
+import type { QuoteNode } from "@lexical/rich-text";
 import {
   $createParagraphNode,
   $isElementNode,
@@ -11,98 +9,29 @@ import {
 } from "lexical";
 
 import {
+  ensureContainerHasParagraph,
+  isMeaningfulContainerChild,
+  normalizeContainerForEditing,
+} from "../container/structure";
+import {
   getDirectQuoteChild,
   getSelectionAnchorNode,
   isCursorAtElementStart,
-  isInlineRuntimeNode,
 } from "./quote-selection";
 
-function isTextualBlockEmpty(node: LexicalNode): boolean {
-  return node.getTextContent().trim().length === 0;
-}
-
-function isMeaningfulQuoteChild(node: LexicalNode): boolean {
-  if (isInlineRuntimeNode(node)) {
-    return node.getTextContent().trim().length > 0;
-  }
-
-  if ($isParagraphNode(node)) {
-    return !isTextualBlockEmpty(node);
-  }
-
-  if ($isCodeNode(node)) {
-    return node.getTextContent().length > 0;
-  }
-
-  if ($isListNode(node) || $isQuoteNode(node)) {
-    return node.getChildrenSize() > 0;
-  }
-
-  return true;
-}
-
 export function normalizeQuoteBlockChildren(quote: QuoteNode): boolean {
-  let changed = false;
-  let index = 0;
-
-  while (index < quote.getChildrenSize()) {
-    const child = quote.getChildAtIndex(index);
-    if (!child || !isInlineRuntimeNode(child)) {
-      index += 1;
-      continue;
-    }
-
-    const inlineChildren: LexicalNode[] = [child];
-    let next = child.getNextSibling();
-    while (next && isInlineRuntimeNode(next)) {
-      inlineChildren.push(next);
-      next = next.getNextSibling();
-    }
-
-    const paragraph = $createParagraphNode();
-    quote.splice(index, inlineChildren.length, [paragraph]);
-    paragraph.splice(0, 0, inlineChildren);
-    changed = true;
-    index += 1;
-  }
-
-  if (quote.getChildrenSize() === 0) {
-    quote.splice(0, 0, [$createParagraphNode()]);
-    changed = true;
-  }
-
-  return changed;
+  return ensureContainerHasParagraph(quote);
 }
 
 export function normalizeQuoteForEditing(
   quote: QuoteNode,
   selection: RangeSelection | null,
 ): boolean {
-  const changed = normalizeQuoteBlockChildren(quote);
-  if (!selection?.isCollapsed()) {
-    return changed;
-  }
-
-  const anchorNode = getSelectionAnchorNode(selection);
-  if (!anchorNode?.is(quote)) {
-    return changed;
-  }
-
-  const child =
-    quote.getChildAtIndex(selection.anchor.offset) ??
-    quote.getChildAtIndex(Math.max(0, selection.anchor.offset - 1)) ??
-    quote.getFirstChild();
-
-  if ($isElementNode(child)) {
-    child.selectStart();
-    return true;
-  }
-
-  return changed;
+  return normalizeContainerForEditing(quote, selection);
 }
 
 export function isEmptyQuote(quote: QuoteNode): boolean {
-  return !quote.getChildren().some(isMeaningfulQuoteChild);
+  return !quote.getChildren().some(isMeaningfulContainerChild);
 }
 
 export function isQuoteExitParagraph(quote: QuoteNode, selection: RangeSelection): boolean {

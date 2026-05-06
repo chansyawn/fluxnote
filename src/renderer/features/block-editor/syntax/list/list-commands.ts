@@ -1,22 +1,18 @@
 import { ListItemNode } from "@lexical/list";
 import type { Transformer } from "@lexical/markdown";
 import {
-  $getNodeByKey,
   $getSelection,
   $isRangeSelection,
-  $isTextNode,
-  COLLABORATION_TAG,
   COMMAND_PRIORITY_HIGH,
-  HISTORIC_TAG,
   KEY_BACKSPACE_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   mergeRegister,
   type LexicalEditor,
-  type NodeKey,
   type RangeSelection,
 } from "lexical";
 
+import { registerContainerShortcutReplay } from "../container/keyboard";
 import {
   getCurrentListItem,
   getCurrentListItemBlock,
@@ -246,49 +242,6 @@ function handleBackspace(event: KeyboardEvent): boolean {
   return mergeListItemIntoPreviousSibling(listItem) || unwrapListItemToBlocks(listItem);
 }
 
-interface PendingShortcutSelection {
-  anchorKey: NodeKey;
-  anchorOffset: number;
-}
-
-function readPendingShortcutSelection(
-  dirtyLeaves: ReadonlySet<NodeKey>,
-): PendingShortcutSelection | null {
-  /*
-   * The update listener replays list-container shortcuts after text changes.
-   * It only considers the currently dirty text leaf so ordinary editor updates
-   * do not repeatedly scan or transform stable list content.
-   */
-  const selection = $getSelection();
-  if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-    return null;
-  }
-
-  const anchorNode = $getNodeByKey(selection.anchor.key);
-  if (
-    !$isTextNode(anchorNode) ||
-    !anchorNode.isAttached() ||
-    !dirtyLeaves.has(anchorNode.getKey())
-  ) {
-    return null;
-  }
-
-  return {
-    anchorKey: anchorNode.getKey(),
-    anchorOffset: selection.anchor.offset,
-  };
-}
-
-function restoreShortcutSelection({ anchorKey, anchorOffset }: PendingShortcutSelection): boolean {
-  const node = $getNodeByKey(anchorKey);
-  if (!$isTextNode(node) || !node.isAttached()) {
-    return false;
-  }
-
-  node.select(anchorOffset, anchorOffset);
-  return true;
-}
-
 export function registerListKeyboardCommands(
   editor: LexicalEditor,
   transformers: ReadonlyArray<Transformer>,
@@ -324,21 +277,8 @@ export function registerListKeyboardCommands(
       const selection = $getSelection();
       normalizeListItemForEditing(listItem, $isRangeSelection(selection) ? selection : null);
     }),
-    editor.registerUpdateListener(({ dirtyLeaves, editorState, tags }) => {
-      if (tags.has(COLLABORATION_TAG) || tags.has(HISTORIC_TAG) || dirtyLeaves.size === 0) {
-        return;
-      }
-
-      const pending = editorState.read(() => readPendingShortcutSelection(dirtyLeaves));
-      if (!pending) {
-        return;
-      }
-
-      editor.update(() => {
-        if (restoreShortcutSelection(pending)) {
-          applyListContainerMarkdownShortcutAtSelection(transformers);
-        }
-      });
-    }),
+    registerContainerShortcutReplay(editor, () =>
+      applyListContainerMarkdownShortcutAtSelection(transformers),
+    ),
   );
 }

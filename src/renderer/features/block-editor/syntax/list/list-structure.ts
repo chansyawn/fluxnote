@@ -1,4 +1,3 @@
-import { $isCodeNode } from "@lexical/code";
 import {
   $createListItemNode,
   $createListNode,
@@ -8,7 +7,6 @@ import {
   type ListNode,
   type ListType,
 } from "@lexical/list";
-import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import {
   $createParagraphNode,
   $isElementNode,
@@ -18,6 +16,12 @@ import {
   type RangeSelection,
 } from "lexical";
 
+import {
+  ensureContainerHasParagraph,
+  isMeaningfulContainerChild,
+  normalizeContainerBlockChildren,
+  repairCollapsedSelectionIntoContainerChild,
+} from "../container/structure";
 import {
   getDirectListItemChild,
   isCursorAtElementEnd,
@@ -43,39 +47,6 @@ function getListType(item: ListItemNode): ListType {
 
 function createListItemForList(list: ListNode): ListItemNode {
   return $createListItemNode(list.getListType() === "check" ? false : undefined);
-}
-
-function isTextualBlockEmpty(node: LexicalNode): boolean {
-  return node.getTextContent().trim().length === 0;
-}
-
-function isMeaningfulListItemChild(node: LexicalNode): boolean {
-  /*
-   * Empty-item detection is semantic, not visual. Empty text blocks are ignored,
-   * while any non-empty structured block, nested list or opaque child keeps the
-   * item from being treated as a blank marker.
-   */
-  if (isInlineRuntimeNode(node)) {
-    return node.getTextContent().trim().length > 0;
-  }
-
-  if ($isParagraphNode(node) || $isHeadingNode(node)) {
-    return !isTextualBlockEmpty(node);
-  }
-
-  if ($isCodeNode(node)) {
-    return node.getTextContent().length > 0;
-  }
-
-  if ($isListNode(node)) {
-    return node.getChildrenSize() > 0;
-  }
-
-  if ($isQuoteNode(node)) {
-    return node.getChildrenSize() > 0;
-  }
-
-  return true;
 }
 
 function getLastNestedList(item: ListItemNode, listType: ListType): ListNode | null {
@@ -115,31 +86,7 @@ export function normalizeListItemBlockChildren(listItem: ListItemNode): boolean 
    * runs are wrapped into paragraphs before shortcuts, typing or structural
    * operations.
    */
-  let changed = false;
-  let index = 0;
-
-  while (index < listItem.getChildrenSize()) {
-    const child = listItem.getChildAtIndex(index);
-    if (!child || !isInlineRuntimeNode(child)) {
-      index += 1;
-      continue;
-    }
-
-    const inlineChildren: LexicalNode[] = [child];
-    let next = child.getNextSibling();
-    while (next && isInlineRuntimeNode(next)) {
-      inlineChildren.push(next);
-      next = next.getNextSibling();
-    }
-
-    const paragraph = $createParagraphNode();
-    listItem.splice(index, inlineChildren.length, [paragraph]);
-    paragraph.splice(0, 0, inlineChildren);
-    changed = true;
-    index += 1;
-  }
-
-  return changed;
+  return normalizeContainerBlockChildren(listItem);
 }
 
 export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): void {
@@ -147,12 +94,7 @@ export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): 
 }
 
 export function ensureListItemHasParagraph(listItem: ListItemNode): boolean {
-  if (listItem.getChildrenSize() === 0) {
-    listItem.splice(0, 0, [$createParagraphNode()]);
-    return true;
-  }
-
-  return normalizeListItemBlockChildren(listItem);
+  return ensureContainerHasParagraph(listItem);
 }
 
 export function repairListItemSelection(
@@ -166,27 +108,7 @@ export function repairListItemSelection(
    * containers. Move it into the nearest paragraph child so typing, Enter and
    * Backspace all see the same shape as imported Markdown lists.
    */
-  if (!selection.isCollapsed()) {
-    return false;
-  }
-
-  const anchorNode = selection.anchor.getNode();
-  if (!anchorNode.is(listItem)) {
-    return false;
-  }
-
-  ensureListItemHasParagraph(listItem);
-  const preferredChild =
-    listItem.getChildAtIndex(selection.anchor.offset) ??
-    listItem.getChildAtIndex(Math.max(0, selection.anchor.offset - 1)) ??
-    listItem.getFirstChild();
-
-  if ($isElementNode(preferredChild)) {
-    preferredChild.selectStart();
-    return true;
-  }
-
-  return false;
+  return repairCollapsedSelectionIntoContainerChild(listItem, selection);
 }
 
 export function normalizeListItemForEditing(
@@ -207,7 +129,7 @@ export function normalizeListItemForEditing(
 }
 
 export function isEmptyListItem(listItem: ListItemNode): boolean {
-  return !listItem.getChildren().some(isMeaningfulListItemChild);
+  return !listItem.getChildren().some(isMeaningfulContainerChild);
 }
 
 export function isSingleParagraphListItem(listItem: ListItemNode): boolean {
