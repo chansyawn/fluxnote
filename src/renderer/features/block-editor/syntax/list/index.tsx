@@ -26,6 +26,7 @@ export const LIST_SYNTAX = {
   semanticTypes: ["list", "listItem"],
   theme: {
     list: {
+      checklist: "block-editor__list--check",
       listitem: "block-editor__list-item",
       listitemChecked: "block-editor__list-item block-editor__list-item--checked",
       listitemUnchecked: "block-editor__list-item block-editor__list-item--unchecked",

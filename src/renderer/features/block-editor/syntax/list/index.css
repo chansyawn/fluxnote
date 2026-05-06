@@ -1,7 +1,13 @@
 @reference "#global.css";
 
 .block-editor__list {
-  @apply my-1 ps-6;
+  --block-editor-list-indent: 1.125rem;
+  --block-editor-check-size: 0.875rem;
+
+  @apply my-1;
+
+  list-style-position: outside;
+  padding-inline-start: var(--block-editor-list-indent);
 }
 
 .block-editor__list-item > .block-editor__list {
@@ -28,23 +34,35 @@
   list-style-type: square;
 }
 
+.block-editor__list--check {
+  padding-inline-start: 0;
+}
+
 .block-editor__list-item {
   @apply my-0.5;
 }
 
 .block-editor__list-item--checked,
 .block-editor__list-item--unchecked {
-  @apply relative list-none ps-6 outline-none;
+  @apply relative list-none outline-none;
+
+  padding-inline-start: var(--block-editor-list-indent);
 }
 
 .block-editor__list-item--checked::before,
 .block-editor__list-item--unchecked::before {
-  @apply border-muted-foreground/70 bg-background text-primary absolute inset-s-0 top-[0.35em] size-3.5 rounded-[3px] border text-[10px] leading-[12px];
+  @apply border-muted-foreground/70 bg-background text-primary absolute top-[0.35em] rounded-[3px] border text-center text-[10px];
+
   content: "";
+  height: var(--block-editor-check-size);
+  inset-inline-start: 0;
+  line-height: calc(var(--block-editor-check-size) - 2px);
+  width: var(--block-editor-check-size);
 }
 
 .block-editor__list-item--checked::before {
-  @apply border-primary bg-primary/10 text-center;
+  @apply border-primary bg-primary/10;
+
   content: "✓";
 }
 
@@ -54,4 +72,6 @@
 
 .block-editor__list-item::marker {
   @apply text-muted-foreground;
+
+  font-variant-numeric: tabular-nums;
 }
