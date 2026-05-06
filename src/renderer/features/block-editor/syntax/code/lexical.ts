@@ -2,6 +2,7 @@ import { $createCodeNode, type CodeNode } from "@lexical/code";
 import { $createTextNode, type LexicalNode } from "lexical";
 
 import type { SemanticCodeBlock } from "../../model";
+import { PLAIN_TEXT_LANGUAGE } from "./code-language-options";
 
 export function codeBlockToLexical(node: SemanticCodeBlock): LexicalNode {
   const code = $createCodeNode(node.lang ?? undefined);
@@ -10,8 +11,10 @@ export function codeBlockToLexical(node: SemanticCodeBlock): LexicalNode {
 }
 
 export function codeBlockFromLexical(node: CodeNode): SemanticCodeBlock {
+  const language = node.getLanguage();
+
   return {
-    lang: node.getLanguage() ?? null,
+    lang: language && language !== PLAIN_TEXT_LANGUAGE ? language : null,
     type: "codeBlock",
     value: node.getTextContent(),
   };

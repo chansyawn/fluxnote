@@ -20,12 +20,32 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:83
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:20
+msgid "block-editor.code.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:16
+msgid "block-editor.code.copy"
+msgstr "复制代码"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:33
+msgid "block-editor.code.language.empty"
+msgstr "没有匹配的语言"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:82
+msgid "block-editor.code.language.search"
+msgstr "搜索语言"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/block-editor-content.tsx:70
 msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:31
+#: src/renderer/features/block-editor/block-editor-content.tsx:30
 msgid "block-editor.placeholder"
 msgstr "写一条笔记..."
 

@@ -20,12 +20,32 @@ msgid "app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:83
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:20
+msgid "block-editor.code.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:16
+msgid "block-editor.code.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:33
+msgid "block-editor.code.language.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:82
+msgid "block-editor.code.language.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/block-editor-content.tsx:70
 msgid "block-editor.content.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:31
+#: src/renderer/features/block-editor/block-editor-content.tsx:30
 msgid "block-editor.placeholder"
 msgstr ""
 
