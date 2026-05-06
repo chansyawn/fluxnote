@@ -6,6 +6,7 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 
 import { EMPTY_TASK_ITEM_PLACEHOLDER } from "../syntax/list/mdast";
+import { escapeIsolatedGfmTaskMarkers } from "./gfm-compat";
 
 const MARKDOWN_PARSER = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
 
@@ -20,7 +21,7 @@ const MARKDOWN_STRINGIFIER = unified().use(remarkGfm).use(remarkMath).use(remark
 });
 
 export function parseMarkdownToMdast(markdown: string): Root {
-  return MARKDOWN_PARSER.parse(markdown);
+  return MARKDOWN_PARSER.parse(escapeIsolatedGfmTaskMarkers(markdown));
 }
 
 export function stringifyMdastToMarkdown(mdast: Root): string {

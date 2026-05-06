@@ -250,6 +250,35 @@ describe("semantic mdast adapter", () => {
     expect(canonicalMarkdown).toContain("2. Fourth");
   });
 
+  it("imports isolated checkbox markers without triggering gfm task assertions", () => {
+    const mdast = parseMarkdownToMdast(
+      [
+        "-",
+        "[ ] ",
+        "  1.",
+        "",
+        "* Hello",
+        "",
+        "- [ ] Todo",
+        "- [x] Done",
+        "  - [ ] Nested",
+        "",
+        "    [ ] code",
+      ].join("\n"),
+    );
+    const semantic = mdastToSemanticDocument(mdast);
+
+    expect(mdast.children[1]).toEqual(
+      expect.objectContaining({
+        children: [expect.objectContaining({ type: "text", value: "[ ]\n1." })],
+        type: "paragraph",
+      }),
+    );
+    expect(JSON.stringify(semantic)).toContain('"checked":false');
+    expect(JSON.stringify(semantic)).toContain('"checked":true');
+    expect(JSON.stringify(semantic)).toContain('"value":"[ ] code"');
+  });
+
   it("imports unsupported syntax as opaque nodes without source offsets", () => {
     const semantic = mdastToSemanticDocument(
       parseMarkdownToMdast(
