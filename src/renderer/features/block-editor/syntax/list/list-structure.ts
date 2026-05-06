@@ -238,23 +238,6 @@ export function isStructuredListItemBlock(node: LexicalNode | null): boolean {
   );
 }
 
-export function isCursorAtListItemStart(
-  selection: RangeSelection,
-  listItem: ListItemNode,
-): boolean {
-  const firstChild = listItem.getFirstChild();
-  if (!firstChild) {
-    return true;
-  }
-
-  const currentChild = getDirectListItemChild(selection.anchor.getNode(), listItem);
-  if (!currentChild?.is(firstChild) || !$isElementNode(firstChild)) {
-    return false;
-  }
-
-  return isCursorAtElementStart(selection, firstChild);
-}
-
 export function isCursorAtListMarkerPosition(
   selection: RangeSelection,
   listItem: ListItemNode,
@@ -326,24 +309,6 @@ export function insertBlockInsideListItem(selection: RangeSelection): boolean {
 
   inserted.selectStart();
   return true;
-}
-
-export function createSiblingListItem(listItem: ListItemNode): ListItemNode | null {
-  /*
-   * New sibling items inherit the parent list type, including checklist checked
-   * state shape. The item starts with an empty paragraph so the semantic adapter
-   * always sees a valid block child.
-   */
-  const list = getListParent(listItem);
-  if (!list) {
-    return null;
-  }
-
-  const sibling = createListItemForList(list);
-  sibling.splice(0, 0, [$createParagraphNode()]);
-  listItem.insertAfter(sibling);
-  sibling.selectStart();
-  return sibling;
 }
 
 export function splitListItemBlocksAtSelection(

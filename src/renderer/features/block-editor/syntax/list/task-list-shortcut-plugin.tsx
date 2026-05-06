@@ -1,7 +1,6 @@
 import {
   $createListItemNode,
   $createListNode,
-  $isListItemNode,
   $isListNode,
   type ListItemNode,
 } from "@lexical/list";
@@ -19,23 +18,12 @@ import {
 } from "lexical";
 import { useEffect } from "react";
 
-const TASK_MARKER = "[] ";
+import { getContainingListItem } from "./list-selection";
+
+const TASK_MARKER_PATTERN = /^(\[[ xX]?\] )/;
 
 function hasContentBeforeNode(node: LexicalNode): boolean {
   return node.getPreviousSiblings().some((sibling) => sibling.getTextContent().length > 0);
-}
-
-function getContainingListItem(node: LexicalNode): ListItemNode | null {
-  let current: LexicalNode | null = node;
-
-  while (current) {
-    if ($isListItemNode(current)) {
-      return current;
-    }
-    current = current.getParent();
-  }
-
-  return null;
 }
 
 function findShortcutTextNode(): TextNode | null {
@@ -46,17 +34,14 @@ function findShortcutTextNode(): TextNode | null {
 
   const anchor = selection.anchor;
   const node = anchor.getNode();
-  if (!$isTextNode(node) || anchor.type !== "text" || anchor.offset < TASK_MARKER.length) {
+  if (!$isTextNode(node) || anchor.type !== "text") {
     return null;
   }
 
   const text = node.getTextContent();
-  const markerStart = anchor.offset - TASK_MARKER.length;
-  if (text.slice(markerStart, anchor.offset) !== TASK_MARKER) {
-    return null;
-  }
-
-  if (text.slice(0, markerStart).length > 0) {
+  const shortcutText = text.slice(0, anchor.offset);
+  const markerMatch = shortcutText.match(TASK_MARKER_PATTERN);
+  if (!markerMatch || markerMatch[0].length !== anchor.offset) {
     return null;
   }
 
@@ -75,11 +60,17 @@ function findShortcutTextNode(): TextNode | null {
 
 function removeTaskMarker(node: TextNode): void {
   const text = node.getTextContent();
-  const nextText = text.slice(TASK_MARKER.length);
+  const markerMatch = text.match(TASK_MARKER_PATTERN);
+  const nextText = markerMatch ? text.slice(markerMatch[0].length) : text;
   node.setTextContent(nextText);
   if (nextText.length > 0) {
     node.select(0, 0);
   }
+}
+
+function readTaskMarkerCheckedState(node: TextNode): boolean {
+  const markerMatch = node.getTextContent().match(TASK_MARKER_PATTERN);
+  return markerMatch?.[0].toLowerCase().includes("x") ?? false;
 }
 
 function createTaskListFromParagraph(textNode: TextNode): boolean {
@@ -88,10 +79,11 @@ function createTaskListFromParagraph(textNode: TextNode): boolean {
     return false;
   }
 
+  const checked = readTaskMarkerCheckedState(textNode);
   removeTaskMarker(textNode);
 
   const taskList = $createListNode("check", 1);
-  const taskItem = $createListItemNode(false);
+  const taskItem = $createListItemNode(checked);
   paragraph.replace(taskList);
   taskList.append(taskItem);
   taskItem.splice(0, 0, [paragraph]);
@@ -105,10 +97,11 @@ function createTaskListFromListItem(textNode: TextNode, listItem: ListItemNode):
     return false;
   }
 
+  const checked = readTaskMarkerCheckedState(textNode);
   removeTaskMarker(textNode);
 
   const taskList = $createListNode("check", 1);
-  const taskItem = $createListItemNode(false);
+  const taskItem = $createListItemNode(checked);
   taskItem.splice(0, 0, listItem.getChildren());
   taskList.append(taskItem);
 

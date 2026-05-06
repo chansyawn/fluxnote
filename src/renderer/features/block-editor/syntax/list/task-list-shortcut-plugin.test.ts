@@ -20,7 +20,7 @@ function textParagraph(value: string): SemanticParagraph {
   };
 }
 
-function applyTaskListShortcut(document: SemanticDocument) {
+function applyTaskListShortcut(document: SemanticDocument, marker = "[] ") {
   const editor = createHeadlessMarkdownEditor();
   importSemanticDocumentToLexical(document, editor);
 
@@ -28,13 +28,13 @@ function applyTaskListShortcut(document: SemanticDocument) {
     () => {
       const textNode = $getRoot()
         .getAllTextNodes()
-        .find((node) => $isTextNode(node) && node.getTextContent().startsWith("[] "));
+        .find((node) => $isTextNode(node) && node.getTextContent().startsWith(marker));
 
       if (!textNode) {
         throw new Error("Missing task shortcut marker in test document");
       }
 
-      textNode.select(3, 3);
+      textNode.select(marker.length, marker.length);
       expect(applyTaskListShortcutAtSelection()).toBe(true);
     },
     { discrete: true },
@@ -86,6 +86,44 @@ describe("list shortcut", () => {
     expect(markdown).toBe("- [ ]");
   });
 
+  it("creates checked task list from plain text shortcut", () => {
+    const { markdown, semantic } = applyTaskListShortcut(
+      {
+        children: [textParagraph("[x] ")],
+        type: "root",
+      },
+      "[x] ",
+    );
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [expect.objectContaining({ checked: true })],
+        ordered: false,
+        type: "list",
+      }),
+    );
+    expect(markdown).toBe("- [x]");
+  });
+
+  it("creates task list from space-bracket marker shortcut", () => {
+    const { markdown, semantic } = applyTaskListShortcut(
+      {
+        children: [textParagraph("[ ] todo")],
+        type: "root",
+      },
+      "[ ] ",
+    );
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [expect.objectContaining({ checked: false })],
+        ordered: false,
+        type: "list",
+      }),
+    );
+    expect(markdown).toBe("- [ ] todo");
+  });
+
   it("creates task list from unordered list item shortcut", () => {
     const { markdown, semantic } = applyTaskListShortcut({
       children: [
@@ -116,6 +154,41 @@ describe("list shortcut", () => {
       }),
     );
     expect(markdown).toBe("- [ ] existing text");
+  });
+
+  it("creates checked task list from unordered list item shortcut", () => {
+    const { markdown, semantic } = applyTaskListShortcut(
+      {
+        children: [
+          {
+            children: [
+              {
+                children: [textParagraph("[x] existing text")],
+                type: "listItem",
+              },
+            ],
+            ordered: false,
+            type: "list",
+          },
+        ],
+        type: "root",
+      },
+      "[x] ",
+    );
+
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        children: [
+          expect.objectContaining({
+            checked: true,
+            children: [textParagraph("existing text")],
+          }),
+        ],
+        ordered: false,
+        type: "list",
+      }),
+    );
+    expect(markdown).toBe("- [x] existing text");
   });
 
   it("creates task list from a multi-block list item shortcut without dropping blocks", () => {

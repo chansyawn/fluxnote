@@ -155,6 +155,19 @@ function hasNodeAfterPoint(pointNode: LexicalNode, boundary: ElementNode): boole
   return false;
 }
 
+function isNodeInsideBoundary(node: LexicalNode, boundary: ElementNode): boolean {
+  let current: LexicalNode | null = node;
+
+  while (current) {
+    if (current.is(boundary)) {
+      return true;
+    }
+    current = current.getParent();
+  }
+
+  return false;
+}
+
 export function isCursorAtElementStart(selection: RangeSelection, element: ElementNode): boolean {
   if (!selection.isCollapsed()) {
     return false;
@@ -162,6 +175,9 @@ export function isCursorAtElementStart(selection: RangeSelection, element: Eleme
 
   const { anchor } = selection;
   const anchorNode = anchor.getNode();
+  if (!isNodeInsideBoundary(anchorNode, element)) {
+    return false;
+  }
 
   if (anchor.type === "text") {
     return anchor.offset === 0 && !hasNodeBeforePoint(anchorNode, element);
@@ -177,6 +193,9 @@ export function isCursorAtElementEnd(selection: RangeSelection, element: Element
 
   const { anchor } = selection;
   const anchorNode = anchor.getNode();
+  if (!isNodeInsideBoundary(anchorNode, element)) {
+    return false;
+  }
 
   if (anchor.type === "text") {
     return (

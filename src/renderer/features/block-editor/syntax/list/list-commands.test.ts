@@ -34,10 +34,8 @@ import type {
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { registerSoftBreakShortcut } from "../break/soft-break-shortcut-plugin";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../registry";
-import {
-  applyListContainerMarkdownShortcutAtSelection,
-  registerListKeyboardCommands,
-} from "./list-commands";
+import { registerListKeyboardCommands } from "./list-commands";
+import { applyListContainerMarkdownShortcutAtSelection } from "./list-shortcuts";
 
 interface KeyboardEventStub extends KeyboardEvent {
   readonly preventedForTest: boolean;
@@ -435,6 +433,16 @@ describe("list keyboard", () => {
 
   it("delegates enter from a non-last block in a multi-block item", () => {
     const source = document([list([item([paragraph("paragraph 1"), paragraph("paragraph 2")])])]);
+    const { editor, unregister } = createEditor(source);
+    selectText(editor, "paragraph 1");
+
+    expect(dispatchEnter(editor)).toMatchObject({ handled: false, prevented: false });
+    expect(semantic(editor)).toEqual(source);
+    unregister();
+  });
+
+  it("delegates enter from a non-last paragraph when trailing blocks are empty", () => {
+    const source = document([list([item([paragraph("paragraph 1"), paragraph()])])]);
     const { editor, unregister } = createEditor(source);
     selectText(editor, "paragraph 1");
 
