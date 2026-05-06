@@ -13,5 +13,5 @@
 }
 
 .block-editor__placeholder {
-  @apply text-muted-foreground pointer-events-none absolute top-[0.2rem] left-0 text-[0.95rem];
+  @apply text-muted-foreground pointer-events-none absolute top-0 left-0;
 }
