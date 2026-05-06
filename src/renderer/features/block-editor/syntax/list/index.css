@@ -4,6 +4,10 @@
   @apply my-1 ps-6;
 }
 
+.block-editor__list-item > .block-editor__list {
+  @apply my-0;
+}
+
 .block-editor__list--ordered {
   list-style-type: decimal;
 }
@@ -25,7 +29,7 @@
 }
 
 .block-editor__list-item {
-  @apply my-1;
+  @apply my-0.5;
 }
 
 .block-editor__list-item--checked,
