@@ -57,7 +57,9 @@ export function BlockEditorContent({
 
       await copyToClipboard(editor, null, data);
     },
-    focus: () => {},
+    focus: () => {
+      editor.focus();
+    },
   }));
 
   return (
