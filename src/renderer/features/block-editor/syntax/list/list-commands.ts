@@ -264,8 +264,12 @@ function readPendingShortcutSelection(
     return null;
   }
 
-  const anchorNode = selection.anchor.getNode();
-  if (!$isTextNode(anchorNode) || !dirtyLeaves.has(anchorNode.getKey())) {
+  const anchorNode = $getNodeByKey(selection.anchor.key);
+  if (
+    !$isTextNode(anchorNode) ||
+    !anchorNode.isAttached() ||
+    !dirtyLeaves.has(anchorNode.getKey())
+  ) {
     return null;
   }
 
@@ -277,7 +281,7 @@ function readPendingShortcutSelection(
 
 function restoreShortcutSelection({ anchorKey, anchorOffset }: PendingShortcutSelection): boolean {
   const node = $getNodeByKey(anchorKey);
-  if (!$isTextNode(node)) {
+  if (!$isTextNode(node) || !node.isAttached()) {
     return false;
   }
 
