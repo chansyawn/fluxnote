@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -30,6 +32,10 @@ vi.mock("electron", () => ({
 
 import { installCli, isCliInstalled, uninstallCli } from "./install-cli";
 
+function getTestCliWrapperPath(): string {
+  return path.join(process.cwd(), "src", "cli", "flux");
+}
+
 function setPlatform(value: NodeJS.Platform): void {
   Object.defineProperty(process, "platform", {
     configurable: true,
@@ -54,7 +60,7 @@ describe("install-cli", () => {
   });
 
   it("detects installed symlink", async () => {
-    mocks.readlink.mockResolvedValue("/Users/chansyawn/Workspace/fluxnote/src/cli/flux");
+    mocks.readlink.mockResolvedValue(getTestCliWrapperPath());
 
     await expect(isCliInstalled()).resolves.toBe(true);
   });
@@ -70,7 +76,7 @@ describe("install-cli", () => {
   });
 
   it("uninstalls existing symlink", async () => {
-    mocks.readlink.mockResolvedValue("/Users/chansyawn/Workspace/fluxnote/src/cli/flux");
+    mocks.readlink.mockResolvedValue(getTestCliWrapperPath());
     mocks.rm.mockResolvedValue(undefined);
 
     await uninstallCli();
