@@ -29,6 +29,7 @@ import {
 import {
   collapseStructuredBlockAtStart,
   ensureListItemHasParagraph,
+  hasNestedListAfterCurrentParagraph,
   indentListItemSubtree,
   insertBlockInsideListItem,
   isCursorAtLastParagraphEnd,
@@ -156,10 +157,16 @@ function handleEnter(
    *
    * - single paragraph item: split into a new sibling list item;
    * - final paragraph in a multi-block item: split into a new sibling list item;
+   * - paragraph before a nested list: split so the nested list follows the new
+   *   sibling item;
    * - non-final paragraph in a multi-block item: return false so paragraph
    *   editing stays inside the current list item.
    */
-  if (isSingleParagraphListItem(listItem) || isCursorAtLastParagraphEnd(selection, listItem)) {
+  if (
+    isSingleParagraphListItem(listItem) ||
+    isCursorAtLastParagraphEnd(selection, listItem) ||
+    hasNestedListAfterCurrentParagraph(selection, listItem)
+  ) {
     event?.preventDefault();
     return splitListItemAtSelection(listItem, selection);
   }

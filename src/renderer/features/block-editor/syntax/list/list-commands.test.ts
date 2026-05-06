@@ -451,6 +451,62 @@ describe("list keyboard", () => {
     unregister();
   });
 
+  it("creates a sibling item from a paragraph end before a nested list", () => {
+    const { editor, unregister } = createEditor(
+      document([
+        list(
+          [
+            item([paragraph("a")]),
+            item([paragraph("b"), list([item([paragraph("c")]), item([paragraph("d")])], true)]),
+          ],
+          true,
+        ),
+      ]),
+    );
+    selectText(editor, "b");
+
+    expect(dispatchEnter(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(
+      document([
+        list(
+          [
+            item([paragraph("a")]),
+            item([paragraph("b")]),
+            item([paragraph(), list([item([paragraph("c")]), item([paragraph("d")])], true)]),
+          ],
+          true,
+        ),
+      ]),
+    );
+    unregister();
+  });
+
+  it("splits a paragraph before a nested list from the cursor position", () => {
+    const { editor, unregister } = createEditor(
+      document([
+        list([
+          item([paragraph("alpha")]),
+          item([paragraph("beta"), list([item([paragraph("nested")])])]),
+        ]),
+      ]),
+    );
+    selectText(editor, "beta", 1);
+
+    expect(dispatchEnter(editor)).toMatchObject({ handled: true, prevented: true });
+
+    expect(semantic(editor)).toEqual(
+      document([
+        list([
+          item([paragraph("alpha")]),
+          item([paragraph("b")]),
+          item([paragraph("eta"), list([item([paragraph("nested")])])]),
+        ]),
+      ]),
+    );
+    unregister();
+  });
+
   it("inserts an internal paragraph from alt enter in a single paragraph item", () => {
     const { editor, unregister } = createEditor(document([list([item([paragraph("A")])])]));
     selectText(editor, "A");

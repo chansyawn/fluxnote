@@ -294,6 +294,14 @@ export function isCursorAtLastParagraphEnd(
   return isCursorAtElementEnd(selection, lastChild);
 }
 
+export function hasNestedListAfterCurrentParagraph(
+  selection: RangeSelection,
+  listItem: ListItemNode,
+): boolean {
+  const currentChild = getDirectListItemChild(selection.anchor.getNode(), listItem);
+  return $isParagraphNode(currentChild) && $isListNode(currentChild.getNextSibling());
+}
+
 export function insertBlockInsideListItem(selection: RangeSelection): boolean {
   /*
    * Alt+Enter inside a simple item:
