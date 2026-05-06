@@ -1,3 +1,5 @@
+import { copyToClipboard } from "@lexical/clipboard";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
@@ -9,6 +11,8 @@ import { Trans } from "@lingui/react/macro";
 import type { EditorState } from "lexical";
 import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 
+import { createClipboardDataFromDocument } from "./clipboard/clipboard-data";
+import { ClipboardPlugin } from "./clipboard/clipboard-plugin";
 import { exportEditorStateToMarkdown } from "./core/editor-state";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_RUNTIME_PLUGINS } from "./syntax/registry";
 import type { BlockEditorHandle } from "./types";
@@ -39,12 +43,20 @@ export function BlockEditorContent({
   ref,
 }: BlockEditorContentProps) {
   const { i18n } = useLingui();
+  const [editor] = useLexicalComposerContext();
   const latestMarkdownRef = useRef(initialMarkdown);
 
   const handleMarkdownUpdated = useEffectEvent(onMarkdownUpdated);
 
   useImperativeHandle(ref, () => ({
-    copy: async () => {},
+    copy: async () => {
+      const data = createClipboardDataFromDocument(editor);
+      if (data === null) {
+        return;
+      }
+
+      await copyToClipboard(editor, null, data);
+    },
     focus: () => {},
   }));
 
@@ -67,6 +79,7 @@ export function BlockEditorContent({
       />
       <HistoryPlugin />
       {SYNTAX_RUNTIME_PLUGINS}
+      <ClipboardPlugin />
       <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />
       <OnChangePlugin
         ignoreSelectionChange
