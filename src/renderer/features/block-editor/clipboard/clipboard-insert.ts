@@ -15,6 +15,10 @@ import {
 import { createNodesForTargetBlock } from "./clipboard-assets";
 import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-payload";
 
+interface RichTextClipboardData {
+  getData(type: string): string;
+}
+
 export function cloneCurrentSelection(): BaseSelection | null {
   return $getSelection()?.clone() ?? null;
 }
@@ -38,7 +42,7 @@ export function insertSerializedNodesAtSelection(
 
 export function insertRichTextDataAtSelection(
   editor: LexicalEditor,
-  dataTransfer: DataTransfer,
+  dataTransfer: RichTextClipboardData,
   selection: BaseSelection | null,
 ): void {
   editor.update(
@@ -49,7 +53,8 @@ export function insertRichTextDataAtSelection(
 
       const currentSelection = $getSelection();
       if (currentSelection) {
-        $insertDataTransferForRichText(dataTransfer, currentSelection, editor);
+        // Lexical's rich text insertion path only reads getData(), so paste snapshots can survive async boundaries.
+        $insertDataTransferForRichText(dataTransfer as DataTransfer, currentSelection, editor);
       }
     },
     { discrete: true },

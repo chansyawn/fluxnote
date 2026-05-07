@@ -2,7 +2,7 @@ import type { BlockEditorClipboardData } from "@shared/features/block-editor/cli
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { BLOCK_EDITOR_CLIPBOARD_MIME } from "./clipboard-payload";
-import { writeBlockEditorClipboardData } from "./clipboard-plugin";
+import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-plugin";
 
 const clipboardData: BlockEditorClipboardData = {
   [BLOCK_EDITOR_CLIPBOARD_MIME]: JSON.stringify({
@@ -27,6 +27,19 @@ function setNavigatorClipboard(writeText: (value: string) => Promise<void>): voi
     configurable: true,
     value: { clipboard: { writeText } },
   });
+}
+
+function createMutableDataTransfer(values: Record<string, string>): DataTransfer {
+  let currentValues = values;
+  return {
+    getData: (type: string) => currentValues[type] ?? "",
+    items: [],
+    files: [],
+    types: Object.keys(values),
+    clearData: () => {
+      currentValues = {};
+    },
+  } as unknown as DataTransfer;
 }
 
 describe("block editor clipboard plugin", () => {
@@ -56,5 +69,18 @@ describe("block editor clipboard plugin", () => {
     await writeBlockEditorClipboardData(clipboardData);
 
     expect(writeText).toHaveBeenCalledWith("Text");
+  });
+
+  it("keeps paste data available after the original data transfer is cleared", () => {
+    const dataTransfer = createMutableDataTransfer({
+      "text/html": "<p>External</p>",
+      "text/plain": "External",
+    });
+
+    const snapshot = createClipboardDataSnapshot(dataTransfer);
+    dataTransfer.clearData();
+
+    expect(snapshot.getData("text/html")).toBe("<p>External</p>");
+    expect(snapshot.getData("text/plain")).toBe("External");
   });
 });

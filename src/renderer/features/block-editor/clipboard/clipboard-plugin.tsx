@@ -19,8 +19,23 @@ interface ClipboardPluginProps {
   blockId: string;
 }
 
+interface ClipboardDataSnapshot {
+  getData(type: string): string;
+}
+
 function getClipboardData(event: PasteCommandType): DataTransfer | null {
   return "clipboardData" in event ? event.clipboardData : null;
+}
+
+export function createClipboardDataSnapshot(dataTransfer: DataTransfer): ClipboardDataSnapshot {
+  const dataByType = new Map<string, string>();
+  for (const type of Array.from(dataTransfer.types)) {
+    dataByType.set(type, dataTransfer.getData(type));
+  }
+
+  return {
+    getData: (type: string) => dataByType.get(type) ?? "",
+  };
 }
 
 function hasFileData(dataTransfer: DataTransfer): boolean {
@@ -101,16 +116,19 @@ export function ClipboardPlugin({ blockId }: ClipboardPluginProps) {
           return false;
         }
 
+        const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
         event.preventDefault();
         event.stopPropagation();
-        void readBlockEditorClipboardPayload().then((readPayload) => {
-          if (readPayload !== null) {
-            void insertClipboardPayloadAtSelection(editor, blockId, readPayload, selection);
-            return;
-          }
+        void readBlockEditorClipboardPayload()
+          .then((readPayload) => {
+            if (readPayload !== null) {
+              void insertClipboardPayloadAtSelection(editor, blockId, readPayload, selection);
+              return;
+            }
 
-          insertRichTextDataAtSelection(editor, clipboardData, selection);
-        });
+            insertRichTextDataAtSelection(editor, clipboardDataSnapshot, selection);
+          })
+          .catch(() => undefined);
         return true;
       },
       COMMAND_PRIORITY_HIGH,
