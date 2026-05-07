@@ -1,6 +1,6 @@
 import {
-  blockEditorClipboardDataSchema,
   blockEditorClipboardReadResultSchema,
+  blockEditorClipboardWriteRequestSchema,
 } from "@shared/features/block-editor/clipboard";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ export const clipboardContract = {
       output: blockEditorClipboardReadResultSchema,
     },
     "clipboard.write": {
-      input: blockEditorClipboardDataSchema,
+      input: blockEditorClipboardWriteRequestSchema,
       output: voidSchema,
     },
   },

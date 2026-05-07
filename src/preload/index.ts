@@ -1,7 +1,3 @@
-import type {
-  BlockEditorClipboardData,
-  BlockEditorClipboardReadResult,
-} from "@shared/features/block-editor/clipboard";
 import type { IpcResult } from "@shared/ipc/result";
 import type {
   CommandInput,
@@ -44,15 +40,3 @@ const ipc = {
 };
 
 contextBridge.exposeInMainWorld("ipc", ipc);
-
-const clipboard = {
-  async read(): Promise<BlockEditorClipboardReadResult> {
-    return await invokeCommand("clipboard.read", undefined);
-  },
-
-  async write(data: BlockEditorClipboardData): Promise<void> {
-    await invokeCommand("clipboard.write", data);
-  },
-};
-
-contextBridge.exposeInMainWorld("clipboard", clipboard);

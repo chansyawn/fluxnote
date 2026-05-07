@@ -1,26 +1,23 @@
-import type { BlockEditorClipboardData } from "@shared/features/block-editor/clipboard";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import { BLOCK_EDITOR_CLIPBOARD_MIME } from "./clipboard-payload";
+import type { BlockEditorClipboardWriteRequest } from "./clipboard-codec";
 import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-plugin";
 
-const clipboardData: BlockEditorClipboardData = {
-  [BLOCK_EDITOR_CLIPBOARD_MIME]: JSON.stringify({
-    assets: [],
-    markdown: "Text",
+vi.mock("@renderer/clients", () => ({
+  writeBlockEditorClipboard: vi.fn(),
+}));
+
+import { writeBlockEditorClipboard } from "@renderer/clients";
+
+const clipboardRequest: BlockEditorClipboardWriteRequest = {
+  html: "<p>Text</p>",
+  payload: {
     nodes: [],
     sourceBlockId: "block-1",
-  }),
-  "text/html": "<p>Text</p>",
-  "text/plain": "Text",
+    version: 1,
+  },
+  text: "Text",
 };
-
-function setWindowClipboard(write?: (data: BlockEditorClipboardData) => Promise<void>): void {
-  Object.defineProperty(globalThis, "window", {
-    configurable: true,
-    value: write ? { clipboard: { write } } : {},
-  });
-}
 
 function setNavigatorClipboard(writeText: (value: string) => Promise<void>): void {
   Object.defineProperty(globalThis, "navigator", {
@@ -32,41 +29,40 @@ function setNavigatorClipboard(writeText: (value: string) => Promise<void>): voi
 function createMutableDataTransfer(values: Record<string, string>): DataTransfer {
   let currentValues = values;
   return {
-    getData: (type: string) => currentValues[type] ?? "",
-    items: [],
-    files: [],
-    types: Object.keys(values),
     clearData: () => {
       currentValues = {};
     },
+    files: [],
+    getData: (type: string) => currentValues[type] ?? "",
+    items: [],
+    types: Object.keys(values),
   } as unknown as DataTransfer;
 }
 
 describe("block editor clipboard plugin", () => {
   afterEach(() => {
-    Reflect.deleteProperty(globalThis, "window");
     Reflect.deleteProperty(globalThis, "navigator");
+    vi.mocked(writeBlockEditorClipboard).mockReset();
     vi.restoreAllMocks();
   });
 
-  it("writes block editor data through the preload clipboard bridge", async () => {
-    const write = vi.fn(async () => undefined);
+  it("writes block editor data through the renderer clipboard client", async () => {
     const writeText = vi.fn(async () => undefined);
-    setWindowClipboard(write);
+    vi.mocked(writeBlockEditorClipboard).mockResolvedValue(undefined);
     setNavigatorClipboard(writeText);
 
-    await writeBlockEditorClipboardData(clipboardData);
+    await writeBlockEditorClipboardData(clipboardRequest);
 
-    expect(write).toHaveBeenCalledWith(clipboardData);
+    expect(writeBlockEditorClipboard).toHaveBeenCalledWith(clipboardRequest);
     expect(writeText).not.toHaveBeenCalled();
   });
 
-  it("falls back to plain text when the preload clipboard bridge is unavailable", async () => {
+  it("falls back to plain text when the renderer clipboard client fails", async () => {
     const writeText = vi.fn(async () => undefined);
-    setWindowClipboard();
+    vi.mocked(writeBlockEditorClipboard).mockRejectedValue(new Error("unavailable"));
     setNavigatorClipboard(writeText);
 
-    await writeBlockEditorClipboardData(clipboardData);
+    await writeBlockEditorClipboardData(clipboardRequest);
 
     expect(writeText).toHaveBeenCalledWith("Text");
   });

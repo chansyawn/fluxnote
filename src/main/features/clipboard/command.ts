@@ -2,8 +2,8 @@ import { fileURLToPath } from "node:url";
 
 import type { IpcRouter } from "@main/core/ipc";
 import {
-  BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL,
-  type BlockEditorClipboardData,
+  BLOCK_EDITOR_CLIPBOARD_MIME,
+  blockEditorClipboardPayloadSchema,
 } from "@shared/features/block-editor/clipboard";
 import { clipboard, nativeImage, type NativeImage } from "electron";
 
@@ -21,30 +21,31 @@ function createClipboardImage(fileUrl: string | undefined): NativeImage | undefi
 }
 
 export function registerClipboardCommands(ipc: IpcRouter): void {
-  let latestBlockEditorData: BlockEditorClipboardData | null = null;
-
   ipc.command("clipboard.read", () => {
-    if (latestBlockEditorData === null) {
-      return { data: null };
+    const buffer = clipboard.readBuffer(BLOCK_EDITOR_CLIPBOARD_MIME);
+    if (buffer.length === 0) {
+      return { payload: null };
     }
 
-    if (clipboard.readText() !== latestBlockEditorData["text/plain"]) {
-      latestBlockEditorData = null;
-      return { data: null };
+    try {
+      const parsed = JSON.parse(buffer.toString("utf8")) as unknown;
+      return { payload: blockEditorClipboardPayloadSchema.parse(parsed) };
+    } catch {
+      return { payload: null };
     }
-
-    return { data: latestBlockEditorData };
   });
 
-  ipc.command("clipboard.write", (data) => {
-    latestBlockEditorData = data;
-    const image = createClipboardImage(data[BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL]);
-    // Electron writeBuffer replaces the clipboard payload, so custom app data stays in memory.
+  ipc.command("clipboard.write", (request) => {
+    const image = createClipboardImage(request.imageFileUrl);
     clipboard.write({
-      html: data["text/html"],
+      html: request.html,
       ...(image ? { image } : {}),
-      text: data["text/plain"],
+      text: request.text,
     });
+    clipboard.writeBuffer(
+      BLOCK_EDITOR_CLIPBOARD_MIME,
+      Buffer.from(JSON.stringify(request.payload), "utf8"),
+    );
 
     return undefined;
   });

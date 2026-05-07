@@ -2,6 +2,7 @@ export { AppInvokeError, invokeCommand, subscribeEvent, toAppInvokeError } from 
 export { getCliStatus, installCli, uninstallCli } from "./cli";
 export { patchSettings, readSettings, resetSettings } from "./preferences";
 export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
+export { readBlockEditorClipboard, writeBlockEditorClipboard } from "./clipboard";
 export {
   cancelExternalEdit,
   listExternalEditSessions,
@@ -34,6 +35,7 @@ export {
 } from "./window";
 
 export type { CliStatus } from "./cli";
+export type { BlockEditorClipboardReadResult, BlockEditorClipboardWriteRequest } from "./clipboard";
 export type {
   ExternalEditCancelRequest,
   ExternalEditSession,

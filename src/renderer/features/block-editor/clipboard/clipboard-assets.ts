@@ -1,6 +1,6 @@
 import { copyAsset, type CopyAssetResult } from "@renderer/clients";
 
-import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-payload";
+import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-codec";
 
 type CopyAssetClient = typeof copyAsset;
 
@@ -26,12 +26,27 @@ export function rewriteClipboardAssetUrls(
   });
 }
 
+export function collectClipboardAssetUrls(nodes: ReadonlyArray<ClipboardSerializedNode>): string[] {
+  const assetUrls = new Set<string>();
+
+  const visit = (node: ClipboardSerializedNode) => {
+    if (node.type === "image" && typeof node.src === "string" && node.src.startsWith("assets://")) {
+      assetUrls.add(node.src);
+    }
+
+    node.children?.forEach(visit);
+  };
+
+  nodes.forEach(visit);
+  return Array.from(assetUrls);
+}
+
 export async function createNodesForTargetBlock(
   payload: BlockEditorClipboardPayload,
   targetBlockId: string,
   copyAssetClient: CopyAssetClient = copyAsset,
 ): Promise<ClipboardSerializedNode[]> {
-  const sourceAssetUrls = payload.assets.map((asset) => asset.assetUrl);
+  const sourceAssetUrls = collectClipboardAssetUrls(payload.nodes);
   if (sourceAssetUrls.length === 0) {
     return [...payload.nodes];
   }

@@ -6,6 +6,7 @@ import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
+  $isNodeSelection,
   $isRangeSelection,
   $setSelection,
   type BaseSelection,
@@ -13,7 +14,7 @@ import {
 } from "lexical";
 
 import { createNodesForTargetBlock } from "./clipboard-assets";
-import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-payload";
+import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-codec";
 
 interface RichTextClipboardData {
   getData(type: string): string;
@@ -30,6 +31,11 @@ export function insertSerializedNodesAtSelection(
   const selection = $getSelection();
 
   if ($isRangeSelection(selection)) {
+    selection.insertNodes(lexicalNodes);
+    return;
+  }
+
+  if ($isNodeSelection(selection)) {
     selection.insertNodes(lexicalNodes);
     return;
   }

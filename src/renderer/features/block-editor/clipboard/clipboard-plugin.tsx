@@ -1,70 +1,16 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { COMMAND_PRIORITY_HIGH, COPY_COMMAND, PASTE_COMMAND, type PasteCommandType } from "lexical";
+import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 import { useEffect } from "react";
 
 import { createClipboardDataFromCurrentSelection } from "./clipboard-data";
-import {
-  cloneCurrentSelection,
-  insertClipboardPayloadAtSelection,
-  insertRichTextDataAtSelection,
-} from "./clipboard-insert";
-import {
-  BLOCK_EDITOR_CLIPBOARD_MIME,
-  parseBlockEditorClipboardPayload,
-  type BlockEditorClipboardData,
-  type BlockEditorClipboardPayload,
-} from "./clipboard-payload";
+import { cloneCurrentSelection } from "./clipboard-insert";
+import { handleBlockEditorPaste, writeBlockEditorClipboardData } from "./paste-pipeline";
 
 interface ClipboardPluginProps {
   blockId: string;
 }
 
-interface ClipboardDataSnapshot {
-  getData(type: string): string;
-}
-
-function getClipboardData(event: PasteCommandType): DataTransfer | null {
-  return "clipboardData" in event ? event.clipboardData : null;
-}
-
-export function createClipboardDataSnapshot(dataTransfer: DataTransfer): ClipboardDataSnapshot {
-  const dataByType = new Map<string, string>();
-  for (const type of Array.from(dataTransfer.types)) {
-    dataByType.set(type, dataTransfer.getData(type));
-  }
-
-  return {
-    getData: (type: string) => dataByType.get(type) ?? "",
-  };
-}
-
-function hasFileData(dataTransfer: DataTransfer): boolean {
-  return (
-    Array.from(dataTransfer.items).some((item) => item.kind === "file") ||
-    dataTransfer.files.length > 0
-  );
-}
-
-async function readBlockEditorClipboardPayload(): Promise<BlockEditorClipboardPayload | null> {
-  const result = await window.clipboard?.read();
-  const value = result?.data?.[BLOCK_EDITOR_CLIPBOARD_MIME];
-  return value ? parseBlockEditorClipboardPayload(value) : null;
-}
-
-export async function writeBlockEditorClipboardData(data: BlockEditorClipboardData): Promise<void> {
-  const clipboardBridge = typeof window !== "undefined" ? window.clipboard : undefined;
-  if (clipboardBridge) {
-    await clipboardBridge.write(data);
-    return;
-  }
-
-  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(data["text/plain"]);
-    return;
-  }
-
-  throw new Error("Clipboard API is unavailable.");
-}
+export { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./paste-pipeline";
 
 export function ClipboardPlugin({ blockId }: ClipboardPluginProps) {
   const [editor] = useLexicalComposerContext();
@@ -75,63 +21,21 @@ export function ClipboardPlugin({ blockId }: ClipboardPluginProps) {
       (event) => {
         if (event instanceof ClipboardEvent && event.clipboardData !== null) {
           event.preventDefault();
-          void createClipboardDataFromCurrentSelection(editor, blockId).then((data) => {
-            if (data !== null) {
-              void writeBlockEditorClipboardData(data);
-            }
-          });
-          return true;
         }
 
-        void createClipboardDataFromCurrentSelection(editor, blockId).then((data) => {
-          if (data !== null) {
-            void writeBlockEditorClipboardData(data);
+        void createClipboardDataFromCurrentSelection(editor, blockId).then((request) => {
+          if (request !== null) {
+            void writeBlockEditorClipboardData(request);
           }
         });
         return true;
       },
-      COMMAND_PRIORITY_HIGH,
+      COMMAND_PRIORITY_CRITICAL,
     );
     const unregisterPaste = editor.registerCommand(
       PASTE_COMMAND,
-      (event) => {
-        const clipboardData = getClipboardData(event);
-        const selection = cloneCurrentSelection();
-        const payload = clipboardData
-          ? parseBlockEditorClipboardPayload(clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME))
-          : null;
-
-        if (payload) {
-          event.preventDefault();
-          event.stopPropagation();
-          void insertClipboardPayloadAtSelection(editor, blockId, payload, selection);
-          return true;
-        }
-
-        if (!window.clipboard?.read || clipboardData === null) {
-          return false;
-        }
-
-        if (hasFileData(clipboardData)) {
-          return false;
-        }
-
-        const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
-        event.preventDefault();
-        event.stopPropagation();
-        void readBlockEditorClipboardPayload()
-          .then((readPayload) => {
-            if (readPayload !== null) {
-              void insertClipboardPayloadAtSelection(editor, blockId, readPayload, selection);
-              return;
-            }
-
-            insertRichTextDataAtSelection(editor, clipboardDataSnapshot, selection);
-          })
-          .catch(() => undefined);
-        return true;
-      },
-      COMMAND_PRIORITY_HIGH,
+      (event) => handleBlockEditorPaste(editor, blockId, event, cloneCurrentSelection()),
+      COMMAND_PRIORITY_CRITICAL,
     );
     return () => {
       unregisterCopy();
