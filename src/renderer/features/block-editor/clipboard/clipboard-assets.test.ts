@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { rewriteImageNodeUrls } from "./image-insert-plugin";
+import { rewriteClipboardAssetUrls } from "./clipboard-assets";
 
-describe("image insert plugin", () => {
+describe("block editor clipboard assets", () => {
   it("rewrites nested image node urls for internal clipboard paste", () => {
     const nodes = [
       {
@@ -22,7 +22,10 @@ describe("image insert plugin", () => {
     ];
 
     expect(
-      rewriteImageNodeUrls(nodes, new Map([["assets://source/a.png", "assets://target/a.png"]])),
+      rewriteClipboardAssetUrls(
+        nodes,
+        new Map([["assets://source/a.png", "assets://target/a.png"]]),
+      ),
     ).toEqual([
       expect.objectContaining({
         children: [

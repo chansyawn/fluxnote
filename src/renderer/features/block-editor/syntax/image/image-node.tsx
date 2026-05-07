@@ -1,9 +1,6 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { cn } from "@renderer/ui/lib/utils";
 import {
-  CLICK_COMMAND,
-  COMMAND_PRIORITY_LOW,
   DecoratorNode,
   type DOMConversionMap,
   type DOMConversionOutput,
@@ -15,7 +12,7 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from "lexical";
-import { useEffect, useRef, type JSX } from "react";
+import { type JSX } from "react";
 
 export interface ImagePayload {
   alt: string;
@@ -30,35 +27,13 @@ interface ImageViewProps extends ImagePayload {
 export type SerializedImageNode = Spread<ImagePayload, SerializedLexicalNode>;
 
 function ImageView({ alt, nodeKey, src, title }: ImageViewProps): JSX.Element {
-  const [editor] = useLexicalComposerContext();
-  const imageRef = useRef<HTMLImageElement | null>(null);
-  const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(nodeKey);
-
-  useEffect(() => {
-    return editor.registerCommand(
-      CLICK_COMMAND,
-      (event) => {
-        if (event.target !== imageRef.current) {
-          return false;
-        }
-
-        event.preventDefault();
-        if (!event.shiftKey) {
-          clearSelected();
-        }
-        setSelected(true);
-        return true;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-  }, [clearSelected, editor, setSelected]);
+  const [isSelected] = useLexicalNodeSelection(nodeKey);
 
   return (
     <img
       alt={alt}
       className={cn("block-editor__image", isSelected && "block-editor__image--selected")}
       draggable={false}
-      ref={imageRef}
       src={src}
       title={title ?? undefined}
     />

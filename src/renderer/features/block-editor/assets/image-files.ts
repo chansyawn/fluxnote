@@ -1,14 +1,8 @@
 import { createAsset } from "@renderer/clients";
 
-import type { ImagePayload } from "./image-node";
+import type { ImagePayload } from "../syntax/image/image-node";
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
-
-export interface CreateImagePayloadFromFileInput {
-  blockId: string;
-  createAssetClient?: typeof createAsset;
-  file: File;
-}
 
 export interface CreateImagePayloadsFromFilesInput {
   blockId: string;
@@ -58,20 +52,6 @@ export function getSupportedImageFiles(dataTransfer: DataTransfer | null): File[
   }
 
   return Array.from(dataTransfer.files).filter(isSupportedImageFile);
-}
-
-export async function createImagePayloadFromFile({
-  blockId,
-  createAssetClient = createAsset,
-  file,
-}: CreateImagePayloadFromFileInput): Promise<ImagePayload | null> {
-  const [payload = null] = await createImagePayloadsFromFiles({
-    blockId,
-    createAssetClient,
-    files: [file],
-  });
-
-  return payload;
 }
 
 export async function createImagePayloadsFromFiles({

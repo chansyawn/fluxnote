@@ -1,11 +1,7 @@
 import type { CreateAssetRequest } from "@renderer/clients";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import {
-  createImagePayloadFromFile,
-  createImagePayloadsFromFiles,
-  isSupportedImageMimeType,
-} from "./image-file";
+import { createImagePayloadsFromFiles, isSupportedImageMimeType } from "./image-files";
 
 describe("image file helpers", () => {
   it("filters supported image mime types", () => {
@@ -38,18 +34,16 @@ describe("image file helpers", () => {
       };
     });
 
-    const payload = await createImagePayloadFromFile({
+    const payloads = await createImagePayloadsFromFiles({
       blockId: "block-1",
       createAssetClient,
-      file,
+      files: [file],
     });
 
     expect(createAssetClient).toHaveBeenCalledTimes(1);
-    expect(payload).toEqual({
-      alt: "photo.png",
-      src: "assets://block-1/photo.png",
-      title: null,
-    });
+    expect(payloads).toEqual([
+      { alt: "photo.png", src: "assets://block-1/photo.png", title: null },
+    ]);
   });
 
   it("creates multiple image payloads with one asset request", async () => {

@@ -2,6 +2,7 @@ import "./index.css";
 import type { SyntaxRegistration } from "../registration";
 import { ImageInsertPlugin } from "./image-insert-plugin";
 import { ImageNode } from "./image-node";
+import { ImageSelectionPlugin } from "./image-selection-plugin";
 import { IMAGE } from "./image-shortcut";
 
 export {
@@ -13,13 +14,6 @@ export {
 } from "./image-node";
 export { imageFromLexical, imageToLexical } from "./lexical";
 export { imageFromMdast, imageToMdast } from "./mdast";
-export {
-  createImagePayloadFromFile,
-  getSupportedImageFiles,
-  hasSupportedImageData,
-  isSupportedImageFile,
-  isSupportedImageMimeType,
-} from "./image-file";
 export { IMAGE } from "./image-shortcut";
 
 export const IMAGE_SYNTAX = {
@@ -28,6 +22,9 @@ export const IMAGE_SYNTAX = {
   markdownShortcuts: [IMAGE],
   mdastTypes: ["image"],
   nodes: [ImageNode],
-  runtimePlugins: ({ blockId }) => [<ImageInsertPlugin key="image-insert" blockId={blockId} />],
+  runtimePlugins: ({ blockId }) => [
+    <ImageInsertPlugin key="image-insert" blockId={blockId} />,
+    <ImageSelectionPlugin key="image-selection" />,
+  ],
   semanticTypes: ["image"],
 } satisfies SyntaxRegistration;
