@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-
 import {
   encodeBlockEditorClipboardHtml,
   type BlockEditorClipboardWriteRequest,
-} from "./clipboard-codec";
+} from "@shared/features/block-editor/clipboard";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+
 import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-plugin";
 
 vi.mock("@renderer/clients", () => ({

@@ -2,16 +2,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createFromPath: vi.fn(),
-  readHTML: vi.fn(),
-  readBuffer: vi.fn(),
   write: vi.fn(),
   writeBuffer: vi.fn(),
 }));
 
 vi.mock("electron", () => ({
   clipboard: {
-    readHTML: mocks.readHTML,
-    readBuffer: mocks.readBuffer,
     write: mocks.write,
     writeBuffer: mocks.writeBuffer,
   },
@@ -48,12 +44,8 @@ function createHandlers(): Map<string, (input?: unknown) => unknown> {
 describe("clipboard command", () => {
   beforeEach(() => {
     mocks.createFromPath.mockReset();
-    mocks.readHTML.mockReset();
-    mocks.readBuffer.mockReset();
     mocks.write.mockReset();
     mocks.writeBuffer.mockReset();
-    mocks.readHTML.mockReturnValue("");
-    mocks.readBuffer.mockReturnValue(Buffer.alloc(0));
   });
 
   it("writes standard formats and block editor payload in one clipboard operation", () => {
@@ -121,32 +113,5 @@ describe("clipboard command", () => {
       text: "![Alt](file:///tmp/block-1/photo.png)",
     });
     expect(mocks.writeBuffer).not.toHaveBeenCalled();
-  });
-
-  it("reads a valid block editor payload from html metadata", () => {
-    const handlers = createHandlers();
-    mocks.readHTML.mockReturnValue(encodeBlockEditorClipboardHtml("<p>Text</p>", payload));
-
-    expect(handlers.get("clipboard.read")?.()).toEqual({ payload });
-    expect(mocks.readBuffer).not.toHaveBeenCalled();
-  });
-
-  it("reads a valid legacy block editor payload buffer", () => {
-    const handlers = createHandlers();
-    mocks.readBuffer.mockReturnValue(Buffer.from(JSON.stringify(payload), "utf8"));
-
-    expect(handlers.get("clipboard.read")?.()).toEqual({ payload });
-  });
-
-  it("returns null when the block editor payload buffer is missing or invalid", () => {
-    const handlers = createHandlers();
-    mocks.readBuffer.mockReturnValueOnce(Buffer.alloc(0));
-    expect(handlers.get("clipboard.read")?.()).toEqual({ payload: null });
-
-    mocks.readBuffer.mockReturnValueOnce(Buffer.from("{", "utf8"));
-    expect(handlers.get("clipboard.read")?.()).toEqual({ payload: null });
-
-    mocks.readBuffer.mockReturnValueOnce(Buffer.from(JSON.stringify({ version: 1 }), "utf8"));
-    expect(handlers.get("clipboard.read")?.()).toEqual({ payload: null });
   });
 });

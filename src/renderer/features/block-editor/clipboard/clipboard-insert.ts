@@ -3,6 +3,10 @@ import {
   $insertDataTransferForRichText,
 } from "@lexical/clipboard";
 import {
+  type BlockEditorClipboardPayload,
+  type ClipboardSerializedNode,
+} from "@shared/features/block-editor/clipboard";
+import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
@@ -14,7 +18,6 @@ import {
 } from "lexical";
 
 import { createNodesForTargetBlock } from "./clipboard-assets";
-import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-codec";
 
 interface RichTextClipboardData {
   getData(type: string): string;

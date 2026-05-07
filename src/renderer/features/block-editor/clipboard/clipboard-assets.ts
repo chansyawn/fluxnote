@@ -1,6 +1,8 @@
 import { copyAsset, type CopyAssetResult } from "@renderer/clients";
-
-import type { BlockEditorClipboardPayload, ClipboardSerializedNode } from "./clipboard-codec";
+import type {
+  BlockEditorClipboardPayload,
+  ClipboardSerializedNode,
+} from "@shared/features/block-editor/clipboard";
 
 type CopyAssetClient = typeof copyAsset;
 

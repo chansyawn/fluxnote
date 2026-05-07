@@ -1,5 +1,10 @@
 import { $generateJSONFromSelectedNodes, $getHtmlContent } from "@lexical/clipboard";
 import { resolveAsset, type ResolveAssetResult } from "@renderer/clients";
+import type {
+  BlockEditorClipboardPayload,
+  BlockEditorClipboardWriteRequest,
+  ClipboardSerializedNode,
+} from "@shared/features/block-editor/clipboard";
 import {
   $getSelection,
   $selectAll,
@@ -11,11 +16,6 @@ import {
 
 import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
 import { collectClipboardAssetUrls, rewriteClipboardAssetUrls } from "./clipboard-assets";
-import {
-  type BlockEditorClipboardPayload,
-  type BlockEditorClipboardWriteRequest,
-  type ClipboardSerializedNode,
-} from "./clipboard-codec";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
 

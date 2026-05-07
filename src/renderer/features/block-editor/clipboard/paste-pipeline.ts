@@ -1,17 +1,14 @@
 import {
-  readBlockEditorClipboard,
   writeBlockEditorClipboard,
   type BlockEditorClipboardWriteRequest,
 } from "@renderer/clients";
+import {
+  decodeBlockEditorClipboardHtml,
+  stripBlockEditorClipboardHtmlMetadata,
+} from "@shared/features/block-editor/clipboard";
 import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
-import {
-  BLOCK_EDITOR_CLIPBOARD_MIME,
-  decodeBlockEditorClipboardHtml,
-  parseBlockEditorClipboardPayload,
-  stripBlockEditorClipboardHtmlMetadata,
-} from "./clipboard-codec";
 import {
   insertClipboardPayloadAtSelection,
   insertRichTextDataAtSelection,
@@ -57,25 +54,6 @@ export async function writeBlockEditorClipboardData(
   }
 }
 
-async function insertPayloadFromSystemClipboard(
-  editor: LexicalEditor,
-  blockId: string,
-  selection: BaseSelection | null,
-  fallback: () => void,
-): Promise<void> {
-  try {
-    const result = await readBlockEditorClipboard();
-    if (result.payload) {
-      await insertClipboardPayloadAtSelection(editor, blockId, result.payload, selection);
-      return;
-    }
-  } catch {
-    // Paste should still insert standard clipboard content when the app payload is unavailable.
-  }
-
-  fallback();
-}
-
 export function handleBlockEditorPaste(
   editor: LexicalEditor,
   blockId: string,
@@ -95,9 +73,7 @@ export function handleBlockEditorPaste(
     return true;
   }
 
-  const eventPayload =
-    decodeBlockEditorClipboardHtml(clipboardData.getData("text/html")) ??
-    parseBlockEditorClipboardPayload(clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME));
+  const eventPayload = decodeBlockEditorClipboardHtml(clipboardData.getData("text/html"));
   if (eventPayload) {
     event.preventDefault();
     event.stopPropagation();
@@ -108,8 +84,6 @@ export function handleBlockEditorPaste(
   const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
   event.preventDefault();
   event.stopPropagation();
-  void insertPayloadFromSystemClipboard(editor, blockId, selection, () => {
-    insertRichTextDataAtSelection(editor, clipboardDataSnapshot, selection);
-  });
+  insertRichTextDataAtSelection(editor, clipboardDataSnapshot, selection);
   return true;
 }

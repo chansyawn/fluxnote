@@ -1,7 +1,6 @@
 import type { SerializedLexicalNode } from "lexical";
 import { z } from "zod";
 
-export const BLOCK_EDITOR_CLIPBOARD_MIME = "application/x-fluxnotes-block-editor";
 const BLOCK_EDITOR_CLIPBOARD_HTML_MARKER = "fluxnotes-block-editor";
 const BLOCK_EDITOR_CLIPBOARD_HTML_MARKER_PATTERN =
   /<!--fluxnotes-block-editor:([A-Za-z0-9_.!~*'()%~-]+)-->/;
@@ -38,12 +37,7 @@ export const blockEditorClipboardWriteRequestSchema = z.object({
   text: z.string(),
 });
 
-export const blockEditorClipboardReadResultSchema = z.object({
-  payload: blockEditorClipboardPayloadSchema.nullable(),
-});
-
 export type BlockEditorClipboardPayload = z.infer<typeof blockEditorClipboardPayloadSchema>;
-export type BlockEditorClipboardReadResult = z.infer<typeof blockEditorClipboardReadResultSchema>;
 export type BlockEditorClipboardWriteRequest = z.infer<
   typeof blockEditorClipboardWriteRequestSchema
 >;
