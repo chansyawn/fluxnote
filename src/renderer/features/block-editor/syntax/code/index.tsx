@@ -1,6 +1,5 @@
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { CODE } from "@lexical/markdown";
-import { createElement } from "react";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
@@ -17,8 +16,8 @@ export const CODE_SYNTAX = {
   nodes: [CodeNode, CodeHighlightNode],
   markdownShortcuts: [CODE],
   runtimePlugins: () => [
-    createElement(CodeHighlightPlugin, { key: "code-highlight" }),
-    createElement(CodeBlockControlsPlugin, { key: "code-block-controls" }),
+    <CodeHighlightPlugin key="code-highlight" />,
+    <CodeBlockControlsPlugin key="code-block-controls" />,
   ],
   semanticTypes: ["codeBlock"],
   theme: {
