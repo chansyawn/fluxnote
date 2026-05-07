@@ -11,6 +11,7 @@ import {
 
 import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
 import {
+  BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL,
   BLOCK_EDITOR_CLIPBOARD_MIME,
   type BlockEditorClipboardData,
   type BlockEditorClipboardPayload,
@@ -180,6 +181,26 @@ function replaceAssetUrls(value: string, assetUrlMap: Map<string, string>): stri
   return nextValue;
 }
 
+function findSingleSelectedImageNode(
+  nodes: ReadonlyArray<ClipboardSerializedNode>,
+): ClipboardSerializedNode | null {
+  if (nodes.length !== 1) {
+    return null;
+  }
+
+  const [node] = nodes;
+  if (node.type === "image") {
+    return node;
+  }
+
+  if (node.type !== "paragraph" || node.children?.length !== 1) {
+    return null;
+  }
+
+  const [child] = node.children;
+  return child?.type === "image" ? child : null;
+}
+
 function createPayload(
   sourceBlockId: string,
   nodes: ClipboardSerializedNode[],
@@ -201,9 +222,11 @@ function createClipboardSnapshotFromSelection(
   editor: LexicalEditor,
   blockId: string,
   selection: BaseSelection,
+  options: { includeImageFileUrl: boolean },
 ): {
   assetUrls: string[];
   html: string;
+  imageAssetUrl: string | null;
   markdown: string;
   nodes: ClipboardSerializedNode[];
   sourceBlockId: string;
@@ -218,6 +241,11 @@ function createClipboardSnapshotFromSelection(
   }
 
   const assetUrls = collectAssetUrlsFromNodes(lexical.nodes);
+  const selectedImageNode = options.includeImageFileUrl
+    ? findSingleSelectedImageNode(lexical.nodes)
+    : null;
+  const selectedImageSrc =
+    selectedImageNode && typeof selectedImageNode.src === "string" ? selectedImageNode.src : null;
   const markdown = exportClipboardNodesToMarkdown(lexical.nodes);
   const exportedHtml = exportSelectionToHtml(editor, selection);
   const html =
@@ -228,6 +256,7 @@ function createClipboardSnapshotFromSelection(
   return {
     assetUrls,
     html,
+    imageAssetUrl: selectedImageSrc?.startsWith("assets://") ? selectedImageSrc : null,
     markdown,
     nodes: lexical.nodes,
     sourceBlockId: blockId,
@@ -243,6 +272,7 @@ async function createClipboardDataFromSnapshot(
       ? await resolveAssetsClient({ assetUrls: snapshot.assetUrls })
       : { assets: [] };
   const assetUrlMap = createAssetUrlMap(resolvedAssets);
+  const imageFileUrl = snapshot.imageAssetUrl ? assetUrlMap.get(snapshot.imageAssetUrl) : undefined;
   const payload = createPayload(
     snapshot.sourceBlockId,
     snapshot.nodes,
@@ -252,6 +282,7 @@ async function createClipboardDataFromSnapshot(
 
   return {
     [BLOCK_EDITOR_CLIPBOARD_MIME]: JSON.stringify(payload),
+    ...(imageFileUrl ? { [BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL]: imageFileUrl } : {}),
     "text/html": replaceAssetUrls(snapshot.html, assetUrlMap),
     "text/plain": replaceAssetUrls(snapshot.markdown, assetUrlMap),
   };
@@ -268,7 +299,9 @@ export async function createClipboardDataFromCurrentSelection(
       return null;
     }
 
-    return createClipboardSnapshotFromSelection(editor, blockId, selection);
+    return createClipboardSnapshotFromSelection(editor, blockId, selection, {
+      includeImageFileUrl: true,
+    });
   });
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;
@@ -296,7 +329,9 @@ export async function createClipboardDataFromDocument(
   const documentSelection = selection;
 
   const snapshot = editor.read(() =>
-    createClipboardSnapshotFromSelection(editor, blockId, documentSelection),
+    createClipboardSnapshotFromSelection(editor, blockId, documentSelection, {
+      includeImageFileUrl: false,
+    }),
   );
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;

@@ -1,4 +1,5 @@
 export {
+  BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL,
   BLOCK_EDITOR_CLIPBOARD_MIME,
   type BlockEditorClipboardData,
   type ClipboardSerializedNode,
