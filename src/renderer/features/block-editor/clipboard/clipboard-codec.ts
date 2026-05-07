@@ -1,6 +1,9 @@
 export {
   BLOCK_EDITOR_CLIPBOARD_MIME,
   blockEditorClipboardPayloadSchema,
+  decodeBlockEditorClipboardHtml,
+  encodeBlockEditorClipboardHtml,
+  stripBlockEditorClipboardHtmlMetadata,
   type BlockEditorClipboardPayload,
   type BlockEditorClipboardWriteRequest,
   type ClipboardSerializedNode,

@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import type { BlockEditorClipboardWriteRequest } from "./clipboard-codec";
+import {
+  encodeBlockEditorClipboardHtml,
+  type BlockEditorClipboardWriteRequest,
+} from "./clipboard-codec";
 import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-plugin";
 
 vi.mock("@renderer/clients", () => ({
@@ -69,7 +72,7 @@ describe("block editor clipboard plugin", () => {
 
   it("keeps paste data available after the original data transfer is cleared", () => {
     const dataTransfer = createMutableDataTransfer({
-      "text/html": "<p>External</p>",
+      "text/html": encodeBlockEditorClipboardHtml("<p>External</p>", clipboardRequest.payload),
       "text/plain": "External",
     });
 

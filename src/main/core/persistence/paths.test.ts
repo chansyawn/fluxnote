@@ -6,14 +6,14 @@ import { createPersistencePaths } from "./paths";
 
 describe("createPersistencePaths", () => {
   it("builds database and asset paths from userData", () => {
-    const base = "/tmp/fluxnote-user";
+    const base = "/tmp/fluxnotes-user";
     const paths = createPersistencePaths({
       assetsDirName: "assets",
-      databaseFileName: "fluxnote.db",
+      databaseFileName: "fluxnotes.db",
       getUserDataPath: () => base,
     });
 
-    expect(paths.getDatabasePath()).toBe(path.join(base, "fluxnote.db"));
+    expect(paths.getDatabasePath()).toBe(path.join(base, "fluxnotes.db"));
     expect(paths.getAssetsRootPath()).toBe(path.join(base, "assets"));
     expect(paths.getAssetPathForBlock("block-1")).toBe(path.join(base, "assets", "block-1"));
   });

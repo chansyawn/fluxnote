@@ -11,7 +11,7 @@ export interface TestDbContext {
 }
 
 export async function createTestDb(): Promise<TestDbContext> {
-  const dir = await mkdtemp(path.join(tmpdir(), "fluxnote-features-test-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "fluxnotes-features-test-"));
   const databasePath = path.join(dir, "test.sqlite3");
   const client = createDatabaseClient(databasePath);
   await migrateDatabase(client.db);

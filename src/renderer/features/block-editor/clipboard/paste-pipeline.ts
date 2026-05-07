@@ -6,7 +6,12 @@ import {
 import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
-import { BLOCK_EDITOR_CLIPBOARD_MIME, parseBlockEditorClipboardPayload } from "./clipboard-codec";
+import {
+  BLOCK_EDITOR_CLIPBOARD_MIME,
+  decodeBlockEditorClipboardHtml,
+  parseBlockEditorClipboardPayload,
+  stripBlockEditorClipboardHtmlMetadata,
+} from "./clipboard-codec";
 import {
   insertClipboardPayloadAtSelection,
   insertRichTextDataAtSelection,
@@ -24,7 +29,11 @@ export function getClipboardData(event: PasteCommandType): DataTransfer | null {
 export function createClipboardDataSnapshot(dataTransfer: DataTransfer): ClipboardDataSnapshot {
   const dataByType = new Map<string, string>();
   for (const type of Array.from(dataTransfer.types)) {
-    dataByType.set(type, dataTransfer.getData(type));
+    const value = dataTransfer.getData(type);
+    dataByType.set(
+      type,
+      type === "text/html" ? stripBlockEditorClipboardHtmlMetadata(value) : value,
+    );
   }
 
   return {
@@ -86,9 +95,9 @@ export function handleBlockEditorPaste(
     return true;
   }
 
-  const eventPayload = parseBlockEditorClipboardPayload(
-    clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME),
-  );
+  const eventPayload =
+    decodeBlockEditorClipboardHtml(clipboardData.getData("text/html")) ??
+    parseBlockEditorClipboardPayload(clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME));
   if (eventPayload) {
     event.preventDefault();
     event.stopPropagation();

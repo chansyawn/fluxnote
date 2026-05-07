@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createFromPath: vi.fn(),
+  readHTML: vi.fn(),
   readBuffer: vi.fn(),
   write: vi.fn(),
   writeBuffer: vi.fn(),
@@ -9,6 +10,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("electron", () => ({
   clipboard: {
+    readHTML: mocks.readHTML,
     readBuffer: mocks.readBuffer,
     write: mocks.write,
     writeBuffer: mocks.writeBuffer,
@@ -18,7 +20,10 @@ vi.mock("electron", () => ({
   },
 }));
 
-import { BLOCK_EDITOR_CLIPBOARD_MIME } from "@shared/features/block-editor/clipboard";
+import {
+  decodeBlockEditorClipboardHtml,
+  encodeBlockEditorClipboardHtml,
+} from "@shared/features/block-editor/clipboard";
 
 import { registerClipboardCommands } from "./command";
 
@@ -43,12 +48,15 @@ function createHandlers(): Map<string, (input?: unknown) => unknown> {
 describe("clipboard command", () => {
   beforeEach(() => {
     mocks.createFromPath.mockReset();
+    mocks.readHTML.mockReset();
     mocks.readBuffer.mockReset();
     mocks.write.mockReset();
     mocks.writeBuffer.mockReset();
+    mocks.readHTML.mockReturnValue("");
+    mocks.readBuffer.mockReturnValue(Buffer.alloc(0));
   });
 
-  it("writes standard formats and block editor payload buffer", () => {
+  it("writes standard formats and block editor payload in one clipboard operation", () => {
     const handlers = createHandlers();
     const result = handlers.get("clipboard.write")?.({
       html: "<p>Text</p>",
@@ -58,16 +66,15 @@ describe("clipboard command", () => {
 
     expect(result).toBeUndefined();
     expect(mocks.write).toHaveBeenCalledWith({
-      html: "<p>Text</p>",
+      html: encodeBlockEditorClipboardHtml("<p>Text</p>", payload),
       text: "Text",
     });
-    expect(mocks.writeBuffer).toHaveBeenCalledWith(
-      BLOCK_EDITOR_CLIPBOARD_MIME,
-      Buffer.from(JSON.stringify(payload), "utf8"),
-    );
+    expect(mocks.writeBuffer).not.toHaveBeenCalled();
+    const [{ html }] = mocks.write.mock.calls[0] as [{ html: string; text: string }];
+    expect(decodeBlockEditorClipboardHtml(html)).toEqual(payload);
   });
 
-  it("writes a native image when image file url is provided", () => {
+  it("writes a native image with the block editor payload metadata", () => {
     const handlers = createHandlers();
     const image = {
       isEmpty: vi.fn(() => false),
@@ -83,10 +90,14 @@ describe("clipboard command", () => {
 
     expect(mocks.createFromPath).toHaveBeenCalledWith("/tmp/block-1/photo.png");
     expect(mocks.write).toHaveBeenCalledWith({
-      html: '<img src="file:///tmp/block-1/photo.png" alt="Alt">',
+      html: encodeBlockEditorClipboardHtml(
+        '<img src="file:///tmp/block-1/photo.png" alt="Alt">',
+        payload,
+      ),
       image,
       text: "![Alt](file:///tmp/block-1/photo.png)",
     });
+    expect(mocks.writeBuffer).not.toHaveBeenCalled();
   });
 
   it("falls back to standard formats when image cannot be created", () => {
@@ -103,12 +114,24 @@ describe("clipboard command", () => {
     });
 
     expect(mocks.write).toHaveBeenCalledWith({
-      html: '<img src="file:///tmp/block-1/photo.png" alt="Alt">',
+      html: encodeBlockEditorClipboardHtml(
+        '<img src="file:///tmp/block-1/photo.png" alt="Alt">',
+        payload,
+      ),
       text: "![Alt](file:///tmp/block-1/photo.png)",
     });
+    expect(mocks.writeBuffer).not.toHaveBeenCalled();
   });
 
-  it("reads a valid block editor payload buffer", () => {
+  it("reads a valid block editor payload from html metadata", () => {
+    const handlers = createHandlers();
+    mocks.readHTML.mockReturnValue(encodeBlockEditorClipboardHtml("<p>Text</p>", payload));
+
+    expect(handlers.get("clipboard.read")?.()).toEqual({ payload });
+    expect(mocks.readBuffer).not.toHaveBeenCalled();
+  });
+
+  it("reads a valid legacy block editor payload buffer", () => {
     const handlers = createHandlers();
     mocks.readBuffer.mockReturnValue(Buffer.from(JSON.stringify(payload), "utf8"));
 
