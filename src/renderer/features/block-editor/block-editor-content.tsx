@@ -1,4 +1,3 @@
-import { copyToClipboard } from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -12,7 +11,7 @@ import type { EditorState } from "lexical";
 import { useEffectEvent, useImperativeHandle, useMemo, useRef, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "./clipboard/clipboard-data";
-import { ClipboardPlugin } from "./clipboard/clipboard-plugin";
+import { ClipboardPlugin, writeBlockEditorClipboardData } from "./clipboard/clipboard-plugin";
 import { exportEditorStateToMarkdown } from "./editor-state";
 import { createSyntaxRuntimePlugins, MARKDOWN_SHORTCUT_TRANSFORMERS } from "./syntax/registry";
 import type { BlockEditorHandle } from "./types";
@@ -53,12 +52,12 @@ export function BlockEditorContent({
 
   useImperativeHandle(ref, () => ({
     copy: async () => {
-      const data = createClipboardDataFromDocument(editor);
+      const data = await createClipboardDataFromDocument(editor, blockId);
       if (data === null) {
         return;
       }
 
-      await copyToClipboard(editor, null, data);
+      await writeBlockEditorClipboardData(data);
     },
     focus: () => {
       editor.focus();
@@ -84,7 +83,7 @@ export function BlockEditorContent({
       />
       <HistoryPlugin />
       {syntaxRuntimePlugins}
-      <ClipboardPlugin />
+      <ClipboardPlugin blockId={blockId} />
       <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />
       <OnChangePlugin
         ignoreSelectionChange

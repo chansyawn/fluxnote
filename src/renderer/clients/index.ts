@@ -1,7 +1,7 @@
 export { AppInvokeError, invokeCommand, subscribeEvent, toAppInvokeError } from "./ipc/invoke";
 export { getCliStatus, installCli, uninstallCli } from "./cli";
 export { patchSettings, readSettings, resetSettings } from "./preferences";
-export { convertFileSrc, copyAsset, createAsset } from "./assets";
+export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
 export {
   cancelExternalEdit,
   listExternalEditSessions,
@@ -45,6 +45,8 @@ export type {
   CopyAssetResult,
   CreateAssetRequest,
   CreateAssetResult,
+  ResolveAssetRequest,
+  ResolveAssetResult,
 } from "./assets";
 export type { OpenBlockPending, OpenBlockRequestedPayload } from "./open-block";
 export type {

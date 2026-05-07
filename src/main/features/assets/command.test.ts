@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   copyAsset: vi.fn(),
   createAsset: vi.fn(),
+  resolveAsset: vi.fn(),
 }));
 
 vi.mock("./service", () => mocks);
@@ -25,21 +26,35 @@ describe("assets command", () => {
     Object.values(mocks).forEach((fn) => fn.mockReset());
   });
 
-  it("dispatches create and copy commands", async () => {
-    mocks.createAsset.mockResolvedValue({ assetUrl: "assets://a/b.png" });
-    mocks.copyAsset.mockResolvedValue({ assetUrl: "assets://c/d.png" });
+  it("dispatches assets commands", async () => {
+    mocks.createAsset.mockResolvedValue({ assets: [{ assetUrl: "assets://a/b.png" }] });
+    mocks.copyAsset.mockResolvedValue({
+      assets: [{ assetUrl: "assets://c/d.png", sourceAssetUrl: "assets://b1/a.png" }],
+    });
+    mocks.resolveAsset.mockResolvedValue({
+      assets: [{ assetUrl: "assets://b1/a.png", fileUrl: "file:///tmp/b1/a.png" }],
+    });
     registerAssetsCommands(ipc as never, deps as never);
 
-    const createResult = await handlers.get("assets.create")?.({ blockId: "b1" });
+    const createResult = await handlers.get("assets.create")?.({ assets: [], blockId: "b1" });
     const copyResult = await handlers.get("assets.copy")?.({
+      assetUrls: ["assets://b1/a.png"],
       sourceBlockId: "b1",
       targetBlockId: "b2",
-      assetUrl: "assets://b1/a.png",
+    });
+    const resolveResult = await handlers.get("assets.resolve")?.({
+      assetUrls: ["assets://b1/a.png"],
     });
 
     expect(mocks.createAsset).toHaveBeenCalled();
     expect(mocks.copyAsset).toHaveBeenCalled();
-    expect(createResult).toEqual({ assetUrl: "assets://a/b.png" });
-    expect(copyResult).toEqual({ assetUrl: "assets://c/d.png" });
+    expect(mocks.resolveAsset).toHaveBeenCalled();
+    expect(createResult).toEqual({ assets: [{ assetUrl: "assets://a/b.png" }] });
+    expect(copyResult).toEqual({
+      assets: [{ assetUrl: "assets://c/d.png", sourceAssetUrl: "assets://b1/a.png" }],
+    });
+    expect(resolveResult).toEqual({
+      assets: [{ assetUrl: "assets://b1/a.png", fileUrl: "file:///tmp/b1/a.png" }],
+    });
   });
 });

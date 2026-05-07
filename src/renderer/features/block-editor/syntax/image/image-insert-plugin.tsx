@@ -1,5 +1,7 @@
+import { $generateNodesFromSerializedNodes } from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
+import { copyAsset } from "@renderer/clients";
 import {
   $createParagraphNode,
   $getRoot,
@@ -13,11 +15,17 @@ import {
   type BaseSelection,
   type LexicalEditor,
   type PasteCommandType,
+  type SerializedLexicalNode,
 } from "lexical";
 import { useEffect } from "react";
 
 import {
-  createImagePayloadFromFile,
+  BLOCK_EDITOR_CLIPBOARD_MIME,
+  parseBlockEditorClipboardPayload,
+  type BlockEditorClipboardPayload,
+} from "../../clipboard/clipboard-payload";
+import {
+  createImagePayloadsFromFiles,
   getSupportedImageFiles,
   hasSupportedImageData,
 } from "./image-file";
@@ -55,22 +63,55 @@ function insertImagePayloadsAtSelection(payloads: ReadonlyArray<ImagePayload>): 
   return true;
 }
 
+type ClipboardSerializedNode = SerializedLexicalNode &
+  Record<string, unknown> & {
+    children?: ClipboardSerializedNode[];
+    src?: unknown;
+  };
+
+export function rewriteImageNodeUrls(
+  nodes: ReadonlyArray<ClipboardSerializedNode>,
+  assetUrlMap: Map<string, string>,
+): ClipboardSerializedNode[] {
+  return nodes.map((node) => {
+    const nextNode: ClipboardSerializedNode = { ...node };
+    if (node.type === "image" && typeof node.src === "string") {
+      nextNode.src = assetUrlMap.get(node.src) ?? node.src;
+    }
+
+    if (node.children) {
+      nextNode.children = rewriteImageNodeUrls(node.children, assetUrlMap);
+    }
+
+    return nextNode;
+  });
+}
+
+function insertSerializedNodesAtSelection(nodes: ReadonlyArray<ClipboardSerializedNode>): void {
+  const lexicalNodes = $generateNodesFromSerializedNodes([...nodes]);
+  const selection = $getSelection();
+
+  if ($isRangeSelection(selection)) {
+    selection.insertNodes(lexicalNodes);
+    return;
+  }
+
+  const paragraph = $createParagraphNode();
+  paragraph.append(...lexicalNodes);
+  $getRoot().append(paragraph);
+  paragraph.selectEnd();
+}
+
 async function createImagePayloads(
   blockId: string,
   files: ReadonlyArray<File>,
 ): Promise<ImagePayload[]> {
-  const payloads = await Promise.all(
-    files.map(async (file): Promise<ImagePayload | null> => {
-      try {
-        return await createImagePayloadFromFile({ blockId, file });
-      } catch (error) {
-        console.error("Failed to create image asset.", error);
-        return null;
-      }
-    }),
-  );
-
-  return payloads.filter((payload): payload is ImagePayload => payload !== null);
+  try {
+    return await createImagePayloadsFromFiles({ blockId, files });
+  } catch (error) {
+    console.error("Failed to create image assets.", error);
+    return [];
+  }
 }
 
 async function insertImageFiles(
@@ -91,6 +132,38 @@ async function insertImageFiles(
       }
 
       insertImagePayloadsAtSelection(payloads);
+    },
+    { discrete: true },
+  );
+}
+
+async function insertInternalClipboardPayload(
+  editor: LexicalEditor,
+  targetBlockId: string,
+  payload: BlockEditorClipboardPayload,
+  selection: BaseSelection | null,
+): Promise<void> {
+  const sourceAssetUrls = payload.assets.map((asset) => asset.assetUrl);
+  const copiedAssets =
+    sourceAssetUrls.length > 0
+      ? await copyAsset({
+          assetUrls: sourceAssetUrls,
+          sourceBlockId: payload.sourceBlockId,
+          targetBlockId,
+        })
+      : { assets: [] };
+  const assetUrlMap = new Map(
+    copiedAssets.assets.map((asset) => [asset.sourceAssetUrl, asset.assetUrl]),
+  );
+  const rewrittenNodes = rewriteImageNodeUrls(payload.nodes, assetUrlMap);
+
+  editor.update(
+    () => {
+      if (selection) {
+        $setSelection(selection.clone());
+      }
+
+      insertSerializedNodesAtSelection(rewrittenNodes);
     },
     { discrete: true },
   );
@@ -132,7 +205,19 @@ export function registerImageInsertCommands(editor: LexicalEditor, blockId: stri
     editor.registerCommand(
       PASTE_COMMAND,
       (event) => {
-        const files = getSupportedImageFiles(getClipboardData(event));
+        const clipboardData = getClipboardData(event);
+        const internalPayload = clipboardData
+          ? parseBlockEditorClipboardPayload(clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME))
+          : null;
+        if (internalPayload) {
+          const selection = cloneCurrentSelection();
+          event.preventDefault();
+          event.stopPropagation();
+          void insertInternalClipboardPayload(editor, blockId, internalPayload, selection);
+          return true;
+        }
+
+        const files = getSupportedImageFiles(clipboardData);
         if (files.length === 0) {
           return false;
         }

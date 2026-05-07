@@ -1,34 +1,61 @@
-import { copyToClipboard, setLexicalClipboardDataTransfer } from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { COMMAND_PRIORITY_HIGH, COPY_COMMAND } from "lexical";
 import { useEffect } from "react";
 
-import { $createClipboardDataFromCurrentSelection } from "./clipboard-data";
+import {
+  createClipboardDataFromCurrentSelection,
+  type BlockEditorClipboardData,
+} from "./clipboard-data";
+import { BLOCK_EDITOR_CLIPBOARD_MIME } from "./clipboard-payload";
 
-export function ClipboardPlugin() {
+interface ClipboardPluginProps {
+  blockId: string;
+}
+
+export async function writeBlockEditorClipboardData(data: BlockEditorClipboardData): Promise<void> {
+  if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        [BLOCK_EDITOR_CLIPBOARD_MIME]: new Blob([data[BLOCK_EDITOR_CLIPBOARD_MIME]], {
+          type: BLOCK_EDITOR_CLIPBOARD_MIME,
+        }),
+        "text/html": new Blob([data["text/html"]], { type: "text/html" }),
+        "text/plain": new Blob([data["text/plain"]], { type: "text/plain" }),
+      }),
+    ]);
+    return;
+  }
+
+  await navigator.clipboard.writeText(data["text/plain"]);
+}
+
+export function ClipboardPlugin({ blockId }: ClipboardPluginProps) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
     return editor.registerCommand(
       COPY_COMMAND,
       (event) => {
-        const data = $createClipboardDataFromCurrentSelection(editor);
-        if (data === null) {
-          return false;
-        }
-
         if (event instanceof ClipboardEvent && event.clipboardData !== null) {
           event.preventDefault();
-          setLexicalClipboardDataTransfer(event.clipboardData, data);
+          void createClipboardDataFromCurrentSelection(editor, blockId).then((data) => {
+            if (data !== null) {
+              void writeBlockEditorClipboardData(data);
+            }
+          });
           return true;
         }
 
-        void copyToClipboard(editor, null, data);
+        void createClipboardDataFromCurrentSelection(editor, blockId).then((data) => {
+          if (data !== null) {
+            void writeBlockEditorClipboardData(data);
+          }
+        });
         return true;
       },
       COMMAND_PRIORITY_HIGH,
     );
-  }, [editor]);
+  }, [blockId, editor]);
 
   return null;
 }

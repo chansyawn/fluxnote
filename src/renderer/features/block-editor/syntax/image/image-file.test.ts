@@ -1,7 +1,11 @@
 import type { CreateAssetRequest } from "@renderer/clients";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { createImagePayloadFromFile, isSupportedImageMimeType } from "./image-file";
+import {
+  createImagePayloadFromFile,
+  createImagePayloadsFromFiles,
+  isSupportedImageMimeType,
+} from "./image-file";
 
 describe("image file helpers", () => {
   it("filters supported image mime types", () => {
@@ -14,15 +18,23 @@ describe("image file helpers", () => {
     const file = new File([new Uint8Array([1, 2, 3])], "photo.png", { type: "image/png" });
     const createAssetClient = vi.fn(async (input: CreateAssetRequest) => {
       expect(input).toEqual({
+        assets: [
+          {
+            dataBase64: "AQID",
+            fileName: "photo.png",
+            mimeType: "image/png",
+          },
+        ],
         blockId: "block-1",
-        dataBase64: "AQID",
-        fileName: "photo.png",
-        mimeType: "image/png",
       });
 
       return {
-        altText: "photo.png",
-        assetUrl: "assets://block-1/photo.png",
+        assets: [
+          {
+            altText: "photo.png",
+            assetUrl: "assets://block-1/photo.png",
+          },
+        ],
       };
     });
 
@@ -38,5 +50,28 @@ describe("image file helpers", () => {
       src: "assets://block-1/photo.png",
       title: null,
     });
+  });
+
+  it("creates multiple image payloads with one asset request", async () => {
+    const first = new File([new Uint8Array([1])], "first.png", { type: "image/png" });
+    const second = new File([new Uint8Array([2])], "second.png", { type: "image/png" });
+    const createAssetClient = vi.fn(async (_input: CreateAssetRequest) => ({
+      assets: [
+        { altText: "first.png", assetUrl: "assets://block-1/first.png" },
+        { altText: "second.png", assetUrl: "assets://block-1/second.png" },
+      ],
+    }));
+
+    const payloads = await createImagePayloadsFromFiles({
+      blockId: "block-1",
+      createAssetClient,
+      files: [first, second],
+    });
+
+    expect(createAssetClient).toHaveBeenCalledTimes(1);
+    expect(payloads).toEqual([
+      { alt: "first.png", src: "assets://block-1/first.png", title: null },
+      { alt: "second.png", src: "assets://block-1/second.png", title: null },
+    ]);
   });
 });

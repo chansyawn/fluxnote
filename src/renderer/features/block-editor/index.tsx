@@ -4,7 +4,6 @@ import type { LexicalEditor } from "lexical";
 import { useMemo, useRef } from "react";
 
 import { BlockEditorContent } from "./block-editor-content";
-import { BLOCK_EDITOR_CLIPBOARD_NAMESPACE } from "./clipboard/clipboard-data";
 import { importMarkdownToEditor } from "./editor-state";
 import { SYNTAX_NODES, SYNTAX_THEME } from "./syntax/registry";
 import type { BlockEditorProps } from "./types";
@@ -25,7 +24,7 @@ export function BlockEditor({
       editorState: (editor: LexicalEditor) => {
         importMarkdownToEditor(editor, initialMarkdownRef.current);
       },
-      namespace: BLOCK_EDITOR_CLIPBOARD_NAMESPACE,
+      namespace: "BlockEditor",
       nodes: [...SYNTAX_NODES],
       onError(error: Error) {
         throw error;

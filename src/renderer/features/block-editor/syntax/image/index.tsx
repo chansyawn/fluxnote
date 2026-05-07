@@ -20,7 +20,6 @@ export {
   isSupportedImageFile,
   isSupportedImageMimeType,
 } from "./image-file";
-export { ImageInsertPlugin, registerImageInsertCommands } from "./image-insert-plugin";
 export { IMAGE } from "./image-shortcut";
 
 export const IMAGE_SYNTAX = {

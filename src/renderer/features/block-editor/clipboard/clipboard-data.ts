@@ -1,8 +1,5 @@
-import {
-  $generateJSONFromSelectedNodes,
-  $getHtmlContent,
-  type LexicalClipboardData,
-} from "@lexical/clipboard";
+import { $generateJSONFromSelectedNodes, $getHtmlContent } from "@lexical/clipboard";
+import { resolveAsset, type ResolveAssetResult } from "@renderer/clients";
 import {
   $getSelection,
   $selectAll,
@@ -10,21 +7,24 @@ import {
   type BaseSelection,
   type LexicalEditor,
   type SerializedEditorState,
-  type SerializedLexicalNode,
 } from "lexical";
 
 import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
-
-export const BLOCK_EDITOR_CLIPBOARD_NAMESPACE = "BlockEditor";
-
-type ClipboardSerializedNode = SerializedLexicalNode &
-  Record<string, unknown> & {
-    children?: ClipboardSerializedNode[];
-  };
+import {
+  BLOCK_EDITOR_CLIPBOARD_MIME,
+  type BlockEditorClipboardPayload,
+  type ClipboardSerializedNode,
+} from "./clipboard-payload";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
 
-export type BlockEditorClipboardData = LexicalClipboardData;
+export interface BlockEditorClipboardData {
+  [BLOCK_EDITOR_CLIPBOARD_MIME]: string;
+  "text/html": string;
+  "text/plain": string;
+}
+
+type ResolveAssetsClient = typeof resolveAsset;
 
 const ROOT_BLOCK_NODE_TYPES = new Set([
   "code",
@@ -100,7 +100,7 @@ function createEditorStateFromClipboardNodes(
 }
 
 function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): string {
-  const editor = createMarkdownEditor(BLOCK_EDITOR_CLIPBOARD_NAMESPACE);
+  const editor = createMarkdownEditor("BlockEditorClipboardExport");
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
   return exportEditorStateToMarkdown(editorState);
 }
@@ -113,6 +113,42 @@ function escapeHtml(value: string): string {
     .replaceAll('"', "&quot;");
 }
 
+function exportInlineNodesToHtml(nodes: ReadonlyArray<ClipboardSerializedNode>): string {
+  return nodes
+    .map((node) => {
+      if (node.type === "text") {
+        return escapeHtml(typeof node.text === "string" ? node.text : "");
+      }
+
+      if (node.type === "image") {
+        const src = typeof node.src === "string" ? node.src : "";
+        const alt = typeof node.alt === "string" ? node.alt : "";
+        const title = typeof node.title === "string" ? ` title="${escapeHtml(node.title)}"` : "";
+        return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${title}>`;
+      }
+
+      return node.children ? exportInlineNodesToHtml(node.children) : "";
+    })
+    .join("");
+}
+
+function exportNodesToFallbackHtml(nodes: ReadonlyArray<ClipboardSerializedNode>): string {
+  return nodes
+    .map((node) => {
+      if (node.type === "heading") {
+        const tag = typeof node.tag === "string" ? node.tag : "h1";
+        return `<${tag}>${exportInlineNodesToHtml(node.children ?? [])}</${tag}>`;
+      }
+
+      if (node.children) {
+        return `<p>${exportInlineNodesToHtml(node.children)}</p>`;
+      }
+
+      return exportInlineNodesToHtml([node]);
+    })
+    .join("");
+}
+
 function exportSelectionToHtml(editor: LexicalEditor, selection: BaseSelection): string {
   try {
     return $getHtmlContent(editor, selection);
@@ -121,10 +157,62 @@ function exportSelectionToHtml(editor: LexicalEditor, selection: BaseSelection):
   }
 }
 
-function createClipboardDataFromSelection(
+function collectAssetUrlsFromNodes(nodes: ReadonlyArray<ClipboardSerializedNode>): string[] {
+  const assetUrls = new Set<string>();
+
+  const visit = (node: ClipboardSerializedNode) => {
+    if (node.type === "image" && typeof node.src === "string" && node.src.startsWith("assets://")) {
+      assetUrls.add(node.src);
+    }
+
+    node.children?.forEach(visit);
+  };
+
+  nodes.forEach(visit);
+  return Array.from(assetUrls);
+}
+
+function createAssetUrlMap(result: ResolveAssetResult): Map<string, string> {
+  return new Map(result.assets.map((asset) => [asset.assetUrl, asset.fileUrl]));
+}
+
+function replaceAssetUrls(value: string, assetUrlMap: Map<string, string>): string {
+  let nextValue = value;
+  for (const [assetUrl, fileUrl] of assetUrlMap) {
+    nextValue = nextValue.replaceAll(assetUrl, fileUrl);
+  }
+
+  return nextValue;
+}
+
+function createPayload(
+  sourceBlockId: string,
+  nodes: ClipboardSerializedNode[],
+  markdown: string,
+  resolvedAssets: ResolveAssetResult,
+): BlockEditorClipboardPayload {
+  return {
+    assets: resolvedAssets.assets.map((asset) => ({
+      assetUrl: asset.assetUrl,
+      fileUrl: asset.fileUrl,
+    })),
+    markdown,
+    nodes,
+    sourceBlockId,
+  };
+}
+
+function createClipboardSnapshotFromSelection(
   editor: LexicalEditor,
+  blockId: string,
   selection: BaseSelection,
-): BlockEditorClipboardData | null {
+): {
+  assetUrls: string[];
+  html: string;
+  markdown: string;
+  nodes: ClipboardSerializedNode[];
+  sourceBlockId: string;
+} | null {
   if (selection.isCollapsed() || selection.getNodes().length === 0) {
     return null;
   }
@@ -134,47 +222,87 @@ function createClipboardDataFromSelection(
     return null;
   }
 
+  const assetUrls = collectAssetUrlsFromNodes(lexical.nodes);
+  const markdown = exportClipboardNodesToMarkdown(lexical.nodes);
+  const exportedHtml = exportSelectionToHtml(editor, selection);
+  const html =
+    assetUrls.length > 0 && !assetUrls.some((assetUrl) => exportedHtml.includes(assetUrl))
+      ? exportNodesToFallbackHtml(lexical.nodes)
+      : exportedHtml;
+
   return {
-    "application/x-lexical-editor": JSON.stringify({
-      namespace: BLOCK_EDITOR_CLIPBOARD_NAMESPACE,
-      nodes: lexical.nodes,
-    }),
-    "text/html": exportSelectionToHtml(editor, selection),
-    "text/plain": exportClipboardNodesToMarkdown(lexical.nodes),
+    assetUrls,
+    html,
+    markdown,
+    nodes: lexical.nodes,
+    sourceBlockId: blockId,
   };
 }
 
-export function $createClipboardDataFromCurrentSelection(
-  editor: LexicalEditor,
-): BlockEditorClipboardData | null {
-  const selection = $getSelection();
-  if (selection === null) {
-    return null;
-  }
+async function createClipboardDataFromSnapshot(
+  snapshot: NonNullable<ReturnType<typeof createClipboardSnapshotFromSelection>>,
+  resolveAssetsClient: ResolveAssetsClient,
+): Promise<BlockEditorClipboardData> {
+  const resolvedAssets =
+    snapshot.assetUrls.length > 0
+      ? await resolveAssetsClient({ assetUrls: snapshot.assetUrls })
+      : { assets: [] };
+  const assetUrlMap = createAssetUrlMap(resolvedAssets);
+  const payload = createPayload(
+    snapshot.sourceBlockId,
+    snapshot.nodes,
+    snapshot.markdown,
+    resolvedAssets,
+  );
 
-  return createClipboardDataFromSelection(editor, selection);
+  return {
+    [BLOCK_EDITOR_CLIPBOARD_MIME]: JSON.stringify(payload),
+    "text/html": replaceAssetUrls(snapshot.html, assetUrlMap),
+    "text/plain": replaceAssetUrls(snapshot.markdown, assetUrlMap),
+  };
 }
 
-export function createClipboardDataFromCurrentSelection(
+export async function createClipboardDataFromCurrentSelection(
   editor: LexicalEditor,
-): BlockEditorClipboardData | null {
-  return editor.read(() => $createClipboardDataFromCurrentSelection(editor));
+  blockId: string,
+  resolveAssetsClient: ResolveAssetsClient = resolveAsset,
+): Promise<BlockEditorClipboardData | null> {
+  const snapshot = editor.read(() => {
+    const selection = $getSelection();
+    if (selection === null) {
+      return null;
+    }
+
+    return createClipboardSnapshotFromSelection(editor, blockId, selection);
+  });
+
+  return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;
 }
 
-export function createClipboardDataFromDocument(
+export async function createClipboardDataFromDocument(
   editor: LexicalEditor,
-): BlockEditorClipboardData | null {
-  let data: BlockEditorClipboardData | null = null;
+  blockId: string,
+  resolveAssetsClient: ResolveAssetsClient = resolveAsset,
+): Promise<BlockEditorClipboardData | null> {
+  let selection: BaseSelection | null = null;
 
   editor.update(
     () => {
       const previousSelection = $getSelection()?.clone() ?? null;
-      const selection = $selectAll();
-      data = createClipboardDataFromSelection(editor, selection);
+      selection = $selectAll();
       $setSelection(previousSelection);
     },
     { discrete: true },
   );
 
-  return data;
+  if (selection === null) {
+    return null;
+  }
+  const documentSelection = selection;
+
+  const snapshot = editor.read(() =>
+    createClipboardSnapshotFromSelection(editor, blockId, documentSelection),
+  );
+
+  return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;
 }

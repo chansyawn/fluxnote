@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createBlockRecord } from "../blocks/service";
 import { createTestDb } from "../test-db";
-import { copyAsset, createAsset } from "./service";
+import { copyAsset, createAsset, resolveAsset } from "./service";
 
 describe("assets service", () => {
   const paths = {
@@ -24,15 +24,19 @@ describe("assets service", () => {
         },
         ctx.db,
         {
+          assets: [
+            {
+              dataBase64: Buffer.from("hello").toString("base64"),
+              fileName: " hello world.png ",
+              mimeType: "image/png",
+            },
+          ],
           blockId: block.id,
-          dataBase64: Buffer.from("hello").toString("base64"),
-          fileName: " hello world.png ",
-          mimeType: "image/png",
         },
       );
 
-      expect(result.assetUrl.startsWith(`assets://${block.id}/`)).toBe(true);
-      expect(result.altText).toBe(" hello world.png ");
+      expect(result.assets[0]?.assetUrl.startsWith(`assets://${block.id}/`)).toBe(true);
+      expect(result.assets[0]?.altText).toBe(" hello world.png ");
       expect(writeFile).toHaveBeenCalledTimes(1);
     } finally {
       ctx.close();
@@ -47,42 +51,39 @@ describe("assets service", () => {
       const writeFile = vi.fn(async (_filePath: string, _data: Buffer) => undefined);
       const storage = { copyFile: vi.fn(), writeFile };
 
-      const first = await createAsset(
+      const result = await createAsset(
         {
           paths,
           storage,
         },
         ctx.db,
         {
+          assets: [
+            {
+              dataBase64: Buffer.from("first").toString("base64"),
+              fileName: "image.png",
+              mimeType: "image/png",
+            },
+            {
+              dataBase64: Buffer.from("second").toString("base64"),
+              fileName: "image.png",
+              mimeType: "image/png",
+            },
+          ],
           blockId: block.id,
-          dataBase64: Buffer.from("first").toString("base64"),
-          fileName: "image.png",
-          mimeType: "image/png",
-        },
-      );
-      const second = await createAsset(
-        {
-          paths,
-          storage,
-        },
-        ctx.db,
-        {
-          blockId: block.id,
-          dataBase64: Buffer.from("second").toString("base64"),
-          fileName: "image.png",
-          mimeType: "image/png",
         },
       );
 
+      const [first, second] = result.assets;
       const firstPath = writeFile.mock.calls[0]?.[0];
       const secondPath = writeFile.mock.calls[1]?.[0];
 
-      expect(first.assetUrl).not.toBe(second.assetUrl);
-      expect(first.altText).toBe("image.png");
-      expect(second.altText).toBe("image.png");
+      expect(first?.assetUrl).not.toBe(second?.assetUrl);
+      expect(first?.altText).toBe("image.png");
+      expect(second?.altText).toBe("image.png");
       expect(firstPath).not.toBe(secondPath);
-      expect(first.assetUrl).toContain("image.png");
-      expect(second.assetUrl).toContain("image.png");
+      expect(first?.assetUrl).toContain("image.png");
+      expect(second?.assetUrl).toContain("image.png");
       expect(writeFile).toHaveBeenCalledTimes(2);
     } finally {
       ctx.close();
@@ -104,14 +105,23 @@ describe("assets service", () => {
         },
         ctx.db,
         {
-          assetUrl: `assets://${source.id}/a.png`,
+          assetUrls: [`assets://${source.id}/a.png`, `assets://${source.id}/b.png`],
           sourceBlockId: source.id,
           targetBlockId: target.id,
         },
       );
 
-      expect(result.assetUrl.startsWith(`assets://${target.id}/`)).toBe(true);
-      expect(copyFile).toHaveBeenCalledTimes(1);
+      expect(result.assets).toEqual([
+        expect.objectContaining({
+          assetUrl: expect.stringContaining(`assets://${target.id}/`),
+          sourceAssetUrl: `assets://${source.id}/a.png`,
+        }),
+        expect.objectContaining({
+          assetUrl: expect.stringContaining(`assets://${target.id}/`),
+          sourceAssetUrl: `assets://${source.id}/b.png`,
+        }),
+      ]);
+      expect(copyFile).toHaveBeenCalledTimes(2);
     } finally {
       ctx.close();
       await ctx.cleanup();
@@ -132,12 +142,33 @@ describe("assets service", () => {
           },
           ctx.db,
           {
-            assetUrl: `assets://another/file.png`,
+            assetUrls: [`assets://another/file.png`],
             sourceBlockId: source.id,
             targetBlockId: target.id,
           },
         ),
       ).rejects.toMatchObject({ code: "BUSINESS.INVALID_OPERATION" });
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("resolves asset urls to file urls", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+
+      const result = await resolveAsset({ paths }, ctx.db, {
+        assetUrls: [`assets://${block.id}/image.png`],
+      });
+
+      expect(result.assets).toEqual([
+        {
+          assetUrl: `assets://${block.id}/image.png`,
+          fileUrl: `file:///tmp/${block.id}/image.png`,
+        },
+      ]);
     } finally {
       ctx.close();
       await ctx.cleanup();

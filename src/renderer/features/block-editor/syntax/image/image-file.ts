@@ -1,4 +1,4 @@
-import { createAsset, type CreateAssetResult } from "@renderer/clients";
+import { createAsset } from "@renderer/clients";
 
 import type { ImagePayload } from "./image-node";
 
@@ -8,6 +8,12 @@ export interface CreateImagePayloadFromFileInput {
   blockId: string;
   createAssetClient?: typeof createAsset;
   file: File;
+}
+
+export interface CreateImagePayloadsFromFilesInput {
+  blockId: string;
+  createAssetClient?: typeof createAsset;
+  files: ReadonlyArray<File>;
 }
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -20,14 +26,6 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   }
 
   return btoa(chunks.join(""));
-}
-
-function createImagePayloadFromAsset(result: CreateAssetResult): ImagePayload {
-  return {
-    alt: result.altText,
-    src: result.assetUrl,
-    title: null,
-  };
 }
 
 export function isSupportedImageMimeType(mimeType: string): boolean {
@@ -67,17 +65,37 @@ export async function createImagePayloadFromFile({
   createAssetClient = createAsset,
   file,
 }: CreateImagePayloadFromFileInput): Promise<ImagePayload | null> {
-  if (!isSupportedImageFile(file)) {
-    return null;
-  }
-
-  const dataBase64 = arrayBufferToBase64(await file.arrayBuffer());
-  const result = await createAssetClient({
+  const [payload = null] = await createImagePayloadsFromFiles({
     blockId,
-    dataBase64,
-    fileName: file.name || undefined,
-    mimeType: file.type,
+    createAssetClient,
+    files: [file],
   });
 
-  return createImagePayloadFromAsset(result);
+  return payload;
+}
+
+export async function createImagePayloadsFromFiles({
+  blockId,
+  createAssetClient = createAsset,
+  files,
+}: CreateImagePayloadsFromFilesInput): Promise<ImagePayload[]> {
+  const supportedFiles = files.filter(isSupportedImageFile);
+  if (supportedFiles.length === 0) {
+    return [];
+  }
+
+  const assets = await Promise.all(
+    supportedFiles.map(async (file) => ({
+      dataBase64: arrayBufferToBase64(await file.arrayBuffer()),
+      fileName: file.name || undefined,
+      mimeType: file.type,
+    })),
+  );
+  const result = await createAssetClient({ assets, blockId });
+
+  return result.assets.map((asset) => ({
+    alt: asset.altText,
+    src: asset.assetUrl,
+    title: null,
+  }));
 }
