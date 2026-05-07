@@ -66,6 +66,7 @@ export type SemanticInline =
   | SemanticDelete
   | SemanticInlineCode
   | SemanticLink
+  | SemanticImage
   | SemanticSoftBreak
   | SemanticHardBreak
   | SemanticOpaqueInline;
@@ -100,6 +101,13 @@ export interface SemanticLink {
   url: string;
   title: string | null;
   children: SemanticInline[];
+}
+
+export interface SemanticImage {
+  type: "image";
+  url: string;
+  alt: string;
+  title: string | null;
 }
 
 export interface SemanticSoftBreak {

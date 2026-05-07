@@ -8,6 +8,7 @@ export type SyntaxRegistrationId =
   | "break"
   | "code"
   | "heading"
+  | "image"
   | "inline-mark"
   | "link"
   | "list"
@@ -30,5 +31,6 @@ export interface SyntaxRegistration {
 }
 
 export interface SyntaxRuntimeContext {
+  blockId: string;
   markdownShortcuts: ReadonlyArray<Transformer>;
 }

@@ -9,15 +9,16 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { EditorState } from "lexical";
-import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
+import { useEffectEvent, useImperativeHandle, useMemo, useRef, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "./clipboard/clipboard-data";
 import { ClipboardPlugin } from "./clipboard/clipboard-plugin";
 import { exportEditorStateToMarkdown } from "./editor-state";
-import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_RUNTIME_PLUGINS } from "./syntax/registry";
+import { createSyntaxRuntimePlugins, MARKDOWN_SHORTCUT_TRANSFORMERS } from "./syntax/registry";
 import type { BlockEditorHandle } from "./types";
 
 interface BlockEditorContentProps {
+  blockId: string;
   initialMarkdown: string;
   onBlur?: () => void;
   onMarkdownUpdated: (markdown: string) => void;
@@ -37,6 +38,7 @@ function exportMarkdownFromState(editorState: EditorState): string {
 }
 
 export function BlockEditorContent({
+  blockId,
   initialMarkdown,
   onBlur,
   onMarkdownUpdated,
@@ -45,6 +47,7 @@ export function BlockEditorContent({
   const { i18n } = useLingui();
   const [editor] = useLexicalComposerContext();
   const latestMarkdownRef = useRef(initialMarkdown);
+  const syntaxRuntimePlugins = useMemo(() => createSyntaxRuntimePlugins({ blockId }), [blockId]);
 
   const handleMarkdownUpdated = useEffectEvent(onMarkdownUpdated);
 
@@ -80,7 +83,7 @@ export function BlockEditorContent({
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
-      {SYNTAX_RUNTIME_PLUGINS}
+      {syntaxRuntimePlugins}
       <ClipboardPlugin />
       <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />
       <OnChangePlugin

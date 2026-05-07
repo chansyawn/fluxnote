@@ -26,6 +26,15 @@ export interface CopyAssetInput {
   targetBlockId: string;
 }
 
+function createUniqueAssetFileName(fileNameCandidate: string | null, mimeType: string): string {
+  const uniquePrefix = `${Date.now()}-${crypto.randomUUID()}`;
+  if (fileNameCandidate) {
+    return sanitizeFileName(`${uniquePrefix}-${fileNameCandidate}`);
+  }
+
+  return sanitizeFileName(`${uniquePrefix}.${extFromMimeType(mimeType)}`);
+}
+
 export async function createAsset(
   deps: AssetServiceOptions,
   db: AppDatabase,
@@ -36,9 +45,7 @@ export async function createAsset(
     input.fileName && input.fileName.trim().length > 0 ? input.fileName : null;
   await assertBlockExists(db, input.blockId);
 
-  const ext = extFromMimeType(input.mimeType);
-  const baseName = fileNameCandidate ?? `${Date.now()}-${crypto.randomUUID()}.${ext}`;
-  const fileName = sanitizeFileName(baseName);
+  const fileName = createUniqueAssetFileName(fileNameCandidate, input.mimeType);
   const blockDir = deps.paths.getAssetPathForBlock(input.blockId);
   const filePath = path.join(blockDir, fileName);
 

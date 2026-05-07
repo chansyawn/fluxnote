@@ -70,6 +70,8 @@ function normalizeInline(node: SemanticInline): SemanticInline[] {
         ? [{ children, title: node.title ?? null, type: "link", url: node.url }]
         : [];
     }
+    case "image":
+      return [{ alt: node.alt, title: node.title ?? null, type: "image", url: node.url }];
     case "softBreak":
       return [{ type: "softBreak" }];
     case "hardBreak":

@@ -1,0 +1,5 @@
+@reference "#global.css";
+
+.block-editor__image {
+  @apply inline-block max-h-64 max-w-full rounded-md align-bottom;
+}

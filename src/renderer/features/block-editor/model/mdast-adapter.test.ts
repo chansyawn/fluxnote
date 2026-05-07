@@ -196,6 +196,30 @@ describe("semantic mdast adapter", () => {
     expect(canonicalMarkdown).toContain("`code`");
   });
 
+  it("roundtrips image as semantic inline content", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      'Before ![Alt text](https://example.com/image.png "Preview") after',
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual({
+      children: [
+        { type: "text", value: "Before " },
+        {
+          alt: "Alt text",
+          title: "Preview",
+          type: "image",
+          url: "https://example.com/image.png",
+        },
+        { type: "text", value: " after" },
+      ],
+      type: "paragraph",
+    });
+    expect(canonicalMarkdown).toBe(
+      'Before ![Alt text](https://example.com/image.png "Preview") after\n',
+    );
+  });
+
   it("classifies plain markdown newlines as soft breaks", () => {
     const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic("Alpha\nBeta");
 
@@ -283,8 +307,6 @@ describe("semantic mdast adapter", () => {
     const semantic = mdastToSemanticDocument(
       parseMarkdownToMdast(
         [
-          "![Alt](https://example.com/image.png)",
-          "",
           "| A | B |",
           "| - | - |",
           "| 1 | 2 |",
@@ -300,7 +322,6 @@ describe("semantic mdast adapter", () => {
 
     expect(JSON.stringify(semantic)).not.toContain("position");
     expect(JSON.stringify(semantic)).not.toContain("offset");
-    expect(JSON.stringify(semantic)).toContain("opaqueInline");
     expect(JSON.stringify(semantic)).toContain("opaqueBlock");
   });
 

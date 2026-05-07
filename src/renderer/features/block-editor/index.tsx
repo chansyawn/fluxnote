@@ -10,7 +10,13 @@ import { SYNTAX_NODES, SYNTAX_THEME } from "./syntax/registry";
 import type { BlockEditorProps } from "./types";
 export type { BlockEditorHandle, BlockEditorProps } from "./types";
 
-export function BlockEditor({ ref, initialMarkdown, onBlur, onMarkdownUpdated }: BlockEditorProps) {
+export function BlockEditor({
+  ref,
+  blockId,
+  initialMarkdown,
+  onBlur,
+  onMarkdownUpdated,
+}: BlockEditorProps) {
   // initialMarkdown is initial-only; prop changes do not re-import editor state.
   const initialMarkdownRef = useRef(initialMarkdown);
 
@@ -34,6 +40,7 @@ export function BlockEditor({ ref, initialMarkdown, onBlur, onMarkdownUpdated }:
       <LexicalComposer initialConfig={initialConfig}>
         <BlockEditorContent
           ref={ref}
+          blockId={blockId}
           initialMarkdown={initialMarkdown}
           onBlur={onBlur}
           onMarkdownUpdated={onMarkdownUpdated}

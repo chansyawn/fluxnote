@@ -33,7 +33,7 @@ export { createPlaceholderPayload, type PlaceholderPayload } from "./placeholder
 export const PLACEHOLDERS_SYNTAX = {
   id: "placeholders",
   lexicalNodeNames: ["PlaceholderBlockNode", "PlaceholderInlineNode"],
-  mdastTypes: ["html", "image", "imageReference", "math", "inlineMath", "unknown"],
+  mdastTypes: ["html", "imageReference", "math", "inlineMath", "unknown"],
   nodes: [PlaceholderBlockNode, PlaceholderInlineNode],
   semanticTypes: ["opaqueBlock", "opaqueInline"],
 } satisfies SyntaxRegistration;

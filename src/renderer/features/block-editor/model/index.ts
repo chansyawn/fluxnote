@@ -8,6 +8,7 @@ export type {
   SemanticEmphasis,
   SemanticHardBreak,
   SemanticHeading,
+  SemanticImage,
   SemanticInline,
   SemanticInlineCode,
   SemanticLink,

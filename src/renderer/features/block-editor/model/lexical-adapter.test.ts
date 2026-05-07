@@ -160,4 +160,27 @@ describe("semantic lexical adapter", () => {
 
     expect(roundTripLexical(semantic)).toEqual(semantic);
   });
+
+  it("keeps images inline through Lexical", () => {
+    const semantic = normalizeSemanticDocument({
+      children: [
+        {
+          children: [
+            { type: "text", value: "Before " },
+            {
+              alt: "Alt text",
+              title: "Preview",
+              type: "image",
+              url: "assets://block-1/photo.png",
+            },
+            { type: "text", value: " after" },
+          ],
+          type: "paragraph",
+        },
+      ],
+      type: "root",
+    });
+
+    expect(roundTripLexical(semantic)).toEqual(semantic);
+  });
 });

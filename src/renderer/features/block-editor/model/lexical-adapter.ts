@@ -21,6 +21,7 @@ import {
 import { $createSoftBreakNode, $isSoftBreakNode } from "../syntax/break";
 import { codeBlockFromLexical, codeBlockToLexical } from "../syntax/code";
 import { headingTagToDepth, headingToLexical } from "../syntax/heading";
+import { $isImageNode, imageFromLexical, imageToLexical } from "../syntax/image";
 import { listFromLexical, listItemFromLexical, listToLexical } from "../syntax/list";
 import { paragraphToLexical } from "../syntax/paragraph";
 import {
@@ -88,6 +89,8 @@ function inlineToLexical(
       link.append(...node.children.flatMap((child) => inlineToLexical(child, formats)));
       return [link];
     }
+    case "image":
+      return [imageToLexical(node)];
     case "opaqueInline":
       return [opaqueInlineToLexical(node)];
   }
@@ -169,6 +172,10 @@ function inlineFromLexical(node: LexicalNode): SemanticInline[] {
         url: node.getURL(),
       },
     ];
+  }
+
+  if ($isImageNode(node)) {
+    return [imageFromLexical(node)];
   }
 
   if ($isPlaceholderInlineNode(node)) {

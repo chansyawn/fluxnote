@@ -5,13 +5,18 @@ import type { ReactNode } from "react";
 import { BREAK_SYNTAX } from "./break";
 import { CODE_SYNTAX } from "./code";
 import { HEADING_SYNTAX } from "./heading";
+import { IMAGE_SYNTAX } from "./image";
 import { INLINE_MARK_SYNTAX } from "./inline-mark";
 import { LINK_SYNTAX } from "./link";
 import { LIST_SYNTAX } from "./list";
 import { PARAGRAPH_SYNTAX } from "./paragraph";
 import { PLACEHOLDERS_SYNTAX } from "./placeholders";
 import { QUOTE_SYNTAX } from "./quote";
-import type { SyntaxRegistration, SyntaxRegistrationId } from "./registration";
+import type {
+  SyntaxRegistration,
+  SyntaxRegistrationId,
+  SyntaxRuntimeContext,
+} from "./registration";
 import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
 
 const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
@@ -22,6 +27,7 @@ const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
   THEMATIC_BREAK_SYNTAX,
   CODE_SYNTAX,
   INLINE_MARK_SYNTAX,
+  IMAGE_SYNTAX,
   LINK_SYNTAX,
   PARAGRAPH_SYNTAX,
   PLACEHOLDERS_SYNTAX,
@@ -32,6 +38,7 @@ const SYNTAX_NODE_REGISTRATION_ORDER = [
   "code",
   "thematic-break",
   "heading",
+  "image",
   "link",
   "list",
   "quote",
@@ -85,10 +92,17 @@ export const MARKDOWN_SHORTCUT_TRANSFORMERS: Transformer[] = SYNTAX_REGISTRY.fla
   (syntax): Transformer[] => Array.from(syntax.markdownShortcuts ?? []),
 );
 
-export const SYNTAX_RUNTIME_PLUGINS: ReadonlyArray<ReactNode> = SYNTAX_REGISTRY.flatMap(
-  (syntax): ReactNode[] =>
-    syntax.runtimePlugins?.({ markdownShortcuts: MARKDOWN_SHORTCUT_TRANSFORMERS }) ?? [],
-);
+export function createSyntaxRuntimePlugins(
+  context: Omit<SyntaxRuntimeContext, "markdownShortcuts">,
+): ReadonlyArray<ReactNode> {
+  return SYNTAX_REGISTRY.flatMap(
+    (syntax): ReactNode[] =>
+      syntax.runtimePlugins?.({
+        ...context,
+        markdownShortcuts: MARKDOWN_SHORTCUT_TRANSFORMERS,
+      }) ?? [],
+  );
+}
 
 export const SYNTAX_THEME: EditorThemeClasses = mergeThemeFragments(SYNTAX_REGISTRY);
 

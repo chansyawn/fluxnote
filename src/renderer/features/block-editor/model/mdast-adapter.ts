@@ -2,6 +2,7 @@ import type {
   BlockContent,
   Break,
   InlineCode,
+  Image,
   PhrasingContent,
   Root,
   RootContent,
@@ -10,6 +11,7 @@ import type {
 
 import { codeBlockFromMdast, codeBlockToMdast } from "../syntax/code";
 import { headingFromMdast, headingToMdast } from "../syntax/heading";
+import { imageFromMdast, imageToMdast } from "../syntax/image";
 import {
   deleteFromMdast,
   deleteToMdast,
@@ -66,6 +68,8 @@ function inlineFromMdast(node: PhrasingContent): SemanticInline[] {
       return [{ type: "inlineCode", value: node.value }];
     case "link":
       return [linkFromMdast(node, inlinesFromMdast)];
+    case "image":
+      return [imageFromMdast(node)];
     default:
       return [opaqueInlineFromMdast(node)];
   }
@@ -118,6 +122,8 @@ function inlineToMdast(node: SemanticInline): PhrasingContent[] {
       return [{ type: "inlineCode", value: node.value } satisfies InlineCode];
     case "link":
       return [linkToMdast(node, inlinesToMdast)];
+    case "image":
+      return [imageToMdast(node) satisfies Image];
     case "opaqueInline":
       return opaqueInlineToMdast(node);
   }

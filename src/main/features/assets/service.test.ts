@@ -40,6 +40,56 @@ describe("assets service", () => {
     }
   });
 
+  it("creates unique asset urls for repeated original file names", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const writeFile = vi.fn(async (_filePath: string, _data: Buffer) => undefined);
+      const storage = { copyFile: vi.fn(), writeFile };
+
+      const first = await createAsset(
+        {
+          paths,
+          storage,
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          dataBase64: Buffer.from("first").toString("base64"),
+          fileName: "image.png",
+          mimeType: "image/png",
+        },
+      );
+      const second = await createAsset(
+        {
+          paths,
+          storage,
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          dataBase64: Buffer.from("second").toString("base64"),
+          fileName: "image.png",
+          mimeType: "image/png",
+        },
+      );
+
+      const firstPath = writeFile.mock.calls[0]?.[0];
+      const secondPath = writeFile.mock.calls[1]?.[0];
+
+      expect(first.assetUrl).not.toBe(second.assetUrl);
+      expect(first.altText).toBe("image.png");
+      expect(second.altText).toBe("image.png");
+      expect(firstPath).not.toBe(secondPath);
+      expect(first.assetUrl).toContain("image.png");
+      expect(second.assetUrl).toContain("image.png");
+      expect(writeFile).toHaveBeenCalledTimes(2);
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
   it("copies asset for target block", async () => {
     const ctx = await createTestDb();
     try {

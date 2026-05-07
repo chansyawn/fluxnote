@@ -5,7 +5,7 @@ import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,
 } from "../test-helper/headless-editor-test-utils";
-import { SYNTAX_NODES, SYNTAX_RUNTIME_PLUGINS } from "./registry";
+import { createSyntaxRuntimePlugins, SYNTAX_NODES } from "./registry";
 
 describe("syntax registry", () => {
   it("provides lexical nodes for headless editor initialization", () => {
@@ -16,19 +16,34 @@ describe("syntax registry", () => {
   });
 
   it("exposes renderable runtime plugins", () => {
-    expect(SYNTAX_RUNTIME_PLUGINS.length).toBeGreaterThan(0);
+    const runtimePlugins = createSyntaxRuntimePlugins({ blockId: "block-1" });
+
+    expect(runtimePlugins.length).toBeGreaterThan(0);
     expect(
-      SYNTAX_RUNTIME_PLUGINS.map((plugin) => (isValidElement(plugin) ? plugin.type : null)),
+      runtimePlugins.map((plugin) => (isValidElement(plugin) ? plugin.type : null)),
     ).not.toContain(null);
   });
 
   it("supports markdown shortcut parsing with aggregated registry", () => {
-    const semantic = parseMarkdownWithShortcuts(["# Heading", "", "- [x] Done"].join("\n"));
+    const semantic = parseMarkdownWithShortcuts(
+      ["# Heading", "", "- [x] Done", "", "![Alt](https://example.com/image.png)"].join("\n"),
+    );
 
     expect(semantic.children[0]).toMatchObject({ type: "heading" });
     expect(semantic.children[1]).toMatchObject({
       children: [expect.objectContaining({ checked: true })],
       type: "list",
+    });
+    expect(semantic.children[2]).toEqual({
+      children: [
+        {
+          alt: "Alt",
+          title: null,
+          type: "image",
+          url: "https://example.com/image.png",
+        },
+      ],
+      type: "paragraph",
     });
   });
 
