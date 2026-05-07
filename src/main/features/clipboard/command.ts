@@ -39,6 +39,7 @@ export function registerClipboardCommands(ipc: IpcRouter): void {
   ipc.command("clipboard.write", (data) => {
     latestBlockEditorData = data;
     const image = createClipboardImage(data[BLOCK_EDITOR_CLIPBOARD_IMAGE_FILE_URL]);
+    // Electron writeBuffer replaces the clipboard payload, so custom app data stays in memory.
     clipboard.write({
       html: data["text/html"],
       ...(image ? { image } : {}),
