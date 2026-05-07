@@ -5,6 +5,7 @@ import "./index.css";
 import type { SyntaxRegistration } from "../registration";
 import { CodeBlockControlsPlugin } from "./code-block-controls-plugin";
 import { CodeHighlightPlugin } from "./code-highlight-plugin";
+import { CodeKeyboardPlugin } from "./code-keyboard-plugin";
 
 export { codeBlockFromLexical, codeBlockToLexical } from "./lexical";
 export { codeBlockFromMdast, codeBlockToMdast } from "./mdast";
@@ -16,6 +17,7 @@ export const CODE_SYNTAX = {
   nodes: [CodeNode, CodeHighlightNode],
   markdownShortcuts: [CODE],
   runtimePlugins: () => [
+    <CodeKeyboardPlugin key="code-keyboard" />,
     <CodeHighlightPlugin key="code-highlight" />,
     <CodeBlockControlsPlugin key="code-block-controls" />,
   ],
