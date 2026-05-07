@@ -12,17 +12,12 @@ import {
 import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
 import {
   BLOCK_EDITOR_CLIPBOARD_MIME,
+  type BlockEditorClipboardData,
   type BlockEditorClipboardPayload,
   type ClipboardSerializedNode,
 } from "./clipboard-payload";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
-
-export interface BlockEditorClipboardData {
-  [BLOCK_EDITOR_CLIPBOARD_MIME]: string;
-  "text/html": string;
-  "text/plain": string;
-}
 
 type ResolveAssetsClient = typeof resolveAsset;
 

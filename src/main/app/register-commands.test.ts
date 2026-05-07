@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   registerAssetsCommands: vi.fn(),
   registerBlocksCommands: vi.fn(),
+  registerClipboardCommands: vi.fn(),
   registerCliCommands: vi.fn(),
   registerExternalEditCommands: vi.fn(),
   registerOpenBlockCommands: vi.fn(),
@@ -17,6 +18,9 @@ vi.mock("../features/assets/command", () => ({
 }));
 vi.mock("../features/blocks/command", () => ({
   registerBlocksCommands: mocks.registerBlocksCommands,
+}));
+vi.mock("../features/clipboard", () => ({
+  registerClipboardCommands: mocks.registerClipboardCommands,
 }));
 vi.mock("../features/cli/command", () => ({ registerCliCommands: mocks.registerCliCommands }));
 vi.mock("../features/external-edit/command", () => ({
@@ -56,6 +60,7 @@ describe("registerFeatureCommands", () => {
 
     expect(mocks.registerAssetsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerBlocksCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerClipboardCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerCliCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerExternalEditCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerOpenBlockCommands).toHaveBeenCalledTimes(1);

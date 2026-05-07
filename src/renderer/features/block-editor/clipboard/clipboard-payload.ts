@@ -1,12 +1,10 @@
-import type { SerializedLexicalNode } from "lexical";
+export {
+  BLOCK_EDITOR_CLIPBOARD_MIME,
+  type BlockEditorClipboardData,
+  type ClipboardSerializedNode,
+} from "@shared/features/block-editor/clipboard";
 
-export const BLOCK_EDITOR_CLIPBOARD_MIME = "application/x-fluxnote-block-editor";
-
-export type ClipboardSerializedNode = SerializedLexicalNode &
-  Record<string, unknown> & {
-    children?: ClipboardSerializedNode[];
-    src?: unknown;
-  };
+import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 
 export interface BlockEditorClipboardPayload {
   assets: Array<{

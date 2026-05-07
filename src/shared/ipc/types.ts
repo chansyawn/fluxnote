@@ -1,6 +1,7 @@
 import { assetsContract } from "@shared/features/assets/contract";
 import { blocksContract } from "@shared/features/blocks/contract";
 import { cliContract } from "@shared/features/cli/contract";
+import { clipboardContract } from "@shared/features/clipboard/contract";
 import { externalEditContract } from "@shared/features/external-edit/contract";
 import { openBlockContract } from "@shared/features/open-block/contract";
 import { preferencesContract } from "@shared/features/preferences/contract";
@@ -13,6 +14,7 @@ export const contracts = {
   commands: {
     ...assetsContract.commands,
     ...blocksContract.commands,
+    ...clipboardContract.commands,
     ...cliContract.commands,
     ...externalEditContract.commands,
     ...openBlockContract.commands,
@@ -23,6 +25,7 @@ export const contracts = {
   },
   events: {
     ...blocksContract.events,
+    ...clipboardContract.events,
     ...externalEditContract.events,
     ...openBlockContract.events,
     ...shortcutContract.events,

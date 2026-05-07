@@ -1,4 +1,7 @@
-import { $generateNodesFromSerializedNodes } from "@lexical/clipboard";
+import {
+  $generateNodesFromSerializedNodes,
+  $insertDataTransferForRichText,
+} from "@lexical/clipboard";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import { copyAsset } from "@renderer/clients";
@@ -41,6 +44,12 @@ function getClipboardData(event: PasteCommandType): DataTransfer | null {
 
 function cloneCurrentSelection(): BaseSelection | null {
   return $getSelection()?.clone() ?? null;
+}
+
+async function readInternalClipboardPayload(): Promise<BlockEditorClipboardPayload | null> {
+  const result = await window.clipboard?.read();
+  const value = result?.data?.[BLOCK_EDITOR_CLIPBOARD_MIME];
+  return value ? parseBlockEditorClipboardPayload(value) : null;
 }
 
 function insertImagePayloadsAtSelection(payloads: ReadonlyArray<ImagePayload>): boolean {
@@ -137,6 +146,26 @@ async function insertImageFiles(
   );
 }
 
+function insertRichTextDataAtSelection(
+  editor: LexicalEditor,
+  dataTransfer: DataTransfer,
+  selection: BaseSelection | null,
+): void {
+  editor.update(
+    () => {
+      if (selection) {
+        $setSelection(selection.clone());
+      }
+
+      const currentSelection = $getSelection();
+      if (currentSelection) {
+        $insertDataTransferForRichText(dataTransfer, currentSelection, editor);
+      }
+    },
+    { discrete: true },
+  );
+}
+
 async function insertInternalClipboardPayload(
   editor: LexicalEditor,
   targetBlockId: string,
@@ -206,11 +235,11 @@ export function registerImageInsertCommands(editor: LexicalEditor, blockId: stri
       PASTE_COMMAND,
       (event) => {
         const clipboardData = getClipboardData(event);
+        const selection = cloneCurrentSelection();
         const internalPayload = clipboardData
           ? parseBlockEditorClipboardPayload(clipboardData.getData(BLOCK_EDITOR_CLIPBOARD_MIME))
           : null;
         if (internalPayload) {
-          const selection = cloneCurrentSelection();
           event.preventDefault();
           event.stopPropagation();
           void insertInternalClipboardPayload(editor, blockId, internalPayload, selection);
@@ -218,14 +247,27 @@ export function registerImageInsertCommands(editor: LexicalEditor, blockId: stri
         }
 
         const files = getSupportedImageFiles(clipboardData);
-        if (files.length === 0) {
+        if (files.length > 0) {
+          event.preventDefault();
+          event.stopPropagation();
+          void insertImageFiles(editor, blockId, files, selection);
+          return true;
+        }
+
+        if (!window.clipboard?.read || clipboardData === null) {
           return false;
         }
 
-        const selection = cloneCurrentSelection();
         event.preventDefault();
         event.stopPropagation();
-        void insertImageFiles(editor, blockId, files, selection);
+        void readInternalClipboardPayload().then((payload) => {
+          if (payload !== null) {
+            void insertInternalClipboardPayload(editor, blockId, payload, selection);
+            return;
+          }
+
+          insertRichTextDataAtSelection(editor, clipboardData, selection);
+        });
         return true;
       },
       COMMAND_PRIORITY_HIGH,

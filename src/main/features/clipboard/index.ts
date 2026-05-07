@@ -1,0 +1,1 @@
+export { registerClipboardCommands } from "./command";
