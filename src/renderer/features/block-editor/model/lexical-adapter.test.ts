@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import type { SemanticDocument } from "../../model";
-import { normalizeSemanticDocument } from "../../model";
 import {
   createHeadlessMarkdownEditor,
   markdownToSemantic,
-} from "../../test-helper/headless-editor-test-utils";
+} from "../test-helper/headless-editor-test-utils";
+import type { SemanticDocument } from "./document";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
 } from "./lexical-adapter";
+import { normalizeSemanticDocument } from "./normalize";
 
 function roundTripLexical(document: SemanticDocument): SemanticDocument {
   const editor = createHeadlessMarkdownEditor();

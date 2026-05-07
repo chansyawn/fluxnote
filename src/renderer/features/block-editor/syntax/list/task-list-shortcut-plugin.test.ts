@@ -1,12 +1,13 @@
 import { $getRoot, $isTextNode } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { exportEditorStateToMarkdown } from "../../core/editor-state";
+import { exportEditorStateToMarkdown } from "../../editor-state";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
-} from "../../core/semantic/lexical-adapter";
-import type { SemanticDocument, SemanticParagraph } from "../../model";
+  type SemanticDocument,
+  type SemanticParagraph,
+} from "../../model";
 import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,

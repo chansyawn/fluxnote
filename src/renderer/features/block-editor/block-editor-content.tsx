@@ -13,7 +13,7 @@ import { useEffectEvent, useImperativeHandle, useRef, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "./clipboard/clipboard-data";
 import { ClipboardPlugin } from "./clipboard/clipboard-plugin";
-import { exportEditorStateToMarkdown } from "./core/editor-state";
+import { exportEditorStateToMarkdown } from "./editor-state";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_RUNTIME_PLUGINS } from "./syntax/registry";
 import type { BlockEditorHandle } from "./types";
 

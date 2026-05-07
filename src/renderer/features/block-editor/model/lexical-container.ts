@@ -1,6 +1,6 @@
 import { $isLineBreakNode, $isTextNode, type LexicalNode } from "lexical";
 
-import type { SemanticBlock, SemanticInline } from "../../model";
+import type { SemanticBlock, SemanticInline } from "./document";
 
 interface LexicalContainerChildrenOptions {
   children: ReadonlyArray<LexicalNode>;

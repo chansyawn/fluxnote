@@ -1,10 +1,7 @@
 import { $getRoot, $isTextNode, KEY_ENTER_COMMAND } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import {
-  exportLexicalToSemanticDocument,
-  importSemanticDocumentToLexical,
-} from "../../core/semantic/lexical-adapter";
+import { exportLexicalToSemanticDocument, importSemanticDocumentToLexical } from "../../model";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { registerSoftBreakShortcut } from "./soft-break-shortcut-plugin";
 

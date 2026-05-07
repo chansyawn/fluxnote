@@ -18,18 +18,11 @@ import {
   type TextNode,
 } from "lexical";
 
-import type {
-  SemanticBlock,
-  SemanticDocument,
-  SemanticInline,
-  SemanticListItem,
-} from "../../model";
-import { normalizeSemanticDocument } from "../../model";
-import { $createSoftBreakNode, $isSoftBreakNode } from "../../syntax/break";
-import { codeBlockFromLexical, codeBlockToLexical } from "../../syntax/code";
-import { headingTagToDepth, headingToLexical } from "../../syntax/heading";
-import { listFromLexical, listItemFromLexical, listToLexical } from "../../syntax/list";
-import { paragraphToLexical } from "../../syntax/paragraph";
+import { $createSoftBreakNode, $isSoftBreakNode } from "../syntax/break";
+import { codeBlockFromLexical, codeBlockToLexical } from "../syntax/code";
+import { headingTagToDepth, headingToLexical } from "../syntax/heading";
+import { listFromLexical, listItemFromLexical, listToLexical } from "../syntax/list";
+import { paragraphToLexical } from "../syntax/paragraph";
 import {
   $isPlaceholderBlockNode,
   $isPlaceholderInlineNode,
@@ -37,10 +30,12 @@ import {
   opaqueBlockToLexical,
   opaqueInlineFromLexical,
   opaqueInlineToLexical,
-} from "../../syntax/placeholders";
-import { quoteFromLexical, quoteToLexical } from "../../syntax/quote";
-import { thematicBreakFromLexical, thematicBreakToLexical } from "../../syntax/thematic-break";
+} from "../syntax/placeholders";
+import { quoteFromLexical, quoteToLexical } from "../syntax/quote";
+import { thematicBreakFromLexical, thematicBreakToLexical } from "../syntax/thematic-break";
+import type { SemanticBlock, SemanticDocument, SemanticInline, SemanticListItem } from "./document";
 import { lexicalContainerChildrenToBlocks } from "./lexical-container";
+import { normalizeSemanticDocument } from "./normalize";
 
 function applyTextFormats(node: TextNode, formats: ReadonlyArray<TextFormatType>): TextNode {
   for (const format of formats) {

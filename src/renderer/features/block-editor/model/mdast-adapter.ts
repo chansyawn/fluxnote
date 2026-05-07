@@ -8,10 +8,8 @@ import type {
   Text,
 } from "mdast";
 
-import type { SemanticBlock, SemanticDocument, SemanticInline } from "../../model";
-import { normalizeSemanticDocument } from "../../model";
-import { codeBlockFromMdast, codeBlockToMdast } from "../../syntax/code";
-import { headingFromMdast, headingToMdast } from "../../syntax/heading";
+import { codeBlockFromMdast, codeBlockToMdast } from "../syntax/code";
+import { headingFromMdast, headingToMdast } from "../syntax/heading";
 import {
   deleteFromMdast,
   deleteToMdast,
@@ -19,19 +17,21 @@ import {
   emphasisToMdast,
   strongFromMdast,
   strongToMdast,
-} from "../../syntax/inline-mark";
-import { linkFromMdast, linkToMdast } from "../../syntax/link";
-import { listFromMdast, listToMdast } from "../../syntax/list";
-import { paragraphFromMdast, paragraphToMdast } from "../../syntax/paragraph";
+} from "../syntax/inline-mark";
+import { linkFromMdast, linkToMdast } from "../syntax/link";
+import { listFromMdast, listToMdast } from "../syntax/list";
+import { paragraphFromMdast, paragraphToMdast } from "../syntax/paragraph";
 import {
   opaqueBlockFromMdast,
   opaqueBlockToMdast,
   opaqueInlineFallbackParagraph,
   opaqueInlineFromMdast,
   opaqueInlineToMdast,
-} from "../../syntax/placeholders";
-import { quoteFromMdast, quoteToMdast } from "../../syntax/quote";
-import { thematicBreakFromMdast, thematicBreakToMdast } from "../../syntax/thematic-break";
+} from "../syntax/placeholders";
+import { quoteFromMdast, quoteToMdast } from "../syntax/quote";
+import { thematicBreakFromMdast, thematicBreakToMdast } from "../syntax/thematic-break";
+import type { SemanticBlock, SemanticDocument, SemanticInline } from "./document";
+import { normalizeSemanticDocument } from "./normalize";
 
 function textFromMdast(value: string): SemanticInline[] {
   const parts = value.split("\n");

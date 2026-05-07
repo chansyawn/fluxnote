@@ -5,15 +5,13 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
-} from "../../core/semantic/lexical-adapter";
-import type {
-  SemanticBlock,
-  SemanticBlockquote,
-  SemanticCodeBlock,
-  SemanticDocument,
-  SemanticList,
-  SemanticListItem,
-  SemanticParagraph,
+  type SemanticBlock,
+  type SemanticBlockquote,
+  type SemanticCodeBlock,
+  type SemanticDocument,
+  type SemanticList,
+  type SemanticListItem,
+  type SemanticParagraph,
 } from "../../model";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../registry";

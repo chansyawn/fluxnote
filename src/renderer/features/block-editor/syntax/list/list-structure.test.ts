@@ -3,12 +3,10 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
-} from "../../core/semantic/lexical-adapter";
-import type {
-  SemanticBlock,
-  SemanticDocument,
-  SemanticListItem,
-  SemanticParagraph,
+  type SemanticBlock,
+  type SemanticDocument,
+  type SemanticListItem,
+  type SemanticParagraph,
 } from "../../model";
 import {
   createHeadlessMarkdownEditor,

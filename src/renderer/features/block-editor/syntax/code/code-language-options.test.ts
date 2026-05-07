@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../core/editor-state";
+import { roundTripMarkdown } from "../../editor-state";
 import {
   CODE_LANGUAGE_OPTIONS,
   getCodeLanguageLabel,

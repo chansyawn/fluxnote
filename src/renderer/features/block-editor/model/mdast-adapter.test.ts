@@ -1,7 +1,7 @@
 import type { Root } from "mdast";
 import { describe, expect, it } from "vite-plus/test";
 
-import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../../markdown/processor";
+import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
 import { mdastToSemanticDocument, semanticDocumentToMdast } from "./mdast-adapter";
 
 function roundTripSemantic(markdown: string) {

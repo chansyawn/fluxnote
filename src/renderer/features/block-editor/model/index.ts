@@ -22,4 +22,9 @@ export type {
   SemanticThematicBreak,
 } from "./document";
 export { createEmptyDocument } from "./document";
+export {
+  exportLexicalToSemanticDocument,
+  importSemanticDocumentToLexical,
+} from "./lexical-adapter";
+export { mdastToSemanticDocument, semanticDocumentToMdast } from "./mdast-adapter";
 export { normalizeSemanticDocument } from "./normalize";

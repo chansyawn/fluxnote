@@ -5,7 +5,7 @@ import { useMemo, useRef } from "react";
 
 import { BlockEditorContent } from "./block-editor-content";
 import { BLOCK_EDITOR_CLIPBOARD_NAMESPACE } from "./clipboard/clipboard-data";
-import { importMarkdownToEditor } from "./core/editor-state";
+import { importMarkdownToEditor } from "./editor-state";
 import { SYNTAX_NODES, SYNTAX_THEME } from "./syntax/registry";
 import type { BlockEditorProps } from "./types";
 export type { BlockEditorHandle, BlockEditorProps } from "./types";

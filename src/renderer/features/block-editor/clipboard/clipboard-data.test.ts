@@ -7,7 +7,7 @@ import {
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { importMarkdownToEditor } from "../core/editor-state";
+import { importMarkdownToEditor } from "../editor-state";
 import { createHeadlessMarkdownEditor } from "../test-helper/headless-editor-test-utils";
 import {
   BLOCK_EDITOR_CLIPBOARD_NAMESPACE,

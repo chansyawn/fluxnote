@@ -2,11 +2,13 @@ import { createHeadlessEditor } from "@lexical/headless";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import type { LexicalEditor, SerializedEditorState } from "lexical";
 
-import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/editor-state";
-import { exportLexicalToSemanticDocument } from "../core/semantic/lexical-adapter";
-import { mdastToSemanticDocument } from "../core/semantic/mdast-adapter";
+import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../editor-state";
 import { parseMarkdownToMdast } from "../markdown/processor";
-import type { SemanticDocument } from "../model";
+import {
+  exportLexicalToSemanticDocument,
+  mdastToSemanticDocument,
+  type SemanticDocument,
+} from "../model";
 import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_NODES } from "../syntax/registry";
 
 export interface MarkdownSyntaxSnapshot {

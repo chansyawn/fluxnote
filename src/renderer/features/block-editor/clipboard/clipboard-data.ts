@@ -13,7 +13,7 @@ import {
   type SerializedLexicalNode,
 } from "lexical";
 
-import { createMarkdownEditor, exportEditorStateToMarkdown } from "../core/editor-state";
+import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
 
 export const BLOCK_EDITOR_CLIPBOARD_NAMESPACE = "BlockEditor";
 
