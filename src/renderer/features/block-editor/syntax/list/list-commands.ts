@@ -249,7 +249,7 @@ export function registerListKeyboardCommands(
   /*
    * Registered shortcut command policy:
    *
-   * - use high priority before the default list plugin mutates plain list text;
+   * - use high priority before the default list extension mutates plain list text;
    * - handle only structural list actions;
    * - return false whenever the focused child block should own the key;
    * - replay Markdown shortcuts through the shared transformer set after text

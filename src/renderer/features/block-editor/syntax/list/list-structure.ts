@@ -81,7 +81,7 @@ function removeListIfEmpty(list: ListNode): void {
 
 export function normalizeListItemBlockChildren(listItem: ListItemNode): boolean {
   /*
-   * Lexical's list plugin can leave raw inline nodes directly under a list item.
+   * Lexical's list extension can leave raw inline nodes directly under a list item.
    * The editor's semantic model treats list items as block containers, so inline
    * runs are wrapped into paragraphs before shortcuts, typing or structural
    * operations.
