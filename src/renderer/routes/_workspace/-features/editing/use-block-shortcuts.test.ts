@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   shortcuts: {
     "create-block": "Mod+N",
-    "delete-block": "Mod+W",
+    "delete-block": "Mod+D",
   } as Record<string, string | null>,
   useHotkeys: vi.fn(),
 }));
@@ -29,7 +29,7 @@ describe("useBlockShortcuts", () => {
   beforeEach(() => {
     mocks.useHotkeys.mockReset();
     mocks.shortcuts["create-block"] = "Mod+N";
-    mocks.shortcuts["delete-block"] = "Mod+W";
+    mocks.shortcuts["delete-block"] = "Mod+D";
   });
 
   afterEach(() => {
@@ -84,7 +84,7 @@ describe("useBlockShortcuts", () => {
       hotkey: string;
       callback: (event: KeyboardEvent & { repeat: boolean }) => void;
     }>;
-    const deleteDefinition = definitions.find((definition) => definition.hotkey === "Mod+W");
+    const deleteDefinition = definitions.find((definition) => definition.hotkey === "Mod+D");
     const preventDefault = vi.fn();
     const stopPropagation = vi.fn();
 

@@ -44,7 +44,7 @@ export const shortcutPreferencesSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.catch("Alt+N"),
     "create-block": shortcutBindingSchema.catch("Mod+N"),
-    "delete-block": shortcutBindingSchema.catch("Mod+W"),
+    "delete-block": shortcutBindingSchema.catch("Mod+D"),
   })
   .strict();
 
@@ -95,7 +95,7 @@ const defaultSettingsValue = {
   shortcuts: {
     "toggle-window": "Alt+N",
     "create-block": "Mod+N",
-    "delete-block": "Mod+W",
+    "delete-block": "Mod+D",
   },
 } as const;
 
