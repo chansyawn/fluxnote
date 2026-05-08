@@ -1,4 +1,3 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
   $isRangeSelection,
@@ -6,7 +5,6 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalEditor,
 } from "lexical";
-import { useEffect } from "react";
 
 import { applyAltEnterAtCodeSelection } from "./code-structure";
 
@@ -31,12 +29,4 @@ export function registerCodeKeyboardCommands(editor: LexicalEditor): () => void 
     },
     COMMAND_PRIORITY_CRITICAL,
   );
-}
-
-export function CodeKeyboardPlugin(): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => registerCodeKeyboardCommands(editor), [editor]);
-
-  return null;
 }

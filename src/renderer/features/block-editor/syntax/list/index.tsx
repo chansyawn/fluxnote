@@ -6,7 +6,7 @@ import "./index.css";
 import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { registerListKeyboardCommands } from "./list-commands";
-import { registerTaskListShortcut } from "./task-list-shortcut-plugin";
+import { registerTaskListShortcut } from "./task-list-shortcut";
 
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
 export { listFromMdast, listItemFromMdast, listItemToMdast, listToMdast } from "./mdast";

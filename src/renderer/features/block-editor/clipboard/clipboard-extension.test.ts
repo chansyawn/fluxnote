@@ -4,7 +4,7 @@ import {
 } from "@shared/features/block-editor/clipboard";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-plugin";
+import { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./clipboard-extension";
 
 vi.mock("@renderer/clients", () => ({
   writeBlockEditorClipboard: vi.fn(),
@@ -41,7 +41,7 @@ function createMutableDataTransfer(values: Record<string, string>): DataTransfer
   } as unknown as DataTransfer;
 }
 
-describe("block editor clipboard plugin", () => {
+describe("block editor clipboard extension", () => {
   afterEach(() => {
     Reflect.deleteProperty(globalThis, "navigator");
     vi.mocked(writeBlockEditorClipboard).mockReset();

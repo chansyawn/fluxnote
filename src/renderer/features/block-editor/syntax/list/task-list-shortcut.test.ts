@@ -12,7 +12,7 @@ import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,
 } from "../../test-helper/headless-editor-test-utils";
-import { applyTaskListShortcutAtSelection } from "./task-list-shortcut-plugin";
+import { applyTaskListShortcutAtSelection } from "./task-list-shortcut";
 
 function textParagraph(value: string): SemanticParagraph {
   return {

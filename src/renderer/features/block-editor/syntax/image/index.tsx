@@ -4,10 +4,10 @@ import { configExtension, defineExtension } from "lexical";
 
 import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
-import { registerImageInsertCommands } from "./image-insert-plugin";
+import { registerImageInsertCommands } from "./image-insert-commands";
 import { ImageNode } from "./image-node";
-import { registerImageOutlineCommands } from "./image-outline-plugin";
-import { registerImageSelectionCommands } from "./image-selection-plugin";
+import { registerImageOutlineCommands } from "./image-outline-commands";
+import { registerImageSelectionCommands } from "./image-selection-commands";
 import { IMAGE } from "./image-shortcut";
 
 export {

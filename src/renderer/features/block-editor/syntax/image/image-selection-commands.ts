@@ -1,4 +1,3 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $createNodeSelection,
   $getNearestNodeFromDOMNode,
@@ -10,7 +9,6 @@ import {
   isDOMNode,
   type LexicalEditor,
 } from "lexical";
-import { useEffect } from "react";
 
 import { $isImageNode } from "./image-node";
 
@@ -41,12 +39,4 @@ export function registerImageSelectionCommands(editor: LexicalEditor): () => voi
     },
     COMMAND_PRIORITY_LOW,
   );
-}
-
-export function ImageSelectionPlugin(): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => registerImageSelectionCommands(editor), [editor]);
-
-  return null;
 }

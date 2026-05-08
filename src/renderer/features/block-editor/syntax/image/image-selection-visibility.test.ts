@@ -12,7 +12,7 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { $createImageNode } from "./image-node";
-import { IMAGE_SELECTED_CLASS, setImageOutlineClass } from "./image-outline-plugin";
+import { IMAGE_SELECTED_CLASS, setImageOutlineClass } from "./image-outline-commands";
 import { getSingleSelectedImageKey, shouldShowImageOutline } from "./image-selection-visibility";
 
 function readSelectedImageKey(markdown = "![Alt](https://example.com/image.png)"): string | null {

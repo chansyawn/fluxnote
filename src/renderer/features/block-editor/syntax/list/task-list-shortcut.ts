@@ -4,7 +4,6 @@ import {
   $isListNode,
   type ListItemNode,
 } from "@lexical/list";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
   $isElementNode,
@@ -17,7 +16,6 @@ import {
   type LexicalNode,
   type TextNode,
 } from "lexical";
-import { useEffect } from "react";
 
 import { getContainingListItem } from "./list-selection";
 
@@ -144,12 +142,4 @@ export function registerTaskListShortcut(editor: LexicalEditor): () => void {
       applyTaskListShortcutAtSelection();
     });
   });
-}
-
-export function TaskListShortcutPlugin(): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => registerTaskListShortcut(editor), [editor]);
-
-  return null;
 }

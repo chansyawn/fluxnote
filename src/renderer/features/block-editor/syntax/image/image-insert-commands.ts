@@ -1,15 +1,9 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import { COMMAND_PRIORITY_HIGH, DRAGOVER_COMMAND, DROP_COMMAND, type LexicalEditor } from "lexical";
-import { useEffect } from "react";
 
 import { getSupportedImageFiles, hasSupportedImageData } from "../../assets/image-files";
 import { cloneCurrentSelection } from "../../clipboard/clipboard-insert";
 import { insertImageFilesAtSelection } from "../../clipboard/image-insert";
-
-interface ImageInsertPluginProps {
-  blockId: string;
-}
 
 export function registerImageInsertCommands(editor: LexicalEditor, blockId: string): () => void {
   return mergeRegister(
@@ -45,12 +39,4 @@ export function registerImageInsertCommands(editor: LexicalEditor, blockId: stri
       COMMAND_PRIORITY_HIGH,
     ),
   );
-}
-
-export function ImageInsertPlugin({ blockId }: ImageInsertPluginProps): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => registerImageInsertCommands(editor, blockId), [blockId, editor]);
-
-  return null;
 }

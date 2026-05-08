@@ -3,14 +3,10 @@ import { defineExtension } from "lexical";
 
 import type { SyntaxRegistration } from "../registration";
 import { SoftBreakNode } from "./soft-break-node";
-import { registerSoftBreakShortcut } from "./soft-break-shortcut-plugin";
+import { registerSoftBreakShortcut } from "./soft-break-shortcut";
 
 export { $createSoftBreakNode, $isSoftBreakNode, SoftBreakNode } from "./soft-break-node";
-export {
-  applySoftBreakAtSelection,
-  registerSoftBreakShortcut,
-  SoftBreakShortcutPlugin,
-} from "./soft-break-shortcut-plugin";
+export { applySoftBreakAtSelection, registerSoftBreakShortcut } from "./soft-break-shortcut";
 
 export const BREAK_MARKDOWN_SHORTCUT_TRANSFORMERS = [];
 

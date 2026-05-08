@@ -92,7 +92,7 @@ function handleEnter(
   /*
    * Shift+Enter rules:
    *
-   * - SoftBreakShortcutPlugin owns the key;
+   * - the soft break shortcut owns the key;
    * - this handler returns false before any list mutation;
    * - list splitting and block insertion never run for Shift+Enter.
    */

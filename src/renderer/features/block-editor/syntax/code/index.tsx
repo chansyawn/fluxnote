@@ -8,7 +8,7 @@ import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { CodeBlockControlsPlugin } from "./code-block-controls-plugin";
 import { CodeHighlightPlugin } from "./code-highlight-plugin";
-import { registerCodeKeyboardCommands } from "./code-keyboard-plugin";
+import { registerCodeKeyboardCommands } from "./code-keyboard";
 
 export { codeBlockFromLexical, codeBlockToLexical } from "./lexical";
 export { codeBlockFromMdast, codeBlockToMdast } from "./mdast";

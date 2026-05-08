@@ -1,4 +1,3 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
   $isRangeSelection,
@@ -6,7 +5,6 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalEditor,
 } from "lexical";
-import { useEffect } from "react";
 
 import { $createSoftBreakNode } from "./soft-break-node";
 
@@ -33,12 +31,4 @@ export function registerSoftBreakShortcut(editor: LexicalEditor): () => void {
     },
     COMMAND_PRIORITY_CRITICAL,
   );
-}
-
-export function SoftBreakShortcutPlugin(): null {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => registerSoftBreakShortcut(editor), [editor]);
-
-  return null;
 }
