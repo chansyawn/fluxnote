@@ -1,3 +1,4 @@
+import { withDOM } from "@lexical/headless/dom";
 import {
   $createNodeSelection,
   $createParagraphNode,
@@ -9,7 +10,6 @@ import {
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { withBlockEditorDOM } from "../../test-helper/dom-runtime";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { $createImageNode } from "./image-node";
 import { IMAGE_SELECTED_CLASS, setImageOutlineClass } from "./image-outline-commands";
@@ -151,7 +151,7 @@ describe("image selection visibility", () => {
   });
 
   it("moves the selected class between image wrappers", () => {
-    withBlockEditorDOM((window) => {
+    withDOM((window) => {
       const firstElement = window.document.createElement("span");
       const secondElement = window.document.createElement("span");
       const editor = {

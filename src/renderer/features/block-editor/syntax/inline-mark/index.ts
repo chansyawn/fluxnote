@@ -2,7 +2,7 @@ import { BOLD_STAR, INLINE_CODE, ITALIC_STAR, STRIKETHROUGH } from "@lexical/mar
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 
 export {

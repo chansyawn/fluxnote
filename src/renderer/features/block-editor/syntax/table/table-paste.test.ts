@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { exportEditorStateToMarkdown } from "../../editor-state";
+import { exportEditorStateToMarkdown } from "../../core/markdown-editor-io";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { insertMarkdownTablesAtSelection } from "./table-paste";
 

@@ -1,7 +1,7 @@
 import { $getRoot, $isTextNode } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { exportEditorStateToMarkdown } from "../../editor-state";
+import { exportEditorStateToMarkdown } from "../../core/markdown-editor-io";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,

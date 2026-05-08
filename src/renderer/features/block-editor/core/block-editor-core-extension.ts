@@ -1,7 +1,7 @@
 import { defineExtension } from "lexical";
 
-import { MarkdownShortcutExtension } from "./markdown-shortcut-extension";
-import { SYNTAX_EXTENSIONS } from "./syntax/registry";
+import { MarkdownShortcutExtension } from "../markdown/markdown-shortcut-extension";
+import { SYNTAX_EXTENSIONS } from "../syntax/registry";
 
 export function createBlockEditorCoreExtension(namespace = "BlockEditorCore") {
   return defineExtension({

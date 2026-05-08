@@ -18,7 +18,8 @@ import {
   type SerializedEditorState,
 } from "lexical";
 
-import { createMarkdownEditor, exportEditorStateToMarkdown } from "../editor-state";
+import { createHeadlessMarkdownEditor } from "../core/headless-markdown-editor";
+import { exportEditorStateToMarkdown } from "../core/markdown-editor-io";
 import { collectClipboardAssetUrls, rewriteClipboardAssetUrls } from "./clipboard-assets";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
@@ -100,7 +101,7 @@ function createEditorStateFromClipboardNodes(
 }
 
 function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): string {
-  const editor = createMarkdownEditor("BlockEditorClipboardExport");
+  const editor = createHeadlessMarkdownEditor("BlockEditorClipboardExport");
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
   return exportEditorStateToMarkdown(editorState);
 }

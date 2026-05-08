@@ -1,7 +1,7 @@
+import { withDOM } from "@lexical/headless/dom";
 import type { ResolveAssetRequest } from "@renderer/clients";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { withBlockEditorDOM } from "../test-helper/dom-runtime";
 import {
   createEditorFromMarkdown,
   selectFirstImage,
@@ -103,8 +103,8 @@ describe("block editor clipboard data", () => {
 
   it("exports file-url image html without assigning the file url to image DOM", async () => {
     const editor = createEditorFromMarkdown("![Alt](assets://block-1/photo.png)");
-    const { imagePrototype, setAttribute, srcDescriptor, srcSetter, writeRequest } =
-      withBlockEditorDOM((window) => {
+    const { imagePrototype, setAttribute, srcDescriptor, srcSetter, writeRequest } = withDOM(
+      (window) => {
         const imagePrototype = window.HTMLImageElement.prototype;
         const srcDescriptor = Object.getOwnPropertyDescriptor(imagePrototype, "src");
         const srcSetter = vi.fn();
@@ -131,7 +131,8 @@ describe("block editor clipboard data", () => {
         }));
 
         return { imagePrototype, setAttribute, srcDescriptor, srcSetter, writeRequest };
-      });
+      },
+    );
 
     try {
       const data = await writeRequest;

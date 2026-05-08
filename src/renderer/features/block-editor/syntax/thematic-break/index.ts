@@ -7,7 +7,7 @@ import type { ElementTransformer } from "@lexical/markdown";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 
 export { thematicBreakFromLexical, thematicBreakToLexical } from "./lexical";

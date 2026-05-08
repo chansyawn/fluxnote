@@ -3,7 +3,7 @@ import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { registerListKeyboardCommands } from "./list-commands";
 import { registerTaskListShortcut } from "./task-list-shortcut";

@@ -4,7 +4,7 @@ import { ReactExtension } from "@lexical/react/ReactExtension";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { CodeBlockControlsDecorator } from "./code-block-controls-decorator";
 import { registerCodeKeyboardCommands } from "./code-keyboard";

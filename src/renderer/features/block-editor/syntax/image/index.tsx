@@ -2,7 +2,7 @@ import "./index.css";
 import { mergeRegister } from "@lexical/utils";
 import { configExtension, defineExtension } from "lexical";
 
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { registerImageInsertCommands } from "./image-insert-commands";
 import { ImageNode } from "./image-node";

@@ -2,7 +2,7 @@ import { TableExtension } from "@lexical/table";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { TABLE } from "./table-shortcut";
 

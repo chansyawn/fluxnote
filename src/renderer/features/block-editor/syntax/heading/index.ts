@@ -3,7 +3,7 @@ import { RichTextExtension } from "@lexical/rich-text";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 
 export { headingTagToDepth, headingToLexical, toHeadingTag } from "./lexical";

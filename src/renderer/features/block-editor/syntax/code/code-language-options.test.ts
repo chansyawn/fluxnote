@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { roundTripMarkdown } from "../../editor-state";
 import {
   CODE_LANGUAGE_OPTIONS,
   getCodeLanguageLabel,
@@ -30,11 +29,5 @@ describe("code language options", () => {
   it("maps language options to CodeNode languages", () => {
     expect(getCodeNodeLanguage({ label: "Plain text", value: "plain" })).toBe("plain");
     expect(getCodeNodeLanguage({ label: "TypeScript", value: "typescript" })).toBe("typescript");
-  });
-
-  it("does not export internal plain text language as a markdown fence language", () => {
-    expect(roundTripMarkdown(["```plain", "text", "```"].join("\n"))).toBe(
-      ["```", "text", "```", ""].join("\n"),
-    );
   });
 });

@@ -9,7 +9,7 @@ import {
   type LexicalNode,
 } from "lexical";
 
-import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../editor-state";
+import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/markdown-editor-io";
 import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
