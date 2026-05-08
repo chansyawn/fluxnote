@@ -6,20 +6,13 @@ import {
   exportLexicalToSemanticDocument,
   importSemanticDocumentToLexical,
   type SemanticDocument,
-  type SemanticParagraph,
 } from "../../model";
 import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,
 } from "../../test-helper/headless-editor-test-utils";
+import { doc, list, listItem, p, quote } from "../../test-helper/semantic-builders";
 import { applyTaskListShortcutAtSelection } from "./task-list-shortcut";
-
-function textParagraph(value: string): SemanticParagraph {
-  return {
-    children: [{ type: "text", value }],
-    type: "paragraph",
-  };
-}
 
 function applyTaskListShortcut(document: SemanticDocument, marker = "[] ") {
   const editor = createHeadlessMarkdownEditor();
@@ -72,10 +65,7 @@ describe("list shortcut", () => {
   });
 
   it("creates task list from plain text shortcut", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [textParagraph("[] ")],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(doc(p("[] ")));
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
@@ -88,13 +78,7 @@ describe("list shortcut", () => {
   });
 
   it("creates checked task list from plain text shortcut", () => {
-    const { markdown, semantic } = applyTaskListShortcut(
-      {
-        children: [textParagraph("[x] ")],
-        type: "root",
-      },
-      "[x] ",
-    );
+    const { markdown, semantic } = applyTaskListShortcut(doc(p("[x] ")), "[x] ");
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
@@ -107,13 +91,7 @@ describe("list shortcut", () => {
   });
 
   it("creates task list from space-bracket marker shortcut", () => {
-    const { markdown, semantic } = applyTaskListShortcut(
-      {
-        children: [textParagraph("[ ] todo")],
-        type: "root",
-      },
-      "[ ] ",
-    );
+    const { markdown, semantic } = applyTaskListShortcut(doc(p("[ ] todo")), "[ ] ");
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
@@ -126,28 +104,16 @@ describe("list shortcut", () => {
   });
 
   it("creates task list from unordered list item shortcut", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [
-        {
-          children: [
-            {
-              children: [textParagraph("[] existing text")],
-              type: "listItem",
-            },
-          ],
-          ordered: false,
-          type: "list",
-        },
-      ],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(
+      doc(list(false, listItem(p("[] existing text")))),
+    );
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
         children: [
           expect.objectContaining({
             checked: false,
-            children: [textParagraph("existing text")],
+            children: [p("existing text")],
           }),
         ],
         ordered: false,
@@ -159,21 +125,7 @@ describe("list shortcut", () => {
 
   it("creates checked task list from unordered list item shortcut", () => {
     const { markdown, semantic } = applyTaskListShortcut(
-      {
-        children: [
-          {
-            children: [
-              {
-                children: [textParagraph("[x] existing text")],
-                type: "listItem",
-              },
-            ],
-            ordered: false,
-            type: "list",
-          },
-        ],
-        type: "root",
-      },
+      doc(list(false, listItem(p("[x] existing text")))),
       "[x] ",
     );
 
@@ -182,7 +134,7 @@ describe("list shortcut", () => {
         children: [
           expect.objectContaining({
             checked: true,
-            children: [textParagraph("existing text")],
+            children: [p("existing text")],
           }),
         ],
         ordered: false,
@@ -193,40 +145,16 @@ describe("list shortcut", () => {
   });
 
   it("creates task list from a multi-block list item shortcut without dropping blocks", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [
-        {
-          children: [
-            {
-              children: [
-                textParagraph("[] existing text"),
-                {
-                  children: [textParagraph("quote")],
-                  type: "blockquote",
-                },
-              ],
-              type: "listItem",
-            },
-          ],
-          ordered: false,
-          type: "list",
-        },
-      ],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(
+      doc(list(false, listItem(p("[] existing text"), quote(p("quote"))))),
+    );
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
         children: [
           expect.objectContaining({
             checked: false,
-            children: [
-              textParagraph("existing text"),
-              {
-                children: [textParagraph("quote")],
-                type: "blockquote",
-              },
-            ],
+            children: [p("existing text"), quote(p("quote"))],
           }),
         ],
         ordered: false,
@@ -237,21 +165,9 @@ describe("list shortcut", () => {
   });
 
   it("creates task list from ordered list item shortcut", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [
-        {
-          children: [
-            {
-              children: [textParagraph("[] existing text")],
-              type: "listItem",
-            },
-          ],
-          ordered: true,
-          type: "list",
-        },
-      ],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(
+      doc(list(true, listItem(p("[] existing text")))),
+    );
 
     expect(semantic.children[0]).toEqual(
       expect.objectContaining({
@@ -264,34 +180,23 @@ describe("list shortcut", () => {
   });
 
   it("splits unordered list when creating a task list in the middle", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [
-        {
-          children: [
-            { children: [textParagraph("A")], type: "listItem" },
-            { children: [textParagraph("[] B")], type: "listItem" },
-            { children: [textParagraph("C")], type: "listItem" },
-          ],
-          ordered: false,
-          type: "list",
-        },
-      ],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(
+      doc(list(false, listItem(p("A")), listItem(p("[] B")), listItem(p("C")))),
+    );
 
     expect(semantic.children).toEqual([
       expect.objectContaining({
-        children: [expect.objectContaining({ children: [textParagraph("A")] })],
+        children: [expect.objectContaining({ children: [p("A")] })],
         ordered: false,
         type: "list",
       }),
       expect.objectContaining({
-        children: [expect.objectContaining({ checked: false, children: [textParagraph("B")] })],
+        children: [expect.objectContaining({ checked: false, children: [p("B")] })],
         ordered: false,
         type: "list",
       }),
       expect.objectContaining({
-        children: [expect.objectContaining({ children: [textParagraph("C")] })],
+        children: [expect.objectContaining({ children: [p("C")] })],
         ordered: false,
         type: "list",
       }),
@@ -300,25 +205,14 @@ describe("list shortcut", () => {
   });
 
   it("splits ordered list when creating a task list in the middle", () => {
-    const { markdown, semantic } = applyTaskListShortcut({
-      children: [
-        {
-          children: [
-            { children: [textParagraph("A")], type: "listItem" },
-            { children: [textParagraph("[] B")], type: "listItem" },
-            { children: [textParagraph("C")], type: "listItem" },
-          ],
-          ordered: true,
-          type: "list",
-        },
-      ],
-      type: "root",
-    });
+    const { markdown, semantic } = applyTaskListShortcut(
+      doc(list(true, listItem(p("A")), listItem(p("[] B")), listItem(p("C")))),
+    );
 
     expect(semantic.children).toEqual([
       expect.objectContaining({ ordered: true, type: "list" }),
       expect.objectContaining({
-        children: [expect.objectContaining({ checked: false, children: [textParagraph("B")] })],
+        children: [expect.objectContaining({ checked: false, children: [p("B")] })],
         ordered: false,
         type: "list",
       }),

@@ -1,12 +1,11 @@
 import { ReactExtension } from "@lexical/react/ReactExtension";
 import { configExtension, defineExtension, type InitialEditorStateType } from "lexical";
 
+import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 import { ClipboardExtension } from "./clipboard/clipboard-extension";
 import { importMarkdownToEditor } from "./editor-state";
-import { MarkdownShortcutExtension } from "./markdown-shortcut-extension";
 import { CODE_SYNTAX_REACT_EXTENSION } from "./syntax/code";
 import { IMAGE_SYNTAX_EXTENSION } from "./syntax/image";
-import { SYNTAX_EXTENSIONS } from "./syntax/registry";
 
 export interface BlockEditorContentExtensionConfig {
   blockId: string;
@@ -30,8 +29,7 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
         contentEditable: null,
       }),
       CODE_SYNTAX_REACT_EXTENSION,
-      MarkdownShortcutExtension,
-      ...SYNTAX_EXTENSIONS,
+      createBlockEditorCoreExtension(config.namespace ?? "BlockEditor"),
       configExtension(IMAGE_SYNTAX_EXTENSION, {
         blockId: config.blockId,
       }),
@@ -39,17 +37,6 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
         blockId: config.blockId,
       }),
     ],
-    onError(error) {
-      throw error;
-    },
-  });
-}
-
-export function createBlockEditorHeadlessExtension(namespace = "BlockEditorHeadless") {
-  return defineExtension({
-    name: "fluxnotes/block-editor/headless",
-    namespace,
-    dependencies: [MarkdownShortcutExtension, ...SYNTAX_EXTENSIONS],
     onError(error) {
       throw error;
     },

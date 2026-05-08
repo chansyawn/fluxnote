@@ -1,4 +1,3 @@
-import { JSDOM } from "jsdom";
 import {
   $createNodeSelection,
   $createParagraphNode,
@@ -10,12 +9,13 @@ import {
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
+import { withBlockEditorDOM } from "../../test-helper/dom-runtime";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
 import { $createImageNode } from "./image-node";
 import { IMAGE_SELECTED_CLASS, setImageOutlineClass } from "./image-outline-commands";
 import { getSingleSelectedImageKey, shouldShowImageOutline } from "./image-selection-visibility";
 
-function readSelectedImageKey(markdown = "![Alt](https://example.com/image.png)"): string | null {
+function readSelectedImageKey(): string | null {
   const editor = createHeadlessMarkdownEditor();
   let imageKey: string | null = null;
   let selectedImageKey: string | null = null;
@@ -44,18 +44,8 @@ function readSelectedImageKey(markdown = "![Alt](https://example.com/image.png)"
     { discrete: true },
   );
 
-  expect(markdown).toBeDefined();
   expect(imageKey).not.toBeNull();
   return selectedImageKey;
-}
-
-function withDOM<T>(run: (document: Document) => T): T {
-  const dom = new JSDOM("<!doctype html><html><body></body></html>");
-  try {
-    return run(dom.window.document);
-  } finally {
-    dom.window.close();
-  }
 }
 
 describe("image selection visibility", () => {
@@ -161,9 +151,9 @@ describe("image selection visibility", () => {
   });
 
   it("moves the selected class between image wrappers", () => {
-    withDOM((document) => {
-      const firstElement = document.createElement("span");
-      const secondElement = document.createElement("span");
+    withBlockEditorDOM((window) => {
+      const firstElement = window.document.createElement("span");
+      const secondElement = window.document.createElement("span");
       const editor = {
         getElementByKey: (key: string) => {
           if (key === "first") {

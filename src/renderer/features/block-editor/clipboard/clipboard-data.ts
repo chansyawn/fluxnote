@@ -1,4 +1,5 @@
 import { $generateJSONFromSelectedNodes, $getHtmlContent } from "@lexical/clipboard";
+import { withDOM } from "@lexical/headless/dom";
 import { resolveAsset, type ResolveAssetResult } from "@renderer/clients";
 import type {
   BlockEditorClipboardPayload,
@@ -273,16 +274,18 @@ export async function createClipboardDataFromCurrentSelection(
   blockId: string,
   resolveAssetsClient: ResolveAssetsClient = resolveAsset,
 ): Promise<BlockEditorClipboardWriteRequest | null> {
-  const snapshot = editor.read(() => {
-    const selection = $getSelection();
-    if (selection === null) {
-      return null;
-    }
+  const snapshot = withDOM(() =>
+    editor.read(() => {
+      const selection = $getSelection();
+      if (selection === null) {
+        return null;
+      }
 
-    return createClipboardSnapshotFromSelection(editor, blockId, selection, {
-      includeImageFileUrl: true,
-    });
-  });
+      return createClipboardSnapshotFromSelection(editor, blockId, selection, {
+        includeImageFileUrl: true,
+      });
+    }),
+  );
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;
 }
@@ -292,25 +295,27 @@ export async function createClipboardDataFromDocument(
   blockId: string,
   resolveAssetsClient: ResolveAssetsClient = resolveAsset,
 ): Promise<BlockEditorClipboardWriteRequest | null> {
-  let selection: BaseSelection | null = null;
+  const snapshot = withDOM(() => {
+    let selection: BaseSelection | null = null;
 
-  editor.update(
-    () => {
-      const previousSelection = $getSelection()?.clone() ?? null;
-      selection = $selectAll();
-      $setSelection(previousSelection);
-    },
-    { discrete: true },
-  );
+    editor.update(
+      () => {
+        const previousSelection = $getSelection()?.clone() ?? null;
+        selection = $selectAll();
+        $setSelection(previousSelection);
+      },
+      { discrete: true },
+    );
 
-  if (selection === null) {
-    return null;
-  }
-  const documentSelection = selection;
+    if (selection === null) {
+      return null;
+    }
+    const documentSelection = selection;
 
-  const snapshot = editor.read(() =>
-    createClipboardSnapshotFromDocument(editor, blockId, documentSelection),
-  );
+    return editor.read(() =>
+      createClipboardSnapshotFromDocument(editor, blockId, documentSelection),
+    );
+  });
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;
 }

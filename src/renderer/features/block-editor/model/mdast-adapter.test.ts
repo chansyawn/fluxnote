@@ -1,15 +1,12 @@
 import type { Root } from "mdast";
 import { describe, expect, it } from "vite-plus/test";
 
-import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
-import { mdastToSemanticDocument, semanticDocumentToMdast } from "./mdast-adapter";
+import { parseMarkdownToMdast } from "../markdown/processor";
+import { expectSemanticRoundTripStable } from "../test-helper/assertions";
+import { mdastToSemanticDocument } from "./mdast-adapter";
 
 function roundTripSemantic(markdown: string) {
-  const firstSemantic = mdastToSemanticDocument(parseMarkdownToMdast(markdown));
-  const canonicalMarkdown = stringifyMdastToMarkdown(semanticDocumentToMdast(firstSemantic));
-  const secondSemantic = mdastToSemanticDocument(parseMarkdownToMdast(canonicalMarkdown));
-
-  return { canonicalMarkdown, firstSemantic, secondSemantic };
+  return expectSemanticRoundTripStable(markdown);
 }
 
 describe("semantic mdast adapter", () => {

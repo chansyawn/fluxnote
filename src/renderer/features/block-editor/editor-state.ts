@@ -1,7 +1,7 @@
 import { LexicalBuilder } from "@lexical/extension";
 import type { EditorState, LexicalEditor } from "lexical";
 
-import { createBlockEditorHeadlessExtension } from "./block-editor-content-extension";
+import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "./markdown/processor";
 import {
   exportLexicalToSemanticDocument,
@@ -12,7 +12,7 @@ import {
 
 export function createMarkdownEditor(namespace = "BlockEditorTest"): LexicalEditor {
   const editor = LexicalBuilder.fromExtensions([
-    createBlockEditorHeadlessExtension(namespace),
+    createBlockEditorCoreExtension(namespace),
   ]).buildEditor();
 
   return editor;

@@ -1,25 +1,12 @@
-import { $getRoot, $isTextNode, KEY_ENTER_COMMAND, type LexicalEditor } from "lexical";
+import type { LexicalEditor } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
 import { exportLexicalToSemanticDocument, importSemanticDocumentToLexical } from "../../model";
+import {
+  selectTextEndAndDispatchEnter,
+  type KeyboardEventStub,
+} from "../../test-helper/editor-driver";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
-
-interface KeyboardEventStub extends KeyboardEvent {
-  readonly preventedForTest: boolean;
-}
-
-function keyboardEvent(): KeyboardEventStub {
-  let prevented = false;
-  return {
-    preventDefault() {
-      prevented = true;
-    },
-    get preventedForTest() {
-      return prevented;
-    },
-    shiftKey: false,
-  } as KeyboardEventStub;
-}
 
 function createEditorWithTableShortcut(header: string, delimiter: string): LexicalEditor {
   const editor = createHeadlessMarkdownEditor();
@@ -37,23 +24,7 @@ function createEditorWithTableShortcut(header: string, delimiter: string): Lexic
 }
 
 function dispatchEnterAtTextEnd(editor: LexicalEditor, value: string): KeyboardEventStub {
-  const event = keyboardEvent();
-  editor.update(
-    () => {
-      const textNode = $getRoot()
-        .getAllTextNodes()
-        .find((node) => $isTextNode(node) && node.getTextContent() === value);
-
-      if (!textNode) {
-        throw new Error(`Missing text node: ${value}`);
-      }
-
-      textNode.select(value.length, value.length);
-      expect(editor.dispatchCommand(KEY_ENTER_COMMAND, event)).toBe(true);
-    },
-    { discrete: true },
-  );
-  return event;
+  return selectTextEndAndDispatchEnter(editor, value);
 }
 
 describe("table shortcut", () => {
@@ -92,23 +63,7 @@ describe("table shortcut", () => {
 
   it("does not transform when the delimiter does not match the header column count", () => {
     const editor = createEditorWithTableShortcut("| Name | Count |", "| --- |");
-    const event = keyboardEvent();
-
-    editor.update(
-      () => {
-        const textNode = $getRoot()
-          .getAllTextNodes()
-          .find((node) => $isTextNode(node) && node.getTextContent() === "| --- |");
-
-        if (!textNode) {
-          throw new Error("Missing delimiter node");
-        }
-
-        textNode.select("| --- |".length, "| --- |".length);
-        editor.dispatchCommand(KEY_ENTER_COMMAND, event);
-      },
-      { discrete: true },
-    );
+    selectTextEndAndDispatchEnter(editor, "| --- |");
 
     expect(exportLexicalToSemanticDocument(editor.getEditorState())).toEqual({
       children: [

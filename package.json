@@ -80,7 +80,6 @@
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
-    "@types/jsdom": "^28.0.1",
     "@types/mdast": "^4.0.4",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
@@ -89,7 +88,6 @@
     "@vitest/coverage-v8": "^4.1.5",
     "drizzle-kit": "^0.31.10",
     "electron": "41.3.0",
-    "jsdom": "^29.1.1",
     "typescript": "~5.9.3",
     "vite": "catalog:",
     "vite-plus": "catalog:"
