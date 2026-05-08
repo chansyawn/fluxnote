@@ -48,7 +48,7 @@ export function useExternalEditActions({
     async (blockId: string, editId: string) => {
       setPendingExternalEditIds((current) => new Set(current).add(editId));
       try {
-        const editorContent = await getEditor(blockId)?.getLatestMarkdown();
+        const editorContent = await getEditor(blockId)?.flush();
         let content = editorContent;
         if (content === undefined) {
           for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({

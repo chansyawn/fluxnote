@@ -9,7 +9,7 @@ interface BlockEditorViewProps {
   leadingActions?: ReactNode;
   willArchive: boolean;
   actions?: ReactNode;
-  onMarkdownUpdated: (markdown: string) => void;
+  onMarkdownChange: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
   ref?: Ref<BlockEditorHandle>;
@@ -22,7 +22,7 @@ export function BlockEditorView({
   leadingActions,
   willArchive,
   actions,
-  onMarkdownUpdated,
+  onMarkdownChange,
   onBlur,
   onFocus,
   ref,
@@ -52,7 +52,7 @@ export function BlockEditorView({
           ref={ref}
           initialMarkdown={initialMarkdown}
           onBlur={onBlur}
-          onMarkdownUpdated={onMarkdownUpdated}
+          onMarkdownChange={onMarkdownChange}
         />
       </div>
     </article>

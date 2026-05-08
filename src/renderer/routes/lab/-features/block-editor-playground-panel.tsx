@@ -98,7 +98,7 @@ export function BlockEditorPlaygroundPanel() {
         willArchive={false}
         onBlur={() => {}}
         onFocus={() => {}}
-        onMarkdownUpdated={(latestMarkdown) => {
+        onMarkdownChange={(latestMarkdown) => {
           setMarkdown(latestMarkdown);
         }}
       />

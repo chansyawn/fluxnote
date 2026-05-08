@@ -1,53 +1,47 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import type { LexicalEditor } from "lexical";
-import { useLayoutEffect, useRef } from "react";
+import { useImperativeHandle, useLayoutEffect, useRef, type Ref } from "react";
 
+import {
+  registerMarkdownChangeListener,
+  type MarkdownChangeHandle,
+  type MarkdownChangeListener,
+} from "./markdown-change-listener";
 import { exportEditorStateToMarkdown } from "./markdown-editor-io";
 
-export interface MarkdownChangeListenerOptions {
-  onMarkdownUpdated: (markdown: string) => void;
-}
-
-export function registerMarkdownChangeListener(
-  editor: LexicalEditor,
-  options: MarkdownChangeListenerOptions,
-): () => void {
-  let latestMarkdown = exportEditorStateToMarkdown(editor.getEditorState());
-
-  return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
-    if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
-      return;
-    }
-
-    const markdown = exportEditorStateToMarkdown(editorState);
-    if (markdown === latestMarkdown) {
-      return;
-    }
-
-    latestMarkdown = markdown;
-    options.onMarkdownUpdated(markdown);
-  });
-}
-
 export interface MarkdownChangePluginProps {
-  onMarkdownUpdated: (markdown: string) => void;
+  onMarkdownChange: (markdown: string) => void;
+  ref?: Ref<MarkdownChangeHandle>;
 }
 
-export function MarkdownChangePlugin({ onMarkdownUpdated }: MarkdownChangePluginProps): null {
+export function MarkdownChangePlugin({ onMarkdownChange, ref }: MarkdownChangePluginProps): null {
   const [editor] = useLexicalComposerContext();
-  const onMarkdownUpdatedRef = useRef(onMarkdownUpdated);
+  const onMarkdownChangeRef = useRef(onMarkdownChange);
+  const listenerRef = useRef<MarkdownChangeListener | null>(null);
 
   useLayoutEffect(() => {
-    onMarkdownUpdatedRef.current = onMarkdownUpdated;
-  }, [onMarkdownUpdated]);
+    onMarkdownChangeRef.current = onMarkdownChange;
+  }, [onMarkdownChange]);
 
-  useLayoutEffect(
-    () =>
-      registerMarkdownChangeListener(editor, {
-        onMarkdownUpdated: (markdown) => onMarkdownUpdatedRef.current(markdown),
-      }),
+  useImperativeHandle(
+    ref,
+    () => ({
+      flush: () =>
+        listenerRef.current?.flush() ?? exportEditorStateToMarkdown(editor.getEditorState()),
+    }),
     [editor],
   );
+
+  useLayoutEffect(() => {
+    const listener = registerMarkdownChangeListener(editor, {
+      onMarkdownChange: (markdown) => onMarkdownChangeRef.current(markdown),
+    });
+    listenerRef.current = listener;
+
+    return () => {
+      listener.dispose();
+      listenerRef.current = null;
+    };
+  }, [editor]);
 
   return null;
 }

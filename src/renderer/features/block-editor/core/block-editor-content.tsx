@@ -15,6 +15,8 @@ import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 import { importMarkdownToEditor } from "./markdown-editor-io";
 import type { BlockEditorHandle } from "./types";
 
+export type BlockEditorContentHandle = Pick<BlockEditorHandle, "copy" | "focus">;
+
 export interface BlockEditorContentExtensionConfig {
   blockId: string;
   initialMarkdown: string;
@@ -54,7 +56,7 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
 interface BlockEditorContentProps {
   blockId: string;
   onBlur?: () => void;
-  ref?: Ref<BlockEditorHandle>;
+  ref?: Ref<BlockEditorContentHandle>;
 }
 
 export function BlockEditorContent({ blockId, onBlur, ref }: BlockEditorContentProps) {
