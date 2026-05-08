@@ -1,11 +1,9 @@
 import "./index.css";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import type { LexicalEditor } from "lexical";
+import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
 import { useMemo, useRef } from "react";
 
 import { BlockEditorContent } from "./block-editor-content";
-import { importMarkdownToEditor } from "./editor-state";
-import { SYNTAX_NODES, SYNTAX_THEME } from "./syntax/registry";
+import { createBlockEditorContentExtension } from "./block-editor-content-extension";
 import type { BlockEditorProps } from "./types";
 export type { BlockEditorHandle, BlockEditorProps } from "./types";
 
@@ -18,25 +16,14 @@ export function BlockEditor({
 }: BlockEditorProps) {
   // initialMarkdown is initial-only; prop changes do not re-import editor state.
   const initialMarkdownRef = useRef(initialMarkdown);
-
-  const initialConfig = useMemo(
-    () => ({
-      editorState: (editor: LexicalEditor) => {
-        importMarkdownToEditor(editor, initialMarkdownRef.current);
-      },
-      namespace: "BlockEditor",
-      nodes: [...SYNTAX_NODES],
-      onError(error: Error) {
-        throw error;
-      },
-      theme: SYNTAX_THEME,
-    }),
+  const extension = useMemo(
+    () => createBlockEditorContentExtension(initialMarkdownRef.current),
     [],
   );
 
   return (
     <div className="block-editor">
-      <LexicalComposer initialConfig={initialConfig}>
+      <LexicalExtensionComposer extension={extension} contentEditable={null}>
         <BlockEditorContent
           ref={ref}
           blockId={blockId}
@@ -44,7 +31,7 @@ export function BlockEditor({
           onBlur={onBlur}
           onMarkdownUpdated={onMarkdownUpdated}
         />
-      </LexicalComposer>
+      </LexicalExtensionComposer>
     </div>
   );
 }

@@ -1,5 +1,10 @@
 import type { Transformer } from "@lexical/markdown";
-import type { EditorThemeClasses, LexicalNodeConfig } from "lexical";
+import type {
+  AnyLexicalExtensionArgument,
+  AnyNormalizedLexicalExtensionArgument,
+  EditorThemeClasses,
+  LexicalNodeConfig,
+} from "lexical";
 import type { ReactNode } from "react";
 
 import { BREAK_SYNTAX } from "./break";
@@ -76,20 +81,95 @@ function mergeThemeFragments(registrations: ReadonlyArray<SyntaxRegistration>): 
   const theme: Record<string, unknown> = {};
 
   for (const registration of registrations) {
-    if (registration.theme) {
-      mergeRecord(theme, registration.theme as Record<string, unknown>);
+    for (const themeFragment of collectExtensionThemes(registration.extension)) {
+      mergeRecord(theme, themeFragment as Record<string, unknown>);
     }
   }
 
   return theme as EditorThemeClasses;
 }
 
+function isNormalizedExtensionArgument(
+  extension: AnyLexicalExtensionArgument,
+): extension is AnyNormalizedLexicalExtensionArgument {
+  return Array.isArray(extension);
+}
+
+function getExtension(extension: AnyLexicalExtensionArgument) {
+  return isNormalizedExtensionArgument(extension) ? extension[0] : extension;
+}
+
+function getNodeConfigKey(nodeConfig: LexicalNodeConfig): string {
+  if (typeof nodeConfig === "function") {
+    return nodeConfig.getType();
+  }
+
+  return nodeConfig.replace.getType();
+}
+
+function dedupeNodes(nodes: ReadonlyArray<LexicalNodeConfig>): LexicalNodeConfig[] {
+  const seen = new Set<string>();
+  const deduped: LexicalNodeConfig[] = [];
+
+  for (const node of nodes) {
+    const key = getNodeConfigKey(node);
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(node);
+    }
+  }
+
+  return deduped;
+}
+
+function collectExtensionNodes(
+  extension: AnyLexicalExtensionArgument,
+  visited = new Set<string>(),
+): LexicalNodeConfig[] {
+  const lexicalExtension = getExtension(extension);
+  if (visited.has(lexicalExtension.name)) {
+    return [];
+  }
+  visited.add(lexicalExtension.name);
+
+  const dependencyNodes = lexicalExtension.dependencies?.flatMap(
+    (dependency): LexicalNodeConfig[] => collectExtensionNodes(dependency, visited),
+  );
+  const ownNodes = lexicalExtension.nodes;
+  const nodes = typeof ownNodes === "function" ? ownNodes() : ownNodes;
+
+  return [...(dependencyNodes ?? []), ...(nodes ?? [])];
+}
+
+function collectExtensionThemes(
+  extension: AnyLexicalExtensionArgument,
+  visited = new Set<string>(),
+): EditorThemeClasses[] {
+  const lexicalExtension = getExtension(extension);
+  if (visited.has(lexicalExtension.name)) {
+    return [];
+  }
+  visited.add(lexicalExtension.name);
+
+  const dependencyThemes =
+    lexicalExtension.dependencies?.flatMap((dependency): EditorThemeClasses[] =>
+      collectExtensionThemes(dependency, visited),
+    ) ?? [];
+
+  return lexicalExtension.theme ? [...dependencyThemes, lexicalExtension.theme] : dependencyThemes;
+}
+
 export const SYNTAX_REGISTRATIONS = SYNTAX_REGISTRY;
 
-export const SYNTAX_NODES: ReadonlyArray<LexicalNodeConfig> =
+export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = SYNTAX_REGISTRY.map(
+  (syntax) => syntax.extension,
+);
+
+export const SYNTAX_NODES: ReadonlyArray<LexicalNodeConfig> = dedupeNodes(
   SYNTAX_NODE_REGISTRATION_ORDER.flatMap((id): LexicalNodeConfig[] =>
-    Array.from(getSyntaxRegistration(id).nodes ?? []),
-  );
+    collectExtensionNodes(getSyntaxRegistration(id).extension),
+  ),
+);
 
 export const MARKDOWN_SHORTCUT_TRANSFORMERS: Transformer[] = SYNTAX_REGISTRY.flatMap(
   (syntax): Transformer[] => Array.from(syntax.markdownShortcuts ?? []),

@@ -1,10 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { EditorState } from "lexical";
@@ -66,22 +63,20 @@ export function BlockEditorContent({
 
   return (
     <div className="block-editor__shell">
-      <RichTextPlugin
-        contentEditable={
-          <ContentEditable
-            aria-label={i18n._({
-              id: "block-editor.content.label",
-              message: "Markdown block editor",
-            })}
-            className="block-editor__content"
-            onBlur={onBlur}
-            spellCheck
-          />
-        }
+      <ContentEditable
+        aria-placeholder={i18n._({
+          id: "block-editor.placeholder",
+          message: "Write a note...",
+        })}
+        ariaLabel={i18n._({
+          id: "block-editor.content.label",
+          message: "Markdown block editor",
+        })}
+        className="block-editor__content"
+        onBlur={onBlur}
         placeholder={<Placeholder />}
-        ErrorBoundary={LexicalErrorBoundary}
+        spellCheck
       />
-      <HistoryPlugin />
       {syntaxRuntimePlugins}
       <ClipboardPlugin blockId={blockId} />
       <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />

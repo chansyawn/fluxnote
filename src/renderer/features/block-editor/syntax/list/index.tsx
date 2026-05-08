@@ -1,7 +1,6 @@
-import { ListItemNode, ListNode } from "@lexical/list";
+import { CheckListExtension, ListExtension } from "@lexical/list";
 import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
-import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
@@ -11,19 +10,17 @@ import { TaskListShortcutPlugin } from "./task-list-shortcut-plugin";
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
 export { listFromMdast, listItemFromMdast, listItemToMdast, listToMdast } from "./mdast";
 
-export const LIST_SYNTAX = {
-  id: "list",
-  lexicalNodeNames: ["ListNode", "ListItemNode"],
-  mdastTypes: ["list", "listItem"],
-  nodes: [ListNode, ListItemNode],
-  markdownShortcuts: [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST],
-  runtimePlugins: ({ markdownShortcuts }) => [
-    <ListPlugin key="list" hasStrictIndent={false} shouldPreserveNumbering />,
-    <CheckListPlugin key="check-list" disableTakeFocusOnClick />,
-    <TaskListShortcutPlugin key="task-list-shortcut" />,
-    <ListKeyboardPlugin key="list-keyboard" markdownShortcuts={markdownShortcuts} />,
+export const LIST_SYNTAX_EXTENSION = defineExtension({
+  name: "fluxnotes/block-editor/syntax/list",
+  dependencies: [
+    configExtension(ListExtension, {
+      hasStrictIndent: false,
+      shouldPreserveNumbering: true,
+    }),
+    configExtension(CheckListExtension, {
+      disableTakeFocusOnClick: true,
+    }),
   ],
-  semanticTypes: ["list", "listItem"],
   theme: {
     list: {
       checklist: "block-editor__list--check",
@@ -42,4 +39,17 @@ export const LIST_SYNTAX = {
       ],
     },
   },
+});
+
+export const LIST_SYNTAX = {
+  id: "list",
+  extension: LIST_SYNTAX_EXTENSION,
+  lexicalNodeNames: ["ListNode", "ListItemNode"],
+  markdownShortcuts: [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST],
+  mdastTypes: ["list", "listItem"],
+  runtimePlugins: ({ markdownShortcuts }) => [
+    <TaskListShortcutPlugin key="task-list-shortcut" />,
+    <ListKeyboardPlugin key="list-keyboard" markdownShortcuts={markdownShortcuts} />,
+  ],
+  semanticTypes: ["list", "listItem"],
 } satisfies SyntaxRegistration;

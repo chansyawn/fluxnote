@@ -1,27 +1,21 @@
-import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { TableExtension } from "@lexical/table";
+import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import type { SyntaxRegistration } from "../registration";
 import { TABLE } from "./table-shortcut";
 
-export const TABLE_SYNTAX = {
-  id: "table",
-  lexicalNodeNames: ["TableNode", "TableRowNode", "TableCellNode"],
-  markdownShortcuts: [TABLE],
-  mdastTypes: ["table", "tableRow", "tableCell"],
-  nodes: [TableNode, TableRowNode, TableCellNode],
-  runtimePlugins: () => [
-    <TablePlugin
-      key="table"
-      hasCellBackgroundColor={false}
-      hasCellMerge={false}
-      hasHorizontalScroll
-      hasNestedTables={false}
-      hasTabHandler
-    />,
+export const TABLE_SYNTAX_EXTENSION = defineExtension({
+  name: "fluxnotes/block-editor/syntax/table",
+  dependencies: [
+    configExtension(TableExtension, {
+      hasCellBackgroundColor: false,
+      hasCellMerge: false,
+      hasHorizontalScroll: true,
+      hasNestedTables: false,
+      hasTabHandler: true,
+    }),
   ],
-  semanticTypes: ["table", "tableRow", "tableCell"],
   theme: {
     table: "block-editor__table",
     tableCell: "block-editor__table-cell",
@@ -32,4 +26,13 @@ export const TABLE_SYNTAX = {
     tableSelected: "block-editor__table--selected",
     tableSelection: "block-editor__table-selection",
   },
+});
+
+export const TABLE_SYNTAX = {
+  id: "table",
+  extension: TABLE_SYNTAX_EXTENSION,
+  lexicalNodeNames: ["TableNode", "TableRowNode", "TableCellNode"],
+  markdownShortcuts: [TABLE],
+  mdastTypes: ["table", "tableRow", "tableCell"],
+  semanticTypes: ["table", "tableRow", "tableCell"],
 } satisfies SyntaxRegistration;
