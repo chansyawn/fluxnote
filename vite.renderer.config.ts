@@ -8,6 +8,9 @@ import { defineConfig } from "vite-plus";
 import { viteAliases } from "./vite.config";
 
 export default defineConfig({
+  server: {
+    port: 6124,
+  },
   plugins: [
     tanstackRouter({
       target: "react",
