@@ -1,5 +1,6 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
+import type { PersistencePaths } from "@main/core/persistence";
 
 import type { ExternalEditManager } from "./manager";
 import { cancelEdit, submitEdit } from "./service";
@@ -7,6 +8,7 @@ import { cancelEdit, submitEdit } from "./service";
 interface ExternalEditCommandDeps {
   manager: ExternalEditManager;
   db: AppDatabase;
+  paths: PersistencePaths;
 }
 
 export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditCommandDeps): void {
@@ -20,6 +22,11 @@ export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditC
   });
 
   ipc.command("external-edit.submit", async (input) => {
-    return await submitEdit({ manager: deps.manager }, deps.db, input.editId, input.content);
+    return await submitEdit(
+      { manager: deps.manager, paths: deps.paths },
+      deps.db,
+      input.editId,
+      input.content,
+    );
   });
 }

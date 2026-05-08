@@ -17,6 +17,7 @@ describe("external-edit command", () => {
   const deps = {
     db: {} as never,
     manager: { listSessions: vi.fn(() => [{ editId: "e1" }]) },
+    paths: {} as never,
   };
 
   beforeEach(() => {
@@ -38,7 +39,12 @@ describe("external-edit command", () => {
 
     expect(mocks.cancelEdit).toHaveBeenCalled();
     expect(deps.manager.listSessions).toHaveBeenCalled();
-    expect(mocks.submitEdit).toHaveBeenCalled();
+    expect(mocks.submitEdit).toHaveBeenCalledWith(
+      { manager: deps.manager, paths: deps.paths },
+      deps.db,
+      "e1",
+      "after",
+    );
     expect(cancelResult).toBeUndefined();
     expect(listResult).toEqual([{ editId: "e1" }]);
     expect(submitResult).toEqual({ id: "b1" });

@@ -3,7 +3,17 @@ import { pathToFileURL } from "node:url";
 
 import type { AppDatabase } from "@main/core/database";
 import type { PersistencePaths } from "@main/core/persistence";
+import {
+  collectImageAssetUrls,
+  getImageAssetUrl,
+  type ImageUrlNode,
+} from "@shared/features/block-editor/asset-urls";
 import { businessError } from "@shared/ipc/result";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
+import type { Position } from "unist";
 
 import { assertBlockExists } from "../blocks/service";
 import { nodeAssetStorage, type AssetStorage } from "./storage";
@@ -33,6 +43,20 @@ export interface ResolveAssetInput {
   assetUrls: string[];
 }
 
+interface MarkdownNode extends ImageUrlNode {
+  children?: MarkdownNode[];
+  position?: Position;
+}
+
+interface MarkdownImageReplacement {
+  endOffset: number;
+  nextUrl: string;
+  startOffset: number;
+}
+
+const MARKDOWN_PARSER = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
+const MARKDOWN_IMAGE_DESTINATION_PREFIX_PATTERN = /]\(\s*<?$/;
+
 function createUniqueAssetFileName(fileNameCandidate: string | null, mimeType: string): string {
   const uniquePrefix = `${Date.now()}-${crypto.randomUUID()}`;
   if (fileNameCandidate) {
@@ -45,6 +69,87 @@ function createUniqueAssetFileName(fileNameCandidate: string | null, mimeType: s
 function getAssetFilePath(paths: PersistencePaths, assetUrl: string): string {
   const parsed = splitAssetUrl(assetUrl);
   return path.join(paths.getAssetPathForBlock(parsed.blockId), sanitizeFileName(parsed.fileName));
+}
+
+function collectMarkdownImageReplacements(
+  content: string,
+  assetUrlMap: Map<string, string>,
+): MarkdownImageReplacement[] {
+  const tree = MARKDOWN_PARSER.parse(content) as MarkdownNode;
+  const replacements: MarkdownImageReplacement[] = [];
+
+  const visit = (node: MarkdownNode): void => {
+    const assetUrl = getImageAssetUrl(node);
+    if (assetUrl) {
+      const nextUrl = assetUrlMap.get(assetUrl);
+      const urlRange = nextUrl ? findMarkdownImageUrlRange(content, node, assetUrl) : null;
+      if (nextUrl && urlRange) {
+        replacements.push({
+          endOffset: urlRange.endOffset,
+          nextUrl,
+          startOffset: urlRange.startOffset,
+        });
+      }
+    }
+
+    node.children?.forEach(visit);
+  };
+
+  visit(tree);
+  return replacements;
+}
+
+function findMarkdownImageUrlRange(
+  content: string,
+  node: MarkdownNode,
+  assetUrl: string,
+): Pick<MarkdownImageReplacement, "endOffset" | "startOffset"> | null {
+  const nodeStartOffset = node.position?.start.offset;
+  const nodeEndOffset = node.position?.end.offset;
+  if (
+    typeof nodeStartOffset !== "number" ||
+    typeof nodeEndOffset !== "number" ||
+    nodeStartOffset >= nodeEndOffset
+  ) {
+    return null;
+  }
+
+  const nodeMarkdown = content.slice(nodeStartOffset, nodeEndOffset);
+  let searchFrom = 0;
+
+  while (searchFrom < nodeMarkdown.length) {
+    const relativeUrlStart = nodeMarkdown.indexOf(assetUrl, searchFrom);
+    if (relativeUrlStart === -1) {
+      return null;
+    }
+
+    const beforeUrl = nodeMarkdown.slice(0, relativeUrlStart);
+    if (MARKDOWN_IMAGE_DESTINATION_PREFIX_PATTERN.test(beforeUrl)) {
+      return {
+        endOffset: nodeStartOffset + relativeUrlStart + assetUrl.length,
+        startOffset: nodeStartOffset + relativeUrlStart,
+      };
+    }
+
+    searchFrom = relativeUrlStart + assetUrl.length;
+  }
+
+  return null;
+}
+
+function replaceMarkdownImageAssetUrls(
+  content: string,
+  replacements: MarkdownImageReplacement[],
+): string {
+  let nextContent = content;
+
+  for (const replacement of replacements.toSorted((a, b) => b.startOffset - a.startOffset)) {
+    const before = nextContent.slice(0, replacement.startOffset);
+    const after = nextContent.slice(replacement.endOffset);
+    nextContent = `${before}${replacement.nextUrl}${after}`;
+  }
+
+  return nextContent;
 }
 
 export async function createAsset(
@@ -130,4 +235,23 @@ export async function resolveAsset(
   }
 
   return { assets };
+}
+
+export async function externalizeMarkdownAssetUrls(
+  deps: AssetServiceOptions,
+  db: AppDatabase,
+  content: string,
+): Promise<string> {
+  const tree = MARKDOWN_PARSER.parse(content) as MarkdownNode;
+  const assetUrls = collectImageAssetUrls([tree]);
+  if (assetUrls.length === 0) {
+    return content;
+  }
+
+  const resolvedAssets = await resolveAsset(deps, db, { assetUrls });
+  const assetUrlMap = new Map(
+    resolvedAssets.assets.map((asset) => [asset.assetUrl, asset.fileUrl]),
+  );
+  const replacements = collectMarkdownImageReplacements(content, assetUrlMap);
+  return replacements.length > 0 ? replaceMarkdownImageAssetUrls(content, replacements) : content;
 }

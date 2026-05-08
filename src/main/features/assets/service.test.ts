@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createBlockRecord } from "../blocks/service";
 import { createTestDb } from "../test-db";
-import { copyAsset, createAsset, resolveAsset } from "./service";
+import { copyAsset, createAsset, externalizeMarkdownAssetUrls, resolveAsset } from "./service";
 
 describe("assets service", () => {
   const paths = {
@@ -169,6 +169,81 @@ describe("assets service", () => {
           fileUrl: `file:///tmp/${block.id}/image.png`,
         },
       ]);
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("externalizes markdown image asset urls without changing literal text", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const content = [
+        `Literal assets://${block.id}/photo.png`,
+        "",
+        `![Alt](assets://${block.id}/photo.png)`,
+        "",
+        "![Remote](https://example.com/remote.png)",
+      ].join("\n");
+
+      const result = await externalizeMarkdownAssetUrls({ paths }, ctx.db, content);
+
+      expect(result).toBe(
+        [
+          `Literal assets://${block.id}/photo.png`,
+          "",
+          `![Alt](file:///tmp/${block.id}/photo.png)`,
+          "",
+          "![Remote](https://example.com/remote.png)",
+        ].join("\n"),
+      );
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("externalizes repeated markdown image asset urls", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const content = [
+        `![One](assets://${block.id}/photo.png)`,
+        `![Two](assets://${block.id}/photo.png)`,
+      ].join("\n");
+
+      const result = await externalizeMarkdownAssetUrls({ paths }, ctx.db, content);
+
+      expect(result).toBe(
+        [
+          `![One](file:///tmp/${block.id}/photo.png)`,
+          `![Two](file:///tmp/${block.id}/photo.png)`,
+        ].join("\n"),
+      );
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("externalizes markdown image destinations without changing matching alt text", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const assetUrl = `assets://${block.id}/photo.png`;
+      const content = [`![${assetUrl}](${assetUrl})`, `![${assetUrl}](${assetUrl} "Preview")`].join(
+        "\n",
+      );
+
+      const result = await externalizeMarkdownAssetUrls({ paths }, ctx.db, content);
+
+      expect(result).toBe(
+        [
+          `![${assetUrl}](file:///tmp/${block.id}/photo.png)`,
+          `![${assetUrl}](file:///tmp/${block.id}/photo.png "Preview")`,
+        ].join("\n"),
+      );
     } finally {
       ctx.close();
       await ctx.cleanup();

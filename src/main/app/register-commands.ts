@@ -46,6 +46,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
   registerExternalEditCommands(ipc, {
     db: deps.db,
     manager: deps.externalEditManager,
+    paths: deps.persistence.paths,
   });
   registerOpenBlockCommands(ipc, {
     openBlockService: deps.openBlockService,
