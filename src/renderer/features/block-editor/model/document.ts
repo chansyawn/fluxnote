@@ -1,3 +1,8 @@
+/**
+ * SemanticDocument is the fidelity boundary for the block editor. It captures
+ * Markdown meaning shared by mdast and Lexical, rather than preserving the exact
+ * original Markdown source layout.
+ */
 export interface SemanticDocument {
   type: "root";
   children: SemanticBlock[];

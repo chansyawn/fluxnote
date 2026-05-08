@@ -25,6 +25,11 @@ export type SyntaxRegistrationId =
   | "table"
   | "thematic-break";
 
+/**
+ * Syntax registrations are the extension boundary for block and inline behavior.
+ * A syntax can contribute Lexical behavior, Markdown shortcuts, mdast adapters,
+ * and ownership metadata for semantic and serialized node types.
+ */
 export interface SyntaxRegistration {
   id: SyntaxRegistrationId;
   extension: AnyLexicalExtensionArgument;
