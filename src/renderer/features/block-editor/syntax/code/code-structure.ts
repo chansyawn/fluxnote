@@ -17,7 +17,6 @@ interface CodeCursorContext {
   offset: number;
   position: CodeSplitPosition;
   text: string;
-  theme: string | undefined;
 }
 
 function isNodeInsideCode(node: LexicalNode, codeNode: CodeNode): boolean {
@@ -72,16 +71,11 @@ function getCodeCursorContext(selection: RangeSelection): CodeCursorContext | nu
     offset,
     position,
     text,
-    theme: codeNode.getTheme(),
   };
 }
 
-function createCodeNodeWithText(
-  language: string | null | undefined,
-  theme: string | undefined,
-  text: string,
-): CodeNode {
-  const codeNode = $createCodeNode(language, theme);
+function createCodeNodeWithText(language: string | null | undefined, text: string): CodeNode {
+  const codeNode = $createCodeNode(language);
   if (text.length > 0) {
     codeNode.append($createTextNode(text));
   }
@@ -113,9 +107,9 @@ function insertParagraphAfterCode(codeNode: CodeNode): boolean {
 }
 
 function splitCodeNodeAtCursor(context: CodeCursorContext): boolean {
-  const { codeNode, language, offset, text, theme } = context;
-  const firstCodeNode = createCodeNodeWithText(language, theme, text.slice(0, offset));
-  const secondCodeNode = createCodeNodeWithText(language, theme, text.slice(offset));
+  const { codeNode, language, offset, text } = context;
+  const firstCodeNode = createCodeNodeWithText(language, text.slice(0, offset));
+  const secondCodeNode = createCodeNodeWithText(language, text.slice(offset));
 
   codeNode.replace(firstCodeNode);
   firstCodeNode.insertAfter(secondCodeNode);

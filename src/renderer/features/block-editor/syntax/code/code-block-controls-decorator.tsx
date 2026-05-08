@@ -1,5 +1,4 @@
 import { $isCodeNode } from "@lexical/code";
-import { loadCodeLanguage } from "@lexical/code-shiki";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getNodeByKey, $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -102,7 +101,7 @@ function areCodeBlockViewsEqual(
   });
 }
 
-export function CodeBlockControlsPlugin() {
+export function CodeBlockControlsDecorator() {
   const [editor] = useLexicalComposerContext();
   const [codeBlocks, setCodeBlocks] = useState<CodeBlockViewState[]>([]);
   const animationFrameIdRef = useRef<number | null>(null);
@@ -212,10 +211,6 @@ export function CodeBlockControlsPlugin() {
           node.setLanguage(nextLanguage);
         }
       });
-
-      if (option.value !== PLAIN_TEXT_LANGUAGE) {
-        void loadCodeLanguage(nextLanguage, editor, key);
-      }
     },
     [editor],
   );

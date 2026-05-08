@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { calculateCodeToolbarRect } from "./code-block-controls-plugin";
+import { calculateCodeToolbarRect } from "./code-block-controls-decorator";
 
-describe("code block controls plugin", () => {
+describe("code block controls decorator", () => {
   it("calculates toolbar rect relative to the editor shell", () => {
     expect(
       calculateCodeToolbarRect(
