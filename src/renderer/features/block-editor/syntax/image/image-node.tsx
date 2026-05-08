@@ -1,5 +1,3 @@
-import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
-import { cn } from "@renderer/ui/lib/utils";
 import {
   DecoratorNode,
   type DOMConversionMap,
@@ -26,13 +24,11 @@ interface ImageViewProps extends ImagePayload {
 
 export type SerializedImageNode = Spread<ImagePayload, SerializedLexicalNode>;
 
-function ImageView({ alt, nodeKey, src, title }: ImageViewProps): JSX.Element {
-  const [isSelected] = useLexicalNodeSelection(nodeKey);
-
+function ImageView({ alt, src, title }: ImageViewProps): JSX.Element {
   return (
     <img
       alt={alt}
-      className={cn("block-editor__image", isSelected && "block-editor__image--selected")}
+      className="block-editor__image"
       draggable={false}
       src={src}
       title={title ?? undefined}
@@ -92,7 +88,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   createDOM(_: EditorConfig): HTMLElement {
-    return document.createElement("span");
+    const element = document.createElement("span");
+    element.className = "block-editor__image-shell";
+    return element;
   }
 
   updateDOM(): false {

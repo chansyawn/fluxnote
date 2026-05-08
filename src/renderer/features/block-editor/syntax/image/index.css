@@ -1,9 +1,9 @@
 @reference "#global.css";
 
 .block-editor__image {
-  @apply inline-block max-h-64 max-w-full rounded-md align-bottom;
+  @apply mx-1 inline-block max-h-64 max-w-full rounded-md align-bottom;
 }
 
-.block-editor__image--selected {
-  @apply outline-ring outline-2 outline-offset-2;
+.block-editor__image-shell--selected .block-editor__image {
+  @apply outline-ring outline-2;
 }

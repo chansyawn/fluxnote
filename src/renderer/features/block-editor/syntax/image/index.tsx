@@ -2,6 +2,7 @@ import "./index.css";
 import type { SyntaxRegistration } from "../registration";
 import { ImageInsertPlugin } from "./image-insert-plugin";
 import { ImageNode } from "./image-node";
+import { ImageOutlinePlugin } from "./image-outline-plugin";
 import { ImageSelectionPlugin } from "./image-selection-plugin";
 import { IMAGE } from "./image-shortcut";
 
@@ -23,6 +24,7 @@ export const IMAGE_SYNTAX = {
   mdastTypes: ["image"],
   nodes: [ImageNode],
   runtimePlugins: ({ blockId }) => [
+    <ImageOutlinePlugin key="image-outline" />,
     <ImageInsertPlugin key="image-insert" blockId={blockId} />,
     <ImageSelectionPlugin key="image-selection" />,
   ],
