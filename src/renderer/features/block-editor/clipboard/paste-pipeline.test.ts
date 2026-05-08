@@ -16,7 +16,6 @@ vi.mock("./clipboard-insert", () => ({
 const payload = {
   nodes: [{ text: "Text", type: "text", version: 1 }],
   sourceBlockId: "block-1",
-  version: 1 as const,
 };
 
 function createPasteEvent(values: Record<string, string>): ClipboardEvent {

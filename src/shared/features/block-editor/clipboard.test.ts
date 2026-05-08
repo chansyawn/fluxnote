@@ -10,7 +10,6 @@ import {
 const payload: BlockEditorClipboardPayload = {
   nodes: [{ text: "Text", type: "text", version: 1 }],
   sourceBlockId: "block-1",
-  version: 1,
 };
 
 describe("block editor clipboard html metadata", () => {

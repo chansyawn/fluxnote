@@ -27,7 +27,6 @@ const clipboardSerializedNodeSchema: z.ZodType<ClipboardSerializedNode> = z.lazy
 export const blockEditorClipboardPayloadSchema = z.object({
   nodes: z.array(clipboardSerializedNodeSchema),
   sourceBlockId: z.string().min(1),
-  version: z.literal(1),
 });
 
 export const blockEditorClipboardWriteRequestSchema = z.object({

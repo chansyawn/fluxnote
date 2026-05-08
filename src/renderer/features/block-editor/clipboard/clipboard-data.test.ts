@@ -136,7 +136,6 @@ describe("block editor clipboard data", () => {
       expect(data?.payload).toMatchObject({
         nodes: [{ type: "heading" }, { type: "paragraph" }],
         sourceBlockId: "block-1",
-        version: 1,
       });
     });
   });
@@ -156,7 +155,6 @@ describe("block editor clipboard data", () => {
       expect(data?.payload).toMatchObject({
         nodes: [{ type: "text" }],
         sourceBlockId: "block-1",
-        version: 1,
       });
     });
   });

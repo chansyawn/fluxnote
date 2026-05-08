@@ -26,7 +26,6 @@ import { registerClipboardCommands } from "./command";
 const payload = {
   nodes: [{ text: "Text", type: "text", version: 1 }],
   sourceBlockId: "block-1",
-  version: 1 as const,
 };
 
 function createHandlers(): Map<string, (input?: unknown) => unknown> {

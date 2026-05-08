@@ -17,7 +17,6 @@ const clipboardRequest: BlockEditorClipboardWriteRequest = {
   payload: {
     nodes: [],
     sourceBlockId: "block-1",
-    version: 1,
   },
   text: "Text",
 };

@@ -157,7 +157,6 @@ function createPayload(
   return {
     nodes,
     sourceBlockId,
-    version: 1,
   };
 }
 
