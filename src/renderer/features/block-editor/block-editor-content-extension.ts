@@ -3,7 +3,6 @@ import { configExtension, defineExtension, type InitialEditorStateType } from "l
 
 import { ClipboardExtension } from "./clipboard/clipboard-extension";
 import { importMarkdownToEditor } from "./editor-state";
-import { MarkdownChangeExtension } from "./markdown-change-extension";
 import { MarkdownShortcutExtension } from "./markdown-shortcut-extension";
 import { CODE_SYNTAX_REACT_EXTENSION } from "./syntax/code";
 import { IMAGE_SYNTAX_EXTENSION } from "./syntax/image";
@@ -13,7 +12,6 @@ export interface BlockEditorContentExtensionConfig {
   blockId: string;
   initialMarkdown: string;
   namespace?: string;
-  onMarkdownUpdated: (markdown: string) => void;
 }
 
 export function createInitialMarkdownEditorState(markdown: string): InitialEditorStateType {
@@ -39,10 +37,6 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
       }),
       configExtension(ClipboardExtension, {
         blockId: config.blockId,
-      }),
-      configExtension(MarkdownChangeExtension, {
-        initialMarkdown: config.initialMarkdown,
-        onMarkdownUpdated: config.onMarkdownUpdated,
       }),
     ],
     onError(error) {
