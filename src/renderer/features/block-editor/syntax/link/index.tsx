@@ -3,9 +3,12 @@ import { LINK } from "@lexical/markdown";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
+import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 
 export { linkFromMdast, linkToMdast } from "./mdast";
+
+export const LINK_MARKDOWN_SHORTCUT_TRANSFORMERS = [LINK];
 
 export const LINK_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/link",
@@ -13,6 +16,9 @@ export const LINK_SYNTAX_EXTENSION = defineExtension({
     configExtension(LinkExtension, {
       attributes: undefined,
       validateUrl: undefined,
+    }),
+    configExtension(MarkdownShortcutExtension, {
+      transformers: LINK_MARKDOWN_SHORTCUT_TRANSFORMERS,
     }),
   ],
   theme: {
@@ -24,7 +30,6 @@ export const LINK_SYNTAX = {
   id: "link",
   extension: LINK_SYNTAX_EXTENSION,
   lexicalNodeNames: ["LinkNode"],
-  markdownShortcuts: [LINK],
   mdastTypes: ["link"],
   semanticTypes: ["link"],
 } satisfies SyntaxRegistration;

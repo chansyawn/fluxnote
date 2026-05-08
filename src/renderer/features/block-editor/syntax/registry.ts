@@ -1,11 +1,4 @@
-import type { Transformer } from "@lexical/markdown";
-import type {
-  AnyLexicalExtensionArgument,
-  AnyNormalizedLexicalExtensionArgument,
-  EditorThemeClasses,
-  LexicalNodeConfig,
-} from "lexical";
-import type { ReactNode } from "react";
+import type { AnyLexicalExtensionArgument } from "lexical";
 
 import { BREAK_SYNTAX } from "./break";
 import { CODE_SYNTAX } from "./code";
@@ -17,11 +10,7 @@ import { LIST_SYNTAX } from "./list";
 import { PARAGRAPH_SYNTAX } from "./paragraph";
 import { PLACEHOLDERS_SYNTAX } from "./placeholders";
 import { QUOTE_SYNTAX } from "./quote";
-import type {
-  SyntaxRegistration,
-  SyntaxRegistrationId,
-  SyntaxRuntimeContext,
-} from "./registration";
+import type { SyntaxRegistration } from "./registration";
 import { TABLE_SYNTAX } from "./table/registration";
 import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
 
@@ -40,154 +29,11 @@ const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
   PLACEHOLDERS_SYNTAX,
 ] satisfies ReadonlyArray<SyntaxRegistration>;
 
-const SYNTAX_NODE_REGISTRATION_ORDER = [
-  "break",
-  "code",
-  "thematic-break",
-  "heading",
-  "image",
-  "link",
-  "list",
-  "quote",
-  "table",
-  "placeholders",
-] satisfies ReadonlyArray<SyntaxRegistrationId>;
-
-function getSyntaxRegistration(id: SyntaxRegistrationId): SyntaxRegistration {
-  const registration = SYNTAX_REGISTRY.find((syntax) => syntax?.id === id);
-  if (!registration) {
-    throw new Error(`Unknown block editor syntax registration: ${id}`);
-  }
-
-  return registration;
-}
-
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function mergeRecord(target: Record<string, unknown>, source: Record<string, unknown>): void {
-  for (const [key, value] of Object.entries(source)) {
-    const current = target[key];
-    if (isPlainRecord(current) && isPlainRecord(value)) {
-      mergeRecord(current, value);
-    } else {
-      target[key] = value;
-    }
-  }
-}
-
-function mergeThemeFragments(registrations: ReadonlyArray<SyntaxRegistration>): EditorThemeClasses {
-  const theme: Record<string, unknown> = {};
-
-  for (const registration of registrations) {
-    for (const themeFragment of collectExtensionThemes(registration.extension)) {
-      mergeRecord(theme, themeFragment as Record<string, unknown>);
-    }
-  }
-
-  return theme as EditorThemeClasses;
-}
-
-function isNormalizedExtensionArgument(
-  extension: AnyLexicalExtensionArgument,
-): extension is AnyNormalizedLexicalExtensionArgument {
-  return Array.isArray(extension);
-}
-
-function getExtension(extension: AnyLexicalExtensionArgument) {
-  return isNormalizedExtensionArgument(extension) ? extension[0] : extension;
-}
-
-function getNodeConfigKey(nodeConfig: LexicalNodeConfig): string {
-  if (typeof nodeConfig === "function") {
-    return nodeConfig.getType();
-  }
-
-  return nodeConfig.replace.getType();
-}
-
-function dedupeNodes(nodes: ReadonlyArray<LexicalNodeConfig>): LexicalNodeConfig[] {
-  const seen = new Set<string>();
-  const deduped: LexicalNodeConfig[] = [];
-
-  for (const node of nodes) {
-    const key = getNodeConfigKey(node);
-    if (!seen.has(key)) {
-      seen.add(key);
-      deduped.push(node);
-    }
-  }
-
-  return deduped;
-}
-
-function collectExtensionNodes(
-  extension: AnyLexicalExtensionArgument,
-  visited = new Set<string>(),
-): LexicalNodeConfig[] {
-  const lexicalExtension = getExtension(extension);
-  if (visited.has(lexicalExtension.name)) {
-    return [];
-  }
-  visited.add(lexicalExtension.name);
-
-  const dependencyNodes = lexicalExtension.dependencies?.flatMap(
-    (dependency): LexicalNodeConfig[] => collectExtensionNodes(dependency, visited),
-  );
-  const ownNodes = lexicalExtension.nodes;
-  const nodes = typeof ownNodes === "function" ? ownNodes() : ownNodes;
-
-  return [...(dependencyNodes ?? []), ...(nodes ?? [])];
-}
-
-function collectExtensionThemes(
-  extension: AnyLexicalExtensionArgument,
-  visited = new Set<string>(),
-): EditorThemeClasses[] {
-  const lexicalExtension = getExtension(extension);
-  if (visited.has(lexicalExtension.name)) {
-    return [];
-  }
-  visited.add(lexicalExtension.name);
-
-  const dependencyThemes =
-    lexicalExtension.dependencies?.flatMap((dependency): EditorThemeClasses[] =>
-      collectExtensionThemes(dependency, visited),
-    ) ?? [];
-
-  return lexicalExtension.theme ? [...dependencyThemes, lexicalExtension.theme] : dependencyThemes;
-}
-
 export const SYNTAX_REGISTRATIONS = SYNTAX_REGISTRY;
 
 export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = SYNTAX_REGISTRY.map(
   (syntax) => syntax.extension,
 );
-
-export const SYNTAX_NODES: ReadonlyArray<LexicalNodeConfig> = dedupeNodes(
-  SYNTAX_NODE_REGISTRATION_ORDER.flatMap((id): LexicalNodeConfig[] =>
-    collectExtensionNodes(getSyntaxRegistration(id).extension),
-  ),
-);
-
-export const MARKDOWN_SHORTCUT_TRANSFORMERS: Transformer[] = SYNTAX_REGISTRY.flatMap(
-  (syntax): Transformer[] => Array.from(syntax.markdownShortcuts ?? []),
-);
-
-export function createSyntaxRuntimePlugins(
-  context: Omit<SyntaxRuntimeContext, "markdownShortcuts">,
-): ReadonlyArray<ReactNode> {
-  return SYNTAX_REGISTRY.flatMap(
-    (syntax): ReactNode[] =>
-      syntax.runtimePlugins?.({
-        ...context,
-        markdownShortcuts: MARKDOWN_SHORTCUT_TRANSFORMERS,
-      }) ?? [],
-  );
-}
-
-export const SYNTAX_THEME: EditorThemeClasses = mergeThemeFragments(SYNTAX_REGISTRY);
 
 export const SYNTAX_SEMANTIC_TYPES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
   Array.from(syntax.semanticTypes ?? []),
@@ -197,6 +43,6 @@ export const SYNTAX_MDAST_TYPES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
   Array.from(syntax.mdastTypes ?? []),
 );
 
-export const SYNTAX_LEXICAL_NODE_NAMES = SYNTAX_NODE_REGISTRATION_ORDER.flatMap((id): string[] =>
-  Array.from(getSyntaxRegistration(id).lexicalNodeNames ?? []),
+export const SYNTAX_LEXICAL_NODE_NAMES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
+  Array.from(syntax.lexicalNodeNames ?? []),
 );

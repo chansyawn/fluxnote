@@ -13,6 +13,7 @@ import {
   $isTextNode,
   COLLABORATION_TAG,
   HISTORIC_TAG,
+  type LexicalEditor,
   type LexicalNode,
   type TextNode,
 } from "lexical";
@@ -129,26 +130,26 @@ export function applyTaskListShortcutAtSelection(): boolean {
   return createTaskListFromParagraph(textNode);
 }
 
+export function registerTaskListShortcut(editor: LexicalEditor): () => void {
+  return editor.registerUpdateListener(({ dirtyLeaves, editorState, tags }) => {
+    if (tags.has(COLLABORATION_TAG) || tags.has(HISTORIC_TAG) || dirtyLeaves.size === 0) {
+      return;
+    }
+
+    if (!editorState.read(() => findShortcutTextNode() !== null)) {
+      return;
+    }
+
+    editor.update(() => {
+      applyTaskListShortcutAtSelection();
+    });
+  });
+}
+
 export function TaskListShortcutPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(
-    () =>
-      editor.registerUpdateListener(({ dirtyLeaves, editorState, tags }) => {
-        if (tags.has(COLLABORATION_TAG) || tags.has(HISTORIC_TAG) || dirtyLeaves.size === 0) {
-          return;
-        }
-
-        if (!editorState.read(() => findShortcutTextNode() !== null)) {
-          return;
-        }
-
-        editor.update(() => {
-          applyTaskListShortcutAtSelection();
-        });
-      }),
-    [editor],
-  );
+  useEffect(() => registerTaskListShortcut(editor), [editor]);
 
   return null;
 }

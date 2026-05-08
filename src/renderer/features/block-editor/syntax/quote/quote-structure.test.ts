@@ -14,8 +14,6 @@ import {
   type SemanticParagraph,
 } from "../../model";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
-import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../registry";
-import { registerQuoteKeyboardCommands } from "./quote-commands";
 import { isEmptyQuote } from "./quote-structure";
 
 function paragraph(value = ""): SemanticParagraph {
@@ -73,7 +71,6 @@ describe("quote structure", () => {
 
   it("wraps raw inline quote children in a paragraph", () => {
     const editor = createHeadlessMarkdownEditor();
-    const unregister = registerQuoteKeyboardCommands(editor, MARKDOWN_SHORTCUT_TRANSFORMERS);
 
     editor.update(
       () => {
@@ -89,7 +86,6 @@ describe("quote structure", () => {
     expect(exportLexicalToSemanticDocument(editor.getEditorState())).toEqual(
       document([quote([paragraph("raw")])]),
     );
-    unregister();
   });
 
   it("treats empty heading children as empty quote content", () => {

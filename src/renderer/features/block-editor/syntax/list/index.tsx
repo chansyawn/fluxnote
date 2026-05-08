@@ -3,12 +3,15 @@ import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
+import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
-import { ListKeyboardPlugin } from "./list-keyboard-plugin";
-import { TaskListShortcutPlugin } from "./task-list-shortcut-plugin";
+import { registerListKeyboardCommands } from "./list-commands";
+import { registerTaskListShortcut } from "./task-list-shortcut-plugin";
 
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
 export { listFromMdast, listItemFromMdast, listItemToMdast, listToMdast } from "./mdast";
+
+export const LIST_MARKDOWN_SHORTCUT_TRANSFORMERS = [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST];
 
 export const LIST_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/list",
@@ -19,6 +22,9 @@ export const LIST_SYNTAX_EXTENSION = defineExtension({
     }),
     configExtension(CheckListExtension, {
       disableTakeFocusOnClick: true,
+    }),
+    configExtension(MarkdownShortcutExtension, {
+      transformers: LIST_MARKDOWN_SHORTCUT_TRANSFORMERS,
     }),
   ],
   theme: {
@@ -39,17 +45,22 @@ export const LIST_SYNTAX_EXTENSION = defineExtension({
       ],
     },
   },
+  register(editor, _, state) {
+    const { transformers } = state.getDependency(MarkdownShortcutExtension).config;
+    const unregisterTaskListShortcut = registerTaskListShortcut(editor);
+    const unregisterListKeyboardCommands = registerListKeyboardCommands(editor, transformers);
+
+    return () => {
+      unregisterTaskListShortcut();
+      unregisterListKeyboardCommands();
+    };
+  },
 });
 
 export const LIST_SYNTAX = {
   id: "list",
   extension: LIST_SYNTAX_EXTENSION,
   lexicalNodeNames: ["ListNode", "ListItemNode"],
-  markdownShortcuts: [CHECK_LIST, UNORDERED_LIST, ORDERED_LIST],
   mdastTypes: ["list", "listItem"],
-  runtimePlugins: ({ markdownShortcuts }) => [
-    <TaskListShortcutPlugin key="task-list-shortcut" />,
-    <ListKeyboardPlugin key="list-keyboard" markdownShortcuts={markdownShortcuts} />,
-  ],
   semanticTypes: ["list", "listItem"],
 } satisfies SyntaxRegistration;

@@ -3,7 +3,7 @@ import { defineExtension } from "lexical";
 
 import type { SyntaxRegistration } from "../registration";
 import { SoftBreakNode } from "./soft-break-node";
-import { SoftBreakShortcutPlugin } from "./soft-break-shortcut-plugin";
+import { registerSoftBreakShortcut } from "./soft-break-shortcut-plugin";
 
 export { $createSoftBreakNode, $isSoftBreakNode, SoftBreakNode } from "./soft-break-node";
 export {
@@ -12,9 +12,12 @@ export {
   SoftBreakShortcutPlugin,
 } from "./soft-break-shortcut-plugin";
 
+export const BREAK_MARKDOWN_SHORTCUT_TRANSFORMERS = [];
+
 export const BREAK_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/break",
   nodes: [SoftBreakNode],
+  register: registerSoftBreakShortcut,
 });
 
 export const BREAK_SYNTAX = {
@@ -22,6 +25,5 @@ export const BREAK_SYNTAX = {
   extension: BREAK_SYNTAX_EXTENSION,
   lexicalNodeNames: ["SoftBreakNode", "LineBreakNode"],
   mdastTypes: ["break", "text"],
-  runtimePlugins: () => [<SoftBreakShortcutPlugin key="soft-break-shortcut" />],
   semanticTypes: ["softBreak", "hardBreak"],
 } satisfies SyntaxRegistration;

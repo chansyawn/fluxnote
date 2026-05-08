@@ -1,6 +1,4 @@
-import type { Transformer } from "@lexical/markdown";
 import type { AnyLexicalExtensionArgument } from "lexical";
-import type { ReactNode } from "react";
 
 import type { SemanticBlock, SemanticInline, SemanticListItem } from "../model";
 
@@ -28,14 +26,7 @@ export type SyntaxRegistrationId =
 export interface SyntaxRegistration {
   id: SyntaxRegistrationId;
   extension: AnyLexicalExtensionArgument;
-  markdownShortcuts?: ReadonlyArray<Transformer>;
-  runtimePlugins?: (context: SyntaxRuntimeContext) => ReactNode[];
   semanticTypes?: ReadonlyArray<SemanticRegistrationType>;
   mdastTypes?: ReadonlyArray<string>;
   lexicalNodeNames?: ReadonlyArray<string>;
-}
-
-export interface SyntaxRuntimeContext {
-  blockId: string;
-  markdownShortcuts: ReadonlyArray<Transformer>;
 }

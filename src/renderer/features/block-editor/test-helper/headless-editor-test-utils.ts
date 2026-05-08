@@ -1,15 +1,18 @@
-import { createHeadlessEditor } from "@lexical/headless";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import type { LexicalEditor, SerializedEditorState } from "lexical";
 
-import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../editor-state";
+import {
+  createMarkdownEditor,
+  exportEditorStateToMarkdown,
+  importMarkdownToEditor,
+} from "../editor-state";
 import { parseMarkdownToMdast } from "../markdown/processor";
 import {
   exportLexicalToSemanticDocument,
   mdastToSemanticDocument,
   type SemanticDocument,
 } from "../model";
-import { MARKDOWN_SHORTCUT_TRANSFORMERS, SYNTAX_NODES } from "../syntax/registry";
+import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../syntax/markdown-shortcuts";
 
 export interface MarkdownSyntaxSnapshot {
   lexical: SerializedEditorState;
@@ -18,13 +21,7 @@ export interface MarkdownSyntaxSnapshot {
 }
 
 export function createHeadlessMarkdownEditor(namespace = "BlockEditorHeadlessTest"): LexicalEditor {
-  return createHeadlessEditor({
-    namespace,
-    nodes: [...SYNTAX_NODES],
-    onError(error) {
-      throw error;
-    },
-  });
+  return createMarkdownEditor(namespace);
 }
 
 export function createMarkdownSyntaxSnapshot(markdown: string): MarkdownSyntaxSnapshot {

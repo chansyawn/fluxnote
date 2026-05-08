@@ -37,6 +37,73 @@ export function setImageOutlineClass(
   }
 }
 
+export function registerImageOutlineCommands(editor: LexicalEditor): () => void {
+  let outlineState = HIDDEN_IMAGE_OUTLINE_STATE;
+  let visibleImageKey: NodeKey | null = null;
+
+  const updateOutline = (nextState: Partial<ImageOutlineState>) => {
+    outlineState = { ...outlineState, ...nextState };
+
+    const nextImageKey = shouldShowImageOutlineForState(outlineState)
+      ? outlineState.selectedImageKey
+      : null;
+    setImageOutlineClass(editor, visibleImageKey, nextImageKey);
+    visibleImageKey = nextImageKey;
+  };
+
+  const rootElement = editor.getRootElement();
+  const startPointerSelection = () => {
+    updateOutline({ isPointerSelecting: true });
+  };
+  const stopPointerSelection = () => {
+    updateOutline({ isPointerSelecting: false });
+  };
+
+  const unregisterRootEvents = rootElement
+    ? () => {
+        rootElement.removeEventListener("pointerdown", startPointerSelection);
+        rootElement.ownerDocument.removeEventListener("pointerup", stopPointerSelection);
+        rootElement.ownerDocument.removeEventListener("pointercancel", stopPointerSelection);
+      }
+    : () => {};
+
+  if (rootElement) {
+    rootElement.addEventListener("pointerdown", startPointerSelection);
+    rootElement.ownerDocument.addEventListener("pointerup", stopPointerSelection);
+    rootElement.ownerDocument.addEventListener("pointercancel", stopPointerSelection);
+  }
+
+  const unregisterEditor = mergeRegister(
+    editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        updateOutline({ selectedImageKey: getSingleSelectedImageKey($getSelection()) });
+      });
+    }),
+    editor.registerCommand(
+      FOCUS_COMMAND,
+      () => {
+        updateOutline({ editorHasFocus: true });
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    ),
+    editor.registerCommand(
+      BLUR_COMMAND,
+      () => {
+        updateOutline({ editorHasFocus: false, isPointerSelecting: false });
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    ),
+  );
+
+  return () => {
+    unregisterRootEvents();
+    unregisterEditor();
+    setImageOutlineClass(editor, visibleImageKey, null);
+  };
+}
+
 export function ImageOutlinePlugin(): null {
   const [editor] = useLexicalComposerContext();
   const outlineStateRef = useRef<ImageOutlineState>(HIDDEN_IMAGE_OUTLINE_STATE);

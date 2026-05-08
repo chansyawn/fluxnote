@@ -1,16 +1,24 @@
 import { HEADING } from "@lexical/markdown";
 import { RichTextExtension } from "@lexical/rich-text";
-import { defineExtension } from "lexical";
+import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
+import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 
 export { headingTagToDepth, headingToLexical, toHeadingTag } from "./lexical";
 export { headingFromMdast, headingToMdast } from "./mdast";
 
+export const HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS = [HEADING];
+
 export const HEADING_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/heading",
-  dependencies: [RichTextExtension],
+  dependencies: [
+    RichTextExtension,
+    configExtension(MarkdownShortcutExtension, {
+      transformers: HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS,
+    }),
+  ],
   theme: {
     heading: {
       h1: "block-editor__heading block-editor__heading--h1",
@@ -27,7 +35,6 @@ export const HEADING_SYNTAX = {
   id: "heading",
   extension: HEADING_SYNTAX_EXTENSION,
   lexicalNodeNames: ["HeadingNode"],
-  markdownShortcuts: [HEADING],
   mdastTypes: ["heading"],
   semanticTypes: ["heading"],
 } satisfies SyntaxRegistration;

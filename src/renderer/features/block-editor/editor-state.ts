@@ -1,5 +1,7 @@
-import { createEditor, type EditorState, type LexicalEditor } from "lexical";
+import { LexicalBuilder } from "@lexical/extension";
+import type { EditorState, LexicalEditor } from "lexical";
 
+import { createBlockEditorHeadlessExtension } from "./block-editor-content-extension";
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "./markdown/processor";
 import {
   exportLexicalToSemanticDocument,
@@ -7,16 +9,13 @@ import {
   mdastToSemanticDocument,
   semanticDocumentToMdast,
 } from "./model";
-import { SYNTAX_NODES } from "./syntax/registry";
 
 export function createMarkdownEditor(namespace = "BlockEditorTest"): LexicalEditor {
-  return createEditor({
-    namespace,
-    nodes: [...SYNTAX_NODES],
-    onError(error) {
-      throw error;
-    },
-  });
+  const editor = LexicalBuilder.fromExtensions([
+    createBlockEditorHeadlessExtension(namespace),
+  ]).buildEditor();
+
+  return editor;
 }
 
 export function importMarkdownToEditor(editor: LexicalEditor, markdown: string): void {

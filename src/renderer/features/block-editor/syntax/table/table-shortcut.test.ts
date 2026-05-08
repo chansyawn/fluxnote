@@ -1,10 +1,8 @@
-import { registerMarkdownShortcuts } from "@lexical/markdown";
 import { $getRoot, $isTextNode, KEY_ENTER_COMMAND, type LexicalEditor } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
 import { exportLexicalToSemanticDocument, importSemanticDocumentToLexical } from "../../model";
 import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
-import { MARKDOWN_SHORTCUT_TRANSFORMERS } from "../registry";
 
 interface KeyboardEventStub extends KeyboardEvent {
   readonly preventedForTest: boolean;
@@ -61,11 +59,9 @@ function dispatchEnterAtTextEnd(editor: LexicalEditor, value: string): KeyboardE
 describe("table shortcut", () => {
   it("creates a GFM table after typing a delimiter row and pressing enter", () => {
     const editor = createEditorWithTableShortcut("| Name | Count |", "| :--- | ---: |");
-    const unregister = registerMarkdownShortcuts(editor, MARKDOWN_SHORTCUT_TRANSFORMERS);
 
     const event = dispatchEnterAtTextEnd(editor, "| :--- | ---: |");
 
-    unregister();
     expect(event.preventedForTest).toBe(true);
     expect(exportLexicalToSemanticDocument(editor.getEditorState())).toEqual({
       children: [
@@ -96,7 +92,6 @@ describe("table shortcut", () => {
 
   it("does not transform when the delimiter does not match the header column count", () => {
     const editor = createEditorWithTableShortcut("| Name | Count |", "| --- |");
-    const unregister = registerMarkdownShortcuts(editor, MARKDOWN_SHORTCUT_TRANSFORMERS);
     const event = keyboardEvent();
 
     editor.update(
@@ -110,13 +105,18 @@ describe("table shortcut", () => {
         }
 
         textNode.select("| --- |".length, "| --- |".length);
-        expect(editor.dispatchCommand(KEY_ENTER_COMMAND, event)).toBe(false);
+        editor.dispatchCommand(KEY_ENTER_COMMAND, event);
       },
       { discrete: true },
     );
 
-    unregister();
-    expect(event.preventedForTest).toBe(false);
-    expect(exportLexicalToSemanticDocument(editor.getEditorState()).children).toHaveLength(2);
+    expect(exportLexicalToSemanticDocument(editor.getEditorState())).toEqual({
+      children: [
+        { children: [{ type: "text", value: "| Name | Count |" }], type: "paragraph" },
+        { children: [{ type: "text", value: "| --- |" }], type: "paragraph" },
+        { children: [], type: "paragraph" },
+      ],
+      type: "root",
+    });
   });
 });

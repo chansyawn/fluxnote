@@ -1,11 +1,13 @@
 import "./index.css";
-import { defineExtension } from "lexical";
+import { mergeRegister } from "@lexical/utils";
+import { configExtension, defineExtension } from "lexical";
 
+import { MarkdownShortcutExtension } from "../../markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
-import { ImageInsertPlugin } from "./image-insert-plugin";
+import { registerImageInsertCommands } from "./image-insert-plugin";
 import { ImageNode } from "./image-node";
-import { ImageOutlinePlugin } from "./image-outline-plugin";
-import { ImageSelectionPlugin } from "./image-selection-plugin";
+import { registerImageOutlineCommands } from "./image-outline-plugin";
+import { registerImageSelectionCommands } from "./image-selection-plugin";
 import { IMAGE } from "./image-shortcut";
 
 export {
@@ -19,21 +21,36 @@ export { imageFromLexical, imageToLexical } from "./lexical";
 export { imageFromMdast, imageToMdast } from "./mdast";
 export { IMAGE } from "./image-shortcut";
 
+export const IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS = [IMAGE];
+
+export interface ImageSyntaxExtensionConfig {
+  blockId: string;
+}
+
 export const IMAGE_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/image",
+  config: {
+    blockId: "",
+  } satisfies ImageSyntaxExtensionConfig,
+  dependencies: [
+    configExtension(MarkdownShortcutExtension, {
+      transformers: IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+    }),
+  ],
   nodes: [ImageNode],
+  register(editor, config) {
+    return mergeRegister(
+      registerImageOutlineCommands(editor),
+      registerImageInsertCommands(editor, config.blockId),
+      registerImageSelectionCommands(editor),
+    );
+  },
 });
 
 export const IMAGE_SYNTAX = {
   id: "image",
   extension: IMAGE_SYNTAX_EXTENSION,
   lexicalNodeNames: ["ImageNode"],
-  markdownShortcuts: [IMAGE],
   mdastTypes: ["image"],
-  runtimePlugins: ({ blockId }) => [
-    <ImageOutlinePlugin key="image-outline" />,
-    <ImageInsertPlugin key="image-insert" blockId={blockId} />,
-    <ImageSelectionPlugin key="image-selection" />,
-  ],
   semanticTypes: ["image"],
 } satisfies SyntaxRegistration;

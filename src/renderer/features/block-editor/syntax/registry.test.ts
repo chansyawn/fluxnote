@@ -1,47 +1,19 @@
-import { isValidElement } from "react";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,
 } from "../test-helper/headless-editor-test-utils";
-import {
-  createSyntaxRuntimePlugins,
-  SYNTAX_EXTENSIONS,
-  SYNTAX_NODES,
-  SYNTAX_THEME,
-} from "./registry";
+import { SYNTAX_EXTENSIONS } from "./registry";
 
 describe("syntax registry", () => {
   it("provides syntax extensions for extension composer initialization", () => {
     expect(SYNTAX_EXTENSIONS.length).toBeGreaterThan(0);
   });
 
-  it("provides lexical nodes for headless editor initialization", () => {
-    expect(SYNTAX_NODES.length).toBeGreaterThan(0);
-
+  it("creates headless editors from syntax extensions", () => {
     const editor = createHeadlessMarkdownEditor();
     expect(editor).toBeDefined();
-  });
-
-  it("derives legacy theme from syntax extensions", () => {
-    expect(SYNTAX_THEME).toMatchObject({
-      code: "block-editor__code",
-      link: "block-editor__link",
-      list: {
-        listitem: "block-editor__list-item",
-      },
-      table: "block-editor__table",
-    });
-  });
-
-  it("exposes renderable runtime plugins", () => {
-    const runtimePlugins = createSyntaxRuntimePlugins({ blockId: "block-1" });
-
-    expect(runtimePlugins.length).toBeGreaterThan(0);
-    expect(
-      runtimePlugins.map((plugin) => (isValidElement(plugin) ? plugin.type : null)),
-    ).not.toContain(null);
   });
 
   it("supports markdown shortcut parsing with aggregated registry", () => {

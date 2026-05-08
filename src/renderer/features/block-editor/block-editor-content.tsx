@@ -1,23 +1,16 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { EditorState } from "lexical";
-import { useEffectEvent, useImperativeHandle, useMemo, useRef, type Ref } from "react";
+import { useImperativeHandle, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "./clipboard/clipboard-data";
-import { ClipboardPlugin, writeBlockEditorClipboardData } from "./clipboard/clipboard-plugin";
-import { exportEditorStateToMarkdown } from "./editor-state";
-import { createSyntaxRuntimePlugins, MARKDOWN_SHORTCUT_TRANSFORMERS } from "./syntax/registry";
+import { writeBlockEditorClipboardData } from "./clipboard/clipboard-extension";
 import type { BlockEditorHandle } from "./types";
 
 interface BlockEditorContentProps {
   blockId: string;
-  initialMarkdown: string;
   onBlur?: () => void;
-  onMarkdownUpdated: (markdown: string) => void;
   ref?: Ref<BlockEditorHandle>;
 }
 
@@ -29,23 +22,9 @@ function Placeholder() {
   );
 }
 
-function exportMarkdownFromState(editorState: EditorState): string {
-  return exportEditorStateToMarkdown(editorState);
-}
-
-export function BlockEditorContent({
-  blockId,
-  initialMarkdown,
-  onBlur,
-  onMarkdownUpdated,
-  ref,
-}: BlockEditorContentProps) {
+export function BlockEditorContent({ blockId, onBlur, ref }: BlockEditorContentProps) {
   const { i18n } = useLingui();
   const [editor] = useLexicalComposerContext();
-  const latestMarkdownRef = useRef(initialMarkdown);
-  const syntaxRuntimePlugins = useMemo(() => createSyntaxRuntimePlugins({ blockId }), [blockId]);
-
-  const handleMarkdownUpdated = useEffectEvent(onMarkdownUpdated);
 
   useImperativeHandle(ref, () => ({
     copy: async () => {
@@ -76,21 +55,6 @@ export function BlockEditorContent({
         onBlur={onBlur}
         placeholder={<Placeholder />}
         spellCheck
-      />
-      {syntaxRuntimePlugins}
-      <ClipboardPlugin blockId={blockId} />
-      <MarkdownShortcutPlugin transformers={MARKDOWN_SHORTCUT_TRANSFORMERS} />
-      <OnChangePlugin
-        ignoreSelectionChange
-        onChange={(editorState) => {
-          const markdown = exportMarkdownFromState(editorState);
-          if (markdown === latestMarkdownRef.current) {
-            return;
-          }
-
-          latestMarkdownRef.current = markdown;
-          handleMarkdownUpdated(markdown);
-        }}
       />
     </div>
   );
