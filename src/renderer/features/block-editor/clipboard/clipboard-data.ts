@@ -100,55 +100,29 @@ function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): strin
   return exportEditorStateToMarkdown(editorState);
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
+function exportClipboardNodesToHtml(nodes: ClipboardSerializedNode[]): string {
+  const editor = createMarkdownEditor("BlockEditorClipboardHtmlExport");
+  const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
+  let html = "";
 
-function exportInlineNodesToHtml(nodes: ReadonlyArray<ClipboardSerializedNode>): string {
-  return nodes
-    .map((node) => {
-      if (node.type === "text") {
-        return escapeHtml(typeof node.text === "string" ? node.text : "");
-      }
+  editor.setEditorState(editorState);
+  editor.update(
+    () => {
+      const selection = $selectAll();
+      html = $getHtmlContent(editor, selection);
+      $setSelection(null);
+    },
+    { discrete: true },
+  );
 
-      if (node.type === "image") {
-        const src = typeof node.src === "string" ? node.src : "";
-        const alt = typeof node.alt === "string" ? node.alt : "";
-        const title = typeof node.title === "string" ? ` title="${escapeHtml(node.title)}"` : "";
-        return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}"${title}>`;
-      }
-
-      return node.children ? exportInlineNodesToHtml(node.children) : "";
-    })
-    .join("");
-}
-
-function exportNodesToFallbackHtml(nodes: ReadonlyArray<ClipboardSerializedNode>): string {
-  return nodes
-    .map((node) => {
-      if (node.type === "heading") {
-        const tag = typeof node.tag === "string" ? node.tag : "h1";
-        return `<${tag}>${exportInlineNodesToHtml(node.children ?? [])}</${tag}>`;
-      }
-
-      if (node.children) {
-        return `<p>${exportInlineNodesToHtml(node.children)}</p>`;
-      }
-
-      return exportInlineNodesToHtml([node]);
-    })
-    .join("");
+  return html;
 }
 
 function exportSelectionToHtml(editor: LexicalEditor, selection: BaseSelection): string {
   try {
     return $getHtmlContent(editor, selection);
   } catch {
-    return escapeHtml(selection.getTextContent()).replaceAll("\n", "<br>");
+    return "";
   }
 }
 
@@ -217,14 +191,10 @@ function createClipboardSnapshotFromSelection(
     selectedImageNode && typeof selectedImageNode.src === "string" ? selectedImageNode.src : null;
   const markdown = exportClipboardNodesToMarkdown(lexical.nodes);
   const exportedHtml = exportSelectionToHtml(editor, selection);
-  const html =
-    assetUrls.length > 0 && !assetUrls.some((assetUrl) => exportedHtml.includes(assetUrl))
-      ? exportNodesToFallbackHtml(lexical.nodes)
-      : exportedHtml;
 
   return {
     assetUrls,
-    html,
+    html: exportedHtml,
     imageAssetUrl: selectedImageSrc?.startsWith("assets://") ? selectedImageSrc : null,
     markdown,
     nodes: lexical.nodes,
@@ -243,7 +213,7 @@ async function createClipboardDataFromSnapshot(
   const assetUrlMap = createAssetUrlMap(resolvedAssets);
   const imageFileUrl = snapshot.imageAssetUrl ? assetUrlMap.get(snapshot.imageAssetUrl) : undefined;
   const externalNodes = rewriteClipboardAssetUrls(snapshot.nodes, assetUrlMap);
-  const html = assetUrlMap.size > 0 ? exportNodesToFallbackHtml(externalNodes) : snapshot.html;
+  const html = assetUrlMap.size > 0 ? exportClipboardNodesToHtml(externalNodes) : snapshot.html;
 
   return {
     html,

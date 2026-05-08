@@ -1,4 +1,5 @@
 import type { ResolveAssetRequest } from "@renderer/clients";
+import { JSDOM } from "jsdom";
 import {
   $createNodeSelection,
   $getRoot,
@@ -17,6 +18,35 @@ import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
 } from "./clipboard-data";
+
+async function withClipboardDOM<T>(run: () => Promise<T>): Promise<T> {
+  const previousWindow = globalThis.window;
+  const previousDocument = globalThis.document;
+  const previousDOMParser = globalThis.DOMParser;
+  const previousMutationObserver = globalThis.MutationObserver;
+  const previousGetComputedStyle = globalThis.getComputedStyle;
+  const dom = new JSDOM("<!doctype html><html><body></body></html>");
+  const { window } = dom;
+
+  Reflect.set(globalThis, "window", window);
+  Reflect.set(globalThis, "document", window.document);
+  Reflect.set(globalThis, "DOMParser", window.DOMParser);
+  Reflect.set(globalThis, "MutationObserver", window.MutationObserver);
+  Reflect.set(globalThis, "getComputedStyle", (element: Element) =>
+    window.getComputedStyle(element as never),
+  );
+
+  try {
+    return await run();
+  } finally {
+    Reflect.set(globalThis, "window", previousWindow);
+    Reflect.set(globalThis, "document", previousDocument);
+    Reflect.set(globalThis, "DOMParser", previousDOMParser);
+    Reflect.set(globalThis, "MutationObserver", previousMutationObserver);
+    Reflect.set(globalThis, "getComputedStyle", previousGetComputedStyle);
+    window.close();
+  }
+}
 
 function createEditorWithMarkdown(markdown: string): LexicalEditor {
   const editor = createHeadlessMarkdownEditor("SourceBlockEditor");
@@ -93,127 +123,144 @@ function selectImage(editor: LexicalEditor): void {
 
 describe("block editor clipboard data", () => {
   it("exports the full document with one application payload", async () => {
-    const editor = createEditorWithMarkdown(["# Title", "", "Text **bold**"].join("\n"));
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown(["# Title", "", "Text **bold**"].join("\n"));
 
-    const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
-      assets: [],
-    }));
+      const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
+        assets: [],
+      }));
 
-    expect(data?.text).toBe(["# Title", "", "Text **bold**", ""].join("\n"));
-    expect(data?.html).toContain("Title");
-    expect(data?.payload).toMatchObject({
-      nodes: [{ type: "heading" }, { type: "paragraph" }],
-      sourceBlockId: "block-1",
-      version: 1,
+      expect(data?.text).toBe(["# Title", "", "Text **bold**", ""].join("\n"));
+      expect(data?.html).toContain("Title");
+      expect(data?.html).toContain("<strong");
+      expect(data?.payload).toMatchObject({
+        nodes: [{ type: "heading" }, { type: "paragraph" }],
+        sourceBlockId: "block-1",
+        version: 1,
+      });
     });
   });
 
   it("exports selected inline content as markdown", async () => {
-    const editor = createEditorWithMarkdown("Text **bold** after");
-    selectText(editor, "bold");
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("Text **bold** after");
+      selectText(editor, "bold");
 
-    const data = await createClipboardDataFromCurrentSelection(editor, "block-1", async () => ({
-      assets: [],
-    }));
+      const data = await createClipboardDataFromCurrentSelection(editor, "block-1", async () => ({
+        assets: [],
+      }));
 
-    expect(data?.text).toBe("**bold**\n");
-    expect(data?.html).toContain("bold");
-    expect(data?.payload).toMatchObject({
-      nodes: [{ type: "text" }],
-      sourceBlockId: "block-1",
-      version: 1,
+      expect(data?.text).toBe("**bold**\n");
+      expect(data?.html).toContain("bold");
+      expect(data?.html).toContain("<strong");
+      expect(data?.payload).toMatchObject({
+        nodes: [{ type: "text" }],
+        sourceBlockId: "block-1",
+        version: 1,
+      });
     });
   });
 
   it("exports external formats from file-url rewritten nodes without changing the payload", async () => {
-    const editor = createEditorWithMarkdown(
-      "Literal assets://block-1/photo.png\n\n![Alt](assets://block-1/photo.png)",
-    );
-    const resolveAssets = vi.fn(async (request: ResolveAssetRequest) => {
-      expect(request).toEqual({ assetUrls: ["assets://block-1/photo.png"] });
-      return {
-        assets: [
-          {
-            assetUrl: "assets://block-1/photo.png",
-            fileUrl: "file:///tmp/block-1/photo.png",
-          },
-        ],
-      };
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown(
+        "Literal assets://block-1/photo.png\n\n![Alt](assets://block-1/photo.png)",
+      );
+      const resolveAssets = vi.fn(async (request: ResolveAssetRequest) => {
+        expect(request).toEqual({ assetUrls: ["assets://block-1/photo.png"] });
+        return {
+          assets: [
+            {
+              assetUrl: "assets://block-1/photo.png",
+              fileUrl: "file:///tmp/block-1/photo.png",
+            },
+          ],
+        };
+      });
+
+      const data = await createClipboardDataFromDocument(editor, "block-1", resolveAssets);
+
+      expect(data?.text).toContain("Literal assets\\://block-1/photo.png");
+      expect(data?.text).toContain("![Alt](file:///tmp/block-1/photo.png)");
+      expect(data?.html).toContain("file:///tmp/block-1/photo.png");
+      expect(data?.html).not.toContain('src="assets://block-1/photo.png"');
+      expect(data?.payload.nodes).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            children: expect.arrayContaining([
+              expect.objectContaining({ text: "Literal assets://block-1/photo.png" }),
+            ]),
+          }),
+          expect.objectContaining({
+            children: expect.arrayContaining([
+              expect.objectContaining({ src: "assets://block-1/photo.png" }),
+            ]),
+          }),
+        ]),
+      );
     });
-
-    const data = await createClipboardDataFromDocument(editor, "block-1", resolveAssets);
-
-    expect(data?.text).toContain("Literal assets\\://block-1/photo.png");
-    expect(data?.text).toContain("![Alt](file:///tmp/block-1/photo.png)");
-    expect(data?.html).toContain("file:///tmp/block-1/photo.png");
-    expect(data?.payload.nodes).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          children: expect.arrayContaining([
-            expect.objectContaining({ text: "Literal assets://block-1/photo.png" }),
-          ]),
-        }),
-        expect.objectContaining({
-          children: expect.arrayContaining([
-            expect.objectContaining({ src: "assets://block-1/photo.png" }),
-          ]),
-        }),
-      ]),
-    );
   });
 
   it("exports an image file url for a selected single asset image", async () => {
-    const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
-    selectImage(editor);
-    const resolveAssets = vi.fn(async (request: ResolveAssetRequest) => {
-      expect(request).toEqual({ assetUrls: ["assets://block-1/photo.png"] });
-      return {
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
+      selectImage(editor);
+      const resolveAssets = vi.fn(async (request: ResolveAssetRequest) => {
+        expect(request).toEqual({ assetUrls: ["assets://block-1/photo.png"] });
+        return {
+          assets: [
+            {
+              assetUrl: "assets://block-1/photo.png",
+              fileUrl: "file:///tmp/block-1/photo.png",
+            },
+          ],
+        };
+      });
+
+      const data = await createClipboardDataFromCurrentSelection(editor, "block-1", resolveAssets);
+
+      expect(data?.imageFileUrl).toBe("file:///tmp/block-1/photo.png");
+      expect(data?.text).toBe("![Alt](file:///tmp/block-1/photo.png)\n");
+    });
+  });
+
+  it("does not export an image file url for full document copy", async () => {
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
+
+      const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
         assets: [
           {
             assetUrl: "assets://block-1/photo.png",
             fileUrl: "file:///tmp/block-1/photo.png",
           },
         ],
-      };
+      }));
+
+      expect(data?.imageFileUrl).toBeUndefined();
     });
-
-    const data = await createClipboardDataFromCurrentSelection(editor, "block-1", resolveAssets);
-
-    expect(data?.imageFileUrl).toBe("file:///tmp/block-1/photo.png");
-    expect(data?.text).toBe("![Alt](file:///tmp/block-1/photo.png)\n");
-  });
-
-  it("does not export an image file url for full document copy", async () => {
-    const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
-
-    const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
-      assets: [
-        {
-          assetUrl: "assets://block-1/photo.png",
-          fileUrl: "file:///tmp/block-1/photo.png",
-        },
-      ],
-    }));
-
-    expect(data?.imageFileUrl).toBeUndefined();
   });
 
   it("does not export an image file url for selected remote images", async () => {
-    const editor = createEditorWithMarkdown("![Alt](https://example.com/photo.png)");
-    selectImage(editor);
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("![Alt](https://example.com/photo.png)");
+      selectImage(editor);
 
-    const data = await createClipboardDataFromCurrentSelection(editor, "block-1", async () => ({
-      assets: [],
-    }));
+      const data = await createClipboardDataFromCurrentSelection(editor, "block-1", async () => ({
+        assets: [],
+      }));
 
-    expect(data?.imageFileUrl).toBeUndefined();
-    expect(data?.text).toBe("![Alt](https://example.com/photo.png)\n");
+      expect(data?.imageFileUrl).toBeUndefined();
+      expect(data?.text).toBe("![Alt](https://example.com/photo.png)\n");
+    });
   });
 
   it("does not export collapsed selections", async () => {
-    const editor = createEditorWithMarkdown("Text");
-    selectText(editor, "");
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("Text");
+      selectText(editor, "");
 
-    await expect(createClipboardDataFromCurrentSelection(editor, "block-1")).resolves.toBeNull();
+      await expect(createClipboardDataFromCurrentSelection(editor, "block-1")).resolves.toBeNull();
+    });
   });
 });
