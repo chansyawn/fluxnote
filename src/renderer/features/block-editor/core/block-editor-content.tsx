@@ -1,3 +1,4 @@
+import { HistoryExtension } from "@lexical/history";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { ReactExtension } from "@lexical/react/ReactExtension";
@@ -46,6 +47,7 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
       configExtension(ClipboardExtension, {
         blockId: config.blockId,
       }),
+      HistoryExtension,
     ],
     onError(error) {
       throw error;
