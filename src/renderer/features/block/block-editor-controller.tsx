@@ -5,8 +5,8 @@ import { BlockEditorView } from "@renderer/features/block/block-editor-view";
 import { useDebouncer } from "@tanstack/react-pacer";
 import { useMutation } from "@tanstack/react-query";
 import {
+  useCallback,
   useEffect,
-  useEffectEvent,
   useImperativeHandle,
   useRef,
   type ReactNode,
@@ -74,7 +74,7 @@ export function BlockEditorController({
     }),
   });
 
-  const handleSaveSuccess = useEffectEvent(
+  const handleSaveSuccess = useCallback(
     ({ requestId, updatedBlock }: { requestId: number; updatedBlock: Block }) => {
       if (requestId < appliedRequestIdRef.current) {
         return;
@@ -84,27 +84,31 @@ export function BlockEditorController({
       persistedContentRef.current = updatedBlock.content;
       updateBlockInCache(updatedBlock);
     },
+    [],
   );
 
-  const handleSaveError = useEffectEvent(() => {
+  const handleSaveError = useCallback(() => {
     // Save errors are intentionally silent in the simplified MVP UI.
-  });
+  }, []);
 
-  const runSave = useEffectEvent((content: string) => {
-    const requestId = latestRequestIdRef.current + 1;
-    latestRequestIdRef.current = requestId;
+  const runSave = useCallback(
+    (content: string) => {
+      const requestId = latestRequestIdRef.current + 1;
+      latestRequestIdRef.current = requestId;
 
-    const savePromise = saveMutation
-      .mutateAsync({ content, requestId })
-      .then(handleSaveSuccess)
-      .catch(handleSaveError);
-    savePromiseRef.current = savePromise;
-    void savePromise.finally(() => {
-      if (savePromiseRef.current === savePromise) {
-        savePromiseRef.current = null;
-      }
-    });
-  });
+      const savePromise = saveMutation
+        .mutateAsync({ content, requestId })
+        .then(handleSaveSuccess)
+        .catch(handleSaveError);
+      savePromiseRef.current = savePromise;
+      void savePromise.finally(() => {
+        if (savePromiseRef.current === savePromise) {
+          savePromiseRef.current = null;
+        }
+      });
+    },
+    [handleSaveError, handleSaveSuccess, saveMutation],
+  );
 
   const saveDebouncer = useDebouncer(
     (content: string) => {
@@ -135,26 +139,29 @@ export function BlockEditorController({
     };
   }, [saveDebouncer]);
 
-  const handleMarkdownUpdated = useEffectEvent((markdown: string) => {
-    latestContentRef.current = markdown;
+  const handleMarkdownUpdated = useCallback(
+    (markdown: string) => {
+      latestContentRef.current = markdown;
 
-    if (markdown === persistedContentRef.current) {
-      saveDebouncer.cancel();
-      return;
-    }
+      if (markdown === persistedContentRef.current) {
+        saveDebouncer.cancel();
+        return;
+      }
 
-    saveDebouncer.maybeExecute(markdown);
-  });
+      saveDebouncer.maybeExecute(markdown);
+    },
+    [saveDebouncer],
+  );
 
-  const flushPendingSave = useEffectEvent(() => {
+  const flushPendingSave = useCallback(() => {
     saveDebouncer.flush();
-  });
+  }, [saveDebouncer]);
 
-  const getLatestMarkdown = useEffectEvent(async () => {
+  const getLatestMarkdown = useCallback(async () => {
     saveDebouncer.flush();
     await savePromiseRef.current;
     return latestContentRef.current;
-  });
+  }, [saveDebouncer]);
 
   useImperativeHandle(ref, () => ({
     copy: async () => {
