@@ -32,7 +32,7 @@ import {
   opaqueInlineToMdast,
 } from "../syntax/placeholders";
 import { quoteFromMdast, quoteToMdast } from "../syntax/quote";
-import { tableFromMdast, tableToMdast } from "../syntax/table/mdast";
+import { tableFromMdast, tableToMdast } from "../syntax/table";
 import { thematicBreakFromMdast, thematicBreakToMdast } from "../syntax/thematic-break";
 import type { SemanticBlock, SemanticDocument, SemanticInline } from "./document";
 import { normalizeSemanticDocument } from "./normalize";

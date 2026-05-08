@@ -8,8 +8,8 @@ import {
   type LexicalEditor,
 } from "lexical";
 
-import { createImagePayloadsFromFiles } from "../assets/image-files";
 import { $createImageNode, type ImagePayload } from "../syntax/image/image-node";
+import { createImagePayloadsFromFiles } from "./image-files";
 
 function insertImagePayloadsAtSelection(payloads: ReadonlyArray<ImagePayload>): boolean {
   if (payloads.length === 0) {

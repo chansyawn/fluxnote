@@ -11,8 +11,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("./clipboard-insert", () => ({
   insertClipboardPayloadAtSelection: mocks.insertClipboardPayloadAtSelection,
-  insertMarkdownTablesAtSelection: mocks.insertMarkdownTablesAtSelection,
   insertRichTextDataAtSelection: mocks.insertRichTextDataAtSelection,
+}));
+
+vi.mock("../syntax/table", () => ({
+  insertMarkdownTablesAtSelection: mocks.insertMarkdownTablesAtSelection,
 }));
 
 const payload = {

@@ -8,7 +8,7 @@ import { INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./inline-mark";
 import { LINK_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./link";
 import { LIST_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./list";
 import { QUOTE_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./quote";
-import { TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./table/registration";
+import { TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./table";
 import { THEMATIC_BREAK_MARKDOWN_SHORTCUT_TRANSFORMERS } from "./thematic-break";
 
 export const MARKDOWN_SHORTCUT_TRANSFORMERS: Transformer[] = [

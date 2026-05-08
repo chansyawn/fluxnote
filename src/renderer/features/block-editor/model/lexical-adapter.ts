@@ -34,7 +34,7 @@ import {
   opaqueInlineToLexical,
 } from "../syntax/placeholders";
 import { quoteFromLexical, quoteToLexical } from "../syntax/quote";
-import { tableFromLexical, tableToLexical } from "../syntax/table/lexical";
+import { tableFromLexical, tableToLexical } from "../syntax/table";
 import { thematicBreakFromLexical, thematicBreakToLexical } from "../syntax/thematic-break";
 import type { SemanticBlock, SemanticDocument, SemanticInline, SemanticListItem } from "./document";
 import { lexicalContainerChildrenToBlocks } from "./lexical-container";

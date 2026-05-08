@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { exportEditorStateToMarkdown } from "../editor-state";
-import { createHeadlessMarkdownEditor } from "../test-helper/headless-editor-test-utils";
-import { insertMarkdownTablesAtSelection } from "./clipboard-insert";
+import { exportEditorStateToMarkdown } from "../../editor-state";
+import { createHeadlessMarkdownEditor } from "../../test-helper/headless-editor-test-utils";
+import { insertMarkdownTablesAtSelection } from "./table-paste";
 
-describe("clipboard insert", () => {
+describe("table paste", () => {
   it("inserts pasted GFM markdown tables", () => {
     const editor = createHeadlessMarkdownEditor();
 

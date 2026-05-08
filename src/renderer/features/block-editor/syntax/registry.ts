@@ -11,7 +11,7 @@ import { PARAGRAPH_SYNTAX } from "./paragraph";
 import { PLACEHOLDERS_SYNTAX } from "./placeholders";
 import { QUOTE_SYNTAX } from "./quote";
 import type { SyntaxRegistration } from "./registration";
-import { TABLE_SYNTAX } from "./table/registration";
+import { TABLE_SYNTAX } from "./table";
 import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
 
 const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [

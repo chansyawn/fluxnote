@@ -2,8 +2,8 @@ import { mergeRegister } from "@lexical/utils";
 import { COMMAND_PRIORITY_HIGH, DRAGOVER_COMMAND, DROP_COMMAND, type LexicalEditor } from "lexical";
 
 import { getSupportedImageFiles, hasSupportedImageData } from "../../assets/image-files";
+import { insertImageFilesAtSelection } from "../../assets/image-insert";
 import { cloneCurrentSelection } from "../../clipboard/clipboard-insert";
-import { insertImageFilesAtSelection } from "../../clipboard/image-insert";
 
 export function registerImageInsertCommands(editor: LexicalEditor, blockId: string): () => void {
   return mergeRegister(

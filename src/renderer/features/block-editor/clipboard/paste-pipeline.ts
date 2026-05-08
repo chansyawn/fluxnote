@@ -9,12 +9,12 @@ import {
 import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
+import { insertImageFilesAtSelection } from "../assets/image-insert";
+import { insertMarkdownTablesAtSelection } from "../syntax/table";
 import {
   insertClipboardPayloadAtSelection,
-  insertMarkdownTablesAtSelection,
   insertRichTextDataAtSelection,
 } from "./clipboard-insert";
-import { insertImageFilesAtSelection } from "./image-insert";
 
 interface ClipboardDataSnapshot {
   getData(type: string): string;
