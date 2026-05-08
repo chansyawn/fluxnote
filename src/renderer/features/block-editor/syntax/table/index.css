@@ -1,0 +1,25 @@
+@reference "#global.css";
+
+.block-editor__table-scrollable-wrapper {
+  @apply my-2 overflow-x-auto;
+}
+
+.block-editor__table {
+  @apply border-border w-full min-w-max border-collapse text-sm;
+}
+
+.block-editor__table-cell {
+  @apply border-border min-w-24 border px-2 py-1 align-top outline-none;
+}
+
+.block-editor__table-cell--header {
+  @apply bg-muted/60 font-medium;
+}
+
+.block-editor__table-cell--selected {
+  @apply bg-primary/10;
+}
+
+.block-editor__table-selection {
+  @apply bg-primary/15;
+}

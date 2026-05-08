@@ -4,6 +4,10 @@ import type {
   SemanticDocument,
   SemanticInline,
   SemanticListItem,
+  SemanticTable,
+  SemanticTableAlign,
+  SemanticTableCell,
+  SemanticTableRow,
 } from "./document";
 import { createEmptyDocument } from "./document";
 
@@ -114,6 +118,52 @@ function normalizeListItems(children: ReadonlyArray<SemanticListItem>): Semantic
   }));
 }
 
+function normalizeTableAlign(value: unknown): SemanticTableAlign {
+  return value === "left" || value === "center" || value === "right" ? value : null;
+}
+
+function getTableColumnCount(rows: ReadonlyArray<SemanticTableRow>): number {
+  return rows.reduce((columnCount, row) => Math.max(columnCount, row.cells.length), 0);
+}
+
+function normalizeTableCell(cell: SemanticTableCell): SemanticTableCell {
+  return {
+    children: normalizeInlineChildren(cell.children),
+    type: "tableCell",
+  };
+}
+
+function normalizeTableRow(row: SemanticTableRow, columnCount: number): SemanticTableRow {
+  const cells = row.cells.map(normalizeTableCell);
+  while (cells.length < columnCount) {
+    cells.push({ children: [], type: "tableCell" });
+  }
+
+  return {
+    cells: cells.slice(0, columnCount),
+    type: "tableRow",
+  };
+}
+
+function normalizeTable(node: SemanticTable): SemanticTable[] {
+  const columnCount = getTableColumnCount(node.rows);
+  if (node.rows.length === 0 || columnCount === 0) {
+    return [];
+  }
+
+  const align = Array.from({ length: columnCount }, (_, index) =>
+    normalizeTableAlign(node.align[index]),
+  );
+
+  return [
+    {
+      align,
+      rows: node.rows.map((row) => normalizeTableRow(row, columnCount)),
+      type: "table",
+    },
+  ];
+}
+
 function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
   switch (node.type) {
     case "paragraph":
@@ -141,6 +191,8 @@ function normalizeBlock(node: SemanticBlock): SemanticBlock[] {
           ]
         : [];
     }
+    case "table":
+      return normalizeTable(node);
     case "codeBlock":
       return [{ lang: node.lang || null, type: "codeBlock", value: node.value }];
     case "thematicBreak":

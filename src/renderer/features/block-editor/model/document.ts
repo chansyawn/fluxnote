@@ -10,6 +10,7 @@ export type SemanticBlock =
   | SemanticHeading
   | SemanticBlockquote
   | SemanticList
+  | SemanticTable
   | SemanticCodeBlock
   | SemanticThematicBreak
   | SemanticOpaqueBlock;
@@ -40,6 +41,24 @@ export interface SemanticListItem {
   type: "listItem";
   checked?: boolean;
   children: SemanticBlock[];
+}
+
+export type SemanticTableAlign = "left" | "center" | "right" | null;
+
+export interface SemanticTable {
+  type: "table";
+  align: SemanticTableAlign[];
+  rows: SemanticTableRow[];
+}
+
+export interface SemanticTableRow {
+  type: "tableRow";
+  cells: SemanticTableCell[];
+}
+
+export interface SemanticTableCell {
+  type: "tableCell";
+  children: SemanticInline[];
 }
 
 export interface SemanticCodeBlock {

@@ -6,6 +6,7 @@ import type {
   PhrasingContent,
   Root,
   RootContent,
+  TableCell,
   Text,
 } from "mdast";
 
@@ -31,6 +32,7 @@ import {
   opaqueInlineToMdast,
 } from "../syntax/placeholders";
 import { quoteFromMdast, quoteToMdast } from "../syntax/quote";
+import { tableFromMdast, tableToMdast } from "../syntax/table/mdast";
 import { thematicBreakFromMdast, thematicBreakToMdast } from "../syntax/thematic-break";
 import type { SemanticBlock, SemanticDocument, SemanticInline } from "./document";
 import { normalizeSemanticDocument } from "./normalize";
@@ -79,6 +81,12 @@ function inlinesFromMdast(children: ReadonlyArray<PhrasingContent>): SemanticInl
   return children.flatMap(inlineFromMdast);
 }
 
+function tableCellInlinesFromMdast(
+  children: ReadonlyArray<TableCell["children"][number]>,
+): SemanticInline[] {
+  return inlinesFromMdast(children);
+}
+
 function blockFromMdast(node: RootContent): SemanticBlock[] {
   switch (node.type) {
     case "paragraph":
@@ -93,6 +101,8 @@ function blockFromMdast(node: RootContent): SemanticBlock[] {
       return [];
     case "code":
       return [codeBlockFromMdast(node)];
+    case "table":
+      return [tableFromMdast(node, tableCellInlinesFromMdast)];
     case "thematicBreak":
       return [thematicBreakFromMdast()];
     default:
@@ -133,6 +143,10 @@ function inlinesToMdast(children: ReadonlyArray<SemanticInline>): PhrasingConten
   return children.flatMap(inlineToMdast);
 }
 
+function tableCellInlinesToMdast(children: ReadonlyArray<SemanticInline>): TableCell["children"] {
+  return inlinesToMdast(children);
+}
+
 function blockToMdast(node: SemanticBlock): BlockContent[] {
   switch (node.type) {
     case "paragraph":
@@ -145,6 +159,8 @@ function blockToMdast(node: SemanticBlock): BlockContent[] {
       return [listToMdast(node, blocksToMdast)];
     case "codeBlock":
       return [codeBlockToMdast(node)];
+    case "table":
+      return [tableToMdast(node, tableCellInlinesToMdast)];
     case "thematicBreak":
       return [thematicBreakToMdast()];
     case "opaqueBlock": {

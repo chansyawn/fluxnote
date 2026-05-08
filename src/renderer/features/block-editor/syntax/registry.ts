@@ -17,6 +17,7 @@ import type {
   SyntaxRegistrationId,
   SyntaxRuntimeContext,
 } from "./registration";
+import { TABLE_SYNTAX } from "./table/registration";
 import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
 
 const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
@@ -24,6 +25,7 @@ const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
   HEADING_SYNTAX,
   QUOTE_SYNTAX,
   LIST_SYNTAX,
+  TABLE_SYNTAX,
   THEMATIC_BREAK_SYNTAX,
   CODE_SYNTAX,
   INLINE_MARK_SYNTAX,
@@ -42,11 +44,12 @@ const SYNTAX_NODE_REGISTRATION_ORDER = [
   "link",
   "list",
   "quote",
+  "table",
   "placeholders",
 ] satisfies ReadonlyArray<SyntaxRegistrationId>;
 
 function getSyntaxRegistration(id: SyntaxRegistrationId): SyntaxRegistration {
-  const registration = SYNTAX_REGISTRY.find((syntax) => syntax.id === id);
+  const registration = SYNTAX_REGISTRY.find((syntax) => syntax?.id === id);
   if (!registration) {
     throw new Error(`Unknown block editor syntax registration: ${id}`);
   }

@@ -7,10 +7,13 @@ import type {
 } from "@shared/features/block-editor/clipboard";
 import {
   $getSelection,
+  $getRoot,
   $selectAll,
   $setSelection,
+  $isElementNode,
   type BaseSelection,
   type LexicalEditor,
+  type LexicalNode,
   type SerializedEditorState,
 } from "lexical";
 
@@ -29,6 +32,7 @@ const ROOT_BLOCK_NODE_TYPES = new Set([
   "paragraph",
   "placeholder-block",
   "quote",
+  "table",
 ]);
 
 function createSerializedRoot(children: ClipboardSerializedNode[]): ClipboardSerializedRoot {
@@ -201,6 +205,42 @@ function createClipboardSnapshotFromSelection(
   };
 }
 
+function serializeClipboardNode(node: LexicalNode): ClipboardSerializedNode {
+  const serialized = node.exportJSON() as ClipboardSerializedNode;
+  if ($isElementNode(node)) {
+    serialized.children = node.getChildren().map(serializeClipboardNode);
+  }
+
+  return serialized;
+}
+
+function createClipboardSnapshotFromDocument(
+  editor: LexicalEditor,
+  blockId: string,
+  selection: BaseSelection,
+): {
+  assetUrls: string[];
+  html: string;
+  imageAssetUrl: string | null;
+  markdown: string;
+  nodes: ClipboardSerializedNode[];
+  sourceBlockId: string;
+} | null {
+  const nodes = $getRoot().getChildren().map(serializeClipboardNode);
+  if (nodes.length === 0) {
+    return null;
+  }
+
+  return {
+    assetUrls: collectClipboardAssetUrls(nodes),
+    html: exportSelectionToHtml(editor, selection),
+    imageAssetUrl: null,
+    markdown: exportClipboardNodesToMarkdown(nodes),
+    nodes,
+    sourceBlockId: blockId,
+  };
+}
+
 async function createClipboardDataFromSnapshot(
   snapshot: NonNullable<ReturnType<typeof createClipboardSnapshotFromSelection>>,
   resolveAssetsClient: ResolveAssetsClient,
@@ -269,9 +309,7 @@ export async function createClipboardDataFromDocument(
   const documentSelection = selection;
 
   const snapshot = editor.read(() =>
-    createClipboardSnapshotFromSelection(editor, blockId, documentSelection, {
-      includeImageFileUrl: false,
-    }),
+    createClipboardSnapshotFromDocument(editor, blockId, documentSelection),
   );
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssetsClient) : null;

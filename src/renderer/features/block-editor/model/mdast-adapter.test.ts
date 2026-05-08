@@ -220,6 +220,38 @@ describe("semantic mdast adapter", () => {
     );
   });
 
+  it("roundtrips GFM tables with column alignment", () => {
+    const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic(
+      [
+        "| Name | Count | Notes |",
+        "| :--- | ---: | :---: |",
+        "| Alpha | 1 | **bold** |",
+        "| Beta | 2 | [link](https://example.com) |",
+      ].join("\n"),
+    );
+
+    expect(secondSemantic).toEqual(firstSemantic);
+    expect(firstSemantic.children[0]).toEqual({
+      align: ["left", "right", "center"],
+      rows: [
+        {
+          cells: [
+            { children: [{ type: "text", value: "Name" }], type: "tableCell" },
+            { children: [{ type: "text", value: "Count" }], type: "tableCell" },
+            { children: [{ type: "text", value: "Notes" }], type: "tableCell" },
+          ],
+          type: "tableRow",
+        },
+        expect.objectContaining({ type: "tableRow" }),
+        expect.objectContaining({ type: "tableRow" }),
+      ],
+      type: "table",
+    });
+    expect(canonicalMarkdown).toContain("| Name");
+    expect(canonicalMarkdown).toContain(":----");
+    expect(canonicalMarkdown).toContain("----:");
+  });
+
   it("classifies plain markdown newlines as soft breaks", () => {
     const { canonicalMarkdown, firstSemantic, secondSemantic } = roundTripSemantic("Alpha\nBeta");
 
@@ -303,7 +335,7 @@ describe("semantic mdast adapter", () => {
     expect(JSON.stringify(semantic)).toContain('"value":"[ ] code"');
   });
 
-  it("imports unsupported syntax as opaque nodes without source offsets", () => {
+  it("imports supported and unsupported syntax without source offsets", () => {
     const semantic = mdastToSemanticDocument(
       parseMarkdownToMdast(
         [
@@ -322,6 +354,7 @@ describe("semantic mdast adapter", () => {
 
     expect(JSON.stringify(semantic)).not.toContain("position");
     expect(JSON.stringify(semantic)).not.toContain("offset");
+    expect(JSON.stringify(semantic)).toContain('"type":"table"');
     expect(JSON.stringify(semantic)).toContain("opaqueBlock");
   });
 

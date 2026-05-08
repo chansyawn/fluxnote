@@ -5,11 +5,13 @@ import { handleBlockEditorPaste } from "./paste-pipeline";
 
 const mocks = vi.hoisted(() => ({
   insertClipboardPayloadAtSelection: vi.fn(),
+  insertMarkdownTablesAtSelection: vi.fn(),
   insertRichTextDataAtSelection: vi.fn(),
 }));
 
 vi.mock("./clipboard-insert", () => ({
   insertClipboardPayloadAtSelection: mocks.insertClipboardPayloadAtSelection,
+  insertMarkdownTablesAtSelection: mocks.insertMarkdownTablesAtSelection,
   insertRichTextDataAtSelection: mocks.insertRichTextDataAtSelection,
 }));
 
@@ -33,6 +35,7 @@ function createPasteEvent(values: Record<string, string>): ClipboardEvent {
 describe("block editor paste pipeline", () => {
   beforeEach(() => {
     mocks.insertClipboardPayloadAtSelection.mockReset();
+    mocks.insertMarkdownTablesAtSelection.mockReset();
     mocks.insertRichTextDataAtSelection.mockReset();
   });
 
@@ -73,5 +76,21 @@ describe("block editor paste pipeline", () => {
       unknown,
     ];
     expect(snapshot.getData("text/html")).toBe("<p>External</p>");
+  });
+
+  it("tries markdown table insertion before ordinary rich text insertion", () => {
+    mocks.insertMarkdownTablesAtSelection.mockReturnValue(true);
+    const event = createPasteEvent({
+      "text/plain": ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n"),
+    });
+
+    expect(handleBlockEditorPaste({} as never, "block-2", event, null)).toBe(true);
+
+    expect(mocks.insertMarkdownTablesAtSelection).toHaveBeenCalledWith(
+      {},
+      ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n"),
+      null,
+    );
+    expect(mocks.insertRichTextDataAtSelection).not.toHaveBeenCalled();
   });
 });

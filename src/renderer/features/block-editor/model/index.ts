@@ -19,6 +19,10 @@ export type {
   SemanticParagraph,
   SemanticSoftBreak,
   SemanticStrong,
+  SemanticTable,
+  SemanticTableAlign,
+  SemanticTableCell,
+  SemanticTableRow,
   SemanticText,
   SemanticThematicBreak,
 } from "./document";

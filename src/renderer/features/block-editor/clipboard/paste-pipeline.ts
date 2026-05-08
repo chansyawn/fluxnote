@@ -11,6 +11,7 @@ import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 import { getSupportedImageFiles } from "../assets/image-files";
 import {
   insertClipboardPayloadAtSelection,
+  insertMarkdownTablesAtSelection,
   insertRichTextDataAtSelection,
 } from "./clipboard-insert";
 import { insertImageFilesAtSelection } from "./image-insert";
@@ -84,6 +85,12 @@ export function handleBlockEditorPaste(
   const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
   event.preventDefault();
   event.stopPropagation();
+  const markdown =
+    clipboardDataSnapshot.getData("text/markdown") || clipboardDataSnapshot.getData("text/plain");
+  if (markdown && insertMarkdownTablesAtSelection(editor, markdown, selection)) {
+    return true;
+  }
+
   insertRichTextDataAtSelection(editor, clipboardDataSnapshot, selection);
   return true;
 }

@@ -183,4 +183,18 @@ describe("semantic lexical adapter", () => {
 
     expect(roundTripLexical(semantic)).toEqual(semantic);
   });
+
+  it("keeps GFM table structure and alignment through Lexical", () => {
+    const semantic = markdownToSemantic(
+      ["| Name | Count |", "| :--- | ---: |", "| Alpha | 1 |", "| **Beta** | `2` |"].join("\n"),
+    );
+
+    expect(roundTripLexical(semantic)).toEqual(semantic);
+    expect(semantic.children[0]).toEqual(
+      expect.objectContaining({
+        align: ["left", "right"],
+        type: "table",
+      }),
+    );
+  });
 });

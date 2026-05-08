@@ -4,6 +4,13 @@ import type { ReactNode } from "react";
 
 import type { SemanticBlock, SemanticInline, SemanticListItem } from "../model";
 
+type SemanticRegistrationType =
+  | SemanticBlock["type"]
+  | SemanticInline["type"]
+  | SemanticListItem["type"]
+  | "tableRow"
+  | "tableCell";
+
 export type SyntaxRegistrationId =
   | "break"
   | "code"
@@ -15,6 +22,7 @@ export type SyntaxRegistrationId =
   | "paragraph"
   | "placeholders"
   | "quote"
+  | "table"
   | "thematic-break";
 
 export interface SyntaxRegistration {
@@ -23,9 +31,7 @@ export interface SyntaxRegistration {
   markdownShortcuts?: ReadonlyArray<Transformer>;
   runtimePlugins?: (context: SyntaxRuntimeContext) => ReactNode[];
   theme?: Partial<EditorThemeClasses>;
-  semanticTypes?: ReadonlyArray<
-    SemanticBlock["type"] | SemanticInline["type"] | SemanticListItem["type"]
-  >;
+  semanticTypes?: ReadonlyArray<SemanticRegistrationType>;
   mdastTypes?: ReadonlyArray<string>;
   lexicalNodeNames?: ReadonlyArray<string>;
 }

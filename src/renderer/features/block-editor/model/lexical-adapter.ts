@@ -3,6 +3,7 @@ import { $isHorizontalRuleNode } from "@lexical/extension";
 import { $createLinkNode, $isLinkNode } from "@lexical/link";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
+import { $isTableNode } from "@lexical/table";
 import {
   $createLineBreakNode,
   $createTextNode,
@@ -33,6 +34,7 @@ import {
   opaqueInlineToLexical,
 } from "../syntax/placeholders";
 import { quoteFromLexical, quoteToLexical } from "../syntax/quote";
+import { tableFromLexical, tableToLexical } from "../syntax/table/lexical";
 import { thematicBreakFromLexical, thematicBreakToLexical } from "../syntax/thematic-break";
 import type { SemanticBlock, SemanticDocument, SemanticInline, SemanticListItem } from "./document";
 import { lexicalContainerChildrenToBlocks } from "./lexical-container";
@@ -106,6 +108,8 @@ function blockToLexical(node: SemanticBlock): LexicalNode[] {
       return [quoteToLexical(node, blockToLexical)];
     case "list":
       return [listToLexical(node, blockToLexical)];
+    case "table":
+      return [tableToLexical(node, inlineToLexical)];
     case "codeBlock":
       return [codeBlockToLexical(node)];
     case "thematicBreak":
@@ -226,6 +230,10 @@ function blockFromLexical(node: LexicalNode): SemanticBlock[] {
 
   if ($isListNode(node)) {
     return [listFromLexical(node, semanticListItemFromLexical)];
+  }
+
+  if ($isTableNode(node)) {
+    return [tableFromLexical(node, childrenToInline)];
   }
 
   if ($isListItemNode(node)) {

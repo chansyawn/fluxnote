@@ -140,6 +140,24 @@ describe("block editor clipboard data", () => {
     });
   });
 
+  it("exports tables as root block nodes", async () => {
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown(
+        ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n"),
+      );
+
+      const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
+        assets: [],
+      }));
+
+      expect(data?.text).toContain("| A");
+      expect(data?.payload).toMatchObject({
+        nodes: [expect.objectContaining({ type: "table" })],
+        sourceBlockId: "block-1",
+      });
+    });
+  });
+
   it("exports selected inline content as markdown", async () => {
     await withClipboardDOM(async () => {
       const editor = createEditorWithMarkdown("Text **bold** after");
