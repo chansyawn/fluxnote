@@ -1,11 +1,13 @@
-import { CheckListExtension, ListExtension } from "@lexical/list";
+import { $isListItemNode, $isListNode, CheckListExtension, ListExtension } from "@lexical/list";
 import { CHECK_LIST, ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
+import { listFromLexical, listItemFromLexical, listToLexical } from "./lexical";
 import { registerListKeyboardCommands } from "./list-commands";
+import { listFromMdast, listToMdast } from "./mdast";
 import { registerTaskListShortcut } from "./task-list-shortcut";
 
 export { listFromLexical, listItemFromLexical, listItemToLexical, listToLexical } from "./lexical";
@@ -23,9 +25,7 @@ export const LIST_SYNTAX_EXTENSION = defineExtension({
     configExtension(CheckListExtension, {
       disableTakeFocusOnClick: true,
     }),
-    configExtension(MarkdownShortcutExtension, {
-      transformers: LIST_MARKDOWN_SHORTCUT_TRANSFORMERS,
-    }),
+    MarkdownShortcutExtension,
   ],
   theme: {
     list: {
@@ -60,7 +60,27 @@ export const LIST_SYNTAX_EXTENSION = defineExtension({
 export const LIST_SYNTAX = {
   id: "list",
   extension: LIST_SYNTAX_EXTENSION,
+  lexical: {
+    fromBlock: (node, context) => {
+      if ($isListNode(node)) {
+        return [listFromLexical(node, context.readListItem)];
+      }
+
+      return $isListItemNode(node) ? [] : null;
+    },
+    fromListItem: (node, context) =>
+      $isListItemNode(node) ? listItemFromLexical(node, context.readContainerChildren) : null,
+    toBlock: (node, context) =>
+      node.type === "list" ? [listToLexical(node, context.writeBlock)] : null,
+  },
   lexicalNodeNames: ["ListNode", "ListItemNode"],
+  markdownShortcuts: LIST_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  mdast: {
+    fromBlock: (node, context) =>
+      node.type === "list" ? [listFromMdast(node, context.readBlocks)] : null,
+    toBlock: (node, context) =>
+      node.type === "list" ? [listToMdast(node, context.writeBlocks)] : null,
+  },
   mdastTypes: ["list", "listItem"],
   semanticTypes: ["list", "listItem"],
 } satisfies SyntaxRegistration;

@@ -1,3 +1,4 @@
+import type { Transformer } from "@lexical/markdown";
 import type { AnyLexicalExtensionArgument } from "lexical";
 
 import { BREAK_SYNTAX } from "./break";
@@ -33,6 +34,10 @@ export const SYNTAX_REGISTRATIONS = SYNTAX_REGISTRY;
 
 export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = SYNTAX_REGISTRY.map(
   (syntax) => syntax.extension,
+);
+
+export const SYNTAX_MARKDOWN_SHORTCUTS: ReadonlyArray<Transformer> = SYNTAX_REGISTRY.flatMap(
+  (syntax) => Array.from(syntax.markdownShortcuts ?? []),
 );
 
 export const SYNTAX_SEMANTIC_TYPES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>

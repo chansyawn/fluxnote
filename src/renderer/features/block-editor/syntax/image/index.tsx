@@ -1,14 +1,15 @@
 import "./index.css";
 import { mergeRegister } from "@lexical/utils";
-import { configExtension, defineExtension } from "lexical";
+import { defineExtension } from "lexical";
 
-import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
 import { registerImageInsertCommands } from "./image-insert-commands";
-import { ImageNode } from "./image-node";
+import { $isImageNode, ImageNode } from "./image-node";
 import { registerImageOutlineCommands } from "./image-outline-commands";
 import { registerImageSelectionCommands } from "./image-selection-commands";
 import { IMAGE } from "./image-shortcut";
+import { imageFromLexical, imageToLexical } from "./lexical";
+import { imageFromMdast, imageToMdast } from "./mdast";
 
 export {
   $createImageNode,
@@ -32,11 +33,6 @@ export const IMAGE_SYNTAX_EXTENSION = defineExtension({
   config: {
     blockId: "",
   } satisfies ImageSyntaxExtensionConfig,
-  dependencies: [
-    configExtension(MarkdownShortcutExtension, {
-      transformers: IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS,
-    }),
-  ],
   nodes: [ImageNode],
   register(editor, config) {
     return mergeRegister(
@@ -50,7 +46,16 @@ export const IMAGE_SYNTAX_EXTENSION = defineExtension({
 export const IMAGE_SYNTAX = {
   id: "image",
   extension: IMAGE_SYNTAX_EXTENSION,
+  lexical: {
+    fromInline: (node) => ($isImageNode(node) ? [imageFromLexical(node)] : null),
+    toInline: (node) => (node.type === "image" ? [imageToLexical(node)] : null),
+  },
   lexicalNodeNames: ["ImageNode"],
+  markdownShortcuts: IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  mdast: {
+    fromInline: (node) => (node.type === "image" ? [imageFromMdast(node)] : null),
+    toInline: (node) => (node.type === "image" ? [imageToMdast(node)] : null),
+  },
   mdastTypes: ["image"],
   semanticTypes: ["image"],
 } satisfies SyntaxRegistration;

@@ -1,10 +1,11 @@
 import { HEADING } from "@lexical/markdown";
-import { RichTextExtension } from "@lexical/rich-text";
-import { configExtension, defineExtension } from "lexical";
+import { $isHeadingNode, RichTextExtension } from "@lexical/rich-text";
+import { defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
+import { headingTagToDepth, headingToLexical } from "./lexical";
+import { headingFromMdast, headingToMdast } from "./mdast";
 
 export { headingTagToDepth, headingToLexical, toHeadingTag } from "./lexical";
 export { headingFromMdast, headingToMdast } from "./mdast";
@@ -13,12 +14,7 @@ export const HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS = [HEADING];
 
 export const HEADING_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/heading",
-  dependencies: [
-    RichTextExtension,
-    configExtension(MarkdownShortcutExtension, {
-      transformers: HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS,
-    }),
-  ],
+  dependencies: [RichTextExtension],
   theme: {
     heading: {
       h1: "block-editor__heading block-editor__heading--h1",
@@ -34,7 +30,28 @@ export const HEADING_SYNTAX_EXTENSION = defineExtension({
 export const HEADING_SYNTAX = {
   id: "heading",
   extension: HEADING_SYNTAX_EXTENSION,
+  lexical: {
+    fromBlock: (node, context) =>
+      $isHeadingNode(node)
+        ? [
+            {
+              children: context.readInlines(node.getChildren()),
+              depth: headingTagToDepth(node.getTag()),
+              type: "heading",
+            },
+          ]
+        : null,
+    toBlock: (node, context) =>
+      node.type === "heading" ? [headingToLexical(node, context.writeInline)] : null,
+  },
   lexicalNodeNames: ["HeadingNode"],
+  markdownShortcuts: HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  mdast: {
+    fromBlock: (node, context) =>
+      node.type === "heading" ? [headingFromMdast(node, context.readInlines)] : null,
+    toBlock: (node, context) =>
+      node.type === "heading" ? [headingToMdast(node, context.writeInlines)] : null,
+  },
   mdastTypes: ["heading"],
   semanticTypes: ["heading"],
 } satisfies SyntaxRegistration;

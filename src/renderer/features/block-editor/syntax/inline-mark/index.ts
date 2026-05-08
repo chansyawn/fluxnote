@@ -1,9 +1,16 @@
 import { BOLD_STAR, INLINE_CODE, ITALIC_STAR, STRIKETHROUGH } from "@lexical/markdown";
-import { configExtension, defineExtension } from "lexical";
+import { defineExtension } from "lexical";
 
 import "./index.css";
-import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
 import type { SyntaxRegistration } from "../registration";
+import {
+  deleteFromMdast,
+  deleteToMdast,
+  emphasisFromMdast,
+  emphasisToMdast,
+  strongFromMdast,
+  strongToMdast,
+} from "./mdast";
 
 export {
   deleteFromMdast,
@@ -23,11 +30,6 @@ export const INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS = [
 
 export const INLINE_MARK_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/inline-mark",
-  dependencies: [
-    configExtension(MarkdownShortcutExtension, {
-      transformers: INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS,
-    }),
-  ],
   theme: {
     text: {
       bold: "block-editor__text--strong",
@@ -41,6 +43,37 @@ export const INLINE_MARK_SYNTAX_EXTENSION = defineExtension({
 export const INLINE_MARK_SYNTAX = {
   id: "inline-mark",
   extension: INLINE_MARK_SYNTAX_EXTENSION,
+  markdownShortcuts: INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  mdast: {
+    fromInline: (node, context) => {
+      switch (node.type) {
+        case "emphasis":
+          return [emphasisFromMdast(node, context.readInlines)];
+        case "strong":
+          return [strongFromMdast(node, context.readInlines)];
+        case "delete":
+          return [deleteFromMdast(node, context.readInlines)];
+        case "inlineCode":
+          return [{ type: "inlineCode", value: node.value }];
+        default:
+          return null;
+      }
+    },
+    toInline: (node, context) => {
+      switch (node.type) {
+        case "emphasis":
+          return [emphasisToMdast(node, context.writeInlines)];
+        case "strong":
+          return [strongToMdast(node, context.writeInlines)];
+        case "delete":
+          return [deleteToMdast(node, context.writeInlines)];
+        case "inlineCode":
+          return [{ type: "inlineCode", value: node.value }];
+        default:
+          return null;
+      }
+    },
+  },
   mdastTypes: ["emphasis", "strong", "delete", "inlineCode"],
   semanticTypes: ["emphasis", "strong", "delete", "inlineCode"],
 } satisfies SyntaxRegistration;
