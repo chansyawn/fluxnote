@@ -100,22 +100,22 @@ function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): strin
   return exportEditorStateToMarkdown(editorState);
 }
 
-function exportClipboardNodesToHtml(nodes: ClipboardSerializedNode[]): string {
-  const editor = createMarkdownEditor("BlockEditorClipboardHtmlExport");
-  const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
-  let html = "";
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
-  editor.setEditorState(editorState);
-  editor.update(
-    () => {
-      const selection = $selectAll();
-      html = $getHtmlContent(editor, selection);
-      $setSelection(null);
-    },
-    { discrete: true },
-  );
+function rewriteClipboardHtmlAssetUrls(html: string, assetUrlMap: Map<string, string>): string {
+  let nextHtml = html;
 
-  return html;
+  for (const [assetUrl, fileUrl] of assetUrlMap) {
+    const assetUrlPattern = escapeRegExp(assetUrl);
+    nextHtml = nextHtml.replaceAll(
+      new RegExp(`(<img\\b[^>]*\\bsrc=)(["'])${assetUrlPattern}\\2`, "gi"),
+      (_match, prefix: string, quote: string) => `${prefix}${quote}${fileUrl}${quote}`,
+    );
+  }
+
+  return nextHtml;
 }
 
 function exportSelectionToHtml(editor: LexicalEditor, selection: BaseSelection): string {
@@ -213,7 +213,13 @@ async function createClipboardDataFromSnapshot(
   const assetUrlMap = createAssetUrlMap(resolvedAssets);
   const imageFileUrl = snapshot.imageAssetUrl ? assetUrlMap.get(snapshot.imageAssetUrl) : undefined;
   const externalNodes = rewriteClipboardAssetUrls(snapshot.nodes, assetUrlMap);
-  const html = assetUrlMap.size > 0 ? exportClipboardNodesToHtml(externalNodes) : snapshot.html;
+  // Keep file:// URLs out of the DOM export path. Chromium attempts to load local
+  // resources when an img element receives a file URL, even if the element only
+  // exists for clipboard serialization, so rewrite the final HTML string instead.
+  const html =
+    assetUrlMap.size > 0
+      ? rewriteClipboardHtmlAssetUrls(snapshot.html, assetUrlMap)
+      : snapshot.html;
 
   return {
     html,

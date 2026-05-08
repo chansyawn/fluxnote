@@ -201,6 +201,47 @@ describe("block editor clipboard data", () => {
     });
   });
 
+  it("exports file-url image html without assigning the file url to image DOM", async () => {
+    await withClipboardDOM(async () => {
+      const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
+      const imagePrototype = window.HTMLImageElement.prototype;
+      const srcDescriptor = Object.getOwnPropertyDescriptor(imagePrototype, "src");
+      const srcSetter = vi.fn();
+      const setAttribute = vi.spyOn(window.Element.prototype, "setAttribute");
+
+      Object.defineProperty(imagePrototype, "src", {
+        configurable: true,
+        get() {
+          return srcDescriptor?.get?.call(this) ?? "";
+        },
+        set(value: string) {
+          srcSetter(value);
+          srcDescriptor?.set?.call(this, value);
+        },
+      });
+
+      try {
+        const data = await createClipboardDataFromDocument(editor, "block-1", async () => ({
+          assets: [
+            {
+              assetUrl: "assets://block-1/photo.png",
+              fileUrl: "file:///tmp/block-1/photo.png",
+            },
+          ],
+        }));
+
+        expect(data?.html).toContain('src="file:///tmp/block-1/photo.png"');
+        expect(srcSetter).not.toHaveBeenCalledWith("file:///tmp/block-1/photo.png");
+        expect(setAttribute).not.toHaveBeenCalledWith("src", "file:///tmp/block-1/photo.png");
+      } finally {
+        setAttribute.mockRestore();
+        if (srcDescriptor) {
+          Object.defineProperty(imagePrototype, "src", srcDescriptor);
+        }
+      }
+    });
+  });
+
   it("exports an image file url for a selected single asset image", async () => {
     await withClipboardDOM(async () => {
       const editor = createEditorWithMarkdown("![Alt](assets://block-1/photo.png)");
