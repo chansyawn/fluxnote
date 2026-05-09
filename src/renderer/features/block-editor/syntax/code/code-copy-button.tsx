@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { useBlockEditorRuntime } from "../../core/runtime-context";
+import { useBlockEditorRuntime } from "../../core/runtime-extension";
 
 const COPY_FEEDBACK_DURATION_MS = 2000;
 
