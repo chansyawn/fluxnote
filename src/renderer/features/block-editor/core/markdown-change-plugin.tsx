@@ -32,9 +32,9 @@ export function MarkdownChangePlugin({ onMarkdownChange, ref }: MarkdownChangePl
   );
 
   useLayoutEffect(() => {
-    const listener = registerMarkdownChangeListener(editor, {
-      onMarkdownChange: (markdown) => onMarkdownChangeRef.current(markdown),
-    });
+    const listener = registerMarkdownChangeListener(editor, (markdown) =>
+      onMarkdownChangeRef.current(markdown),
+    );
     listenerRef.current = listener;
 
     return () => {

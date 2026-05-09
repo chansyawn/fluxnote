@@ -1,17 +1,21 @@
 import type { LexicalNode } from "lexical";
+import type { Image } from "mdast";
 
-import type { SemanticImage } from "../../model";
-import { $createImageNode, type ImageNode } from "./image-node";
+import { $createImageNode, $isImageNode } from "./image-node";
 
-export function imageToLexical(node: SemanticImage): LexicalNode {
+export function imageToLexical(node: Image): LexicalNode {
   return $createImageNode({
-    alt: node.alt,
+    alt: node.alt ?? "",
     src: node.url,
-    title: node.title,
+    title: node.title ?? null,
   });
 }
 
-export function imageFromLexical(node: ImageNode): SemanticImage {
+export function imageFromLexical(node: LexicalNode): Image | null {
+  if (!$isImageNode(node)) {
+    return null;
+  }
+
   return {
     alt: node.getAlt(),
     title: node.getTitle(),

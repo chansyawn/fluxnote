@@ -29,7 +29,6 @@ const ROOT_BLOCK_NODE_TYPES = new Set([
   "horizontalrule",
   "list",
   "paragraph",
-  "placeholder-block",
   "quote",
   "table",
 ]);

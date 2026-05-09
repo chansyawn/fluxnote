@@ -1,23 +1,29 @@
-import { $createQuoteNode, type QuoteNode } from "@lexical/rich-text";
+import { $createQuoteNode, $isQuoteNode } from "@lexical/rich-text";
 import type { LexicalNode } from "lexical";
+import type { Blockquote, BlockContent, DefinitionContent } from "mdast";
 
-import type { SemanticBlock, SemanticBlockquote } from "../../model";
+// mdast Blockquote children allow definitions in addition to plain block content.
+type ContainerChild = BlockContent | DefinitionContent;
 
 export function quoteToLexical(
-  node: SemanticBlockquote,
-  writeBlock: (node: SemanticBlock) => LexicalNode[],
+  node: Blockquote,
+  writeBlock: (child: ContainerChild) => LexicalNode[],
 ): LexicalNode {
   const quote = $createQuoteNode();
-  quote.append(...node.children.flatMap((child) => writeBlock(child)));
+  quote.append(...node.children.flatMap(writeBlock));
   return quote;
 }
 
 export function quoteFromLexical(
-  node: QuoteNode,
-  readContainerChildren: (children: ReadonlyArray<LexicalNode>) => SemanticBlock[],
-): SemanticBlockquote {
+  node: LexicalNode,
+  readContainer: (children: ReadonlyArray<LexicalNode>) => BlockContent[],
+): Blockquote | null {
+  if (!$isQuoteNode(node)) {
+    return null;
+  }
+
   return {
-    children: readContainerChildren(node.getChildren()),
+    children: readContainer(node.getChildren()) as Blockquote["children"],
     type: "blockquote",
   };
 }

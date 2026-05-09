@@ -1,12 +1,11 @@
-import { $createHorizontalRuleNode, type HorizontalRuleNode } from "@lexical/extension";
+import { $createHorizontalRuleNode, $isHorizontalRuleNode } from "@lexical/extension";
 import type { LexicalNode } from "lexical";
-
-import type { SemanticThematicBreak } from "../../model";
+import type { ThematicBreak } from "mdast";
 
 export function thematicBreakToLexical(): LexicalNode {
   return $createHorizontalRuleNode();
 }
 
-export function thematicBreakFromLexical(_: HorizontalRuleNode): SemanticThematicBreak {
-  return { type: "thematicBreak" };
+export function thematicBreakFromLexical(node: LexicalNode): ThematicBreak | null {
+  return $isHorizontalRuleNode(node) ? { type: "thematicBreak" } : null;
 }

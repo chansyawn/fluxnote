@@ -1,55 +1,54 @@
 import type { Transformer } from "@lexical/markdown";
 import type { AnyLexicalExtensionArgument } from "lexical";
 
-import { BREAK_SYNTAX } from "./break";
-import { CODE_SYNTAX } from "./code";
-import { HEADING_SYNTAX } from "./heading";
-import { IMAGE_SYNTAX } from "./image";
-import { INLINE_MARK_SYNTAX } from "./inline-mark";
-import { LINK_SYNTAX } from "./link";
-import { LIST_SYNTAX } from "./list";
-import { PARAGRAPH_SYNTAX } from "./paragraph";
-import { PLACEHOLDERS_SYNTAX } from "./placeholders";
-import { QUOTE_SYNTAX } from "./quote";
-import type { SyntaxRegistration } from "./registration";
-import { TABLE_SYNTAX } from "./table";
-import { THEMATIC_BREAK_SYNTAX } from "./thematic-break";
+import { BREAK_SYNTAX_EXTENSION } from "./break";
+import {
+  CODE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  CODE_SYNTAX_EXTENSION,
+  CODE_SYNTAX_REACT_EXTENSION,
+} from "./code";
+import { HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS, HEADING_SYNTAX_EXTENSION } from "./heading";
+import { IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS, IMAGE_SYNTAX_EXTENSION } from "./image";
+import {
+  INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  INLINE_MARK_SYNTAX_EXTENSION,
+} from "./inline-mark";
+import { LINK_MARKDOWN_SHORTCUT_TRANSFORMERS, LINK_SYNTAX_EXTENSION } from "./link";
+import { LIST_MARKDOWN_SHORTCUT_TRANSFORMERS, LIST_SYNTAX_EXTENSION } from "./list";
+import { PARAGRAPH_SYNTAX_EXTENSION } from "./paragraph";
+import { QUOTE_MARKDOWN_SHORTCUT_TRANSFORMERS, QUOTE_SYNTAX_EXTENSION } from "./quote";
+import { TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS, TABLE_SYNTAX_EXTENSION } from "./table";
+import {
+  THEMATIC_BREAK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  THEMATIC_BREAK_SYNTAX_EXTENSION,
+} from "./thematic-break";
 
-const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
-  BREAK_SYNTAX,
-  HEADING_SYNTAX,
-  QUOTE_SYNTAX,
-  LIST_SYNTAX,
-  TABLE_SYNTAX,
-  THEMATIC_BREAK_SYNTAX,
-  CODE_SYNTAX,
-  INLINE_MARK_SYNTAX,
-  IMAGE_SYNTAX,
-  LINK_SYNTAX,
-  PARAGRAPH_SYNTAX,
-  PLACEHOLDERS_SYNTAX,
-] satisfies ReadonlyArray<SyntaxRegistration>;
+export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = [
+  BREAK_SYNTAX_EXTENSION,
+  HEADING_SYNTAX_EXTENSION,
+  QUOTE_SYNTAX_EXTENSION,
+  LIST_SYNTAX_EXTENSION,
+  TABLE_SYNTAX_EXTENSION,
+  THEMATIC_BREAK_SYNTAX_EXTENSION,
+  CODE_SYNTAX_EXTENSION,
+  INLINE_MARK_SYNTAX_EXTENSION,
+  IMAGE_SYNTAX_EXTENSION,
+  LINK_SYNTAX_EXTENSION,
+  PARAGRAPH_SYNTAX_EXTENSION,
+];
 
-export const SYNTAX_REGISTRATIONS = SYNTAX_REGISTRY;
+export const SYNTAX_REACT_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = [
+  CODE_SYNTAX_REACT_EXTENSION,
+];
 
-export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> =
-  SYNTAX_REGISTRY.flatMap((syntax) => Array.from(syntax.extensions));
-
-export const SYNTAX_REACT_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> =
-  SYNTAX_REGISTRY.flatMap((syntax) => Array.from(syntax.reactExtensions ?? []));
-
-export const SYNTAX_MARKDOWN_SHORTCUTS: ReadonlyArray<Transformer> = SYNTAX_REGISTRY.flatMap(
-  (syntax) => Array.from(syntax.markdownShortcuts ?? []),
-);
-
-export const SYNTAX_SEMANTIC_TYPES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
-  Array.from(syntax.semanticTypes ?? []),
-);
-
-export const SYNTAX_MDAST_TYPES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
-  Array.from(syntax.mdastTypes ?? []),
-);
-
-export const SYNTAX_LEXICAL_NODE_NAMES = SYNTAX_REGISTRY.flatMap((syntax): string[] =>
-  Array.from(syntax.lexicalNodeNames ?? []),
-);
+export const SYNTAX_MARKDOWN_SHORTCUTS: ReadonlyArray<Transformer> = [
+  ...HEADING_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...QUOTE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...LIST_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...THEMATIC_BREAK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...CODE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS,
+  ...LINK_MARKDOWN_SHORTCUT_TRANSFORMERS,
+];

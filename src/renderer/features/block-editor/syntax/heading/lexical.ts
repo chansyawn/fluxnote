@@ -1,10 +1,15 @@
-import { $createHeadingNode, type HeadingTagType } from "@lexical/rich-text";
+import { $createHeadingNode, $isHeadingNode, type HeadingTagType } from "@lexical/rich-text";
 import type { LexicalNode } from "lexical";
+import type { Heading, PhrasingContent } from "mdast";
 
-import type { HeadingDepth, SemanticHeading, SemanticInline } from "../../model";
+type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6;
 
-export function toHeadingTag(depth: HeadingDepth): HeadingTagType {
-  return `h${depth}` as HeadingTagType;
+function clampDepth(depth: number): HeadingDepth {
+  return Math.min(Math.max(Math.trunc(depth), 1), 6) as HeadingDepth;
+}
+
+export function depthToHeadingTag(depth: number): HeadingTagType {
+  return `h${clampDepth(depth)}` as HeadingTagType;
 }
 
 export function headingTagToDepth(tag: HeadingTagType): HeadingDepth {
@@ -12,10 +17,25 @@ export function headingTagToDepth(tag: HeadingTagType): HeadingDepth {
 }
 
 export function headingToLexical(
-  node: SemanticHeading,
-  writeInline: (node: SemanticInline) => LexicalNode[],
+  node: Heading,
+  writeInline: (child: PhrasingContent) => LexicalNode[],
 ): LexicalNode {
-  const heading = $createHeadingNode(toHeadingTag(node.depth));
-  heading.append(...node.children.flatMap((child) => writeInline(child)));
+  const heading = $createHeadingNode(depthToHeadingTag(node.depth));
+  heading.append(...node.children.flatMap(writeInline));
   return heading;
+}
+
+export function headingFromLexical(
+  node: LexicalNode,
+  readInline: (child: LexicalNode) => PhrasingContent[],
+): Heading | null {
+  if (!$isHeadingNode(node)) {
+    return null;
+  }
+
+  return {
+    children: node.getChildren().flatMap(readInline),
+    depth: headingTagToDepth(node.getTag()),
+    type: "heading",
+  };
 }

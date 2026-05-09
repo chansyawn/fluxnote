@@ -1,150 +1,54 @@
-import {
-  $createNodeSelection,
-  $getRoot,
-  $isElementNode,
-  $isTextNode,
-  $setSelection,
-  KEY_ENTER_COMMAND,
-  type LexicalEditor,
-  type LexicalNode,
-} from "lexical";
+import { getExtensionDependencyFromEditor, LexicalBuilder } from "@lexical/extension";
+import { $convertFromMarkdownString } from "@lexical/markdown";
+import type { LexicalEditor } from "lexical";
+import type { Root } from "mdast";
 
+import { createBlockEditorCoreExtension } from "../core/block-editor-core-extension";
+import { exportLexicalToMdast, importMdastToLexical } from "../core/lexical-mdast";
 import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/markdown-editor-io";
-import {
-  exportLexicalToSemanticDocument,
-  importSemanticDocumentToLexical,
-  type SemanticDocument,
-} from "../model";
-import { $isImageNode } from "../syntax/image";
-import { createHeadlessMarkdownEditor } from "./headless-editor-test-utils";
+import { MarkdownShortcutExtension } from "../markdown/markdown-shortcut-extension";
 
-export interface KeyboardEventStub extends KeyboardEvent {
-  readonly preventedForTest: boolean;
+export function createHeadlessEditor(): LexicalEditor {
+  return LexicalBuilder.fromExtensions([createBlockEditorCoreExtension()]).buildEditor();
 }
 
-export interface EditorSnapshot {
-  markdown: string;
-  semantic: SemanticDocument;
-}
-
-export function createEditorFromMarkdown(markdown: string): LexicalEditor {
-  const editor = createHeadlessMarkdownEditor();
+export function editorFromMarkdown(markdown: string): LexicalEditor {
+  const editor = createHeadlessEditor();
   importMarkdownToEditor(editor, markdown);
   return editor;
 }
 
-export function createEditorFromSemantic(document: SemanticDocument): LexicalEditor {
-  const editor = createHeadlessMarkdownEditor();
-  importSemanticDocumentToLexical(document, editor);
+export function editorFromMdast(mdast: Root): LexicalEditor {
+  const editor = createHeadlessEditor();
+  importMdastToLexical(mdast, editor);
   return editor;
 }
 
-export function readEditorSnapshot(editor: LexicalEditor): EditorSnapshot {
-  const editorState = editor.getEditorState();
-  return {
-    markdown: exportEditorStateToMarkdown(editorState).trimEnd(),
-    semantic: exportLexicalToSemanticDocument(editorState),
-  };
+export function readMarkdown(editor: LexicalEditor): string {
+  return exportEditorStateToMarkdown(editor.getEditorState());
 }
 
-export function visitEditorNodes(
-  node: LexicalNode,
-  visit: (node: LexicalNode) => boolean,
-): boolean {
-  if (visit(node)) {
-    return true;
-  }
-
-  if (!$isElementNode(node)) {
-    return false;
-  }
-
-  return node.getChildren().some((child) => visitEditorNodes(child, visit));
+export function readMdast(editor: LexicalEditor): Root {
+  return exportLexicalToMdast(editor.getEditorState());
 }
 
-export function selectText(editor: LexicalEditor, value: string): void {
+/**
+ * Drive markdown through Lexical's shortcut transformer pipeline (the same
+ * code path that runs when a user types `# ` or `- [ ]` in the live editor).
+ * Returns the resulting mdast so tests can assert structure.
+ */
+export function applyMarkdownShortcuts(markdown: string): Root {
+  const editor = createHeadlessEditor();
+  const { transformers } = getExtensionDependencyFromEditor(
+    editor,
+    MarkdownShortcutExtension,
+  ).config;
+
   editor.update(
     () => {
-      const found = visitEditorNodes($getRoot(), (node) => {
-        if (!$isTextNode(node)) {
-          return false;
-        }
-
-        const start = node.getTextContent().indexOf(value);
-        if (start === -1) {
-          return false;
-        }
-
-        node.select(start, start + value.length);
-        return true;
-      });
-
-      if (!found) {
-        throw new Error(`Text not found: ${value}`);
-      }
+      $convertFromMarkdownString(markdown, [...transformers]);
     },
     { discrete: true },
   );
-}
-
-export function selectFirstImage(editor: LexicalEditor): void {
-  editor.update(
-    () => {
-      let imageKey: string | null = null;
-
-      const found = visitEditorNodes($getRoot(), (node) => {
-        if (!$isImageNode(node)) {
-          return false;
-        }
-
-        imageKey = node.getKey();
-        return true;
-      });
-
-      if (!found || imageKey === null) {
-        throw new Error("Image not found");
-      }
-
-      const selection = $createNodeSelection();
-      selection.add(imageKey);
-      $setSelection(selection);
-    },
-    { discrete: true },
-  );
-}
-
-export function createKeyboardEventStub(): KeyboardEventStub {
-  let prevented = false;
-  return {
-    preventDefault() {
-      prevented = true;
-    },
-    get preventedForTest() {
-      return prevented;
-    },
-    shiftKey: false,
-  } as KeyboardEventStub;
-}
-
-export function selectTextEndAndDispatchEnter(
-  editor: LexicalEditor,
-  value: string,
-): KeyboardEventStub {
-  const event = createKeyboardEventStub();
-  editor.update(
-    () => {
-      const textNode = $getRoot()
-        .getAllTextNodes()
-        .find((node) => $isTextNode(node) && node.getTextContent() === value);
-
-      if (!textNode) {
-        throw new Error(`Missing text node: ${value}`);
-      }
-
-      textNode.select(value.length, value.length);
-      editor.dispatchCommand(KEY_ENTER_COMMAND, event);
-    },
-    { discrete: true },
-  );
-  return event;
+  return readMdast(editor);
 }

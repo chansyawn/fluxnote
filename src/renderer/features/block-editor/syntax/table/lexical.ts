@@ -3,10 +3,10 @@ import {
   $createTableNode,
   $createTableRowNode,
   $isTableCellNode,
+  $isTableNode,
   $isTableRowNode,
   TableCellHeaderStates,
   type TableCellNode,
-  type TableNode,
   type TableRowNode,
 } from "@lexical/table";
 import {
@@ -16,123 +16,116 @@ import {
   type LexicalNode,
   type ParagraphNode,
 } from "lexical";
+import type { AlignType, PhrasingContent, Table, TableCell, TableRow } from "mdast";
 
-import type {
-  SemanticInline,
-  SemanticTable,
-  SemanticTableAlign,
-  SemanticTableCell,
-  SemanticTableRow,
-} from "../../model";
 import { paragraphToLexical } from "../paragraph";
 
-function tableAlignToElementFormat(align: SemanticTableAlign): ElementFormatType {
-  return align ?? "";
+function alignToFormat(align: AlignType | null | undefined): ElementFormatType {
+  return align === "left" || align === "center" || align === "right" ? align : "";
 }
 
-function elementFormatToTableAlign(format: ElementFormatType): SemanticTableAlign {
+function formatToAlign(format: ElementFormatType): AlignType | null {
   return format === "left" || format === "center" || format === "right" ? format : null;
 }
 
 function tableCellToLexical(
-  node: SemanticTableCell,
-  writeInline: (node: SemanticInline) => LexicalNode[],
+  cell: TableCell,
+  writeInline: (child: PhrasingContent) => LexicalNode[],
   isHeader: boolean,
-  align: SemanticTableAlign,
+  align: AlignType | null,
 ): TableCellNode {
-  const cell = $createTableCellNode(
+  const cellNode = $createTableCellNode(
     isHeader ? TableCellHeaderStates.ROW : TableCellHeaderStates.NO_STATUS,
   );
   const paragraph = paragraphToLexical(
-    { children: node.children, type: "paragraph" },
+    { children: cell.children, type: "paragraph" },
     writeInline,
   ) as ParagraphNode;
-  paragraph.setFormat(tableAlignToElementFormat(align));
-  cell.append(paragraph);
-  return cell;
+  paragraph.setFormat(alignToFormat(align));
+  cellNode.append(paragraph);
+  return cellNode;
 }
 
 function tableRowToLexical(
-  node: SemanticTableRow,
-  writeInline: (node: SemanticInline) => LexicalNode[],
+  row: TableRow,
+  writeInline: (child: PhrasingContent) => LexicalNode[],
   isHeader: boolean,
-  align: ReadonlyArray<SemanticTableAlign>,
+  align: ReadonlyArray<AlignType | null>,
 ): TableRowNode {
-  const row = $createTableRowNode();
-  row.append(
-    ...node.cells.map((cell, index) =>
+  const rowNode = $createTableRowNode();
+  rowNode.append(
+    ...row.children.map((cell, index) =>
       tableCellToLexical(cell, writeInline, isHeader, align[index] ?? null),
     ),
   );
-  return row;
+  return rowNode;
 }
 
 export function tableToLexical(
-  node: SemanticTable,
-  writeInline: (node: SemanticInline) => LexicalNode[],
-): TableNode {
+  node: Table,
+  writeInline: (child: PhrasingContent) => LexicalNode[],
+): LexicalNode {
+  const align: ReadonlyArray<AlignType | null> = node.align ?? [];
   const table = $createTableNode();
   table.append(
-    ...node.rows.map((row, index) => tableRowToLexical(row, writeInline, index === 0, node.align)),
+    ...node.children.map((row, index) => tableRowToLexical(row, writeInline, index === 0, align)),
   );
   return table;
 }
 
 function tableCellFromLexical(
-  node: TableCellNode,
-  readInlines: (children: ReadonlyArray<LexicalNode>) => SemanticInline[],
-): SemanticTableCell {
+  cell: TableCellNode,
+  readInline: (child: LexicalNode) => PhrasingContent[],
+): TableCell {
   return {
-    children: node
+    children: cell
       .getChildren()
-      .flatMap((child) => ($isElementNode(child) ? readInlines(child.getChildren()) : [])),
+      .flatMap((child) => ($isElementNode(child) ? child.getChildren().flatMap(readInline) : []))
+      // GFM table source syntax cannot represent a hard break inside a cell —
+      // a literal newline would close the row. Drop break nodes; soft line
+      // wrapping inside a cell is the closest approximation we support.
+      .filter((node): node is TableCell["children"][number] => node.type !== "break"),
     type: "tableCell",
   };
 }
 
 function tableRowFromLexical(
-  node: TableRowNode,
-  readInlines: (children: ReadonlyArray<LexicalNode>) => SemanticInline[],
-): SemanticTableRow {
+  row: TableRowNode,
+  readInline: (child: LexicalNode) => PhrasingContent[],
+): TableRow {
   return {
-    cells: node
+    children: row
       .getChildren()
       .flatMap((child) =>
-        $isTableCellNode(child) ? [tableCellFromLexical(child, readInlines)] : [],
+        $isTableCellNode(child) ? [tableCellFromLexical(child, readInline)] : [],
       ),
     type: "tableRow",
   };
 }
 
-function readTableAlign(node: TableNode): SemanticTableAlign[] {
+function readTableAlign(node: LexicalNode): Array<AlignType | null> {
+  if (!$isTableNode(node)) return [];
   const firstRow = node.getFirstChild();
-  if (!$isTableRowNode(firstRow)) {
-    return [];
-  }
+  if (!$isTableRowNode(firstRow)) return [];
 
   return firstRow.getChildren().map((cell) => {
-    if (!$isTableCellNode(cell)) {
-      return null;
-    }
-
+    if (!$isTableCellNode(cell)) return null;
     const firstChild = cell.getFirstChild();
-    return $isParagraphNode(firstChild)
-      ? elementFormatToTableAlign(firstChild.getFormatType())
-      : null;
+    return $isParagraphNode(firstChild) ? formatToAlign(firstChild.getFormatType()) : null;
   });
 }
 
 export function tableFromLexical(
-  node: TableNode,
-  readInlines: (children: ReadonlyArray<LexicalNode>) => SemanticInline[],
-): SemanticTable {
+  node: LexicalNode,
+  readInline: (child: LexicalNode) => PhrasingContent[],
+): Table | null {
+  if (!$isTableNode(node)) return null;
+
   return {
     align: readTableAlign(node),
-    rows: node
+    children: node
       .getChildren()
-      .flatMap((child) =>
-        $isTableRowNode(child) ? [tableRowFromLexical(child, readInlines)] : [],
-      ),
+      .flatMap((child) => ($isTableRowNode(child) ? [tableRowFromLexical(child, readInline)] : [])),
     type: "table",
   };
 }

@@ -15,8 +15,9 @@ import {
   type ElementFormatType,
   type ElementNode,
 } from "lexical";
+import type { AlignType } from "mdast";
 
-import type { SemanticTableAlign } from "../../model";
+type TableAlign = AlignType | null;
 
 const TABLE_ROW_REG_EXP = /^\|(.+)\|\s*$/;
 const TABLE_DELIMITER_REG_EXP = /^\|(?:\s*:?-{3,}:?\s*\|)+\s*$/;
@@ -31,13 +32,13 @@ function splitTableRow(line: string): string[] | null {
   return match[1].split(CELL_SEPARATOR_REG_EXP).map((cell) => cell.trim().replace(/\\\|/g, "|"));
 }
 
-function parseDelimiterAlign(line: string): SemanticTableAlign[] | null {
+function parseDelimiterAlign(line: string): TableAlign[] | null {
   const cells = splitTableRow(line);
   if (!cells || cells.length === 0) {
     return null;
   }
 
-  const align: SemanticTableAlign[] = [];
+  const align: TableAlign[] = [];
   for (const cell of cells) {
     if (!/^:?-{3,}:?$/.test(cell)) {
       return null;
@@ -57,15 +58,11 @@ function parseDelimiterAlign(line: string): SemanticTableAlign[] | null {
   return align;
 }
 
-function tableAlignToElementFormat(align: SemanticTableAlign): ElementFormatType {
+function tableAlignToElementFormat(align: TableAlign): ElementFormatType {
   return align ?? "";
 }
 
-function createTableCell(
-  value: string,
-  isHeader: boolean,
-  align: SemanticTableAlign,
-): TableCellNode {
+function createTableCell(value: string, isHeader: boolean, align: TableAlign): TableCellNode {
   const cell = $createTableCellNode(
     isHeader ? TableCellHeaderStates.ROW : TableCellHeaderStates.NO_STATUS,
   );
@@ -81,7 +78,7 @@ function createTableCell(
 function createTableRow(
   cells: ReadonlyArray<string>,
   isHeader: boolean,
-  align: ReadonlyArray<SemanticTableAlign>,
+  align: ReadonlyArray<TableAlign>,
 ): TableRowNode {
   const row = $createTableRowNode();
   row.append(...cells.map((cell, index) => createTableCell(cell, isHeader, align[index] ?? null)));
@@ -90,7 +87,7 @@ function createTableRow(
 
 function createTable(
   headerCells: ReadonlyArray<string>,
-  align: ReadonlyArray<SemanticTableAlign>,
+  align: ReadonlyArray<TableAlign>,
 ): TableNode | null {
   if (headerCells.length === 0 || headerCells.length !== align.length) {
     return null;

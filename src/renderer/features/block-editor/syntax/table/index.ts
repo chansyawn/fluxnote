@@ -1,14 +1,10 @@
-import { $isTableNode, TableExtension } from "@lexical/table";
+import { TableExtension } from "@lexical/table";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
-import type { SyntaxRegistration } from "../registration";
-import { tableFromLexical, tableToLexical } from "./lexical";
-import { tableFromMdast, tableToMdast } from "./mdast";
 import { TABLE } from "./table-shortcut";
 
 export { tableFromLexical, tableToLexical } from "./lexical";
-export { tableFromMdast, tableToMdast } from "./mdast";
 export { insertMarkdownTablesAtSelection } from "./table-paste";
 export { TABLE } from "./table-shortcut";
 
@@ -36,24 +32,3 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
     tableSelection: "block-editor__table-selection",
   },
 });
-
-export const TABLE_SYNTAX = {
-  id: "table",
-  extensions: [TABLE_SYNTAX_EXTENSION],
-  lexical: {
-    fromBlock: (node, context) =>
-      $isTableNode(node) ? [tableFromLexical(node, context.readInlines)] : null,
-    toBlock: (node, context) =>
-      node.type === "table" ? [tableToLexical(node, context.writeInline)] : null,
-  },
-  lexicalNodeNames: ["TableNode", "TableRowNode", "TableCellNode"],
-  markdownShortcuts: TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS,
-  mdast: {
-    fromBlock: (node, context) =>
-      node.type === "table" ? [tableFromMdast(node, context.readInlines)] : null,
-    toBlock: (node, context) =>
-      node.type === "table" ? [tableToMdast(node, context.writeInlines)] : null,
-  },
-  mdastTypes: ["table", "tableRow", "tableCell"],
-  semanticTypes: ["table", "tableRow", "tableCell"],
-} satisfies SyntaxRegistration;

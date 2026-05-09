@@ -1,27 +1,24 @@
-import { expect } from "vite-plus/test";
+import { expect } from "vitest";
 
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
-import { mdastToSemanticDocument, semanticDocumentToMdast, type SemanticDocument } from "../model";
-import { parseMarkdownWithShortcuts } from "./headless-editor-test-utils";
+import { editorFromMarkdown, readMarkdown } from "./editor-driver";
 
-export function roundTripSemantic(markdown: string): {
-  canonicalMarkdown: string;
-  firstSemantic: SemanticDocument;
-  secondSemantic: SemanticDocument;
-} {
-  const firstSemantic = mdastToSemanticDocument(parseMarkdownToMdast(markdown));
-  const canonicalMarkdown = stringifyMdastToMarkdown(semanticDocumentToMdast(firstSemantic));
-  const secondSemantic = mdastToSemanticDocument(parseMarkdownToMdast(canonicalMarkdown));
-
-  return { canonicalMarkdown, firstSemantic, secondSemantic };
+/**
+ * Verifies that converting markdown → editor → markdown is stable. The output
+ * may be normalized but must round-trip on the second pass.
+ */
+export function expectMarkdownRoundTripStable(markdown: string): void {
+  const editor = editorFromMarkdown(markdown);
+  const first = readMarkdown(editor);
+  const second = readMarkdown(editorFromMarkdown(first));
+  expect(second).toBe(first);
 }
 
-export function expectSemanticRoundTripStable(markdown: string) {
-  const result = roundTripSemantic(markdown);
-  expect(result.secondSemantic).toEqual(result.firstSemantic);
-  return result;
-}
-
-export function expectMarkdownShortcut(markdown: string) {
-  return expect(parseMarkdownWithShortcuts(markdown).children[0]);
+/**
+ * Verifies markdown → mdast → markdown is stable across the processor pipeline.
+ */
+export function expectMarkdownProcessorStable(markdown: string): void {
+  const first = stringifyMdastToMarkdown(parseMarkdownToMdast(markdown));
+  const second = stringifyMdastToMarkdown(parseMarkdownToMdast(first));
+  expect(second).toBe(first);
 }

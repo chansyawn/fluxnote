@@ -1,12 +1,8 @@
-import type { EditorState, LexicalEditor } from "lexical";
+import type { LexicalEditor } from "lexical";
 
 import { exportEditorStateToMarkdown } from "./markdown-editor-io";
 
-const MARKDOWN_CHANGE_DEBOUNCE_MS = 600;
-
-export interface MarkdownChangeListenerOptions {
-  onMarkdownChange: (markdown: string) => void;
-}
+const DEBOUNCE_MS = 600;
 
 export interface MarkdownChangeHandle {
   flush: () => string;
@@ -18,58 +14,37 @@ export interface MarkdownChangeListener extends MarkdownChangeHandle {
 
 export function registerMarkdownChangeListener(
   editor: LexicalEditor,
-  options: MarkdownChangeListenerOptions,
+  onMarkdownChange: (markdown: string) => void,
 ): MarkdownChangeListener {
-  let latestMarkdown = exportEditorStateToMarkdown(editor.getEditorState());
-  let pendingEditorState: EditorState | null = null;
-  let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+  let lastEmitted = exportEditorStateToMarkdown(editor.getEditorState());
+  let timer: ReturnType<typeof setTimeout> | null = null;
 
-  const clearPendingTimer = (): void => {
-    if (pendingTimer === null) {
-      return;
+  const emit = (): string => {
+    const markdown = exportEditorStateToMarkdown(editor.getEditorState());
+    if (markdown !== lastEmitted) {
+      lastEmitted = markdown;
+      onMarkdownChange(markdown);
     }
-
-    clearTimeout(pendingTimer);
-    pendingTimer = null;
-  };
-
-  const emitMarkdown = (editorState: EditorState): string => {
-    pendingEditorState = null;
-    const markdown = exportEditorStateToMarkdown(editorState);
-    if (markdown === latestMarkdown) {
-      return latestMarkdown;
-    }
-
-    latestMarkdown = markdown;
-    options.onMarkdownChange(markdown);
-    return latestMarkdown;
+    return lastEmitted;
   };
 
   const flush = (): string => {
-    clearPendingTimer();
-    return pendingEditorState ? emitMarkdown(pendingEditorState) : latestMarkdown;
+    if (timer !== null) {
+      clearTimeout(timer);
+      timer = null;
+      return emit();
+    }
+    return lastEmitted;
   };
 
-  const schedule = (editorState: EditorState): void => {
-    pendingEditorState = editorState;
-    clearPendingTimer();
-    pendingTimer = setTimeout(() => {
-      pendingTimer = null;
-      if (pendingEditorState) {
-        emitMarkdown(pendingEditorState);
-      }
-    }, MARKDOWN_CHANGE_DEBOUNCE_MS);
-  };
-
-  const unregister = editor.registerUpdateListener(
-    ({ dirtyElements, dirtyLeaves, editorState }) => {
-      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
-        return;
-      }
-
-      schedule(editorState);
-    },
-  );
+  const unregister = editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+    if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+    if (timer !== null) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      emit();
+    }, DEBOUNCE_MS);
+  });
 
   return {
     dispose: () => {

@@ -1,10 +1,106 @@
+import { HistoryExtension } from "@lexical/history";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
+import { ReactExtension } from "@lexical/react/ReactExtension";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { configExtension, defineExtension, type InitialEditorStateType } from "lexical";
 import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
 
-import { BlockEditorContent, createBlockEditorContentExtension } from "./block-editor-content";
+import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
+import { ClipboardExtension } from "../clipboard/clipboard-extension";
+import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
+import {
+  BLOCK_EDITOR_NAMESPACE,
+  createBlockEditorCoreExtension,
+} from "./block-editor-core-extension";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
-import type { BlockEditorProps } from "./types";
+import { importMarkdownToEditor } from "./markdown-editor-io";
+import { BlockEditorRuntimeExtension, useBlockEditorRuntime } from "./runtime-extension";
+import type { BlockEditorProps, BlockEditorRuntime } from "./types";
+
+interface BlockEditorContentExtensionConfig {
+  initialMarkdown: string;
+  runtime: BlockEditorRuntime;
+}
+
+function createInitialMarkdownEditorState(markdown: string): InitialEditorStateType {
+  return (editor) => {
+    importMarkdownToEditor(editor, markdown);
+  };
+}
+
+function createBlockEditorContentExtension(config: BlockEditorContentExtensionConfig) {
+  return defineExtension({
+    $initialEditorState: createInitialMarkdownEditorState(config.initialMarkdown),
+    dependencies: [
+      configExtension(ReactExtension, { contentEditable: null }),
+      configExtension(BlockEditorRuntimeExtension, { runtime: config.runtime }),
+      ...SYNTAX_REACT_EXTENSIONS,
+      createBlockEditorCoreExtension(),
+      ClipboardExtension,
+      HistoryExtension,
+    ],
+    name: "fluxnotes/block-editor/content",
+    namespace: BLOCK_EDITOR_NAMESPACE,
+    onError(error) {
+      throw error;
+    },
+  });
+}
+
+interface BlockEditorContentProps {
+  onBlur?: () => void;
+}
+
+function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
+  const { i18n } = useLingui();
+  return (
+    <div className="block-editor__shell">
+      <ContentEditable
+        aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
+        ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
+        className="block-editor__content"
+        onBlur={onBlur}
+        placeholder={
+          <div className="block-editor__placeholder">
+            <Trans id="block-editor.placeholder">Write a note...</Trans>
+          </div>
+        }
+        spellCheck
+      />
+    </div>
+  );
+}
+
+interface BlockEditorImperativeProps {
+  ref: BlockEditorProps["ref"];
+  onBlur?: () => void;
+  flushMarkdown: () => Promise<string>;
+}
+
+function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImperativeProps) {
+  const [editor] = useLexicalComposerContext();
+  const runtime = useBlockEditorRuntime();
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      copy: async () => {
+        const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
+        if (data === null) return;
+        await runtime.clipboard.write(data);
+      },
+      flush: flushMarkdown,
+      focus: () => editor.focus(),
+    }),
+    [editor, runtime, flushMarkdown],
+  );
+
+  return <BlockEditorContent onBlur={onBlur} />;
+}
 
 export function BlockEditor({
   ref,
@@ -15,18 +111,15 @@ export function BlockEditor({
 }: BlockEditorProps) {
   // initialMarkdown is initial-only; prop changes do not re-import editor state.
   const initialMarkdownRef = useRef(initialMarkdown);
-  const contentRef = useRef<{ copy: () => Promise<void>; focus: () => void } | null>(null);
   const markdownRef = useRef<MarkdownChangeHandle | null>(null);
+
   const extension = useMemo(
     () =>
-      createBlockEditorContentExtension({
-        initialMarkdown: initialMarkdownRef.current,
-        runtime,
-      }),
+      createBlockEditorContentExtension({ initialMarkdown: initialMarkdownRef.current, runtime }),
     [runtime],
   );
 
-  const flush = useCallback(
+  const flushMarkdown = useCallback(
     async () => markdownRef.current?.flush() ?? initialMarkdownRef.current,
     [],
   );
@@ -36,21 +129,11 @@ export function BlockEditor({
     onBlur?.();
   }, [onBlur]);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      copy: async () => await contentRef.current?.copy(),
-      focus: () => contentRef.current?.focus(),
-      flush,
-    }),
-    [flush],
-  );
-
   return (
     <div className="block-editor">
       <LexicalExtensionComposer extension={extension} contentEditable={null}>
         <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
-        <BlockEditorContent ref={contentRef} onBlur={handleBlur} />
+        <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
       </LexicalExtensionComposer>
     </div>
   );
