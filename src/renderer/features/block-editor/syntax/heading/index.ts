@@ -29,7 +29,7 @@ export const HEADING_SYNTAX_EXTENSION = defineExtension({
 
 export const HEADING_SYNTAX = {
   id: "heading",
-  extension: HEADING_SYNTAX_EXTENSION,
+  extensions: [HEADING_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node, context) =>
       $isHeadingNode(node)

@@ -4,11 +4,15 @@ import {
   createHeadlessMarkdownEditor,
   parseMarkdownWithShortcuts,
 } from "../test-helper/headless-editor-test-utils";
-import { SYNTAX_EXTENSIONS } from "./registry";
+import { SYNTAX_EXTENSIONS, SYNTAX_REACT_EXTENSIONS } from "./registry";
 
 describe("syntax registry", () => {
   it("provides syntax extensions for extension composer initialization", () => {
     expect(SYNTAX_EXTENSIONS.length).toBeGreaterThan(0);
+  });
+
+  it("provides React-hosted syntax extensions separately", () => {
+    expect(SYNTAX_REACT_EXTENSIONS.length).toBeGreaterThan(0);
   });
 
   it("creates headless editors from syntax extensions", () => {

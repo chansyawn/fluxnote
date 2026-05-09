@@ -25,7 +25,7 @@ export const LINK_SYNTAX_EXTENSION = defineExtension({
 
 export const LINK_SYNTAX = {
   id: "link",
-  extension: LINK_SYNTAX_EXTENSION,
+  extensions: [LINK_SYNTAX_EXTENSION],
   lexical: {
     fromInline: (node, context) =>
       $isLinkNode(node)

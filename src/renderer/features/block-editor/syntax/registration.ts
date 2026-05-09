@@ -32,7 +32,14 @@ export type SyntaxRegistrationId =
  */
 export interface SyntaxRegistration {
   id: SyntaxRegistrationId;
-  extension: AnyLexicalExtensionArgument;
+  /**
+   * Lexical extensions that can run in both React-hosted and headless editors.
+   */
+  extensions: ReadonlyArray<AnyLexicalExtensionArgument>;
+  /**
+   * Lexical extensions that require a React provider, such as decorators.
+   */
+  reactExtensions?: ReadonlyArray<AnyLexicalExtensionArgument>;
   lexical?: SyntaxLexicalRegistration;
   markdownShortcuts?: ReadonlyArray<Transformer>;
   mdast?: SyntaxMdastRegistration;

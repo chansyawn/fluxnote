@@ -48,7 +48,8 @@ export const CODE_SYNTAX_REACT_EXTENSION = defineExtension({
 
 export const CODE_SYNTAX = {
   id: "code",
-  extension: CODE_SYNTAX_EXTENSION,
+  extensions: [CODE_SYNTAX_EXTENSION],
+  reactExtensions: [CODE_SYNTAX_REACT_EXTENSION],
   lexical: {
     fromBlock: (node) => ($isCodeNode(node) ? [codeBlockFromLexical(node)] : null),
     toBlock: (node) => (node.type === "codeBlock" ? [codeBlockToLexical(node)] : null),

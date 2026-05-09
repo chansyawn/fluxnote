@@ -42,7 +42,7 @@ export const INLINE_MARK_SYNTAX_EXTENSION = defineExtension({
 
 export const INLINE_MARK_SYNTAX = {
   id: "inline-mark",
-  extension: INLINE_MARK_SYNTAX_EXTENSION,
+  extensions: [INLINE_MARK_SYNTAX_EXTENSION],
   markdownShortcuts: INLINE_MARK_MARKDOWN_SHORTCUT_TRANSFORMERS,
   mdast: {
     fromInline: (node, context) => {

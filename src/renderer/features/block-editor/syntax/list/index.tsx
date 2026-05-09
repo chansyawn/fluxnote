@@ -59,7 +59,7 @@ export const LIST_SYNTAX_EXTENSION = defineExtension({
 
 export const LIST_SYNTAX = {
   id: "list",
-  extension: LIST_SYNTAX_EXTENSION,
+  extensions: [LIST_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node, context) => {
       if ($isListNode(node)) {

@@ -32,9 +32,11 @@ const SYNTAX_REGISTRY: ReadonlyArray<SyntaxRegistration> = [
 
 export const SYNTAX_REGISTRATIONS = SYNTAX_REGISTRY;
 
-export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> = SYNTAX_REGISTRY.map(
-  (syntax) => syntax.extension,
-);
+export const SYNTAX_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> =
+  SYNTAX_REGISTRY.flatMap((syntax) => Array.from(syntax.extensions));
+
+export const SYNTAX_REACT_EXTENSIONS: ReadonlyArray<AnyLexicalExtensionArgument> =
+  SYNTAX_REGISTRY.flatMap((syntax) => Array.from(syntax.reactExtensions ?? []));
 
 export const SYNTAX_MARKDOWN_SHORTCUTS: ReadonlyArray<Transformer> = SYNTAX_REGISTRY.flatMap(
   (syntax) => Array.from(syntax.markdownShortcuts ?? []),

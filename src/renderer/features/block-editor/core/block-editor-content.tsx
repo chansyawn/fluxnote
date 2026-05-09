@@ -9,7 +9,7 @@ import { useImperativeHandle, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
-import { CODE_SYNTAX_REACT_EXTENSION } from "../syntax/code";
+import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
@@ -41,7 +41,7 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
     dependencies: [
       configExtension(ReactExtension, { contentEditable: null }),
       configExtension(BlockEditorRuntimeExtension, { runtime: config.runtime }),
-      CODE_SYNTAX_REACT_EXTENSION,
+      ...SYNTAX_REACT_EXTENSIONS,
       createBlockEditorCoreExtension(),
       ClipboardExtension,
       HistoryExtension,

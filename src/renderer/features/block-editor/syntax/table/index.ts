@@ -39,7 +39,7 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
 
 export const TABLE_SYNTAX = {
   id: "table",
-  extension: TABLE_SYNTAX_EXTENSION,
+  extensions: [TABLE_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node, context) =>
       $isTableNode(node) ? [tableFromLexical(node, context.readInlines)] : null,

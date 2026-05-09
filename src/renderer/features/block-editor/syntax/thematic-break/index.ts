@@ -37,7 +37,7 @@ export const THEMATIC_BREAK_SYNTAX_EXTENSION = defineExtension({
 
 export const THEMATIC_BREAK_SYNTAX = {
   id: "thematic-break",
-  extension: THEMATIC_BREAK_SYNTAX_EXTENSION,
+  extensions: [THEMATIC_BREAK_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node) => ($isHorizontalRuleNode(node) ? [thematicBreakFromLexical(node)] : null),
     toBlock: (node) => (node.type === "thematicBreak" ? [thematicBreakToLexical()] : null),

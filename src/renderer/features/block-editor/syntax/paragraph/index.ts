@@ -17,7 +17,7 @@ export const PARAGRAPH_SYNTAX_EXTENSION = defineExtension({
 
 export const PARAGRAPH_SYNTAX = {
   id: "paragraph",
-  extension: PARAGRAPH_SYNTAX_EXTENSION,
+  extensions: [PARAGRAPH_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node, context) =>
       $isParagraphNode(node)

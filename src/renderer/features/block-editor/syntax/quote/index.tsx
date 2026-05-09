@@ -29,7 +29,7 @@ export const QUOTE_SYNTAX_EXTENSION = defineExtension({
 
 export const QUOTE_SYNTAX = {
   id: "quote",
-  extension: QUOTE_SYNTAX_EXTENSION,
+  extensions: [QUOTE_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node, context) =>
       $isQuoteNode(node) ? [quoteFromLexical(node, context.readContainerChildren)] : null,

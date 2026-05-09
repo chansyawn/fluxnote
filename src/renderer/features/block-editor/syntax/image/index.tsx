@@ -42,7 +42,7 @@ export const IMAGE_SYNTAX_EXTENSION = defineExtension({
 
 export const IMAGE_SYNTAX = {
   id: "image",
-  extension: IMAGE_SYNTAX_EXTENSION,
+  extensions: [IMAGE_SYNTAX_EXTENSION],
   lexical: {
     fromInline: (node) => ($isImageNode(node) ? [imageFromLexical(node)] : null),
     toInline: (node) => (node.type === "image" ? [imageToLexical(node)] : null),

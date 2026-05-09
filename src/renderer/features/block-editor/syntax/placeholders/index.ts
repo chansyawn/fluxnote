@@ -52,7 +52,7 @@ export const PLACEHOLDERS_SYNTAX_EXTENSION = defineExtension({
 
 export const PLACEHOLDERS_SYNTAX = {
   id: "placeholders",
-  extension: PLACEHOLDERS_SYNTAX_EXTENSION,
+  extensions: [PLACEHOLDERS_SYNTAX_EXTENSION],
   lexical: {
     fromBlock: (node) => ($isPlaceholderBlockNode(node) ? [opaqueBlockFromLexical(node)] : null),
     fromInline: (node) => ($isPlaceholderInlineNode(node) ? [opaqueInlineFromLexical(node)] : null),

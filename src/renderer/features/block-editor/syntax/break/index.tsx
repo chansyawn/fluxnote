@@ -18,7 +18,7 @@ export const BREAK_SYNTAX_EXTENSION = defineExtension({
 
 export const BREAK_SYNTAX = {
   id: "break",
-  extension: BREAK_SYNTAX_EXTENSION,
+  extensions: [BREAK_SYNTAX_EXTENSION],
   lexical: {
     fromInline: (node) => {
       if ($isSoftBreakNode(node)) {
