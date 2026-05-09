@@ -98,7 +98,7 @@ function createEditorStateFromClipboardNodes(
 }
 
 function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): string {
-  const editor = createHeadlessMarkdownEditor("BlockEditorClipboardExport");
+  const editor = createHeadlessMarkdownEditor();
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
   return exportEditorStateToMarkdown(editorState);
 }

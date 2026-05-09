@@ -18,10 +18,7 @@ const resolveNoAssets: ResolveAssets = async () => ({ assets: [] });
 
 describe("block editor clipboard data", () => {
   it("exports the full document with one application payload", async () => {
-    const editor = createEditorFromMarkdown(
-      ["# Title", "", "Text **bold**"].join("\n"),
-      "SourceBlockEditor",
-    );
+    const editor = createEditorFromMarkdown(["# Title", "", "Text **bold**"].join("\n"));
 
     const resolveAssets = vi.fn(resolveNoAssets);
 

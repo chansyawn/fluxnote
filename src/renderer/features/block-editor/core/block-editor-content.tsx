@@ -10,7 +10,10 @@ import { useImperativeHandle, type Ref } from "react";
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { CODE_SYNTAX_REACT_EXTENSION } from "../syntax/code";
-import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
+import {
+  BLOCK_EDITOR_NAMESPACE,
+  createBlockEditorCoreExtension,
+} from "./block-editor-core-extension";
 import { importMarkdownToEditor } from "./markdown-editor-io";
 import { useBlockEditorRuntime } from "./runtime-context";
 import { BlockEditorRuntimeExtension } from "./runtime-extension";
@@ -21,7 +24,6 @@ export type BlockEditorContentHandle = Pick<BlockEditorHandle, "copy" | "focus">
 
 export interface BlockEditorContentExtensionConfig {
   initialMarkdown: string;
-  namespace?: string;
   runtime: BlockEditorRuntime;
 }
 
@@ -34,13 +36,13 @@ export function createInitialMarkdownEditorState(markdown: string): InitialEdito
 export function createBlockEditorContentExtension(config: BlockEditorContentExtensionConfig) {
   return defineExtension({
     name: "fluxnotes/block-editor/content",
-    namespace: config.namespace ?? "BlockEditor",
+    namespace: BLOCK_EDITOR_NAMESPACE,
     $initialEditorState: createInitialMarkdownEditorState(config.initialMarkdown),
     dependencies: [
       configExtension(ReactExtension, { contentEditable: null }),
       configExtension(BlockEditorRuntimeExtension, { runtime: config.runtime }),
       CODE_SYNTAX_REACT_EXTENSION,
-      createBlockEditorCoreExtension(config.namespace ?? "BlockEditor"),
+      createBlockEditorCoreExtension(),
       ClipboardExtension,
       HistoryExtension,
     ],

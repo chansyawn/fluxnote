@@ -27,17 +27,14 @@ export interface EditorSnapshot {
   semantic: SemanticDocument;
 }
 
-export function createEditorFromMarkdown(markdown: string, namespace?: string): LexicalEditor {
-  const editor = createHeadlessMarkdownEditor(namespace);
+export function createEditorFromMarkdown(markdown: string): LexicalEditor {
+  const editor = createHeadlessMarkdownEditor();
   importMarkdownToEditor(editor, markdown);
   return editor;
 }
 
-export function createEditorFromSemantic(
-  document: SemanticDocument,
-  namespace?: string,
-): LexicalEditor {
-  const editor = createHeadlessMarkdownEditor(namespace);
+export function createEditorFromSemantic(document: SemanticDocument): LexicalEditor {
+  const editor = createHeadlessMarkdownEditor();
   importSemanticDocumentToLexical(document, editor);
   return editor;
 }

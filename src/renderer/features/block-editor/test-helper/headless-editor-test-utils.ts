@@ -17,8 +17,8 @@ export interface MarkdownSyntaxSnapshot {
   semantic: SemanticDocument;
 }
 
-export function createHeadlessMarkdownEditor(namespace = "BlockEditorHeadlessTest"): LexicalEditor {
-  return createCoreHeadlessMarkdownEditor(namespace);
+export function createHeadlessMarkdownEditor(): LexicalEditor {
+  return createCoreHeadlessMarkdownEditor();
 }
 
 export function markdownToSemantic(markdown: string): SemanticDocument {

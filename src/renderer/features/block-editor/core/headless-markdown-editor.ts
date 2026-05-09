@@ -3,6 +3,6 @@ import type { LexicalEditor } from "lexical";
 
 import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 
-export function createHeadlessMarkdownEditor(namespace = "BlockEditorHeadless"): LexicalEditor {
-  return LexicalBuilder.fromExtensions([createBlockEditorCoreExtension(namespace)]).buildEditor();
+export function createHeadlessMarkdownEditor(): LexicalEditor {
+  return LexicalBuilder.fromExtensions([createBlockEditorCoreExtension()]).buildEditor();
 }
