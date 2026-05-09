@@ -1,0 +1,35 @@
+import { Trans } from "@lingui/react/macro";
+import { ButtonGroup } from "@renderer/ui/components/button-group";
+import { cn } from "@renderer/ui/lib/utils";
+import { CheckIcon, XIcon } from "lucide-react";
+
+import { ACTION_BAR_CLS, ACTION_BAR_DISABLED_CLS } from "./block-actions";
+import { IconAction } from "./icon-action";
+
+interface ExternalEditActionsProps {
+  pending?: boolean;
+  onSubmit: () => void;
+  onCancel: () => void;
+}
+
+export function ExternalEditActions({ pending, onSubmit, onCancel }: ExternalEditActionsProps) {
+  return (
+    <ButtonGroup
+      aria-disabled={pending}
+      className={cn(ACTION_BAR_CLS, pending && ACTION_BAR_DISABLED_CLS)}
+    >
+      <IconAction
+        icon={CheckIcon}
+        label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
+        pending={pending}
+        onClick={onSubmit}
+      />
+      <IconAction
+        icon={XIcon}
+        label={<Trans id="home-note.block.external-edit.cancel">Cancel external edit</Trans>}
+        disabled={pending}
+        onClick={onCancel}
+      />
+    </ButtonGroup>
+  );
+}

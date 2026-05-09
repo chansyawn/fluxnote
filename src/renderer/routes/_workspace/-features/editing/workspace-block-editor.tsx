@@ -2,7 +2,7 @@ import type { Block, Tag } from "@renderer/clients";
 import {
   BlockActions,
   BlockEditorController,
-  BlockExternalEditActions,
+  ExternalEditActions,
   type BlockEditorControllerHandle,
 } from "@renderer/features/block";
 import { memo, useCallback, useRef, useState } from "react";
@@ -43,29 +43,35 @@ function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockE
   return (
     <BlockActions
       block={block}
-      visibility={state.visibility}
-      tags={tags}
-      isDisabled={state.isLocked}
-      isArchivePending={state.isArchivePending}
-      isDeletePending={state.isDeletePending}
-      isTagOpPending={state.isTagCreatePending}
-      onArchive={() => {
-        commands.archiveBlock(block.id);
+      state={{
+        visibility: state.visibility,
+        tags,
+        disabled: state.isLocked,
+        pending: {
+          archive: state.isArchivePending,
+          delete: state.isDeletePending,
+          tag: state.isTagCreatePending,
+        },
       }}
-      onRestore={() => {
-        commands.restoreBlock(block.id);
+      handlers={{
+        onCopy: handleCopy,
+        onToggleArchive: () => {
+          if (state.visibility === "active") {
+            commands.archiveBlock(block.id);
+          } else {
+            commands.restoreBlock(block.id);
+          }
+        },
+        onDelete: () => {
+          if (state.externalEditSession) {
+            commands.cancelExternalEdit(state.externalEditSession.editId);
+            return;
+          }
+          commands.deleteBlock(block.id);
+        },
+        onCreateTag: handleCreateTag,
+        onAssignTags: handleAssignTags,
       }}
-      onDelete={() => {
-        if (state.externalEditSession) {
-          commands.cancelExternalEdit(state.externalEditSession.editId);
-          return;
-        }
-
-        commands.deleteBlock(block.id);
-      }}
-      onCopy={handleCopy}
-      onCreateTag={handleCreateTag}
-      onAssignTags={handleAssignTags}
     />
   );
 }
@@ -82,8 +88,8 @@ function WorkspaceExternalEditActions({
   isPending: boolean;
 }) {
   return (
-    <BlockExternalEditActions
-      isPending={isPending}
+    <ExternalEditActions
+      pending={isPending}
       onCancel={() => {
         commands.cancelExternalEdit(editId);
       }}

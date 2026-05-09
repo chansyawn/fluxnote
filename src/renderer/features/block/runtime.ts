@@ -25,20 +25,6 @@ function createClipboardWriteRequest(
   };
 }
 
-async function writeClipboardWithFallback(
-  data: BlockEditorClipboardWriteData,
-  blockId: string,
-): Promise<void> {
-  const request = createClipboardWriteRequest(data, blockId);
-
-  try {
-    await writeBlockEditorClipboard(request);
-    return;
-  } catch {
-    await writeClipboardText(data.text);
-  }
-}
-
 async function writeClipboardText(text: string): Promise<void> {
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -48,20 +34,23 @@ async function writeClipboardText(text: string): Promise<void> {
   throw new Error("Clipboard API is unavailable.");
 }
 
-export function createBlockEditorRuntime(blockId: string): BlockEditorRuntime {
+async function writeClipboardWithFallback(
+  data: BlockEditorClipboardWriteData,
+  blockId: string,
+): Promise<void> {
+  try {
+    await writeBlockEditorClipboard(createClipboardWriteRequest(data, blockId));
+  } catch {
+    await writeClipboardText(data.text);
+  }
+}
+
+export function createBlockRuntime(blockId: string): BlockEditorRuntime {
   return {
     assets: {
       copy: ({ assetUrls, sourceBlockId }) =>
-        copyAsset({
-          assetUrls,
-          sourceBlockId,
-          targetBlockId: blockId,
-        }),
-      create: ({ assets }) =>
-        createAsset({
-          assets,
-          blockId,
-        }),
+        copyAsset({ assetUrls, sourceBlockId, targetBlockId: blockId }),
+      create: ({ assets }) => createAsset({ assets, blockId }),
       resolve: resolveAsset,
     },
     clipboard: {

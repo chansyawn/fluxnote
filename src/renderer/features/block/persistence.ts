@@ -3,7 +3,7 @@ import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 
-interface BlockContentPersistence {
+interface BlockPersistence {
   getLatestContent: () => string;
   saveMarkdown: (markdown: string) => void;
   snapshotLatestContent: () => void;
@@ -23,18 +23,7 @@ function updateBlockInCache(blockId: string, updateBlock: (block: Block) => Bloc
   });
 }
 
-function replaceBlockInCache(updatedBlock: Block): void {
-  updateBlockInCache(updatedBlock.id, () => updatedBlock);
-}
-
-function updateBlockContentInCache(blockId: string, content: string): void {
-  updateBlockInCache(blockId, (block) => ({ ...block, content }));
-}
-
-export function useBlockContentPersistence(block: Block): BlockContentPersistence {
-  const blockIdRef = useRef(block.id);
-  blockIdRef.current = block.id;
-
+export function useBlockPersistence(block: Block): BlockPersistence {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
   const latestRequestIdRef = useRef(0);
@@ -52,29 +41,9 @@ export function useBlockContentPersistence(block: Block): BlockContentPersistenc
   const { mutateAsync: saveContent } = useMutation({
     mutationFn: async ({ content, requestId }: { content: string; requestId: number }) => ({
       requestId,
-      updatedBlock: await updateBlockContent({
-        blockId: block.id,
-        content,
-      }),
+      updatedBlock: await updateBlockContent({ blockId: block.id, content }),
     }),
   });
-
-  const handleSaveSuccess = useCallback(
-    ({ requestId, updatedBlock }: { requestId: number; updatedBlock: Block }) => {
-      if (requestId < appliedRequestIdRef.current) {
-        return;
-      }
-
-      appliedRequestIdRef.current = requestId;
-      persistedContentRef.current = updatedBlock.content;
-      replaceBlockInCache(updatedBlock);
-    },
-    [],
-  );
-
-  const handleSaveError = useCallback(() => {
-    // Save errors are intentionally silent in the simplified MVP UI.
-  }, []);
 
   const runSave = useCallback(
     (content: string) => {
@@ -82,8 +51,16 @@ export function useBlockContentPersistence(block: Block): BlockContentPersistenc
       latestRequestIdRef.current = requestId;
 
       const savePromise = saveContent({ content, requestId })
-        .then(handleSaveSuccess)
-        .catch(handleSaveError);
+        .then(({ requestId: appliedId, updatedBlock }) => {
+          // Out-of-order responses keep the latest applied id; ties pass to honor "last write wins".
+          if (appliedId < appliedRequestIdRef.current) return;
+          appliedRequestIdRef.current = appliedId;
+          persistedContentRef.current = updatedBlock.content;
+          updateBlockInCache(updatedBlock.id, () => updatedBlock);
+        })
+        .catch(() => {
+          // Save errors are intentionally silent in the simplified MVP UI.
+        });
       savePromiseRef.current = savePromise;
       void savePromise.finally(() => {
         if (savePromiseRef.current === savePromise) {
@@ -91,27 +68,22 @@ export function useBlockContentPersistence(block: Block): BlockContentPersistenc
         }
       });
     },
-    [handleSaveError, handleSaveSuccess, saveContent],
+    [saveContent],
   );
 
   const getLatestContent = useCallback(() => latestContentRef.current, []);
 
   const snapshotLatestContent = useCallback(() => {
-    if (latestContentRef.current === persistedContentRef.current) {
-      return;
-    }
-
-    updateBlockContentInCache(blockIdRef.current, latestContentRef.current);
-  }, []);
+    if (latestContentRef.current === persistedContentRef.current) return;
+    const blockId = block.id;
+    const content = latestContentRef.current;
+    updateBlockInCache(blockId, (current) => ({ ...current, content }));
+  }, [block.id]);
 
   const saveMarkdown = useCallback(
     (markdown: string) => {
       latestContentRef.current = markdown;
-
-      if (markdown === persistedContentRef.current) {
-        return;
-      }
-
+      if (markdown === persistedContentRef.current) return;
       runSave(markdown);
     },
     [runSave],
@@ -121,10 +93,5 @@ export function useBlockContentPersistence(block: Block): BlockContentPersistenc
     await savePromiseRef.current;
   }, []);
 
-  return {
-    getLatestContent,
-    saveMarkdown,
-    snapshotLatestContent,
-    waitForPendingSave,
-  };
+  return { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave };
 }

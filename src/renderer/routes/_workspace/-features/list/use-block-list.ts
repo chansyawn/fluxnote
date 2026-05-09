@@ -11,7 +11,7 @@ import {
   BLOCKS_PAGE_SIZE,
   blockListPageQueryKey,
   getBlockPageOffset,
-} from "@renderer/features/block/block-query-key";
+} from "@renderer/features/block/query-key";
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
