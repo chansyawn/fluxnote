@@ -8,11 +8,12 @@ import {
 } from "./block-editor-content";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
+import { BlockEditorRuntimeProvider } from "./runtime-context";
 import type { BlockEditorProps } from "./types";
 
 export function BlockEditor({
   ref,
-  blockId,
+  runtime,
   initialMarkdown,
   onBlur,
   onMarkdownChange,
@@ -24,10 +25,10 @@ export function BlockEditor({
   const extension = useMemo(
     () =>
       createBlockEditorContentExtension({
-        blockId,
         initialMarkdown: initialMarkdownRef.current,
+        runtime,
       }),
-    [blockId],
+    [runtime],
   );
 
   const flush = useCallback(
@@ -52,10 +53,12 @@ export function BlockEditor({
 
   return (
     <div className="block-editor">
-      <LexicalExtensionComposer extension={extension} contentEditable={null}>
-        <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
-        <BlockEditorContent ref={contentRef} blockId={blockId} onBlur={handleBlur} />
-      </LexicalExtensionComposer>
+      <BlockEditorRuntimeProvider runtime={runtime}>
+        <LexicalExtensionComposer extension={extension} contentEditable={null}>
+          <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
+          <BlockEditorContent ref={contentRef} onBlur={handleBlur} />
+        </LexicalExtensionComposer>
+      </BlockEditorRuntimeProvider>
     </div>
   );
 }

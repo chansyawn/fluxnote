@@ -1,8 +1,4 @@
 import {
-  writeBlockEditorClipboard,
-  type BlockEditorClipboardWriteRequest,
-} from "@renderer/clients";
-import {
   decodeBlockEditorClipboardHtml,
   stripBlockEditorClipboardHtmlMetadata,
 } from "@shared/features/block-editor/clipboard";
@@ -10,6 +6,7 @@ import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
 import { insertImageFilesAtSelection } from "../assets/image-insert";
+import type { BlockEditorRuntime } from "../core/types";
 import { insertMarkdownTablesAtSelection } from "../syntax/table";
 import {
   insertClipboardPayloadAtSelection,
@@ -39,25 +36,9 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
   };
 }
 
-export async function writeBlockEditorClipboardData(
-  request: BlockEditorClipboardWriteRequest,
-): Promise<void> {
-  try {
-    await writeBlockEditorClipboard(request);
-    return;
-  } catch {
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(request.text);
-      return;
-    }
-
-    throw new Error("Clipboard API is unavailable.");
-  }
-}
-
 export function handleBlockEditorPaste(
   editor: LexicalEditor,
-  blockId: string,
+  runtime: BlockEditorRuntime,
   event: PasteCommandType,
   selection: BaseSelection | null,
 ): boolean {
@@ -70,7 +51,7 @@ export function handleBlockEditorPaste(
   if (files.length > 0) {
     event.preventDefault();
     event.stopPropagation();
-    void insertImageFilesAtSelection(editor, blockId, files, selection);
+    void insertImageFilesAtSelection(editor, runtime, files, selection);
     return true;
   }
 
@@ -78,7 +59,7 @@ export function handleBlockEditorPaste(
   if (eventPayload) {
     event.preventDefault();
     event.stopPropagation();
-    void insertClipboardPayloadAtSelection(editor, blockId, eventPayload, selection);
+    void insertClipboardPayloadAtSelection(editor, runtime, eventPayload, selection);
     return true;
   }
 

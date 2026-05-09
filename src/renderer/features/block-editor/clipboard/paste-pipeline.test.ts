@@ -1,6 +1,7 @@
 import { encodeBlockEditorClipboardHtml } from "@shared/features/block-editor/clipboard";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
+import type { BlockEditorRuntime } from "../core/types";
 import { handleBlockEditorPaste } from "./paste-pipeline";
 
 const mocks = vi.hoisted(() => ({
@@ -21,6 +22,18 @@ vi.mock("../syntax/table", () => ({
 const payload = {
   nodes: [{ text: "Text", type: "text", version: 1 }],
   sourceBlockId: "block-1",
+};
+
+const runtime: BlockEditorRuntime = {
+  assets: {
+    copy: async () => ({ assets: [] }),
+    create: async () => ({ assets: [] }),
+    resolve: async () => ({ assets: [] }),
+  },
+  clipboard: {
+    write: async () => undefined,
+    writeText: async () => undefined,
+  },
 };
 
 function createPasteEvent(values: Record<string, string>): ClipboardEvent {
@@ -48,11 +61,11 @@ describe("block editor paste pipeline", () => {
       "text/plain": "Text",
     });
 
-    expect(handleBlockEditorPaste({} as never, "block-2", event, null)).toBe(true);
+    expect(handleBlockEditorPaste({} as never, runtime, event, null)).toBe(true);
 
     expect(mocks.insertClipboardPayloadAtSelection).toHaveBeenCalledWith(
       {},
-      "block-2",
+      runtime,
       payload,
       null,
     );
@@ -65,7 +78,7 @@ describe("block editor paste pipeline", () => {
       "text/plain": "External",
     });
 
-    expect(handleBlockEditorPaste({} as never, "block-2", event, null)).toBe(true);
+    expect(handleBlockEditorPaste({} as never, runtime, event, null)).toBe(true);
 
     expect(mocks.insertClipboardPayloadAtSelection).not.toHaveBeenCalled();
     expect(mocks.insertRichTextDataAtSelection).toHaveBeenCalledWith(
@@ -87,7 +100,7 @@ describe("block editor paste pipeline", () => {
       "text/plain": ["| A | B |", "| --- | --- |", "| 1 | 2 |"].join("\n"),
     });
 
-    expect(handleBlockEditorPaste({} as never, "block-2", event, null)).toBe(true);
+    expect(handleBlockEditorPaste({} as never, runtime, event, null)).toBe(true);
 
     expect(mocks.insertMarkdownTablesAtSelection).toHaveBeenCalledWith(
       {},

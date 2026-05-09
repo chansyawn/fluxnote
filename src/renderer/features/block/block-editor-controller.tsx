@@ -5,11 +5,13 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   type ReactNode,
   type Ref,
 } from "react";
 
+import { createBlockEditorRuntime } from "./runtime";
 import { useBlockContentPersistence } from "./use-block-content-persistence";
 
 interface BlockEditorControllerProps {
@@ -32,6 +34,7 @@ export function BlockEditorController({
   ref,
 }: BlockEditorControllerProps) {
   const editorShellRef = useRef<BlockEditorHandle | null>(null);
+  const runtime = useMemo(() => createBlockEditorRuntime(block.id), [block.id]);
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockContentPersistence(block);
 
@@ -70,6 +73,7 @@ export function BlockEditorController({
     <BlockEditorView
       blockId={block.id}
       ref={editorShellRef}
+      runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}
       leadingActions={leadingActions}

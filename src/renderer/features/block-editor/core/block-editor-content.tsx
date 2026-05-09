@@ -8,20 +8,21 @@ import { configExtension, defineExtension, type InitialEditorStateType } from "l
 import { useImperativeHandle, type Ref } from "react";
 
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
-import { writeBlockEditorClipboardData } from "../clipboard/clipboard-extension";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { CODE_SYNTAX_REACT_EXTENSION } from "../syntax/code";
 import { IMAGE_SYNTAX_EXTENSION } from "../syntax/image";
 import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 import { importMarkdownToEditor } from "./markdown-editor-io";
+import { useBlockEditorRuntime } from "./runtime-context";
 import type { BlockEditorHandle } from "./types";
+import type { BlockEditorRuntime } from "./types";
 
 export type BlockEditorContentHandle = Pick<BlockEditorHandle, "copy" | "focus">;
 
 export interface BlockEditorContentExtensionConfig {
-  blockId: string;
   initialMarkdown: string;
   namespace?: string;
+  runtime: BlockEditorRuntime;
 }
 
 export function createInitialMarkdownEditorState(markdown: string): InitialEditorStateType {
@@ -42,10 +43,10 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
       CODE_SYNTAX_REACT_EXTENSION,
       createBlockEditorCoreExtension(config.namespace ?? "BlockEditor"),
       configExtension(IMAGE_SYNTAX_EXTENSION, {
-        blockId: config.blockId,
+        runtime: config.runtime,
       }),
       configExtension(ClipboardExtension, {
-        blockId: config.blockId,
+        runtime: config.runtime,
       }),
       HistoryExtension,
     ],
@@ -56,23 +57,23 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
 }
 
 interface BlockEditorContentProps {
-  blockId: string;
   onBlur?: () => void;
   ref?: Ref<BlockEditorContentHandle>;
 }
 
-export function BlockEditorContent({ blockId, onBlur, ref }: BlockEditorContentProps) {
+export function BlockEditorContent({ onBlur, ref }: BlockEditorContentProps) {
   const { i18n } = useLingui();
   const [editor] = useLexicalComposerContext();
+  const runtime = useBlockEditorRuntime();
 
   useImperativeHandle(ref, () => ({
     copy: async () => {
-      const data = await createClipboardDataFromDocument(editor, blockId);
+      const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
       if (data === null) {
         return;
       }
 
-      await writeBlockEditorClipboardData(data);
+      await runtime.clipboard.write(data);
     },
     focus: () => {
       editor.focus();

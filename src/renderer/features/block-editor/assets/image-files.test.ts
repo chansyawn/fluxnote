@@ -1,7 +1,9 @@
-import type { CreateAssetRequest } from "@renderer/clients";
 import { describe, expect, it, vi } from "vite-plus/test";
 
+import type { BlockEditorCreateAssetRequest, BlockEditorRuntime } from "../core/types";
 import { createImagePayloadsFromFiles, isSupportedImageMimeType } from "./image-files";
+
+type CreateAssets = BlockEditorRuntime["assets"]["create"];
 
 describe("image file helpers", () => {
   it("filters supported image mime types", () => {
@@ -12,7 +14,7 @@ describe("image file helpers", () => {
 
   it("creates image payloads by storing files as block assets", async () => {
     const file = new File([new Uint8Array([1, 2, 3])], "photo.png", { type: "image/png" });
-    const createAssetClient = vi.fn(async (input: CreateAssetRequest) => {
+    const createAssets = vi.fn(async (input: BlockEditorCreateAssetRequest) => {
       expect(input).toEqual({
         assets: [
           {
@@ -21,7 +23,6 @@ describe("image file helpers", () => {
             mimeType: "image/png",
           },
         ],
-        blockId: "block-1",
       });
 
       return {
@@ -35,12 +36,11 @@ describe("image file helpers", () => {
     });
 
     const payloads = await createImagePayloadsFromFiles({
-      blockId: "block-1",
-      createAssetClient,
+      createAssets,
       files: [file],
     });
 
-    expect(createAssetClient).toHaveBeenCalledTimes(1);
+    expect(createAssets).toHaveBeenCalledTimes(1);
     expect(payloads).toEqual([
       { alt: "photo.png", src: "assets://block-1/photo.png", title: null },
     ]);
@@ -49,7 +49,7 @@ describe("image file helpers", () => {
   it("creates multiple image payloads with one asset request", async () => {
     const first = new File([new Uint8Array([1])], "first.png", { type: "image/png" });
     const second = new File([new Uint8Array([2])], "second.png", { type: "image/png" });
-    const createAssetClient = vi.fn(async (_input: CreateAssetRequest) => ({
+    const createAssets: CreateAssets = vi.fn(async () => ({
       assets: [
         { altText: "first.png", assetUrl: "assets://block-1/first.png" },
         { altText: "second.png", assetUrl: "assets://block-1/second.png" },
@@ -57,12 +57,11 @@ describe("image file helpers", () => {
     }));
 
     const payloads = await createImagePayloadsFromFiles({
-      blockId: "block-1",
-      createAssetClient,
+      createAssets,
       files: [first, second],
     });
 
-    expect(createAssetClient).toHaveBeenCalledTimes(1);
+    expect(createAssets).toHaveBeenCalledTimes(1);
     expect(payloads).toEqual([
       { alt: "first.png", src: "assets://block-1/first.png", title: null },
       { alt: "second.png", src: "assets://block-1/second.png", title: null },

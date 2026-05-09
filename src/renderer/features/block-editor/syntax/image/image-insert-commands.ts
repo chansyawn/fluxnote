@@ -4,8 +4,12 @@ import { COMMAND_PRIORITY_HIGH, DRAGOVER_COMMAND, DROP_COMMAND, type LexicalEdit
 import { getSupportedImageFiles, hasSupportedImageData } from "../../assets/image-files";
 import { insertImageFilesAtSelection } from "../../assets/image-insert";
 import { cloneCurrentSelection } from "../../clipboard/clipboard-insert";
+import type { BlockEditorRuntime } from "../../core/types";
 
-export function registerImageInsertCommands(editor: LexicalEditor, blockId: string): () => void {
+export function registerImageInsertCommands(
+  editor: LexicalEditor,
+  runtime: BlockEditorRuntime,
+): () => void {
   return mergeRegister(
     editor.registerCommand(
       DRAGOVER_COMMAND,
@@ -33,7 +37,7 @@ export function registerImageInsertCommands(editor: LexicalEditor, blockId: stri
         const selection = cloneCurrentSelection();
         event.preventDefault();
         event.stopPropagation();
-        void insertImageFilesAtSelection(editor, blockId, files, selection);
+        void insertImageFilesAtSelection(editor, runtime, files, selection);
         return true;
       },
       COMMAND_PRIORITY_HIGH,

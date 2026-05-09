@@ -1,4 +1,3 @@
-import { copyAsset, type CopyAssetResult } from "@renderer/clients";
 import {
   collectImageAssetUrls,
   rewriteClipboardImageAssetUrls,
@@ -8,7 +7,10 @@ import type {
   ClipboardSerializedNode,
 } from "@shared/features/block-editor/clipboard";
 
-type CopyAssetClient = typeof copyAsset;
+import type { BlockEditorRuntime } from "../core/types";
+
+type CopyAssets = BlockEditorRuntime["assets"]["copy"];
+type CopyAssetResult = Awaited<ReturnType<CopyAssets>>;
 
 function createAssetUrlMap(result: CopyAssetResult): Map<string, string> {
   return new Map(result.assets.map((asset) => [asset.sourceAssetUrl, asset.assetUrl]));
@@ -19,18 +21,16 @@ export const rewriteClipboardAssetUrls = rewriteClipboardImageAssetUrls;
 
 export async function createNodesForTargetBlock(
   payload: BlockEditorClipboardPayload,
-  targetBlockId: string,
-  copyAssetClient: CopyAssetClient = copyAsset,
+  copyAssets: CopyAssets,
 ): Promise<ClipboardSerializedNode[]> {
   const sourceAssetUrls = collectClipboardAssetUrls(payload.nodes);
   if (sourceAssetUrls.length === 0) {
     return [...payload.nodes];
   }
 
-  const copiedAssets = await copyAssetClient({
+  const copiedAssets = await copyAssets({
     assetUrls: sourceAssetUrls,
     sourceBlockId: payload.sourceBlockId,
-    targetBlockId,
   });
   return rewriteClipboardAssetUrls(payload.nodes, createAssetUrlMap(copiedAssets));
 }

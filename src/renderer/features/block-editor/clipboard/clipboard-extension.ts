@@ -1,20 +1,22 @@
 import { defineExtension } from "lexical";
 import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 
+import { UNAVAILABLE_BLOCK_EDITOR_RUNTIME } from "../core/runtime-defaults";
+import type { BlockEditorRuntime } from "../core/types";
 import { createClipboardDataFromCurrentSelection } from "./clipboard-data";
 import { cloneCurrentSelection } from "./clipboard-insert";
-import { handleBlockEditorPaste, writeBlockEditorClipboardData } from "./paste-pipeline";
+import { handleBlockEditorPaste } from "./paste-pipeline";
 
 export interface ClipboardExtensionConfig {
-  blockId: string;
+  runtime: BlockEditorRuntime;
 }
 
-export { createClipboardDataSnapshot, writeBlockEditorClipboardData } from "./paste-pipeline";
+export { createClipboardDataSnapshot } from "./paste-pipeline";
 
 export const ClipboardExtension = defineExtension({
   name: "fluxnotes/block-editor/clipboard",
   config: {
-    blockId: "",
+    runtime: UNAVAILABLE_BLOCK_EDITOR_RUNTIME,
   } satisfies ClipboardExtensionConfig,
   register(editor, config) {
     const unregisterCopy = editor.registerCommand(
@@ -24,18 +26,20 @@ export const ClipboardExtension = defineExtension({
           event.preventDefault();
         }
 
-        void createClipboardDataFromCurrentSelection(editor, config.blockId).then((request) => {
-          if (request !== null) {
-            void writeBlockEditorClipboardData(request);
-          }
-        });
+        void createClipboardDataFromCurrentSelection(editor, config.runtime.assets.resolve).then(
+          (data) => {
+            if (data !== null) {
+              void config.runtime.clipboard.write(data);
+            }
+          },
+        );
         return true;
       },
       COMMAND_PRIORITY_CRITICAL,
     );
     const unregisterPaste = editor.registerCommand(
       PASTE_COMMAND,
-      (event) => handleBlockEditorPaste(editor, config.blockId, event, cloneCurrentSelection()),
+      (event) => handleBlockEditorPaste(editor, config.runtime, event, cloneCurrentSelection()),
       COMMAND_PRIORITY_CRITICAL,
     );
 

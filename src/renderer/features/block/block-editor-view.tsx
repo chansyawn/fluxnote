@@ -1,4 +1,8 @@
-import { BlockEditor, type BlockEditorHandle } from "@renderer/features/block-editor";
+import {
+  BlockEditor,
+  type BlockEditorHandle,
+  type BlockEditorRuntime,
+} from "@renderer/features/block-editor";
 import { cn } from "@renderer/ui/lib/utils";
 import type { ReactNode, Ref } from "react";
 
@@ -7,6 +11,7 @@ interface BlockEditorViewProps {
   initialMarkdown: string;
   isExternalEditPending?: boolean;
   leadingActions?: ReactNode;
+  runtime: BlockEditorRuntime;
   willArchive: boolean;
   actions?: ReactNode;
   onMarkdownChange: (markdown: string) => void;
@@ -20,6 +25,7 @@ export function BlockEditorView({
   initialMarkdown,
   isExternalEditPending = false,
   leadingActions,
+  runtime,
   willArchive,
   actions,
   onMarkdownChange,
@@ -48,8 +54,8 @@ export function BlockEditorView({
 
       <div className="min-h-16 px-3 pt-3 pb-2">
         <BlockEditor
-          blockId={blockId}
           ref={ref}
+          runtime={runtime}
           initialMarkdown={initialMarkdown}
           onBlur={onBlur}
           onMarkdownChange={onMarkdownChange}

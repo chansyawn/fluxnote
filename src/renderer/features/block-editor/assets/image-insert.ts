@@ -8,6 +8,7 @@ import {
   type LexicalEditor,
 } from "lexical";
 
+import type { BlockEditorRuntime } from "../core/types";
 import { $createImageNode, type ImagePayload } from "../syntax/image/image-node";
 import { createImagePayloadsFromFiles } from "./image-files";
 
@@ -32,11 +33,11 @@ function insertImagePayloadsAtSelection(payloads: ReadonlyArray<ImagePayload>): 
 }
 
 async function createImagePayloads(
-  blockId: string,
+  runtime: BlockEditorRuntime,
   files: ReadonlyArray<File>,
 ): Promise<ImagePayload[]> {
   try {
-    return await createImagePayloadsFromFiles({ blockId, files });
+    return await createImagePayloadsFromFiles({ createAssets: runtime.assets.create, files });
   } catch (error) {
     console.error("Failed to create image assets.", error);
     return [];
@@ -45,11 +46,11 @@ async function createImagePayloads(
 
 export async function insertImageFilesAtSelection(
   editor: LexicalEditor,
-  blockId: string,
+  runtime: BlockEditorRuntime,
   files: ReadonlyArray<File>,
   selection: BaseSelection | null,
 ): Promise<void> {
-  const payloads = await createImagePayloads(blockId, files);
+  const payloads = await createImagePayloads(runtime, files);
   if (payloads.length === 0) {
     return;
   }

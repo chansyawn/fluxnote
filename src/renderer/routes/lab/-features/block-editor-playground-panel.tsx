@@ -1,7 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { BlockEditorView } from "@renderer/features/block";
+import type { BlockEditorRuntime } from "@renderer/features/block-editor";
 import { Button } from "@renderer/ui/components/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const DEFAULT_PLAYGROUND_MARKDOWN = `# Heading 1
 
@@ -65,6 +66,35 @@ pnpm dev
 export function BlockEditorPlaygroundPanel() {
   const [markdown, setMarkdown] = useState(DEFAULT_PLAYGROUND_MARKDOWN);
   const [editorVersion, setEditorVersion] = useState(0);
+  const runtime = useMemo<BlockEditorRuntime>(
+    () => ({
+      assets: {
+        copy: async ({ assetUrls }) => ({
+          assets: assetUrls.map((assetUrl) => ({
+            assetUrl,
+            sourceAssetUrl: assetUrl,
+          })),
+        }),
+        create: async ({ assets }) => ({
+          assets: assets.map((asset, index) => ({
+            altText: asset.fileName ?? `image-${index + 1}`,
+            assetUrl: `data:${asset.mimeType};base64,${asset.dataBase64}`,
+          })),
+        }),
+        resolve: async ({ assetUrls }) => ({
+          assets: assetUrls.map((assetUrl) => ({
+            assetUrl,
+            fileUrl: assetUrl,
+          })),
+        }),
+      },
+      clipboard: {
+        write: async () => undefined,
+        writeText: async () => undefined,
+      },
+    }),
+    [],
+  );
 
   return (
     <section className="flex flex-col gap-3">
@@ -94,6 +124,7 @@ export function BlockEditorPlaygroundPanel() {
       <BlockEditorView
         key={editorVersion}
         blockId="playground-block"
+        runtime={runtime}
         initialMarkdown={markdown}
         willArchive={false}
         onBlur={() => {}}

@@ -1,12 +1,10 @@
-import { createAsset } from "@renderer/clients";
-
+import type { BlockEditorRuntime } from "../core/types";
 import type { ImagePayload } from "../syntax/image/image-node";
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 export interface CreateImagePayloadsFromFilesInput {
-  blockId: string;
-  createAssetClient?: typeof createAsset;
+  createAssets: BlockEditorRuntime["assets"]["create"];
   files: ReadonlyArray<File>;
 }
 
@@ -55,8 +53,7 @@ export function getSupportedImageFiles(dataTransfer: DataTransfer | null): File[
 }
 
 export async function createImagePayloadsFromFiles({
-  blockId,
-  createAssetClient = createAsset,
+  createAssets,
   files,
 }: CreateImagePayloadsFromFilesInput): Promise<ImagePayload[]> {
   const supportedFiles = files.filter(isSupportedImageFile);
@@ -71,7 +68,7 @@ export async function createImagePayloadsFromFiles({
       mimeType: file.type,
     })),
   );
-  const result = await createAssetClient({ assets, blockId });
+  const result = await createAssets({ assets });
 
   return result.assets.map((asset) => ({
     alt: asset.altText,

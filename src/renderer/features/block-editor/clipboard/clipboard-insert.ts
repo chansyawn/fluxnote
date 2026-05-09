@@ -17,6 +17,7 @@ import {
   type LexicalEditor,
 } from "lexical";
 
+import type { BlockEditorRuntime } from "../core/types";
 import { createNodesForTargetBlock } from "./clipboard-assets";
 
 interface RichTextClipboardData {
@@ -72,11 +73,11 @@ export function insertRichTextDataAtSelection(
 
 export async function insertClipboardPayloadAtSelection(
   editor: LexicalEditor,
-  targetBlockId: string,
+  runtime: BlockEditorRuntime,
   payload: BlockEditorClipboardPayload,
   selection: BaseSelection | null,
 ): Promise<void> {
-  const nodes = await createNodesForTargetBlock(payload, targetBlockId);
+  const nodes = await createNodesForTargetBlock(payload, runtime.assets.copy);
 
   editor.update(
     () => {

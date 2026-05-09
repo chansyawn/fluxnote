@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
-import { rewriteClipboardAssetUrls } from "./clipboard-assets";
+import { createNodesForTargetBlock, rewriteClipboardAssetUrls } from "./clipboard-assets";
 
 describe("block editor clipboard assets", () => {
   it("rewrites nested image node urls for internal clipboard paste", () => {
@@ -36,5 +36,34 @@ describe("block editor clipboard assets", () => {
       }),
     ]);
     expect(nodes[0]?.children?.[0]?.src).toBe("assets://source/a.png");
+  });
+
+  it("copies internal asset urls through the injected runtime", async () => {
+    const copyAssets = vi.fn(async () => ({
+      assets: [
+        {
+          assetUrl: "assets://target/a.png",
+          sourceAssetUrl: "assets://source/a.png",
+        },
+      ],
+    }));
+
+    const nodes = await createNodesForTargetBlock(
+      {
+        nodes: [{ alt: "A", src: "assets://source/a.png", title: null, type: "image", version: 1 }],
+        sourceBlockId: "source-block",
+      },
+      copyAssets,
+    );
+
+    expect(copyAssets).toHaveBeenCalledWith({
+      assetUrls: ["assets://source/a.png"],
+      sourceBlockId: "source-block",
+    });
+    expect(nodes).toEqual([
+      expect.objectContaining({
+        src: "assets://target/a.png",
+      }),
+    ]);
   });
 });

@@ -4,6 +4,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useBlockEditorRuntime } from "../../core/runtime-context";
+
 const COPY_FEEDBACK_DURATION_MS = 2000;
 
 interface CodeCopyButtonProps {
@@ -12,6 +14,7 @@ interface CodeCopyButtonProps {
 
 export function CodeCopyButton({ code }: CodeCopyButtonProps) {
   const { i18n } = useLingui();
+  const runtime = useBlockEditorRuntime();
   const [copied, setCopied] = useState(false);
   const copyLabel = i18n._({
     id: "block-editor.code.copy",
@@ -29,7 +32,7 @@ export function CodeCopyButton({ code }: CodeCopyButtonProps) {
   }, [copied]);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
+    await runtime.clipboard.writeText(code);
     setCopied(true);
   };
 
