@@ -11,7 +11,7 @@ import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
 import { useOpenBlockRequest } from "./navigation/use-open-block-request";
 import { useBlockMutations } from "./use-block-mutations";
-import { type WorkspaceCommands } from "./workspace-runtime-context";
+import { type WorkspaceCommands } from "./workspace-state-context";
 
 export function useWorkspaceDataBoundary() {
   const [visibility, setVisibility] = useState<BlockVisibility>("active");
@@ -121,7 +121,7 @@ export function useWorkspaceDataBoundary() {
     ],
   );
 
-  const runtimeContextValue = useMemo(
+  const stateContextValue = useMemo(
     () => ({
       commands,
       isTagCreatePending: tagData.isTagOpPending("create"),
@@ -147,7 +147,7 @@ export function useWorkspaceDataBoundary() {
     blockNavigation,
     commands,
     editorRegistry,
-    runtimeContextValue,
+    stateContextValue,
     tagData,
     viewState: {
       selectedTagIds,

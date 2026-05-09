@@ -18,7 +18,7 @@ export interface WorkspaceCommands {
   submitExternalEdit: (blockId: string, editId: string) => void;
 }
 
-export interface WorkspaceBlockRuntimeState {
+export interface WorkspaceBlockState {
   externalEditSession: ExternalEditSession | undefined;
   isArchivePending: boolean;
   isDeletePending: boolean;
@@ -28,7 +28,7 @@ export interface WorkspaceBlockRuntimeState {
   visibility: BlockVisibility;
 }
 
-interface WorkspaceRuntimeContextValue {
+interface WorkspaceStateContextValue {
   commands: WorkspaceCommands;
   isTagCreatePending: boolean;
   pendingBlockOps: WorkspacePendingBlockOps;
@@ -38,38 +38,36 @@ interface WorkspaceRuntimeContextValue {
   visibility: BlockVisibility;
 }
 
-const WorkspaceRuntimeContext = createContext<WorkspaceRuntimeContextValue | null>(null);
+const WorkspaceStateContext = createContext<WorkspaceStateContextValue | null>(null);
 
-function useWorkspaceRuntimeContext(): WorkspaceRuntimeContextValue {
-  const ctx = useContext(WorkspaceRuntimeContext);
+function useWorkspaceStateContext(): WorkspaceStateContextValue {
+  const ctx = useContext(WorkspaceStateContext);
   if (!ctx) {
-    throw new Error("useWorkspaceRuntimeContext must be used within WorkspaceRuntimeProvider");
+    throw new Error("useWorkspaceStateContext must be used within WorkspaceStateProvider");
   }
   return ctx;
 }
 
-export function WorkspaceRuntimeProvider({
+export function WorkspaceStateProvider({
   value,
   children,
 }: {
-  value: WorkspaceRuntimeContextValue;
+  value: WorkspaceStateContextValue;
   children: ReactNode;
 }) {
-  return (
-    <WorkspaceRuntimeContext.Provider value={value}>{children}</WorkspaceRuntimeContext.Provider>
-  );
+  return <WorkspaceStateContext.Provider value={value}>{children}</WorkspaceStateContext.Provider>;
 }
 
 export function useWorkspaceCommands(): WorkspaceCommands {
-  return useWorkspaceRuntimeContext().commands;
+  return useWorkspaceStateContext().commands;
 }
 
 export function useWorkspaceTags(): Tag[] {
-  return useWorkspaceRuntimeContext().tags;
+  return useWorkspaceStateContext().tags;
 }
 
-export function useWorkspaceBlockRuntimeState(blockId: string): WorkspaceBlockRuntimeState {
-  const ctx = useWorkspaceRuntimeContext();
+export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
+  const ctx = useWorkspaceStateContext();
   return useMemo(() => {
     const externalEditSession = ctx.sessionsByBlockId.get(blockId);
     const isExternalEditPending = externalEditSession

@@ -7,17 +7,17 @@ import {
 } from "@renderer/features/block";
 import { memo, useCallback, useRef, useState } from "react";
 
-import type { WorkspaceBlockRuntimeState, WorkspaceCommands } from "../workspace-runtime-context";
+import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 import { useEditorRegistryContext } from "./editor-registry-context";
 
 interface WorkspaceBlockEditorProps {
   block: Block;
   commands: WorkspaceCommands;
-  runtime: WorkspaceBlockRuntimeState;
+  state: WorkspaceBlockState;
   tags: Tag[];
 }
 
-function WorkspaceBlockActions({ block, commands, runtime, tags }: WorkspaceBlockEditorProps) {
+function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockEditorProps) {
   const registry = useEditorRegistryContext();
 
   const handleCopy = useCallback(() => {
@@ -43,12 +43,12 @@ function WorkspaceBlockActions({ block, commands, runtime, tags }: WorkspaceBloc
   return (
     <BlockActions
       block={block}
-      visibility={runtime.visibility}
+      visibility={state.visibility}
       tags={tags}
-      isDisabled={runtime.isLocked}
-      isArchivePending={runtime.isArchivePending}
-      isDeletePending={runtime.isDeletePending}
-      isTagOpPending={runtime.isTagCreatePending}
+      isDisabled={state.isLocked}
+      isArchivePending={state.isArchivePending}
+      isDeletePending={state.isDeletePending}
+      isTagOpPending={state.isTagCreatePending}
       onArchive={() => {
         commands.archiveBlock(block.id);
       }}
@@ -56,8 +56,8 @@ function WorkspaceBlockActions({ block, commands, runtime, tags }: WorkspaceBloc
         commands.restoreBlock(block.id);
       }}
       onDelete={() => {
-        if (runtime.externalEditSession) {
-          commands.cancelExternalEdit(runtime.externalEditSession.editId);
+        if (state.externalEditSession) {
+          commands.cancelExternalEdit(state.externalEditSession.editId);
           return;
         }
 
@@ -97,7 +97,7 @@ function WorkspaceExternalEditActions({
 export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   block,
   commands,
-  runtime,
+  state,
   tags,
 }: WorkspaceBlockEditorProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -111,7 +111,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     [block.id, registry],
   );
 
-  const shouldRenderActions = isActionAreaActive || Boolean(runtime.externalEditSession);
+  const shouldRenderActions = isActionAreaActive || Boolean(state.externalEditSession);
 
   return (
     <div
@@ -139,22 +139,17 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         ref={setEditorRef}
         actions={
           shouldRenderActions ? (
-            <WorkspaceBlockActions
-              block={block}
-              commands={commands}
-              runtime={runtime}
-              tags={tags}
-            />
+            <WorkspaceBlockActions block={block} commands={commands} state={state} tags={tags} />
           ) : null
         }
-        isExternalEditPending={Boolean(runtime.externalEditSession)}
+        isExternalEditPending={Boolean(state.externalEditSession)}
         leadingActions={
-          runtime.externalEditSession ? (
+          state.externalEditSession ? (
             <WorkspaceExternalEditActions
               blockId={block.id}
-              editId={runtime.externalEditSession.editId}
+              editId={state.externalEditSession.editId}
               commands={commands}
-              isPending={runtime.isExternalEditPending}
+              isPending={state.isExternalEditPending}
             />
           ) : null
         }

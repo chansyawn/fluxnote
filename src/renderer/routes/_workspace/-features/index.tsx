@@ -10,7 +10,7 @@ import {
 } from "./view/workspace-empty-state";
 import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-actions-portal";
 import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
-import { WorkspaceRuntimeProvider } from "./workspace-runtime-context";
+import { WorkspaceStateProvider } from "./workspace-state-context";
 
 export function BlockWorkspace() {
   const {
@@ -19,7 +19,7 @@ export function BlockWorkspace() {
     blockNavigation,
     commands,
     editorRegistry,
-    runtimeContextValue,
+    stateContextValue,
     tagData,
     viewState,
   } = useWorkspaceDataBoundary();
@@ -85,7 +85,7 @@ export function BlockWorkspace() {
           <WorkspaceFilteredEmptyState visibility={visibility} />
         )
       ) : (
-        <WorkspaceRuntimeProvider value={runtimeContextValue}>
+        <WorkspaceStateProvider value={stateContextValue}>
           <EditorRegistryProvider value={registryContextValue}>
             <VirtualBlockList
               totalCount={totalBlockCount}
@@ -95,7 +95,7 @@ export function BlockWorkspace() {
               onScrollTargetRendered={blockNavigation.targetRendered}
             />
           </EditorRegistryProvider>
-        </WorkspaceRuntimeProvider>
+        </WorkspaceStateProvider>
       )}
     </section>
   );

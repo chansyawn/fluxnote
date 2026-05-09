@@ -3,10 +3,10 @@ import { memo } from "react";
 
 import { WorkspaceBlockEditor } from "../editing/workspace-block-editor";
 import {
-  useWorkspaceBlockRuntimeState,
+  useWorkspaceBlockState,
   useWorkspaceCommands,
   useWorkspaceTags,
-} from "../workspace-runtime-context";
+} from "../workspace-state-context";
 
 function BlockListPlaceholder() {
   return <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />;
@@ -15,9 +15,9 @@ function BlockListPlaceholder() {
 function BlockListItem({ block }: { block: Block }) {
   const commands = useWorkspaceCommands();
   const tags = useWorkspaceTags();
-  const runtime = useWorkspaceBlockRuntimeState(block.id);
+  const state = useWorkspaceBlockState(block.id);
 
-  return <WorkspaceBlockEditor block={block} commands={commands} tags={tags} runtime={runtime} />;
+  return <WorkspaceBlockEditor block={block} commands={commands} tags={tags} state={state} />;
 }
 
 interface BlockListRowProps {
