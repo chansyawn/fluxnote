@@ -1,24 +1,18 @@
 import { defineExtension } from "lexical";
 import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 
-import { UNAVAILABLE_BLOCK_EDITOR_RUNTIME } from "../core/runtime-defaults";
-import type { BlockEditorRuntime } from "../core/types";
+import { BlockEditorRuntimeExtension } from "../core/runtime-extension";
 import { createClipboardDataFromCurrentSelection } from "./clipboard-data";
 import { cloneCurrentSelection } from "./clipboard-insert";
 import { handleBlockEditorPaste } from "./paste-pipeline";
-
-export interface ClipboardExtensionConfig {
-  runtime: BlockEditorRuntime;
-}
 
 export { createClipboardDataSnapshot } from "./paste-pipeline";
 
 export const ClipboardExtension = defineExtension({
   name: "fluxnotes/block-editor/clipboard",
-  config: {
-    runtime: UNAVAILABLE_BLOCK_EDITOR_RUNTIME,
-  } satisfies ClipboardExtensionConfig,
-  register(editor, config) {
+  dependencies: [BlockEditorRuntimeExtension],
+  register(editor, _config, state) {
+    const runtime = state.getDependency(BlockEditorRuntimeExtension).config.runtime;
     const unregisterCopy = editor.registerCommand(
       COPY_COMMAND,
       (event) => {
@@ -26,10 +20,10 @@ export const ClipboardExtension = defineExtension({
           event.preventDefault();
         }
 
-        void createClipboardDataFromCurrentSelection(editor, config.runtime.assets.resolve).then(
+        void createClipboardDataFromCurrentSelection(editor, runtime.assets.resolve).then(
           (data) => {
             if (data !== null) {
-              void config.runtime.clipboard.write(data);
+              void runtime.clipboard.write(data);
             }
           },
         );
@@ -39,7 +33,7 @@ export const ClipboardExtension = defineExtension({
     );
     const unregisterPaste = editor.registerCommand(
       PASTE_COMMAND,
-      (event) => handleBlockEditorPaste(editor, config.runtime, event, cloneCurrentSelection()),
+      (event) => handleBlockEditorPaste(editor, runtime, event, cloneCurrentSelection()),
       COMMAND_PRIORITY_CRITICAL,
     );
 

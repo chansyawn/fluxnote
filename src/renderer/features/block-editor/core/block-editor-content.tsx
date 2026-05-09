@@ -10,10 +10,10 @@ import { useImperativeHandle, type Ref } from "react";
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { CODE_SYNTAX_REACT_EXTENSION } from "../syntax/code";
-import { IMAGE_SYNTAX_EXTENSION } from "../syntax/image";
 import { createBlockEditorCoreExtension } from "./block-editor-core-extension";
 import { importMarkdownToEditor } from "./markdown-editor-io";
 import { useBlockEditorRuntime } from "./runtime-context";
+import { BlockEditorRuntimeExtension } from "./runtime-extension";
 import type { BlockEditorHandle } from "./types";
 import type { BlockEditorRuntime } from "./types";
 
@@ -37,17 +37,11 @@ export function createBlockEditorContentExtension(config: BlockEditorContentExte
     namespace: config.namespace ?? "BlockEditor",
     $initialEditorState: createInitialMarkdownEditorState(config.initialMarkdown),
     dependencies: [
-      configExtension(ReactExtension, {
-        contentEditable: null,
-      }),
+      configExtension(ReactExtension, { contentEditable: null }),
+      configExtension(BlockEditorRuntimeExtension, { runtime: config.runtime }),
       CODE_SYNTAX_REACT_EXTENSION,
       createBlockEditorCoreExtension(config.namespace ?? "BlockEditor"),
-      configExtension(IMAGE_SYNTAX_EXTENSION, {
-        runtime: config.runtime,
-      }),
-      configExtension(ClipboardExtension, {
-        runtime: config.runtime,
-      }),
+      ClipboardExtension,
       HistoryExtension,
     ],
     onError(error) {

@@ -2,8 +2,7 @@ import "./index.css";
 import { mergeRegister } from "@lexical/utils";
 import { defineExtension } from "lexical";
 
-import { UNAVAILABLE_BLOCK_EDITOR_RUNTIME } from "../../core/runtime-defaults";
-import type { BlockEditorRuntime } from "../../core/types";
+import { BlockEditorRuntimeExtension } from "../../core/runtime-extension";
 import type { SyntaxRegistration } from "../registration";
 import { registerImageInsertCommands } from "./image-insert-commands";
 import { $isImageNode, ImageNode } from "./image-node";
@@ -26,20 +25,16 @@ export { IMAGE } from "./image-shortcut";
 
 export const IMAGE_MARKDOWN_SHORTCUT_TRANSFORMERS = [IMAGE];
 
-export interface ImageSyntaxExtensionConfig {
-  runtime: BlockEditorRuntime;
-}
-
 export const IMAGE_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/image",
-  config: {
-    runtime: UNAVAILABLE_BLOCK_EDITOR_RUNTIME,
-  } satisfies ImageSyntaxExtensionConfig,
+  dependencies: [BlockEditorRuntimeExtension],
   nodes: [ImageNode],
-  register(editor, config) {
+  register(editor, _config, state) {
+    const runtime = state.getDependency(BlockEditorRuntimeExtension).config.runtime;
+
     return mergeRegister(
       registerImageOutlineCommands(editor),
-      registerImageInsertCommands(editor, config.runtime),
+      registerImageInsertCommands(editor, runtime),
       registerImageSelectionCommands(editor),
     );
   },

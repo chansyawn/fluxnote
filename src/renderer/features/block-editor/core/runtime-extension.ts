@@ -1,3 +1,5 @@
+import { defineExtension } from "lexical";
+
 import type { BlockEditorRuntime } from "./types";
 
 function throwMissingRuntime(): never {
@@ -15,3 +17,14 @@ export const UNAVAILABLE_BLOCK_EDITOR_RUNTIME: BlockEditorRuntime = {
     writeText: async () => throwMissingRuntime(),
   },
 };
+
+export interface BlockEditorRuntimeExtensionConfig {
+  runtime: BlockEditorRuntime;
+}
+
+export const BlockEditorRuntimeExtension = defineExtension({
+  name: "fluxnotes/block-editor/runtime",
+  config: {
+    runtime: UNAVAILABLE_BLOCK_EDITOR_RUNTIME,
+  } satisfies BlockEditorRuntimeExtensionConfig,
+});
