@@ -57,13 +57,13 @@ Fluxnotes 的目标是成为一个轻量、全局可用、适合 AI 工作流的
 如果你希望 Claude Code 或 Codex 的外部编辑流程直接打开 Fluxnotes，可以在 shell 中设置：
 
 ```bash
-export EDITOR="flux --edit"
+export EDITOR="flux edit"
 ```
 
 如果希望长期生效：
 
 ```bash
-echo 'export EDITOR="flux --edit"' >> ~/.zshrc
+echo 'export EDITOR="flux edit"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -72,8 +72,8 @@ source ~/.zshrc
 如果你只想对 Codex / Claude 单独启用（不修改全局 `EDITOR`），可以加别名：
 
 ```bash
-alias cdx='EDITOR="flux --edit" codex'
-alias cld='EDITOR="flux --edit" claude'
+alias cdx='EDITOR="flux edit" codex'
+alias cld='EDITOR="flux edit" claude'
 ```
 
 之后使用 `cdx` 或 `cld` 启动即可。

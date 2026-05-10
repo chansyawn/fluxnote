@@ -57,13 +57,13 @@ Core design goals:
 If you want Claude Code or Codex to open external edits in Fluxnotes, set your shell editor to:
 
 ```bash
-export EDITOR="flux --edit"
+export EDITOR="flux edit"
 ```
 
 To make it persistent:
 
 ```bash
-echo 'export EDITOR="flux --edit"' >> ~/.zshrc
+echo 'export EDITOR="flux edit"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -72,8 +72,8 @@ Then when Claude Code or Codex triggers an external editor flow, the target file
 If you prefer enabling this only for Codex / Claude commands (without changing global `EDITOR`), add aliases:
 
 ```bash
-alias cdx='EDITOR="flux --edit" codex'
-alias cld='EDITOR="flux --edit" claude'
+alias cdx='EDITOR="flux edit" codex'
+alias cld='EDITOR="flux edit" claude'
 ```
 
 Then use `cdx` or `cld` when you want Fluxnotes-backed external editing.

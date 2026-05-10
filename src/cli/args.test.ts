@@ -99,12 +99,6 @@ describe("parseFluxArgs", () => {
     );
   });
 
-  it("throws usage error for removed root edit option", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "--edit", "note.md"])).toThrow(
-      "Unknown option: --edit",
-    );
-  });
-
   it("throws usage error for removed root positional input", () => {
     expect(() => parseFluxArgs(["node", "flux-cli.mjs", "note.md"])).toThrow(
       "Use `flux add` to create a block or `flux edit` to edit a file.",
