@@ -2,7 +2,9 @@ import {
   $createTableCellNode,
   $createTableRowNode,
   $deleteTableColumn,
+  $getTableColumnIndexFromTableCellNode,
   $getTableNodeFromLexicalNodeOrThrow,
+  $getTableRowIndexFromTableCellNode,
   $isTableCellNode,
   $isTableRowNode,
   $moveTableColumn,
@@ -40,25 +42,19 @@ export function getTableRowCount(tableNode: TableNode): number {
 }
 
 export function getTableCellColumnIndex(cellNode: TableCellNode): number {
-  const rowNode = cellNode.getParent();
-  if (!$isTableRowNode(rowNode)) {
-    return -1;
-  }
-
-  return rowNode.getChildren().findIndex((child) => child.is(cellNode));
+  return $getTableColumnIndexFromTableCellNode(cellNode);
 }
 
 export function getTableCellRowIndex(cellNode: TableCellNode): number {
-  const rowNode = cellNode.getParent();
-  const tableNode = rowNode?.getParent();
-  if (!$isTableRowNode(rowNode) || !tableNode) {
-    return -1;
-  }
+  return $getTableRowIndexFromTableCellNode(cellNode);
+}
 
-  return tableNode
-    .getChildren()
-    .filter($isTableRowNode)
-    .findIndex((child) => child.is(rowNode));
+function getRows(tableNode: TableNode): TableRowNode[] {
+  return tableNode.getChildren().filter($isTableRowNode);
+}
+
+function getCells(rowNode: TableRowNode): TableCellNode[] {
+  return rowNode.getChildren().filter($isTableCellNode);
 }
 
 function getCellNodeAt(
@@ -66,16 +62,11 @@ function getCellNodeAt(
   rowIndex: number,
   columnIndex: number,
 ): TableCellNode | null {
-  const rowNode = tableNode.getChildren().filter($isTableRowNode).at(rowIndex);
-  const cellNode = rowNode?.getChildren().filter($isTableCellNode).at(columnIndex);
-  return cellNode ?? null;
+  const rowNode = getRows(tableNode).at(rowIndex);
+  return rowNode ? (getCells(rowNode).at(columnIndex) ?? null) : null;
 }
 
 type TableCellHeaderState = (typeof TableCellHeaderStates)[keyof typeof TableCellHeaderStates];
-
-function createTableCell(headerState: TableCellHeaderState): TableCellNode {
-  return $createTableCellNode(headerState).append($createParagraphNode());
-}
 
 function getHeaderState(
   currentState: TableCellHeaderState,
@@ -88,28 +79,38 @@ function getHeaderState(
   return TableCellHeaderStates.NO_STATUS;
 }
 
-function insertTableRowAtCell(cellNode: TableCellNode, insertAfter: boolean): TableRowNode | null {
-  const tableNode = $getTableNodeFromLexicalNodeOrThrow(cellNode);
-  const rowIndex = getTableCellRowIndex(cellNode);
-  const targetRow = tableNode.getChildren().filter($isTableRowNode).at(rowIndex);
-  if (!targetRow) {
-    return null;
-  }
+function createTableCell(headerState: TableCellHeaderState): TableCellNode {
+  return $createTableCellNode(headerState).append($createParagraphNode());
+}
 
-  const newRow = $createTableRowNode();
-  for (const cell of targetRow.getChildren().filter($isTableCellNode)) {
-    newRow.append(
+function cloneEmptyRowFrom(rowNode: TableRowNode): TableRowNode {
+  const clone = $createTableRowNode(rowNode.getHeight());
+  for (const cell of getCells(rowNode)) {
+    clone.append(
       createTableCell(getHeaderState(cell.getHeaderStyles(), TableCellHeaderStates.COLUMN)),
     );
   }
+  return clone;
+}
 
-  if (insertAfter) {
-    targetRow.insertAfter(newRow);
-    return newRow;
+function insertTableRowAtCell(cellNode: TableCellNode, insertAfter: boolean): TableRowNode | null {
+  const rowNode = cellNode.getParent();
+  if (!$isTableRowNode(rowNode)) {
+    return null;
   }
 
-  targetRow.insertBefore(newRow);
-  return newRow;
+  const insertedRow = cloneEmptyRowFrom(rowNode);
+  if (insertAfter) {
+    rowNode.insertAfter(insertedRow);
+    return insertedRow;
+  }
+
+  rowNode.insertBefore(insertedRow);
+  return insertedRow;
+}
+
+function cloneEmptyCellFrom(cellNode: TableCellNode): TableCellNode {
+  return createTableCell(getHeaderState(cellNode.getHeaderStyles(), TableCellHeaderStates.ROW));
 }
 
 function insertTableColumnAtCell(
@@ -120,18 +121,12 @@ function insertTableColumnAtCell(
   const columnIndex = getTableCellColumnIndex(cellNode);
   let firstInsertedCell: TableCellNode | null = null;
 
-  for (const row of tableNode.getChildren().filter($isTableRowNode)) {
-    const cells = row.getChildren().filter($isTableCellNode);
-    const anchorCell = cells.at(columnIndex);
+  for (const row of getRows(tableNode)) {
+    const anchorCell = getCells(row).at(columnIndex);
     if (!anchorCell) continue;
 
-    const insertedCell = createTableCell(
-      getHeaderState(anchorCell.getHeaderStyles(), TableCellHeaderStates.ROW),
-    );
-    if (!firstInsertedCell) {
-      firstInsertedCell = insertedCell;
-    }
-
+    const insertedCell = cloneEmptyCellFrom(anchorCell);
+    firstInsertedCell ??= insertedCell;
     if (insertAfter) {
       anchorCell.insertAfter(insertedCell);
     } else {
@@ -141,18 +136,18 @@ function insertTableColumnAtCell(
 
   const colWidths = tableNode.getColWidths();
   if (colWidths) {
-    const newColWidths = [...colWidths];
+    const nextColWidths = [...colWidths];
     const widthIndex = insertAfter ? columnIndex + 1 : columnIndex;
-    newColWidths.splice(widthIndex, 0, newColWidths[columnIndex] ?? 0);
-    tableNode.setColWidths(newColWidths);
+    nextColWidths.splice(widthIndex, 0, nextColWidths[columnIndex] ?? 0);
+    tableNode.setColWidths(nextColWidths);
   }
 
   return firstInsertedCell;
 }
 
 function moveTableRow(rowNode: TableRowNode, targetRowIndex: number): void {
-  const tableNode = rowNode.getParentOrThrow();
-  const rows = tableNode.getChildren().filter($isTableRowNode);
+  const tableNode = $getTableNodeFromLexicalNodeOrThrow(rowNode);
+  const rows = getRows(tableNode);
   const currentRowIndex = rows.findIndex((child) => child.is(rowNode));
   const targetRowNode = rows.at(targetRowIndex);
 
@@ -162,10 +157,9 @@ function moveTableRow(rowNode: TableRowNode, targetRowIndex: number): void {
 
   if (currentRowIndex < targetRowIndex) {
     targetRowNode.insertAfter(rowNode);
-    return;
+  } else {
+    targetRowNode.insertBefore(rowNode);
   }
-
-  targetRowNode.insertBefore(rowNode);
 }
 
 function selectCell(cellNode: TableCellNode | null): void {
@@ -220,12 +214,12 @@ function applyTableStructureOperation(payload: TableStructureOperationPayload): 
     }
     case "insert-row-above": {
       const insertedRow = insertTableRowAtCell(node, false);
-      selectCell(insertedRow?.getChildren().filter($isTableCellNode).at(columnIndex) ?? null);
+      selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "insert-row-below": {
       const insertedRow = insertTableRowAtCell(node, true);
-      selectCell(insertedRow?.getChildren().filter($isTableCellNode).at(columnIndex) ?? null);
+      selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "move-row-up": {
@@ -253,7 +247,10 @@ export function performTableStructureOperation(
   editor: LexicalEditor,
   payload: TableStructureOperationPayload,
 ): void {
-  editor.update(() => {
-    applyTableStructureOperation(payload);
-  });
+  editor.update(
+    () => {
+      applyTableStructureOperation(payload);
+    },
+    { discrete: true },
+  );
 }

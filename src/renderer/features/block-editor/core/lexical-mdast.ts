@@ -8,31 +8,18 @@ import {
   type EditorState,
   type LexicalEditor,
   type LexicalNode,
-  type TextFormatType,
 } from "lexical";
-import type {
-  BlockContent,
-  DefinitionContent,
-  Delete,
-  Emphasis,
-  PhrasingContent,
-  Root,
-  RootContent,
-  Strong,
-  Text,
-} from "mdast";
+import type { BlockContent, DefinitionContent, PhrasingContent, Root, RootContent } from "mdast";
 
 import { stringifyMdastToMarkdown } from "../markdown/processor";
-import { $createSoftBreakNode, $isSoftBreakNode } from "../syntax/break";
 import { codeBlockFromLexical, codeBlockToLexical } from "../syntax/code/lexical";
 import { headingFromLexical, headingToLexical } from "../syntax/heading/lexical";
-import { imageFromLexical, imageToLexical } from "../syntax/image/lexical";
-import { linkFromLexical, linkToLexical } from "../syntax/link/lexical";
 import { listFromLexical, listItemFromLexical, listToLexical } from "../syntax/list/lexical";
 import { paragraphFromLexical, paragraphToLexical } from "../syntax/paragraph/lexical";
 import { quoteFromLexical, quoteToLexical } from "../syntax/quote/lexical";
 import { tableFromLexical, tableToLexical } from "../syntax/table/lexical";
 import { thematicBreakFromLexical, thematicBreakToLexical } from "../syntax/thematic-break/lexical";
+import { inlineFromLexical, inlineToLexical } from "./inline-lexical-mdast";
 import { normalizeMdast } from "./normalize-mdast";
 
 // mdast Blockquote / ListItem children allow definitions and footnote
@@ -42,62 +29,6 @@ type ContainerChild = BlockContent | DefinitionContent;
 // ============================================================================
 // mdast → Lexical
 // ============================================================================
-
-function applyTextFormats(
-  node: ReturnType<typeof $createTextNode>,
-  formats: ReadonlyArray<TextFormatType>,
-) {
-  for (const format of formats) {
-    node.toggleFormat(format);
-  }
-  return node;
-}
-
-function textValueToLexical(value: string, formats: ReadonlyArray<TextFormatType>): LexicalNode[] {
-  const parts = value.split("\n");
-  const nodes: LexicalNode[] = [];
-  parts.forEach((part, index) => {
-    if (index > 0) nodes.push($createSoftBreakNode());
-    if (part.length > 0) nodes.push(applyTextFormats($createTextNode(part), formats));
-  });
-  return nodes;
-}
-
-function inlineToLexical(
-  node: PhrasingContent,
-  formats: ReadonlyArray<TextFormatType> = [],
-): LexicalNode[] {
-  switch (node.type) {
-    case "text":
-      return textValueToLexical(node.value, formats);
-    case "emphasis":
-      return node.children.flatMap((child) => inlineToLexical(child, [...formats, "italic"]));
-    case "strong":
-      return node.children.flatMap((child) => inlineToLexical(child, [...formats, "bold"]));
-    case "delete":
-      return node.children.flatMap((child) =>
-        inlineToLexical(child, [...formats, "strikethrough"]),
-      );
-    case "inlineCode":
-      return [applyTextFormats($createTextNode(node.value), [...formats, "code"])];
-    case "link":
-      return [linkToLexical(node, (child) => inlineToLexical(child, formats))];
-    case "image":
-      return [imageToLexical(node)];
-    case "break":
-      return [$createSoftBreakNode()];
-    default:
-      return fallbackInlineText(node, formats);
-  }
-}
-
-function fallbackInlineText(
-  node: PhrasingContent,
-  formats: ReadonlyArray<TextFormatType>,
-): LexicalNode[] {
-  const literal = stringifyAsInline(node);
-  return literal ? [applyTextFormats($createTextNode(literal), formats)] : [];
-}
 
 function blockToLexical(node: ContainerChild): LexicalNode[] {
   switch (node.type) {
@@ -139,14 +70,6 @@ function stringifyAsBlock(node: RootContent): string {
   return stringifyMdastToMarkdown(wrapped).trim();
 }
 
-function stringifyAsInline(node: PhrasingContent): string {
-  const wrapped: Root = {
-    children: [{ children: [node], type: "paragraph" }],
-    type: "root",
-  };
-  return stringifyMdastToMarkdown(wrapped).trim();
-}
-
 function isContainerChild(node: RootContent | DefinitionContent): node is ContainerChild {
   return (
     node.type === "blockquote" ||
@@ -162,60 +85,6 @@ function isContainerChild(node: RootContent | DefinitionContent): node is Contai
 // ============================================================================
 // Lexical → mdast
 // ============================================================================
-
-function inlineFromLexical(node: LexicalNode): PhrasingContent[] {
-  if ($isTextNode(node)) {
-    return textNodeToInline(node);
-  }
-  if ($isSoftBreakNode(node)) {
-    return [{ type: "text", value: "\n" } satisfies Text];
-  }
-  if ($isLineBreakNode(node)) {
-    return [{ type: "break" }];
-  }
-
-  const link = linkFromLexical(node, inlineFromLexical);
-  if (link) return [link];
-
-  const image = imageFromLexical(node);
-  if (image) return [image];
-
-  return [];
-}
-
-function textNodeToInline(node: LexicalNode): PhrasingContent[] {
-  if (!$isTextNode(node)) return [];
-
-  const value = node.getTextContent();
-  if (value.length === 0) return [];
-
-  return value.split("\n").flatMap((part, index): PhrasingContent[] => {
-    const inlines: PhrasingContent[] = index > 0 ? [{ type: "text", value: "\n" }] : [];
-    if (part.length === 0) return inlines;
-
-    const base: PhrasingContent = node.hasFormat("code")
-      ? { type: "inlineCode", value: part }
-      : ({ type: "text", value: part } satisfies Text);
-    inlines.push(wrapWithFormats(base, node));
-    return inlines;
-  });
-}
-
-function wrapWithFormats(inline: PhrasingContent, textNode: LexicalNode): PhrasingContent {
-  if (!$isTextNode(textNode)) return inline;
-
-  let current = inline;
-  if (textNode.hasFormat("bold")) {
-    current = { children: [current], type: "strong" } satisfies Strong;
-  }
-  if (textNode.hasFormat("italic")) {
-    current = { children: [current], type: "emphasis" } satisfies Emphasis;
-  }
-  if (textNode.hasFormat("strikethrough")) {
-    current = { children: [current], type: "delete" } satisfies Delete;
-  }
-  return current;
-}
 
 function blockFromLexical(node: LexicalNode): BlockContent[] {
   if ($isParagraphNode(node)) {

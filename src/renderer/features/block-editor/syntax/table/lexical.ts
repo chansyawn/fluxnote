@@ -20,6 +20,8 @@ import type { AlignType, PhrasingContent, Table, TableCell, TableRow } from "mda
 
 import { paragraphToLexical } from "../paragraph";
 
+const EMPTY_TABLE_CELL: TableCell = { children: [], type: "tableCell" };
+
 function alignToFormat(align: AlignType | null | undefined): ElementFormatType {
   return align === "left" || align === "center" || align === "right" ? align : "";
 }
@@ -51,11 +53,17 @@ function tableRowToLexical(
   writeInline: (child: PhrasingContent) => LexicalNode[],
   isHeader: boolean,
   align: ReadonlyArray<AlignType | null>,
+  columnCount: number,
 ): TableRowNode {
   const rowNode = $createTableRowNode();
   rowNode.append(
-    ...row.children.map((cell, index) =>
-      tableCellToLexical(cell, writeInline, isHeader, align[index] ?? null),
+    ...Array.from({ length: columnCount }, (_, index) =>
+      tableCellToLexical(
+        row.children[index] ?? EMPTY_TABLE_CELL,
+        writeInline,
+        isHeader,
+        align[index] ?? null,
+      ),
     ),
   );
   return rowNode;
@@ -66,9 +74,12 @@ export function tableToLexical(
   writeInline: (child: PhrasingContent) => LexicalNode[],
 ): LexicalNode {
   const align: ReadonlyArray<AlignType | null> = node.align ?? [];
+  const columnCount = Math.max(...node.children.map((row) => row.children.length), 0);
   const table = $createTableNode();
   table.append(
-    ...node.children.map((row, index) => tableRowToLexical(row, writeInline, index === 0, align)),
+    ...node.children.map((row, index) =>
+      tableRowToLexical(row, writeInline, index === 0, align, columnCount),
+    ),
   );
   return table;
 }

@@ -1,6 +1,78 @@
-import { describe, it } from "vitest";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $isElementNode,
+  type LexicalEditor,
+  type NodeKey,
+} from "lexical";
+import type { Table } from "mdast";
+import { describe, expect, it } from "vite-plus/test";
 
 import { expectMarkdownRoundTripStable } from "../../test-helper/assertions";
+import {
+  createHeadlessEditor,
+  editorFromMarkdown,
+  readMarkdown,
+  readMdast,
+} from "../../test-helper/editor-driver";
+import { pressEnter } from "../../test-helper/interaction-driver";
+import { performTableStructureOperation, type TableStructureOperation } from "./table-operations";
+import { insertMarkdownTablesAtSelection } from "./table-paste";
+
+function getTable(editor: LexicalEditor): Table {
+  const child = readMdast(editor).children[0];
+  expect(child?.type).toBe("table");
+  return child as Table;
+}
+
+function getCellKey(editor: LexicalEditor, rowIndex: number, columnIndex: number): NodeKey {
+  let key: NodeKey | null = null;
+
+  editor.getEditorState().read(() => {
+    const table = $getRoot().getFirstChild();
+    const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
+    const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
+    key = cell?.getKey() ?? null;
+  });
+
+  if (!key) {
+    throw new Error(`Unable to find table cell at ${rowIndex}, ${columnIndex}.`);
+  }
+
+  return key;
+}
+
+function createEditorWithTypedTableShortcut(): LexicalEditor {
+  const editor = createHeadlessEditor();
+
+  editor.update(
+    () => {
+      const root = $getRoot();
+      root.clear();
+      root.append(
+        $createParagraphNode().append($createTextNode("| h1 | h2 |")),
+        $createParagraphNode().append($createTextNode("| --- | --- |")),
+      );
+      root.getLastChild()?.selectEnd();
+    },
+    { discrete: true },
+  );
+
+  return editor;
+}
+
+function performOperation(
+  editor: LexicalEditor,
+  rowIndex: number,
+  columnIndex: number,
+  operation: TableStructureOperation,
+): void {
+  performTableStructureOperation(editor, {
+    cellKey: getCellKey(editor, rowIndex, columnIndex),
+    operation,
+  });
+}
 
 describe("table", () => {
   it("round-trips a simple table", () => {
@@ -16,5 +88,96 @@ describe("table", () => {
       "",
     ].join("\n");
     expectMarkdownRoundTripStable(markdown);
+  });
+
+  it("pads ragged table rows during markdown import", () => {
+    const editor = editorFromMarkdown(
+      ["| h1 | h2 | h3 |", "| -- | -- | -- |", "| a  |", ""].join("\n"),
+    );
+
+    expect(getTable(editor).children[1].children).toMatchObject([
+      { children: [{ type: "text", value: "a" }], type: "tableCell" },
+      { children: [], type: "tableCell" },
+      { children: [], type: "tableCell" },
+    ]);
+  });
+
+  it("inserts pasted markdown tables with shared inline conversion", () => {
+    const editor = createHeadlessEditor();
+
+    const didInsert = insertMarkdownTablesAtSelection(
+      editor,
+      [
+        "| Name | Link | Code |",
+        "| --- | --- | --- |",
+        "| **Bold** | [site](https://example.com) | `x` |",
+        "",
+      ].join("\n"),
+      null,
+    );
+
+    expect(didInsert).toBe(true);
+    const markdown = readMarkdown(editor);
+    expect(markdown).toContain("**Bold**");
+    expect(markdown).toContain("[site](https://example.com)");
+    expect(markdown).toContain("`x`");
+  });
+
+  it("typed delimiter shortcut creates a table", () => {
+    const editor = createEditorWithTypedTableShortcut();
+
+    expect(pressEnter(editor)).toBe(true);
+    const result = readMdast(editor);
+
+    expect(result.children[0]).toMatchObject({
+      children: [
+        {
+          children: [
+            { children: [{ type: "text", value: "h1" }], type: "tableCell" },
+            { children: [{ type: "text", value: "h2" }], type: "tableCell" },
+          ],
+          type: "tableRow",
+        },
+        {
+          children: [
+            { children: [], type: "tableCell" },
+            { children: [], type: "tableCell" },
+          ],
+          type: "tableRow",
+        },
+      ],
+      type: "table",
+    });
+  });
+
+  it("performs row and column structure operations", () => {
+    const editor = editorFromMarkdown(
+      ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", "| c  | d  |", ""].join("\n"),
+    );
+
+    performOperation(editor, 1, 1, "insert-column-left");
+    expect(getTable(editor).children[0].children).toHaveLength(3);
+
+    performOperation(editor, 2, 0, "move-row-up");
+    expect(getTable(editor).children[1].children[0]).toMatchObject({
+      children: [{ type: "text", value: "c" }],
+    });
+
+    performOperation(editor, 1, 0, "delete-row");
+    expect(getTable(editor).children).toHaveLength(2);
+
+    performOperation(editor, 0, 1, "delete-column");
+    expect(getTable(editor).children[0].children).toHaveLength(2);
+  });
+
+  it("does not delete the last row or last column", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", ""].join("\n"));
+
+    performOperation(editor, 0, 0, "delete-column");
+    performOperation(editor, 0, 0, "delete-row");
+
+    const table = getTable(editor);
+    expect(table.children).toHaveLength(1);
+    expect(table.children[0].children).toHaveLength(1);
   });
 });

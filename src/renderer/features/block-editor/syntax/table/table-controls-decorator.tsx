@@ -3,6 +3,7 @@ import {
   $getTableNodeFromLexicalNodeOrThrow,
   $isTableCellNode,
   $isTableNode,
+  $isTableRowNode,
 } from "@lexical/table";
 import { Button } from "@renderer/ui/components/button";
 import {
@@ -13,13 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@renderer/ui/components/dropdown-menu";
 import clsx from "clsx";
-import {
-  $getNearestNodeFromDOMNode,
-  $getRoot,
-  $isElementNode,
-  type LexicalNode,
-  type NodeKey,
-} from "lexical";
+import { $getNearestNodeFromDOMNode, type NodeKey } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -32,17 +27,23 @@ import {
   type TableStructureOperation,
 } from "./table-operations";
 
-interface TableCellDocumentState {
+interface ActiveTableCellState {
   key: NodeKey;
   tableKey: NodeKey;
   rowIndex: number;
   columnIndex: number;
   rowCount: number;
   columnCount: number;
+  columnStartRect: DOMRect;
+  rowStartRect: DOMRect;
 }
 
-interface TableCellViewState extends TableCellDocumentState {
-  rect: DOMRect;
+interface ActiveTableCellDocumentState extends Omit<
+  ActiveTableCellState,
+  "columnStartRect" | "rowStartRect"
+> {
+  columnStartKey: NodeKey;
+  rowStartKey: NodeKey;
 }
 
 interface TableActionContext {
@@ -65,48 +66,9 @@ interface TableHandleMenuProps {
   editorFocus: () => void;
   handleAction: (operation: TableStructureOperation) => void;
   menuContext: TableActionContext | null;
-  setActiveCellKey: (key: NodeKey | null) => void;
+  setActiveCell: (cell: ActiveTableCellState | null) => void;
   setMenuContext: (context: TableActionContext | null) => void;
   style: React.CSSProperties;
-}
-
-function createActionContext(cell: TableCellViewState, kind: "row" | "column"): TableActionContext {
-  return {
-    cellKey: cell.key,
-    count: kind === "column" ? cell.columnCount : cell.rowCount,
-    index: kind === "column" ? cell.columnIndex : cell.rowIndex,
-    kind,
-    tableKey: cell.tableKey,
-  };
-}
-
-function collectTableCells(node: LexicalNode, cells: TableCellDocumentState[]): void {
-  if ($isTableCellNode(node)) {
-    const tableNode = $getTableNodeFromLexicalNodeOrThrow(node);
-    cells.push({
-      key: node.getKey(),
-      tableKey: tableNode.getKey(),
-      rowIndex: getTableCellRowIndex(node),
-      columnIndex: getTableCellColumnIndex(node),
-      rowCount: getTableRowCount(tableNode),
-      columnCount: getTableColumnCount(tableNode),
-    });
-    return;
-  }
-
-  if (!$isElementNode(node)) {
-    return;
-  }
-
-  for (const child of node.getChildren()) {
-    collectTableCells(child, cells);
-  }
-}
-
-function readTableCells(): TableCellDocumentState[] {
-  const cells: TableCellDocumentState[] = [];
-  collectTableCells($getRoot(), cells);
-  return cells;
 }
 
 function getEditorShellElement(editorRootElement: HTMLElement | null): HTMLElement | null {
@@ -122,27 +84,26 @@ function toShellRect(shellRect: DOMRect, cellRect: DOMRect, shell: HTMLElement):
   });
 }
 
-function areCellViewsEqual(
-  previousCells: ReadonlyArray<TableCellViewState>,
-  nextCells: ReadonlyArray<TableCellViewState>,
-): boolean {
-  if (previousCells.length !== nextCells.length) return false;
+function areRectsEqual(a: DOMRect, b: DOMRect): boolean {
+  return a.left === b.left && a.top === b.top && a.width === b.width && a.height === b.height;
+}
 
-  return previousCells.every((previousCell, index) => {
-    const nextCell = nextCells[index];
-    return (
-      previousCell.key === nextCell.key &&
-      previousCell.tableKey === nextCell.tableKey &&
-      previousCell.rowIndex === nextCell.rowIndex &&
-      previousCell.columnIndex === nextCell.columnIndex &&
-      previousCell.rowCount === nextCell.rowCount &&
-      previousCell.columnCount === nextCell.columnCount &&
-      previousCell.rect.left === nextCell.rect.left &&
-      previousCell.rect.top === nextCell.rect.top &&
-      previousCell.rect.width === nextCell.rect.width &&
-      previousCell.rect.height === nextCell.rect.height
-    );
-  });
+function areActiveCellsEqual(
+  previous: ActiveTableCellState | null,
+  next: ActiveTableCellState | null,
+): boolean {
+  if (!previous || !next) return previous === next;
+
+  return (
+    previous.key === next.key &&
+    previous.tableKey === next.tableKey &&
+    previous.rowIndex === next.rowIndex &&
+    previous.columnIndex === next.columnIndex &&
+    previous.rowCount === next.rowCount &&
+    previous.columnCount === next.columnCount &&
+    areRectsEqual(previous.columnStartRect, next.columnStartRect) &&
+    areRectsEqual(previous.rowStartRect, next.rowStartRect)
+  );
 }
 
 function findCellFromTarget(target: EventTarget | null): HTMLTableCellElement | null {
@@ -165,13 +126,26 @@ function isSameContext(a: TableActionContext | null, b: TableActionContext): boo
   return a?.kind === b.kind && a.tableKey === b.tableKey && a.index === b.index;
 }
 
+function createActionContext(
+  cell: ActiveTableCellState,
+  kind: "row" | "column",
+): TableActionContext {
+  return {
+    cellKey: cell.key,
+    count: kind === "column" ? cell.columnCount : cell.rowCount,
+    index: kind === "column" ? cell.columnIndex : cell.rowIndex,
+    kind,
+    tableKey: cell.tableKey,
+  };
+}
+
 function TableHandleMenu({
   actions,
   context,
   editorFocus,
   handleAction,
   menuContext,
-  setActiveCellKey,
+  setActiveCell,
   setMenuContext,
   style,
 }: TableHandleMenuProps) {
@@ -183,14 +157,13 @@ function TableHandleMenu({
       onOpenChange={(nextOpen) => {
         if (nextOpen) {
           setMenuContext(context);
-          setActiveCellKey(context.cellKey);
           return;
         }
 
         if (open) {
           setMenuContext(null);
           window.requestAnimationFrame(() => {
-            if (!isPointerOverTableControls()) setActiveCellKey(null);
+            if (!isPointerOverTableControls()) setActiveCell(null);
           });
           editorFocus();
         }
@@ -203,9 +176,6 @@ function TableHandleMenu({
           context.kind === "row" ? "rotate-90" : undefined,
         )}
         data-table-control
-        onPointerEnter={() => {
-          setActiveCellKey(context.cellKey);
-        }}
         onPointerMove={(event) => {
           event.stopPropagation();
         }}
@@ -265,53 +235,104 @@ function getRowActions(context: TableActionContext): TableMenuAction[] {
 
 export function TableControlsDecorator() {
   const [editor] = useLexicalComposerContext();
-  const [cells, setCells] = useState<TableCellViewState[]>([]);
-  const [activeCellKey, setActiveCellKey] = useState<NodeKey | null>(null);
+  const [activeCell, setActiveCell] = useState<ActiveTableCellState | null>(null);
   const [menuContext, setMenuContext] = useState<TableActionContext | null>(null);
+  const activeCellKeyRef = useRef<NodeKey | null>(null);
   const animationFrameIdRef = useRef<number | null>(null);
   const shellElement = getEditorShellElement(editor.getRootElement());
 
-  const measureCells = useCallback(() => {
-    const shell = getEditorShellElement(editor.getRootElement());
-    if (!shell) {
-      setCells([]);
-      return;
-    }
+  const readCellState = useCallback(
+    (cellKey: NodeKey): ActiveTableCellState | null => {
+      const shell = getEditorShellElement(editor.getRootElement());
+      if (!shell) return null;
 
-    const shellRect = shell.getBoundingClientRect();
-    editor.getEditorState().read(
-      () => {
-        const nextCells = readTableCells().flatMap((cell): TableCellViewState[] => {
-          const element = editor.getElementByKey(cell.key);
-          if (!element) return [];
-          return [
-            { ...cell, rect: toShellRect(shellRect, element.getBoundingClientRect(), shell) },
-          ];
-        });
+      const element = editor.getElementByKey(cellKey);
+      if (!element) return null;
 
-        setCells((previousCells) =>
-          areCellViewsEqual(previousCells, nextCells) ? previousCells : nextCells,
-        );
-      },
-      { editor },
-    );
-  }, [editor]);
+      const documentState = editor.getEditorState().read(
+        (): ActiveTableCellDocumentState | null => {
+          const node = $getNearestNodeFromDOMNode(element);
+          const cellNode = $isTableCellNode(node) ? node : null;
+          const tableNode = cellNode ? $getTableNodeFromLexicalNodeOrThrow(cellNode) : null;
+          if (!cellNode || !$isTableNode(tableNode)) return null;
 
-  const scheduleMeasureCells = useCallback(() => {
+          const rows = tableNode.getChildren().filter($isTableRowNode);
+          const rowIndex = getTableCellRowIndex(cellNode);
+          const columnIndex = getTableCellColumnIndex(cellNode);
+          const rowStartNode = rows.at(rowIndex)?.getChildren().filter($isTableCellNode).at(0);
+          const columnStartNode = rows
+            .at(0)
+            ?.getChildren()
+            .filter($isTableCellNode)
+            .at(columnIndex);
+          if (!rowStartNode || !columnStartNode) return null;
+
+          return {
+            columnCount: getTableColumnCount(tableNode),
+            columnIndex,
+            columnStartKey: columnStartNode.getKey(),
+            key: cellNode.getKey(),
+            rowCount: getTableRowCount(tableNode),
+            rowIndex,
+            rowStartKey: rowStartNode.getKey(),
+            tableKey: tableNode.getKey(),
+          };
+        },
+        { editor },
+      );
+
+      if (!documentState) return null;
+      const columnStartElement = editor.getElementByKey(documentState.columnStartKey);
+      const rowStartElement = editor.getElementByKey(documentState.rowStartKey);
+      if (!columnStartElement || !rowStartElement) return null;
+
+      return {
+        columnCount: documentState.columnCount,
+        columnIndex: documentState.columnIndex,
+        columnStartRect: toShellRect(
+          shell.getBoundingClientRect(),
+          columnStartElement.getBoundingClientRect(),
+          shell,
+        ),
+        key: documentState.key,
+        rowCount: documentState.rowCount,
+        rowIndex: documentState.rowIndex,
+        rowStartRect: toShellRect(
+          shell.getBoundingClientRect(),
+          rowStartElement.getBoundingClientRect(),
+          shell,
+        ),
+        tableKey: documentState.tableKey,
+      };
+    },
+    [editor],
+  );
+
+  const updateActiveCell = useCallback(
+    (cellKey: NodeKey | null) => {
+      activeCellKeyRef.current = cellKey;
+      const nextCell = cellKey ? readCellState(cellKey) : null;
+      setActiveCell((previousCell) =>
+        areActiveCellsEqual(previousCell, nextCell) ? previousCell : nextCell,
+      );
+    },
+    [readCellState],
+  );
+
+  const scheduleMeasureActiveCell = useCallback(() => {
     if (animationFrameIdRef.current !== null) return;
 
     animationFrameIdRef.current = window.requestAnimationFrame(() => {
       animationFrameIdRef.current = null;
-      measureCells();
+      updateActiveCell(activeCellKeyRef.current);
     });
-  }, [measureCells]);
+  }, [updateActiveCell]);
 
   useEffect(() => {
-    scheduleMeasureCells();
     return editor.registerUpdateListener(() => {
-      scheduleMeasureCells();
+      scheduleMeasureActiveCell();
     });
-  }, [editor, scheduleMeasureCells]);
+  }, [editor, scheduleMeasureActiveCell]);
 
   useEffect(() => {
     return () => {
@@ -323,31 +344,31 @@ export function TableControlsDecorator() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("resize", scheduleMeasureCells);
-    window.addEventListener("scroll", scheduleMeasureCells, true);
+    window.addEventListener("resize", scheduleMeasureActiveCell);
+    window.addEventListener("scroll", scheduleMeasureActiveCell, true);
 
     return () => {
-      window.removeEventListener("resize", scheduleMeasureCells);
-      window.removeEventListener("scroll", scheduleMeasureCells, true);
+      window.removeEventListener("resize", scheduleMeasureActiveCell);
+      window.removeEventListener("scroll", scheduleMeasureActiveCell, true);
     };
-  }, [scheduleMeasureCells]);
+  }, [scheduleMeasureActiveCell]);
 
   useEffect(() => {
     const shell = getEditorShellElement(editor.getRootElement());
     if (!shell) return;
 
     const handlePointerMove = (event: PointerEvent) => {
-      const target = event.target;
-      if (findControlFromTarget(target)) {
+      if (findControlFromTarget(event.target)) {
         return;
       }
 
-      const cellElement = findCellFromTarget(target);
+      const cellElement = findCellFromTarget(event.target);
       if (!cellElement) {
-        if (!menuContext) setActiveCellKey(null);
+        if (!menuContext) updateActiveCell(null);
         return;
       }
 
+      let cellKey: NodeKey | null = null;
       editor.getEditorState().read(
         () => {
           const node = $getNearestNodeFromDOMNode(cellElement);
@@ -355,16 +376,17 @@ export function TableControlsDecorator() {
           const tableNode = cellNode ? $getTableNodeFromLexicalNodeOrThrow(cellNode) : null;
           if (!cellNode || !$isTableNode(tableNode)) return;
 
-          setActiveCellKey(cellNode.getKey());
+          cellKey = cellNode.getKey();
         },
         { editor },
       );
+      updateActiveCell(cellKey);
     };
 
     const handlePointerLeave = () => {
       window.requestAnimationFrame(() => {
         if (menuContext || isPointerOverTableControls()) return;
-        setActiveCellKey(null);
+        updateActiveCell(null);
       });
     };
 
@@ -375,80 +397,53 @@ export function TableControlsDecorator() {
       shell.removeEventListener("pointermove", handlePointerMove);
       shell.removeEventListener("pointerleave", handlePointerLeave);
     };
-  }, [editor, menuContext]);
+  }, [editor, menuContext, updateActiveCell]);
 
   const handleAction = useCallback(
     (operation: TableStructureOperation) => {
       if (!menuContext) return;
       performTableStructureOperation(editor, { cellKey: menuContext.cellKey, operation });
       setMenuContext(null);
-      setActiveCellKey(null);
-      scheduleMeasureCells();
+      updateActiveCell(null);
+      scheduleMeasureActiveCell();
       editor.focus();
     },
-    [editor, menuContext, scheduleMeasureCells],
+    [editor, menuContext, scheduleMeasureActiveCell, updateActiveCell],
   );
 
-  if (!shellElement || cells.length === 0) return null;
+  if (!shellElement || !activeCell) return null;
 
-  const activeCellByKey = activeCellKey ? cells.find((cell) => cell.key === activeCellKey) : null;
-  const activeCell = menuContext
-    ? cells.find(
-        (cell) =>
-          cell.key === menuContext.cellKey ||
-          (cell.tableKey === menuContext.tableKey &&
-            (menuContext.kind === "column"
-              ? cell.columnIndex === menuContext.index
-              : cell.rowIndex === menuContext.index)),
-      )
-    : activeCellByKey;
-  const columnContext = activeCell ? createActionContext(activeCell, "column") : null;
-  const rowContext = activeCell ? createActionContext(activeCell, "row") : null;
-
-  const columnCell = columnContext
-    ? cells.find(
-        (cell) =>
-          cell.tableKey === columnContext.tableKey && cell.columnIndex === columnContext.index,
-      )
-    : null;
-  const rowCell = rowContext
-    ? cells.find(
-        (cell) => cell.tableKey === rowContext.tableKey && cell.rowIndex === rowContext.index,
-      )
-    : null;
+  const columnContext = createActionContext(activeCell, "column");
+  const rowContext = createActionContext(activeCell, "row");
 
   return createPortal(
     <>
-      {columnCell && columnContext ? (
-        <TableHandleMenu
-          actions={getColumnActions(columnContext)}
-          context={columnContext}
-          editorFocus={() => editor.focus()}
-          handleAction={handleAction}
-          menuContext={menuContext}
-          setActiveCellKey={setActiveCellKey}
-          setMenuContext={setMenuContext}
-          style={{
-            insetBlockStart: columnCell.rect.top,
-            insetInlineStart: columnCell.rect.left + columnCell.rect.width / 2,
-          }}
-        />
-      ) : null}
-      {rowCell && rowContext ? (
-        <TableHandleMenu
-          actions={getRowActions(rowContext)}
-          context={rowContext}
-          editorFocus={() => editor.focus()}
-          handleAction={handleAction}
-          menuContext={menuContext}
-          setActiveCellKey={setActiveCellKey}
-          setMenuContext={setMenuContext}
-          style={{
-            insetBlockStart: rowCell.rect.top + rowCell.rect.height / 2,
-            insetInlineStart: rowCell.rect.left,
-          }}
-        />
-      ) : null}
+      <TableHandleMenu
+        actions={getColumnActions(columnContext)}
+        context={columnContext}
+        editorFocus={() => editor.focus()}
+        handleAction={handleAction}
+        menuContext={menuContext}
+        setActiveCell={setActiveCell}
+        setMenuContext={setMenuContext}
+        style={{
+          insetBlockStart: activeCell.columnStartRect.top,
+          insetInlineStart: activeCell.columnStartRect.left + activeCell.columnStartRect.width / 2,
+        }}
+      />
+      <TableHandleMenu
+        actions={getRowActions(rowContext)}
+        context={rowContext}
+        editorFocus={() => editor.focus()}
+        handleAction={handleAction}
+        menuContext={menuContext}
+        setActiveCell={setActiveCell}
+        setMenuContext={setMenuContext}
+        style={{
+          insetBlockStart: activeCell.rowStartRect.top + activeCell.rowStartRect.height / 2,
+          insetInlineStart: activeCell.rowStartRect.left,
+        }}
+      />
     </>,
     shellElement,
   );
