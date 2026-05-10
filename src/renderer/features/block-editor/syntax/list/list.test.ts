@@ -1,21 +1,44 @@
 import { $createListItemNode } from "@lexical/list";
 import { $createLineBreakNode, $createTextNode } from "lexical";
-import { describe, expect, it } from "vitest";
+import type { List, Root } from "mdast";
+import { describe, expect, it } from "vite-plus/test";
 
 import { expectMarkdownRoundTripStable } from "../../test-helper/assertions";
 import {
   applyMarkdownShortcuts,
   createHeadlessEditor,
+  editorFromMdast,
+  editorFromMarkdown,
+  readMarkdown,
   readMdast,
 } from "../../test-helper/editor-driver";
-import { editorFromMarkdown } from "../../test-helper/editor-driver";
+import {
+  pressBackspace,
+  pressEnter,
+  pressTab,
+  selectEmptyParagraph,
+  selectText,
+} from "../../test-helper/interaction-driver";
+import { doc, li, p, quote, t, ul } from "../../test-helper/mdast-builders";
 import { isSingleParagraphListItem } from "./list-structure";
+
+function getList(root: Root, index = 0): List {
+  const child = root.children[index];
+  expect(child?.type).toBe("list");
+  return child as List;
+}
 
 describe("list", () => {
   describe("structure round-trip", () => {
     it("preserves multiple paragraphs in a single list item", () => {
       const markdown = ["- A", "", "  B", ""].join("\n");
       expectMarkdownRoundTripStable(markdown);
+
+      const list = getList(readMdast(editorFromMarkdown(markdown)));
+      expect(list.children[0].children).toMatchObject([
+        { children: [{ type: "text", value: "A" }], type: "paragraph" },
+        { children: [{ type: "text", value: "B" }], type: "paragraph" },
+      ]);
     });
 
     it("preserves a quote nested inside a list item", () => {
@@ -78,6 +101,163 @@ describe("list", () => {
       );
 
       expect(result).toBe(true);
+    });
+  });
+
+  describe("interactions", () => {
+    it("Enter at the end of a paragraph creates the next list item", () => {
+      const editor = editorFromMarkdown("- Alpha\n");
+
+      selectText(editor, "Alpha");
+      expect(pressEnter(editor)).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [{ children: [{ type: "text", value: "Alpha" }], type: "paragraph" }],
+          type: "listItem",
+        },
+        {
+          children: [{ children: [], type: "paragraph" }],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Alt+Enter inserts a paragraph inside a simple list item", () => {
+      const editor = editorFromMarkdown("- Alpha\n");
+
+      selectText(editor, "Alpha");
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Alpha" }], type: "paragraph" },
+            { children: [], type: "paragraph" },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Enter on an empty nested item promotes it one list level", () => {
+      const editor = editorFromMdast(doc(ul(li([p(t("Parent")), ul(li([p()]))]))));
+
+      selectEmptyParagraph(editor);
+      expect(pressEnter(editor)).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [{ children: [{ type: "text", value: "Parent" }], type: "paragraph" }],
+          type: "listItem",
+        },
+        {
+          children: [{ children: [], type: "paragraph" }],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Backspace at the marker position merges into the previous item", () => {
+      const editor = editorFromMarkdown("- Alpha\n- Beta\n");
+
+      selectText(editor, "Beta", 0);
+      expect(pressBackspace(editor)).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Alpha" }], type: "paragraph" },
+            { children: [{ type: "text", value: "Beta" }], type: "paragraph" },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Tab nests the selected item under its previous sibling", () => {
+      const editor = editorFromMarkdown("- Alpha\n- Beta\n");
+
+      selectText(editor, "Beta", 0);
+      expect(pressTab(editor)).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Alpha" }], type: "paragraph" },
+            {
+              children: [
+                {
+                  children: [{ children: [{ type: "text", value: "Beta" }], type: "paragraph" }],
+                  type: "listItem",
+                },
+              ],
+              type: "list",
+            },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Shift+Tab unwraps a top-level item and keeps following items listed", () => {
+      const editor = editorFromMarkdown("- Alpha\n- Beta\n- Gamma\n");
+
+      selectText(editor, "Beta", 0);
+      expect(pressTab(editor, { shiftKey: true })).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([
+        {
+          children: [
+            {
+              children: [{ children: [{ type: "text", value: "Alpha" }], type: "paragraph" }],
+              type: "listItem",
+            },
+          ],
+          type: "list",
+        },
+        { children: [{ type: "text", value: "Beta" }], type: "paragraph" },
+        {
+          children: [
+            {
+              children: [{ children: [{ type: "text", value: "Gamma" }], type: "paragraph" }],
+              type: "listItem",
+            },
+          ],
+          type: "list",
+        },
+      ]);
+    });
+
+    it("Backspace at a nested quote start collapses the quote before list merging", () => {
+      const editor = editorFromMdast(doc(ul(li([p(t("Lead")), quote(p(t("Quoted")))]))));
+
+      selectText(editor, "Quoted", 0);
+      expect(pressBackspace(editor)).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Lead" }], type: "paragraph" },
+            { children: [{ type: "text", value: "Quoted" }], type: "paragraph" },
+          ],
+          type: "listItem",
+        },
+      ]);
+
+      const savedMarkdown = readMarkdown(editor);
+      expect(savedMarkdown).toContain("\n\n");
+      const reopenedList = getList(readMdast(editorFromMarkdown(savedMarkdown)));
+      expect(reopenedList.children[0].children).toMatchObject([
+        { children: [{ type: "text", value: "Lead" }], type: "paragraph" },
+        { children: [{ type: "text", value: "Quoted" }], type: "paragraph" },
+      ]);
     });
   });
 

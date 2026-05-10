@@ -7,6 +7,7 @@ import {
   type ListNode,
   type ListType,
 } from "@lexical/list";
+import { $isQuoteNode } from "@lexical/rich-text";
 import {
   $createParagraphNode,
   $isElementNode,
@@ -22,6 +23,7 @@ import {
   normalizeContainerBlockChildren,
   repairCollapsedSelectionIntoContainerChild,
 } from "../container/structure";
+import { unwrapQuoteAtStart } from "../quote/quote-structure";
 import {
   getDirectListItemChild,
   isCursorAtElementEnd,
@@ -190,6 +192,15 @@ export function collapseStructuredBlockAtStart(
     !isCursorAtElementStart(selection, currentBlock)
   ) {
     return false;
+  }
+
+  if ($isQuoteNode(currentBlock)) {
+    /*
+     * Lexical's QuoteNode collapse wraps block children into a new paragraph.
+     * FluxNote quotes already own block children, so unwrap them directly to
+     * avoid nested paragraphs and data loss during markdown export.
+     */
+    return unwrapQuoteAtStart(selection, currentBlock);
   }
 
   return currentBlock.collapseAtStart(selection);

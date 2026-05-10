@@ -72,11 +72,19 @@ function normalizeContainerChildren(children: ReadonlyArray<BlockContent>): Bloc
   return blocks.length > 0 ? blocks : [{ children: [], type: "paragraph" }];
 }
 
+function shouldSpreadListItem(children: ReadonlyArray<BlockContent>): boolean {
+  return children.length > 1;
+}
+
 function normalizeListItem(item: ListItem): ListItem {
+  const children = normalizeContainerChildren(
+    item.children as BlockContent[],
+  ) as ListItem["children"];
+
   return {
     checked: typeof item.checked === "boolean" ? item.checked : null,
-    children: normalizeContainerChildren(item.children as BlockContent[]) as ListItem["children"],
-    spread: false,
+    children,
+    spread: shouldSpreadListItem(children as BlockContent[]),
     type: "listItem",
   };
 }
@@ -141,12 +149,13 @@ function normalizeBlock(node: BlockContent): BlockContent[] {
       ];
     case "list": {
       const children = node.children.map(normalizeListItem);
+      const spread = children.some((item) => item.spread);
       return children.length > 0
         ? [
             {
               children,
               ordered: node.ordered ?? false,
-              spread: false,
+              spread,
               start: node.start ?? null,
               type: "list",
             },

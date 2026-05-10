@@ -11,6 +11,10 @@ import type { BlockContent, DefinitionContent, List, ListItem } from "mdast";
 // mdast ListItem children allow definitions in addition to plain block content.
 type ContainerChild = BlockContent | DefinitionContent;
 
+function shouldSpreadListItem(children: ReadonlyArray<ContainerChild>): boolean {
+  return children.length > 1;
+}
+
 function deriveListType(
   items: ReadonlyArray<ListItem>,
   ordered: boolean | null | undefined,
@@ -27,7 +31,7 @@ export function listItemToLexical(
   const listItem = $createListItemNode(listType === "check" ? item.checked === true : undefined);
   const children = item.children.flatMap(writeBlock);
   if (children.length > 0) {
-    listItem.append(...children);
+    listItem.splice(0, 0, children);
   }
   return listItem;
 }
@@ -56,9 +60,7 @@ export function listItemFromLexical(
   return {
     checked: typeof checked === "boolean" ? checked : null,
     children,
-    // Editor renders all lists as tight; loose/spread is a source-format concern
-    // the WYSIWYG surface intentionally does not model.
-    spread: false,
+    spread: shouldSpreadListItem(children),
     type: "listItem",
   };
 }
@@ -80,7 +82,7 @@ export function listFromLexical(
   return {
     children: items,
     ordered,
-    spread: false,
+    spread: items.some((item) => item.spread),
     start: ordered ? node.getStart() : null,
     type: "list",
   };
