@@ -129,17 +129,15 @@ export function applyTaskListShortcutAtSelection(): boolean {
 }
 
 export function registerTaskListShortcut(editor: LexicalEditor): () => void {
-  return editor.registerUpdateListener(({ dirtyLeaves, editorState, tags }) => {
+  return editor.registerUpdateListener(({ dirtyLeaves, tags }) => {
     if (tags.has(COLLABORATION_TAG) || tags.has(HISTORIC_TAG) || dirtyLeaves.size === 0) {
       return;
     }
 
-    if (!editorState.read(() => findShortcutTextNode() !== null)) {
-      return;
-    }
-
     editor.update(() => {
-      applyTaskListShortcutAtSelection();
+      if (findShortcutTextNode()) {
+        applyTaskListShortcutAtSelection();
+      }
     });
   });
 }
