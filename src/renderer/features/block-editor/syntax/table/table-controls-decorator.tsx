@@ -4,7 +4,11 @@ import { createPortal } from "react-dom";
 
 import { TableHandleMenu } from "./table-controls-menu";
 import { type TableControlKind, useTableControlState } from "./table-controls-state";
-import { performTableStructureOperation, type TableStructureOperation } from "./table-operations";
+import {
+  createTableOperationPayload,
+  performTableStructureOperation,
+  type TableOperationAction,
+} from "./table-operations";
 
 export function TableControlsDecorator() {
   const [editor] = useLexicalComposerContext();
@@ -40,10 +44,10 @@ export function TableControlsDecorator() {
   );
 
   const handleAction = useCallback(
-    (operation: TableStructureOperation) => {
+    (action: TableOperationAction) => {
       if (!target) return;
 
-      performTableStructureOperation(editor, { cellKey: target.cellKey, operation });
+      performTableStructureOperation(editor, createTableOperationPayload(target.cellKey, action));
       setActiveMenu(null);
       clearTarget();
       scheduleMeasure();

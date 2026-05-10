@@ -14,7 +14,16 @@ import {
   type TableNode,
   type TableRowNode,
 } from "@lexical/table";
-import { $createParagraphNode, $getNodeByKey, type LexicalEditor, type NodeKey } from "lexical";
+import {
+  $createParagraphNode,
+  $getNodeByKey,
+  $isParagraphNode,
+  type ElementFormatType,
+  type LexicalEditor,
+  type NodeKey,
+} from "lexical";
+
+export type TableColumnAlign = "none" | "left" | "center" | "right";
 
 export type TableStructureOperation =
   | "insert-column-left"
@@ -28,9 +37,32 @@ export type TableStructureOperation =
   | "move-row-down"
   | "delete-row";
 
-export interface TableStructureOperationPayload {
+interface TableStructureOperationBasePayload {
   cellKey: NodeKey;
+}
+
+export interface SetTableColumnAlignOperationPayload extends TableStructureOperationBasePayload {
+  align: TableColumnAlign;
+  operation: "set-column-align";
+}
+
+export interface TableStructureOperationPayload extends TableStructureOperationBasePayload {
   operation: TableStructureOperation;
+}
+
+export type TableOperationPayload =
+  | SetTableColumnAlignOperationPayload
+  | TableStructureOperationPayload;
+
+export type TableOperationAction =
+  | Omit<SetTableColumnAlignOperationPayload, "cellKey">
+  | TableStructureOperation;
+
+export function createTableOperationPayload(
+  cellKey: NodeKey,
+  action: TableOperationAction,
+): TableOperationPayload {
+  return typeof action === "string" ? { cellKey, operation: action } : { cellKey, ...action };
 }
 
 export function getTableColumnCount(tableNode: TableNode): number {
@@ -79,8 +111,22 @@ function getHeaderState(
   return TableCellHeaderStates.NO_STATUS;
 }
 
-function createTableCell(headerState: TableCellHeaderState): TableCellNode {
-  return $createTableCellNode(headerState).append($createParagraphNode());
+function columnAlignToFormat(align: TableColumnAlign): ElementFormatType {
+  return align === "none" ? "" : align;
+}
+
+function readCellFormat(cellNode: TableCellNode): ElementFormatType {
+  const firstChild = cellNode.getFirstChild();
+  return $isParagraphNode(firstChild) ? firstChild.getFormatType() : "";
+}
+
+function createTableCell(
+  headerState: TableCellHeaderState,
+  format: ElementFormatType = "",
+): TableCellNode {
+  const paragraph = $createParagraphNode();
+  paragraph.setFormat(format);
+  return $createTableCellNode(headerState).append(paragraph);
 }
 
 function normalizeTableRowHeaders(tableNode: TableNode): void {
@@ -98,7 +144,10 @@ function cloneEmptyRowFrom(rowNode: TableRowNode): TableRowNode {
   const clone = $createTableRowNode(rowNode.getHeight());
   for (const cell of getCells(rowNode)) {
     clone.append(
-      createTableCell(getHeaderState(cell.getHeaderStyles(), TableCellHeaderStates.COLUMN)),
+      createTableCell(
+        getHeaderState(cell.getHeaderStyles(), TableCellHeaderStates.COLUMN),
+        readCellFormat(cell),
+      ),
     );
   }
   return clone;
@@ -121,7 +170,26 @@ function insertTableRowAtCell(cellNode: TableCellNode, insertAfter: boolean): Ta
 }
 
 function cloneEmptyCellFrom(cellNode: TableCellNode): TableCellNode {
-  return createTableCell(getHeaderState(cellNode.getHeaderStyles(), TableCellHeaderStates.ROW));
+  return createTableCell(
+    getHeaderState(cellNode.getHeaderStyles(), TableCellHeaderStates.ROW),
+    readCellFormat(cellNode),
+  );
+}
+
+function setTableColumnAlign(
+  tableNode: TableNode,
+  columnIndex: number,
+  align: TableColumnAlign,
+): void {
+  const format = columnAlignToFormat(align);
+
+  for (const rowNode of getRows(tableNode)) {
+    const cellNode = getCells(rowNode).at(columnIndex);
+    const firstChild = cellNode?.getFirstChild();
+    if ($isParagraphNode(firstChild)) {
+      firstChild.setFormat(format);
+    }
+  }
 }
 
 function insertTableColumnAtCell(
@@ -177,7 +245,7 @@ function selectCell(cellNode: TableCellNode | null): void {
   cellNode?.selectStart();
 }
 
-function applyTableStructureOperation(payload: TableStructureOperationPayload): boolean {
+function applyTableOperation(payload: TableOperationPayload): boolean {
   const node = $getNodeByKey(payload.cellKey);
   if (!$isTableCellNode(node)) {
     return false;
@@ -195,6 +263,11 @@ function applyTableStructureOperation(payload: TableStructureOperationPayload): 
   const columnCount = getTableColumnCount(tableNode);
 
   switch (payload.operation) {
+    case "set-column-align": {
+      setTableColumnAlign(tableNode, columnIndex, payload.align);
+      selectCell(getCellNodeAt(tableNode, rowIndex, columnIndex));
+      return true;
+    }
     case "insert-column-left": {
       const insertedCell = insertTableColumnAtCell(node, false);
       selectCell(insertedCell ?? getCellNodeAt(tableNode, rowIndex, columnIndex));
@@ -261,11 +334,11 @@ function applyTableStructureOperation(payload: TableStructureOperationPayload): 
 
 export function performTableStructureOperation(
   editor: LexicalEditor,
-  payload: TableStructureOperationPayload,
+  payload: TableOperationPayload,
 ): void {
   editor.update(
     () => {
-      applyTableStructureOperation(payload);
+      applyTableOperation(payload);
     },
     { discrete: true },
   );

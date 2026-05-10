@@ -51,62 +51,82 @@ msgid "block-editor.placeholder"
 msgstr "写一条笔记..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:78
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:178
+msgid "block-editor.table.align-center"
+msgstr "居中对齐"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:174
+msgid "block-editor.table.align-default"
+msgstr "默认"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:176
+msgid "block-editor.table.align-left"
+msgstr "左对齐"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:180
+msgid "block-editor.table.align-right"
+msgstr "右对齐"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:128
 msgid "block-editor.table.column-menu"
 msgstr "打开列操作菜单"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:107
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:157
 msgid "block-editor.table.delete-column"
 msgstr "删除列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:117
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:167
 msgid "block-editor.table.delete-row"
 msgstr "删除行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:93
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:143
 msgid "block-editor.table.insert-column-left"
 msgstr "左侧插入列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:98
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:148
 msgid "block-editor.table.insert-column-right"
 msgstr "右侧插入列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:109
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:159
 msgid "block-editor.table.insert-row-above"
 msgstr "上方插入行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:111
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:161
 msgid "block-editor.table.insert-row-below"
 msgstr "下方插入行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:103
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:153
 msgid "block-editor.table.move-column-left"
 msgstr "左移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:105
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:155
 msgid "block-editor.table.move-column-right"
 msgstr "右移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:115
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:165
 msgid "block-editor.table.move-row-down"
 msgstr "下移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:113
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:163
 msgid "block-editor.table.move-row-up"
 msgstr "上移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:84
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
 msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 

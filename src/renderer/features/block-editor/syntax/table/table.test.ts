@@ -4,6 +4,8 @@ import {
   $createTextNode,
   $getRoot,
   $isElementNode,
+  $isParagraphNode,
+  type ElementFormatType,
   type LexicalEditor,
   type NodeKey,
 } from "lexical";
@@ -17,7 +19,11 @@ import {
   readMdast,
 } from "../../test-helper/editor-driver";
 import { pressEnter } from "../../test-helper/interaction-driver";
-import { performTableStructureOperation, type TableStructureOperation } from "./table-operations";
+import {
+  performTableStructureOperation,
+  type TableColumnAlign,
+  type TableStructureOperation,
+} from "./table-operations";
 
 function getTable(editor: LexicalEditor): Table {
   const child = readMdast(editor).children[0];
@@ -59,7 +65,29 @@ function cellHasRowHeader(editor: LexicalEditor, rowIndex: number, columnIndex: 
   return (headerState & TableCellHeaderStates.ROW) === TableCellHeaderStates.ROW;
 }
 
-function createEditorWithTypedTableShortcut(): LexicalEditor {
+function getCellFormat(
+  editor: LexicalEditor,
+  rowIndex: number,
+  columnIndex: number,
+): ElementFormatType {
+  let format: ElementFormatType | null = null;
+
+  editor.getEditorState().read(() => {
+    const table = $getRoot().getFirstChild();
+    const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
+    const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
+    const paragraph = $isElementNode(cell) ? cell.getFirstChild() : null;
+    format = $isParagraphNode(paragraph) ? paragraph.getFormatType() : null;
+  });
+
+  if (format === null) {
+    throw new Error(`Unable to read table cell format at ${rowIndex}, ${columnIndex}.`);
+  }
+
+  return format;
+}
+
+function createEditorWithTypedTableShortcut(delimiter = "| --- | --- |"): LexicalEditor {
   const editor = createHeadlessEditor();
 
   editor.update(
@@ -68,7 +96,7 @@ function createEditorWithTypedTableShortcut(): LexicalEditor {
       root.clear();
       root.append(
         $createParagraphNode().append($createTextNode("| h1 | h2 |")),
-        $createParagraphNode().append($createTextNode("| --- | --- |")),
+        $createParagraphNode().append($createTextNode(delimiter)),
       );
       root.getLastChild()?.selectEnd();
     },
@@ -90,6 +118,19 @@ function performOperation(
   });
 }
 
+function performAlignOperation(
+  editor: LexicalEditor,
+  rowIndex: number,
+  columnIndex: number,
+  align: TableColumnAlign,
+): void {
+  performTableStructureOperation(editor, {
+    align,
+    cellKey: getCellKey(editor, rowIndex, columnIndex),
+    operation: "set-column-align",
+  });
+}
+
 describe("table", () => {
   it("round-trips a simple table", () => {
     const markdown = ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n");
@@ -98,12 +139,14 @@ describe("table", () => {
 
   it("round-trips a table with column alignment", () => {
     const markdown = [
-      "| left | center | right |",
-      "| :--- | :----: | ----: |",
-      "| a    | b      | c     |",
+      "| left | center | right | default |",
+      "| :--- | :----: | ----: | --- |",
+      "| a    | b      | c     | d |",
       "",
     ].join("\n");
     expectMarkdownRoundTripStable(markdown);
+
+    expect(getTable(editorFromMarkdown(markdown)).align).toEqual(["left", "center", "right", null]);
   });
 
   it("pads ragged table rows during markdown import", () => {
@@ -145,6 +188,18 @@ describe("table", () => {
     });
   });
 
+  it("typed delimiter shortcut creates aligned table columns", () => {
+    const editor = createEditorWithTypedTableShortcut("| :--- | ---: |");
+
+    expect(pressEnter(editor)).toBe(true);
+
+    expect(getTable(editor).align).toEqual(["left", "right"]);
+    expect(getCellFormat(editor, 0, 0)).toBe("left");
+    expect(getCellFormat(editor, 1, 0)).toBe("left");
+    expect(getCellFormat(editor, 0, 1)).toBe("right");
+    expect(getCellFormat(editor, 1, 1)).toBe("right");
+  });
+
   it("performs row and column structure operations", () => {
     const editor = editorFromMarkdown(
       ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", "| c  | d  |", ""].join("\n"),
@@ -163,6 +218,26 @@ describe("table", () => {
 
     performOperation(editor, 0, 1, "delete-column");
     expect(getTable(editor).children[0].children).toHaveLength(2);
+  });
+
+  it("sets and clears column alignment", () => {
+    const editor = editorFromMarkdown(
+      ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", "| c  | d  |", ""].join("\n"),
+    );
+
+    performAlignOperation(editor, 1, 1, "center");
+
+    expect(getTable(editor).align).toEqual([null, "center"]);
+    expect(getCellFormat(editor, 0, 1)).toBe("center");
+    expect(getCellFormat(editor, 1, 1)).toBe("center");
+    expect(getCellFormat(editor, 2, 1)).toBe("center");
+
+    performAlignOperation(editor, 0, 1, "none");
+
+    expect(getTable(editor).align).toEqual([null, null]);
+    expect(getCellFormat(editor, 0, 1)).toBe("");
+    expect(getCellFormat(editor, 1, 1)).toBe("");
+    expect(getCellFormat(editor, 2, 1)).toBe("");
   });
 
   it("keeps row header styles anchored to the first row when moving rows", () => {

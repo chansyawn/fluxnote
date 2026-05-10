@@ -13,7 +13,7 @@
 }
 
 .block-editor__table-cell--header {
-  @apply bg-muted/60 font-medium;
+  @apply font-medium;
 }
 
 .block-editor__table-cell--selected {

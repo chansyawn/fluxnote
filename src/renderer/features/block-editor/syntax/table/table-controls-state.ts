@@ -4,7 +4,13 @@ import {
   $isTableNode,
   $isTableRowNode,
 } from "@lexical/table";
-import { $getNearestNodeFromDOMNode, type LexicalEditor, type NodeKey } from "lexical";
+import {
+  $getNearestNodeFromDOMNode,
+  $isParagraphNode,
+  type ElementFormatType,
+  type LexicalEditor,
+  type NodeKey,
+} from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -12,6 +18,7 @@ import {
   getTableCellRowIndex,
   getTableColumnCount,
   getTableRowCount,
+  type TableColumnAlign,
 } from "./table-operations";
 
 export type TableControlKind = "row" | "column";
@@ -24,6 +31,7 @@ export interface TableHandlePosition {
 export interface TableControlTarget {
   cellKey: NodeKey;
   tableKey: NodeKey;
+  columnAlign: TableColumnAlign;
   rowIndex: number;
   columnIndex: number;
   rowCount: number;
@@ -63,6 +71,7 @@ function areTargetsEqual(
   return (
     previous.cellKey === next.cellKey &&
     previous.tableKey === next.tableKey &&
+    previous.columnAlign === next.columnAlign &&
     previous.rowIndex === next.rowIndex &&
     previous.columnIndex === next.columnIndex &&
     previous.rowCount === next.rowCount &&
@@ -97,6 +106,10 @@ function getCellKeyFromElement(
   );
 }
 
+function formatToColumnAlign(format: ElementFormatType): TableColumnAlign {
+  return format === "left" || format === "center" || format === "right" ? format : "none";
+}
+
 function readDocumentTarget(
   editor: LexicalEditor,
   cellElement: HTMLElement,
@@ -115,8 +128,13 @@ function readDocumentTarget(
       const columnStartNode = rows.at(0)?.getChildren().filter($isTableCellNode).at(columnIndex);
       if (!rowStartNode || !columnStartNode) return null;
 
+      const columnStartFirstChild = columnStartNode.getFirstChild();
+
       return {
         cellKey: cellNode.getKey(),
+        columnAlign: $isParagraphNode(columnStartFirstChild)
+          ? formatToColumnAlign(columnStartFirstChild.getFormatType())
+          : "none",
         columnCount: getTableColumnCount(tableNode),
         columnIndex,
         columnStartKey: columnStartNode.getKey(),
@@ -148,6 +166,7 @@ function readControlTarget(editor: LexicalEditor, cellKey: NodeKey): TableContro
 
   return {
     cellKey: documentTarget.cellKey,
+    columnAlign: documentTarget.columnAlign,
     columnCount: documentTarget.columnCount,
     columnIndex: documentTarget.columnIndex,
     handles: {

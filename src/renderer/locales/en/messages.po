@@ -51,62 +51,82 @@ msgid "block-editor.placeholder"
 msgstr "Write a note..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:78
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:178
+msgid "block-editor.table.align-center"
+msgstr "Align center"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:174
+msgid "block-editor.table.align-default"
+msgstr "Default"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:176
+msgid "block-editor.table.align-left"
+msgstr "Align left"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:180
+msgid "block-editor.table.align-right"
+msgstr "Align right"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:128
 msgid "block-editor.table.column-menu"
 msgstr "Open column actions menu"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:107
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:157
 msgid "block-editor.table.delete-column"
 msgstr "Delete column"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:117
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:167
 msgid "block-editor.table.delete-row"
 msgstr "Delete row"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:93
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:143
 msgid "block-editor.table.insert-column-left"
 msgstr "Insert column left"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:98
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:148
 msgid "block-editor.table.insert-column-right"
 msgstr "Insert column right"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:109
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:159
 msgid "block-editor.table.insert-row-above"
 msgstr "Insert row above"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:111
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:161
 msgid "block-editor.table.insert-row-below"
 msgstr "Insert row below"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:103
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:153
 msgid "block-editor.table.move-column-left"
 msgstr "Move left"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:105
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:155
 msgid "block-editor.table.move-column-right"
 msgstr "Move right"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:115
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:165
 msgid "block-editor.table.move-row-down"
 msgstr "Move down"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:113
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:163
 msgid "block-editor.table.move-row-up"
 msgstr "Move up"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:84
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
 msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
 

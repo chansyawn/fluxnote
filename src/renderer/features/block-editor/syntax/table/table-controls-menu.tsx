@@ -6,22 +6,51 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@renderer/ui/components/dropdown-menu";
 import { cn } from "@renderer/ui/lib/utils";
+import {
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  ArrowDownIcon,
+  ArrowDownToLineIcon,
+  ArrowLeftIcon,
+  ArrowLeftToLineIcon,
+  ArrowRightIcon,
+  ArrowRightToLineIcon,
+  ArrowUpIcon,
+  ArrowUpToLineIcon,
+  TextIcon,
+  Trash2Icon,
+  type LucideIcon,
+} from "lucide-react";
 
 import type { TableControlKind, TableControlTarget } from "./table-controls-state";
-import type { TableStructureOperation } from "./table-operations";
+import type {
+  TableColumnAlign,
+  TableOperationAction,
+  TableStructureOperation,
+} from "./table-operations";
 
 interface TableActionDefinition {
+  icon: LucideIcon;
   operation: TableStructureOperation;
   isDisabled: (target: TableControlTarget) => boolean;
+}
+
+interface TableAlignDefinition {
+  align: TableColumnAlign;
+  icon: typeof TextIcon;
 }
 
 interface TableHandleMenuProps {
   activeMenu: TableControlKind | null;
   kind: TableControlKind;
-  onAction: (operation: TableStructureOperation) => void;
+  onAction: (action: TableOperationAction) => void;
   onOpenChange: (kind: TableControlKind, open: boolean) => void;
   target: TableControlTarget;
 }
@@ -29,49 +58,70 @@ interface TableHandleMenuProps {
 const TABLE_ACTIONS: Record<TableControlKind, TableActionDefinition[]> = {
   column: [
     {
+      icon: ArrowLeftToLineIcon,
       isDisabled: () => false,
       operation: "insert-column-left",
     },
     {
+      icon: ArrowRightToLineIcon,
       isDisabled: () => false,
       operation: "insert-column-right",
     },
     {
+      icon: ArrowLeftIcon,
       isDisabled: (target) => target.columnIndex <= 0,
       operation: "move-column-left",
     },
     {
+      icon: ArrowRightIcon,
       isDisabled: (target) => target.columnIndex >= target.columnCount - 1,
       operation: "move-column-right",
     },
     {
+      icon: Trash2Icon,
       isDisabled: (target) => target.columnCount <= 1,
       operation: "delete-column",
     },
   ],
   row: [
     {
+      icon: ArrowUpToLineIcon,
       isDisabled: () => false,
       operation: "insert-row-above",
     },
     {
+      icon: ArrowDownToLineIcon,
       isDisabled: () => false,
       operation: "insert-row-below",
     },
     {
+      icon: ArrowUpIcon,
       isDisabled: (target) => target.rowIndex <= 0,
       operation: "move-row-up",
     },
     {
+      icon: ArrowDownIcon,
       isDisabled: (target) => target.rowIndex >= target.rowCount - 1,
       operation: "move-row-down",
     },
     {
+      icon: Trash2Icon,
       isDisabled: (target) => target.rowCount <= 1,
       operation: "delete-row",
     },
   ],
 };
+
+const TABLE_ALIGNMENTS: TableAlignDefinition[] = [
+  { align: "none", icon: TextIcon },
+  { align: "left", icon: AlignLeftIcon },
+  { align: "center", icon: AlignCenterIcon },
+  { align: "right", icon: AlignRightIcon },
+];
+
+function isTableColumnAlign(value: string): value is TableColumnAlign {
+  return value === "none" || value === "left" || value === "center" || value === "right";
+}
 
 function getMenuLabel(i18n: I18n, kind: TableControlKind): string {
   if (kind === "column") {
@@ -115,6 +165,19 @@ function getActionLabel(i18n: I18n, operation: TableStructureOperation): string 
       return i18n._({ id: "block-editor.table.move-row-down", message: "Move down" });
     case "delete-row":
       return i18n._({ id: "block-editor.table.delete-row", message: "Delete row" });
+  }
+}
+
+function getAlignmentLabel(i18n: I18n, align: TableColumnAlign): string {
+  switch (align) {
+    case "none":
+      return i18n._({ id: "block-editor.table.align-default", message: "Default" });
+    case "left":
+      return i18n._({ id: "block-editor.table.align-left", message: "Align left" });
+    case "center":
+      return i18n._({ id: "block-editor.table.align-center", message: "Align center" });
+    case "right":
+      return i18n._({ id: "block-editor.table.align-right", message: "Align right" });
   }
 }
 
@@ -162,6 +225,7 @@ export function TableHandleMenu({
         <DropdownMenuGroup>
           {TABLE_ACTIONS[kind].map((action) => {
             const disabled = action.isDisabled(target);
+            const ActionIcon = action.icon;
 
             return (
               <DropdownMenuItem
@@ -171,11 +235,34 @@ export function TableHandleMenu({
                   if (!disabled) onAction(action.operation);
                 }}
               >
+                <ActionIcon />
                 {getActionLabel(i18n, action.operation)}
               </DropdownMenuItem>
             );
           })}
         </DropdownMenuGroup>
+        {kind === "column" && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuRadioGroup
+                value={target.columnAlign}
+                onValueChange={(value) => {
+                  if (isTableColumnAlign(value)) {
+                    onAction({ align: value, operation: "set-column-align" });
+                  }
+                }}
+              >
+                {TABLE_ALIGNMENTS.map(({ align, icon: AlignIcon }) => (
+                  <DropdownMenuRadioItem key={align} value={align}>
+                    <AlignIcon />
+                    {getAlignmentLabel(i18n, align)}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
