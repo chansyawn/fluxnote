@@ -1,3 +1,4 @@
+import { $isTableCellNode, TableCellHeaderStates } from "@lexical/table";
 import {
   $createParagraphNode,
   $createTextNode,
@@ -39,6 +40,23 @@ function getCellKey(editor: LexicalEditor, rowIndex: number, columnIndex: number
   }
 
   return key;
+}
+
+function cellHasRowHeader(editor: LexicalEditor, rowIndex: number, columnIndex: number): boolean {
+  let headerState: number | null = null;
+
+  editor.getEditorState().read(() => {
+    const table = $getRoot().getFirstChild();
+    const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
+    const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
+    headerState = $isTableCellNode(cell) ? cell.getHeaderStyles() : null;
+  });
+
+  if (headerState === null) {
+    throw new Error(`Unable to read table cell header at ${rowIndex}, ${columnIndex}.`);
+  }
+
+  return (headerState & TableCellHeaderStates.ROW) === TableCellHeaderStates.ROW;
 }
 
 function createEditorWithTypedTableShortcut(): LexicalEditor {
@@ -145,6 +163,26 @@ describe("table", () => {
 
     performOperation(editor, 0, 1, "delete-column");
     expect(getTable(editor).children[0].children).toHaveLength(2);
+  });
+
+  it("keeps row header styles anchored to the first row when moving rows", () => {
+    const editor = editorFromMarkdown(
+      ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", "| c  | d  |", ""].join("\n"),
+    );
+
+    performOperation(editor, 0, 0, "move-row-down");
+
+    expect(cellHasRowHeader(editor, 0, 0)).toBe(true);
+    expect(cellHasRowHeader(editor, 0, 1)).toBe(true);
+    expect(cellHasRowHeader(editor, 1, 0)).toBe(false);
+    expect(cellHasRowHeader(editor, 1, 1)).toBe(false);
+
+    performOperation(editor, 1, 0, "move-row-up");
+
+    expect(cellHasRowHeader(editor, 0, 0)).toBe(true);
+    expect(cellHasRowHeader(editor, 0, 1)).toBe(true);
+    expect(cellHasRowHeader(editor, 1, 0)).toBe(false);
+    expect(cellHasRowHeader(editor, 1, 1)).toBe(false);
   });
 
   it("does not delete the last row or last column", () => {

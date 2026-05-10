@@ -83,6 +83,17 @@ function createTableCell(headerState: TableCellHeaderState): TableCellNode {
   return $createTableCellNode(headerState).append($createParagraphNode());
 }
 
+function normalizeTableRowHeaders(tableNode: TableNode): void {
+  getRows(tableNode).forEach((rowNode, rowIndex) => {
+    for (const cellNode of getCells(rowNode)) {
+      cellNode.setHeaderStyles(
+        rowIndex === 0 ? TableCellHeaderStates.ROW : TableCellHeaderStates.NO_STATUS,
+        TableCellHeaderStates.ROW,
+      );
+    }
+  });
+}
+
 function cloneEmptyRowFrom(rowNode: TableRowNode): TableRowNode {
   const clone = $createTableRowNode(rowNode.getHeight());
   for (const cell of getCells(rowNode)) {
@@ -214,29 +225,34 @@ function applyTableStructureOperation(payload: TableStructureOperationPayload): 
     }
     case "insert-row-above": {
       const insertedRow = insertTableRowAtCell(node, false);
+      normalizeTableRowHeaders(tableNode);
       selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "insert-row-below": {
       const insertedRow = insertTableRowAtCell(node, true);
+      normalizeTableRowHeaders(tableNode);
       selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "move-row-up": {
       if (rowIndex <= 0) return false;
       moveTableRow(rowNode, rowIndex - 1);
+      normalizeTableRowHeaders(tableNode);
       selectCell(getCellNodeAt(tableNode, rowIndex - 1, columnIndex));
       return true;
     }
     case "move-row-down": {
       if (rowIndex < 0 || rowIndex >= rowCount - 1) return false;
       moveTableRow(rowNode, rowIndex + 1);
+      normalizeTableRowHeaders(tableNode);
       selectCell(getCellNodeAt(tableNode, rowIndex + 1, columnIndex));
       return true;
     }
     case "delete-row": {
       if (rowCount <= 1) return false;
       $removeTableRowAtIndex(tableNode, rowIndex);
+      normalizeTableRowHeaders(tableNode);
       selectCell(getCellNodeAt(tableNode, Math.min(rowIndex, rowCount - 2), columnIndex));
       return true;
     }
