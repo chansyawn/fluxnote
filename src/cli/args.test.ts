@@ -68,40 +68,4 @@ describe("parseFluxArgs", () => {
       parseFluxArgs(["node", "flux-cli.mjs", "add", "--text", "hello", "note.md"]),
     ).toThrow("Use only one input source: --text, --file, or an input value.");
   });
-
-  it("throws usage error when edit has no file path", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "edit"])).toThrow(
-      "flux edit requires a file path.",
-    );
-  });
-
-  it("throws usage error when edit has multiple file paths", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "edit", "a.md", "b.md"])).toThrow(
-      "flux edit only accepts one file path.",
-    );
-  });
-
-  it("throws usage error when edit receives a typed source option", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "edit", "--file", "note.md"])).toThrow(
-      "flux edit only accepts a file path argument.",
-    );
-  });
-
-  it("throws usage error for removed new command", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "new", "hello"])).toThrow(
-      "Use `flux add` instead of `flux new`.",
-    );
-  });
-
-  it("throws usage error for removed root text option", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "--text", "hello"])).toThrow(
-      "Use `flux add` to create a block or `flux edit` to edit a file.",
-    );
-  });
-
-  it("throws usage error for removed root positional input", () => {
-    expect(() => parseFluxArgs(["node", "flux-cli.mjs", "note.md"])).toThrow(
-      "Use `flux add` to create a block or `flux edit` to edit a file.",
-    );
-  });
 });

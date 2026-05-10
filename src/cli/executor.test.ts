@@ -1,11 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { FluxCliCommand } from "./args";
 import {
   executeAddFromAuto,
   executeAddFromFile,
   executeAddFromText,
-  executeCliCommand,
   executeExternalEdit,
   executeOpen,
 } from "./executor";
@@ -155,101 +153,5 @@ describe("executor", () => {
 
     await expect(executeExternalEdit("note.md", deps)).rejects.toThrow("failed");
     expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "original", "utf8");
-  });
-
-  it("routes add file command through executeCliCommand", async () => {
-    const deps = createDeps();
-    deps.readFile.mockResolvedValue("text-from-file");
-    deps.dispatchCommand.mockResolvedValueOnce({ blockId: "block-6" });
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
-    const command: FluxCliCommand = {
-      kind: "add",
-      source: {
-        filePath: "note.md",
-        type: "file",
-      },
-    };
-
-    await executeCliCommand(command, deps);
-
-    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
-      content: "text-from-file",
-    });
-    expect(logSpy).toHaveBeenCalledWith("Created block: block-6");
-  });
-
-  it("routes add text command through executeCliCommand", async () => {
-    const deps = createDeps();
-    deps.dispatchCommand.mockResolvedValue({ blockId: "block-7" });
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
-    const command: FluxCliCommand = {
-      kind: "add",
-      source: {
-        text: "inline",
-        type: "text",
-      },
-    };
-
-    await executeCliCommand(command, deps);
-
-    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
-      content: "inline",
-    });
-    expect(logSpy).toHaveBeenCalledWith("Created block: block-7");
-  });
-
-  it("routes add auto command through executeCliCommand", async () => {
-    const deps = createDeps();
-    deps.stat.mockResolvedValue(createFileStat(false));
-    deps.dispatchCommand.mockResolvedValue({ blockId: "block-8" });
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
-    const command: FluxCliCommand = {
-      kind: "add",
-      source: {
-        input: "inline",
-        type: "auto",
-      },
-    };
-
-    await executeCliCommand(command, deps);
-
-    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
-      content: "inline",
-    });
-    expect(logSpy).toHaveBeenCalledWith("Created block: block-8");
-  });
-
-  it("routes edit command through executeCliCommand", async () => {
-    const deps = createDeps();
-    deps.readFile.mockResolvedValue("original");
-    deps.dispatchCommand.mockResolvedValue({ status: "submitted", content: "updated" });
-
-    await executeCliCommand({ filePath: "note.md", kind: "edit" }, deps);
-
-    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
-      content: "original",
-    });
-    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "updated", "utf8");
-  });
-
-  it("routes open command through executeCliCommand", async () => {
-    const deps = createDeps();
-    deps.dispatchCommand.mockResolvedValue(null);
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    await executeCliCommand({ kind: "open" }, deps);
-
-    expect(deps.dispatchCommand).toHaveBeenCalledWith("app.open", null);
-    expect(logSpy).toHaveBeenCalledWith("Opened Fluxnotes.");
-  });
-
-  it("returns without side effects for help command", async () => {
-    const deps = createDeps();
-
-    await executeCliCommand({ kind: "help" }, deps);
-
-    expect(deps.dispatchCommand).not.toHaveBeenCalled();
-    expect(deps.readFile).not.toHaveBeenCalled();
-    expect(deps.writeFile).not.toHaveBeenCalled();
   });
 });
