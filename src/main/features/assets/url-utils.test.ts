@@ -22,7 +22,7 @@ describe("assets url utils", () => {
   });
 
   it("throws business error for invalid asset url", () => {
-    expect(() => splitAssetUrl("http://invalid")).toThrowError("Invalid asset url");
-    expect(() => splitAssetUrl("assets://missing-block")).toThrowError("Invalid asset url");
+    expect(() => splitAssetUrl("http://invalid")).toThrow("Invalid asset url");
+    expect(() => splitAssetUrl("assets://missing-block")).toThrow("Invalid asset url");
   });
 });

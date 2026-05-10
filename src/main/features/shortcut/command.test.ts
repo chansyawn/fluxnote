@@ -55,7 +55,7 @@ describe("shortcut command", () => {
 
     registerShortcutCommands(ipc as never, { events: { emit: vi.fn() } } as never);
 
-    expect(() => handlers.get("shortcut.register")?.({ shortcut: "Alt+N" })).toThrowError(
+    expect(() => handlers.get("shortcut.register")?.({ shortcut: "Alt+N" })).toThrow(
       /Failed to register global shortcut/,
     );
   });

@@ -2,12 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { FluxCliCommand } from "./args";
 import {
+  executeAddFromAuto,
+  executeAddFromFile,
+  executeAddFromText,
   executeCliCommand,
-  executeCreateFromFile,
-  executeCreateFromText,
   executeExternalEdit,
   executeOpen,
 } from "./executor";
+
+function createFileStat(isFile: boolean) {
+  return {
+    isFile: () => isFile,
+  };
+}
 
 function createDeps() {
   return {
@@ -15,6 +22,7 @@ function createDeps() {
     cwd: vi.fn(() => "/workspace"),
     dispatchCommand: vi.fn(),
     readFile: vi.fn(),
+    stat: vi.fn(async () => createFileStat(true)),
     writeFile: vi.fn(),
   };
 }
@@ -35,12 +43,12 @@ describe("executor", () => {
     expect(logSpy).toHaveBeenCalledWith("Opened Fluxnotes.");
   });
 
-  it("creates a block from text", async () => {
+  it("adds a block from text", async () => {
     const deps = createDeps();
     deps.dispatchCommand.mockResolvedValue({ blockId: "block-1" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    await executeCreateFromText("hello", deps);
+    await executeAddFromText("hello", deps);
 
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       content: "hello",
@@ -48,20 +56,75 @@ describe("executor", () => {
     expect(logSpy).toHaveBeenCalledWith("Created block: block-1");
   });
 
-  it("creates a block from file", async () => {
+  it("adds a block from file", async () => {
     const deps = createDeps();
     deps.readFile.mockResolvedValue("file-content");
     deps.dispatchCommand.mockResolvedValue({ blockId: "block-2" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    await executeCreateFromFile("note.md", deps);
+    await executeAddFromFile("note.md", deps);
 
     expect(deps.access).toHaveBeenCalledWith("/workspace/note.md");
+    expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
     expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       content: "file-content",
     });
     expect(logSpy).toHaveBeenCalledWith("Created block: block-2");
+  });
+
+  it("rejects directories for explicit file input", async () => {
+    const deps = createDeps();
+    deps.stat.mockResolvedValue(createFileStat(false));
+
+    await expect(executeAddFromFile("notes", deps)).rejects.toThrow("Expected a file path: notes");
+    expect(deps.readFile).not.toHaveBeenCalled();
+  });
+
+  it("adds a block from auto input when input is an existing file", async () => {
+    const deps = createDeps();
+    deps.readFile.mockResolvedValue("file-content");
+    deps.dispatchCommand.mockResolvedValue({ blockId: "block-3" });
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await executeAddFromAuto("note.md", deps);
+
+    expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
+    expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
+    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      content: "file-content",
+    });
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-3");
+  });
+
+  it("adds a block from auto input as text when input is not a file", async () => {
+    const deps = createDeps();
+    deps.stat.mockResolvedValue(createFileStat(false));
+    deps.dispatchCommand.mockResolvedValue({ blockId: "block-4" });
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await executeAddFromAuto("hello", deps);
+
+    expect(deps.readFile).not.toHaveBeenCalled();
+    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      content: "hello",
+    });
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-4");
+  });
+
+  it("adds a block from auto input as text when stat fails", async () => {
+    const deps = createDeps();
+    deps.stat.mockRejectedValue(new Error("missing"));
+    deps.dispatchCommand.mockResolvedValue({ blockId: "block-5" });
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    await executeAddFromAuto("hello", deps);
+
+    expect(deps.readFile).not.toHaveBeenCalled();
+    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      content: "hello",
+    });
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-5");
   });
 
   it("writes updated content on external edit submit", async () => {
@@ -90,18 +153,17 @@ describe("executor", () => {
     deps.dispatchCommand.mockRejectedValue(new Error("failed"));
     deps.writeFile.mockResolvedValue(undefined);
 
-    await expect(executeExternalEdit("note.md", deps)).rejects.toThrowError("failed");
+    await expect(executeExternalEdit("note.md", deps)).rejects.toThrow("failed");
     expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "original", "utf8");
   });
 
-  it("routes parsed command through executeCliCommand", async () => {
+  it("routes add file command through executeCliCommand", async () => {
     const deps = createDeps();
     deps.readFile.mockResolvedValue("text-from-file");
-    deps.dispatchCommand.mockResolvedValueOnce({ blockId: "block-3" });
+    deps.dispatchCommand.mockResolvedValueOnce({ blockId: "block-6" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const command: FluxCliCommand = {
-      kind: "create",
-      edit: false,
+      kind: "add",
       source: {
         filePath: "note.md",
         type: "file",
@@ -113,16 +175,15 @@ describe("executor", () => {
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       content: "text-from-file",
     });
-    expect(logSpy).toHaveBeenCalledWith("Created block: block-3");
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-6");
   });
 
-  it("routes text command through executeCliCommand", async () => {
+  it("routes add text command through executeCliCommand", async () => {
     const deps = createDeps();
-    deps.dispatchCommand.mockResolvedValue({ blockId: "block-4" });
+    deps.dispatchCommand.mockResolvedValue({ blockId: "block-7" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
     const command: FluxCliCommand = {
-      kind: "create",
-      edit: false,
+      kind: "add",
       source: {
         text: "inline",
         type: "text",
@@ -134,7 +195,41 @@ describe("executor", () => {
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       content: "inline",
     });
-    expect(logSpy).toHaveBeenCalledWith("Created block: block-4");
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-7");
+  });
+
+  it("routes add auto command through executeCliCommand", async () => {
+    const deps = createDeps();
+    deps.stat.mockResolvedValue(createFileStat(false));
+    deps.dispatchCommand.mockResolvedValue({ blockId: "block-8" });
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const command: FluxCliCommand = {
+      kind: "add",
+      source: {
+        input: "inline",
+        type: "auto",
+      },
+    };
+
+    await executeCliCommand(command, deps);
+
+    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      content: "inline",
+    });
+    expect(logSpy).toHaveBeenCalledWith("Created block: block-8");
+  });
+
+  it("routes edit command through executeCliCommand", async () => {
+    const deps = createDeps();
+    deps.readFile.mockResolvedValue("original");
+    deps.dispatchCommand.mockResolvedValue({ status: "submitted", content: "updated" });
+
+    await executeCliCommand({ filePath: "note.md", kind: "edit" }, deps);
+
+    expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
+      content: "original",
+    });
+    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "updated", "utf8");
   });
 
   it("routes open command through executeCliCommand", async () => {

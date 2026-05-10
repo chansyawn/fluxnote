@@ -28,7 +28,7 @@ describe("tags service", () => {
   it("rejects duplicate tag name", async () => {
     await createTag(ctx.db, "dup");
 
-    await expect(createTag(ctx.db, "dup")).rejects.toThrowError(/Failed query: insert into "tags"/);
+    await expect(createTag(ctx.db, "dup")).rejects.toThrow(/Failed query: insert into "tags"/);
   });
 
   it("deletes existing tag", async () => {

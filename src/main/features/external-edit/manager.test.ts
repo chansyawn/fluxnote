@@ -25,7 +25,7 @@ describe("external-edit manager", () => {
   it("throws not found when claim missing session", () => {
     const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
 
-    expect(() => manager.claim("missing")).toThrowError(/External edit not found/);
+    expect(() => manager.claim("missing")).toThrow(/External edit not found/);
   });
 
   it("cancels all pending sessions", async () => {

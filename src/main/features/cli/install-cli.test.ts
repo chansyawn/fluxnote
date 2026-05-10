@@ -87,13 +87,13 @@ describe("install-cli", () => {
   it("throws on non-macos platform", async () => {
     setPlatform("linux");
 
-    await expect(installCli()).rejects.toThrowError(/only supported on macOS/);
+    await expect(installCli()).rejects.toThrow(/only supported on macOS/);
   });
 
   it("throws when wrapper file does not exist", async () => {
     mocks.access.mockRejectedValue(new Error("missing"));
 
-    await expect(installCli()).rejects.toThrowError(/CLI wrapper not found/);
+    await expect(installCli()).rejects.toThrow(/CLI wrapper not found/);
   });
 
   it("falls back to admin symlink when direct symlink fails", async () => {

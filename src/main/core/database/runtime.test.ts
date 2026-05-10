@@ -11,7 +11,7 @@ describe("createDbRuntime", () => {
       migrateDatabase: vi.fn(),
     });
 
-    expect(() => runtime.getDb()).toThrowError("Database is not initialized");
+    expect(() => runtime.getDb()).toThrow("Database is not initialized");
   });
 
   it("initializes once for concurrent init calls", async () => {
@@ -48,9 +48,9 @@ describe("createDbRuntime", () => {
       migrateDatabase,
     });
 
-    await expect(runtime.init()).rejects.toThrowError("migration failed");
+    await expect(runtime.init()).rejects.toThrow("migration failed");
     expect(close).toHaveBeenCalledTimes(1);
-    expect(() => runtime.getDb()).toThrowError("Database is not initialized");
+    expect(() => runtime.getDb()).toThrow("Database is not initialized");
   });
 
   it("close is idempotent and resets initialized state", async () => {
@@ -71,6 +71,6 @@ describe("createDbRuntime", () => {
     await runtime.close();
 
     expect(close).toHaveBeenCalledTimes(1);
-    expect(() => runtime.getDb()).toThrowError("Database is not initialized");
+    expect(() => runtime.getDb()).toThrow("Database is not initialized");
   });
 });
