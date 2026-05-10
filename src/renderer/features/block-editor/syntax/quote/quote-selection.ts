@@ -8,11 +8,18 @@ import {
   getNearestAncestor,
   getSelectionAnchorNode,
   hasAncestor,
+  isCursorAtElementEnd,
   isCursorAtElementStart,
   isInlineRuntimeNode,
 } from "../container/selection";
 
-export { getElementParent, getSelectionAnchorNode, isCursorAtElementStart, isInlineRuntimeNode };
+export {
+  getElementParent,
+  getSelectionAnchorNode,
+  isCursorAtElementEnd,
+  isCursorAtElementStart,
+  isInlineRuntimeNode,
+};
 
 /*
  * Selection helpers translate Lexical points into quote-container concepts.

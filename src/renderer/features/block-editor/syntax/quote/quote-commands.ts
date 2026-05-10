@@ -18,6 +18,7 @@ import {
   applyQuoteContainerMultilineShortcutAtSelection,
 } from "./quote-shortcuts";
 import {
+  applyAltEnterAtQuoteSelection,
   collapseQuoteChildAtStart,
   exitQuoteAtEmptyParagraph,
   normalizeQuoteForEditing,
@@ -39,6 +40,7 @@ function getSelectionFromCommand(): RangeSelection | null {
  * Enter key policy, in priority order:
  * - Shift+Enter belongs to soft-break handling;
  * - multiline Markdown shortcuts run before quote exits;
+ * - Alt+Enter exits or splits the quote at the current quote boundary;
  * - an empty final paragraph exits the quote;
  * - all other positions stay owned by the active child block.
  */
@@ -65,6 +67,11 @@ function handleEnter(
   if (applyQuoteContainerMultilineShortcutAtSelection(selection, transformers)) {
     event?.preventDefault();
     return true;
+  }
+
+  if (event?.altKey) {
+    event.preventDefault();
+    return applyAltEnterAtQuoteSelection(quote, selection);
   }
 
   if (exitQuoteAtEmptyParagraph(quote, selection)) {

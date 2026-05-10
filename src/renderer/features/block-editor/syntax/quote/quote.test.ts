@@ -96,6 +96,72 @@ describe("quote", () => {
       expect(readMdast(editor).children).toMatchObject([{ children: [], type: "paragraph" }]);
     });
 
+    it("Alt+Enter at the start of a quote creates a paragraph before it", () => {
+      const editor = editorFromMdast(doc(quote(p(t("Quoted")))));
+
+      selectText(editor, "Quoted", 0);
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([
+        { children: [], type: "paragraph" },
+        {
+          children: [{ children: [{ type: "text", value: "Quoted" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+      ]);
+    });
+
+    it("Alt+Enter in the middle of a quote splits it into two quotes", () => {
+      const editor = editorFromMdast(doc(quote(p(t("FirstSecond")))));
+
+      selectText(editor, "FirstSecond", "First".length);
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([
+        {
+          children: [{ children: [{ type: "text", value: "First" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+        {
+          children: [{ children: [{ type: "text", value: "Second" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+      ]);
+    });
+
+    it("Alt+Enter between quote children splits them into separate quotes", () => {
+      const editor = editorFromMdast(doc(quote(p(t("First")), p(t("Second")))));
+
+      selectText(editor, "Second", 0);
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([
+        {
+          children: [{ children: [{ type: "text", value: "First" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+        {
+          children: [{ children: [{ type: "text", value: "Second" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+      ]);
+    });
+
+    it("Alt+Enter at the end of a quote creates a paragraph after it", () => {
+      const editor = editorFromMdast(doc(quote(p(t("Quoted")))));
+
+      selectText(editor, "Quoted");
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([
+        {
+          children: [{ children: [{ type: "text", value: "Quoted" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+        { children: [], type: "paragraph" },
+      ]);
+    });
+
     it("Backspace at the start of the first child unwraps the quote", () => {
       const editor = editorFromMdast(doc(quote(p(t("First")), p(t("Second")))));
 
