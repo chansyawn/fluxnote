@@ -5,7 +5,7 @@ import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import { CodeBlockControlsDecorator } from "./code-block-controls-decorator";
-import { registerCodeKeyboardCommands } from "./code-keyboard";
+import { registerCodeKeyboardCommands } from "./code-commands";
 import { CODE_SHIKI_DEFAULT_THEME, CodeShikiThemeDecorator } from "./code-shiki-theme-decorator";
 
 export { codeBlockFromLexical, codeBlockToLexical } from "./lexical";
