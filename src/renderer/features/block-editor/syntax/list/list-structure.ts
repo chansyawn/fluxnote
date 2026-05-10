@@ -140,7 +140,7 @@ export function isSingleParagraphListItem(listItem: ListItemNode): boolean {
    */
   const children = listItem.getChildren();
   return (
-    children.length === 1 &&
+    children.length > 0 &&
     ($isParagraphNode(children[0]) || children.every((child) => isInlineRuntimeNode(child)))
   );
 }

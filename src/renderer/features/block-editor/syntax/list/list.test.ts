@@ -1,8 +1,15 @@
+import { $createListItemNode } from "@lexical/list";
+import { $createLineBreakNode, $createTextNode } from "lexical";
 import { describe, expect, it } from "vitest";
 
 import { expectMarkdownRoundTripStable } from "../../test-helper/assertions";
-import { applyMarkdownShortcuts, readMdast } from "../../test-helper/editor-driver";
+import {
+  applyMarkdownShortcuts,
+  createHeadlessEditor,
+  readMdast,
+} from "../../test-helper/editor-driver";
 import { editorFromMarkdown } from "../../test-helper/editor-driver";
+import { isSingleParagraphListItem } from "./list-structure";
 
 describe("list", () => {
   describe("structure round-trip", () => {
@@ -53,6 +60,24 @@ describe("list", () => {
       if (list.type === "list") {
         expect(list.children[0].checked).toBe(true);
       }
+    });
+  });
+
+  describe("structure helpers", () => {
+    it("treats raw inline children as a single paragraph item", () => {
+      const editor = createHeadlessEditor();
+      let result = false;
+
+      editor.update(
+        () => {
+          const listItem = $createListItemNode();
+          listItem.append($createTextNode("A"), $createLineBreakNode(), $createTextNode("B"));
+          result = isSingleParagraphListItem(listItem);
+        },
+        { discrete: true },
+      );
+
+      expect(result).toBe(true);
     });
   });
 
