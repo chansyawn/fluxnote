@@ -14,6 +14,11 @@ import {
 } from "./clipboard-insert";
 
 interface ClipboardDataSnapshot {
+  files: File[];
+  html: string;
+  markdown: string;
+  plainText: string;
+  rawHtml: string;
   getData(type: string): string;
 }
 
@@ -31,9 +36,24 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
     );
   }
 
+  const html = dataByType.get("text/html") ?? "";
+  const markdown = dataByType.get("text/markdown") ?? "";
+  const plainText = dataByType.get("text/plain") ?? "";
+  const rawHtml = dataTransfer.getData("text/html");
+
   return {
+    files: getSupportedImageFiles(dataTransfer),
+    html,
+    markdown,
+    plainText,
+    rawHtml,
     getData: (type: string) => dataByType.get(type) ?? "",
   };
+}
+
+function claimPaste(event: PasteCommandType): void {
+  event.preventDefault();
+  event.stopPropagation();
 }
 
 export function handleBlockEditorPaste(
@@ -47,27 +67,22 @@ export function handleBlockEditorPaste(
     return false;
   }
 
-  const files = getSupportedImageFiles(clipboardData);
-  if (files.length > 0) {
-    event.preventDefault();
-    event.stopPropagation();
-    void insertImageFilesAtSelection(editor, runtime, files, selection);
+  const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
+  if (clipboardDataSnapshot.files.length > 0) {
+    claimPaste(event);
+    void insertImageFilesAtSelection(editor, runtime, clipboardDataSnapshot.files, selection);
     return true;
   }
 
-  const eventPayload = decodeBlockEditorClipboardHtml(clipboardData.getData("text/html"));
+  const eventPayload = decodeBlockEditorClipboardHtml(clipboardDataSnapshot.rawHtml);
   if (eventPayload) {
-    event.preventDefault();
-    event.stopPropagation();
+    claimPaste(event);
     void insertClipboardPayloadAtSelection(editor, runtime, eventPayload, selection);
     return true;
   }
 
-  const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
-  event.preventDefault();
-  event.stopPropagation();
-  const markdown =
-    clipboardDataSnapshot.getData("text/markdown") || clipboardDataSnapshot.getData("text/plain");
+  claimPaste(event);
+  const markdown = clipboardDataSnapshot.markdown || clipboardDataSnapshot.plainText;
   if (markdown && insertMarkdownTablesAtSelection(editor, markdown, selection)) {
     return true;
   }

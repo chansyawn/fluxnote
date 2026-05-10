@@ -28,6 +28,12 @@ export function cloneCurrentSelection(): BaseSelection | null {
   return $getSelection()?.clone() ?? null;
 }
 
+function restoreSelection(selection: BaseSelection | null): void {
+  if (selection) {
+    $setSelection(selection.clone());
+  }
+}
+
 export function insertSerializedNodesAtSelection(
   nodes: ReadonlyArray<ClipboardSerializedNode>,
 ): void {
@@ -57,9 +63,7 @@ export function insertRichTextDataAtSelection(
 ): void {
   editor.update(
     () => {
-      if (selection) {
-        $setSelection(selection.clone());
-      }
+      restoreSelection(selection);
 
       const currentSelection = $getSelection();
       if (currentSelection) {
@@ -81,9 +85,7 @@ export async function insertClipboardPayloadAtSelection(
 
   editor.update(
     () => {
-      if (selection) {
-        $setSelection(selection.clone());
-      }
+      restoreSelection(selection);
 
       insertSerializedNodesAtSelection(nodes);
     },
