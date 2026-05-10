@@ -30,10 +30,9 @@ import {
 } from "./list-selection";
 
 /*
- * This module owns structural mutations for list-item containers. Helpers move
- * Lexical nodes directly so paragraph children, structured blocks and nested
- * lists travel as one subtree; no operation reconstructs content from rendered
- * Markdown lines.
+ * List items are block containers. Structural helpers move Lexical subtrees
+ * directly so paragraphs, structured blocks, and nested lists keep their runtime
+ * state instead of being rebuilt from Markdown text.
  */
 
 function getListParent(item: ListItemNode): ListNode | null {
@@ -57,12 +56,11 @@ function getLastNestedList(item: ListItemNode, listType: ListType): ListNode | n
   return lists.at(-1) ?? null;
 }
 
+/*
+ * Indenting appends to the previous sibling's last nested list of the same
+ * type, matching Markdown nesting without disturbing earlier block children.
+ */
 function getOrCreateNestedList(item: ListItemNode, listType: ListType): ListNode {
-  /*
-   * Indenting appends to the last nested list of the same type under the
-   * previous sibling. This mirrors Markdown nesting while preserving any
-   * existing block children before that nested list.
-   */
   const nested = getLastNestedList(item, listType);
   if (nested) {
     return nested;
@@ -79,13 +77,13 @@ function removeListIfEmpty(list: ListNode): void {
   }
 }
 
+/*
+ * Lexical's list extension can leave raw inline nodes directly under a list item.
+ * The editor's semantic model treats list items as block containers, so inline
+ * runs are wrapped into paragraphs before shortcuts, typing or structural
+ * operations.
+ */
 export function normalizeListItemBlockChildren(listItem: ListItemNode): boolean {
-  /*
-   * Lexical's list extension can leave raw inline nodes directly under a list item.
-   * The editor's semantic model treats list items as block containers, so inline
-   * runs are wrapped into paragraphs before shortcuts, typing or structural
-   * operations.
-   */
   return normalizeContainerBlockChildren(listItem);
 }
 
@@ -97,32 +95,30 @@ export function ensureListItemHasParagraph(listItem: ListItemNode): boolean {
   return ensureContainerHasParagraph(listItem);
 }
 
+/*
+ * Fresh Markdown-created list items can leave the collapsed cursor on the
+ * ListItemNode itself. That element point is valid to Lexical, but it is not a
+ * text-editing location for this editor because list items are block
+ * containers. Move it into the nearest paragraph child so typing, Enter and
+ * Backspace all see the same shape as imported Markdown lists.
+ */
 export function repairListItemSelection(
   listItem: ListItemNode,
   selection: RangeSelection,
 ): boolean {
-  /*
-   * Fresh Markdown-created list items can leave the collapsed cursor on the
-   * ListItemNode itself. That element point is valid to Lexical, but it is not a
-   * text-editing location for this editor because list items are block
-   * containers. Move it into the nearest paragraph child so typing, Enter and
-   * Backspace all see the same shape as imported Markdown lists.
-   */
   return repairCollapsedSelectionIntoContainerChild(listItem, selection);
 }
 
+/*
+ * Normalize runtime list items to the editor's block-container shape:
+ * - empty items receive an editable paragraph;
+ * - raw inline children are wrapped into paragraphs;
+ * - collapsed selection on the item moves into a child block.
+ */
 export function normalizeListItemForEditing(
   listItem: ListItemNode,
   selection: RangeSelection | null,
 ): boolean {
-  /*
-   * Runtime list normalization rules:
-   *
-   * - empty list items receive an editable paragraph child;
-   * - raw inline children are wrapped into paragraph blocks;
-   * - collapsed selection on the ListItemNode is moved into a child block;
-   * - existing paragraph, quote, code and nested-list children are preserved.
-   */
   const changed = ensureListItemHasParagraph(listItem);
   const selectionChanged = selection ? repairListItemSelection(listItem, selection) : false;
   return changed || selectionChanged;
@@ -132,12 +128,12 @@ export function isEmptyListItem(listItem: ListItemNode): boolean {
   return !listItem.getChildren().some(isMeaningfulContainerChild);
 }
 
+/*
+ * Raw inline children are accepted here because callers may check the shape
+ * before normalization. They represent the same user-facing state as a single
+ * paragraph list item.
+ */
 export function isSingleParagraphListItem(listItem: ListItemNode): boolean {
-  /*
-   * Raw inline children are accepted here because callers may check the shape
-   * before normalization. They represent the same user-facing state as a single
-   * paragraph list item.
-   */
   const children = listItem.getChildren();
   return (
     children.length > 0 &&
@@ -145,13 +141,11 @@ export function isSingleParagraphListItem(listItem: ListItemNode): boolean {
   );
 }
 
+/*
+ * Structured children own their internal editing; paragraphs and raw inline
+ * runtime nodes are the only simple text blocks for list keyboard commands.
+ */
 export function isStructuredListItemBlock(node: LexicalNode | null): boolean {
-  /*
-   * Paragraphs and inline runtime nodes are simple text blocks for list keyboard
-   * purposes. Everything else is treated as structured and keeps ownership of
-   * its internal Enter/Backspace behavior unless a command explicitly splits at
-   * a block boundary.
-   */
   return (
     node !== null &&
     !$isParagraphNode(node) &&
@@ -160,16 +154,14 @@ export function isStructuredListItemBlock(node: LexicalNode | null): boolean {
   );
 }
 
+/*
+ * Only the start of the first paragraph counts as the marker position. Starts
+ * of quote/code/nested blocks must not unwrap the surrounding list item.
+ */
 export function isCursorAtListMarkerPosition(
   selection: RangeSelection,
   listItem: ListItemNode,
 ): boolean {
-  /*
-   * The marker position is deliberately narrower than "start of list item".
-   * It only matches the start of the first paragraph child. This prevents
-   * Backspace at the start of quote/code/nested blocks from accidentally
-   * unwrapping the surrounding list item.
-   */
   const firstChild = listItem.getFirstChild();
   if (!firstChild) {
     return true;
@@ -183,15 +175,14 @@ export function isCursorAtListMarkerPosition(
   return isCursorAtElementStart(selection, currentChild);
 }
 
+/*
+ * Let structured blocks collapse themselves first so quote/code exit behavior
+ * stays local to those block implementations.
+ */
 export function collapseStructuredBlockAtStart(
   selection: RangeSelection,
   listItem: ListItemNode,
 ): boolean {
-  /*
-   * Quote, code and other ElementNode-based blocks know how to collapse at their
-   * own start. Calling collapseAtStart keeps block-specific exit behavior local
-   * to the block and avoids duplicating quote/code rules in the list handler.
-   */
   const currentBlock = getDirectListItemChild(selection.anchor.getNode(), listItem);
   if (
     !$isElementNode(currentBlock) ||
@@ -224,14 +215,11 @@ export function hasNestedListAfterCurrentParagraph(
   return $isParagraphNode(currentChild) && $isListNode(currentChild.getNextSibling());
 }
 
+/*
+ * Alt+Enter inside a simple item inserts a sibling paragraph block within the
+ * same list item and selects it for continued typing.
+ */
 export function insertBlockInsideListItem(selection: RangeSelection): boolean {
-  /*
-   * Alt+Enter inside a simple item:
-   *
-   * - insert a paragraph block inside the current list item;
-   * - let Lexical split the current paragraph at the cursor;
-   * - select the new paragraph so typing continues inside the same item.
-   */
   const inserted = selection.insertParagraph();
   if (!$isElementNode(inserted)) {
     return false;
@@ -241,19 +229,15 @@ export function insertBlockInsideListItem(selection: RangeSelection): boolean {
   return true;
 }
 
+/*
+ * Alt+Enter in a multi-block item splits at the current block boundary:
+ * content before the cursor stays put, and content after it moves into the new
+ * sibling list item.
+ */
 export function splitListItemBlocksAtSelection(
   listItem: ListItemNode,
   selection: RangeSelection,
 ): boolean {
-  /*
-   * Alt+Enter in a multi-block item:
-   *
-   * - content before the cursor remains in the current item;
-   * - content after the cursor moves into a new sibling item;
-   * - when the cursor is inside a paragraph, that paragraph is split first;
-   * - when the cursor is inside a structured block, the split happens after the
-   *   structured block so the block can keep its own internal state intact.
-   */
   const list = getListParent(listItem);
   const currentBlock = getDirectListItemChild(selection.anchor.getNode(), listItem);
   if (!list || !currentBlock) {
@@ -285,18 +269,14 @@ export function splitListItemBlocksAtSelection(
   return true;
 }
 
+/*
+ * Plain Enter creates the next list item from the current paragraph split,
+ * moving the inserted paragraph and following blocks into that item.
+ */
 export function splitListItemAtSelection(
   listItem: ListItemNode,
   selection: RangeSelection,
 ): boolean {
-  /*
-   * Plain Enter list split:
-   *
-   * - applies to a single paragraph item;
-   * - also applies to the final paragraph of a multi-block item;
-   * - splits the current paragraph at the cursor;
-   * - moves the new paragraph and following blocks into the new sibling item.
-   */
   const list = getListParent(listItem);
   if (!list) {
     return false;
@@ -316,15 +296,11 @@ export function splitListItemAtSelection(
   return true;
 }
 
+/*
+ * Tab requires a previous sibling and moves the whole selected ListItemNode
+ * under that sibling's nested list, preserving all child blocks.
+ */
 export function indentListItemSubtree(listItem: ListItemNode): boolean {
-  /*
-   * Tab indent:
-   *
-   * - require a previous sibling list item;
-   * - move the selected ListItemNode under that sibling's nested list;
-   * - keep paragraph, quote, code and nested list children attached to the moved
-   *   subtree in their original order.
-   */
   const list = getListParent(listItem);
   const previous = listItem.getPreviousSibling();
   if (!list || !$isListItemNode(previous)) {
@@ -337,16 +313,12 @@ export function indentListItemSubtree(listItem: ListItemNode): boolean {
   return true;
 }
 
+/*
+ * Shift+Tab promotes nested items after their parent item. Top-level items
+ * unwrap into ordinary blocks, while following siblings stay nested under the
+ * promoted item.
+ */
 export function outdentListItemSubtree(listItem: ListItemNode): boolean {
-  /*
-   * Shift+Tab outdent:
-   *
-   * - nested item: promote the item after its containing parent item;
-   * - following siblings at the old level: move them under the promoted item as
-   *   a nested list;
-   * - top-level item: unwrap it into ordinary blocks;
-   * - every path preserves child block and nested list subtrees.
-   */
   const list = getListParent(listItem);
   if (!list) {
     return false;
@@ -368,15 +340,11 @@ export function outdentListItemSubtree(listItem: ListItemNode): boolean {
   return unwrapListItemToBlocks(listItem);
 }
 
+/*
+ * Top-level outdent converts the selected item children into ordinary sibling
+ * blocks and keeps any following list items in a new list after them.
+ */
 export function unwrapListItemToBlocks(listItem: ListItemNode): boolean {
-  /*
-   * Top-level Shift+Tab unwrap:
-   *
-   * - convert the selected list item children into ordinary sibling blocks;
-   * - if following list items exist, move them into a new list after the
-   *   unwrapped blocks;
-   * - keep block order stable whether the item is first, middle or last.
-   */
   const list = getListParent(listItem);
   const container = list?.getParent();
   if (!list || !$isElementNode(container)) {
@@ -419,15 +387,11 @@ export function unwrapListItemToBlocks(listItem: ListItemNode): boolean {
   return true;
 }
 
+/*
+ * Marker Backspace with a previous sibling appends this item's blocks to that
+ * sibling and selects the first moved block.
+ */
 export function mergeListItemIntoPreviousSibling(listItem: ListItemNode): boolean {
-  /*
-   * Backspace marker merge:
-   *
-   * - require a previous sibling list item;
-   * - append all current item block children to that previous sibling;
-   * - never guess a visual insertion line;
-   * - keep previous structured children, such as quotes, ahead of moved content.
-   */
   const previous = listItem.getPreviousSibling();
   if (!$isListItemNode(previous)) {
     return false;

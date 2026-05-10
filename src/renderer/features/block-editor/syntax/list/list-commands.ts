@@ -42,16 +42,9 @@ import {
 } from "./list-structure";
 
 /*
- * Keyboard handling is split along ownership boundaries:
- *
- * - list-commands decides whether a keystroke should affect list structure;
- * - list-structure performs tree mutations on ListNode/ListItemNode subtrees;
- * - paragraph, quote, code and other block nodes keep their own internal editing
- *   behavior whenever this module returns false.
- *
- * This is important for WYSIWYG Markdown because a list item can contain many
- * block children. Enter inside a code block should still be a code-block newline,
- * while Enter at the end of the final paragraph should create the next list item.
+ * List keyboard commands only own list-level structure changes. Returning false
+ * deliberately delegates the keystroke to the focused child block or Lexical's
+ * default editing behavior.
  */
 
 function getSelectionFromCommand(): RangeSelection | null {
@@ -59,6 +52,12 @@ function getSelectionFromCommand(): RangeSelection | null {
   return $isRangeSelection(selection) && selection.isCollapsed() ? selection : null;
 }
 
+/*
+ * Alt+Enter stays inside the current list item when possible:
+ * - single paragraph item: insert another paragraph in the same item;
+ * - multi-block item: split the item into sibling list items;
+ * - structured block: split at the block boundary, not inside block internals.
+ */
 function handleAltEnter(selection: RangeSelection): boolean {
   const listItem = getCurrentListItem(selection);
   if (!listItem) {
@@ -67,17 +66,6 @@ function handleAltEnter(selection: RangeSelection): boolean {
 
   normalizeListItemForEditing(listItem, selection);
   const currentBlock = getCurrentListItemBlock(selection, listItem);
-  /*
-   * Alt+Enter rules:
-   *
-   * - single paragraph item: insert a new paragraph block inside the current
-   *   list item;
-   * - multi-block item: split the current item into two sibling list items;
-   * - structured block context: split at the list-item block boundary instead of
-   *   reimplementing quote/code internals;
-   * - split result: blocks before the cursor stay in the current item, and
-   *   blocks after the cursor move to the new sibling item.
-   */
   if (isSingleParagraphListItem(listItem) && !isStructuredListItemBlock(currentBlock)) {
     return insertBlockInsideListItem(selection);
   }
@@ -85,17 +73,19 @@ function handleAltEnter(selection: RangeSelection): boolean {
   return splitListItemBlocksAtSelection(listItem, selection);
 }
 
+/*
+ * Enter key policy, in priority order:
+ * - Shift+Enter belongs to soft-break handling;
+ * - multiline Markdown shortcuts run before list splitting;
+ * - Alt+Enter inserts/splits blocks inside the current item;
+ * - empty items exit one list level;
+ * - structured children keep their own Enter behavior;
+ * - paragraph endings create the next list item.
+ */
 function handleEnter(
   event: KeyboardEvent | null,
   transformers: ReadonlyArray<Transformer>,
 ): boolean {
-  /*
-   * Shift+Enter rules:
-   *
-   * - the soft break shortcut owns the key;
-   * - this handler returns false before any list mutation;
-   * - list splitting and block insertion never run for Shift+Enter.
-   */
   if (event?.shiftKey) {
     return false;
   }
@@ -124,40 +114,16 @@ function handleEnter(
 
   ensureListItemHasParagraph(listItem);
 
-  /*
-   * Enter on an empty item:
-   *
-   * - nested item: promote it one list level;
-   * - top-level item: unwrap it into ordinary blocks;
-   * - both paths keep an editable paragraph so the user can continue typing.
-   */
   if (isEmptyListItem(listItem)) {
     event?.preventDefault();
     return outdentListItemSubtree(listItem);
   }
 
   const currentBlock = getCurrentListItemBlock(selection, listItem);
-  /*
-   * Enter inside structured blocks:
-   *
-   * - quote/code/nested-list children own their internal Enter behavior;
-   * - the list handler returns false instead of forcing a list split;
-   * - block-specific newline, split or exit behavior remains local to that node.
-   */
   if (!currentBlock || isStructuredListItemBlock(currentBlock)) {
     return false;
   }
 
-  /*
-   * Enter on paragraph blocks:
-   *
-   * - single paragraph item: split into a new sibling list item;
-   * - final paragraph in a multi-block item: split into a new sibling list item;
-   * - paragraph before a nested list: split so the nested list follows the new
-   *   sibling item;
-   * - non-final paragraph in a multi-block item: return false so paragraph
-   *   editing stays inside the current list item.
-   */
   if (
     isSingleParagraphListItem(listItem) ||
     isCursorAtLastParagraphEnd(selection, listItem) ||
@@ -170,6 +136,12 @@ function handleEnter(
   return false;
 }
 
+/*
+ * Tab changes list depth for selected items:
+ * - parent/child overlap moves only the selected parent subtree;
+ * - Tab nests items under the previous sibling;
+ * - Shift+Tab promotes items or unwraps top-level items.
+ */
 function handleTab(event: KeyboardEvent): boolean {
   const selection = $getSelection();
   if (!$isRangeSelection(selection)) {
@@ -182,16 +154,6 @@ function handleTab(event: KeyboardEvent): boolean {
   }
 
   event.preventDefault();
-  /*
-   * Tab and Shift+Tab rules:
-   *
-   * - selection is normalized so parent/child overlap moves only the parent;
-   * - Tab moves each selected item under the previous sibling's nested list;
-   * - Shift+Tab promotes each selected item one level or unwraps top-level
-   *   items into ordinary blocks;
-   * - moving the ListItemNode itself preserves all block children and nested
-   *   lists under that item.
-   */
   for (const item of items) {
     if (event.shiftKey) {
       outdentListItemSubtree(item);
@@ -202,6 +164,13 @@ function handleTab(event: KeyboardEvent): boolean {
   return true;
 }
 
+/*
+ * Backspace only owns list structure at safe boundaries:
+ * - structured block start first collapses/exits that child block;
+ * - marker position merges into the previous item when available;
+ * - first item marker position unwraps or outdents the item;
+ * - all other positions delegate to normal text/block editing.
+ */
 function handleBackspace(event: KeyboardEvent): boolean {
   const selection = getSelectionFromCommand();
   if (!selection) {
@@ -214,26 +183,11 @@ function handleBackspace(event: KeyboardEvent): boolean {
   }
 
   normalizeListItemForEditing(listItem, selection);
-  /*
-   * Backspace at structured block start:
-   *
-   * - quote/code children first receive collapseAtStart;
-   * - the first Backspace exits the structured child wrapper;
-   * - list marker merge/outdent is skipped for this keypress.
-   */
   if (collapseStructuredBlockAtStart(selection, listItem)) {
     event.preventDefault();
     return true;
   }
 
-  /*
-   * Backspace at list marker:
-   *
-   * - only the start of the first paragraph child counts as the marker position;
-   * - with a previous sibling, append this item's blocks to that sibling;
-   * - without a previous sibling, outdent or unwrap this item;
-   * - all other cursor positions delegate to the active block or Lexical default.
-   */
   if (!isCursorAtListMarkerPosition(selection, listItem)) {
     return false;
   }
@@ -242,19 +196,15 @@ function handleBackspace(event: KeyboardEvent): boolean {
   return mergeListItemIntoPreviousSibling(listItem) || unwrapListItemToBlocks(listItem);
 }
 
+/*
+ * Register before Lexical's default list commands so FluxNote can preserve the
+ * block-container model, while still replaying Markdown shortcuts after text
+ * updates inside list items.
+ */
 export function registerListKeyboardCommands(
   editor: LexicalEditor,
   transformers: ReadonlyArray<Transformer>,
 ): () => void {
-  /*
-   * Registered shortcut command policy:
-   *
-   * - use high priority before the default list extension mutates plain list text;
-   * - handle only structural list actions;
-   * - return false whenever the focused child block should own the key;
-   * - replay Markdown shortcuts through the shared transformer set after text
-   *   updates inside list-item block containers.
-   */
   return mergeRegister(
     editor.registerCommand(
       KEY_ENTER_COMMAND,
@@ -265,14 +215,9 @@ export function registerListKeyboardCommands(
     editor.registerCommand(KEY_BACKSPACE_COMMAND, handleBackspace, COMMAND_PRIORITY_HIGH),
     editor.registerNodeTransform(ListItemNode, (listItem) => {
       /*
-       * Fresh Markdown shortcuts create Lexical-native list items first. The
-       * runtime transform immediately aligns them with the block-container
-       * model used by imported Markdown:
-       *
-       * - inline text under ListItemNode becomes a paragraph child;
-       * - empty items receive an editable paragraph;
-       * - a collapsed cursor on the list item moves into that paragraph;
-       * - existing structured children are left untouched.
+       * Keep Lexical-created list items aligned with imported Markdown lists:
+       * inline text is wrapped, empty items become editable, and structured
+       * children are preserved.
        */
       const selection = $getSelection();
       normalizeListItemForEditing(listItem, $isRangeSelection(selection) ? selection : null);

@@ -19,6 +19,12 @@ import {
 import { getContainingQuote, getElementParent, getSelectionAnchorNode } from "./quote-selection";
 import { normalizeQuoteBlockChildren } from "./quote-structure";
 
+/*
+ * Quote Markdown shortcuts run only inside text-bearing quote children. The
+ * shortcut transforms the child block while keeping quote-container ownership of
+ * selection repair and block normalization.
+ */
+
 function getTransformerParent(anchorNode: TextNode): ElementNode | null {
   const quote = getContainingQuote(anchorNode);
   if (!quote) {
@@ -34,6 +40,10 @@ function getTransformerParent(anchorNode: TextNode): ElementNode | null {
   return parent;
 }
 
+/*
+ * Shortcuts require a collapsed cursor at the start of the first text node in a
+ * non-code child block, matching root shortcut behavior inside the quote.
+ */
 function getShortcutContext(selection: RangeSelection): ContainerShortcutContext | null {
   if (!selection.isCollapsed()) {
     return null;

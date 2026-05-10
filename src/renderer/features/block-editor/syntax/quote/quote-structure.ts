@@ -19,10 +19,26 @@ import {
   isCursorAtElementStart,
 } from "./quote-selection";
 
+/*
+ * Quotes are block containers. Structural helpers move Lexical child blocks
+ * directly so paragraphs, lists, code blocks, and nested quotes keep their
+ * runtime state instead of being rebuilt from Markdown text.
+ */
+
+/*
+ * Ensure every quote has an editable block child before shortcuts, typing, or
+ * structural operations inspect its contents.
+ */
 export function normalizeQuoteBlockChildren(quote: QuoteNode): boolean {
   return ensureContainerHasParagraph(quote);
 }
 
+/*
+ * Normalize runtime quotes to the editor's block-container shape:
+ * - empty quotes receive an editable paragraph;
+ * - raw inline children are wrapped into paragraphs;
+ * - collapsed selection on the quote moves into a child block.
+ */
 export function normalizeQuoteForEditing(
   quote: QuoteNode,
   selection: RangeSelection | null,
@@ -34,6 +50,10 @@ export function isEmptyQuote(quote: QuoteNode): boolean {
   return !quote.getChildren().some(isMeaningfulContainerChild);
 }
 
+/*
+ * A quote exit paragraph is the empty final paragraph inside the quote. Enter on
+ * that paragraph exits the quote instead of inserting another quoted line.
+ */
 export function isQuoteExitParagraph(quote: QuoteNode, selection: RangeSelection): boolean {
   const anchorNode = getSelectionAnchorNode(selection);
   if (!anchorNode) {
@@ -48,6 +68,10 @@ export function isQuoteExitParagraph(quote: QuoteNode, selection: RangeSelection
   );
 }
 
+/*
+ * Enter on an empty final quote paragraph creates an ordinary paragraph after
+ * the quote, or replaces an otherwise empty quote with that paragraph.
+ */
 export function exitQuoteAtEmptyParagraph(quote: QuoteNode, selection: RangeSelection): boolean {
   const anchorNode = getSelectionAnchorNode(selection);
   if (!anchorNode) {
@@ -71,6 +95,10 @@ export function exitQuoteAtEmptyParagraph(quote: QuoteNode, selection: RangeSele
   return true;
 }
 
+/*
+ * Unwrapping converts quote children into ordinary sibling blocks. Root-level
+ * quotes insert blocks before removal; nested quotes insert after the container.
+ */
 export function unwrapQuoteToBlocks(quote: QuoteNode): boolean {
   const parent = quote.getParent();
   if (!$isElementNode(parent)) {
@@ -107,6 +135,10 @@ export function unwrapQuoteToBlocks(quote: QuoteNode): boolean {
   return true;
 }
 
+/*
+ * Backspace unwraps a quote only from the start of its first direct child. Other
+ * quote positions stay owned by the active child block.
+ */
 export function unwrapQuoteAtStart(selection: RangeSelection, quote: QuoteNode): boolean {
   const anchorNode = getSelectionAnchorNode(selection);
   if (!anchorNode) {
@@ -125,6 +157,10 @@ export function unwrapQuoteAtStart(selection: RangeSelection, quote: QuoteNode):
   return unwrapQuoteToBlocks(quote);
 }
 
+/*
+ * Structured quote children collapse themselves first so nested list/code/quote
+ * exit behavior stays local to those block implementations.
+ */
 export function collapseQuoteChildAtStart(selection: RangeSelection, quote: QuoteNode): boolean {
   const anchorNode = getSelectionAnchorNode(selection);
   if (!anchorNode) {
