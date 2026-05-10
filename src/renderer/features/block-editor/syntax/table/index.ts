@@ -1,7 +1,9 @@
+import { ReactExtension } from "@lexical/react/ReactExtension";
 import { TableExtension } from "@lexical/table";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
+import { TableControlsDecorator } from "./table-controls-decorator";
 import { TABLE } from "./table-shortcut";
 
 export { tableFromLexical, tableToLexical } from "./lexical";
@@ -31,4 +33,13 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
     tableSelected: "block-editor__table--selected",
     tableSelection: "block-editor__table-selection",
   },
+});
+
+export const TABLE_SYNTAX_REACT_EXTENSION = defineExtension({
+  name: "fluxnotes/block-editor/syntax/table/react",
+  dependencies: [
+    configExtension(ReactExtension, {
+      decorators: [TableControlsDecorator],
+    }),
+  ],
 });

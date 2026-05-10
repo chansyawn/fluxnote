@@ -1,7 +1,7 @@
 @reference "#global.css";
 
 .block-editor__table-scrollable-wrapper {
-  @apply my-2 overflow-x-auto;
+  @apply my-2 overflow-x-auto overflow-y-visible;
 }
 
 .block-editor__table {
