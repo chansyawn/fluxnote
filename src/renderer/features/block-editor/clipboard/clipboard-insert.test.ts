@@ -36,19 +36,30 @@ describe("clipboard insert", () => {
     expect(readMarkdown(editor).trim()).toBe("Appended");
   });
 
-  it("inserts serialized nodes at the restored selection", () => {
+  it("inserts clipboard payload nodes at the restored selection", async () => {
     const editor = editorFromMarkdown("Hello world");
     const selection = editor.read(() => $getSelection()?.clone() ?? null);
+    const runtime = {
+      assets: {
+        copy: vi.fn(async () => ({ assets: [] })),
+      },
+    } as unknown as BlockEditorRuntime;
 
     editor.update(
       () => {
         $setSelection(null);
-        if (selection) {
-          $setSelection(selection.clone());
-        }
-        insertSerializedNodesAtSelection([textNode("Start")]);
       },
       { discrete: true },
+    );
+
+    await insertClipboardPayloadAtSelection(
+      editor,
+      runtime,
+      {
+        nodes: [textNode("Start")],
+        sourceBlockId: "source-block",
+      },
+      selection,
     );
 
     expect(readMarkdown(editor)).toContain("Start");

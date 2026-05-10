@@ -1,7 +1,4 @@
-import {
-  $generateNodesFromSerializedNodes,
-  $insertDataTransferForRichText,
-} from "@lexical/clipboard";
+import { $insertDataTransferForRichText } from "@lexical/clipboard";
 import {
   type BlockEditorClipboardPayload,
   type ClipboardSerializedNode,
@@ -12,6 +9,7 @@ import {
   $getSelection,
   $isNodeSelection,
   $isRangeSelection,
+  $parseSerializedNode,
   $setSelection,
   type BaseSelection,
   type LexicalEditor,
@@ -37,7 +35,7 @@ function restoreSelection(selection: BaseSelection | null): void {
 export function insertSerializedNodesAtSelection(
   nodes: ReadonlyArray<ClipboardSerializedNode>,
 ): void {
-  const lexicalNodes = $generateNodesFromSerializedNodes([...nodes]);
+  const lexicalNodes = nodes.map((node) => $parseSerializedNode(node));
   const selection = $getSelection();
 
   if ($isRangeSelection(selection)) {
