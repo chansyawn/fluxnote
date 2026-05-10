@@ -51,7 +51,7 @@ function blockToLexical(node: ContainerChild): LexicalNode[] {
   }
 }
 
-function rootContentToLexical(node: RootContent): LexicalNode[] {
+export function rootContentToLexical(node: RootContent): LexicalNode[] {
   if (isContainerChild(node)) return blockToLexical(node);
   return [fallbackTextBlock(node)];
 }

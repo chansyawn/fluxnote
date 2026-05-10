@@ -7,7 +7,6 @@ import { TableControlsDecorator } from "./table-controls-decorator";
 import { TABLE } from "./table-shortcut";
 
 export { tableFromLexical, tableToLexical } from "./lexical";
-export { insertMarkdownTablesAtSelection } from "./table-paste";
 export { TABLE } from "./table-shortcut";
 
 export const TABLE_MARKDOWN_SHORTCUT_TRANSFORMERS = [TABLE];

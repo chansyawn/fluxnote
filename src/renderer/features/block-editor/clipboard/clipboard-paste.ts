@@ -7,16 +7,15 @@ import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 import { getSupportedImageFiles } from "../assets/image-files";
 import { insertImageFilesAtSelection } from "../assets/image-insert";
 import type { BlockEditorRuntime } from "../core/types";
-import { insertMarkdownTablesAtSelection } from "../syntax/table";
 import {
   insertClipboardPayloadAtSelection,
   insertRichTextDataAtSelection,
 } from "./clipboard-insert";
+import { insertMarkdownAtSelection } from "./markdown-paste";
 
 interface ClipboardDataSnapshot {
   files: File[];
   html: string;
-  markdown: string;
   plainText: string;
   rawHtml: string;
   getData(type: string): string;
@@ -37,14 +36,12 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
   }
 
   const html = dataByType.get("text/html") ?? "";
-  const markdown = dataByType.get("text/markdown") ?? "";
   const plainText = dataByType.get("text/plain") ?? "";
   const rawHtml = dataTransfer.getData("text/html");
 
   return {
     files: getSupportedImageFiles(dataTransfer),
     html,
-    markdown,
     plainText,
     rawHtml,
     getData: (type: string) => dataByType.get(type) ?? "",
@@ -82,8 +79,8 @@ export function handleBlockEditorPaste(
   }
 
   claimPaste(event);
-  const markdown = clipboardDataSnapshot.markdown || clipboardDataSnapshot.plainText;
-  if (markdown && insertMarkdownTablesAtSelection(editor, markdown, selection)) {
+  if (clipboardDataSnapshot.plainText) {
+    insertMarkdownAtSelection(editor, clipboardDataSnapshot.plainText, selection);
     return true;
   }
 

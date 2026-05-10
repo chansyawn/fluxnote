@@ -13,12 +13,10 @@ import { expectMarkdownRoundTripStable } from "../../test-helper/assertions";
 import {
   createHeadlessEditor,
   editorFromMarkdown,
-  readMarkdown,
   readMdast,
 } from "../../test-helper/editor-driver";
 import { pressEnter } from "../../test-helper/interaction-driver";
 import { performTableStructureOperation, type TableStructureOperation } from "./table-operations";
-import { insertMarkdownTablesAtSelection } from "./table-paste";
 
 function getTable(editor: LexicalEditor): Table {
   const child = readMdast(editor).children[0];
@@ -100,27 +98,6 @@ describe("table", () => {
       { children: [], type: "tableCell" },
       { children: [], type: "tableCell" },
     ]);
-  });
-
-  it("inserts pasted markdown tables with shared inline conversion", () => {
-    const editor = createHeadlessEditor();
-
-    const didInsert = insertMarkdownTablesAtSelection(
-      editor,
-      [
-        "| Name | Link | Code |",
-        "| --- | --- | --- |",
-        "| **Bold** | [site](https://example.com) | `x` |",
-        "",
-      ].join("\n"),
-      null,
-    );
-
-    expect(didInsert).toBe(true);
-    const markdown = readMarkdown(editor);
-    expect(markdown).toContain("**Bold**");
-    expect(markdown).toContain("[site](https://example.com)");
-    expect(markdown).toContain("`x`");
   });
 
   it("typed delimiter shortcut creates a table", () => {

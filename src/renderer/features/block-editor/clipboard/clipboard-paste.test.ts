@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 const mocks = vi.hoisted(() => ({
   insertClipboardPayloadAtSelection: vi.fn(),
   insertImageFilesAtSelection: vi.fn(),
-  insertMarkdownTablesAtSelection: vi.fn(),
+  insertMarkdownAtSelection: vi.fn(),
   insertRichTextDataAtSelection: vi.fn(),
 }));
 
@@ -16,13 +16,13 @@ vi.mock("../assets/image-insert", () => ({
   insertImageFilesAtSelection: mocks.insertImageFilesAtSelection,
 }));
 
-vi.mock("../syntax/table", () => ({
-  insertMarkdownTablesAtSelection: mocks.insertMarkdownTablesAtSelection,
-}));
-
 vi.mock("./clipboard-insert", () => ({
   insertClipboardPayloadAtSelection: mocks.insertClipboardPayloadAtSelection,
   insertRichTextDataAtSelection: mocks.insertRichTextDataAtSelection,
+}));
+
+vi.mock("./markdown-paste", () => ({
+  insertMarkdownAtSelection: mocks.insertMarkdownAtSelection,
 }));
 
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./clipboard-paste";
@@ -90,7 +90,7 @@ describe("clipboard paste", () => {
   beforeEach(() => {
     mocks.insertClipboardPayloadAtSelection.mockReset();
     mocks.insertImageFilesAtSelection.mockReset();
-    mocks.insertMarkdownTablesAtSelection.mockReset();
+    mocks.insertMarkdownAtSelection.mockReset();
     mocks.insertRichTextDataAtSelection.mockReset();
   });
 
@@ -98,7 +98,6 @@ describe("clipboard paste", () => {
     const dataTransfer = new TestDataTransfer(
       new Map([
         ["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)],
-        ["text/markdown", "**Text**"],
         ["text/plain", "Text"],
       ]),
     ) as unknown as DataTransfer;
@@ -107,7 +106,6 @@ describe("clipboard paste", () => {
 
     expect(snapshot.html).toBe("<p>Text</p>");
     expect(snapshot.rawHtml).toBe(encodeBlockEditorClipboardHtml("<p>Text</p>", payload));
-    expect(snapshot.markdown).toBe("**Text**");
     expect(snapshot.plainText).toBe("Text");
     expect(snapshot.getData("text/html")).toBe("<p>Text</p>");
     expect(snapshot.files).toEqual([]);
@@ -137,9 +135,12 @@ describe("clipboard paste", () => {
     expect(mocks.insertClipboardPayloadAtSelection).not.toHaveBeenCalled();
   });
 
-  it("decodes internal payloads from raw html while passing stripped html to rich text paths", () => {
+  it("decodes internal payloads from raw html ahead of markdown parsing", () => {
     const dataTransfer = new TestDataTransfer(
-      new Map([["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)]]),
+      new Map([
+        ["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)],
+        ["text/plain", "Text"],
+      ]),
     ) as unknown as DataTransfer;
     const paste = createPasteEvent(dataTransfer);
 
@@ -151,43 +152,39 @@ describe("clipboard paste", () => {
       payload,
       null,
     );
+    expect(mocks.insertMarkdownAtSelection).not.toHaveBeenCalled();
     expect(mocks.insertRichTextDataAtSelection).not.toHaveBeenCalled();
   });
 
-  it("inserts markdown tables before falling back to rich text", () => {
-    mocks.insertMarkdownTablesAtSelection.mockReturnValue(true);
+  it("parses plain text as markdown when no internal payload is present", () => {
     const dataTransfer = new TestDataTransfer(
       new Map([
         ["text/html", "<p>fallback</p>"],
-        ["text/markdown", "| a | b |\n| --- | --- |\n| c | d |"],
+        ["text/plain", "# Heading\n\n- item"],
       ]),
     ) as unknown as DataTransfer;
     const paste = createPasteEvent(dataTransfer);
 
     expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
 
-    expect(mocks.insertMarkdownTablesAtSelection).toHaveBeenCalledWith(
+    expect(mocks.insertMarkdownAtSelection).toHaveBeenCalledWith(
       editor,
-      "| a | b |\n| --- | --- |\n| c | d |",
+      "# Heading\n\n- item",
       null,
     );
     expect(mocks.insertRichTextDataAtSelection).not.toHaveBeenCalled();
   });
 
-  it("falls back to rich text insertion with sanitized html", () => {
-    mocks.insertMarkdownTablesAtSelection.mockReturnValue(false);
+  it("falls back to rich text insertion when plain text is empty", () => {
     const dataTransfer = new TestDataTransfer(
-      new Map([
-        ["text/html", "<p>fallback</p>"],
-        ["text/plain", "fallback"],
-      ]),
+      new Map([["text/html", "<p>fallback</p>"]]),
     ) as unknown as DataTransfer;
     const paste = createPasteEvent(dataTransfer);
 
     expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
 
+    expect(mocks.insertMarkdownAtSelection).not.toHaveBeenCalled();
     const [, richTextData] = mocks.insertRichTextDataAtSelection.mock.calls[0] ?? [];
     expect(richTextData.getData("text/html")).toBe("<p>fallback</p>");
-    expect(richTextData.getData("text/plain")).toBe("fallback");
   });
 });
