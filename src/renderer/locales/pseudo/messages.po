@@ -20,12 +20,12 @@ msgid "app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:20
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:23
 msgid "block-editor.code.copied"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:16
+#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:19
 msgid "block-editor.code.copy"
 msgstr ""
 
@@ -35,18 +35,79 @@ msgid "block-editor.code.language.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:82
+#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:76
 msgid "block-editor.code.language.search"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:70
+#: src/renderer/features/block-editor/core/block-editor.tsx:64
 msgid "block-editor.content.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/block-editor-content.tsx:30
+#: src/renderer/features/block-editor/core/block-editor.tsx:63
+#: src/renderer/features/block-editor/core/block-editor.tsx:69
 msgid "block-editor.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:78
+msgid "block-editor.table.column-menu"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:107
+msgid "block-editor.table.delete-column"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:117
+msgid "block-editor.table.delete-row"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:93
+msgid "block-editor.table.insert-column-left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:98
+msgid "block-editor.table.insert-column-right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:109
+msgid "block-editor.table.insert-row-above"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:111
+msgid "block-editor.table.insert-row-below"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:103
+msgid "block-editor.table.move-column-left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:105
+msgid "block-editor.table.move-column-right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:115
+msgid "block-editor.table.move-row-down"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:113
+msgid "block-editor.table.move-row-up"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:84
+msgid "block-editor.table.row-menu"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -112,22 +173,22 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-copy-action.tsx:31
+#: src/renderer/features/block/actions/icon-action.tsx:44
 msgid "home-note.block.copy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-delete-action.tsx:20
+#: src/renderer/features/block/actions/block-actions.tsx:78
 msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-external-edit-actions.tsx:33
+#: src/renderer/features/block/actions/external-edit-actions.tsx:29
 msgid "home-note.block.external-edit.cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-external-edit-actions.tsx:27
+#: src/renderer/features/block/actions/external-edit-actions.tsx:23
 msgid "home-note.block.external-edit.submit"
 msgstr ""
 
@@ -137,17 +198,17 @@ msgid "lab.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:77
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:107
 msgid "lab.playground.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:90
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:120
 msgid "lab.playground.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:74
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:104
 msgid "lab.playground.title"
 msgstr ""
 
@@ -331,12 +392,12 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-archive-action.tsx:30
+#: src/renderer/features/block/actions/block-actions.tsx:69
 msgid "workspace.blocks.archive"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-archive-action.tsx:32
+#: src/renderer/features/block/actions/block-actions.tsx:67
 msgid "workspace.blocks.restore"
 msgstr ""
 
@@ -371,12 +432,12 @@ msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-tag-action.tsx:41
+#: src/renderer/features/block/actions/block-actions.tsx:56
 msgid "workspace.tags.assign.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/block-tag-action.tsx:28
+#: src/renderer/features/block/actions/block-actions.tsx:45
 msgid "workspace.tags.assign.placeholder"
 msgstr ""
 
