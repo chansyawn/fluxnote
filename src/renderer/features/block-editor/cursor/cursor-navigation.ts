@@ -9,6 +9,7 @@ import {
   type RangeSelection,
 } from "lexical";
 
+import { $selectThematicBreak } from "../syntax/thematic-break/thematic-break-commands";
 import { $isGapBoundaryNode } from "./cursor-normalize";
 import { $isGapCursorParagraph } from "./cursor-state";
 
@@ -78,12 +79,29 @@ function $selectAdjacentBlockFromGap(gap: ElementNode, direction: Direction): bo
     return false;
   }
 
+  if ($selectThematicBreak(block)) {
+    return true;
+  }
+
   if (direction === "backward") {
     block?.selectEnd();
   } else {
     block?.selectStart();
   }
   return true;
+}
+
+function $selectAdjacentThematicBreak(
+  selection: RangeSelection,
+  block: LexicalNode,
+  direction: Direction,
+): boolean {
+  if (!$isAtBoundaryEdge(selection, block, direction)) {
+    return false;
+  }
+
+  const sibling = direction === "backward" ? block.getPreviousSibling() : block.getNextSibling();
+  return $selectThematicBreak(sibling);
 }
 
 export function $moveGapCursorSelection(direction: Direction): boolean {
@@ -101,11 +119,38 @@ export function $moveGapCursorSelection(direction: Direction): boolean {
     return $selectAdjacentBlockFromGap(topLevelNode, direction);
   }
 
+  if ($selectAdjacentThematicBreak(selection, topLevelNode, direction)) {
+    return true;
+  }
+
   if (!$isGapBoundaryNode(topLevelNode) || !$isAtBoundaryEdge(selection, topLevelNode, direction)) {
     return false;
   }
 
   return $selectGapNearBlock(topLevelNode, direction);
+}
+
+export function $selectAdjacentThematicBreakFromSelection(direction: Direction): boolean {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+    return false;
+  }
+
+  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
+  if (!topLevelNode) {
+    return false;
+  }
+
+  if (
+    !$isGapCursorParagraph(topLevelNode) &&
+    !$isAtBoundaryEdge(selection, topLevelNode, direction)
+  ) {
+    return false;
+  }
+
+  const sibling =
+    direction === "backward" ? topLevelNode.getPreviousSibling() : topLevelNode.getNextSibling();
+  return $selectThematicBreak(sibling);
 }
 
 export function $isSelectionInsideGapCursor(): boolean {

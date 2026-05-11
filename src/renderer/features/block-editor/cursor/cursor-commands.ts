@@ -9,6 +9,8 @@ import {
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
+  KEY_BACKSPACE_COMMAND,
+  KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   PASTE_COMMAND,
   mergeRegister,
@@ -16,7 +18,10 @@ import {
   type PasteCommandType,
 } from "lexical";
 
-import { $moveGapCursorSelection } from "./cursor-navigation";
+import {
+  $moveGapCursorSelection,
+  $selectAdjacentThematicBreakFromSelection,
+} from "./cursor-navigation";
 import { $promoteGapCursorParagraph } from "./cursor-state";
 
 function $promoteSelectionGapCursor(): boolean {
@@ -52,6 +57,18 @@ function handleEnter(event: KeyboardEvent | null): boolean {
   return handled;
 }
 
+function handleGapDelete(event: KeyboardEvent, direction: "backward" | "forward"): boolean {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return false;
+  }
+
+  const handled = $selectAdjacentThematicBreakFromSelection(direction);
+  if (handled) {
+    event.preventDefault();
+  }
+  return handled;
+}
+
 export function registerCursorCommands(editor: LexicalEditor): () => void {
   return mergeRegister(
     editor.registerCommand(
@@ -75,6 +92,16 @@ export function registerCursorCommands(editor: LexicalEditor): () => void {
       COMMAND_PRIORITY_HIGH,
     ),
     editor.registerCommand(KEY_ENTER_COMMAND, handleEnter, COMMAND_PRIORITY_CRITICAL),
+    editor.registerCommand(
+      KEY_BACKSPACE_COMMAND,
+      (event) => handleGapDelete(event, "backward"),
+      COMMAND_PRIORITY_HIGH,
+    ),
+    editor.registerCommand(
+      KEY_DELETE_COMMAND,
+      (event) => handleGapDelete(event, "forward"),
+      COMMAND_PRIORITY_HIGH,
+    ),
     editor.registerCommand(
       INSERT_PARAGRAPH_COMMAND,
       () => $promoteSelectionGapCursor(),
