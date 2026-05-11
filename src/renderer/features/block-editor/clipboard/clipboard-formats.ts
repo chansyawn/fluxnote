@@ -1,5 +1,7 @@
+import { $getHtmlContent } from "@lexical/clipboard";
+import { withDOM } from "@lexical/headless/dom";
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
-import type { SerializedEditorState } from "lexical";
+import { $selectAll, $setSelection, type SerializedEditorState } from "lexical";
 
 import { createHeadlessMarkdownEditor } from "../core/headless-markdown-editor";
 import { exportEditorStateToMarkdown } from "../core/markdown-editor-io";
@@ -87,6 +89,25 @@ export function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[])
   const editor = createHeadlessMarkdownEditor();
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
   return exportEditorStateToMarkdown(editorState);
+}
+
+export function exportClipboardNodesToHtml(nodes: ClipboardSerializedNode[]): string {
+  return withDOM(() => {
+    const editor = createHeadlessMarkdownEditor();
+    const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
+    editor.setEditorState(editorState);
+
+    let html = "";
+    editor.update(
+      () => {
+        const selection = $selectAll();
+        html = $getHtmlContent(editor, selection);
+        $setSelection(null);
+      },
+      { discrete: true },
+    );
+    return html;
+  });
 }
 
 export function rewriteClipboardHtmlAssetUrls(

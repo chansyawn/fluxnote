@@ -11,6 +11,8 @@ import {
   type LexicalNode,
 } from "lexical";
 
+import { $isGapCursorParagraph } from "../cursor";
+
 interface KeyboardCommandOptions {
   altKey?: boolean;
   shiftKey?: boolean;
@@ -84,7 +86,7 @@ export function selectEmptyParagraph(
   editor.update(
     () => {
       const paragraphs = collectParagraphs($getRoot()).filter(
-        (paragraph) => paragraph.getTextContentSize() === 0,
+        (paragraph) => paragraph.getTextContentSize() === 0 && !$isGapCursorParagraph(paragraph),
       );
       const paragraph = position === "first" ? paragraphs[0] : paragraphs.at(-1);
 

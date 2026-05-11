@@ -11,6 +11,7 @@ import {
 } from "lexical";
 import type { BlockContent, DefinitionContent, PhrasingContent, Root, RootContent } from "mdast";
 
+import { $isGapCursorParagraph } from "../cursor";
 import { stringifyMdastToMarkdown } from "../markdown/processor";
 import { codeBlockFromLexical, codeBlockToLexical } from "../syntax/code/lexical";
 import { headingFromLexical, headingToLexical } from "../syntax/heading/lexical";
@@ -88,6 +89,10 @@ function isContainerChild(node: RootContent | DefinitionContent): node is Contai
 
 function blockFromLexical(node: LexicalNode): BlockContent[] {
   if ($isParagraphNode(node)) {
+    if ($isGapCursorParagraph(node)) {
+      return [];
+    }
+
     const result = paragraphFromLexical(node, inlineFromLexical);
     return result ? [result] : [];
   }

@@ -1,5 +1,6 @@
 import { configExtension, defineExtension } from "lexical";
 
+import { CursorExtension } from "../cursor";
 import { MarkdownShortcutExtension } from "../markdown/markdown-shortcut-extension";
 import { SYNTAX_EXTENSIONS, SYNTAX_MARKDOWN_SHORTCUTS } from "../syntax/registry";
 
@@ -14,6 +15,7 @@ export function createBlockEditorCoreExtension() {
       configExtension(MarkdownShortcutExtension, {
         transformers: Array.from(SYNTAX_MARKDOWN_SHORTCUTS),
       }),
+      CursorExtension,
     ],
     onError(error) {
       throw error;

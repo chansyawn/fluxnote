@@ -1,0 +1,18 @@
+@reference "#global.css";
+
+.block-editor__content {
+  @apply caret-primary;
+}
+
+.block-editor__gap-cursor {
+  @apply relative my-0 h-0 min-h-0 overflow-visible;
+}
+
+.block-editor__gap-cursor::before {
+  @apply text-primary pointer-events-none absolute left-0 hidden -translate-y-1/2 font-mono text-xs font-bold;
+  content: ">";
+}
+
+.block-editor__gap-cursor--active::before {
+  @apply animate-caret-blink block;
+}

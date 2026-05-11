@@ -8,8 +8,9 @@ import {
   type LexicalNode,
 } from "lexical";
 
+import { filterGapCursorNodes } from "../cursor";
 import { collectClipboardAssetUrls } from "./clipboard-assets";
-import { exportClipboardNodesToMarkdown } from "./clipboard-formats";
+import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./clipboard-formats";
 
 export interface ClipboardExportSnapshot {
   assetUrls: string[];
@@ -67,16 +68,17 @@ function createClipboardExportSnapshot(
   nodes: ClipboardSerializedNode[],
   imageAssetUrl: string | null,
 ): ClipboardExportSnapshot | null {
-  if (nodes.length === 0) {
+  const filteredNodes = filterGapCursorNodes(nodes);
+  if (filteredNodes.length === 0) {
     return null;
   }
 
   return {
-    assetUrls: collectClipboardAssetUrls(nodes),
-    html: exportSelectionToHtml(editor, selection),
+    assetUrls: collectClipboardAssetUrls(filteredNodes),
+    html: exportClipboardNodesToHtml(filteredNodes) || exportSelectionToHtml(editor, selection),
     imageAssetUrl,
-    markdown: exportClipboardNodesToMarkdown(nodes),
-    nodes,
+    markdown: exportClipboardNodesToMarkdown(filteredNodes),
+    nodes: filteredNodes,
   };
 }
 

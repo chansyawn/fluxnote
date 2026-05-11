@@ -35,7 +35,9 @@ function getCellKey(editor: LexicalEditor, rowIndex: number, columnIndex: number
   let key: NodeKey | null = null;
 
   editor.getEditorState().read(() => {
-    const table = $getRoot().getFirstChild();
+    const table = $getRoot()
+      .getChildren()
+      .find((child) => child.getType() === "table");
     const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
     const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
     key = cell?.getKey() ?? null;
@@ -52,7 +54,9 @@ function cellHasRowHeader(editor: LexicalEditor, rowIndex: number, columnIndex: 
   let headerState: number | null = null;
 
   editor.getEditorState().read(() => {
-    const table = $getRoot().getFirstChild();
+    const table = $getRoot()
+      .getChildren()
+      .find((child) => child.getType() === "table");
     const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
     const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
     headerState = $isTableCellNode(cell) ? cell.getHeaderStyles() : null;
@@ -73,7 +77,9 @@ function getCellFormat(
   let format: ElementFormatType | null = null;
 
   editor.getEditorState().read(() => {
-    const table = $getRoot().getFirstChild();
+    const table = $getRoot()
+      .getChildren()
+      .find((child) => child.getType() === "table");
     const row = $isElementNode(table) ? table.getChildAtIndex(rowIndex) : null;
     const cell = $isElementNode(row) ? row.getChildAtIndex(columnIndex) : null;
     const paragraph = $isElementNode(cell) ? cell.getFirstChild() : null;

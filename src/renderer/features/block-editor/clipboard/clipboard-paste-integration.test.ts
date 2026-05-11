@@ -58,7 +58,10 @@ describe("handleBlockEditorPaste integration", () => {
     const editor = editorFromMarkdown("```ts\nconst x = 1;\n```");
     editor.update(
       () => {
-        $getRoot().getFirstChild()?.selectEnd();
+        $getRoot()
+          .getChildren()
+          .find((child) => child.getType() === "code")
+          ?.selectEnd();
       },
       { discrete: true },
     );
