@@ -2,10 +2,10 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { useLingui } from "@lingui/react";
 import { Button } from "@renderer/ui/components/button";
 import { Input } from "@renderer/ui/components/input";
+import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { $getNearestNodeFromDOMNode, type LexicalEditor } from "lexical";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
@@ -21,7 +21,7 @@ const CLOSE_DELAY_MS = 120;
 const COPY_FEEDBACK_DURATION_MS = 1600;
 
 interface ActiveLink {
-  rect: DOMRect;
+  element: HTMLElement;
   target: LinkTarget;
 }
 
@@ -51,13 +51,9 @@ function measureActiveLink(editor: LexicalEditor, domNode: Node): ActiveLink | n
   if (!element) return null;
 
   return {
-    rect: element.getBoundingClientRect(),
+    element,
     target,
   };
-}
-
-function getEditorShellElement(editorRootElement: HTMLElement | null): HTMLElement | null {
-  return editorRootElement?.closest<HTMLElement>(".block-editor__shell") ?? null;
 }
 
 export function LinkHoverControls() {
@@ -65,7 +61,6 @@ export function LinkHoverControls() {
   const [editor] = useLexicalComposerContext();
   const runtime = useBlockEditorRuntime();
   const closeTimerRef = useRef<number | null>(null);
-  const shellRef = useRef<HTMLElement | null>(null);
   const [activeLink, setActiveLink] = useState<ActiveLink | null>(null);
   const [draftUrl, setDraftUrl] = useState("");
   const [copied, setCopied] = useState(false);
@@ -104,7 +99,6 @@ export function LinkHoverControls() {
 
   useEffect(() => {
     return editor.registerRootListener((rootElement) => {
-      shellRef.current = getEditorShellElement(rootElement);
       if (!rootElement) return;
 
       const handlePointerOver = (event: PointerEvent) => {
@@ -172,13 +166,8 @@ export function LinkHoverControls() {
     close();
   };
 
-  if (!activeLink || !shellRef.current) return null;
+  if (!activeLink) return null;
 
-  const shellRect = shellRef.current.getBoundingClientRect();
-  const position = {
-    left: activeLink.rect.left - shellRect.left + activeLink.rect.width / 2,
-    top: activeLink.rect.bottom - shellRect.top + 6,
-  };
   const isMarkdownLink = activeLink.target.kind === "link";
 
   const openLabel = i18n._({ id: "block-editor.link.open", message: "Open" });
@@ -188,60 +177,62 @@ export function LinkHoverControls() {
   const convertLabel = i18n._({ id: "block-editor.link.convert", message: "Convert to link" });
   const urlLabel = i18n._({ id: "block-editor.link.url", message: "Link URL" });
 
-  return createPortal(
-    <div
-      className="block-editor__link-popover"
-      style={position}
-      onPointerEnter={clearCloseTimer}
-      onPointerLeave={scheduleClose}
+  const sharedActions = (
+    <>
+      <Button size="sm" type="button" variant="ghost" onClick={() => void handleOpen()}>
+        <ExternalLinkIcon data-icon="inline-start" />
+        {openLabel}
+      </Button>
+      <Button size="sm" type="button" variant="ghost" onClick={() => void handleCopy()}>
+        {copied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}
+        {copied ? copiedLabel : copyLabel}
+      </Button>
+    </>
+  );
+
+  return (
+    <Popover
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) close();
+      }}
     >
-      {isMarkdownLink ? (
-        <form className="block-editor__link-popover-form" onSubmit={handleSubmit}>
-          <Input
-            aria-label={urlLabel}
-            value={draftUrl}
-            onChange={(event) => setDraftUrl(event.currentTarget.value)}
-          />
-          <div className="block-editor__link-popover-actions">
-            <Button size="sm" type="button" variant="ghost" onClick={() => void handleOpen()}>
-              <ExternalLinkIcon data-icon="inline-start" />
-              {openLabel}
-            </Button>
-            <Button size="sm" type="button" variant="ghost" onClick={() => void handleCopy()}>
-              {copied ? (
-                <CheckIcon data-icon="inline-start" />
-              ) : (
-                <CopyIcon data-icon="inline-start" />
-              )}
-              {copied ? copiedLabel : copyLabel}
-            </Button>
-            <Button size="sm" type="button" variant="ghost" onClick={handleRemove}>
-              <UnlinkIcon data-icon="inline-start" />
-              {removeLabel}
+      <PopoverContent
+        anchor={activeLink.element}
+        className="p-2"
+        align="center"
+        finalFocus={false}
+        initialFocus={false}
+        side="bottom"
+        sideOffset={6}
+        onPointerEnter={clearCloseTimer}
+        onPointerLeave={scheduleClose}
+      >
+        {isMarkdownLink ? (
+          <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+            <Input
+              aria-label={urlLabel}
+              value={draftUrl}
+              onChange={(event) => setDraftUrl(event.currentTarget.value)}
+            />
+            <div className="flex flex-wrap items-center gap-1">
+              {sharedActions}
+              <Button size="sm" type="button" variant="ghost" onClick={handleRemove}>
+                <UnlinkIcon data-icon="inline-start" />
+                {removeLabel}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="flex flex-wrap items-center gap-1">
+            {sharedActions}
+            <Button size="sm" type="button" variant="ghost" onClick={handleConvert}>
+              <LinkIcon data-icon="inline-start" />
+              {convertLabel}
             </Button>
           </div>
-        </form>
-      ) : (
-        <div className="block-editor__link-popover-actions">
-          <Button size="sm" type="button" variant="ghost" onClick={() => void handleOpen()}>
-            <ExternalLinkIcon data-icon="inline-start" />
-            {openLabel}
-          </Button>
-          <Button size="sm" type="button" variant="ghost" onClick={() => void handleCopy()}>
-            {copied ? (
-              <CheckIcon data-icon="inline-start" />
-            ) : (
-              <CopyIcon data-icon="inline-start" />
-            )}
-            {copied ? copiedLabel : copyLabel}
-          </Button>
-          <Button size="sm" type="button" variant="ghost" onClick={handleConvert}>
-            <LinkIcon data-icon="inline-start" />
-            {convertLabel}
-          </Button>
-        </div>
-      )}
-    </div>,
-    shellRef.current,
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
