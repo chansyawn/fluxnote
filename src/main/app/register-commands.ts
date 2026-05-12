@@ -61,6 +61,8 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
     db: deps.db,
   });
   registerWindowCommands(ipc, {
+    db: deps.db,
+    openBlockService: deps.openBlockService,
     windowManager: deps.windowManager,
   });
   ipc.register();

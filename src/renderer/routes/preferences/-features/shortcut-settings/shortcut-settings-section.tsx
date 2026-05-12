@@ -6,7 +6,14 @@ import {
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
 import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences/settings";
-import { KeyboardIcon, PanelTopOpenIcon, PlusCircleIcon } from "lucide-react";
+import {
+  CheckIcon,
+  KeyboardIcon,
+  PanelTopOpenIcon,
+  PlusCircleIcon,
+  WandSparklesIcon,
+  XIcon,
+} from "lucide-react";
 import { type ReactElement } from "react";
 
 import { ShortcutInput } from "./shortcut-input";
@@ -34,10 +41,29 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
     icon: PanelTopOpenIcon,
     title: <Trans id="preferences.shortcuts.delete-block.label">Delete block</Trans>,
   },
+  {
+    action: "capture-block",
+    icon: WandSparklesIcon,
+    title: <Trans id="preferences.shortcuts.capture-block.label">Capture block</Trans>,
+  },
+  {
+    action: "submit-external-edit",
+    icon: CheckIcon,
+    title: (
+      <Trans id="preferences.shortcuts.submit-external-edit.label">Submit external edit</Trans>
+    ),
+  },
+  {
+    action: "cancel-external-edit",
+    icon: XIcon,
+    title: (
+      <Trans id="preferences.shortcuts.cancel-external-edit.label">Cancel external edit</Trans>
+    ),
+  },
 ];
 
 export function ShortcutSettingsSection() {
-  const { shortcuts, clearShortcut, globalShortcutError, resetShortcut, updateShortcut } =
+  const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
     useShortcutState();
   const {
     clearFieldError,
@@ -58,9 +84,9 @@ export function ShortcutSettingsSection() {
           const isRecording = recordingAction === field.action;
           const shortcut = shortcuts[field.action];
           const fieldError =
-            field.action === "toggle-window" &&
+            (field.action === "toggle-window" || field.action === "capture-block") &&
             shortcut !== null &&
-            globalShortcutError === shortcut
+            globalShortcutErrors[field.action] === shortcut
               ? ("unavailable" as const)
               : (fieldErrors[field.action] ?? null);
           const shouldShowReset = shortcut !== DEFAULT_SETTINGS.shortcuts[field.action];

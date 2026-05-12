@@ -313,18 +313,28 @@ msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+msgid "preferences.shortcuts.cancel-external-edit.label"
+msgstr "Cancel external edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+msgid "preferences.shortcuts.capture-block.label"
+msgstr "Capture block"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:30
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:35
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
@@ -366,12 +376,17 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:55
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
+msgid "preferences.shortcuts.submit-external-edit.label"
+msgstr "Submit external edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:81
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:25
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:32
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 

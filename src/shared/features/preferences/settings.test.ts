@@ -41,6 +41,8 @@ describe("settings", () => {
         "toggle-window": 1,
         "create-block": null,
         "delete-block": "Mod+Delete",
+        "submit-external-edit": "Mod+Enter",
+        "cancel-external-edit": "Mod+\\",
       },
     });
 
@@ -50,6 +52,9 @@ describe("settings", () => {
       "toggle-window": "Alt+N",
       "create-block": null,
       "delete-block": "Mod+Delete",
+      "capture-block": "Ctrl+Alt+N",
+      "submit-external-edit": "Mod+Enter",
+      "cancel-external-edit": "Mod+\\",
     });
   });
 

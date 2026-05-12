@@ -5,6 +5,8 @@ import {
   ExternalEditActions,
   type BlockEditorControllerHandle,
 } from "@renderer/features/block";
+import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
+import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import { memo, useCallback, useRef, useState } from "react";
 
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
@@ -109,6 +111,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [isActionAreaActive, setIsActionAreaActive] = useState(false);
   const registry = useEditorRegistryContext();
+  const { shortcuts } = useShortcutState();
 
   const setEditorRef = useCallback(
     (handle: BlockEditorControllerHandle | null) => {
@@ -118,6 +121,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   );
 
   const shouldRenderActions = isActionAreaActive || Boolean(state.externalEditSession);
+  const externalEditId = state.externalEditSession?.editId ?? null;
 
   return (
     <div
@@ -130,6 +134,24 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
       }}
       onFocusCapture={() => {
         setIsActionAreaActive(true);
+      }}
+      onKeyDownCapture={(event) => {
+        if (!externalEditId || event.repeat) {
+          return;
+        }
+
+        if (keyboardEventMatchesShortcut(event, shortcuts["submit-external-edit"])) {
+          event.preventDefault();
+          event.stopPropagation();
+          commands.submitExternalEdit(block.id, externalEditId);
+          return;
+        }
+
+        if (keyboardEventMatchesShortcut(event, shortcuts["cancel-external-edit"])) {
+          event.preventDefault();
+          event.stopPropagation();
+          commands.cancelExternalEdit(externalEditId);
+        }
       }}
       onMouseEnter={() => {
         setIsActionAreaActive(true);

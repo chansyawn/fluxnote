@@ -313,18 +313,28 @@ msgid "preferences.language.label"
 msgstr "语言"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+msgid "preferences.shortcuts.cancel-external-edit.label"
+msgstr "取消外部编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+msgid "preferences.shortcuts.capture-block.label"
+msgstr "快速记录区块"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:30
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
 msgid "preferences.shortcuts.create-block.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:35
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "删除区块"
 
@@ -366,12 +376,17 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:55
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
+msgid "preferences.shortcuts.submit-external-edit.label"
+msgstr "提交外部编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:81
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:25
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:32
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "开启/关闭窗口"
 

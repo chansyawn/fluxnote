@@ -1,4 +1,4 @@
-import { toggleMainWindowVisibility } from "@renderer/clients";
+import { captureBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
   normalizeShortcutBinding,
@@ -18,7 +18,7 @@ type ShortcutUpdateResult =
 
 interface ShortcutStateContextValue {
   shortcuts: ShortcutPreferences;
-  globalShortcutError: ShortcutBinding;
+  globalShortcutErrors: Partial<Record<ShortcutAction, ShortcutBinding>>;
   clearShortcut: (action: ShortcutAction) => void;
   resetShortcut: (action: ShortcutAction) => void;
   updateShortcut: (action: ShortcutAction, shortcut: string) => ShortcutUpdateResult;
@@ -36,16 +36,26 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   const handleToggleWindow = useEffectEvent(() => {
     void toggleMainWindowVisibility();
   });
+  const handleCaptureBlock = useEffectEvent(() => {
+    void captureBlockAndShowWindow();
+  });
 
-  const globalShortcutError = useGlobalShortcutSync({
+  const toggleWindowShortcutError = useGlobalShortcutSync({
     shortcut: shortcuts["toggle-window"],
     onPressed: handleToggleWindow,
+  });
+  const captureBlockShortcutError = useGlobalShortcutSync({
+    shortcut: shortcuts["capture-block"],
+    onPressed: handleCaptureBlock,
   });
 
   const contextValue = useMemo<ShortcutStateContextValue>(
     () => ({
       shortcuts,
-      globalShortcutError,
+      globalShortcutErrors: {
+        "toggle-window": toggleWindowShortcutError,
+        "capture-block": captureBlockShortcutError,
+      },
       clearShortcut: (action) => {
         clearShortcut(action);
       },
@@ -70,7 +80,14 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
         return { ok: true, shortcut: normalizedShortcut };
       },
     }),
-    [clearShortcut, globalShortcutError, resetShortcut, setShortcut, shortcuts],
+    [
+      captureBlockShortcutError,
+      clearShortcut,
+      resetShortcut,
+      setShortcut,
+      shortcuts,
+      toggleWindowShortcutError,
+    ],
   );
 
   return (

@@ -25,7 +25,14 @@ export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[3]),
   z.literal(FONT_SIZE_OPTIONS[4]),
 ]);
-export const shortcutActionSchema = z.enum(["toggle-window", "create-block", "delete-block"]);
+export const shortcutActionSchema = z.enum([
+  "toggle-window",
+  "create-block",
+  "delete-block",
+  "capture-block",
+  "submit-external-edit",
+  "cancel-external-edit",
+]);
 export const shortcutBindingSchema = z.string().nullable();
 
 const autoArchiveIdleMinutesSchema = z.preprocess(
@@ -45,6 +52,9 @@ export const shortcutPreferencesSchema = z
     "toggle-window": shortcutBindingSchema.catch("Alt+N"),
     "create-block": shortcutBindingSchema.catch("Mod+N"),
     "delete-block": shortcutBindingSchema.catch("Mod+D"),
+    "capture-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
+    "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
+    "cancel-external-edit": shortcutBindingSchema.catch("Mod+\\"),
   })
   .strict();
 
@@ -79,6 +89,9 @@ const shortcutPreferencesPatchSchema = z
     "toggle-window": shortcutBindingSchema.optional(),
     "create-block": shortcutBindingSchema.optional(),
     "delete-block": shortcutBindingSchema.optional(),
+    "capture-block": shortcutBindingSchema.optional(),
+    "submit-external-edit": shortcutBindingSchema.optional(),
+    "cancel-external-edit": shortcutBindingSchema.optional(),
   })
   .strict();
 
@@ -96,6 +109,9 @@ const defaultSettingsValue = {
     "toggle-window": "Alt+N",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
+    "capture-block": "Ctrl+Alt+N",
+    "submit-external-edit": "Mod+Enter",
+    "cancel-external-edit": "Mod+\\",
   },
 } as const;
 
