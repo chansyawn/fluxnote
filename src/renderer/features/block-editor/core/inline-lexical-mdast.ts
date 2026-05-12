@@ -1,3 +1,4 @@
+import { $isAutoLinkNode } from "@lexical/link";
 import {
   $createTextNode,
   $isLineBreakNode,
@@ -118,6 +119,9 @@ export function inlineFromLexical(node: LexicalNode): PhrasingContent[] {
   }
   if ($isLineBreakNode(node)) {
     return [{ type: "break" }];
+  }
+  if ($isAutoLinkNode(node)) {
+    return node.getChildren().flatMap(inlineFromLexical);
   }
 
   const link = linkFromLexical(node, inlineFromLexical);

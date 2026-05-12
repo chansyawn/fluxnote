@@ -45,6 +45,36 @@ msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:182
+msgid "block-editor.link.convert"
+msgstr "Convert to link"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:180
+msgid "block-editor.link.copied"
+msgstr "Copied"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:179
+msgid "block-editor.link.copy"
+msgstr "Copy"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:178
+msgid "block-editor.link.open"
+msgstr "Open"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:181
+msgid "block-editor.link.remove"
+msgstr "Remove link"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:183
+msgid "block-editor.link.url"
+msgstr "Link URL"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/block-editor/core/block-editor.tsx:63
 #: src/renderer/features/block-editor/core/block-editor.tsx:69
 msgid "block-editor.placeholder"
@@ -218,17 +248,17 @@ msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:107
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:112
 msgid "lab.playground.description"
 msgstr "Frontend-only playground. Edit this preset markdown to verify note block behavior."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:120
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:125
 msgid "lab.playground.reset"
 msgstr "Reset preset"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:104
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:109
 msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 

@@ -92,6 +92,11 @@ export function BlockEditorPlaygroundPanel() {
         write: async () => undefined,
         writeText: async () => undefined,
       },
+      links: {
+        openExternal: async (url) => {
+          window.open(url, "_blank", "noopener,noreferrer");
+        },
+      },
     }),
     [],
   );

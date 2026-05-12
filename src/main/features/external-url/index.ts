@@ -1,0 +1,1 @@
+export { registerExternalUrlCommands } from "./command";

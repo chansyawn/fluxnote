@@ -1,6 +1,7 @@
 import {
   copyAsset,
   createAsset,
+  openExternalUrl,
   resolveAsset,
   writeBlockEditorClipboard,
   type BlockEditorClipboardWriteRequest,
@@ -56,6 +57,9 @@ export function createBlockRuntime(blockId: string): BlockEditorRuntime {
     clipboard: {
       write: (data) => writeClipboardWithFallback(data, blockId),
       writeText: writeClipboardText,
+    },
+    links: {
+      openExternal: (url) => openExternalUrl({ url }),
     },
   };
 }

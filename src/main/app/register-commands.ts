@@ -9,6 +9,7 @@ import { registerCliCommands } from "../features/cli/command";
 import { registerClipboardCommands } from "../features/clipboard";
 import type { ExternalEditManager } from "../features/external-edit";
 import { registerExternalEditCommands } from "../features/external-edit/command";
+import { registerExternalUrlCommands } from "../features/external-url";
 import type { OpenBlockService } from "../features/open-block";
 import { registerOpenBlockCommands } from "../features/open-block/command";
 import type { PreferencesService } from "../features/preferences";
@@ -48,6 +49,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
     manager: deps.externalEditManager,
     paths: deps.persistence.paths,
   });
+  registerExternalUrlCommands(ipc);
   registerOpenBlockCommands(ipc, {
     openBlockService: deps.openBlockService,
   });

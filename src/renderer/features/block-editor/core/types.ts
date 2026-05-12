@@ -58,6 +58,9 @@ export interface BlockEditorRuntime {
     write: (data: BlockEditorClipboardWriteData) => Promise<void>;
     writeText: (text: string) => Promise<void>;
   };
+  links: {
+    openExternal: (url: string) => Promise<void>;
+  };
 }
 
 export interface BlockEditorHandle {

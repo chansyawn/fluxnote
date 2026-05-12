@@ -3,6 +3,7 @@ import { blocksContract } from "@shared/features/blocks/contract";
 import { cliContract } from "@shared/features/cli/contract";
 import { clipboardContract } from "@shared/features/clipboard/contract";
 import { externalEditContract } from "@shared/features/external-edit/contract";
+import { externalUrlContract } from "@shared/features/external-url/contract";
 import { openBlockContract } from "@shared/features/open-block/contract";
 import { preferencesContract } from "@shared/features/preferences/contract";
 import { shortcutContract } from "@shared/features/shortcut/contract";
@@ -17,6 +18,7 @@ export const contracts = {
     ...clipboardContract.commands,
     ...cliContract.commands,
     ...externalEditContract.commands,
+    ...externalUrlContract.commands,
     ...openBlockContract.commands,
     ...preferencesContract.commands,
     ...shortcutContract.commands,
@@ -27,6 +29,7 @@ export const contracts = {
     ...blocksContract.events,
     ...clipboardContract.events,
     ...externalEditContract.events,
+    ...externalUrlContract.events,
     ...openBlockContract.events,
     ...shortcutContract.events,
     ...windowContract.events,

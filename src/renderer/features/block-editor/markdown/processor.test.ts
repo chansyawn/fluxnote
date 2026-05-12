@@ -35,4 +35,21 @@ describe("processor", () => {
     // Should not crash and should produce a checkbox marker
     expect(result).toMatch(/\[\s\]/);
   });
+
+  it("keeps bare http urls as plain markdown text", () => {
+    const result = stringifyMdastToMarkdown(parseMarkdownToMdast("https://example.com"));
+    expect(result.trim()).toBe("https://example.com");
+  });
+
+  it("normalizes angle bracket urls to bare markdown text", () => {
+    const result = stringifyMdastToMarkdown(parseMarkdownToMdast("<https://example.com>"));
+    expect(result.trim()).toBe("https://example.com");
+  });
+
+  it("preserves explicit markdown links", () => {
+    const result = stringifyMdastToMarkdown(
+      parseMarkdownToMdast("[https://example.com](https://example.com)"),
+    );
+    expect(result.trim()).toBe("[https://example.com](https://example.com)");
+  });
 });

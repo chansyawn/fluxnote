@@ -1,5 +1,18 @@
+import { $isAutoLinkNode, $isLinkNode } from "@lexical/link";
+import {
+  $getRoot,
+  $isElementNode,
+  type LexicalEditor,
+  type LexicalNode,
+  type NodeKey,
+} from "lexical";
 import { describe, expect, it } from "vitest";
 
+import {
+  convertAutoLinkToMarkdownLink,
+  removeMarkdownLink,
+  updateMarkdownLinkUrl,
+} from "../syntax/link/link-operations";
 import { expectMarkdownRoundTripStable } from "../test-helper/assertions";
 import {
   editorFromMarkdown,
@@ -22,6 +35,27 @@ import {
   t,
   ul,
 } from "../test-helper/mdast-builders";
+
+function readFirstLinkKey(editor: LexicalEditor): NodeKey {
+  let key: NodeKey | null = null;
+  editor.getEditorState().read(() => {
+    const visit = (node: LexicalNode): void => {
+      if ($isLinkNode(node)) {
+        key = node.getKey();
+        return;
+      }
+      if ($isElementNode(node)) {
+        for (const child of node.getChildren()) {
+          visit(child);
+        }
+      }
+    };
+    visit($getRoot());
+  });
+
+  if (!key) throw new Error("Expected a link node");
+  return key;
+}
 
 describe("lexical-mdast", () => {
   describe("paragraph", () => {
@@ -96,6 +130,56 @@ describe("lexical-mdast", () => {
     it("preserves links", () => {
       const editor = editorFromMdast(doc(p(link("https://example.com", t("site")))));
       expect(readMarkdown(editor).trim()).toBe("[site](https://example.com)");
+    });
+
+    it("exports bare urls as plain markdown text", () => {
+      const editor = editorFromMarkdown("https://example.com");
+      expect(readMarkdown(editor).trim()).toBe("https://example.com");
+    });
+
+    it("does not preserve angle bracket urls", () => {
+      const editor = editorFromMarkdown("<https://example.com>");
+      expect(readMarkdown(editor).trim()).toBe("https://example.com");
+    });
+
+    it("converts autolinks to markdown links", () => {
+      const editor = editorFromMarkdown("https://example.com");
+      const key = readFirstLinkKey(editor);
+
+      convertAutoLinkToMarkdownLink(editor, key);
+
+      expect(readMarkdown(editor).trim()).toBe("[https://example.com](https://example.com)");
+    });
+
+    it("updates markdown link urls", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      updateMarkdownLinkUrl(editor, key, "https://example.org");
+
+      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
+    });
+
+    it("removes markdown links while preserving text", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      removeMarkdownLink(editor, key);
+
+      expect(readMarkdown(editor).trim()).toBe("site");
+    });
+
+    it("imports bare urls as autolink nodes", () => {
+      const editor = editorFromMarkdown("https://example.com");
+      let isAutoLink = false;
+      editor.getEditorState().read(() => {
+        const paragraph = $getRoot().getFirstChildOrThrow();
+        if ($isElementNode(paragraph)) {
+          isAutoLink = $isAutoLinkNode(paragraph.getFirstChild());
+        }
+      });
+
+      expect(isAutoLink).toBe(true);
     });
   });
 

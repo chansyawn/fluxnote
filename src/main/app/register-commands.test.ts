@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   registerClipboardCommands: vi.fn(),
   registerCliCommands: vi.fn(),
   registerExternalEditCommands: vi.fn(),
+  registerExternalUrlCommands: vi.fn(),
   registerOpenBlockCommands: vi.fn(),
   registerPreferencesCommands: vi.fn(),
   registerShortcutCommands: vi.fn(),
@@ -25,6 +26,9 @@ vi.mock("../features/clipboard", () => ({
 vi.mock("../features/cli/command", () => ({ registerCliCommands: mocks.registerCliCommands }));
 vi.mock("../features/external-edit/command", () => ({
   registerExternalEditCommands: mocks.registerExternalEditCommands,
+}));
+vi.mock("../features/external-url", () => ({
+  registerExternalUrlCommands: mocks.registerExternalUrlCommands,
 }));
 vi.mock("../features/open-block/command", () => ({
   registerOpenBlockCommands: mocks.registerOpenBlockCommands,
@@ -63,6 +67,7 @@ describe("registerFeatureCommands", () => {
     expect(mocks.registerClipboardCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerCliCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerExternalEditCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerExternalUrlCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerOpenBlockCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerPreferencesCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);

@@ -45,6 +45,36 @@ msgid "block-editor.content.label"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:182
+msgid "block-editor.link.convert"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:180
+msgid "block-editor.link.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:179
+msgid "block-editor.link.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:178
+msgid "block-editor.link.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:181
+msgid "block-editor.link.remove"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:183
+msgid "block-editor.link.url"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/features/block-editor/core/block-editor.tsx:63
 #: src/renderer/features/block-editor/core/block-editor.tsx:69
 msgid "block-editor.placeholder"
@@ -218,17 +248,17 @@ msgid "lab.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:107
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:112
 msgid "lab.playground.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:120
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:125
 msgid "lab.playground.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:104
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:109
 msgid "lab.playground.title"
 msgstr ""
 

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 const mocks = vi.hoisted(() => ({
   copyAsset: vi.fn(),
   createAsset: vi.fn(),
+  openExternalUrl: vi.fn(),
   resolveAsset: vi.fn(),
   writeBlockEditorClipboard: vi.fn(),
 }));
@@ -11,6 +12,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@renderer/clients", () => ({
   copyAsset: mocks.copyAsset,
   createAsset: mocks.createAsset,
+  openExternalUrl: mocks.openExternalUrl,
   resolveAsset: mocks.resolveAsset,
   writeBlockEditorClipboard: mocks.writeBlockEditorClipboard,
 }));
@@ -36,6 +38,7 @@ describe("block editor runtime", () => {
     Reflect.deleteProperty(globalThis, "navigator");
     mocks.copyAsset.mockReset();
     mocks.createAsset.mockReset();
+    mocks.openExternalUrl.mockReset();
     mocks.resolveAsset.mockReset();
     mocks.writeBlockEditorClipboard.mockReset();
   });
@@ -116,5 +119,14 @@ describe("block editor runtime", () => {
 
     expect(writeText).toHaveBeenCalledWith("const value = 1;");
     expect(mocks.writeBlockEditorClipboard).not.toHaveBeenCalled();
+  });
+
+  it("opens external links through the client runtime", async () => {
+    const runtime = createBlockRuntime("block-1");
+    mocks.openExternalUrl.mockResolvedValue(undefined);
+
+    await runtime.links.openExternal("https://example.com");
+
+    expect(mocks.openExternalUrl).toHaveBeenCalledWith({ url: "https://example.com" });
   });
 });

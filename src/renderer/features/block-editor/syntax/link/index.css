@@ -1,5 +1,25 @@
 @reference "#global.css";
 
 .block-editor__link {
-  @apply text-primary decoration-primary underline;
+  @apply text-primary decoration-primary underline underline-offset-2;
+}
+
+.block-editor__link--markdown {
+  @apply decoration-solid;
+}
+
+.block-editor__link--auto {
+  @apply decoration-dashed;
+}
+
+.block-editor__link-popover {
+  @apply bg-popover text-popover-foreground ring-foreground/10 absolute z-50 flex w-max max-w-80 -translate-x-1/2 flex-col gap-2 rounded-lg p-2.5 text-xs/relaxed shadow-md ring-1;
+}
+
+.block-editor__link-popover-form {
+  @apply flex w-72 flex-col gap-2;
+}
+
+.block-editor__link-popover-actions {
+  @apply flex flex-wrap items-center gap-1;
 }

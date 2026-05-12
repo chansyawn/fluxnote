@@ -1,4 +1,4 @@
-import { $createLinkNode, $isLinkNode } from "@lexical/link";
+import { $createLinkNode, $isAutoLinkNode, $isLinkNode } from "@lexical/link";
 import type { LexicalNode } from "lexical";
 import type { Link, PhrasingContent } from "mdast";
 
@@ -15,7 +15,7 @@ export function linkFromLexical(
   node: LexicalNode,
   readInline: (child: LexicalNode) => PhrasingContent[],
 ): Link | null {
-  if (!$isLinkNode(node)) {
+  if (!$isLinkNode(node) || $isAutoLinkNode(node)) {
     return null;
   }
 

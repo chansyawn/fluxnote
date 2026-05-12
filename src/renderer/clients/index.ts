@@ -9,6 +9,7 @@ export {
   onExternalEditSessionsChanged,
   submitExternalEdit,
 } from "./external-edit";
+export { openExternalUrl } from "./external-url";
 export { onAutoArchiveStateChanged } from "./ipc/events";
 export {
   acknowledgePendingOpenBlock,
@@ -43,6 +44,7 @@ export type {
   ExternalEditSessionsChangedPayload,
   ExternalEditSubmitRequest,
 } from "./external-edit";
+export type { ExternalUrlOpenRequest } from "./external-url";
 export type {
   CopyAssetRequest,
   CopyAssetResult,
