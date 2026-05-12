@@ -14,5 +14,9 @@
 }
 
 .block-editor__gap-cursor--active::before {
-  @apply animate-caret-blink block;
+  @apply animate-caret-blink;
+}
+
+[data-block-id]:focus-within .block-editor__gap-cursor--active::before {
+  @apply block;
 }
