@@ -1,7 +1,4 @@
 import {
-  $getNearestNodeFromDOMNode,
-  $getSelection,
-  $isRangeSelection,
   BLUR_COMMAND,
   COMMAND_PRIORITY_LOW,
   FOCUS_COMMAND,
@@ -9,199 +6,133 @@ import {
   type EditorState,
   type LexicalEditor,
 } from "lexical";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { findLinkAncestor, type LinkTarget, readLinkTarget } from "./link-operations";
+import {
+  type ActiveLink,
+  isSameActiveLink,
+  measureLinkFromDom,
+  measureLinkFromSelection,
+} from "./link-model";
 
 const CLOSE_DELAY_MS = 120;
 
-export interface ActiveLink {
-  element: HTMLElement;
-  target: LinkTarget;
+interface LinkSources {
+  hover: ActiveLink | null;
+  pinned: ActiveLink | null;
+  selection: ActiveLink | null;
 }
 
-function readLinkFromDom(editor: LexicalEditor, domNode: Node): LinkTarget | null {
-  let target: LinkTarget | null = null;
-  editor.getEditorState().read(
-    () => {
-      const lexicalNode = $getNearestNodeFromDOMNode(domNode);
-      const link = findLinkAncestor(lexicalNode);
-      target = link ? readLinkTarget(link) : null;
-    },
-    { editor },
-  );
-  return target;
-}
+type LinkSource = keyof LinkSources;
+type DelayedCloseSource = "hover" | "pinned";
 
-function getLinkElement(editor: LexicalEditor, target: LinkTarget): HTMLElement | null {
-  const element = editor.getElementByKey(target.key);
-  return element instanceof HTMLElement ? element : null;
-}
-
-function measureActiveLink(editor: LexicalEditor, domNode: Node): ActiveLink | null {
-  const target = readLinkFromDom(editor, domNode);
-  if (!target) return null;
-
-  const element = getLinkElement(editor, target);
-  if (!element) return null;
-
-  return {
-    element,
-    target,
-  };
-}
-
-function readLinkFromSelection(): LinkTarget | null {
-  const selection = $getSelection();
-  if (!$isRangeSelection(selection) || !selection.isCollapsed()) return null;
-
-  const link = findLinkAncestor(selection.anchor.getNode());
-  return link ? readLinkTarget(link) : null;
-}
-
-function measureSelectionLink(editor: LexicalEditor, editorState: EditorState): ActiveLink | null {
-  let target: LinkTarget | null = null;
-  editorState.read(() => {
-    target = readLinkFromSelection();
-  });
-
-  if (!target) return null;
-
-  const element = getLinkElement(editor, target);
-  if (!element) return null;
-
-  return {
-    element,
-    target,
-  };
-}
-
-function isSameActiveLink(current: ActiveLink | null, next: ActiveLink): boolean {
-  return (
-    current?.element === next.element &&
-    current.target.key === next.target.key &&
-    current.target.kind === next.target.kind &&
-    current.target.text === next.target.text &&
-    current.target.url === next.target.url
-  );
-}
+const EMPTY_LINK_SOURCES: LinkSources = {
+  hover: null,
+  pinned: null,
+  selection: null,
+};
 
 function isNodeInsideElement(element: HTMLElement | null, node: EventTarget | null): boolean {
   return node instanceof Node && element?.contains(node) === true;
 }
 
+function resolveActiveLink(sources: LinkSources): ActiveLink | null {
+  return sources.hover ?? sources.pinned ?? sources.selection;
+}
+
+function setLinkSource(
+  sources: LinkSources,
+  source: LinkSource,
+  next: ActiveLink | null,
+): LinkSources {
+  return isSameActiveLink(sources[source], next) ? sources : { ...sources, [source]: next };
+}
+
+function clearLinkSources(sources: LinkSources): LinkSources {
+  return resolveActiveLink(sources) === null ? sources : EMPTY_LINK_SOURCES;
+}
+
 export function useActiveLinkTarget(editor: LexicalEditor) {
-  const hoverCloseTimerRef = useRef<number | null>(null);
-  const popoverCloseTimerRef = useRef<number | null>(null);
+  const closeTimersRef = useRef<Record<DelayedCloseSource, number | null>>({
+    hover: null,
+    pinned: null,
+  });
   const activeLinkRef = useRef<ActiveLink | null>(null);
   const editorHasFocusRef = useRef(false);
   const popoverElementRef = useRef<HTMLElement | null>(null);
   const rootElementRef = useRef<HTMLElement | null>(null);
-  const [caretLink, setCaretLink] = useState<ActiveLink | null>(null);
-  const [pointerLink, setPointerLink] = useState<ActiveLink | null>(null);
-  const [popoverLink, setPopoverLink] = useState<ActiveLink | null>(null);
+  const [sources, setSources] = useState<LinkSources>(EMPTY_LINK_SOURCES);
 
-  const activeLink = useMemo(
-    () => pointerLink ?? popoverLink ?? caretLink,
-    [caretLink, pointerLink, popoverLink],
-  );
+  const activeLink = resolveActiveLink(sources);
 
   useEffect(() => {
     activeLinkRef.current = activeLink;
   }, [activeLink]);
 
-  const clearHoverCloseTimer = useCallback(() => {
-    if (hoverCloseTimerRef.current === null) return;
-    window.clearTimeout(hoverCloseTimerRef.current);
-    hoverCloseTimerRef.current = null;
-  }, []);
-
-  const clearPopoverCloseTimer = useCallback(() => {
-    if (popoverCloseTimerRef.current === null) return;
-    window.clearTimeout(popoverCloseTimerRef.current);
-    popoverCloseTimerRef.current = null;
+  const clearCloseTimer = useCallback((source: DelayedCloseSource) => {
+    const timer = closeTimersRef.current[source];
+    if (timer === null) return;
+    window.clearTimeout(timer);
+    closeTimersRef.current[source] = null;
   }, []);
 
   const clearCloseTimers = useCallback(() => {
-    clearHoverCloseTimer();
-    clearPopoverCloseTimer();
-  }, [clearHoverCloseTimer, clearPopoverCloseTimer]);
+    clearCloseTimer("hover");
+    clearCloseTimer("pinned");
+  }, [clearCloseTimer]);
 
-  const setNextCaretLink = useCallback((next: ActiveLink | null) => {
-    setCaretLink((current) => {
-      if (!next) return current === null ? current : null;
-      return isSameActiveLink(current, next) ? current : next;
-    });
-  }, []);
-
-  const setNextPointerLink = useCallback((next: ActiveLink | null) => {
-    setPointerLink((current) => {
-      if (!next) return current === null ? current : null;
-      return isSameActiveLink(current, next) ? current : next;
-    });
-  }, []);
-
-  const setNextPopoverLink = useCallback((next: ActiveLink | null) => {
-    setPopoverLink((current) => {
-      if (!next) return current === null ? current : null;
-      return isSameActiveLink(current, next) ? current : next;
-    });
-  }, []);
-
-  const updateCaretLink = useCallback(
-    (editorState: EditorState) => {
-      setNextCaretLink(
-        editorHasFocusRef.current ? measureSelectionLink(editor, editorState) : null,
-      );
-    },
-    [editor, setNextCaretLink],
+  const setSource = useCallback(
+    (source: LinkSource, next: ActiveLink | null) =>
+      setSources((current) => setLinkSource(current, source, next)),
+    [],
   );
 
-  const closeHoverLink = useCallback(() => {
-    clearHoverCloseTimer();
-    setNextPointerLink(null);
-  }, [clearHoverCloseTimer, setNextPointerLink]);
-
-  const closePopoverLink = useCallback(() => {
-    clearPopoverCloseTimer();
-    setNextPopoverLink(null);
-  }, [clearPopoverCloseTimer, setNextPopoverLink]);
+  const updateSelectionLink = useCallback(
+    (editorState: EditorState) => {
+      const next = editorHasFocusRef.current ? measureLinkFromSelection(editor, editorState) : null;
+      setSource("selection", next);
+    },
+    [editor, setSource],
+  );
 
   const closeActiveLink = useCallback(() => {
     clearCloseTimers();
-    setNextCaretLink(null);
-    setNextPointerLink(null);
-    setNextPopoverLink(null);
-  }, [clearCloseTimers, setNextCaretLink, setNextPointerLink, setNextPopoverLink]);
-
-  const scheduleHoverLinkClose = useCallback(() => {
-    clearHoverCloseTimer();
-    hoverCloseTimerRef.current = window.setTimeout(closeHoverLink, CLOSE_DELAY_MS);
-  }, [clearHoverCloseTimer, closeHoverLink]);
+    setSources(clearLinkSources);
+  }, [clearCloseTimers]);
 
   const holdPopoverLinkOpen = useCallback(() => {
-    clearPopoverCloseTimer();
+    clearCloseTimer("pinned");
     const next = activeLinkRef.current;
-    if (next) setNextPopoverLink(next);
-  }, [clearPopoverCloseTimer, setNextPopoverLink]);
+    if (next) setSource("pinned", next);
+  }, [clearCloseTimer, setSource]);
 
-  const schedulePopoverLinkClose = useCallback(() => {
-    clearPopoverCloseTimer();
-    popoverCloseTimerRef.current = window.setTimeout(closePopoverLink, CLOSE_DELAY_MS);
-  }, [clearPopoverCloseTimer, closePopoverLink]);
+  const scheduleSourceClose = useCallback(
+    (source: DelayedCloseSource) => {
+      clearCloseTimer(source);
+      closeTimersRef.current[source] = window.setTimeout(() => {
+        closeTimersRef.current[source] = null;
+        setSource(source, null);
+      }, CLOSE_DELAY_MS);
+    },
+    [clearCloseTimer, setSource],
+  );
+
+  const schedulePinnedLinkClose = useCallback(() => {
+    scheduleSourceClose("pinned");
+  }, [scheduleSourceClose]);
 
   const showLinkFromDom = useCallback(
     (domNode: Node) => {
-      const next = measureActiveLink(editor, domNode);
+      const next = measureLinkFromDom(editor, domNode);
       if (next) {
-        clearHoverCloseTimer();
-        setNextPointerLink(next);
+        clearCloseTimer("hover");
+        setSource("hover", next);
         return;
       }
 
-      scheduleHoverLinkClose();
+      scheduleSourceClose("hover");
     },
-    [clearHoverCloseTimer, editor, scheduleHoverLinkClose, setNextPointerLink],
+    [clearCloseTimer, editor, scheduleSourceClose, setSource],
   );
 
   const setPopoverElement = useCallback((element: HTMLDivElement | null) => {
@@ -237,7 +168,7 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
         if (event.target instanceof Node) showLinkFromDom(event.target);
       };
       const handlePointerLeave = () => {
-        scheduleHoverLinkClose();
+        scheduleSourceClose("hover");
       };
 
       rootElement.addEventListener("pointermove", handlePointerMove);
@@ -251,18 +182,18 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
         rootElement.removeEventListener("pointerleave", handlePointerLeave);
       };
     });
-  }, [editor, scheduleHoverLinkClose, showLinkFromDom]);
+  }, [editor, scheduleSourceClose, showLinkFromDom]);
 
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
-        updateCaretLink(editorState);
+        updateSelectionLink(editorState);
       }),
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
           editorHasFocusRef.current = true;
-          updateCaretLink(editor.getEditorState());
+          updateSelectionLink(editor.getEditorState());
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -271,14 +202,14 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
         BLUR_COMMAND,
         () => {
           editorHasFocusRef.current = false;
-          setNextPointerLink(null);
-          setNextCaretLink(null);
+          setSource("hover", null);
+          setSource("selection", null);
           return false;
         },
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, setNextCaretLink, setNextPointerLink, updateCaretLink]);
+  }, [editor, setSource, updateSelectionLink]);
 
   useEffect(() => {
     return () => clearCloseTimers();
@@ -288,7 +219,7 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
     activeLink,
     closeActiveLink,
     holdActiveLinkOpen: holdPopoverLinkOpen,
-    scheduleActiveLinkClose: schedulePopoverLinkClose,
+    scheduleActiveLinkClose: schedulePinnedLinkClose,
     setPopoverElement,
     shouldIgnorePopoverClose,
   };

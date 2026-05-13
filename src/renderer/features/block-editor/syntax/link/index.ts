@@ -18,10 +18,7 @@ const HTTP_URL_MATCHER = createLinkMatcherWithRegExp(
 export const LINK_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/link",
   dependencies: [
-    configExtension(LinkExtension, {
-      attributes: undefined,
-      validateUrl: undefined,
-    }),
+    LinkExtension,
     configExtension(AutoLinkExtension, {
       matchers: [HTTP_URL_MATCHER],
     }),

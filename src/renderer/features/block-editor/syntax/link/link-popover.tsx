@@ -10,16 +10,11 @@ import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,
-  updateMarkdownLinkUrl,
-} from "./link-operations";
+  setMarkdownLinkUrl,
+} from "./link-model";
 import { useActiveLinkTarget } from "./use-active-link-target";
 
 const COPY_FEEDBACK_DURATION_MS = 1600;
-
-interface LinkUrlDraft {
-  key: string;
-  url: string;
-}
 
 export function LinkHoverControls() {
   const { i18n } = useLingui();
@@ -33,12 +28,12 @@ export function LinkHoverControls() {
     setPopoverElement,
     shouldIgnorePopoverClose,
   } = useActiveLinkTarget(editor);
-  const [draftUrl, setDraftUrl] = useState<LinkUrlDraft | null>(null);
+  const [draftUrl, setDraftUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
   const close = useCallback(() => {
     closeActiveLink();
-    setDraftUrl(null);
+    setDraftUrl("");
     setCopied(false);
   }, [closeActiveLink]);
 
@@ -49,49 +44,44 @@ export function LinkHoverControls() {
   }, [copied]);
 
   useEffect(() => {
-    setDraftUrl(null);
+    setDraftUrl(activeLink?.link.kind === "markdown" ? activeLink.link.url : "");
     setCopied(false);
   }, [activeLink]);
 
   const handleOpen = async () => {
     if (!activeLink) return;
-    await runtime.links.openExternal(activeLink.target.url);
+    await runtime.links.openExternal(activeLink.link.url);
     close();
   };
 
   const handleCopy = async () => {
     if (!activeLink) return;
-    await runtime.clipboard.writeText(activeLink.target.url);
+    await runtime.clipboard.writeText(activeLink.link.url);
     setCopied(true);
   };
 
   const handleRemove = () => {
-    if (!activeLink || activeLink.target.kind !== "link") return;
-    removeMarkdownLink(editor, activeLink.target.key);
+    if (!activeLink || activeLink.link.kind !== "markdown") return;
+    removeMarkdownLink(editor, activeLink.link.key);
     close();
   };
 
   const handleConvert = () => {
-    if (!activeLink || activeLink.target.kind !== "autolink") return;
-    convertAutoLinkToMarkdownLink(editor, activeLink.target.key);
+    if (!activeLink || activeLink.link.kind !== "auto") return;
+    convertAutoLinkToMarkdownLink(editor, activeLink.link.key);
     close();
   };
 
-  const currentDraftUrl =
-    activeLink && draftUrl?.key === activeLink.target.key
-      ? draftUrl.url
-      : (activeLink?.target.url ?? "");
-
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
-    if (!activeLink || activeLink.target.kind !== "link") return;
-    updateMarkdownLinkUrl(editor, activeLink.target.key, currentDraftUrl);
+    if (!activeLink || activeLink.link.kind !== "markdown") return;
+    setMarkdownLinkUrl(editor, activeLink.link.key, draftUrl);
     close();
   };
 
   if (!activeLink) return null;
 
-  const isMarkdownLink = activeLink.target.kind === "link";
+  const isMarkdownLink = activeLink.link.kind === "markdown";
 
   const openLabel = i18n._({ id: "block-editor.link.open", message: "Open" });
   const copyLabel = i18n._({ id: "block-editor.link.copy", message: "Copy" });
@@ -142,13 +132,8 @@ export function LinkHoverControls() {
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <Input
               aria-label={urlLabel}
-              value={currentDraftUrl}
-              onChange={(event) =>
-                setDraftUrl({
-                  key: activeLink.target.key,
-                  url: event.currentTarget.value,
-                })
-              }
+              value={draftUrl}
+              onChange={(event) => setDraftUrl(event.currentTarget.value)}
             />
             <div className="flex flex-wrap items-center gap-1">
               {sharedActions}
