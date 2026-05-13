@@ -25,6 +25,7 @@ export function LinkHoverControls() {
     activeLink,
     closeActiveLink,
     holdActiveLinkOpen,
+    pinActiveLink,
     scheduleActiveLinkClose,
     setPopoverElement,
     shouldIgnorePopoverClose,
@@ -65,14 +66,19 @@ export function LinkHoverControls() {
 
   const handleRemove = () => {
     if (!activeLink || activeLink.link.kind !== "markdown") return;
-    removeMarkdownLink(editor, activeLink.link.key);
+    const convertedLink = removeMarkdownLink(editor, activeLink.link.key);
+    if (convertedLink) {
+      pinActiveLink(convertedLink);
+      return;
+    }
+
     close();
   };
 
   const handleConvert = () => {
     if (!activeLink || activeLink.link.kind !== "auto") return;
-    convertAutoLinkToMarkdownLink(editor, activeLink.link.key);
-    close();
+    const convertedLink = convertAutoLinkToMarkdownLink(editor, activeLink.link.key);
+    if (convertedLink) pinActiveLink(convertedLink);
   };
 
   const handleDraftUrlChange = (url: string) => {

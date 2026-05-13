@@ -1,4 +1,5 @@
 import {
+  $createAutoLinkNode,
   $createLinkNode,
   $isAutoLinkNode,
   $isLinkNode,
@@ -19,6 +20,9 @@ import {
 } from "lexical";
 
 export type LinkKind = "auto" | "markdown";
+
+export const HTTP_URL_REGEXP =
+  /https?:\/\/[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b[-a-zA-Z0-9()@:%_+.~#?&//=]*/;
 
 export interface LinkSnapshot {
   key: NodeKey;
@@ -51,7 +55,7 @@ function readLinkSnapshot(node: LinkNode | AutoLinkNode): LinkSnapshot {
 
 function getLinkElement(editor: LexicalEditor, link: LinkSnapshot): HTMLElement | null {
   const element = editor.getElementByKey(link.key);
-  return element instanceof HTMLElement ? element : null;
+  return typeof HTMLElement !== "undefined" && element instanceof HTMLElement ? element : null;
 }
 
 function measureLink(editor: LexicalEditor, link: LinkSnapshot | null): ActiveLink | null {
@@ -76,14 +80,32 @@ function unwrapLinkNode(node: LinkNode): void {
   node.remove();
 }
 
-function replaceAutoLinkWithMarkdownLink(node: AutoLinkNode): void {
+function getAutoLinkUrl(text: string): string | null {
+  const match = HTTP_URL_REGEXP.exec(text);
+  return match?.index === 0 && match[0].length === text.length ? match[0] : null;
+}
+
+function replaceAutoLinkWithMarkdownLink(node: AutoLinkNode): LinkNode {
   const link = $createLinkNode(node.getURL(), {
     rel: node.getRel(),
     target: node.getTarget(),
     title: node.getTitle(),
   });
   link.append(...node.getChildren());
-  node.replace(link);
+  return node.replace(link);
+}
+
+function replaceMarkdownLinkWithAutoLink(node: LinkNode): AutoLinkNode | null {
+  const text = node.getTextContent();
+  if (getAutoLinkUrl(text) !== node.getURL()) return null;
+
+  const link = $createAutoLinkNode(node.getURL(), {
+    rel: node.getRel(),
+    target: node.getTarget(),
+    title: node.getTitle(),
+  });
+  link.append(...node.getChildren());
+  return node.replace(link);
 }
 
 function updateLinkNode(
@@ -176,18 +198,35 @@ export function setMarkdownLinkUrl(editor: LexicalEditor, key: NodeKey, url: str
   );
 }
 
-export function removeMarkdownLink(editor: LexicalEditor, key: NodeKey): void {
+export function removeMarkdownLink(editor: LexicalEditor, key: NodeKey): ActiveLink | null {
+  let convertedLink: LinkSnapshot | null = null;
+
   updateLinkNode(editor, key, (node) => {
     if (isMarkdownLinkNode(node)) {
+      const autoLink = replaceMarkdownLinkWithAutoLink(node);
+      if (autoLink) {
+        convertedLink = readLinkSnapshot(autoLink);
+        return;
+      }
+
       unwrapLinkNode(node);
     }
   });
+
+  return measureLink(editor, convertedLink);
 }
 
-export function convertAutoLinkToMarkdownLink(editor: LexicalEditor, key: NodeKey): void {
+export function convertAutoLinkToMarkdownLink(
+  editor: LexicalEditor,
+  key: NodeKey,
+): ActiveLink | null {
+  let convertedLink: LinkSnapshot | null = null;
+
   updateLinkNode(editor, key, (node) => {
     if ($isAutoLinkNode(node)) {
-      replaceAutoLinkWithMarkdownLink(node);
+      convertedLink = readLinkSnapshot(replaceAutoLinkWithMarkdownLink(node));
     }
   });
+
+  return measureLink(editor, convertedLink);
 }

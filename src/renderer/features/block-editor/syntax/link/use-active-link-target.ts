@@ -147,6 +147,18 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
     scheduleSourceClose("pinned", () => isElementFocusedWithin(popoverElementRef.current));
   }, [scheduleSourceClose]);
 
+  const pinActiveLink = useCallback(
+    (next: ActiveLink) => {
+      clearCloseTimers();
+      setSources((current) =>
+        current.hover === null && isSameActiveLink(current.pinned, next)
+          ? current
+          : { ...current, hover: null, pinned: next },
+      );
+    },
+    [clearCloseTimers],
+  );
+
   const showLinkFromDom = useCallback(
     (domNode: Node) => {
       const next = measureLinkFromDom(editor, domNode);
@@ -246,6 +258,7 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
     activeLink,
     closeActiveLink,
     holdActiveLinkOpen: holdPopoverLinkOpen,
+    pinActiveLink,
     scheduleActiveLinkClose: schedulePinnedLinkClose,
     setPopoverElement,
     shouldIgnorePopoverClose,

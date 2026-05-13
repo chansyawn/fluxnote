@@ -139,6 +139,28 @@ describe("link", () => {
       expect(readMarkdown(editor).trim()).toBe("[https://example.com](https://example.com)");
     });
 
+    it("returns the converted markdown link target", () => {
+      const editor = editorFromMarkdown("https://example.com");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          const convertedLink = convertAutoLinkToMarkdownLink(editor, key);
+
+          expect(convertedLink).toEqual({
+            element,
+            link: {
+              key: readFirstLinkKey(editor),
+              kind: "markdown",
+              text: "https://example.com",
+              url: "https://example.com",
+            },
+          });
+          expect(convertedLink?.link.key).not.toBe(key);
+        });
+      });
+    });
+
     it("updates markdown link urls", () => {
       const editor = editorFromMarkdown("[site](https://example.com)");
       const key = readFirstLinkKey(editor);
@@ -185,6 +207,38 @@ describe("link", () => {
       expect(readMarkdown(editor).trim()).toBe("**site**");
     });
 
+    it("converts markdown bare url links to autolinks", () => {
+      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      removeMarkdownLink(editor, key);
+
+      expect(readMarkdown(editor).trim()).toBe("https://example.com");
+      expect(readFirstLink(editor, (node) => $isAutoLinkNode(node))).toBe(true);
+    });
+
+    it("returns the converted autolink target", () => {
+      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          const convertedLink = removeMarkdownLink(editor, key);
+
+          expect(convertedLink).toEqual({
+            element,
+            link: {
+              key: readFirstLinkKey(editor),
+              kind: "auto",
+              text: "https://example.com",
+              url: "https://example.com",
+            },
+          });
+          expect(convertedLink?.link.key).not.toBe(key);
+        });
+      });
+    });
+
     it("refreshes active links from the current editor state", () => {
       const editor = editorFromMarkdown("[site](https://example.com)");
       const key = readFirstLinkKey(editor);
@@ -218,6 +272,52 @@ describe("link", () => {
             refreshActiveLink(editor, {
               element,
               link: { key, kind: "markdown", text: "site", url: "https://example.com" },
+            }),
+          ).toBeNull();
+        });
+      });
+    });
+
+    it("clears stale active markdown links after converting them to autolinks", () => {
+      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          removeMarkdownLink(editor, key);
+
+          expect(
+            refreshActiveLink(editor, {
+              element,
+              link: {
+                key,
+                kind: "markdown",
+                text: "https://example.com",
+                url: "https://example.com",
+              },
+            }),
+          ).toBeNull();
+        });
+      });
+    });
+
+    it("clears stale active autolinks after converting them", () => {
+      const editor = editorFromMarkdown("https://example.com");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          convertAutoLinkToMarkdownLink(editor, key);
+
+          expect(
+            refreshActiveLink(editor, {
+              element,
+              link: {
+                key,
+                kind: "auto",
+                text: "https://example.com",
+                url: "https://example.com",
+              },
             }),
           ).toBeNull();
         });

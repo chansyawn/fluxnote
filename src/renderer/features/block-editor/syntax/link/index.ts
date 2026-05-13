@@ -5,15 +5,14 @@ import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import { registerLinkDomClassSync } from "./link-dom";
+import { HTTP_URL_REGEXP } from "./link-model";
 import { LinkHoverControls } from "./link-popover";
 
 export { linkFromLexical, linkToLexical } from "./lexical";
 
 export const LINK_MARKDOWN_SHORTCUT_TRANSFORMERS = [LINK];
 
-const HTTP_URL_MATCHER = createLinkMatcherWithRegExp(
-  /https?:\/\/[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,63}\b[-a-zA-Z0-9()@:%_+.~#?&//=]*/,
-);
+const HTTP_URL_MATCHER = createLinkMatcherWithRegExp(HTTP_URL_REGEXP);
 
 export const LINK_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/link",
