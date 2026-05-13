@@ -12,12 +12,12 @@ import type { ShortcutAction } from "@shared/features/preferences/settings";
 import { RotateCcwIcon, XIcon } from "lucide-react";
 
 import { ShortcutRecordingPopover } from "./shortcut-recording-popover";
-import type { ShortcutInputError, ShortcutRecordingFeedback } from "./shortcut-recording-types";
+import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";
 
 interface ShortcutInputProps {
   action: ShortcutAction;
   shortcut: ShortcutBinding;
-  feedback: ShortcutRecordingFeedback | null;
+  feedback: ShortcutRecordingState | null;
   error: ShortcutInputError | null;
   shouldShowReset: boolean;
   onStartRecording: () => void;

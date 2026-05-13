@@ -2,10 +2,10 @@ import { Trans } from "@lingui/react/macro";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { cn } from "@renderer/ui/lib/utils";
 
-import type { ShortcutInputError, ShortcutRecordingFeedback } from "./shortcut-recording-types";
+import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";
 
 interface ShortcutRecordingPopoverProps {
-  feedback: ShortcutRecordingFeedback;
+  feedback: ShortcutRecordingState;
 }
 
 function ShortcutRecordingMessage({ error }: { error: ShortcutInputError | null }) {

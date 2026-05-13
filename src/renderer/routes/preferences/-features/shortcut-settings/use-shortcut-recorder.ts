@@ -1,9 +1,13 @@
-import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  formatShortcutRecorderTokens,
+  formatShortcutTokens,
+  normalizeShortcutRecorderHotkey,
+} from "@renderer/features/shortcut/shortcut-utils";
 import type { ShortcutAction } from "@shared/features/preferences/settings";
-import { useHotkeyRecorder, type Hotkey } from "@tanstack/react-hotkeys";
+import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { ShortcutInputError, ShortcutRecordingFeedback } from "./shortcut-recording-types";
+import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";
 
 const ERROR_FEEDBACK_DURATION_MS = 1_800;
 const SUCCESS_FEEDBACK_DURATION_MS = 1_200;
@@ -19,11 +23,19 @@ interface UseShortcutRecorderParams {
 
 interface UseShortcutRecorderResult {
   recordingAction: ShortcutAction | null;
-  feedback: ShortcutRecordingFeedback | null;
+  feedback: ShortcutRecordingState | null;
   fieldErrors: Partial<Record<ShortcutAction, ShortcutInputError>>;
   clearFieldError: (action: ShortcutAction) => void;
   startRecording: (action: ShortcutAction) => void;
   cancelRecording: () => void;
+}
+
+function createRecordingState(
+  phase: ShortcutRecordingState["phase"],
+  tokens: string[] = [],
+  error: ShortcutInputError | null = null,
+): ShortcutRecordingState {
+  return { phase, tokens, error };
 }
 
 export function useShortcutRecorder({
@@ -31,12 +43,19 @@ export function useShortcutRecorder({
   updateShortcut,
 }: UseShortcutRecorderParams): UseShortcutRecorderResult {
   const [recordingAction, setRecordingAction] = useState<ShortcutAction | null>(null);
-  const [feedback, setFeedback] = useState<ShortcutRecordingFeedback | null>(null);
+  const [feedback, setFeedback] = useState<ShortcutRecordingState | null>(null);
   const [fieldErrors, setFieldErrors] = useState<
     Partial<Record<ShortcutAction, ShortcutInputError>>
   >({});
   const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const recordingActionRef = useRef<ShortcutAction | null>(null);
+  const listenerCleanupRef = useRef<(() => void) | null>(null);
+  const startListeningRef = useRef<() => void>(() => {});
+
+  const stopListening = useCallback(() => {
+    listenerCleanupRef.current?.();
+    listenerCleanupRef.current = null;
+  }, []);
 
   const clearFeedbackTimer = useCallback(() => {
     if (!feedbackTimerRef.current) {
@@ -48,108 +67,155 @@ export function useShortcutRecorder({
   }, []);
 
   const finishRecording = useCallback(() => {
+    stopListening();
     recordingActionRef.current = null;
     setRecordingAction(null);
     setFeedback(null);
-  }, []);
+  }, [stopListening]);
 
-  const showErrorFeedback = useCallback(
-    (action: ShortcutAction, tokens: string[], error: ShortcutInputError) => {
-      clearFeedbackTimer();
-      setFieldErrors((currentErrors) => ({
-        ...currentErrors,
-        [action]: error,
-      }));
-      setFeedback({ phase: "error", tokens, error });
+  const startListening = useCallback(() => {
+    stopListening();
 
-      feedbackTimerRef.current = setTimeout(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const action = recordingActionRef.current;
+
+      if (!action || event.repeat) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (event.key === "Escape") {
+        clearFeedbackTimer();
+        finishRecording();
+        return;
+      }
+
+      if (
+        (event.key === "Backspace" || event.key === "Delete") &&
+        !event.ctrlKey &&
+        !event.shiftKey &&
+        !event.altKey &&
+        !event.metaKey
+      ) {
+        stopListening();
+        clearShortcut(action);
         setFieldErrors((currentErrors) => ({
           ...currentErrors,
           [action]: undefined,
         }));
-        setFeedback({ phase: "recording", tokens: [], error: null });
-        feedbackTimerRef.current = null;
-      }, ERROR_FEEDBACK_DURATION_MS);
-    },
-    [clearFeedbackTimer],
-  );
+        setFeedback(createRecordingState("success"));
 
-  const showSuccessFeedback = useCallback(
-    (action: ShortcutAction, tokens: string[]) => {
+        feedbackTimerRef.current = setTimeout(() => {
+          finishRecording();
+          feedbackTimerRef.current = null;
+        }, SUCCESS_FEEDBACK_DURATION_MS);
+        return;
+      }
+
+      const hotkey = normalizeShortcutRecorderHotkey(event);
+      const tokens = formatShortcutRecorderTokens(event);
+
+      if (!hotkey) {
+        setFeedback(createRecordingState("recording", tokens));
+        return;
+      }
+
+      stopListening();
+
+      const result = updateShortcut(action, hotkey);
+      const recordedTokens = formatShortcutTokens(result.ok ? result.shortcut : hotkey);
+
+      if (!result.ok) {
+        clearFeedbackTimer();
+        setFieldErrors((currentErrors) => ({
+          ...currentErrors,
+          [action]: result.error ?? "invalid",
+        }));
+        setFeedback(createRecordingState("error", recordedTokens, result.error ?? "invalid"));
+
+        feedbackTimerRef.current = setTimeout(() => {
+          if (recordingActionRef.current !== action) {
+            feedbackTimerRef.current = null;
+            return;
+          }
+
+          setFieldErrors((currentErrors) => ({
+            ...currentErrors,
+            [action]: undefined,
+          }));
+          setFeedback(createRecordingState("recording"));
+          startListeningRef.current();
+          feedbackTimerRef.current = null;
+        }, ERROR_FEEDBACK_DURATION_MS);
+        return;
+      }
+
       clearFeedbackTimer();
       setFieldErrors((currentErrors) => ({
         ...currentErrors,
         [action]: undefined,
       }));
-      setFeedback({ phase: "success", tokens, error: null });
+      setFeedback(createRecordingState("success", recordedTokens));
 
       feedbackTimerRef.current = setTimeout(() => {
         finishRecording();
         feedbackTimerRef.current = null;
       }, SUCCESS_FEEDBACK_DURATION_MS);
-    },
-    [clearFeedbackTimer, finishRecording],
-  );
+    };
 
-  const recorder = useHotkeyRecorder({
-    ignoreInputs: false,
-    onCancel: finishRecording,
-    onClear: () => {
-      const action = recordingActionRef.current;
-
-      if (!action) {
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (!recordingActionRef.current) {
         return;
       }
 
-      clearShortcut(action);
-      showSuccessFeedback(action, []);
-    },
-    onRecord: (hotkey) => {
-      const action = recordingActionRef.current;
+      setFeedback((currentFeedback) => {
+        if (!currentFeedback || currentFeedback.phase !== "recording") {
+          return currentFeedback;
+        }
 
-      if (!action || !hotkey) {
-        return;
-      }
+        return createRecordingState("recording", formatShortcutRecorderTokens(event));
+      });
+    };
 
-      const result = updateShortcut(action, hotkey);
-      const tokens = formatShortcutTokens(result.ok ? result.shortcut : hotkey);
+    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener("keyup", handleKeyUp, true);
+    listenerCleanupRef.current = () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener("keyup", handleKeyUp, true);
+    };
+  }, [clearFeedbackTimer, clearShortcut, finishRecording, stopListening, updateShortcut]);
 
-      if (!result.ok) {
-        showErrorFeedback(action, tokens, result.error ?? "invalid");
-        return;
-      }
-
-      showSuccessFeedback(action, tokens);
-    },
-  });
+  startListeningRef.current = startListening;
 
   const cancelRecording = useCallback(() => {
     clearFeedbackTimer();
-    recorder.cancelRecording();
     finishRecording();
-  }, [clearFeedbackTimer, finishRecording, recorder]);
+  }, [clearFeedbackTimer, finishRecording]);
 
   const startRecording = useCallback(
     (action: ShortcutAction) => {
       clearFeedbackTimer();
-      recorder.stopRecording();
+      finishRecording();
       recordingActionRef.current = action;
       setRecordingAction(action);
-      setFeedback({ phase: "recording", tokens: [], error: null });
+      setFeedback(createRecordingState("recording"));
       setFieldErrors((currentErrors) => ({
         ...currentErrors,
         [action]: undefined,
       }));
-      recorder.startRecording();
+      startListening();
     },
-    [clearFeedbackTimer, recorder],
+    [clearFeedbackTimer, finishRecording, startListening],
   );
 
   useEffect(
     () => () => {
       clearFeedbackTimer();
+      stopListening();
     },
-    [clearFeedbackTimer],
+    [clearFeedbackTimer, stopListening],
   );
 
   return {

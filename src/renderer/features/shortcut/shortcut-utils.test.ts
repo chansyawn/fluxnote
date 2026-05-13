@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
-import { keyboardEventMatchesShortcut } from "./shortcut-utils";
+import {
+  formatShortcutRecorderTokens,
+  keyboardEventMatchesShortcut,
+  normalizeShortcutRecorderHotkey,
+} from "./shortcut-utils";
 
 describe("shortcut utils", () => {
   it("matches submit external edit shortcut", () => {
@@ -25,5 +29,53 @@ describe("shortcut utils", () => {
     } as KeyboardEvent;
 
     expect(keyboardEventMatchesShortcut(event, "Mod+\\", "mac")).toBe(true);
+  });
+
+  it("formats modifier-only recorder previews", () => {
+    const event = {
+      altKey: false,
+      ctrlKey: true,
+      key: "Shift",
+      metaKey: false,
+      shiftKey: true,
+    } as KeyboardEvent;
+
+    expect(formatShortcutRecorderTokens(event, "windows")).toEqual(["Ctrl", "Shift"]);
+  });
+
+  it("formats recorder previews with the final key", () => {
+    const event = {
+      altKey: false,
+      ctrlKey: true,
+      key: "k",
+      metaKey: false,
+      shiftKey: true,
+    } as KeyboardEvent;
+
+    expect(formatShortcutRecorderTokens(event, "windows")).toEqual(["Ctrl", "Shift", "K"]);
+  });
+
+  it("normalizes a recorded shortcut when a non-modifier key is pressed", () => {
+    const event = {
+      altKey: true,
+      ctrlKey: true,
+      key: "k",
+      metaKey: false,
+      shiftKey: false,
+    } as KeyboardEvent;
+
+    expect(normalizeShortcutRecorderHotkey(event, "windows")).toBe("Mod+Alt+K");
+  });
+
+  it("ignores modifier-only recorder input for persistence", () => {
+    const event = {
+      altKey: false,
+      ctrlKey: true,
+      key: "Control",
+      metaKey: false,
+      shiftKey: false,
+    } as KeyboardEvent;
+
+    expect(normalizeShortcutRecorderHotkey(event, "windows")).toBeNull();
   });
 });

@@ -5,7 +5,9 @@ import {
 } from "@shared/features/preferences/settings";
 import {
   formatForDisplay,
+  isModifierKey,
   normalizeHotkey,
+  normalizeKeyName,
   parseHotkey,
   validateHotkey,
   type Hotkey,
@@ -18,6 +20,25 @@ export const SHORTCUT_ACTIONS = shortcutActionSchema.options;
 
 type ShortcutPlatform = "mac" | "windows" | "linux";
 type KeyboardEventLike = Pick<KeyboardEvent, "altKey" | "ctrlKey" | "key" | "metaKey" | "shiftKey">;
+
+function getModifierTokens(event: KeyboardEventLike): string[] {
+  const modifiers: string[] = [];
+
+  if (event.ctrlKey) {
+    modifiers.push("Control");
+  }
+  if (event.altKey) {
+    modifiers.push("Alt");
+  }
+  if (event.shiftKey) {
+    modifiers.push("Shift");
+  }
+  if (event.metaKey) {
+    modifiers.push("Meta");
+  }
+
+  return modifiers;
+}
 
 export function normalizeShortcutBinding(
   shortcut: string,
@@ -76,6 +97,41 @@ export function formatShortcutTokens(
     separatorToken: "+",
     useSymbols: false,
   }).split("+");
+}
+
+export function formatShortcutRecorderTokens(
+  event: KeyboardEventLike,
+  platform?: ShortcutPlatform,
+): string[] {
+  const normalizedKey = normalizeKeyName(event.key);
+  const parts = getModifierTokens(event);
+
+  if (!isModifierKey(normalizedKey)) {
+    parts.push(normalizedKey);
+  }
+
+  if (parts.length === 0) {
+    return [];
+  }
+
+  return formatForDisplay(parts.join("+"), {
+    platform,
+    separatorToken: "+",
+    useSymbols: false,
+  }).split("+");
+}
+
+export function normalizeShortcutRecorderHotkey(
+  event: KeyboardEventLike,
+  platform?: ShortcutPlatform,
+): Hotkey | null {
+  const normalizedKey = normalizeKeyName(event.key);
+
+  if (isModifierKey(normalizedKey)) {
+    return null;
+  }
+
+  return normalizeHotkey([...getModifierTokens(event), normalizedKey].join("+"), platform);
 }
 
 export function normalizeShortcutPreferences(
