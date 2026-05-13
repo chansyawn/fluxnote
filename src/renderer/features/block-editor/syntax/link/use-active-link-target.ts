@@ -13,6 +13,7 @@ import {
   isSameActiveLink,
   measureLinkFromDom,
   measureLinkFromSelection,
+  refreshActiveLink,
 } from "./link-model";
 
 const CLOSE_DELAY_MS = 120;
@@ -56,6 +57,24 @@ function setLinkSource(
 
 function clearLinkSources(sources: LinkSources): LinkSources {
   return resolveActiveLink(sources) === null ? sources : EMPTY_LINK_SOURCES;
+}
+
+function refreshLinkSources(
+  editor: LexicalEditor,
+  editorState: EditorState,
+  sources: LinkSources,
+): LinkSources {
+  const next: LinkSources = {
+    hover: refreshActiveLink(editor, sources.hover, editorState),
+    pinned: refreshActiveLink(editor, sources.pinned, editorState),
+    selection: sources.selection,
+  };
+
+  return Object.entries(next).every(([source, activeLink]) =>
+    isSameActiveLink(sources[source as LinkSource], activeLink),
+  )
+    ? sources
+    : next;
 }
 
 export function useActiveLinkTarget(editor: LexicalEditor) {
@@ -194,6 +213,7 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
+        setSources((current) => refreshLinkSources(editor, editorState, current));
         updateSelectionLink(editorState);
       }),
       editor.registerCommand(

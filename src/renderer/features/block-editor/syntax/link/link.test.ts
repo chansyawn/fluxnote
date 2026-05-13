@@ -16,10 +16,13 @@ import { getLinkElementClassState, type LinkElementClassState } from "./link-dom
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,
+  refreshActiveLink,
   sanitizeLinkUrlInput,
   setMarkdownLinkUrl,
 } from "./link-model";
 import { isElementFocusedWithin } from "./use-active-link-target";
+
+class TestHTMLElement {}
 
 function findFirstLinkNode(node: LexicalNode): LinkNode | null {
   if ($isLinkNode(node)) return node;
@@ -60,6 +63,39 @@ function createPopoverElementStub(activeElement: Element | null, containedElemen
     ownerDocument: { activeElement },
     contains: (node: Node | null) => node === containedElement,
   } as unknown as HTMLElement;
+}
+
+function withHTMLElementStub<T>(run: (element: HTMLElement) => T): T {
+  const originalHTMLElement = globalThis.HTMLElement;
+  const element = new TestHTMLElement() as HTMLElement;
+  Object.defineProperty(globalThis, "HTMLElement", {
+    configurable: true,
+    value: TestHTMLElement,
+  });
+
+  try {
+    return run(element);
+  } finally {
+    if (originalHTMLElement) {
+      Object.defineProperty(globalThis, "HTMLElement", {
+        configurable: true,
+        value: originalHTMLElement,
+      });
+    } else {
+      Reflect.deleteProperty(globalThis, "HTMLElement");
+    }
+  }
+}
+
+function withLinkElement<T>(editor: LexicalEditor, element: HTMLElement, run: () => T): T {
+  const originalGetElementByKey = editor.getElementByKey.bind(editor);
+  editor.getElementByKey = () => element;
+
+  try {
+    return run();
+  } finally {
+    editor.getElementByKey = originalGetElementByKey;
+  }
 }
 
 describe("link", () => {
@@ -147,6 +183,45 @@ describe("link", () => {
       removeMarkdownLink(editor, key);
 
       expect(readMarkdown(editor).trim()).toBe("**site**");
+    });
+
+    it("refreshes active links from the current editor state", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          setMarkdownLinkUrl(editor, key, "https://example.org");
+
+          expect(
+            refreshActiveLink(editor, {
+              element,
+              link: { key, kind: "markdown", text: "site", url: "https://example.com" },
+            }),
+          ).toEqual({
+            element,
+            link: { key, kind: "markdown", text: "site", url: "https://example.org" },
+          });
+        });
+      });
+    });
+
+    it("clears active links whose link node was removed", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      withHTMLElementStub((element) => {
+        withLinkElement(editor, element, () => {
+          removeMarkdownLink(editor, key);
+
+          expect(
+            refreshActiveLink(editor, {
+              element,
+              link: { key, kind: "markdown", text: "site", url: "https://example.com" },
+            }),
+          ).toBeNull();
+        });
+      });
     });
   });
 

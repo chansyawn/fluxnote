@@ -135,6 +135,21 @@ export function measureLinkFromSelection(
   return measureLink(editor, link);
 }
 
+export function refreshActiveLink(
+  editor: LexicalEditor,
+  activeLink: ActiveLink | null,
+  editorState: EditorState = editor.getEditorState(),
+): ActiveLink | null {
+  if (!activeLink) return null;
+
+  let link: LinkSnapshot | null = null;
+  editorState.read(() => {
+    const node = $getNodeByKey(activeLink.link.key);
+    link = $isLinkNode(node) ? readLinkSnapshot(node) : null;
+  });
+  return measureLink(editor, link);
+}
+
 export function isSameActiveLink(current: ActiveLink | null, next: ActiveLink | null): boolean {
   if (current === next) return true;
   if (!current || !next) return false;
