@@ -63,6 +63,32 @@ export interface BlockEditorRuntime {
   };
 }
 
+export interface BlockEditorCodeBlockConfig {
+  showLineNumbers: boolean;
+  wordWrap: boolean;
+}
+
+export interface BlockEditorMarkdownConfig {
+  codeBlock: BlockEditorCodeBlockConfig;
+}
+
+export interface BlockEditorConfig {
+  markdown: BlockEditorMarkdownConfig;
+}
+
+export interface BlockEditorCodeBlockConfigInput {
+  showLineNumbers?: boolean;
+  wordWrap?: boolean;
+}
+
+export interface BlockEditorMarkdownConfigInput {
+  codeBlock?: BlockEditorCodeBlockConfigInput;
+}
+
+export interface BlockEditorConfigInput {
+  markdown?: BlockEditorMarkdownConfigInput;
+}
+
 export interface BlockEditorHandle {
   copy: () => Promise<void>;
   focus: () => void;
@@ -73,6 +99,7 @@ export interface BlockEditorProps {
   ref?: Ref<BlockEditorHandle>;
   runtime: BlockEditorRuntime;
   initialMarkdown: string;
+  config?: BlockEditorConfigInput;
   onMarkdownChange: (markdown: string) => void;
   onBlur?: () => void;
 }

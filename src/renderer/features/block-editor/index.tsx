@@ -8,8 +8,12 @@ import "./index.css";
 
 export { BlockEditor } from "./core/block-editor";
 export type {
+  BlockEditorCodeBlockConfig,
+  BlockEditorConfig,
+  BlockEditorConfigInput,
   BlockEditorClipboardWriteData,
   BlockEditorHandle,
+  BlockEditorMarkdownConfig,
   BlockEditorProps,
   BlockEditorRuntime,
 } from "./core/types";

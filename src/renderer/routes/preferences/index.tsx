@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { AppSettingsSection } from "@renderer/routes/preferences/-features/app-settings-section";
 import { AutoArchiveSettingsSection } from "@renderer/routes/preferences/-features/auto-archive-settings-section";
+import { MarkdownSettingsSection } from "@renderer/routes/preferences/-features/markdown-settings-section";
 import { ShortcutSettingsSection } from "@renderer/routes/preferences/-features/shortcut-settings";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -19,6 +20,7 @@ function RouteComponent() {
 
       <div className="flex flex-col gap-2">
         <AppSettingsSection />
+        <MarkdownSettingsSection />
         <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />
       </div>

@@ -36,6 +36,14 @@ function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
       ...current.shortcuts,
       ...patch.shortcuts,
     },
+    markdown: {
+      ...current.markdown,
+      ...patch.markdown,
+      codeBlock: {
+        ...current.markdown.codeBlock,
+        ...patch.markdown?.codeBlock,
+      },
+    },
   });
 }
 

@@ -45,6 +45,12 @@ describe("settings", () => {
         "submit-external-edit": "Mod+Enter",
         "cancel-external-edit": "Mod+\\",
       },
+      markdown: {
+        codeBlock: {
+          showLineNumbers: "bad",
+          wordWrap: true,
+        },
+      },
     });
 
     expect(normalized.appearance).toEqual(DEFAULT_SETTINGS.appearance);
@@ -58,6 +64,12 @@ describe("settings", () => {
       "submit-external-edit": "Mod+Enter",
       "cancel-external-edit": "Mod+\\",
     });
+    expect(normalized.markdown).toEqual({
+      codeBlock: {
+        showLineNumbers: false,
+        wordWrap: true,
+      },
+    });
   });
 
   it("should parse valid settings patch", () => {
@@ -66,11 +78,13 @@ describe("settings", () => {
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
         shortcuts: { "archive-block": "Mod+E" },
+        markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
       shortcuts: { "archive-block": "Mod+E" },
+      markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
     });
   });
 
@@ -78,6 +92,12 @@ describe("settings", () => {
     expect(() =>
       normalizeSettingsPatch({
         appearance: { locale: "en", unknown: true },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      normalizeSettingsPatch({
+        markdown: { codeBlock: { unknown: true } },
       }),
     ).toThrow();
 

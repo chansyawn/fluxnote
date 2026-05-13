@@ -15,6 +15,7 @@ import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
 } from "./block-editor-core-extension";
+import { BlockEditorConfigProvider, resolveBlockEditorConfig } from "./config";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
 import { importMarkdownToEditor } from "./markdown-editor-io";
@@ -106,6 +107,7 @@ export function BlockEditor({
   ref,
   runtime,
   initialMarkdown,
+  config,
   onBlur,
   onMarkdownChange,
 }: BlockEditorProps) {
@@ -123,6 +125,7 @@ export function BlockEditor({
     async () => markdownRef.current?.flush() ?? initialMarkdownRef.current,
     [],
   );
+  const resolvedConfig = useMemo(() => resolveBlockEditorConfig(config), [config]);
 
   const handleBlur = useCallback(() => {
     markdownRef.current?.flush();
@@ -131,10 +134,12 @@ export function BlockEditor({
 
   return (
     <div className="block-editor">
-      <LexicalExtensionComposer extension={extension} contentEditable={null}>
-        <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
-        <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
-      </LexicalExtensionComposer>
+      <BlockEditorConfigProvider config={resolvedConfig}>
+        <LexicalExtensionComposer extension={extension} contentEditable={null}>
+          <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
+          <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
+        </LexicalExtensionComposer>
+      </BlockEditorConfigProvider>
     </div>
   );
 }

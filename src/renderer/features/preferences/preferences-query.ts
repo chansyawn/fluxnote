@@ -4,6 +4,7 @@ import {
   type AutoArchiveSettings,
   type FontSize,
   type LocaleCode,
+  type MarkdownCodeBlockSettings,
   type Settings,
   type SettingsPatch,
   type ShortcutAction,
@@ -143,5 +144,21 @@ export function useFontSizePreference() {
   return {
     fontSize: settings.appearance.fontSize,
     setFontSize,
+  };
+}
+
+export function useMarkdownCodeBlockPreference() {
+  const settings = useSettingsValue();
+  const mutation = usePatchSettingsMutation();
+  const patchCodeBlock = useCallback(
+    (patch: Partial<MarkdownCodeBlockSettings>) => {
+      mutation.mutate({ markdown: { codeBlock: patch } });
+    },
+    [mutation],
+  );
+
+  return {
+    codeBlock: settings.markdown.codeBlock,
+    patchCodeBlock,
   };
 }

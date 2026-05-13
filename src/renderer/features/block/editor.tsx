@@ -1,9 +1,11 @@
 import { type Block } from "@renderer/clients";
 import {
   BlockEditor,
+  type BlockEditorConfigInput,
   type BlockEditorHandle,
   type BlockEditorRuntime,
 } from "@renderer/features/block-editor";
+import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import { cn } from "@renderer/ui/lib/utils";
 import {
   useCallback,
@@ -22,6 +24,7 @@ export type BlockEditorControllerHandle = BlockEditorHandle;
 
 interface BlockEditorViewProps {
   blockId: string;
+  editorConfig?: BlockEditorConfigInput;
   initialMarkdown: string;
   isExternalEditPending?: boolean;
   isKept: boolean;
@@ -37,6 +40,7 @@ interface BlockEditorViewProps {
 
 export function BlockEditorView({
   blockId,
+  editorConfig,
   initialMarkdown,
   isExternalEditPending = false,
   isKept,
@@ -74,6 +78,7 @@ export function BlockEditorView({
           ref={ref}
           runtime={runtime}
           initialMarkdown={initialMarkdown}
+          config={editorConfig}
           onBlur={onBlur}
           onMarkdownChange={onMarkdownChange}
         />
@@ -101,6 +106,15 @@ export function BlockEditorController({
 }: BlockEditorControllerProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createBlockRuntime(block.id), [block.id]);
+  const { codeBlock } = useMarkdownCodeBlockPreference();
+  const editorConfig = useMemo<BlockEditorConfigInput>(
+    () => ({
+      markdown: {
+        codeBlock,
+      },
+    }),
+    [codeBlock],
+  );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockPersistence(block);
 
@@ -135,6 +149,7 @@ export function BlockEditorController({
     <BlockEditorView
       ref={editorRef}
       blockId={block.id}
+      editorConfig={editorConfig}
       runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}

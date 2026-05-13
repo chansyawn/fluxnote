@@ -16,11 +16,16 @@ describe("preferences service", () => {
     const result = service.patchSettings({
       appearance: { locale: "zh-Hans", fontSize: 20 },
       autoArchive: { enabled: false },
+      markdown: { codeBlock: { wordWrap: true } },
     });
 
     expect(result.appearance.locale).toBe("zh-Hans");
     expect(result.appearance.fontSize).toBe(20);
     expect(result.autoArchive.enabled).toBe(false);
+    expect(result.markdown.codeBlock).toEqual({
+      showLineNumbers: false,
+      wordWrap: true,
+    });
     expect(service.readAutoArchiveSettings()).toEqual(result.autoArchive);
   });
 

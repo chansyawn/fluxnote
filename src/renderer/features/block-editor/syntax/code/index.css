@@ -4,6 +4,31 @@
   @apply border-border bg-muted/80 relative my-1 block min-h-14 w-full overflow-x-auto rounded-lg border px-3 pt-8 pb-3 font-mono whitespace-pre;
 }
 
+.block-editor__code--line-numbers {
+  --block-editor-code-line-number-padding-inline-start: 0.5rem;
+  --block-editor-code-line-number-width: 1.75rem;
+  --block-editor-code-line-number-gap: 0.25rem;
+
+  padding-inline-start: calc(
+    var(--block-editor-code-line-number-padding-inline-start) +
+      var(--block-editor-code-line-number-width) + var(--block-editor-code-line-number-gap)
+  );
+}
+
+.block-editor__code--word-wrap {
+  @apply overflow-x-hidden whitespace-pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.block-editor__code-line-numbers {
+  @apply bg-muted/80 text-muted-foreground pointer-events-none absolute z-10 overflow-hidden font-mono text-[0.625rem] leading-[var(--block-editor-code-line-number-line-height)] font-normal select-none;
+}
+
+.block-editor__code-line-number {
+  @apply absolute block pe-1 text-right;
+  inline-size: 100%;
+}
+
 .block-editor__code-toolbar {
   @apply pointer-events-none absolute z-10 flex w-full items-start justify-between gap-2 px-2 py-1.5;
 }

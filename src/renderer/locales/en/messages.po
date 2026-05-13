@@ -40,7 +40,7 @@ msgid "block-editor.code.language.search"
 msgstr "Search language"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:64
+#: src/renderer/features/block-editor/core/block-editor.tsx:65
 msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
@@ -75,8 +75,8 @@ msgid "block-editor.link.url"
 msgstr "Link URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:63
-#: src/renderer/features/block-editor/core/block-editor.tsx:69
+#: src/renderer/features/block-editor/core/block-editor.tsx:64
+#: src/renderer/features/block-editor/core/block-editor.tsx:70
 msgid "block-editor.placeholder"
 msgstr "Write a note..."
 
@@ -223,12 +223,12 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:51
+#: src/renderer/features/block/actions/icon-action.tsx:66
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:93
+#: src/renderer/features/block/actions/block-actions.tsx:100
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -343,6 +343,31 @@ msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:27
+msgid "preferences.markdown.code-block.line-numbers.description"
+msgstr "Show a gutter with logical line numbers in fenced code blocks."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:33
+msgid "preferences.markdown.code-block.line-numbers.label"
+msgstr "Show line numbers"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:46
+msgid "preferences.markdown.code-block.word-wrap.description"
+msgstr "Wrap long code lines to the editor width instead of scrolling horizontally."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:51
+msgid "preferences.markdown.code-block.word-wrap.label"
+msgstr "Word wrap"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:15
+msgid "preferences.markdown.title"
+msgstr "Markdown"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:48
 msgid "preferences.shortcuts.archive-block.label"
 msgstr "Archive block"
@@ -426,7 +451,7 @@ msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:16
+#: src/renderer/routes/preferences/index.tsx:17
 msgid "preferences.title"
 msgstr "Preferences"
 
@@ -462,22 +487,22 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:84
+#: src/renderer/features/block/actions/block-actions.tsx:91
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:71
+#: src/renderer/features/block/actions/block-actions.tsx:78
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:82
+#: src/renderer/features/block/actions/block-actions.tsx:89
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:69
+#: src/renderer/features/block/actions/block-actions.tsx:76
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
@@ -512,12 +537,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:57
+#: src/renderer/features/block/actions/block-actions.tsx:64
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:46
+#: src/renderer/features/block/actions/block-actions.tsx:53
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

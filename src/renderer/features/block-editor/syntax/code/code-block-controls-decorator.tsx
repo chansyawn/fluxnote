@@ -1,10 +1,19 @@
 import { $isCodeNode } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useBlockEditorConfig } from "@renderer/features/block-editor/core/config";
 import { $getNodeByKey, $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
 import { CodeCopyButton } from "./code-copy-button";
+import {
+  applyCodeBlockDisplayConfig,
+  areLineNumberDisplaysEqual,
+  calculateCodeToolbarRect,
+  measureCodeLineNumberDisplay,
+  type CodeBlockLineNumberDisplayState,
+  type CodeBlockOverlayRect,
+} from "./code-display";
 import { CodeLanguageCombobox } from "./code-language-combobox";
 import {
   getCodeNodeLanguage,
@@ -12,42 +21,32 @@ import {
   type CodeLanguageOption,
 } from "./code-language-options";
 
+export { calculateCodeToolbarRect } from "./code-display";
+
 interface CodeBlockDocumentState {
   key: NodeKey;
   language: string | null;
   text: string;
 }
 
-interface CodeBlockOverlayRect {
-  left: number;
-  top: number;
-  width: number;
-}
-
 interface CodeBlockViewState extends CodeBlockDocumentState {
+  lineNumberDisplay: CodeBlockLineNumberDisplayState | null;
   rect: CodeBlockOverlayRect;
 }
 
-interface ElementRect {
-  left: number;
-  top: number;
-  width: number;
+interface CodeLineNumberGutterStyle extends CSSProperties {
+  "--block-editor-code-line-number-line-height"?: string;
 }
 
-interface ScrollOffset {
-  left: number;
-  top: number;
-}
-
-export function calculateCodeToolbarRect(
-  shellRect: ElementRect,
-  codeRect: ElementRect,
-  scrollOffset: ScrollOffset,
-): CodeBlockOverlayRect {
+function getCodeLineNumberGutterStyle(
+  display: CodeBlockLineNumberDisplayState | null,
+): CodeLineNumberGutterStyle {
   return {
-    left: codeRect.left - shellRect.left + scrollOffset.left,
-    top: codeRect.top - shellRect.top + scrollOffset.top,
-    width: codeRect.width,
+    "--block-editor-code-line-number-line-height": display?.gutter.lineHeight,
+    blockSize: display?.gutter.height,
+    inlineSize: display?.gutter.width,
+    insetBlockStart: display?.gutter.top,
+    insetInlineStart: display?.gutter.left,
   };
 }
 
@@ -94,15 +93,20 @@ function areCodeBlockViewsEqual(
       previousBlock.key === nextBlock.key &&
       previousBlock.language === nextBlock.language &&
       previousBlock.text === nextBlock.text &&
+      previousBlock.rect.height === nextBlock.rect.height &&
       previousBlock.rect.left === nextBlock.rect.left &&
       previousBlock.rect.top === nextBlock.rect.top &&
-      previousBlock.rect.width === nextBlock.rect.width
+      previousBlock.rect.width === nextBlock.rect.width &&
+      areLineNumberDisplaysEqual(previousBlock.lineNumberDisplay, nextBlock.lineNumberDisplay)
     );
   });
 }
 
 export function CodeBlockControlsDecorator() {
   const [editor] = useLexicalComposerContext();
+  const {
+    markdown: { codeBlock: codeBlockConfig },
+  } = useBlockEditorConfig();
   const [codeBlocks, setCodeBlocks] = useState<CodeBlockViewState[]>([]);
   const animationFrameIdRef = useRef<number | null>(null);
   const shellElement = getEditorShellElement(editor.getRootElement());
@@ -122,10 +126,24 @@ export function CodeBlockControlsDecorator() {
           return [];
         }
 
+        applyCodeBlockDisplayConfig(element, codeBlockConfig);
+        const codeRect = element.getBoundingClientRect();
+
         return [
           {
             ...codeBlock,
-            rect: calculateCodeToolbarRect(shellRect, element.getBoundingClientRect(), {
+            lineNumberDisplay: measureCodeLineNumberDisplay(
+              element,
+              codeBlock.text,
+              codeBlockConfig,
+              shellRect,
+              codeRect,
+              {
+                left: shell.scrollLeft,
+                top: shell.scrollTop,
+              },
+            ),
+            rect: calculateCodeToolbarRect(shellRect, codeRect, {
               left: shell.scrollLeft,
               top: shell.scrollTop,
             }),
@@ -139,7 +157,7 @@ export function CodeBlockControlsDecorator() {
           : nextCodeBlocks,
       );
     });
-  }, [editor]);
+  }, [codeBlockConfig, editor]);
 
   const scheduleMeasureCodeBlocks = useCallback(() => {
     if (animationFrameIdRef.current !== null) {
@@ -201,6 +219,23 @@ export function CodeBlockControlsDecorator() {
     };
   }, [codeBlocks, editor, scheduleMeasureCodeBlocks]);
 
+  useEffect(() => {
+    const scrollableCodeBlocks = codeBlocks.flatMap((codeBlock): HTMLElement[] => {
+      const element = editor.getElementByKey(codeBlock.key);
+      return element ? [element] : [];
+    });
+
+    for (const element of scrollableCodeBlocks) {
+      element.addEventListener("scroll", scheduleMeasureCodeBlocks, { passive: true });
+    }
+
+    return () => {
+      for (const element of scrollableCodeBlocks) {
+        element.removeEventListener("scroll", scheduleMeasureCodeBlocks);
+      }
+    };
+  }, [codeBlocks, editor, scheduleMeasureCodeBlocks]);
+
   const handleLanguageChange = useCallback(
     (key: NodeKey, option: CodeLanguageOption) => {
       const nextLanguage = getCodeNodeLanguage(option) ?? PLAIN_TEXT_LANGUAGE;
@@ -225,6 +260,29 @@ export function CodeBlockControlsDecorator() {
 
   return createPortal(
     <>
+      {codeBlockConfig.showLineNumbers
+        ? codeBlocks.map((codeBlock) => (
+            <div
+              key={`${codeBlock.key}:line-numbers`}
+              aria-hidden="true"
+              className="block-editor__code-line-numbers"
+              contentEditable={false}
+              style={getCodeLineNumberGutterStyle(codeBlock.lineNumberDisplay)}
+            >
+              {codeBlock.lineNumberDisplay?.lineNumbers.map((lineNumber) => (
+                <span
+                  key={lineNumber.number}
+                  className="block-editor__code-line-number"
+                  style={{
+                    insetBlockStart: lineNumber.top,
+                  }}
+                >
+                  {lineNumber.number}
+                </span>
+              ))}
+            </div>
+          ))
+        : null}
       {codeBlocks.map((codeBlock) => (
         <div
           key={codeBlock.key}

@@ -36,6 +36,11 @@ export const shortcutActionSchema = z.enum([
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
+const defaultMarkdownCodeBlockSettingsValue = {
+  showLineNumbers: false,
+  wordWrap: false,
+} as const;
+
 const autoArchiveIdleMinutesSchema = z.preprocess(
   normalizeAutoArchiveIdleMinutes,
   z.number().int(),
@@ -64,6 +69,19 @@ export const appearanceSettingsSchema = z
   .object({
     locale: localeSchema.catch("en"),
     fontSize: fontSizeSchema.catch(16),
+  })
+  .strict();
+
+export const markdownCodeBlockSettingsSchema = z
+  .object({
+    showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.showLineNumbers),
+    wordWrap: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.wordWrap),
+  })
+  .strict();
+
+export const markdownSettingsSchema = z
+  .object({
+    codeBlock: markdownCodeBlockSettingsSchema.catch(defaultMarkdownCodeBlockSettingsValue),
   })
   .strict();
 
@@ -98,6 +116,19 @@ const shortcutPreferencesPatchSchema = z
   })
   .strict();
 
+const markdownCodeBlockSettingsPatchSchema = z
+  .object({
+    showLineNumbers: z.boolean().optional(),
+    wordWrap: z.boolean().optional(),
+  })
+  .strict();
+
+const markdownSettingsPatchSchema = z
+  .object({
+    codeBlock: markdownCodeBlockSettingsPatchSchema.optional(),
+  })
+  .strict();
+
 const defaultSettingsValue = {
   schemaVersion: SETTINGS_SCHEMA_VERSION,
   appearance: {
@@ -117,6 +148,9 @@ const defaultSettingsValue = {
     "submit-external-edit": "Mod+Enter",
     "cancel-external-edit": "Mod+\\",
   },
+  markdown: {
+    codeBlock: defaultMarkdownCodeBlockSettingsValue,
+  },
 } as const;
 
 export const settingsSchema = z
@@ -125,6 +159,7 @@ export const settingsSchema = z
     appearance: appearanceSettingsSchema.catch(defaultSettingsValue.appearance),
     autoArchive: autoArchiveSettingsSchema.catch(defaultSettingsValue.autoArchive),
     shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
+    markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
   })
   .strict();
 
@@ -133,6 +168,7 @@ export const settingsPatchSchema = z
     appearance: appearanceSettingsPatchSchema.optional(),
     autoArchive: autoArchiveSettingsPatchSchema.optional(),
     shortcuts: shortcutPreferencesPatchSchema.optional(),
+    markdown: markdownSettingsPatchSchema.optional(),
   })
   .strict();
 
@@ -145,9 +181,13 @@ export type AutoArchiveSettings = z.infer<typeof autoArchiveSettingsSchema>;
 export type ShortcutAction = z.infer<typeof shortcutActionSchema>;
 export type ShortcutBinding = z.infer<typeof shortcutBindingSchema>;
 export type ShortcutPreferences = z.infer<typeof shortcutPreferencesSchema>;
+export type MarkdownSettings = z.infer<typeof markdownSettingsSchema>;
+export type MarkdownCodeBlockSettings = z.infer<typeof markdownCodeBlockSettingsSchema>;
 
 export const DEFAULT_SETTINGS: Settings = defaultSettingsValue;
 export const DEFAULT_AUTO_ARCHIVE_SETTINGS: AutoArchiveSettings = DEFAULT_SETTINGS.autoArchive;
+export const DEFAULT_MARKDOWN_CODE_BLOCK_SETTINGS: MarkdownCodeBlockSettings =
+  DEFAULT_SETTINGS.markdown.codeBlock;
 
 export function isLocaleCode(value: string): value is LocaleCode {
   return LANGUAGE_OPTIONS.some((option) => option.key === value);
