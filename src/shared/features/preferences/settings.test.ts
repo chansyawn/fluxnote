@@ -40,6 +40,7 @@ describe("settings", () => {
       shortcuts: {
         "toggle-window": 1,
         "create-block": null,
+        "archive-block": "Mod+E",
         "delete-block": "Mod+Delete",
         "submit-external-edit": "Mod+Enter",
         "cancel-external-edit": "Mod+\\",
@@ -51,6 +52,7 @@ describe("settings", () => {
     expect(normalized.shortcuts).toEqual({
       "toggle-window": "Alt+N",
       "create-block": null,
+      "archive-block": "Mod+E",
       "delete-block": "Mod+Delete",
       "capture-block": "Ctrl+Alt+N",
       "submit-external-edit": "Mod+Enter",
@@ -63,10 +65,12 @@ describe("settings", () => {
       normalizeSettingsPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
+        shortcuts: { "archive-block": "Mod+E" },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
+      shortcuts: { "archive-block": "Mod+E" },
     });
   });
 

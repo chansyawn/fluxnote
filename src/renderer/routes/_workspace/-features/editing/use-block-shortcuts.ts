@@ -4,12 +4,14 @@ import { useEffectEvent, useMemo } from "react";
 
 export interface UseBlockShortcutsParams {
   activeBlockId: string | null;
+  archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockShortcuts({
   activeBlockId,
+  archiveBlockWithFocus,
   createBlockWithFocus,
   deleteBlockWithFocus,
 }: UseBlockShortcutsParams): void {
@@ -28,6 +30,7 @@ export function useBlockShortcuts({
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
     const definitions: UseHotkeyDefinition[] = [];
     const createBlockShortcut = shortcuts["create-block"];
+    const archiveBlockShortcut = shortcuts["archive-block"];
     const deleteBlockShortcut = shortcuts["delete-block"];
 
     if (createBlockShortcut) {
@@ -44,6 +47,24 @@ export function useBlockShortcuts({
         },
         options: {
           meta: { name: "Create block" },
+        },
+      });
+    }
+
+    if (archiveBlockShortcut) {
+      definitions.push({
+        hotkey: archiveBlockShortcut,
+        callback: (event) => {
+          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          void archiveBlockWithFocus(activeBlockId);
+        },
+        options: {
+          meta: { name: "Archive block" },
         },
       });
     }
@@ -67,7 +88,14 @@ export function useBlockShortcuts({
     }
 
     return definitions;
-  }, [activeBlockId, createBlockWithFocus, deleteBlockWithFocus, isActiveBlockFocused, shortcuts]);
+  }, [
+    activeBlockId,
+    archiveBlockWithFocus,
+    createBlockWithFocus,
+    deleteBlockWithFocus,
+    isActiveBlockFocused,
+    shortcuts,
+  ]);
 
   useHotkeys(hotkeyDefinitions, {
     ignoreInputs: false,

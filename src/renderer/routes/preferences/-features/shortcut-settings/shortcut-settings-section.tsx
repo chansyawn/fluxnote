@@ -8,9 +8,10 @@ import {
 import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences/settings";
 import {
   CheckIcon,
+  ArchiveIcon,
   KeyboardIcon,
-  PanelTopOpenIcon,
   PlusCircleIcon,
+  Trash2Icon,
   WandSparklesIcon,
   XIcon,
 } from "lucide-react";
@@ -38,8 +39,13 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
   },
   {
     action: "delete-block",
-    icon: PanelTopOpenIcon,
+    icon: Trash2Icon,
     title: <Trans id="preferences.shortcuts.delete-block.label">Delete block</Trans>,
+  },
+  {
+    action: "archive-block",
+    icon: ArchiveIcon,
+    title: <Trans id="preferences.shortcuts.archive-block.label">Archive block</Trans>,
   },
   {
     action: "capture-block",

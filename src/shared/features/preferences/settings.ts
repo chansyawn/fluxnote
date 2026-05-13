@@ -28,6 +28,7 @@ export const fontSizeSchema = z.union([
 export const shortcutActionSchema = z.enum([
   "toggle-window",
   "create-block",
+  "archive-block",
   "delete-block",
   "capture-block",
   "submit-external-edit",
@@ -51,6 +52,7 @@ export const shortcutPreferencesSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.catch("Alt+N"),
     "create-block": shortcutBindingSchema.catch("Mod+N"),
+    "archive-block": shortcutBindingSchema.catch("Mod+E"),
     "delete-block": shortcutBindingSchema.catch("Mod+D"),
     "capture-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
     "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
@@ -88,6 +90,7 @@ const shortcutPreferencesPatchSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.optional(),
     "create-block": shortcutBindingSchema.optional(),
+    "archive-block": shortcutBindingSchema.optional(),
     "delete-block": shortcutBindingSchema.optional(),
     "capture-block": shortcutBindingSchema.optional(),
     "submit-external-edit": shortcutBindingSchema.optional(),
@@ -108,6 +111,7 @@ const defaultSettingsValue = {
   shortcuts: {
     "toggle-window": "Alt+N",
     "create-block": "Mod+N",
+    "archive-block": "Mod+E",
     "delete-block": "Mod+D",
     "capture-block": "Ctrl+Alt+N",
     "submit-external-edit": "Mod+Enter",

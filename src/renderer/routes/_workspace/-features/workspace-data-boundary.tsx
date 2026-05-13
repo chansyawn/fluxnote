@@ -41,25 +41,28 @@ export function useWorkspaceDataBoundary() {
     [blockNavigation.setActiveBlockId],
   );
 
-  const { createBlockWithFocus, deleteBlockWithFocus } = useBlockFocusActions({
-    activeBlockId: blockNavigation.activeBlockId,
-    totalBlockCount: blockList.totalBlockCount,
-    createBlock: async () => {
-      const block = await blockMutations.createBlock();
-      if (selectedTagIds.length > 0) {
-        return await blockMutations.assignBlockTags(block.id, selectedTagIds);
-      }
-      return block;
-    },
-    deleteBlock: blockMutations.deleteBlock,
-    navigateToBlock: blockNavigation.navigateToBlock,
-    navigateToIndex: blockNavigation.navigateToIndex,
-    locateBlockInView: blockList.locateBlockInView,
-    setActiveBlockId: focusBlock,
-  });
+  const { archiveBlockWithFocus, createBlockWithFocus, deleteBlockWithFocus } =
+    useBlockFocusActions({
+      activeBlockId: blockNavigation.activeBlockId,
+      archiveBlock: blockMutations.archiveBlock,
+      totalBlockCount: blockList.totalBlockCount,
+      createBlock: async () => {
+        const block = await blockMutations.createBlock();
+        if (selectedTagIds.length > 0) {
+          return await blockMutations.assignBlockTags(block.id, selectedTagIds);
+        }
+        return block;
+      },
+      deleteBlock: blockMutations.deleteBlock,
+      navigateToBlock: blockNavigation.navigateToBlock,
+      navigateToIndex: blockNavigation.navigateToIndex,
+      locateBlockInView: blockList.locateBlockInView,
+      setActiveBlockId: focusBlock,
+    });
 
   useBlockShortcuts({
     activeBlockId: blockNavigation.activeBlockId,
+    archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
   });
@@ -87,7 +90,7 @@ export function useWorkspaceDataBoundary() {
   const commands = useMemo<WorkspaceCommands>(
     () => ({
       archiveBlock: (blockId) => {
-        void blockMutations.archiveBlock(blockId);
+        void archiveBlockWithFocus(blockId);
       },
       assignBlockTags: blockMutations.assignBlockTags,
       cancelExternalEdit: (editId) => {
@@ -108,9 +111,9 @@ export function useWorkspaceDataBoundary() {
       },
     }),
     [
-      blockMutations.archiveBlock,
       blockMutations.assignBlockTags,
       blockMutations.restoreBlock,
+      archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
       externalEditActions.handleCancelExternalEdit,

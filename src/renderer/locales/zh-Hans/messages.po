@@ -343,6 +343,11 @@ msgid "preferences.language.label"
 msgstr "语言"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:49
+msgid "preferences.shortcuts.archive-block.label"
+msgstr "归档区块"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr "取消外部编辑"

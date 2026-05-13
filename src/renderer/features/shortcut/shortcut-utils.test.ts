@@ -3,6 +3,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   formatShortcutRecorderTokens,
   keyboardEventMatchesShortcut,
+  normalizeShortcutPreferences,
   normalizeShortcutRecorderHotkey,
 } from "./shortcut-utils";
 
@@ -29,6 +30,23 @@ describe("shortcut utils", () => {
     } as KeyboardEvent;
 
     expect(keyboardEventMatchesShortcut(event, "Mod+\\", "mac")).toBe(true);
+  });
+
+  it("normalizes archive block shortcut preferences", () => {
+    expect(
+      normalizeShortcutPreferences(
+        {
+          "toggle-window": "Alt+N",
+          "create-block": "Mod+N",
+          "archive-block": "Mod+E",
+          "delete-block": "Mod+D",
+          "capture-block": "Ctrl+Alt+N",
+          "submit-external-edit": "Mod+Enter",
+          "cancel-external-edit": "Mod+\\",
+        },
+        "mac",
+      )["archive-block"],
+    ).toBe("Mod+E");
   });
 
   it("formats modifier-only recorder previews", () => {

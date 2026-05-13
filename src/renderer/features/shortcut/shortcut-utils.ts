@@ -145,6 +145,9 @@ export function normalizeShortcutPreferences(
     "create-block": shortcuts["create-block"]
       ? normalizeShortcutBinding(shortcuts["create-block"], platform)
       : null,
+    "archive-block": shortcuts["archive-block"]
+      ? normalizeShortcutBinding(shortcuts["archive-block"], platform)
+      : null,
     "delete-block": shortcuts["delete-block"]
       ? normalizeShortcutBinding(shortcuts["delete-block"], platform)
       : null,

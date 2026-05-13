@@ -5,6 +5,7 @@ import type { BlockNavigationAlign } from "./use-block-navigation";
 
 export interface UseBlockFocusActionsParams {
   activeBlockId: string | null;
+  archiveBlock: (blockId: string) => Promise<Block>;
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
@@ -15,12 +16,14 @@ export interface UseBlockFocusActionsParams {
 }
 
 export interface UseBlockFocusActionsResult {
+  archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockFocusActions({
   activeBlockId,
+  archiveBlock,
   totalBlockCount,
   createBlock,
   deleteBlock,
@@ -32,6 +35,29 @@ export function useBlockFocusActions({
   const createBlockWithFocus = useEffectEvent(async () => {
     const newBlock = await createBlock();
     navigateToBlock(newBlock.id);
+  });
+
+  const archiveBlockWithFocus = useEffectEvent(async (blockId: string) => {
+    const shouldMoveFocus = activeBlockId === blockId;
+    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
+    const countBeforeArchive = totalBlockCount;
+
+    await archiveBlock(blockId);
+
+    if (!shouldMoveFocus) {
+      return;
+    }
+
+    if (!currentLocation || countBeforeArchive <= 1) {
+      setActiveBlockId(null);
+      return;
+    }
+
+    const nextIndex =
+      currentLocation.index >= countBeforeArchive - 1
+        ? currentLocation.index - 1
+        : currentLocation.index;
+    navigateToIndex(nextIndex, { align: "auto" });
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
@@ -58,6 +84,7 @@ export function useBlockFocusActions({
   });
 
   return {
+    archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
   };
