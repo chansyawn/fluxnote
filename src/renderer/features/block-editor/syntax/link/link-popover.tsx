@@ -3,127 +3,38 @@ import { useLingui } from "@lingui/react";
 import { Button } from "@renderer/ui/components/button";
 import { Input } from "@renderer/ui/components/input";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
-import { $getNearestNodeFromDOMNode, type LexicalEditor } from "lexical";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
-import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
   convertAutoLinkToMarkdownLink,
-  findLinkAncestor,
-  type LinkTarget,
-  readLinkTarget,
   removeMarkdownLink,
   updateMarkdownLinkUrl,
 } from "./link-operations";
+import { useActiveLinkTarget } from "./use-active-link-target";
 
-const CLOSE_DELAY_MS = 120;
 const COPY_FEEDBACK_DURATION_MS = 1600;
 
-interface ActiveLink {
-  element: HTMLElement;
-  target: LinkTarget;
-}
-
-function readLinkFromDom(editor: LexicalEditor, domNode: Node): LinkTarget | null {
-  let target: LinkTarget | null = null;
-  editor.getEditorState().read(
-    () => {
-      const lexicalNode = $getNearestNodeFromDOMNode(domNode);
-      const link = findLinkAncestor(lexicalNode);
-      target = link ? readLinkTarget(link) : null;
-    },
-    { editor },
-  );
-  return target;
-}
-
-function getLinkElement(editor: LexicalEditor, target: LinkTarget): HTMLElement | null {
-  const element = editor.getElementByKey(target.key);
-  return element instanceof HTMLElement ? element : null;
-}
-
-function measureActiveLink(editor: LexicalEditor, domNode: Node): ActiveLink | null {
-  const target = readLinkFromDom(editor, domNode);
-  if (!target) return null;
-
-  const element = getLinkElement(editor, target);
-  if (!element) return null;
-
-  return {
-    element,
-    target,
-  };
+interface LinkUrlDraft {
+  key: string;
+  url: string;
 }
 
 export function LinkHoverControls() {
   const { i18n } = useLingui();
   const [editor] = useLexicalComposerContext();
   const runtime = useBlockEditorRuntime();
-  const closeTimerRef = useRef<number | null>(null);
-  const [activeLink, setActiveLink] = useState<ActiveLink | null>(null);
-  const [draftUrl, setDraftUrl] = useState("");
+  const { activeLink, closeActiveLink, keepActiveLinkOpen, scheduleActiveLinkClose } =
+    useActiveLinkTarget(editor);
+  const [draftUrl, setDraftUrl] = useState<LinkUrlDraft | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const clearCloseTimer = useCallback(() => {
-    if (closeTimerRef.current === null) return;
-    window.clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = null;
-  }, []);
-
   const close = useCallback(() => {
-    clearCloseTimer();
-    setActiveLink(null);
+    closeActiveLink();
+    setDraftUrl(null);
     setCopied(false);
-  }, [clearCloseTimer]);
-
-  const scheduleClose = useCallback(() => {
-    clearCloseTimer();
-    closeTimerRef.current = window.setTimeout(close, CLOSE_DELAY_MS);
-  }, [clearCloseTimer, close]);
-
-  const showLink = useCallback(
-    (domNode: Node) => {
-      const next = measureActiveLink(editor, domNode);
-      if (!next) {
-        scheduleClose();
-        return;
-      }
-      clearCloseTimer();
-      setActiveLink(next);
-      setDraftUrl(next.target.url);
-      setCopied(false);
-    },
-    [clearCloseTimer, editor, scheduleClose],
-  );
-
-  useEffect(() => {
-    return editor.registerRootListener((rootElement) => {
-      if (!rootElement) return;
-
-      const handlePointerOver = (event: PointerEvent) => {
-        if (event.target instanceof Node) showLink(event.target);
-      };
-      const handleFocusIn = (event: FocusEvent) => {
-        if (event.target instanceof Node) showLink(event.target);
-      };
-      const handlePointerOut = (event: PointerEvent) => {
-        const nextTarget = event.relatedTarget;
-        if (nextTarget instanceof Node && rootElement.contains(nextTarget)) return;
-        scheduleClose();
-      };
-
-      rootElement.addEventListener("pointerover", handlePointerOver);
-      rootElement.addEventListener("focusin", handleFocusIn);
-      rootElement.addEventListener("pointerout", handlePointerOut);
-
-      return () => {
-        rootElement.removeEventListener("pointerover", handlePointerOver);
-        rootElement.removeEventListener("focusin", handleFocusIn);
-        rootElement.removeEventListener("pointerout", handlePointerOut);
-      };
-    });
-  }, [editor, scheduleClose, showLink]);
+  }, [closeActiveLink]);
 
   useEffect(() => {
     if (!copied) return;
@@ -132,8 +43,9 @@ export function LinkHoverControls() {
   }, [copied]);
 
   useEffect(() => {
-    return () => clearCloseTimer();
-  }, [clearCloseTimer]);
+    setDraftUrl(null);
+    setCopied(false);
+  }, [activeLink]);
 
   const handleOpen = async () => {
     if (!activeLink) return;
@@ -159,10 +71,15 @@ export function LinkHoverControls() {
     close();
   };
 
+  const currentDraftUrl =
+    activeLink && draftUrl?.key === activeLink.target.key
+      ? draftUrl.url
+      : (activeLink?.target.url ?? "");
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!activeLink || activeLink.target.kind !== "link") return;
-    updateMarkdownLinkUrl(editor, activeLink.target.key, draftUrl);
+    updateMarkdownLinkUrl(editor, activeLink.target.key, currentDraftUrl);
     close();
   };
 
@@ -205,15 +122,20 @@ export function LinkHoverControls() {
         initialFocus={false}
         side="bottom"
         sideOffset={6}
-        onPointerEnter={clearCloseTimer}
-        onPointerLeave={scheduleClose}
+        onPointerEnter={keepActiveLinkOpen}
+        onPointerLeave={scheduleActiveLinkClose}
       >
         {isMarkdownLink ? (
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
             <Input
               aria-label={urlLabel}
-              value={draftUrl}
-              onChange={(event) => setDraftUrl(event.currentTarget.value)}
+              value={currentDraftUrl}
+              onChange={(event) =>
+                setDraftUrl({
+                  key: activeLink.target.key,
+                  url: event.currentTarget.value,
+                })
+              }
             />
             <div className="flex flex-wrap items-center gap-1">
               {sharedActions}
