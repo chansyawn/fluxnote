@@ -11,6 +11,7 @@ import {
   getPublicBlockById,
   listBlocks,
   restoreBlock,
+  setBlockKeepState,
   updateBlockContent,
 } from "./service";
 
@@ -30,8 +31,19 @@ describe("blocks service", () => {
     const created = await createBlockRecord(ctx.db, "hello");
 
     expect(created.content).toBe("hello");
+    expect(created.isKept).toBe(false);
     const loaded = await getPublicBlockById(ctx.db, created.id);
     expect(loaded.id).toBe(created.id);
+  });
+
+  it("sets block keep state", async () => {
+    const block = await createBlockRecord(ctx.db, "keep me");
+
+    const kept = await setBlockKeepState(ctx.db, block.id, true);
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
+
+    expect(kept.isKept).toBe(true);
+    expect(result.blocks.find((item) => item.id === block.id)?.isKept).toBe(true);
   });
 
   it("lists blocks by visibility", async () => {

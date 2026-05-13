@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@renderer/ui/components/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { cn } from "@renderer/ui/lib/utils";
 import { CheckIcon, CopyIcon, LoaderCircleIcon, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -7,6 +8,7 @@ import { useEffect, useState, type ReactNode } from "react";
 const COPY_FEEDBACK_DURATION_MS = 2000;
 
 interface IconActionProps {
+  active?: boolean;
   icon: LucideIcon;
   label: ReactNode;
   pending?: boolean;
@@ -14,13 +16,33 @@ interface IconActionProps {
   onClick: () => void;
 }
 
-export function IconAction({ icon: Icon, label, pending, disabled, onClick }: IconActionProps) {
+export function IconAction({
+  active,
+  icon: Icon,
+  label,
+  pending,
+  disabled,
+  onClick,
+}: IconActionProps) {
   const Glyph = pending ? LoaderCircleIcon : Icon;
   return (
-    <Button disabled={disabled || pending} size="icon-xs" variant="ghost" onClick={onClick}>
-      <Glyph className={cn("size-3", pending && "animate-spin")} />
-      <span className="sr-only">{label}</span>
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            aria-pressed={active}
+            disabled={disabled || pending}
+            size="icon-xs"
+            variant="ghost"
+            onClick={onClick}
+          />
+        }
+      >
+        <Glyph className={cn("size-3", pending && "animate-spin")} />
+        <span className="sr-only">{label}</span>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 

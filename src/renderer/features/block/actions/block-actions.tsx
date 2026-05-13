@@ -4,7 +4,14 @@ import type { Block, BlockVisibility, Tag } from "@renderer/clients";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
 import { cn } from "@renderer/ui/lib/utils";
-import { ArchiveIcon, ArchiveRestoreIcon, TagIcon, Trash2Icon } from "lucide-react";
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  PinIcon,
+  PinOffIcon,
+  TagIcon,
+  Trash2Icon,
+} from "lucide-react";
 
 import { CopyAction, IconAction } from "./icon-action";
 
@@ -17,10 +24,11 @@ interface BlockActionsProps {
     visibility: BlockVisibility;
     tags: Tag[];
     disabled?: boolean;
-    pending?: { archive?: boolean; delete?: boolean; tag?: boolean };
+    pending?: { archive?: boolean; delete?: boolean; keep?: boolean; tag?: boolean };
   };
   handlers: {
     onCopy: () => void;
+    onToggleKeep: () => void;
     onToggleArchive: () => void;
     onDelete: () => void;
     onCreateTag: (name: string) => Promise<void>;
@@ -59,6 +67,20 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
         }
         onCreateTag={handlers.onCreateTag}
         onSelectedTagIdsChange={handlers.onAssignTags}
+      />
+      <IconAction
+        active={block.isKept}
+        icon={block.isKept ? PinOffIcon : PinIcon}
+        label={
+          block.isKept ? (
+            <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+          ) : (
+            <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+          )
+        }
+        disabled={disabled}
+        pending={pending.keep}
+        onClick={handlers.onToggleKeep}
       />
       <IconAction
         icon={isArchived ? ArchiveRestoreIcon : ArchiveIcon}

@@ -1,7 +1,7 @@
 import type { AppDatabase } from "@main/core/database";
 import { blocks, type BlockRecord } from "@main/core/database";
 import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
-import { and, isNull, lt } from "drizzle-orm";
+import { and, eq, isNull, lt } from "drizzle-orm";
 
 export interface AutoArchiveEvaluationContext {
   cutoffIso: string | null;
@@ -45,12 +45,13 @@ export function createAutoArchiveEvaluationContext({
 }
 
 export function blockWillAutoArchive(
-  block: Pick<BlockRecord, "archivedAt" | "contentUpdatedAt" | "id">,
+  block: Pick<BlockRecord, "archivedAt" | "contentUpdatedAt" | "id" | "isKept">,
   context: AutoArchiveEvaluationContext,
 ): boolean {
   return (
     context.cutoffIso !== null &&
     block.archivedAt === null &&
+    !block.isKept &&
     block.contentUpdatedAt < context.cutoffIso &&
     !context.protectedBlockIds.has(block.id)
   );
@@ -67,7 +68,13 @@ export async function listAutoArchiveCandidateBlockIds(
   const rows = await db
     .select({ id: blocks.id })
     .from(blocks)
-    .where(and(isNull(blocks.archivedAt), lt(blocks.contentUpdatedAt, context.cutoffIso)))
+    .where(
+      and(
+        isNull(blocks.archivedAt),
+        eq(blocks.isKept, false),
+        lt(blocks.contentUpdatedAt, context.cutoffIso),
+      ),
+    )
     .all();
 
   return rows

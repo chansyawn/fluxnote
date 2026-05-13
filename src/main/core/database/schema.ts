@@ -1,5 +1,12 @@
 import { sql } from "drizzle-orm";
-import { index, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 const sqliteNowIsoExpression = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
 
@@ -10,6 +17,7 @@ export const blocks = sqliteTable(
     content: text("content").notNull().default(""),
     contentUpdatedAt: text("content_updated_at").notNull().default(sqliteNowIsoExpression),
     archivedAt: text("archived_at"),
+    isKept: integer("is_kept", { mode: "boolean" }).notNull().default(false),
     createdAt: text("created_at").notNull().default(sqliteNowIsoExpression),
     updatedAt: text("updated_at")
       .notNull()

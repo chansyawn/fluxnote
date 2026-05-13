@@ -106,6 +106,9 @@ export function useWorkspaceDataBoundary() {
       restoreBlock: (blockId) => {
         void blockMutations.restoreBlock(blockId);
       },
+      setBlockKeepState: (blockId, isKept) => {
+        void blockMutations.setKeepState(blockId, isKept);
+      },
       submitExternalEdit: (blockId, editId) => {
         void externalEditActions.handleSubmitExternalEdit(blockId, editId);
       },
@@ -113,6 +116,7 @@ export function useWorkspaceDataBoundary() {
     [
       blockMutations.assignBlockTags,
       blockMutations.restoreBlock,
+      blockMutations.setKeepState,
       archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,

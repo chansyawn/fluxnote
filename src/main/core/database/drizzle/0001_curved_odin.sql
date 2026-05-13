@@ -1,0 +1,1 @@
+ALTER TABLE `blocks` ADD `is_kept` integer DEFAULT false NOT NULL;

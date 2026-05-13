@@ -24,6 +24,7 @@ interface BlockEditorViewProps {
   blockId: string;
   initialMarkdown: string;
   isExternalEditPending?: boolean;
+  isKept: boolean;
   leadingActions?: ReactNode;
   runtime: BlockEditorRuntime;
   willArchive: boolean;
@@ -38,6 +39,7 @@ export function BlockEditorView({
   blockId,
   initialMarkdown,
   isExternalEditPending = false,
+  isKept,
   leadingActions,
   runtime,
   willArchive,
@@ -50,7 +52,8 @@ export function BlockEditorView({
   return (
     <article
       className={cn(
-        "group border-border bg-card relative rounded-xl border transition-opacity",
+        "group bg-card relative rounded-xl border transition-opacity",
+        isKept ? "border-ring/80" : "border-border",
         isExternalEditPending && "border-dashed",
         willArchive && "opacity-60",
       )}
@@ -135,6 +138,7 @@ export function BlockEditorController({
       runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}
+      isKept={block.isKept}
       leadingActions={leadingActions}
       willArchive={block.willArchive}
       actions={actions}

@@ -15,6 +15,7 @@ export interface WorkspaceCommands {
   deleteTag: (tagId: string) => Promise<void>;
   focusBlock: (blockId: string | null) => void;
   restoreBlock: (blockId: string) => void;
+  setBlockKeepState: (blockId: string, isKept: boolean) => void;
   submitExternalEdit: (blockId: string, editId: string) => void;
 }
 
@@ -23,6 +24,7 @@ export interface WorkspaceBlockState {
   isArchivePending: boolean;
   isDeletePending: boolean;
   isExternalEditPending: boolean;
+  isKeepPending: boolean;
   isLocked: boolean;
   isTagCreatePending: boolean;
   visibility: BlockVisibility;
@@ -81,6 +83,7 @@ export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
       ctx.pendingBlockOps.archive.has(blockId) ||
       ctx.pendingBlockOps.restore.has(blockId) ||
       ctx.pendingBlockOps.delete.has(blockId) ||
+      ctx.pendingBlockOps.setKeep.has(blockId) ||
       ctx.pendingBlockOps.setTags.has(blockId);
 
     return {
@@ -88,6 +91,7 @@ export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
       isArchivePending,
       isDeletePending,
       isExternalEditPending,
+      isKeepPending: ctx.pendingBlockOps.setKeep.has(blockId),
       isLocked,
       isTagCreatePending: ctx.isTagCreatePending,
       visibility: ctx.visibility,

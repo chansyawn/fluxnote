@@ -52,11 +52,15 @@ function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockE
         pending: {
           archive: state.isArchivePending,
           delete: state.isDeletePending,
+          keep: state.isKeepPending,
           tag: state.isTagCreatePending,
         },
       }}
       handlers={{
         onCopy: handleCopy,
+        onToggleKeep: () => {
+          commands.setBlockKeepState(block.id, !block.isKept);
+        },
         onToggleArchive: () => {
           if (state.visibility === "active") {
             commands.archiveBlock(block.id);

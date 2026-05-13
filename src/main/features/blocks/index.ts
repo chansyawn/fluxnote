@@ -8,5 +8,6 @@ export {
   listBlocks,
   locateBlock,
   restoreBlock,
+  setBlockKeepState,
   updateBlockContent,
 } from "./service";

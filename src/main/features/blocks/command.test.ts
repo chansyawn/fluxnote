@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   listBlocks: vi.fn(),
   locateBlock: vi.fn(),
   restoreBlock: vi.fn(),
+  setBlockKeepState: vi.fn(),
   updateBlockContent: vi.fn(),
 }));
 
@@ -90,5 +91,20 @@ describe("blocks command", () => {
       expect.objectContaining({ cutoffIso: expect.any(String) }),
     );
     expect(result).toEqual({ block: { id: "b1" }, index: 3 });
+  });
+
+  it("dispatches keep state command", async () => {
+    mocks.setBlockKeepState.mockResolvedValue({ id: "b1", isKept: true });
+    registerBlocksCommands(ipc as never, deps);
+
+    const result = await handlers.get("blocks.set-keep-state")?.({ blockId: "b1", isKept: true });
+
+    expect(mocks.setBlockKeepState).toHaveBeenCalledWith(
+      deps.db,
+      "b1",
+      true,
+      expect.objectContaining({ cutoffIso: expect.any(String) }),
+    );
+    expect(result).toEqual({ id: "b1", isKept: true });
   });
 });

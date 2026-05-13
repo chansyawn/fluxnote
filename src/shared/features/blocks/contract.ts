@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   blockMutationRequestSchema,
+  blockKeepStateRequestSchema,
   blockSchema,
   blocksListRequestSchema,
   blocksListResponseSchema,
@@ -42,6 +43,10 @@ export const blocksContract = {
     },
     "blocks.restore": {
       input: blockMutationRequestSchema,
+      output: blockSchema,
+    },
+    "blocks.set-keep-state": {
+      input: blockKeepStateRequestSchema,
       output: blockSchema,
     },
     "blocks.update-content": {

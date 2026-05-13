@@ -12,6 +12,7 @@ export const blockSchema = z.object({
   content: z.string(),
   contentUpdatedAt: z.string(),
   archivedAt: z.string().nullable(),
+  isKept: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
   willArchive: z.boolean(),
@@ -21,6 +22,10 @@ export type Block = z.infer<typeof blockSchema>;
 
 export const blockMutationRequestSchema = z.object({
   blockId: z.string().min(1),
+});
+export const blockKeepStateRequestSchema = z.object({
+  blockId: z.string().min(1),
+  isKept: z.boolean(),
 });
 export const blockVisibilitySchema = z.enum(["active", "archived"]);
 export const blocksListRequestSchema = z.object({

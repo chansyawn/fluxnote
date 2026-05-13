@@ -43,7 +43,7 @@ describe("auto-archive policy", () => {
 
     expect(
       blockWillAutoArchive(
-        { archivedAt: null, contentUpdatedAt: "2026-01-01T00:00:00.000Z", id: "b1" },
+        { archivedAt: null, contentUpdatedAt: "2026-01-01T00:00:00.000Z", id: "b1", isKept: false },
         context,
       ),
     ).toBe(true);
@@ -53,19 +53,41 @@ describe("auto-archive policy", () => {
           archivedAt: "2026-01-01T00:09:00.000Z",
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
           id: "b1",
+          isKept: false,
         },
         context,
       ),
     ).toBe(false);
     expect(
       blockWillAutoArchive(
-        { archivedAt: null, contentUpdatedAt: "2026-01-01T00:06:00.000Z", id: "b1" },
+        {
+          archivedAt: null,
+          contentUpdatedAt: "2026-01-01T00:06:00.000Z",
+          id: "b1",
+          isKept: false,
+        },
         context,
       ),
     ).toBe(false);
     expect(
       blockWillAutoArchive(
-        { archivedAt: null, contentUpdatedAt: "2026-01-01T00:00:00.000Z", id: "protected" },
+        {
+          archivedAt: null,
+          contentUpdatedAt: "2026-01-01T00:00:00.000Z",
+          id: "protected",
+          isKept: false,
+        },
+        context,
+      ),
+    ).toBe(false);
+    expect(
+      blockWillAutoArchive(
+        {
+          archivedAt: null,
+          contentUpdatedAt: "2026-01-01T00:00:00.000Z",
+          id: "b1",
+          isKept: true,
+        },
         context,
       ),
     ).toBe(false);

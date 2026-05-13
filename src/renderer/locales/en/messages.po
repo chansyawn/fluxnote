@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:35
-#: src/renderer/routes/-layout/window-title-bar.tsx:94
+#: src/renderer/features/error-boundary/error-title-bar.tsx:36
+#: src/renderer/routes/-layout/window-title-bar.tsx:95
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -45,32 +45,32 @@ msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:182
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:99
 msgid "block-editor.link.convert"
 msgstr "Convert to link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:180
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:97
 msgid "block-editor.link.copied"
 msgstr "Copied"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:179
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:96
 msgid "block-editor.link.copy"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:178
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:95
 msgid "block-editor.link.open"
 msgstr "Open"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:181
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:98
 msgid "block-editor.link.remove"
 msgstr "Remove link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:183
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:100
 msgid "block-editor.link.url"
 msgstr "Link URL"
 
@@ -187,7 +187,7 @@ msgstr "Fluxnotes encountered an unexpected error. You can retry or exit the app
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:14
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
+#: src/renderer/features/error-boundary/error-title-bar.tsx:30
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr "Exit app"
@@ -223,12 +223,12 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:44
+#: src/renderer/features/block/actions/icon-action.tsx:51
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:78
+#: src/renderer/features/block/actions/block-actions.tsx:93
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -343,17 +343,17 @@ msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:49
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:48
 msgid "preferences.shortcuts.archive-block.label"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:66
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
 msgid "preferences.shortcuts.capture-block.label"
 msgstr "Capture block"
 
@@ -364,12 +364,12 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:38
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:43
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
@@ -411,17 +411,17 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:59
 msgid "preferences.shortcuts.submit-external-edit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:87
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:32
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:33
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
@@ -432,7 +432,7 @@ msgstr "Preferences"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:67
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:80
 msgid "window.hide"
 msgstr "Hide window"
 
@@ -462,14 +462,24 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:69
+#: src/renderer/features/block/actions/block-actions.tsx:84
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:67
+#: src/renderer/features/block/actions/block-actions.tsx:71
+msgid "workspace.blocks.keep"
+msgstr "Keep from auto archive"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:82
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:69
+msgid "workspace.blocks.unkeep"
+msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
@@ -502,12 +512,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:56
+#: src/renderer/features/block/actions/block-actions.tsx:57
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:45
+#: src/renderer/features/block/actions/block-actions.tsx:46
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

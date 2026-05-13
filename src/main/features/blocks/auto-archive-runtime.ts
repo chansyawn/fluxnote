@@ -5,7 +5,7 @@ import type { EventBus } from "@main/core/ipc";
 import type { PersistenceRuntime } from "@main/core/persistence";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
 import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
-import { and, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import {
   createAutoArchiveEvaluationContext,
@@ -185,7 +185,9 @@ async function archiveBlocks(
     .set({
       archivedAt,
     })
-    .where(and(isNull(blocks.archivedAt), inArray(blocks.id, [...blockIds])))
+    .where(
+      and(isNull(blocks.archivedAt), eq(blocks.isKept, false), inArray(blocks.id, [...blockIds])),
+    )
     .run();
   return getSqliteChangedRows(result);
 }

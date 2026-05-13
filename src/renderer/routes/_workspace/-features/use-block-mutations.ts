@@ -5,18 +5,20 @@ import {
   deleteBlock,
   restoreBlock,
   setBlockTags,
+  setBlockKeepState,
   type Block,
 } from "@renderer/clients";
 import { useMutation, useMutationState } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
-export type BlockMutationOperation = "archive" | "restore" | "delete" | "setTags";
+export type BlockMutationOperation = "archive" | "restore" | "delete" | "setKeep" | "setTags";
 
 export interface UseBlockMutationsResult {
   createBlock: () => Promise<Block>;
   archiveBlock: (blockId: string) => Promise<Block>;
   restoreBlock: (blockId: string) => Promise<Block>;
+  setKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
   isCreatingBlock: boolean;
@@ -47,15 +49,26 @@ export function usePendingBlockIdsByOperation() {
     filters: { mutationKey: ["blocks", "setTags"], status: "pending" },
     select: (mutation) => (mutation.state.variables as { blockId: string }).blockId,
   });
+  const pendingSetKeepBlockIds = useMutationState<string>({
+    filters: { mutationKey: ["blocks", "setKeep"], status: "pending" },
+    select: (mutation) => (mutation.state.variables as { blockId: string }).blockId,
+  });
 
   return useMemo(
     () => ({
       archive: new Set(pendingArchiveBlockIds),
       restore: new Set(pendingRestoreBlockIds),
       delete: new Set(pendingDeleteBlockIds),
+      setKeep: new Set(pendingSetKeepBlockIds),
       setTags: new Set(pendingSetTagsBlockIds),
     }),
-    [pendingArchiveBlockIds, pendingDeleteBlockIds, pendingRestoreBlockIds, pendingSetTagsBlockIds],
+    [
+      pendingArchiveBlockIds,
+      pendingDeleteBlockIds,
+      pendingRestoreBlockIds,
+      pendingSetKeepBlockIds,
+      pendingSetTagsBlockIds,
+    ],
   );
 }
 
@@ -116,6 +129,18 @@ export function useBlockMutations(): UseBlockMutationsResult {
     },
   });
 
+  const setBlockKeepMutation = useMutation({
+    mutationKey: ["blocks", "setKeep"],
+    mutationFn: async ({ blockId, isKept }: { blockId: string; isKept: boolean }) =>
+      await setBlockKeepState({ blockId, isKept }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+    },
+    onError: (error) => {
+      handleMutationError("Failed to update block keep state.", error);
+    },
+  });
+
   const pendingBlockIdsByOperation = usePendingBlockIdsByOperation();
 
   const stableCreateBlock = useCallback(
@@ -140,17 +165,22 @@ export function useBlockMutations(): UseBlockMutationsResult {
     (blockId: string, tagIds: string[]) => setBlockTagsMutation.mutateAsync({ blockId, tagIds }),
     [setBlockTagsMutation.mutateAsync],
   );
+  const stableSetKeepState = useCallback(
+    (blockId: string, isKept: boolean) => setBlockKeepMutation.mutateAsync({ blockId, isKept }),
+    [setBlockKeepMutation.mutateAsync],
+  );
 
   return {
     createBlock: stableCreateBlock,
     archiveBlock: stableArchiveBlock,
     restoreBlock: stableRestoreBlock,
+    setKeepState: stableSetKeepState,
     deleteBlock: stableDeleteBlock,
     assignBlockTags: stableAssignBlockTags,
     isCreatingBlock: createBlockMutation.isPending,
     isBlockLocked: (blockId: string) =>
-      (["archive", "restore", "delete", "setTags"] as BlockMutationOperation[]).some((op) =>
-        pendingBlockIdsByOperation[op].has(blockId),
+      (["archive", "restore", "delete", "setKeep", "setTags"] as BlockMutationOperation[]).some(
+        (op) => pendingBlockIdsByOperation[op].has(blockId),
       ),
     isBlockOpPending: (blockId: string, op: BlockMutationOperation) =>
       pendingBlockIdsByOperation[op].has(blockId),

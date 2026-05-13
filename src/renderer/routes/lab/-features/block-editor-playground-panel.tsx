@@ -131,6 +131,7 @@ export function BlockEditorPlaygroundPanel() {
         blockId="playground-block"
         runtime={runtime}
         initialMarkdown={markdown}
+        isKept={false}
         willArchive={false}
         onBlur={() => {}}
         onFocus={() => {}}

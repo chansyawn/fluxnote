@@ -21,6 +21,9 @@ export type LocateBlockResult = z.infer<
 export type UpdateBlockContentRequest = z.input<
   (typeof blocksContract)["commands"]["blocks.update-content"]["input"]
 >;
+export type SetBlockKeepStateRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.set-keep-state"]["input"]
+>;
 export type BlockMutationRequest = z.input<
   (typeof blocksContract)["commands"]["blocks.archive"]["input"]
 >;
@@ -59,3 +62,6 @@ export const archiveBlock = (req: BlockMutationRequest): Promise<Block> =>
 
 export const restoreBlock = (req: BlockMutationRequest): Promise<Block> =>
   invokeCommand("blocks.restore", req);
+
+export const setBlockKeepState = (req: SetBlockKeepStateRequest): Promise<Block> =>
+  invokeCommand("blocks.set-keep-state", req);

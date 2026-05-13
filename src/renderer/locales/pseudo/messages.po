@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:35
-#: src/renderer/routes/-layout/window-title-bar.tsx:94
+#: src/renderer/features/error-boundary/error-title-bar.tsx:36
+#: src/renderer/routes/-layout/window-title-bar.tsx:95
 msgid "app.title"
 msgstr ""
 
@@ -45,32 +45,32 @@ msgid "block-editor.content.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:182
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:99
 msgid "block-editor.link.convert"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:180
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:97
 msgid "block-editor.link.copied"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:179
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:96
 msgid "block-editor.link.copy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:178
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:95
 msgid "block-editor.link.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:181
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:98
 msgid "block-editor.link.remove"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:183
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:100
 msgid "block-editor.link.url"
 msgstr ""
 
@@ -187,7 +187,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:14
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
+#: src/renderer/features/error-boundary/error-title-bar.tsx:30
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr ""
@@ -223,12 +223,12 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:44
+#: src/renderer/features/block/actions/icon-action.tsx:51
 msgid "home-note.block.copy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:78
+#: src/renderer/features/block/actions/block-actions.tsx:93
 msgid "home-note.block.delete"
 msgstr ""
 
@@ -343,17 +343,17 @@ msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:49
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:48
 msgid "preferences.shortcuts.archive-block.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:66
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
 msgid "preferences.shortcuts.capture-block.label"
 msgstr ""
 
@@ -364,12 +364,12 @@ msgid "preferences.shortcuts.clear"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:38
 msgid "preferences.shortcuts.create-block.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:43
 msgid "preferences.shortcuts.delete-block.label"
 msgstr ""
 
@@ -411,17 +411,17 @@ msgid "preferences.shortcuts.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:59
 msgid "preferences.shortcuts.submit-external-edit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:87
 msgid "preferences.shortcuts.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:32
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:33
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr ""
 
@@ -432,7 +432,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:67
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:80
 msgid "window.hide"
 msgstr ""
 
@@ -462,13 +462,23 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:69
+#: src/renderer/features/block/actions/block-actions.tsx:84
 msgid "workspace.blocks.archive"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:67
+#: src/renderer/features/block/actions/block-actions.tsx:71
+msgid "workspace.blocks.keep"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:82
 msgid "workspace.blocks.restore"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:69
+msgid "workspace.blocks.unkeep"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -502,12 +512,12 @@ msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:56
+#: src/renderer/features/block/actions/block-actions.tsx:57
 msgid "workspace.tags.assign.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:45
+#: src/renderer/features/block/actions/block-actions.tsx:46
 msgid "workspace.tags.assign.placeholder"
 msgstr ""
 

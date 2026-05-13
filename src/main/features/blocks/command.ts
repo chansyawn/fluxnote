@@ -15,6 +15,7 @@ import {
   listBlocks,
   locateBlock,
   restoreBlock,
+  setBlockKeepState,
   updateBlockContent,
 } from "./service";
 
@@ -78,6 +79,11 @@ export function registerBlocksCommands(ipc: IpcRouter, deps: BlocksCommandDeps):
   ipc.command("blocks.restore", async (input) => {
     const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
     return await restoreBlock(deps.db, input.blockId, autoArchiveContext);
+  });
+
+  ipc.command("blocks.set-keep-state", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await setBlockKeepState(deps.db, input.blockId, input.isKept, autoArchiveContext);
   });
 
   ipc.command("blocks.update-content", async (input) => {

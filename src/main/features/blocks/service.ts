@@ -29,6 +29,7 @@ function mapBlockRow(
     content: block.content,
     contentUpdatedAt: block.contentUpdatedAt,
     archivedAt: block.archivedAt,
+    isKept: block.isKept,
     createdAt: block.createdAt,
     updatedAt: block.updatedAt,
     willArchive: autoArchiveContext ? blockWillAutoArchive(block, autoArchiveContext) : false,
@@ -155,6 +156,7 @@ export async function listBlocks(
     contentUpdatedAt: blocks.contentUpdatedAt,
     createdAt: blocks.createdAt,
     id: blocks.id,
+    isKept: blocks.isKept,
     updatedAt: blocks.updatedAt,
   } satisfies Record<string, unknown>;
 
@@ -172,6 +174,7 @@ export async function listBlocks(
         blocks.contentUpdatedAt,
         blocks.archivedAt,
         blocks.createdAt,
+        blocks.isKept,
         blocks.updatedAt,
       )
       .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
@@ -294,6 +297,26 @@ export async function restoreBlock(
     .update(blocks)
     .set({
       archivedAt: null,
+    })
+    .where(eq(blocks.id, blockId))
+    .run();
+  if (getSqliteChangedRows(result) === 0) {
+    throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+  }
+
+  return await getPublicBlockById(db, blockId, autoArchiveContext);
+}
+
+export async function setBlockKeepState(
+  db: AppDatabase,
+  blockId: string,
+  isKept: boolean,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<Block> {
+  const result = await db
+    .update(blocks)
+    .set({
+      isKept,
     })
     .where(eq(blocks.id, blockId))
     .run();
