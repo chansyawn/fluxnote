@@ -10,10 +10,12 @@ import {
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
+  SKIP_DOM_SELECTION_TAG,
   type EditorState,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
+  type UpdateTag,
 } from "lexical";
 
 export type LinkKind = "auto" | "markdown";
@@ -84,12 +86,13 @@ function updateLinkNode(
   editor: LexicalEditor,
   key: NodeKey,
   update: (node: LexicalNode | null) => void,
+  tag?: UpdateTag | UpdateTag[],
 ): void {
   editor.update(
     () => {
       update($getNodeByKey(key));
     },
-    { discrete: true },
+    tag === undefined ? { discrete: true } : { discrete: true, tag },
   );
 }
 
@@ -142,11 +145,16 @@ export function isSameActiveLink(current: ActiveLink | null, next: ActiveLink | 
 }
 
 export function setMarkdownLinkUrl(editor: LexicalEditor, key: NodeKey, url: string): void {
-  updateLinkNode(editor, key, (node) => {
-    if (isMarkdownLinkNode(node)) {
-      node.setURL(url);
-    }
-  });
+  updateLinkNode(
+    editor,
+    key,
+    (node) => {
+      if (isMarkdownLinkNode(node)) {
+        node.setURL(url);
+      }
+    },
+    SKIP_DOM_SELECTION_TAG,
+  );
 }
 
 export function removeMarkdownLink(editor: LexicalEditor, key: NodeKey): void {

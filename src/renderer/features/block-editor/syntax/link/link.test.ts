@@ -2,9 +2,11 @@ import { $isAutoLinkNode, $isLinkNode, type LinkNode } from "@lexical/link";
 import {
   $getRoot,
   $isElementNode,
+  SKIP_DOM_SELECTION_TAG,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
+  type UpdateTag,
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -94,6 +96,34 @@ describe("link", () => {
 
       setMarkdownLinkUrl(editor, key, "https://example.org");
 
+      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
+    });
+
+    it("applies successive markdown link url updates immediately", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+
+      setMarkdownLinkUrl(editor, key, "https://example.org");
+
+      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
+
+      setMarkdownLinkUrl(editor, key, "https://example.net");
+
+      expect(readMarkdown(editor).trim()).toBe("[site](https://example.net)");
+    });
+
+    it("skips DOM selection sync when updating markdown link urls", () => {
+      const editor = editorFromMarkdown("[site](https://example.com)");
+      const key = readFirstLinkKey(editor);
+      const updateTags: UpdateTag[] = [];
+      const unregister = editor.registerUpdateListener(({ tags }) => {
+        updateTags.push(...tags);
+      });
+
+      setMarkdownLinkUrl(editor, key, "https://example.org");
+      unregister();
+
+      expect(updateTags).toContain(SKIP_DOM_SELECTION_TAG);
       expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
     });
 

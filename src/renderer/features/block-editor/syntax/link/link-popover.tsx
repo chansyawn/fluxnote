@@ -4,7 +4,7 @@ import { Button } from "@renderer/ui/components/button";
 import { Input } from "@renderer/ui/components/input";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
-import { type SubmitEventHandler, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
@@ -50,13 +50,15 @@ export function LinkHoverControls() {
 
   const handleOpen = async () => {
     if (!activeLink) return;
-    await runtime.links.openExternal(activeLink.link.url);
+    const url = activeLink.link.kind === "markdown" ? draftUrl : activeLink.link.url;
+    await runtime.links.openExternal(url);
     close();
   };
 
   const handleCopy = async () => {
     if (!activeLink) return;
-    await runtime.clipboard.writeText(activeLink.link.url);
+    const url = activeLink.link.kind === "markdown" ? draftUrl : activeLink.link.url;
+    await runtime.clipboard.writeText(url);
     setCopied(true);
   };
 
@@ -72,11 +74,10 @@ export function LinkHoverControls() {
     close();
   };
 
-  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
+  const handleDraftUrlChange = (url: string) => {
     if (!activeLink || activeLink.link.kind !== "markdown") return;
-    setMarkdownLinkUrl(editor, activeLink.link.key, draftUrl);
-    close();
+    setDraftUrl(url);
+    setMarkdownLinkUrl(editor, activeLink.link.key, url);
   };
 
   if (!activeLink) return null;
@@ -129,11 +130,11 @@ export function LinkHoverControls() {
         onPointerLeave={scheduleActiveLinkClose}
       >
         {isMarkdownLink ? (
-          <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-2">
             <Input
               aria-label={urlLabel}
               value={draftUrl}
-              onChange={(event) => setDraftUrl(event.currentTarget.value)}
+              onChange={(event) => handleDraftUrlChange(event.currentTarget.value)}
             />
             <div className="flex flex-wrap items-center gap-1">
               {sharedActions}
@@ -142,7 +143,7 @@ export function LinkHoverControls() {
                 {removeLabel}
               </Button>
             </div>
-          </form>
+          </div>
         ) : (
           <div className="flex flex-wrap items-center gap-1">
             {sharedActions}
