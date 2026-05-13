@@ -4,7 +4,7 @@ import { Button } from "@renderer/ui/components/button";
 import { Input } from "@renderer/ui/components/input";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type SubmitEventHandler, useCallback, useEffect, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
@@ -25,8 +25,14 @@ export function LinkHoverControls() {
   const { i18n } = useLingui();
   const [editor] = useLexicalComposerContext();
   const runtime = useBlockEditorRuntime();
-  const { activeLink, closeActiveLink, keepActiveLinkOpen, scheduleActiveLinkClose } =
-    useActiveLinkTarget(editor);
+  const {
+    activeLink,
+    closeActiveLink,
+    holdActiveLinkOpen,
+    scheduleActiveLinkClose,
+    setPopoverElement,
+    shouldIgnorePopoverClose,
+  } = useActiveLinkTarget(editor);
   const [draftUrl, setDraftUrl] = useState<LinkUrlDraft | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -76,7 +82,7 @@ export function LinkHoverControls() {
       ? draftUrl.url
       : (activeLink?.target.url ?? "");
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     if (!activeLink || activeLink.target.kind !== "link") return;
     updateMarkdownLinkUrl(editor, activeLink.target.key, currentDraftUrl);
@@ -110,11 +116,12 @@ export function LinkHoverControls() {
   return (
     <Popover
       open
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) close();
+      onOpenChange={(nextOpen, eventDetails) => {
+        if (!nextOpen && !shouldIgnorePopoverClose(eventDetails.event)) close();
       }}
     >
       <PopoverContent
+        ref={setPopoverElement}
         anchor={activeLink.element}
         className="p-2"
         align="center"
@@ -122,7 +129,13 @@ export function LinkHoverControls() {
         initialFocus={false}
         side="bottom"
         sideOffset={6}
-        onPointerEnter={keepActiveLinkOpen}
+        onBlurCapture={(event) => {
+          const nextTarget = event.relatedTarget;
+          if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return;
+          scheduleActiveLinkClose();
+        }}
+        onFocusCapture={holdActiveLinkOpen}
+        onPointerEnter={holdActiveLinkOpen}
         onPointerLeave={scheduleActiveLinkClose}
       >
         {isMarkdownLink ? (
