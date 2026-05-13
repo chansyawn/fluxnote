@@ -19,6 +19,7 @@ import {
   sanitizeLinkUrlInput,
   setMarkdownLinkUrl,
 } from "./link-model";
+import { isElementFocusedWithin } from "./use-active-link-target";
 
 function findFirstLinkNode(node: LexicalNode): LinkNode | null {
   if ($isLinkNode(node)) return node;
@@ -52,6 +53,13 @@ function readFirstLinkKey(editor: LexicalEditor): NodeKey {
 
 function readFirstLinkClassState(editor: LexicalEditor): LinkElementClassState {
   return readFirstLink(editor, getLinkElementClassState);
+}
+
+function createPopoverElementStub(activeElement: Element | null, containedElement: Element) {
+  return {
+    ownerDocument: { activeElement },
+    contains: (node: Node | null) => node === containedElement,
+  } as unknown as HTMLElement;
 }
 
 describe("link", () => {
@@ -171,6 +179,27 @@ describe("link", () => {
         auto: false,
         markdown: true,
       });
+    });
+  });
+
+  describe("popover focus", () => {
+    it("keeps the popover active when focus remains inside it", () => {
+      const textarea = {} as Element;
+      const popoverElement = createPopoverElementStub(textarea, textarea);
+
+      expect(isElementFocusedWithin(popoverElement)).toBe(true);
+    });
+
+    it("allows the popover to close when focus moves outside it", () => {
+      const textarea = {} as Element;
+      const outsideElement = {} as Element;
+      const popoverElement = createPopoverElementStub(outsideElement, textarea);
+
+      expect(isElementFocusedWithin(popoverElement)).toBe(false);
+    });
+
+    it("allows the popover to close when no popover element is mounted", () => {
+      expect(isElementFocusedWithin(null)).toBe(false);
     });
   });
 });

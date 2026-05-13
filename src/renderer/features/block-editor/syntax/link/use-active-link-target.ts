@@ -36,6 +36,12 @@ function isNodeInsideElement(element: HTMLElement | null, node: EventTarget | nu
   return node instanceof Node && element?.contains(node) === true;
 }
 
+export function isElementFocusedWithin(element: HTMLElement | null): boolean {
+  if (!element) return false;
+  const activeElement = element.ownerDocument.activeElement;
+  return activeElement !== null && element.contains(activeElement);
+}
+
 function resolveActiveLink(sources: LinkSources): ActiveLink | null {
   return sources.hover ?? sources.pinned ?? sources.selection;
 }
@@ -107,10 +113,11 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
   }, [clearCloseTimer, setSource]);
 
   const scheduleSourceClose = useCallback(
-    (source: DelayedCloseSource) => {
+    (source: DelayedCloseSource, shouldKeepOpen?: () => boolean) => {
       clearCloseTimer(source);
       closeTimersRef.current[source] = window.setTimeout(() => {
         closeTimersRef.current[source] = null;
+        if (shouldKeepOpen?.()) return;
         setSource(source, null);
       }, CLOSE_DELAY_MS);
     },
@@ -118,7 +125,7 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
   );
 
   const schedulePinnedLinkClose = useCallback(() => {
-    scheduleSourceClose("pinned");
+    scheduleSourceClose("pinned", () => isElementFocusedWithin(popoverElementRef.current));
   }, [scheduleSourceClose]);
 
   const showLinkFromDom = useCallback(
