@@ -1,9 +1,5 @@
 @reference "#global.css";
 
-.block-editor__content {
-  @apply caret-primary;
-}
-
 .block-editor__gap-cursor {
   @apply relative my-0 h-0 min-h-0 overflow-visible;
 }
