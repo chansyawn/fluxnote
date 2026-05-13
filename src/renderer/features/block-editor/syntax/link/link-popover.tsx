@@ -1,8 +1,8 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLingui } from "@lingui/react";
 import { Button } from "@renderer/ui/components/button";
-import { Input } from "@renderer/ui/components/input";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
+import { Textarea } from "@renderer/ui/components/textarea";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -10,6 +10,7 @@ import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,
+  sanitizeLinkUrlInput,
   setMarkdownLinkUrl,
 } from "./link-model";
 import { useActiveLinkTarget } from "./use-active-link-target";
@@ -76,8 +77,9 @@ export function LinkHoverControls() {
 
   const handleDraftUrlChange = (url: string) => {
     if (!activeLink || activeLink.link.kind !== "markdown") return;
-    setDraftUrl(url);
-    setMarkdownLinkUrl(editor, activeLink.link.key, url);
+    const nextUrl = sanitizeLinkUrlInput(url);
+    setDraftUrl(nextUrl);
+    setMarkdownLinkUrl(editor, activeLink.link.key, nextUrl);
   };
 
   if (!activeLink) return null;
@@ -131,10 +133,15 @@ export function LinkHoverControls() {
       >
         {isMarkdownLink ? (
           <div className="flex flex-col gap-2">
-            <Input
+            <Textarea
               aria-label={urlLabel}
+              className="max-h-28 min-h-7 resize-none overflow-auto py-1"
+              rows={1}
               value={draftUrl}
               onChange={(event) => handleDraftUrlChange(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.preventDefault();
+              }}
             />
             <div className="flex flex-wrap items-center gap-1">
               {sharedActions}

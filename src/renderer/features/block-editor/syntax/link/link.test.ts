@@ -16,6 +16,7 @@ import { getLinkElementClassState, type LinkElementClassState } from "./link-dom
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,
+  sanitizeLinkUrlInput,
   setMarkdownLinkUrl,
 } from "./link-model";
 
@@ -81,6 +82,10 @@ describe("link", () => {
   });
 
   describe("operations", () => {
+    it("sanitizes url input line breaks", () => {
+      expect(sanitizeLinkUrlInput("https://example.com/a\nb\r\nc")).toBe("https://example.com/abc");
+    });
+
     it("converts autolinks to markdown links", () => {
       const editor = editorFromMarkdown("https://example.com");
       const key = readFirstLinkKey(editor);

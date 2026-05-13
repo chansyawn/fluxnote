@@ -32,6 +32,10 @@ export interface ActiveLink {
   link: LinkSnapshot;
 }
 
+export function sanitizeLinkUrlInput(url: string): string {
+  return url.replace(/[\r\n]+/g, "");
+}
+
 function isMarkdownLinkNode(node: LexicalNode | null | undefined): node is LinkNode {
   return $isLinkNode(node) && !$isAutoLinkNode(node);
 }
