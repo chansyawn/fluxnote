@@ -32,8 +32,32 @@ describe("parseFluxArgs", () => {
     });
   });
 
+  it("parses add command from short text option", () => {
+    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "-x", "hello"]);
+    expect(command).toEqual({
+      kind: "add",
+      source: {
+        text: "hello",
+        type: "text",
+      },
+      tagNames: [],
+    });
+  });
+
   it("parses add command from file option", () => {
     const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "--file", "note.md"]);
+    expect(command).toEqual({
+      kind: "add",
+      source: {
+        filePath: "note.md",
+        type: "file",
+      },
+      tagNames: [],
+    });
+  });
+
+  it("parses add command from short file option", () => {
+    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "-f", "note.md"]);
     expect(command).toEqual({
       kind: "add",
       source: {
@@ -65,6 +89,27 @@ describe("parseFluxArgs", () => {
     });
   });
 
+  it("parses add command with repeated short tag options", () => {
+    const command = parseFluxArgs([
+      "node",
+      "flux-cli.mjs",
+      "add",
+      "hello",
+      "-t",
+      "work",
+      "-t",
+      " idea ",
+    ]);
+    expect(command).toEqual({
+      kind: "add",
+      source: {
+        input: "hello",
+        type: "auto",
+      },
+      tagNames: ["work", "idea"],
+    });
+  });
+
   it("parses edit command from file path", () => {
     const command = parseFluxArgs(["node", "flux-cli.mjs", "edit", "note.md"]);
     expect(command).toEqual({
@@ -83,6 +128,24 @@ describe("parseFluxArgs", () => {
       "--tag",
       "work",
       "--tag",
+      "draft",
+    ]);
+    expect(command).toEqual({
+      filePath: "note.md",
+      kind: "edit",
+      tagNames: ["work", "draft"],
+    });
+  });
+
+  it("parses edit command with repeated short tag options", () => {
+    const command = parseFluxArgs([
+      "node",
+      "flux-cli.mjs",
+      "edit",
+      "note.md",
+      "-t",
+      "work",
+      "-t",
       "draft",
     ]);
     expect(command).toEqual({

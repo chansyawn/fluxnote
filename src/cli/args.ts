@@ -101,17 +101,17 @@ function createCli(onCommand: (command: FluxCliCommand) => void) {
 
   cli
     .command("add [input]", "Create a block from text or a UTF-8 text file")
-    .usage("[--text <text> | --file <path> | <input>]")
-    .option("--text <text>", "Create a block with inline text")
-    .option("--file <path>", "Create a block from a UTF-8 text file")
-    .option("--tag <name>", "Add a tag to the created block")
+    .usage("[-x, --text <text> | -f, --file <path> | <input>]")
+    .option("-x, --text <text>", "Create a block with inline text")
+    .option("-f, --file <path>", "Create a block from a UTF-8 text file")
+    .option("-t, --tag <name>", "Add a tag to the created block")
     .action((input: string | undefined, options: FluxCliOptions) => {
       onCommand(parseAddCommand(input, options));
     });
 
   cli
     .command("edit <file>", "Edit a file-backed block and wait for submit or cancel")
-    .option("--tag <name>", "Add a tag to the created block")
+    .option("-t, --tag <name>", "Add a tag to the created block")
     .action((filePath: string, options: FluxCliOptions) => {
       onCommand({ filePath, kind: "edit", tagNames: parseTagNames(options.tag) });
     });
