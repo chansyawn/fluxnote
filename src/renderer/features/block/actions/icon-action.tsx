@@ -15,6 +15,7 @@ interface IconActionProps {
   active?: boolean;
   icon: ReactNode;
   label: ReactNode;
+  tooltipLabel?: ReactNode;
   shortcut?: ShortcutBinding;
   pending?: boolean;
   disabled?: boolean;
@@ -25,12 +26,14 @@ export function IconAction({
   active,
   icon,
   label,
+  tooltipLabel,
   shortcut,
   pending,
   disabled,
   onClick,
 }: IconActionProps) {
   const shortcutTokens = formatShortcutTokens(shortcut ?? null);
+  const tooltipContent = tooltipLabel ?? label;
 
   return (
     <Tooltip>
@@ -49,7 +52,7 @@ export function IconAction({
         <span className="sr-only">{label}</span>
       </TooltipTrigger>
       <TooltipContent className="flex items-center gap-2">
-        <span>{label}</span>
+        <span>{tooltipContent}</span>
         {shortcutTokens.length > 0 ? (
           <KbdGroup>
             {shortcutTokens.map((token, index) => (
@@ -80,6 +83,7 @@ export function CopyAction({ disabled, onCopy }: CopyActionProps) {
     <IconAction
       icon={copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
       label={<Trans id="home-note.block.copy">Copy block</Trans>}
+      tooltipLabel={<Trans id="home-note.block.copy.tooltip">Copy</Trans>}
       disabled={disabled}
       onClick={() => {
         onCopy();

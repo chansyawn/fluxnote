@@ -223,24 +223,44 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:82
+#: src/renderer/features/block/actions/icon-action.tsx:85
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:105
+#: src/renderer/features/block/actions/icon-action.tsx:86
+msgid "home-note.block.copy.tooltip"
+msgstr "Copy"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:119
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:29
+#: src/renderer/features/block/actions/block-actions.tsx:120
+msgid "home-note.block.delete.tooltip"
+msgstr "Delete"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:30
 msgid "home-note.block.external-edit.cancel"
 msgstr "Cancel external edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+msgid "home-note.block.external-edit.cancel.tooltip"
+msgstr "Cancel"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/external-edit-actions.tsx:23
 msgid "home-note.block.external-edit.submit"
 msgstr "Submit external edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:24
+msgid "home-note.block.external-edit.submit.tooltip"
+msgstr "Submit"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
@@ -343,22 +363,12 @@ msgid "preferences.language.label"
 msgstr "Language"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:27
-msgid "preferences.markdown.code-block.line-numbers.description"
-msgstr "Show a gutter with logical line numbers in fenced code blocks."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:33
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:28
 msgid "preferences.markdown.code-block.line-numbers.label"
 msgstr "Show line numbers"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:46
-msgid "preferences.markdown.code-block.word-wrap.description"
-msgstr "Wrap long code lines to the editor width instead of scrolling horizontally."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:51
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:41
 msgid "preferences.markdown.code-block.word-wrap.label"
 msgstr "Word wrap"
 
@@ -497,9 +507,14 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:95
+#: src/renderer/features/block/actions/block-actions.tsx:102
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:109
+msgid "workspace.blocks.archive.tooltip"
+msgstr "Archive"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/block-actions.tsx:75
@@ -507,14 +522,29 @@ msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:93
+#: src/renderer/features/block/actions/block-actions.tsx:82
+msgid "workspace.blocks.keep.tooltip"
+msgstr "Keep"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:100
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:107
+msgid "workspace.blocks.restore.tooltip"
+msgstr "Restore"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/block-actions.tsx:73
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:80
+msgid "workspace.blocks.unkeep.tooltip"
+msgstr "Unkeep"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49

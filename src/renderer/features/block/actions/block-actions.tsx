@@ -75,6 +75,13 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
               <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
             )
           }
+          tooltipLabel={
+            block.isKept ? (
+              <Trans id="workspace.blocks.unkeep.tooltip">Unkeep</Trans>
+            ) : (
+              <Trans id="workspace.blocks.keep.tooltip">Keep</Trans>
+            )
+          }
           disabled={disabled}
           pending={pending.keep}
           onClick={handlers.onToggleKeep}
@@ -95,6 +102,13 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
             <Trans id="workspace.blocks.archive">Archive block</Trans>
           )
         }
+        tooltipLabel={
+          isArchived ? (
+            <Trans id="workspace.blocks.restore.tooltip">Restore</Trans>
+          ) : (
+            <Trans id="workspace.blocks.archive.tooltip">Archive</Trans>
+          )
+        }
         shortcut={isArchived ? undefined : shortcuts?.["archive-block"]}
         disabled={disabled}
         pending={pending.archive}
@@ -103,6 +117,7 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
       <IconAction
         icon={<Trash2Icon className="size-3" />}
         label={<Trans id="home-note.block.delete">Delete block</Trans>}
+        tooltipLabel={<Trans id="home-note.block.delete.tooltip">Delete</Trans>}
         shortcut={shortcuts?.["delete-block"]}
         disabled={disabled}
         pending={pending.delete}

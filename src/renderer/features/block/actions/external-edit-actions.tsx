@@ -21,12 +21,14 @@ export function ExternalEditActions({ pending, onSubmit, onCancel }: ExternalEdi
       <IconAction
         icon={<CheckIcon className="size-3" />}
         label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
+        tooltipLabel={<Trans id="home-note.block.external-edit.submit.tooltip">Submit</Trans>}
         pending={pending}
         onClick={onSubmit}
       />
       <IconAction
         icon={<XIcon className="size-3" />}
         label={<Trans id="home-note.block.external-edit.cancel">Cancel external edit</Trans>}
+        tooltipLabel={<Trans id="home-note.block.external-edit.cancel.tooltip">Cancel</Trans>}
         disabled={pending}
         onClick={onCancel}
       />

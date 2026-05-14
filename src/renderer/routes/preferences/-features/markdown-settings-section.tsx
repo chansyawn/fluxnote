@@ -23,11 +23,6 @@ export function MarkdownSettingsSection() {
               }}
             />
           }
-          description={
-            <Trans id="preferences.markdown.code-block.line-numbers.description">
-              Show a gutter with logical line numbers in fenced code blocks.
-            </Trans>
-          }
           icon={ListOrderedIcon}
           label={
             <Trans id="preferences.markdown.code-block.line-numbers.label">Show line numbers</Trans>
@@ -41,11 +36,6 @@ export function MarkdownSettingsSection() {
                 patchCodeBlock({ wordWrap: checked });
               }}
             />
-          }
-          description={
-            <Trans id="preferences.markdown.code-block.word-wrap.description">
-              Wrap long code lines to the editor width instead of scrolling horizontally.
-            </Trans>
           }
           icon={WrapTextIcon}
           label={<Trans id="preferences.markdown.code-block.word-wrap.label">Word wrap</Trans>}

@@ -223,23 +223,43 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:82
+#: src/renderer/features/block/actions/icon-action.tsx:85
 msgid "home-note.block.copy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:105
+#: src/renderer/features/block/actions/icon-action.tsx:86
+msgid "home-note.block.copy.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:119
 msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:29
+#: src/renderer/features/block/actions/block-actions.tsx:120
+msgid "home-note.block.delete.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:30
 msgid "home-note.block.external-edit.cancel"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/external-edit-actions.tsx:23
 msgid "home-note.block.external-edit.submit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:24
+msgid "home-note.block.external-edit.submit.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -343,22 +363,12 @@ msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:27
-msgid "preferences.markdown.code-block.line-numbers.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:33
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:28
 msgid "preferences.markdown.code-block.line-numbers.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:46
-msgid "preferences.markdown.code-block.word-wrap.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:51
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:41
 msgid "preferences.markdown.code-block.word-wrap.label"
 msgstr ""
 
@@ -497,8 +507,13 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:95
+#: src/renderer/features/block/actions/block-actions.tsx:102
 msgid "workspace.blocks.archive"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:109
+msgid "workspace.blocks.archive.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -507,13 +522,28 @@ msgid "workspace.blocks.keep"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:93
+#: src/renderer/features/block/actions/block-actions.tsx:82
+msgid "workspace.blocks.keep.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:100
 msgid "workspace.blocks.restore"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:107
+msgid "workspace.blocks.restore.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/block-actions.tsx:73
 msgid "workspace.blocks.unkeep"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:80
+msgid "workspace.blocks.unkeep.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id

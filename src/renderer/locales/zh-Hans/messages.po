@@ -223,24 +223,44 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:82
+#: src/renderer/features/block/actions/icon-action.tsx:85
 msgid "home-note.block.copy"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:105
+#: src/renderer/features/block/actions/icon-action.tsx:86
+msgid "home-note.block.copy.tooltip"
+msgstr "复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:119
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:29
+#: src/renderer/features/block/actions/block-actions.tsx:120
+msgid "home-note.block.delete.tooltip"
+msgstr "删除"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:30
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+msgid "home-note.block.external-edit.cancel.tooltip"
+msgstr "取消"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/external-edit-actions.tsx:23
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:24
+msgid "home-note.block.external-edit.submit.tooltip"
+msgstr "提交"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
@@ -343,22 +363,12 @@ msgid "preferences.language.label"
 msgstr "语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:27
-msgid "preferences.markdown.code-block.line-numbers.description"
-msgstr "在围栏代码块中显示逻辑行号栏。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:33
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:28
 msgid "preferences.markdown.code-block.line-numbers.label"
 msgstr "显示行号"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:46
-msgid "preferences.markdown.code-block.word-wrap.description"
-msgstr "将长代码行按编辑器宽度换行，而不是横向滚动。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:51
+#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:41
 msgid "preferences.markdown.code-block.word-wrap.label"
 msgstr "自动换行"
 
@@ -497,9 +507,14 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:95
+#: src/renderer/features/block/actions/block-actions.tsx:102
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:109
+msgid "workspace.blocks.archive.tooltip"
+msgstr "归档"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/block-actions.tsx:75
@@ -507,14 +522,29 @@ msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:93
+#: src/renderer/features/block/actions/block-actions.tsx:82
+msgid "workspace.blocks.keep.tooltip"
+msgstr "保留"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:100
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:107
+msgid "workspace.blocks.restore.tooltip"
+msgstr "恢复"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block/actions/block-actions.tsx:73
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/block-actions.tsx:80
+msgid "workspace.blocks.unkeep.tooltip"
+msgstr "取消保留"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
