@@ -32,6 +32,12 @@ export interface WindowManager {
   toggleMainWindow: () => void;
 }
 
+function resolveIconPath(iconName: string): string {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, "assets/icons", iconName)
+    : path.resolve(process.cwd(), "src/assets/icons", iconName);
+}
+
 export function createWindowManager(services: WindowManagerServices): WindowManager {
   let mainWindow: BrowserWindow | null = null;
   let isQuitting = false;
@@ -140,6 +146,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       frame: false,
       hasShadow: true,
       height: MAIN_WINDOW_HEIGHT,
+      icon: process.platform === "win32" ? resolveIconPath("icon.ico") : undefined,
       maximizable: false,
       maxWidth: MAIN_WINDOW_MAX_WIDTH,
       minWidth: MAIN_WINDOW_MIN_WIDTH,

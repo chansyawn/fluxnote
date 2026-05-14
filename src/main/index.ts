@@ -7,6 +7,7 @@ import { app } from "electron";
 
 import { configureUserDataPath } from "./app/app-paths";
 import { startPrimaryInstance } from "./app/bootstrap";
+import { handleSquirrelStartup } from "./app/squirrel-startup";
 
 function registerDefaultProtocolClient(): void {
   if (process.defaultApp) {
@@ -21,12 +22,16 @@ function registerDefaultProtocolClient(): void {
   app.setAsDefaultProtocolClient(APP_PROTOCOL);
 }
 
-configureUserDataPath();
-registerDefaultProtocolClient();
-
-const gotSingleInstanceLock = app.requestSingleInstanceLock();
-if (!gotSingleInstanceLock) {
-  app.quit();
+if (handleSquirrelStartup()) {
+  process.exitCode = 0;
 } else {
-  startPrimaryInstance();
+  configureUserDataPath();
+  registerDefaultProtocolClient();
+
+  const gotSingleInstanceLock = app.requestSingleInstanceLock();
+  if (!gotSingleInstanceLock) {
+    app.quit();
+  } else {
+    startPrimaryInstance();
+  }
 }

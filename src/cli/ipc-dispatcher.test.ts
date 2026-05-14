@@ -119,9 +119,19 @@ vi.mock("node:fs/promises", () => ({
 
 import { dispatchCommand } from "./ipc-dispatcher";
 
+function setPlatform(value: NodeJS.Platform): void {
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value,
+  });
+}
+
 describe("ipc-dispatcher", () => {
   beforeEach(() => {
+    setPlatform("darwin");
     vi.clearAllMocks();
+    delete process.env.ELECTRON_RUN_AS_NODE;
+    mocks.access.mockResolvedValue(undefined);
     mocks.stat.mockResolvedValue({ isFile: () => true });
   });
 
@@ -134,7 +144,7 @@ describe("ipc-dispatcher", () => {
     expect(mocks.spawn).not.toHaveBeenCalled();
   });
 
-  it("retries after launching app on connection error", async () => {
+  it("retries after launching packaged macOS app on connection error", async () => {
     mocks.pushBehavior((socket) => {
       socket.emit("error", mocks.connectionError("ENOENT"));
     });
@@ -149,6 +159,50 @@ describe("ipc-dispatcher", () => {
     expect(mocks.spawn).toHaveBeenCalledTimes(1);
     expect(mocks.spawn).toHaveBeenCalledWith("open", ["-a", expect.any(String)], {
       detached: true,
+      env: expect.any(Object),
+      stdio: "ignore",
+    });
+  });
+
+  it("retries after launching packaged Windows app on connection error", async () => {
+    setPlatform("win32");
+    process.env.ELECTRON_RUN_AS_NODE = "1";
+    mocks.pushBehavior((socket) => {
+      socket.emit("error", mocks.connectionError("ENOENT"));
+    });
+    mocks.pushBehavior((socket) => {
+      socket.emit("connect");
+    });
+    mocks.pushBehavior((socket) => {
+      mocks.connectAndRespond(socket, null);
+    });
+
+    await expect(dispatchCommand("app.open", null)).resolves.toBeNull();
+    expect(mocks.spawn).toHaveBeenCalledTimes(1);
+    expect(mocks.spawn).toHaveBeenCalledWith(expect.stringMatching(/fluxnotes\.exe$/), [], {
+      detached: true,
+      env: expect.not.objectContaining({ ELECTRON_RUN_AS_NODE: "1" }),
+      stdio: "ignore",
+    });
+  });
+
+  it("falls back to development app launch when packaged app is not found", async () => {
+    mocks.stat.mockResolvedValue({ isFile: () => false });
+    mocks.pushBehavior((socket) => {
+      socket.emit("error", mocks.connectionError("ENOENT"));
+    });
+    mocks.pushBehavior((socket) => {
+      socket.emit("connect");
+    });
+    mocks.pushBehavior((socket) => {
+      mocks.connectAndRespond(socket, null);
+    });
+
+    await expect(dispatchCommand("app.open", null)).resolves.toBeNull();
+    expect(mocks.spawn).toHaveBeenCalledWith("vp", ["run", "dev"], {
+      cwd: expect.any(String),
+      detached: true,
+      env: expect.any(Object),
       stdio: "ignore",
     });
   });

@@ -33,7 +33,7 @@ fi
 
 if [ ! -f "$CLI_JS" ]; then
   echo "CLI script not found at $CLI_JS." >&2
-  echo "Run 'vp run cli:build' to build it." >&2
+  echo "Run 'vp run package' or 'vp run dev' to build it." >&2
   exit 1
 fi
 

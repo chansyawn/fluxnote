@@ -20,7 +20,12 @@ function resolveIconPath(iconName: string): string {
 }
 
 function createTrayIcon(): NativeImage {
-  const iconName = process.platform === "darwin" ? "tray-template.png" : "32x32.png";
+  const iconName =
+    process.platform === "darwin"
+      ? "tray-template.png"
+      : process.platform === "win32"
+        ? "icon.ico"
+        : "32x32.png";
   const icon = nativeImage.createFromPath(resolveIconPath(iconName));
 
   if (process.platform === "darwin") {

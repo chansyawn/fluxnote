@@ -1,6 +1,7 @@
 import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
 
+import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { VitePlugin } from "@electron-forge/plugin-vite";
@@ -11,14 +12,17 @@ async function copyCliResources(buildPath: string): Promise<void> {
   const resourcesCliPath = path.resolve(buildPath, "..", "cli");
   await mkdir(resourcesCliPath, { recursive: true });
   await cp("src/cli/flux", path.join(resourcesCliPath, "flux"));
+  await cp("src/cli/flux.cmd", path.join(resourcesCliPath, "flux.cmd"));
   await cp(".vite/cli/flux-cli.mjs", path.join(resourcesCliPath, "flux-cli.mjs"));
 }
 
 const config: ForgeConfig = {
   packagerConfig: {
     appBundleId: "app.fluxnotes",
+    appCopyright: "Copyright (c) 2026 Fluxnotes",
     appCategoryType: "public.app-category.productivity",
     asar: true,
+    executableName: "fluxnotes",
     extraResource: ["src/main/core/database/drizzle", "src/assets"],
     icon: "src/assets/icons/icon",
     name: "Fluxnotes",
@@ -35,7 +39,17 @@ const config: ForgeConfig = {
     },
   },
   rebuildConfig: {},
-  makers: [new MakerZIP({}, ["darwin"])],
+  makers: [
+    new MakerZIP({}, ["darwin"]),
+    new MakerSquirrel({
+      authors: "Fluxnotes",
+      description: "A lightweight, always-on-top editor for AI-first workflows.",
+      name: "fluxnotes",
+      noMsi: true,
+      setupExe: "Fluxnotes Setup.exe",
+      setupIcon: "src/assets/icons/icon.ico",
+    }),
+  ],
   plugins: [
     new VitePlugin({
       build: [

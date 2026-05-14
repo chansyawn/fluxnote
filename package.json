@@ -2,6 +2,8 @@
   "name": "fluxnotes",
   "version": "0.0.0",
   "private": true,
+  "description": "A lightweight, always-on-top editor for AI-first workflows.",
+  "author": "Fluxnotes",
   "bin": {
     "flux": ".vite/cli/flux-cli.mjs"
   },
@@ -69,6 +71,7 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "8.0.0-alpha.8",
+    "@electron-forge/maker-squirrel": "8.0.0-alpha.8",
     "@electron-forge/maker-zip": "8.0.0-alpha.8",
     "@electron-forge/plugin-fuses": "8.0.0-alpha.8",
     "@electron-forge/plugin-vite": "8.0.0-alpha.8",
@@ -98,8 +101,9 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "electron"
+      "electron",
+      "electron-winstaller"
     ]
   },
-  "productName": "fluxnotes"
+  "productName": "Fluxnotes"
 }

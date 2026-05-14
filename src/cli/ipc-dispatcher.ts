@@ -102,23 +102,70 @@ async function waitForServer(timeoutMs: number): Promise<void> {
 }
 
 type CliContext =
-  | { mode: "production"; appBundlePath: string }
+  | { mode: "production"; appPath: string; launchArgs: string[]; probePath: string }
   | { mode: "development"; repoRoot: string };
 
-async function detectCliContext(): Promise<CliContext> {
-  const cliDir = path.dirname(fileURLToPath(import.meta.url));
-  const rootDir = path.resolve(cliDir, "../..");
-  const electronBinary = path.join(rootDir, "MacOS", "fluxnotes");
+function getProductionCandidates(cliDir: string): CliContext[] {
+  const resourcesDir = path.resolve(cliDir, "..");
+  const appDir = path.resolve(resourcesDir, "..");
 
-  try {
-    const s = await stat(electronBinary);
-    if (s.isFile()) {
-      return { mode: "production", appBundlePath: path.dirname(rootDir) };
-    }
-  } catch {
-    // Not inside an app bundle
+  if (process.platform === "darwin") {
+    const contentsDir = appDir;
+    const appBundlePath = path.dirname(contentsDir);
+    const executablePath = path.join(contentsDir, "MacOS", "fluxnotes");
+    return [
+      {
+        appPath: "open",
+        launchArgs: ["-a", appBundlePath],
+        mode: "production",
+        probePath: executablePath,
+      },
+    ];
   }
 
+  if (process.platform === "win32") {
+    return ["fluxnotes.exe", "Fluxnotes.exe"].map((executableName) => ({
+      appPath: path.join(appDir, executableName),
+      launchArgs: [],
+      mode: "production" as const,
+      probePath: path.join(appDir, executableName),
+    }));
+  }
+
+  const executablePath = path.join(appDir, "fluxnotes");
+  return [
+    {
+      appPath: executablePath,
+      launchArgs: [],
+      mode: "production",
+      probePath: executablePath,
+    },
+  ];
+}
+
+async function isProductionCandidate(context: CliContext): Promise<boolean> {
+  if (context.mode !== "production") {
+    return false;
+  }
+
+  try {
+    const s = await stat(context.probePath);
+    return s.isFile();
+  } catch {
+    return false;
+  }
+}
+
+async function getCliContext(): Promise<CliContext> {
+  const cliDir = path.dirname(fileURLToPath(import.meta.url));
+
+  for (const context of getProductionCandidates(cliDir)) {
+    if (await isProductionCandidate(context)) {
+      return context;
+    }
+  }
+
+  const rootDir = path.resolve(cliDir, "../..");
   try {
     await access(path.join(rootDir, "package.json"));
     await access(path.join(rootDir, "src/main/index.ts"));
@@ -131,22 +178,27 @@ async function detectCliContext(): Promise<CliContext> {
 }
 
 function launchApp(context: CliContext): void {
+  const env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+
   if (context.mode === "production") {
-    spawn("open", ["-a", context.appBundlePath], {
+    spawn(context.appPath, context.launchArgs, {
       detached: true,
+      env,
       stdio: "ignore",
     }).unref();
   } else {
     spawn("vp", ["run", "dev"], {
       cwd: context.repoRoot,
       detached: true,
+      env,
       stdio: "ignore",
     }).unref();
   }
 }
 
 async function ensureAppRunning(): Promise<void> {
-  const context = await detectCliContext();
+  const context = await getCliContext();
   const waitMs = context.mode === "production" ? INITIAL_SERVER_WAIT_MS : DEV_SERVER_WAIT_MS;
 
   launchApp(context);
