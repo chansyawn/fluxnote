@@ -13,6 +13,7 @@ import type { AppDatabase } from "../core/database";
 import { createBlockRecord } from "../features/blocks/service";
 import { createCliIpcServer } from "../features/cli/ipc-server";
 import { createDeepLinkHandler } from "../features/deep-link/handler";
+import { setBlockTagsByName } from "../features/tags/service";
 
 interface EntrypointRuntimeServices {
   createExternalEditSession: (
@@ -92,14 +93,24 @@ function createEntrypointCommandExecutor(services: EntrypointCommandServices) {
         return null as BackendCommandResponse<TKey>;
       }
       case "block.create-from-text": {
-        const { content } = request as ParsedBackendCommandRequest<"block.create-from-text">;
-        const block = await createBlockRecord(await services.getDb(), content);
+        const { content, tagNames } =
+          request as ParsedBackendCommandRequest<"block.create-from-text">;
+        const db = await services.getDb();
+        const block = await createBlockRecord(db, content);
+        if (tagNames && tagNames.length > 0) {
+          await setBlockTagsByName(db, block.id, tagNames);
+        }
         services.requestOpenBlock(block.id);
         return { blockId: block.id } as BackendCommandResponse<TKey>;
       }
       case "block.create-external-edit": {
-        const { content } = request as ParsedBackendCommandRequest<"block.create-external-edit">;
-        const block = await createBlockRecord(await services.getDb(), content);
+        const { content, tagNames } =
+          request as ParsedBackendCommandRequest<"block.create-external-edit">;
+        const db = await services.getDb();
+        const block = await createBlockRecord(db, content);
+        if (tagNames && tagNames.length > 0) {
+          await setBlockTagsByName(db, block.id, tagNames);
+        }
         const result = services.createExternalEditSession(block.id, content, signal);
         services.requestOpenBlock(block.id);
         return (await result) as BackendCommandResponse<TKey>;

@@ -4,7 +4,7 @@ import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/datab
 import type { Block } from "@shared/features/blocks/models";
 import type { Tag } from "@shared/features/tags/models";
 import { businessError, internalError } from "@shared/ipc/result";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, or, sql } from "drizzle-orm";
 
 import { assertBlockExists, getPublicBlockById } from "../blocks/service";
 
@@ -17,11 +17,36 @@ function mapTagRow(tag: TagRecord): Tag {
   };
 }
 
+function normalizeTagNames(tagNames: readonly string[]): string[] {
+  const normalized = new Map<string, string>();
+  for (const tagName of tagNames) {
+    const trimmedName = tagName.trim();
+    if (trimmedName.length > 0) {
+      normalized.set(trimmedName.toLowerCase(), trimmedName);
+    }
+  }
+  return [...normalized.values()];
+}
+
 export async function listTags(db: AppDatabase): Promise<Tag[]> {
   const rows = await db
     .select()
     .from(tags)
     .orderBy(sql`lower(${tags.name})`)
+    .all();
+  return rows.map(mapTagRow);
+}
+
+async function listTagsByName(db: AppDatabase, tagNames: readonly string[]): Promise<Tag[]> {
+  if (tagNames.length === 0) {
+    return [];
+  }
+
+  const predicates = tagNames.map((tagName) => sql`lower(${tags.name}) = ${tagName.toLowerCase()}`);
+  const rows = await db
+    .select()
+    .from(tags)
+    .where(or(...predicates))
     .all();
   return rows.map(mapTagRow);
 }
@@ -97,4 +122,36 @@ export async function setBlockTags(
   });
 
   return await getPublicBlockById(db, blockId);
+}
+
+export async function setBlockTagsByName(
+  db: AppDatabase,
+  blockId: string,
+  tagNames: string[],
+): Promise<Block> {
+  await assertBlockExists(db, blockId);
+
+  const normalizedTagNames = normalizeTagNames(tagNames);
+  if (normalizedTagNames.length === 0) {
+    return await setBlockTags(db, blockId, []);
+  }
+
+  await db
+    .insert(tags)
+    .values(
+      normalizedTagNames.map((tagName) => ({
+        id: crypto.randomUUID(),
+        name: tagName,
+      })),
+    )
+    .onConflictDoNothing()
+    .run();
+
+  const resolvedTags = await listTagsByName(db, normalizedTagNames);
+
+  return await setBlockTags(
+    db,
+    blockId,
+    resolvedTags.map((tag) => tag.id),
+  );
 }

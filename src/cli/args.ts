@@ -16,10 +16,12 @@ export type FluxCliCommand =
             text: string;
             type: "text";
           };
+      tagNames: string[];
     }
   | {
       filePath: string;
       kind: "edit";
+      tagNames: string[];
     }
   | {
       kind: "help";
@@ -30,6 +32,7 @@ export type FluxCliCommand =
 
 interface FluxCliOptions {
   file?: string;
+  tag?: string | string[];
   text?: string;
 }
 
@@ -44,8 +47,14 @@ function hasValue(value: string | undefined): value is string {
   return value !== undefined;
 }
 
+function parseTagNames(value: FluxCliOptions["tag"]): string[] {
+  const values = Array.isArray(value) ? value : value === undefined ? [] : [value];
+  return values.map((tagName) => tagName.trim()).filter((tagName) => tagName.length > 0);
+}
+
 function parseAddCommand(input: string | undefined, options: FluxCliOptions): FluxCliCommand {
   const sources = [options.text, options.file, input].filter(hasValue);
+  const tagNames = parseTagNames(options.tag);
 
   if (sources.length === 0) {
     throw new FluxCliUsageError("flux add requires text or a file path.");
@@ -62,6 +71,7 @@ function parseAddCommand(input: string | undefined, options: FluxCliOptions): Fl
         text: options.text,
         type: "text",
       },
+      tagNames,
     };
   }
 
@@ -72,6 +82,7 @@ function parseAddCommand(input: string | undefined, options: FluxCliOptions): Fl
         filePath: options.file,
         type: "file",
       },
+      tagNames,
     };
   }
 
@@ -81,6 +92,7 @@ function parseAddCommand(input: string | undefined, options: FluxCliOptions): Fl
       input: sources[0],
       type: "auto",
     },
+    tagNames,
   };
 }
 
@@ -92,14 +104,16 @@ function createCli(onCommand: (command: FluxCliCommand) => void) {
     .usage("[--text <text> | --file <path> | <input>]")
     .option("--text <text>", "Create a block with inline text")
     .option("--file <path>", "Create a block from a UTF-8 text file")
+    .option("--tag <name>", "Add a tag to the created block")
     .action((input: string | undefined, options: FluxCliOptions) => {
       onCommand(parseAddCommand(input, options));
     });
 
   cli
     .command("edit <file>", "Edit a file-backed block and wait for submit or cancel")
-    .action((filePath: string) => {
-      onCommand({ filePath, kind: "edit" });
+    .option("--tag <name>", "Add a tag to the created block")
+    .action((filePath: string, options: FluxCliOptions) => {
+      onCommand({ filePath, kind: "edit", tagNames: parseTagNames(options.tag) });
     });
 
   cli.command("").action(() => {

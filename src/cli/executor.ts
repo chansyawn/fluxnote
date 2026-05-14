@@ -66,34 +66,38 @@ export async function executeOpen(deps: CliExecutorDeps = defaultDeps): Promise<
 
 export async function executeAddFromText(
   text: string,
+  tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  const result = await deps.dispatchCommand("block.create-from-text", { content: text });
+  const result = await deps.dispatchCommand("block.create-from-text", { content: text, tagNames });
   console.log(`Created block: ${result.blockId}`);
 }
 
 export async function executeAddFromFile(
   filePath: string,
+  tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
   const content = await readTextFile(filePath, deps);
-  await executeAddFromText(content, deps);
+  await executeAddFromText(content, tagNames, deps);
 }
 
 export async function executeAddFromAuto(
   input: string,
+  tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
   if (await isRegularFile(input, deps)) {
-    await executeAddFromFile(input, deps);
+    await executeAddFromFile(input, tagNames, deps);
     return;
   }
 
-  await executeAddFromText(input, deps);
+  await executeAddFromText(input, tagNames, deps);
 }
 
 export async function executeExternalEdit(
   filePath: string,
+  tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
   const resolvedPath = resolveTextFilePath(filePath, deps.cwd());
@@ -102,6 +106,7 @@ export async function executeExternalEdit(
   try {
     const result = await deps.dispatchCommand("block.create-external-edit", {
       content: originalContent,
+      tagNames,
     });
     if (result.status === "submitted") {
       await deps.writeFile(resolvedPath, result.content, "utf8");
@@ -119,20 +124,20 @@ export async function executeCliCommand(
   switch (command.kind) {
     case "add": {
       if (command.source.type === "text") {
-        await executeAddFromText(command.source.text, deps);
+        await executeAddFromText(command.source.text, command.tagNames, deps);
         return;
       }
 
       if (command.source.type === "file") {
-        await executeAddFromFile(command.source.filePath, deps);
+        await executeAddFromFile(command.source.filePath, command.tagNames, deps);
         return;
       }
 
-      await executeAddFromAuto(command.source.input, deps);
+      await executeAddFromAuto(command.source.input, command.tagNames, deps);
       return;
     }
     case "edit": {
-      await executeExternalEdit(command.filePath, deps);
+      await executeExternalEdit(command.filePath, command.tagNames, deps);
       return;
     }
     case "help": {

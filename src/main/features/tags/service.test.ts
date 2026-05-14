@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
 import { createTestDb, type TestDbContext } from "../test-db";
-import { createTag, deleteTag, listTags, setBlockTags } from "./service";
+import { createTag, deleteTag, listTags, setBlockTags, setBlockTagsByName } from "./service";
 
 describe("tags service", () => {
   let ctx: TestDbContext;
@@ -47,5 +47,40 @@ describe("tags service", () => {
     const updated = await getPublicBlockById(ctx.db, block.id);
 
     expect(updated.tags.map((item) => item.id)).toEqual([tag.id]);
+  });
+
+  it("creates missing tags by name and assigns them to a block", async () => {
+    const block = await createBlockRecord(ctx.db, "content");
+
+    const updated = await setBlockTagsByName(ctx.db, block.id, ["work", "idea"]);
+
+    expect(updated.tags.map((item) => item.name)).toEqual(["idea", "work"]);
+    expect((await listTags(ctx.db)).map((item) => item.name)).toEqual(["idea", "work"]);
+  });
+
+  it("reuses existing tags by name when assigning them to a block", async () => {
+    const block = await createBlockRecord(ctx.db, "content");
+    const existing = await createTag(ctx.db, "Work");
+
+    const updated = await setBlockTagsByName(ctx.db, block.id, ["work", "draft"]);
+
+    expect(updated.tags.map((item) => item.name)).toEqual(["draft", "Work"]);
+    expect(updated.tags.find((item) => item.name === "Work")?.id).toBe(existing.id);
+    expect((await listTags(ctx.db)).map((item) => item.name)).toEqual(["draft", "Work"]);
+  });
+
+  it("deduplicates requested tag names case-insensitively", async () => {
+    const block = await createBlockRecord(ctx.db, "content");
+
+    const updated = await setBlockTagsByName(ctx.db, block.id, [
+      " work ",
+      "WORK",
+      "",
+      "idea",
+      "Idea",
+    ]);
+
+    expect(updated.tags.map((item) => item.name)).toEqual(["Idea", "WORK"]);
+    expect((await listTags(ctx.db)).map((item) => item.name)).toEqual(["Idea", "WORK"]);
   });
 });

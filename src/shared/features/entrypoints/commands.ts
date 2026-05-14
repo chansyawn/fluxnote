@@ -11,6 +11,10 @@ export const backendCommandKeys = [
 export type BackendCommandKey = (typeof backendCommandKeys)[number];
 
 const nullSchema = z.null();
+const blockCreationRequestSchema = z.object({
+  content: z.string(),
+  tagNames: z.array(z.string()).optional(),
+});
 
 export const backendCommandContracts = {
   "app.open": {
@@ -18,17 +22,13 @@ export const backendCommandContracts = {
     response: nullSchema,
   },
   "block.create-from-text": {
-    request: z.object({
-      content: z.string(),
-    }),
+    request: blockCreationRequestSchema,
     response: z.object({
       blockId: z.string().min(1),
     }),
   },
   "block.create-external-edit": {
-    request: z.object({
-      content: z.string(),
-    }),
+    request: blockCreationRequestSchema,
     response: externalEditResultSchema,
   },
   "block.open": {

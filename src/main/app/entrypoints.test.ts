@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   cliStart: vi.fn(async () => undefined),
   createBlockRecord: vi.fn(),
   deepLinkHandle: vi.fn(async () => ({ ok: true, data: null })),
+  setBlockTagsByName: vi.fn(),
 }));
 
 const block = {
@@ -24,6 +25,10 @@ const block = {
 
 vi.mock("../features/blocks/service", () => ({
   createBlockRecord: mocks.createBlockRecord,
+}));
+
+vi.mock("../features/tags/service", () => ({
+  setBlockTagsByName: mocks.setBlockTagsByName,
 }));
 
 vi.mock("../features/deep-link/handler", () => ({
@@ -71,6 +76,61 @@ describe("createEntrypointRuntime", () => {
 
     expect(result).toEqual({ data: { blockId: "block-1" }, ok: true });
     expect(requestOpenBlock).toHaveBeenCalledWith("block-1");
+  });
+
+  it("creates block from text with tags and requests open", async () => {
+    mocks.createBlockRecord.mockResolvedValue(block);
+    mocks.setBlockTagsByName.mockResolvedValue(block);
+    const requestOpenBlock = vi.fn();
+    const db = {} as AppDatabase;
+    const getTaggedDb = vi.fn(async () => db) as () => Promise<AppDatabase>;
+
+    const runtime = createEntrypointRuntime({
+      createExternalEditSession: vi.fn(),
+      getDb: getTaggedDb,
+      requestOpenBlock,
+      showMainWindow: vi.fn(),
+    });
+
+    const result = await runtime.dispatchCommand("block.create-from-text", {
+      content: "hello",
+      tagNames: ["work", "idea"],
+    });
+
+    expect(result).toEqual({ data: { blockId: "block-1" }, ok: true });
+    expect(mocks.setBlockTagsByName).toHaveBeenCalledWith(db, "block-1", ["work", "idea"]);
+    expect(requestOpenBlock).toHaveBeenCalledWith("block-1");
+  });
+
+  it("creates external edit block with tags and starts edit session", async () => {
+    mocks.createBlockRecord.mockResolvedValue(block);
+    mocks.setBlockTagsByName.mockResolvedValue(block);
+    const createExternalEditSession = vi.fn(async () => ({
+      blockId: "block-1",
+      content: "updated",
+      status: "submitted" as const,
+    }));
+    const db = {} as AppDatabase;
+    const getTaggedDb = vi.fn(async () => db) as () => Promise<AppDatabase>;
+
+    const runtime = createEntrypointRuntime({
+      createExternalEditSession,
+      getDb: getTaggedDb,
+      requestOpenBlock: vi.fn(),
+      showMainWindow: vi.fn(),
+    });
+
+    const result = await runtime.dispatchCommand("block.create-external-edit", {
+      content: "hello",
+      tagNames: ["work"],
+    });
+
+    expect(result).toEqual({
+      data: { blockId: "block-1", content: "updated", status: "submitted" },
+      ok: true,
+    });
+    expect(mocks.setBlockTagsByName).toHaveBeenCalledWith(db, "block-1", ["work"]);
+    expect(createExternalEditSession).toHaveBeenCalledWith("block-1", "hello", undefined);
   });
 
   it("returns business error when payload is invalid", async () => {

@@ -16,6 +16,7 @@ describe("parseFluxArgs", () => {
         input: "hello",
         type: "auto",
       },
+      tagNames: [],
     });
   });
 
@@ -27,6 +28,7 @@ describe("parseFluxArgs", () => {
         text: "hello",
         type: "text",
       },
+      tagNames: [],
     });
   });
 
@@ -38,6 +40,28 @@ describe("parseFluxArgs", () => {
         filePath: "note.md",
         type: "file",
       },
+      tagNames: [],
+    });
+  });
+
+  it("parses add command with repeated tag options", () => {
+    const command = parseFluxArgs([
+      "node",
+      "flux-cli.mjs",
+      "add",
+      "hello",
+      "--tag",
+      "work",
+      "--tag",
+      " idea ",
+    ]);
+    expect(command).toEqual({
+      kind: "add",
+      source: {
+        input: "hello",
+        type: "auto",
+      },
+      tagNames: ["work", "idea"],
     });
   });
 
@@ -46,6 +70,25 @@ describe("parseFluxArgs", () => {
     expect(command).toEqual({
       filePath: "note.md",
       kind: "edit",
+      tagNames: [],
+    });
+  });
+
+  it("parses edit command with repeated tag options", () => {
+    const command = parseFluxArgs([
+      "node",
+      "flux-cli.mjs",
+      "edit",
+      "note.md",
+      "--tag",
+      "work",
+      "--tag",
+      "draft",
+    ]);
+    expect(command).toEqual({
+      filePath: "note.md",
+      kind: "edit",
+      tagNames: ["work", "draft"],
     });
   });
 
