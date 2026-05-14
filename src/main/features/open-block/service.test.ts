@@ -7,22 +7,23 @@ describe("open-block service", () => {
     const emitEvent = vi.fn(() => true);
     const showWindow = vi.fn();
     const service = createOpenBlockService({ emitEvent, showWindow });
+    const target = { blockId: "block-1" };
 
-    const requested = service.requestOpen("block-1");
+    const requested = service.requestOpen(target);
 
     expect(requested).toBe(true);
     expect(showWindow).toHaveBeenCalledTimes(1);
-    expect(service.readPending()).toEqual({ blockId: "block-1" });
-    expect(emitEvent).toHaveBeenCalledWith("open-block.requested", { blockId: "block-1" });
+    expect(service.readPending()).toEqual({ target });
+    expect(emitEvent).toHaveBeenCalledWith("open-block.requested", target);
   });
 
   it("acknowledges pending when block id matches", () => {
     const service = createOpenBlockService({ emitEvent: vi.fn(() => true), showWindow: vi.fn() });
-    service.requestOpen("block-1");
+    service.requestOpen({ blockId: "block-1" });
 
     service.acknowledgePending("block-1");
 
-    expect(service.readPending()).toEqual({ blockId: null });
+    expect(service.readPending()).toEqual({ target: null });
   });
 
   it("emitPending returns false when no pending request", () => {

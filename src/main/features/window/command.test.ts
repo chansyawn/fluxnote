@@ -56,9 +56,10 @@ describe("window command", () => {
     };
     const openBlockService = { requestOpen: vi.fn() };
 
-    mocks.createBlockRecord.mockResolvedValue({
+    const block = {
       id: "block-1",
-    });
+    };
+    mocks.createBlockRecord.mockResolvedValue(block);
 
     registerWindowCommands(ipc as never, {
       db: db as never,
@@ -70,7 +71,7 @@ describe("window command", () => {
 
     expect(result).toEqual({ blockId: "block-1" });
     expect(windowManager.showMainWindow).toHaveBeenCalledOnce();
-    expect(openBlockService.requestOpen).toHaveBeenCalledWith("block-1");
+    expect(openBlockService.requestOpen).toHaveBeenCalledWith({ blockId: "block-1" });
     expect(mocks.createBlockRecord).toHaveBeenCalledWith(db);
   });
 });

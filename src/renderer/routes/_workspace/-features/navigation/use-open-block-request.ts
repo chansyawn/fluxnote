@@ -2,26 +2,27 @@ import {
   acknowledgePendingOpenBlock,
   onOpenBlockRequested,
   readPendingOpenBlock,
+  type OpenBlockRequestedPayload,
 } from "@renderer/clients";
 import { useCallback, useEffect, useState } from "react";
 
 interface UseOpenBlockRequestResult {
   acknowledgePendingBlockId: (blockId: string) => void;
-  pendingBlockId: string | null;
+  pendingTarget: OpenBlockRequestedPayload | null;
 }
 
 export function useOpenBlockRequest(): UseOpenBlockRequestResult {
-  const [pendingBlockId, setPendingBlockId] = useState<string | null>(null);
+  const [pendingTarget, setPendingTarget] = useState<OpenBlockRequestedPayload | null>(null);
 
   useEffect(() => {
     let active = true;
     const unlisten = onOpenBlockRequested((payload) => {
-      setPendingBlockId(payload.blockId);
+      setPendingTarget(payload);
     });
     void readPendingOpenBlock()
       .then((pending) => {
-        if (active && pending.blockId) {
-          setPendingBlockId(pending.blockId);
+        if (active && pending.target) {
+          setPendingTarget(pending.target);
         }
       })
       .catch(() => undefined);
@@ -33,12 +34,14 @@ export function useOpenBlockRequest(): UseOpenBlockRequestResult {
   }, []);
 
   const acknowledgePendingBlockId = useCallback((blockId: string) => {
-    setPendingBlockId((currentBlockId) => (currentBlockId === blockId ? null : currentBlockId));
+    setPendingTarget((currentTarget) =>
+      currentTarget?.blockId === blockId ? null : currentTarget,
+    );
     void acknowledgePendingOpenBlock(blockId).catch(() => undefined);
   }, []);
 
   return {
     acknowledgePendingBlockId,
-    pendingBlockId,
+    pendingTarget,
   };
 }

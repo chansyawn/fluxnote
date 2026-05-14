@@ -27,7 +27,10 @@ interface UseBlockListResult {
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockIndex: (index: number) => void;
   ensureBlockRange: (startIndex: number, endIndex: number) => void;
-  ensureBlockIndexLoaded: (index: number) => Promise<Block | undefined>;
+  ensureBlockIndexLoaded: (
+    index: number,
+    options?: { refresh?: boolean },
+  ) => Promise<Block | undefined>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
 }
 
@@ -137,24 +140,32 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
   );
 
   const ensureBlockIndexLoaded = useCallback(
-    async (index: number) => {
+    async (index: number, options?: { refresh?: boolean }) => {
       if (index < 0) {
         return;
       }
 
       ensureBlockIndex(index);
       const offset = getBlockPageOffset(index);
-      const page = await queryClient.fetchQuery({
-        queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
-        queryFn: async () =>
-          await listBlocks({
-            tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
-            visibility,
-            offset,
-            limit: BLOCKS_PAGE_SIZE,
-          }),
-        staleTime: 0,
-      });
+      const queryKey = blockListPageQueryKey(normalizedTagIds, visibility, offset);
+      const request = {
+        tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
+        visibility,
+        offset,
+        limit: BLOCKS_PAGE_SIZE,
+      };
+      let page: ListBlocksResult;
+      if (options?.refresh) {
+        await queryClient.cancelQueries({ exact: true, queryKey });
+        page = await listBlocks(request);
+        queryClient.setQueryData(queryKey, page);
+      } else {
+        page = await queryClient.fetchQuery({
+          queryKey,
+          queryFn: async () => await listBlocks(request),
+          staleTime: 0,
+        });
+      }
       return page.blocks[index - offset];
     },
     [ensureBlockIndex, normalizedTagIds, visibility],

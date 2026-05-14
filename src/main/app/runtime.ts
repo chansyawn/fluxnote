@@ -26,7 +26,7 @@ export function createBackendRuntime() {
         services.externalEditManager.begin(blockId, originalContent, { signal }).result,
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
-        services.openBlockService.requestOpen(blockId);
+        services.openBlockService.requestOpen({ blockId });
       },
       showMainWindow: () => services.windowManager.showMainWindow(),
     });

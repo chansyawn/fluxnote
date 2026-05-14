@@ -10,6 +10,18 @@ const mocks = vi.hoisted(() => ({
   deepLinkHandle: vi.fn(async () => ({ ok: true, data: null })),
 }));
 
+const block = {
+  archivedAt: null,
+  content: "hello",
+  contentUpdatedAt: "2026-01-01T00:00:00.000Z",
+  createdAt: "2026-01-01T00:00:00.000Z",
+  id: "block-1",
+  isKept: false,
+  tags: [],
+  updatedAt: "2026-01-01T00:00:00.000Z",
+  willArchive: false,
+};
+
 vi.mock("../features/blocks/service", () => ({
   createBlockRecord: mocks.createBlockRecord,
 }));
@@ -45,7 +57,7 @@ describe("createEntrypointRuntime", () => {
   });
 
   it("creates block from text and requests open", async () => {
-    mocks.createBlockRecord.mockResolvedValue({ id: "block-1" });
+    mocks.createBlockRecord.mockResolvedValue(block);
     const requestOpenBlock = vi.fn();
 
     const runtime = createEntrypointRuntime({

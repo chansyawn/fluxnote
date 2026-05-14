@@ -130,6 +130,9 @@ export function blockNavigationReducer(
       if (!isCurrentRequest(state, event.requestId) || state.phase !== "scrolling") {
         return state;
       }
+      if (state.target.blockId !== event.target.blockId) {
+        return state;
+      }
       return { phase: "focusing", request: state.request, target: event.target };
     case "finish":
     case "fail":
@@ -138,7 +141,10 @@ export function blockNavigationReducer(
 }
 
 interface UseBlockNavigationParams {
-  ensureBlockIndexLoaded: (index: number) => Promise<Block | undefined>;
+  ensureBlockIndexLoaded: (
+    index: number,
+    options?: { refresh?: boolean },
+  ) => Promise<Block | undefined>;
   getBlockAtIndex: (index: number) => Block | undefined;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   registry: EditorRegistry;
@@ -361,11 +367,11 @@ export function useBlockNavigation({
     let cancelled = false;
     const { request, target } = state;
 
-    void ensureBlockIndexLoaded(target.index)
+    void ensureBlockIndexLoaded(target.index, { refresh: request.kind !== "index" })
       .then((loadedBlock) => {
         if (cancelled) return;
         const block = loadedBlock ?? getBlockAtIndex(target.index);
-        if (!block) {
+        if (!block || (request.kind !== "index" && block.id !== target.blockId)) {
           failRequest(request);
           return;
         }

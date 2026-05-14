@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-import { openBlockPendingSchema } from "./models";
+import { openBlockPendingSchema, openBlockTargetSchema } from "./models";
 
 const voidSchema = z.undefined();
 
-export const openBlockRequestedPayloadSchema = z.object({
-  blockId: z.string(),
-});
+export const openBlockRequestedPayloadSchema = openBlockTargetSchema;
 export type OpenBlockRequestedPayload = z.infer<typeof openBlockRequestedPayloadSchema>;
 
 export const openBlockContract = {

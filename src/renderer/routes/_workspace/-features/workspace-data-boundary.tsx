@@ -1,3 +1,4 @@
+import { queryClient } from "@renderer/app/query";
 import type { BlockVisibility } from "@renderer/clients";
 import { useTagData } from "@renderer/features/tag/use-tag-data";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -72,20 +73,22 @@ export function useWorkspaceDataBoundary() {
     navigateToBlock: blockNavigation.navigateToBlock,
   });
 
-  const { acknowledgePendingBlockId, pendingBlockId } = useOpenBlockRequest();
+  const { acknowledgePendingBlockId, pendingTarget } = useOpenBlockRequest();
   useEffect(() => {
-    if (!pendingBlockId) {
+    if (!pendingTarget) {
       return;
     }
 
-    blockNavigation.navigateToBlock(pendingBlockId, {
+    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+
+    blockNavigation.navigateToBlock(pendingTarget.blockId, {
       acknowledge: () => {
-        acknowledgePendingBlockId(pendingBlockId);
+        acknowledgePendingBlockId(pendingTarget.blockId);
       },
       onNotFound: () => undefined,
       viewMode: "active-unfiltered",
     });
-  }, [acknowledgePendingBlockId, blockNavigation.navigateToBlock, pendingBlockId]);
+  }, [acknowledgePendingBlockId, blockNavigation.navigateToBlock, pendingTarget]);
 
   const commands = useMemo<WorkspaceCommands>(
     () => ({

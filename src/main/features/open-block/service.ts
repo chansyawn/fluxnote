@@ -5,33 +5,37 @@ interface OpenBlockServiceOptions {
   showWindow: () => void;
 }
 
+export interface OpenBlockTarget {
+  blockId: string;
+}
+
 export interface PendingOpenBlockRequest {
-  blockId: string | null;
+  target: OpenBlockTarget | null;
 }
 
 export function createOpenBlockService(services: OpenBlockServiceOptions) {
-  let pendingBlockId: string | null = null;
+  let pendingTarget: OpenBlockTarget | null = null;
 
   function readPending(): PendingOpenBlockRequest {
-    return { blockId: pendingBlockId };
+    return { target: pendingTarget };
   }
 
   function acknowledgePending(blockId: string): void {
-    if (pendingBlockId === blockId) {
-      pendingBlockId = null;
+    if (pendingTarget?.blockId === blockId) {
+      pendingTarget = null;
     }
   }
 
   function emitPending(): boolean {
-    if (!pendingBlockId) {
+    if (!pendingTarget) {
       return false;
     }
 
-    return services.emitEvent("open-block.requested", { blockId: pendingBlockId });
+    return services.emitEvent("open-block.requested", pendingTarget);
   }
 
-  function requestOpen(blockId: string): boolean {
-    pendingBlockId = blockId;
+  function requestOpen(target: OpenBlockTarget): boolean {
+    pendingTarget = target;
     services.showWindow();
     emitPending();
     return true;

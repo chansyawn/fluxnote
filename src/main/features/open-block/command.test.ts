@@ -21,7 +21,7 @@ describe("open-block command", () => {
   });
 
   it("dispatches acknowledge and read commands", () => {
-    openBlockService.readPending.mockReturnValue({ blockId: "b1" });
+    openBlockService.readPending.mockReturnValue({ target: { blockId: "b1" } });
     registerOpenBlockCommands(ipc as never, { openBlockService } as never);
 
     const ackResult = handlers.get("open-block.acknowledge-pending")?.({ blockId: "b1" });
@@ -29,6 +29,6 @@ describe("open-block command", () => {
 
     expect(openBlockService.acknowledgePending).toHaveBeenCalledWith("b1");
     expect(ackResult).toBeUndefined();
-    expect(readResult).toEqual({ blockId: "b1" });
+    expect(readResult).toEqual({ target: { blockId: "b1" } });
   });
 });
