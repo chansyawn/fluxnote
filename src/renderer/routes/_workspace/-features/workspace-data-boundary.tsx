@@ -1,5 +1,6 @@
 import { queryClient } from "@renderer/app/query";
 import type { BlockVisibility } from "@renderer/clients";
+import { useOpenBlockRequest } from "@renderer/features/open-block/open-block-request-context";
 import { useTagData } from "@renderer/features/tag/use-tag-data";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -10,7 +11,6 @@ import { useExternalEditSessions } from "./external-edit/use-external-edit-sessi
 import { useBlockList } from "./list/use-block-list";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
-import { useOpenBlockRequest } from "./navigation/use-open-block-request";
 import { useBlockMutations } from "./use-block-mutations";
 import { type WorkspaceCommands } from "./workspace-state-context";
 
