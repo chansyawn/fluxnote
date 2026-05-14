@@ -278,6 +278,7 @@ export async function archiveBlock(
     .update(blocks)
     .set({
       archivedAt: now,
+      isKept: false,
     })
     .where(eq(blocks.id, blockId))
     .run();

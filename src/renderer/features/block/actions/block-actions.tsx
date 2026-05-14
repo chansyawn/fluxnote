@@ -1,17 +1,11 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { Block, BlockVisibility, Tag } from "@renderer/clients";
+import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
 import { cn } from "@renderer/ui/lib/utils";
-import {
-  ArchiveIcon,
-  ArchiveRestoreIcon,
-  PinIcon,
-  PinOffIcon,
-  TagIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { ArchiveIcon, ArchiveRestoreIcon, FlagIcon, TagIcon, Trash2Icon } from "lucide-react";
 
 import { CopyAction, IconAction } from "./icon-action";
 
@@ -23,6 +17,7 @@ interface BlockActionsProps {
   state: {
     visibility: BlockVisibility;
     tags: Tag[];
+    shortcuts?: ShortcutPreferences;
     disabled?: boolean;
     pending?: { archive?: boolean; delete?: boolean; keep?: boolean; tag?: boolean };
   };
@@ -38,7 +33,7 @@ interface BlockActionsProps {
 
 export function BlockActions({ block, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
-  const { visibility, tags, disabled, pending = {} } = state;
+  const { visibility, tags, shortcuts, disabled, pending = {} } = state;
   const isArchived = visibility !== "active";
 
   return (
@@ -59,7 +54,7 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
         triggerSize="icon-xs"
         trigger={
           <>
-            <TagIcon className="size-3" />
+            <TagIcon className={cn("size-3", block.tags.length > 0 && "fill-primary")} />
             <span className="sr-only">
               <Trans id="workspace.tags.assign.button">Assign tags</Trans>
             </span>
@@ -68,22 +63,30 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
         onCreateTag={handlers.onCreateTag}
         onSelectedTagIdsChange={handlers.onAssignTags}
       />
+      {isArchived ? null : (
+        <IconAction
+          active={block.isKept}
+          icon={<FlagIcon className={cn("size-3", block.isKept && "fill-primary")} />}
+          label={
+            block.isKept ? (
+              <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+            ) : (
+              <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+            )
+          }
+          disabled={disabled}
+          pending={pending.keep}
+          onClick={handlers.onToggleKeep}
+        />
+      )}
       <IconAction
-        active={block.isKept}
-        icon={block.isKept ? PinOffIcon : PinIcon}
-        label={
-          block.isKept ? (
-            <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+        icon={
+          isArchived ? (
+            <ArchiveRestoreIcon className="size-3" />
           ) : (
-            <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+            <ArchiveIcon className="size-3" />
           )
         }
-        disabled={disabled}
-        pending={pending.keep}
-        onClick={handlers.onToggleKeep}
-      />
-      <IconAction
-        icon={isArchived ? ArchiveRestoreIcon : ArchiveIcon}
         label={
           isArchived ? (
             <Trans id="workspace.blocks.restore">Restore block</Trans>
@@ -91,13 +94,15 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
             <Trans id="workspace.blocks.archive">Archive block</Trans>
           )
         }
+        shortcut={isArchived ? undefined : shortcuts?.["archive-block"]}
         disabled={disabled}
         pending={pending.archive}
         onClick={handlers.onToggleArchive}
       />
       <IconAction
-        icon={Trash2Icon}
+        icon={<Trash2Icon className="size-3" />}
         label={<Trans id="home-note.block.delete">Delete block</Trans>}
+        shortcut={shortcuts?.["delete-block"]}
         disabled={disabled}
         pending={pending.delete}
         onClick={handlers.onDelete}

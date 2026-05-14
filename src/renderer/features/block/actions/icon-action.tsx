@@ -1,16 +1,21 @@
 import { Trans } from "@lingui/react/macro";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { Button } from "@renderer/ui/components/button";
+import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
-import { cn } from "@renderer/ui/lib/utils";
-import { CheckIcon, CopyIcon, LoaderCircleIcon, type LucideIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 const COPY_FEEDBACK_DURATION_MS = 2000;
 
 interface IconActionProps {
   active?: boolean;
-  icon: LucideIcon;
+  icon: ReactNode;
   label: ReactNode;
+  shortcut?: ShortcutBinding;
   pending?: boolean;
   disabled?: boolean;
   onClick: () => void;
@@ -18,13 +23,15 @@ interface IconActionProps {
 
 export function IconAction({
   active,
-  icon: Icon,
+  icon,
   label,
+  shortcut,
   pending,
   disabled,
   onClick,
 }: IconActionProps) {
-  const Glyph = pending ? LoaderCircleIcon : Icon;
+  const shortcutTokens = formatShortcutTokens(shortcut ?? null);
+
   return (
     <Tooltip>
       <TooltipTrigger
@@ -38,10 +45,19 @@ export function IconAction({
           />
         }
       >
-        <Glyph className={cn("size-3", pending && "animate-spin")} />
+        {pending ? <LoaderCircleIcon className="size-3 animate-spin" /> : icon}
         <span className="sr-only">{label}</span>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent className="flex items-center gap-2">
+        <span>{label}</span>
+        {shortcutTokens.length > 0 ? (
+          <KbdGroup>
+            {shortcutTokens.map((token, index) => (
+              <Kbd key={`${token}-${index}`}>{token}</Kbd>
+            ))}
+          </KbdGroup>
+        ) : null}
+      </TooltipContent>
     </Tooltip>
   );
 }
@@ -62,7 +78,7 @@ export function CopyAction({ disabled, onCopy }: CopyActionProps) {
 
   return (
     <IconAction
-      icon={copied ? CheckIcon : CopyIcon}
+      icon={copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
       label={<Trans id="home-note.block.copy">Copy block</Trans>}
       disabled={disabled}
       onClick={() => {

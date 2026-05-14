@@ -19,13 +19,13 @@ export function ExternalEditActions({ pending, onSubmit, onCancel }: ExternalEdi
       className={cn(ACTION_BAR_CLS, pending && ACTION_BAR_DISABLED_CLS)}
     >
       <IconAction
-        icon={CheckIcon}
+        icon={<CheckIcon className="size-3" />}
         label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
         pending={pending}
         onClick={onSubmit}
       />
       <IconAction
-        icon={XIcon}
+        icon={<XIcon className="size-3" />}
         label={<Trans id="home-note.block.external-edit.cancel">Cancel external edit</Trans>}
         disabled={pending}
         onClick={onCancel}

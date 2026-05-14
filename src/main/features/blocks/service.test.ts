@@ -46,6 +46,18 @@ describe("blocks service", () => {
     expect(result.blocks.find((item) => item.id === block.id)?.isKept).toBe(true);
   });
 
+  it("archives block and clears keep state", async () => {
+    const block = await createBlockRecord(ctx.db, "kept archive");
+    await setBlockKeepState(ctx.db, block.id, true);
+
+    const archived = await archiveBlock(ctx.db, block.id);
+    const loaded = await getPublicBlockById(ctx.db, block.id);
+
+    expect(archived.archivedAt).not.toBeNull();
+    expect(archived.isKept).toBe(false);
+    expect(loaded.isKept).toBe(false);
+  });
+
   it("lists blocks by visibility", async () => {
     const active = await createBlockRecord(ctx.db, "active");
     const archived = await createBlockRecord(ctx.db, "archived");

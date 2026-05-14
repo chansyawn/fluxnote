@@ -21,6 +21,7 @@ interface WorkspaceBlockEditorProps {
 
 function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockEditorProps) {
   const registry = useEditorRegistryContext();
+  const { shortcuts } = useShortcutState();
 
   const handleCopy = useCallback(() => {
     void registry.getEditor(block.id)?.copy();
@@ -48,6 +49,7 @@ function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockE
       state={{
         visibility: state.visibility,
         tags,
+        shortcuts,
         disabled: state.isLocked,
         pending: {
           archive: state.isArchivePending,
