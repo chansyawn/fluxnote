@@ -40,7 +40,7 @@ describe("window command", () => {
     expect(windowManager.toggleMainWindow).toHaveBeenCalled();
   });
 
-  it("captures block and requests focus when window.capture-block is called", async () => {
+  it("quick creates a block and requests focus when window.quick-create-block is called", async () => {
     const handlers = new Map<string, () => void | Promise<{ blockId: string }>>();
     const ipc = {
       command: vi.fn((name: string, handler: () => void | Promise<{ blockId: string }>) =>
@@ -67,7 +67,7 @@ describe("window command", () => {
       windowManager: windowManager as never,
     });
 
-    const result = await handlers.get("window.capture-block")?.();
+    const result = await handlers.get("window.quick-create-block")?.();
 
     expect(result).toEqual({ blockId: "block-1" });
     expect(windowManager.showMainWindow).toHaveBeenCalledOnce();

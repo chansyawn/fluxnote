@@ -7,6 +7,7 @@ export interface UseBlockShortcutsParams {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
+  toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockShortcuts({
@@ -14,6 +15,7 @@ export function useBlockShortcuts({
   archiveBlockWithFocus,
   createBlockWithFocus,
   deleteBlockWithFocus,
+  toggleKeepBlockWithFocus,
 }: UseBlockShortcutsParams): void {
   const { shortcuts } = useShortcutState();
 
@@ -30,6 +32,7 @@ export function useBlockShortcuts({
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
     const definitions: UseHotkeyDefinition[] = [];
     const createBlockShortcut = shortcuts["create-block"];
+    const keepBlockShortcut = shortcuts["keep-block"];
     const archiveBlockShortcut = shortcuts["archive-block"];
     const deleteBlockShortcut = shortcuts["delete-block"];
 
@@ -47,6 +50,24 @@ export function useBlockShortcuts({
         },
         options: {
           meta: { name: "Create block" },
+        },
+      });
+    }
+
+    if (keepBlockShortcut) {
+      definitions.push({
+        hotkey: keepBlockShortcut,
+        callback: (event) => {
+          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          void toggleKeepBlockWithFocus(activeBlockId);
+        },
+        options: {
+          meta: { name: "Keep block" },
         },
       });
     }
@@ -95,6 +116,7 @@ export function useBlockShortcuts({
     deleteBlockWithFocus,
     isActiveBlockFocused,
     shortcuts,
+    toggleKeepBlockWithFocus,
   ]);
 
   useHotkeys(hotkeyDefinitions, {

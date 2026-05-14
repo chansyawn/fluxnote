@@ -40,6 +40,7 @@ describe("settings", () => {
       shortcuts: {
         "toggle-window": 1,
         "create-block": null,
+        "keep-block": "Mod+K",
         "archive-block": "Mod+E",
         "delete-block": "Mod+Delete",
         "submit-external-edit": "Mod+Enter",
@@ -58,9 +59,10 @@ describe("settings", () => {
     expect(normalized.shortcuts).toEqual({
       "toggle-window": "Alt+N",
       "create-block": null,
+      "keep-block": "Mod+K",
       "archive-block": "Mod+E",
       "delete-block": "Mod+Delete",
-      "capture-block": "Ctrl+Alt+N",
+      "quick-create-block": "Ctrl+Alt+N",
       "submit-external-edit": "Mod+Enter",
       "cancel-external-edit": "Mod+\\",
     });

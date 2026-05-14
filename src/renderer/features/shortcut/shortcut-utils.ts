@@ -145,14 +145,17 @@ export function normalizeShortcutPreferences(
     "create-block": shortcuts["create-block"]
       ? normalizeShortcutBinding(shortcuts["create-block"], platform)
       : null,
+    "keep-block": shortcuts["keep-block"]
+      ? normalizeShortcutBinding(shortcuts["keep-block"], platform)
+      : null,
     "archive-block": shortcuts["archive-block"]
       ? normalizeShortcutBinding(shortcuts["archive-block"], platform)
       : null,
     "delete-block": shortcuts["delete-block"]
       ? normalizeShortcutBinding(shortcuts["delete-block"], platform)
       : null,
-    "capture-block": shortcuts["capture-block"]
-      ? normalizeShortcutBinding(shortcuts["capture-block"], platform)
+    "quick-create-block": shortcuts["quick-create-block"]
+      ? normalizeShortcutBinding(shortcuts["quick-create-block"], platform)
       : null,
     "submit-external-edit": shortcuts["submit-external-edit"]
       ? normalizeShortcutBinding(shortcuts["submit-external-edit"], platform)

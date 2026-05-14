@@ -1,4 +1,4 @@
-import { captureBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
+import { quickCreateBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
   normalizeShortcutBinding,
@@ -36,17 +36,17 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   const handleToggleWindow = useEffectEvent(() => {
     void toggleMainWindowVisibility();
   });
-  const handleCaptureBlock = useEffectEvent(() => {
-    void captureBlockAndShowWindow();
+  const handleQuickCreateBlock = useEffectEvent(() => {
+    void quickCreateBlockAndShowWindow();
   });
 
   const toggleWindowShortcutError = useGlobalShortcutSync({
     shortcut: shortcuts["toggle-window"],
     onPressed: handleToggleWindow,
   });
-  const captureBlockShortcutError = useGlobalShortcutSync({
-    shortcut: shortcuts["capture-block"],
-    onPressed: handleCaptureBlock,
+  const quickCreateBlockShortcutError = useGlobalShortcutSync({
+    shortcut: shortcuts["quick-create-block"],
+    onPressed: handleQuickCreateBlock,
   });
 
   const contextValue = useMemo<ShortcutStateContextValue>(
@@ -54,7 +54,7 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       shortcuts,
       globalShortcutErrors: {
         "toggle-window": toggleWindowShortcutError,
-        "capture-block": captureBlockShortcutError,
+        "quick-create-block": quickCreateBlockShortcutError,
       },
       clearShortcut: (action) => {
         clearShortcut(action);
@@ -81,8 +81,9 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       },
     }),
     [
-      captureBlockShortcutError,
+      quickCreateBlockShortcutError,
       clearShortcut,
+      handleQuickCreateBlock,
       resetShortcut,
       setShortcut,
       shortcuts,

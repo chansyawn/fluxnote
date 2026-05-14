@@ -67,6 +67,7 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
         <IconAction
           active={block.isKept}
           icon={<FlagIcon className={cn("size-3", block.isKept && "fill-primary")} />}
+          shortcut={shortcuts?.["keep-block"]}
           label={
             block.isKept ? (
               <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>

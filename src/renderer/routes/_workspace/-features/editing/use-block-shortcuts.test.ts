@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
     "archive-block": "Mod+E",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
+    "keep-block": "Mod+K",
   } as Record<string, string | null>,
   useHotkeys: vi.fn(),
 }));
@@ -32,6 +33,7 @@ describe("useBlockShortcuts", () => {
     mocks.shortcuts["archive-block"] = "Mod+E";
     mocks.shortcuts["create-block"] = "Mod+N";
     mocks.shortcuts["delete-block"] = "Mod+D";
+    mocks.shortcuts["keep-block"] = "Mod+K";
   });
 
   afterEach(() => {
@@ -42,12 +44,14 @@ describe("useBlockShortcuts", () => {
     const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     useBlockShortcuts({
       activeBlockId: "block-1",
       archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleKeepBlockWithFocus,
     });
 
     const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
@@ -73,6 +77,7 @@ describe("useBlockShortcuts", () => {
     const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     const activeElement = {
       closest: () => null,
@@ -84,6 +89,7 @@ describe("useBlockShortcuts", () => {
       archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleKeepBlockWithFocus,
     });
 
     const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
@@ -105,10 +111,11 @@ describe("useBlockShortcuts", () => {
     expect(stopPropagation).not.toHaveBeenCalled();
   });
 
-  it("triggers archive block when active block is focused", () => {
+  it("triggers keep block when active block is focused", () => {
     const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     const activeElement = {
       closest: () => ({ dataset: { blockId: "block-1" } }),
@@ -120,6 +127,45 @@ describe("useBlockShortcuts", () => {
       archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleKeepBlockWithFocus,
+    });
+
+    const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
+      hotkey: string;
+      callback: (event: KeyboardEvent & { repeat: boolean }) => void;
+    }>;
+    const keepDefinition = definitions.find((definition) => definition.hotkey === "Mod+K");
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+
+    keepDefinition?.callback({
+      repeat: false,
+      preventDefault,
+      stopPropagation,
+    } as unknown as KeyboardEvent & { repeat: boolean });
+
+    expect(toggleKeepBlockWithFocus).toHaveBeenCalledWith("block-1");
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(stopPropagation).toHaveBeenCalledOnce();
+  });
+
+  it("triggers archive block when active block is focused", () => {
+    const archiveBlockWithFocus = vi.fn(async () => undefined);
+    const createBlockWithFocus = vi.fn(async () => undefined);
+    const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
+
+    const activeElement = {
+      closest: () => ({ dataset: { blockId: "block-1" } }),
+    };
+    vi.stubGlobal("document", { activeElement });
+
+    useBlockShortcuts({
+      activeBlockId: "block-1",
+      archiveBlockWithFocus,
+      createBlockWithFocus,
+      deleteBlockWithFocus,
+      toggleKeepBlockWithFocus,
     });
 
     const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{

@@ -28,9 +28,10 @@ export const fontSizeSchema = z.union([
 export const shortcutActionSchema = z.enum([
   "toggle-window",
   "create-block",
+  "keep-block",
   "archive-block",
   "delete-block",
-  "capture-block",
+  "quick-create-block",
   "submit-external-edit",
   "cancel-external-edit",
 ]);
@@ -57,9 +58,10 @@ export const shortcutPreferencesSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.catch("Alt+N"),
     "create-block": shortcutBindingSchema.catch("Mod+N"),
+    "keep-block": shortcutBindingSchema.catch("Mod+K"),
     "archive-block": shortcutBindingSchema.catch("Mod+E"),
     "delete-block": shortcutBindingSchema.catch("Mod+D"),
-    "capture-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
+    "quick-create-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
     "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
     "cancel-external-edit": shortcutBindingSchema.catch("Mod+\\"),
   })
@@ -108,9 +110,10 @@ const shortcutPreferencesPatchSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.optional(),
     "create-block": shortcutBindingSchema.optional(),
+    "keep-block": shortcutBindingSchema.optional(),
     "archive-block": shortcutBindingSchema.optional(),
     "delete-block": shortcutBindingSchema.optional(),
-    "capture-block": shortcutBindingSchema.optional(),
+    "quick-create-block": shortcutBindingSchema.optional(),
     "submit-external-edit": shortcutBindingSchema.optional(),
     "cancel-external-edit": shortcutBindingSchema.optional(),
   })
@@ -142,9 +145,10 @@ const defaultSettingsValue = {
   shortcuts: {
     "toggle-window": "Alt+N",
     "create-block": "Mod+N",
+    "keep-block": "Mod+K",
     "archive-block": "Mod+E",
     "delete-block": "Mod+D",
-    "capture-block": "Ctrl+Alt+N",
+    "quick-create-block": "Ctrl+Alt+N",
     "submit-external-edit": "Mod+Enter",
     "cancel-external-edit": "Mod+\\",
   },

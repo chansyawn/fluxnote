@@ -27,7 +27,7 @@ export function registerWindowCommands(ipc: IpcRouter, deps: WindowCommandDeps):
     return undefined;
   });
 
-  ipc.command("window.capture-block", async () => {
+  ipc.command("window.quick-create-block", async () => {
     const block = await createBlockRecord(deps.db);
     deps.windowManager.showMainWindow();
     deps.openBlockService.requestOpen({ blockId: block.id });

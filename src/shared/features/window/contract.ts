@@ -22,7 +22,7 @@ export const windowContract = {
       input: voidSchema,
       output: voidSchema,
     },
-    "window.capture-block": {
+    "window.quick-create-block": {
       input: voidSchema,
       output: z.object({
         blockId: z.string().min(1),

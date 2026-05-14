@@ -29,11 +29,11 @@ export {
 export { createTag, deleteTag, listTags, setBlockTags } from "./tags";
 export { isRegistered, register, unregister, type ShortcutEvent } from "./shortcut";
 export {
-  captureBlockAndShowWindow,
   destroyWindow,
   hideWindow,
   onWindowCloseRequested,
   onWindowFocusChanged,
+  quickCreateBlockAndShowWindow,
   toggleMainWindowVisibility,
 } from "./window";
 

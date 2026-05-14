@@ -12,8 +12,8 @@ export async function toggleMainWindowVisibility(): Promise<void> {
   await invokeCommand("window.toggle", undefined);
 }
 
-export async function captureBlockAndShowWindow(): Promise<{ blockId: string }> {
-  return await invokeCommand("window.capture-block", undefined);
+export async function quickCreateBlockAndShowWindow(): Promise<{ blockId: string }> {
+  return await invokeCommand("window.quick-create-block", undefined);
 }
 
 export function onWindowCloseRequested(handler: () => void): () => void {

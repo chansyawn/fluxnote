@@ -12,6 +12,7 @@ export interface UseBlockFocusActionsParams {
   navigateToBlock: (blockId: string) => void;
   navigateToIndex: (index: number, options?: { align?: BlockNavigationAlign }) => void;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
+  setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setActiveBlockId: (blockId: string | null) => void;
 }
 
@@ -19,6 +20,7 @@ export interface UseBlockFocusActionsResult {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
+  toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockFocusActions({
@@ -30,6 +32,7 @@ export function useBlockFocusActions({
   navigateToBlock,
   navigateToIndex,
   locateBlockInView,
+  setBlockKeepState,
   setActiveBlockId,
 }: UseBlockFocusActionsParams): UseBlockFocusActionsResult {
   const createBlockWithFocus = useEffectEvent(async () => {
@@ -83,9 +86,20 @@ export function useBlockFocusActions({
     navigateToIndex(nextIndex, { align: "auto" });
   });
 
+  const toggleKeepBlockWithFocus = useEffectEvent(async (blockId: string) => {
+    const locatedBlock = await locateBlockInView(blockId);
+
+    if (!locatedBlock || locatedBlock.block.archivedAt !== null) {
+      return;
+    }
+
+    await setBlockKeepState(blockId, !locatedBlock.block.isKept);
+  });
+
   return {
     archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
+    toggleKeepBlockWithFocus,
   };
 }

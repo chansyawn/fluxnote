@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:36
-#: src/renderer/routes/-layout/window-title-bar.tsx:95
+#: src/renderer/features/error-boundary/error-title-bar.tsx:35
+#: src/renderer/routes/-layout/window-title-bar.tsx:94
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -187,7 +187,7 @@ msgstr "Fluxnotes encountered an unexpected error. You can retry or exit the app
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:14
-#: src/renderer/features/error-boundary/error-title-bar.tsx:30
+#: src/renderer/features/error-boundary/error-title-bar.tsx:29
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr "Exit app"
@@ -223,12 +223,12 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/icon-action.tsx:66
+#: src/renderer/features/block/actions/icon-action.tsx:82
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:100
+#: src/renderer/features/block/actions/block-actions.tsx:105
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
@@ -368,19 +368,14 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:55
 msgid "preferences.shortcuts.archive-block.label"
-msgstr "Archive block"
+msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:66
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:78
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr "Cancel external edit"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:53
-msgid "preferences.shortcuts.capture-block.label"
-msgstr "Capture block"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
@@ -389,12 +384,12 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:38
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:40
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:43
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:50
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
@@ -420,6 +415,21 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:45
+msgid "preferences.shortcuts.keep-block.label"
+msgstr "Keep block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:62
+msgid "preferences.shortcuts.quick-create-block.description"
+msgstr "Quickly create a new block and bring the window forward for fast capture."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+msgid "preferences.shortcuts.quick-create-block.label"
+msgstr "Quick create block"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:69
 msgid "preferences.shortcuts.recording.success"
 msgstr "Your new hotkey is set!"
@@ -436,17 +446,17 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:59
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:71
 msgid "preferences.shortcuts.submit-external-edit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:87
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:99
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:33
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:35
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
@@ -457,12 +467,12 @@ msgstr "Preferences"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:67
-#: src/renderer/routes/-layout/window-title-bar.tsx:80
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:67
 msgid "workspace.add-block"
 msgstr "Add block"
 
@@ -487,22 +497,22 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:91
+#: src/renderer/features/block/actions/block-actions.tsx:95
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:78
+#: src/renderer/features/block/actions/block-actions.tsx:75
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:89
+#: src/renderer/features/block/actions/block-actions.tsx:93
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:76
+#: src/renderer/features/block/actions/block-actions.tsx:73
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
@@ -537,12 +547,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:64
+#: src/renderer/features/block/actions/block-actions.tsx:59
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/block-actions.tsx:53
+#: src/renderer/features/block/actions/block-actions.tsx:48
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
@@ -557,12 +567,12 @@ msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:109
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:100
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:97
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
 msgid "workspace.tags.filter.placeholder"
 msgstr "Search or create tags"
 
@@ -572,11 +582,11 @@ msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:92
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:83
 msgid "workspace.visibility.show-active"
 msgstr "Show active blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:90
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:81
 msgid "workspace.visibility.show-archived"
 msgstr "Show archived blocks"

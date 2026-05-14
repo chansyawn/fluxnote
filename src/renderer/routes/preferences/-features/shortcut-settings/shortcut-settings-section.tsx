@@ -14,6 +14,7 @@ import {
   Trash2Icon,
   WandSparklesIcon,
   XIcon,
+  FlagIcon,
 } from "lucide-react";
 import { type ReactElement } from "react";
 
@@ -24,6 +25,7 @@ interface ShortcutFieldDefinition {
   action: ShortcutAction;
   icon: typeof KeyboardIcon;
   title: ReactElement;
+  description?: ReactElement;
 }
 
 const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
@@ -38,6 +40,11 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
     title: <Trans id="preferences.shortcuts.create-block.label">Create block</Trans>,
   },
   {
+    action: "keep-block",
+    icon: FlagIcon,
+    title: <Trans id="preferences.shortcuts.keep-block.label">Keep block</Trans>,
+  },
+  {
     action: "delete-block",
     icon: Trash2Icon,
     title: <Trans id="preferences.shortcuts.delete-block.label">Delete block</Trans>,
@@ -45,12 +52,17 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
   {
     action: "archive-block",
     icon: ArchiveIcon,
-    title: <Trans id="preferences.shortcuts.archive-block.label">Archive block</Trans>,
+    title: <Trans id="preferences.shortcuts.archive-block.label">Archive/restore block</Trans>,
   },
   {
-    action: "capture-block",
+    action: "quick-create-block",
     icon: WandSparklesIcon,
-    title: <Trans id="preferences.shortcuts.capture-block.label">Capture block</Trans>,
+    title: <Trans id="preferences.shortcuts.quick-create-block.label">Quick create block</Trans>,
+    description: (
+      <Trans id="preferences.shortcuts.quick-create-block.description">
+        Quickly create a new block and bring the window forward for fast capture.
+      </Trans>
+    ),
   },
   {
     action: "submit-external-edit",
@@ -90,7 +102,7 @@ export function ShortcutSettingsSection() {
           const isRecording = recordingAction === field.action;
           const shortcut = shortcuts[field.action];
           const fieldError =
-            (field.action === "toggle-window" || field.action === "capture-block") &&
+            (field.action === "toggle-window" || field.action === "quick-create-block") &&
             shortcut !== null &&
             globalShortcutErrors[field.action] === shortcut
               ? ("unavailable" as const)
@@ -129,6 +141,7 @@ export function ShortcutSettingsSection() {
                   }}
                 />
               }
+              description={field.description}
               icon={field.icon}
               label={field.title}
             />

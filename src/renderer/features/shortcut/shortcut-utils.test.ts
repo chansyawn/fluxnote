@@ -38,9 +38,10 @@ describe("shortcut utils", () => {
         {
           "toggle-window": "Alt+N",
           "create-block": "Mod+N",
+          "keep-block": "Mod+K",
           "archive-block": "Mod+E",
           "delete-block": "Mod+D",
-          "capture-block": "Ctrl+Alt+N",
+          "quick-create-block": "Ctrl+Alt+N",
           "submit-external-edit": "Mod+Enter",
           "cancel-external-edit": "Mod+\\",
         },
