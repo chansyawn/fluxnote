@@ -4,13 +4,8 @@ import type { BlockVisibility, Tag } from "@renderer/clients";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import type { TagMutationOperation } from "@renderer/features/tag/use-tag-data";
 import { Button } from "@renderer/ui/components/button";
-import {
-  ArchiveIcon,
-  ArchiveRestoreIcon,
-  LoaderCircleIcon,
-  PlusIcon,
-  TagsIcon,
-} from "lucide-react";
+import { cn } from "@renderer/ui/lib/utils";
+import { ArchiveIcon, LoaderCircleIcon, PlusIcon, TagsIcon } from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { createPortal } from "react-dom";
 
@@ -80,11 +75,7 @@ export function WorkspaceTitlebarActionsPortal({
           onSetVisibility(visibility === "active" ? "archived" : "active");
         }}
       >
-        {visibility === "active" ? (
-          <ArchiveIcon className="size-3.5" />
-        ) : (
-          <ArchiveRestoreIcon className="size-3.5" />
-        )}
+        <ArchiveIcon className={cn("size-3.5", visibility === "archived" && "fill-primary")} />
         <span className="sr-only">
           {visibility === "active" ? (
             <Trans id="workspace.visibility.show-archived">Show archived blocks</Trans>
@@ -104,7 +95,7 @@ export function WorkspaceTitlebarActionsPortal({
         tags={tags}
         trigger={
           <>
-            <TagsIcon className="size-3.5" />
+            <TagsIcon className={cn("size-3.5", selectedTagIds.length > 0 && "fill-primary")} />
             <span className="sr-only">
               <Trans id="workspace.tags.filter.button">Filter tags</Trans>
             </span>
