@@ -69,7 +69,6 @@ function HeaderCloseButton() {
         message: "Hide window",
       })}
       className="group flex size-3 items-center justify-center rounded-full bg-red-500/85 text-red-950 transition-all [-webkit-app-region:no-drag] hover:brightness-95 dark:bg-red-400/85 dark:text-red-950"
-      tabIndex={-1}
       type="button"
       onClick={() => {
         void hideWindow();
