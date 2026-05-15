@@ -4,16 +4,14 @@ import {
   type BackendCommandResponse,
   type ParsedBackendCommandRequest,
 } from "@shared/features/entrypoints/commands";
-import type { ExternalEditResult } from "@shared/features/external-edit/session-contracts";
 import type { IpcResult } from "@shared/ipc/result";
 import { businessError, toIpcErrorPayload } from "@shared/ipc/result";
 import { ZodError } from "zod";
 
 import type { AppDatabase } from "../core/database";
-import { createBlockRecord } from "../features/blocks/service";
 import { createCliIpcServer } from "../features/cli/ipc-server";
 import { createDeepLinkHandler } from "../features/deep-link/handler";
-import { setBlockTagsByName } from "../features/tags/service";
+import { createEntrypointService, type EntrypointService } from "../features/entrypoints/service";
 
 interface EntrypointRuntimeServices {
   createExternalEditSession: (
@@ -32,17 +30,6 @@ interface EntrypointDispatcherServices {
     request: ParsedBackendCommandRequest<TKey>,
     signal?: AbortSignal,
   ) => Promise<BackendCommandResponse<TKey>>;
-}
-
-interface EntrypointCommandServices {
-  createExternalEditSession: (
-    blockId: string,
-    originalContent: string,
-    signal?: AbortSignal,
-  ) => Promise<ExternalEditResult>;
-  getDb: () => Promise<AppDatabase>;
-  requestOpenBlock: (blockId: string) => void;
-  showMainWindow: () => void;
 }
 
 function createEntrypointDispatcher(services: EntrypointDispatcherServices) {
@@ -81,7 +68,7 @@ function createEntrypointDispatcher(services: EntrypointDispatcherServices) {
   return { dispatchCommand };
 }
 
-function createEntrypointCommandExecutor(services: EntrypointCommandServices) {
+function createEntrypointCommandExecutor(service: EntrypointService) {
   async function execute<TKey extends BackendCommandKey>(
     command: TKey,
     request: ParsedBackendCommandRequest<TKey>,
@@ -89,36 +76,23 @@ function createEntrypointCommandExecutor(services: EntrypointCommandServices) {
   ): Promise<BackendCommandResponse<TKey>> {
     switch (command) {
       case "app.open": {
-        services.showMainWindow();
-        return null as BackendCommandResponse<TKey>;
+        return service.openApp() as BackendCommandResponse<TKey>;
       }
       case "block.create-from-text": {
-        const { content, tagNames } =
-          request as ParsedBackendCommandRequest<"block.create-from-text">;
-        const db = await services.getDb();
-        const block = await createBlockRecord(db, content);
-        if (tagNames && tagNames.length > 0) {
-          await setBlockTagsByName(db, block.id, tagNames);
-        }
-        services.requestOpenBlock(block.id);
-        return { blockId: block.id } as BackendCommandResponse<TKey>;
+        return (await service.createBlockFromText(
+          request as ParsedBackendCommandRequest<"block.create-from-text">,
+        )) as BackendCommandResponse<TKey>;
       }
       case "block.create-external-edit": {
-        const { content, tagNames } =
-          request as ParsedBackendCommandRequest<"block.create-external-edit">;
-        const db = await services.getDb();
-        const block = await createBlockRecord(db, content);
-        if (tagNames && tagNames.length > 0) {
-          await setBlockTagsByName(db, block.id, tagNames);
-        }
-        const result = services.createExternalEditSession(block.id, content, signal);
-        services.requestOpenBlock(block.id);
-        return (await result) as BackendCommandResponse<TKey>;
+        return (await service.createExternalEdit(
+          request as ParsedBackendCommandRequest<"block.create-external-edit">,
+          signal,
+        )) as BackendCommandResponse<TKey>;
       }
       case "block.open": {
-        const { blockId } = request as ParsedBackendCommandRequest<"block.open">;
-        services.requestOpenBlock(blockId);
-        return null as BackendCommandResponse<TKey>;
+        return service.openBlock(
+          request as ParsedBackendCommandRequest<"block.open">,
+        ) as BackendCommandResponse<TKey>;
       }
     }
   }
@@ -127,12 +101,13 @@ function createEntrypointCommandExecutor(services: EntrypointCommandServices) {
 }
 
 export function createEntrypointRuntime(services: EntrypointRuntimeServices) {
-  const commandExecutor = createEntrypointCommandExecutor({
+  const entrypointService = createEntrypointService({
     createExternalEditSession: services.createExternalEditSession,
     getDb: services.getDb,
     requestOpenBlock: services.requestOpenBlock,
     showMainWindow: services.showMainWindow,
   });
+  const commandExecutor = createEntrypointCommandExecutor(entrypointService);
   const dispatcher = createEntrypointDispatcher({
     executeCommand: commandExecutor.execute,
   });

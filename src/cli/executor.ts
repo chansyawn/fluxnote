@@ -8,7 +8,7 @@ import type {
 } from "@shared/features/entrypoints/commands";
 
 import type { FluxCliCommand } from "./args";
-import { dispatchCommand } from "./ipc-dispatcher";
+import { dispatchCommand } from "./dispatch-command";
 
 interface FileStat {
   isFile: () => boolean;
@@ -59,6 +59,26 @@ async function readTextFile(filePath: string, deps: CliExecutorDeps): Promise<st
   return await deps.readFile(resolvedPath, "utf8");
 }
 
+async function resolveAddContent(
+  source: Extract<FluxCliCommand, { kind: "add" }>["source"],
+  deps: CliExecutorDeps,
+): Promise<string> {
+  switch (source.type) {
+    case "text": {
+      return source.text;
+    }
+    case "file": {
+      return await readTextFile(source.filePath, deps);
+    }
+    case "auto": {
+      if (await isRegularFile(source.input, deps)) {
+        return await readTextFile(source.input, deps);
+      }
+      return source.input;
+    }
+  }
+}
+
 export async function executeOpen(deps: CliExecutorDeps = defaultDeps): Promise<void> {
   await deps.dispatchCommand("app.open", null);
   console.log("Opened Fluxnotes.");
@@ -78,8 +98,17 @@ export async function executeAddFromFile(
   tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  const content = await readTextFile(filePath, deps);
-  await executeAddFromText(content, tagNames, deps);
+  await executeAdd(
+    {
+      kind: "add",
+      source: {
+        filePath,
+        type: "file",
+      },
+      tagNames,
+    },
+    deps,
+  );
 }
 
 export async function executeAddFromAuto(
@@ -87,12 +116,17 @@ export async function executeAddFromAuto(
   tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  if (await isRegularFile(input, deps)) {
-    await executeAddFromFile(input, tagNames, deps);
-    return;
-  }
-
-  await executeAddFromText(input, tagNames, deps);
+  await executeAdd(
+    {
+      kind: "add",
+      source: {
+        input,
+        type: "auto",
+      },
+      tagNames,
+    },
+    deps,
+  );
 }
 
 export async function executeExternalEdit(
@@ -123,17 +157,7 @@ export async function executeCliCommand(
 ): Promise<void> {
   switch (command.kind) {
     case "add": {
-      if (command.source.type === "text") {
-        await executeAddFromText(command.source.text, command.tagNames, deps);
-        return;
-      }
-
-      if (command.source.type === "file") {
-        await executeAddFromFile(command.source.filePath, command.tagNames, deps);
-        return;
-      }
-
-      await executeAddFromAuto(command.source.input, command.tagNames, deps);
+      await executeAdd(command, deps);
       return;
     }
     case "edit": {
@@ -148,4 +172,12 @@ export async function executeCliCommand(
       return;
     }
   }
+}
+
+async function executeAdd(
+  command: Extract<FluxCliCommand, { kind: "add" }>,
+  deps: CliExecutorDeps = defaultDeps,
+): Promise<void> {
+  const content = await resolveAddContent(command.source, deps);
+  await executeAddFromText(content, command.tagNames, deps);
 }

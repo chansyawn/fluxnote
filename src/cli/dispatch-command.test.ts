@@ -117,7 +117,7 @@ vi.mock("node:fs/promises", () => ({
   stat: mocks.stat,
 }));
 
-import { dispatchCommand } from "./ipc-dispatcher";
+import { dispatchCommand } from "./dispatch-command";
 
 function setPlatform(value: NodeJS.Platform): void {
   Object.defineProperty(process, "platform", {
@@ -126,7 +126,7 @@ function setPlatform(value: NodeJS.Platform): void {
   });
 }
 
-describe("ipc-dispatcher", () => {
+describe("dispatch-command", () => {
   beforeEach(() => {
     setPlatform("darwin");
     vi.clearAllMocks();
