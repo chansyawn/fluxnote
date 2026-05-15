@@ -6,6 +6,7 @@ import type { BlockNavigationAlign } from "./use-block-navigation";
 export interface UseBlockFocusActionsParams {
   activeBlockId: string | null;
   archiveBlock: (blockId: string) => Promise<Block>;
+  restoreBlock: (blockId: string) => Promise<Block>;
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
@@ -20,12 +21,15 @@ export interface UseBlockFocusActionsResult {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
+  restoreBlockWithFocus: (blockId: string) => Promise<void>;
+  toggleArchiveBlockWithFocus: (blockId: string) => Promise<void>;
   toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockFocusActions({
   activeBlockId,
   archiveBlock,
+  restoreBlock,
   totalBlockCount,
   createBlock,
   deleteBlock,
@@ -61,6 +65,44 @@ export function useBlockFocusActions({
         ? currentLocation.index - 1
         : currentLocation.index;
     navigateToIndex(nextIndex, { align: "auto" });
+  });
+
+  const restoreBlockWithFocus = useEffectEvent(async (blockId: string) => {
+    const shouldMoveFocus = activeBlockId === blockId;
+    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
+    const countBeforeRestore = totalBlockCount;
+
+    await restoreBlock(blockId);
+
+    if (!shouldMoveFocus) {
+      return;
+    }
+
+    if (!currentLocation || countBeforeRestore <= 1) {
+      setActiveBlockId(null);
+      return;
+    }
+
+    const nextIndex =
+      currentLocation.index >= countBeforeRestore - 1
+        ? currentLocation.index - 1
+        : currentLocation.index;
+    navigateToIndex(nextIndex, { align: "auto" });
+  });
+
+  const toggleArchiveBlockWithFocus = useEffectEvent(async (blockId: string) => {
+    const locatedBlock = await locateBlockInView(blockId);
+
+    if (!locatedBlock) {
+      return;
+    }
+
+    if (locatedBlock.block.archivedAt === null) {
+      await archiveBlockWithFocus(blockId);
+      return;
+    }
+
+    await restoreBlockWithFocus(blockId);
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
@@ -100,6 +142,8 @@ export function useBlockFocusActions({
     archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
+    restoreBlockWithFocus,
+    toggleArchiveBlockWithFocus,
     toggleKeepBlockWithFocus,
   };
 }

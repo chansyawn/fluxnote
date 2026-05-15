@@ -109,7 +109,7 @@ export function BlockActions({ block, state, handlers }: BlockActionsProps) {
             <Trans id="workspace.blocks.archive.tooltip">Archive</Trans>
           )
         }
-        shortcut={isArchived ? undefined : shortcuts?.["archive-block"]}
+        shortcut={shortcuts?.["archive-block"]}
         disabled={disabled}
         pending={pending.archive}
         onClick={handlers.onToggleArchive}

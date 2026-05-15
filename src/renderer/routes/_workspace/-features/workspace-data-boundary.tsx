@@ -46,10 +46,13 @@ export function useWorkspaceDataBoundary() {
     archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
+    restoreBlockWithFocus,
+    toggleArchiveBlockWithFocus,
     toggleKeepBlockWithFocus,
   } = useBlockFocusActions({
     activeBlockId: blockNavigation.activeBlockId,
     archiveBlock: blockMutations.archiveBlock,
+    restoreBlock: blockMutations.restoreBlock,
     totalBlockCount: blockList.totalBlockCount,
     createBlock: async () => {
       const block = await blockMutations.createBlock();
@@ -68,9 +71,9 @@ export function useWorkspaceDataBoundary() {
 
   useBlockShortcuts({
     activeBlockId: blockNavigation.activeBlockId,
-    archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
+    toggleArchiveBlockWithFocus,
     toggleKeepBlockWithFocus,
   });
 
@@ -113,7 +116,7 @@ export function useWorkspaceDataBoundary() {
       deleteTag: tagData.deleteTag,
       focusBlock,
       restoreBlock: (blockId) => {
-        void blockMutations.restoreBlock(blockId);
+        void restoreBlockWithFocus(blockId);
       },
       setBlockKeepState: (blockId, isKept) => {
         void blockMutations.setKeepState(blockId, isKept);
@@ -132,6 +135,7 @@ export function useWorkspaceDataBoundary() {
       externalEditActions.handleCancelExternalEdit,
       externalEditActions.handleSubmitExternalEdit,
       focusBlock,
+      restoreBlockWithFocus,
       tagData.createTag,
       tagData.deleteTag,
       toggleKeepBlockWithFocus,

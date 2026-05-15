@@ -4,17 +4,17 @@ import { useEffectEvent, useMemo } from "react";
 
 export interface UseBlockShortcutsParams {
   activeBlockId: string | null;
-  archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
+  toggleArchiveBlockWithFocus: (blockId: string) => Promise<void>;
   toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function useBlockShortcuts({
   activeBlockId,
-  archiveBlockWithFocus,
   createBlockWithFocus,
   deleteBlockWithFocus,
+  toggleArchiveBlockWithFocus,
   toggleKeepBlockWithFocus,
 }: UseBlockShortcutsParams): void {
   const { shortcuts } = useShortcutState();
@@ -82,10 +82,10 @@ export function useBlockShortcuts({
 
           event.preventDefault();
           event.stopPropagation();
-          void archiveBlockWithFocus(activeBlockId);
+          void toggleArchiveBlockWithFocus(activeBlockId);
         },
         options: {
-          meta: { name: "Archive block" },
+          meta: { name: "Archive or restore block" },
         },
       });
     }
@@ -111,11 +111,11 @@ export function useBlockShortcuts({
     return definitions;
   }, [
     activeBlockId,
-    archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
     isActiveBlockFocused,
     shortcuts,
+    toggleArchiveBlockWithFocus,
     toggleKeepBlockWithFocus,
   ]);
 

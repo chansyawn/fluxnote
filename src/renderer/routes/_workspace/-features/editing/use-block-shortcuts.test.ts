@@ -41,16 +41,16 @@ describe("useBlockShortcuts", () => {
   });
 
   it("triggers create block without active block focus", () => {
-    const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     useBlockShortcuts({
       activeBlockId: "block-1",
-      archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleArchiveBlockWithFocus,
       toggleKeepBlockWithFocus,
     });
 
@@ -74,9 +74,9 @@ describe("useBlockShortcuts", () => {
   });
 
   it("keeps delete block focus guard", () => {
-    const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     const activeElement = {
@@ -86,9 +86,9 @@ describe("useBlockShortcuts", () => {
 
     useBlockShortcuts({
       activeBlockId: "block-1",
-      archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleArchiveBlockWithFocus,
       toggleKeepBlockWithFocus,
     });
 
@@ -112,9 +112,9 @@ describe("useBlockShortcuts", () => {
   });
 
   it("triggers keep block when active block is focused", () => {
-    const archiveBlockWithFocus = vi.fn(async () => undefined);
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     const activeElement = {
@@ -124,9 +124,9 @@ describe("useBlockShortcuts", () => {
 
     useBlockShortcuts({
       activeBlockId: "block-1",
-      archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleArchiveBlockWithFocus,
       toggleKeepBlockWithFocus,
     });
 
@@ -149,10 +149,10 @@ describe("useBlockShortcuts", () => {
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
 
-  it("triggers archive block when active block is focused", () => {
-    const archiveBlockWithFocus = vi.fn(async () => undefined);
+  it("toggles block archive state when active block is focused", () => {
     const createBlockWithFocus = vi.fn(async () => undefined);
     const deleteBlockWithFocus = vi.fn(async () => undefined);
+    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     const activeElement = {
@@ -162,9 +162,9 @@ describe("useBlockShortcuts", () => {
 
     useBlockShortcuts({
       activeBlockId: "block-1",
-      archiveBlockWithFocus,
       createBlockWithFocus,
       deleteBlockWithFocus,
+      toggleArchiveBlockWithFocus,
       toggleKeepBlockWithFocus,
     });
 
@@ -182,7 +182,7 @@ describe("useBlockShortcuts", () => {
       stopPropagation,
     } as unknown as KeyboardEvent & { repeat: boolean });
 
-    expect(archiveBlockWithFocus).toHaveBeenCalledWith("block-1");
+    expect(toggleArchiveBlockWithFocus).toHaveBeenCalledWith("block-1");
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
