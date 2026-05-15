@@ -1,8 +1,8 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
-import type { PersistencePaths } from "@main/core/persistence";
 import {
   collectImageAssetUrls,
   getImageAssetUrl,
@@ -20,7 +20,7 @@ import { nodeAssetStorage, type AssetStorage } from "./storage";
 import { assetUrlScheme, extFromMimeType, sanitizeFileName, splitAssetUrl } from "./url-utils";
 
 interface AssetServiceOptions {
-  paths: PersistencePaths;
+  paths: AppDataPaths;
   storage?: AssetStorage;
 }
 
@@ -66,9 +66,9 @@ function createUniqueAssetFileName(fileNameCandidate: string | null, mimeType: s
   return sanitizeFileName(`${uniquePrefix}.${extFromMimeType(mimeType)}`);
 }
 
-function getAssetFilePath(paths: PersistencePaths, assetUrl: string): string {
+function getAssetFilePath(paths: AppDataPaths, assetUrl: string): string {
   const parsed = splitAssetUrl(assetUrl);
-  return path.join(paths.getAssetPathForBlock(parsed.blockId), sanitizeFileName(parsed.fileName));
+  return path.join(paths.assetPathForBlock(parsed.blockId), sanitizeFileName(parsed.fileName));
 }
 
 function collectMarkdownImageReplacements(
@@ -165,7 +165,7 @@ export async function createAsset(
     const fileNameCandidate =
       asset.fileName && asset.fileName.trim().length > 0 ? asset.fileName : null;
     const fileName = createUniqueAssetFileName(fileNameCandidate, asset.mimeType);
-    const blockDir = deps.paths.getAssetPathForBlock(input.blockId);
+    const blockDir = deps.paths.assetPathForBlock(input.blockId);
     const filePath = path.join(blockDir, fileName);
 
     await storage.writeFile(filePath, Buffer.from(asset.dataBase64, "base64"));
@@ -196,16 +196,13 @@ export async function copyAsset(deps: AssetServiceOptions, db: AppDatabase, inpu
     }
 
     const sourcePath = path.join(
-      deps.paths.getAssetPathForBlock(input.sourceBlockId),
+      deps.paths.assetPathForBlock(input.sourceBlockId),
       sanitizeFileName(parsed.fileName),
     );
     const targetFileName = sanitizeFileName(
       `${Date.now()}-${crypto.randomUUID()}-${parsed.fileName}`,
     );
-    const targetPath = path.join(
-      deps.paths.getAssetPathForBlock(input.targetBlockId),
-      targetFileName,
-    );
+    const targetPath = path.join(deps.paths.assetPathForBlock(input.targetBlockId), targetFileName);
 
     await storage.copyFile(sourcePath, targetPath);
     assets.push({

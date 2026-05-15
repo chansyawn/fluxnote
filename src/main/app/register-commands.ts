@@ -1,7 +1,7 @@
+import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 import type { EventBus } from "@main/core/ipc";
-import type { PersistenceRuntime } from "@main/core/persistence";
 
 import { registerAssetsCommands } from "../features/assets/command";
 import { registerBlocksCommands } from "../features/blocks/command";
@@ -25,7 +25,7 @@ export interface RegisterFeatureCommandsDeps {
   externalEditManager: ExternalEditManager;
   now: () => Date;
   openBlockService: OpenBlockService;
-  persistence: PersistenceRuntime;
+  paths: AppDataPaths;
   preferencesService: PreferencesService;
   windowManager: WindowManager;
 }
@@ -33,11 +33,11 @@ export interface RegisterFeatureCommandsDeps {
 export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCommandsDeps): void {
   registerAssetsCommands(ipc, {
     db: deps.db,
-    persistence: deps.persistence,
+    paths: deps.paths,
   });
   registerBlocksCommands(ipc, {
     db: deps.db,
-    getAssetPathForBlock: deps.persistence.paths.getAssetPathForBlock,
+    getAssetPathForBlock: deps.paths.assetPathForBlock,
     listExternalEditSessions: deps.externalEditManager.listSessions,
     now: deps.now,
     readAutoArchiveSettings: deps.preferencesService.readAutoArchiveSettings,
@@ -47,7 +47,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
   registerExternalEditCommands(ipc, {
     db: deps.db,
     manager: deps.externalEditManager,
-    paths: deps.persistence.paths,
+    paths: deps.paths,
   });
   registerExternalUrlCommands(ipc);
   registerOpenBlockCommands(ipc, {

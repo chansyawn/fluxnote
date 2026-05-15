@@ -2,10 +2,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import type { PersistencePaths } from "@main/core/persistence";
+import type { AppDataPaths } from "@main/core/app-data";
 import { net, protocol } from "electron";
 
-export function registerAssetProtocol(paths: PersistencePaths): void {
+export function registerAssetProtocol(paths: AppDataPaths): void {
   protocol.handle("assets", async (request) => {
     try {
       const requestUrl = new URL(request.url);
@@ -20,7 +20,7 @@ export function registerAssetProtocol(paths: PersistencePaths): void {
         return new Response("Invalid asset path", { status: 400 });
       }
 
-      const blockDir = path.resolve(paths.getAssetPathForBlock(blockId));
+      const blockDir = path.resolve(paths.assetPathForBlock(blockId));
       const assetPath = path.resolve(path.join(blockDir, normalizedPath));
       if (!assetPath.startsWith(`${blockDir}${path.sep}`) && assetPath !== blockDir) {
         return new Response("Invalid asset path", { status: 400 });

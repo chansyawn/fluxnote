@@ -6,9 +6,10 @@ import { copyAsset, createAsset, externalizeMarkdownAssetUrls, resolveAsset } fr
 
 describe("assets service", () => {
   const paths = {
-    getAssetPathForBlock: (id: string) => `/tmp/${id}`,
-    getAssetsRootPath: () => "/tmp",
-    getDatabasePath: () => "/tmp/test.sqlite3",
+    assetPathForBlock: (id: string) => `/tmp/${id}`,
+    assetsRootPath: "/tmp",
+    databasePath: "/tmp/test.sqlite3",
+    userDataPath: "/tmp",
   };
 
   it("creates asset and writes decoded bytes", async () => {

@@ -17,7 +17,7 @@ describe("assets command", () => {
   };
   const deps = {
     db: {} as never,
-    persistence: { paths: { getAssetPathForBlock: (blockId: string) => `/tmp/${blockId}` } },
+    paths: { assetPathForBlock: (blockId: string) => `/tmp/${blockId}` },
   };
 
   beforeEach(() => {

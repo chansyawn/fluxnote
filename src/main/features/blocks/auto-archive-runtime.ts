@@ -2,7 +2,6 @@ import type { AppDatabase } from "@main/core/database";
 import { blocks } from "@main/core/database";
 import { getSqliteChangedRows } from "@main/core/database";
 import type { EventBus } from "@main/core/ipc";
-import type { PersistenceRuntime } from "@main/core/persistence";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
 import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
 import { and, eq, inArray, isNull } from "drizzle-orm";
@@ -18,7 +17,7 @@ interface AutoArchiveRuntimeOptions {
   emitEvent: EventBus["emit"];
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
-  persistence: PersistenceRuntime;
+  getDb: () => AppDatabase;
   readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
 }
 
@@ -81,7 +80,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
     }
 
     const now = new Date();
-    const db = options.persistence.getDb();
+    const db = options.getDb();
     const evaluationContext = createAutoArchiveEvaluationContext({
       now,
       protectedBlockIds: getProtectedBlockIds(),

@@ -1,4 +1,3 @@
-import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
 import {
   DEFAULT_SETTINGS,
   normalizeSettings,
@@ -7,8 +6,6 @@ import {
   type Settings,
   type SettingsPatch,
 } from "@shared/features/preferences/settings";
-
-import { getConfigStore } from "./config-store";
 
 interface PreferencesStorage {
   store: Record<string, unknown>;
@@ -48,7 +45,7 @@ function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
 }
 
 export function createPreferencesService(
-  storage: PreferencesStorage = getConfigStore(APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
+  storage: PreferencesStorage = { store: DEFAULT_SETTINGS },
 ): PreferencesService {
   function readSettings(): Settings {
     return normalizeSettings(storage.store);

@@ -45,7 +45,11 @@ describe("createBackendRuntime", () => {
       start: vi.fn(async () => undefined),
       stop: vi.fn(),
     },
-    db: { marker: "db" },
+    db: {
+      close: vi.fn(async () => undefined),
+      getDb: vi.fn(() => ({}) as never),
+      init: vi.fn(async () => undefined),
+    },
     events: {
       emit: vi.fn(),
       isSenderTrusted: vi.fn(() => true),
@@ -59,11 +63,11 @@ describe("createBackendRuntime", () => {
     openBlockService: {
       requestOpen: vi.fn(),
     },
-    persistence: {
-      close: vi.fn(async () => undefined),
-      getDb: vi.fn(() => ({ marker: "db" })),
-      init: vi.fn(async () => undefined),
-      paths: { getAssetPathForBlock: vi.fn() },
+    paths: {
+      assetPathForBlock: vi.fn(),
+      assetsRootPath: "/tmp",
+      databasePath: "/tmp/test.sqlite3",
+      userDataPath: "/tmp",
     },
     preferencesService: {
       readAutoArchiveSettings: vi.fn(),
@@ -96,7 +100,7 @@ describe("createBackendRuntime", () => {
 
     await runtime.start();
 
-    expect(services.persistence.init).toHaveBeenCalledTimes(1);
+    expect(services.db.init).toHaveBeenCalledTimes(1);
     expect(mocks.createEntrypointRuntime).toHaveBeenCalledTimes(1);
     expect(mocks.createIpcRouter).toHaveBeenCalledTimes(1);
     expect(mocks.registerFeatureCommands).toHaveBeenCalledTimes(1);
@@ -129,7 +133,7 @@ describe("createBackendRuntime", () => {
     expect(services.trayManager.destroyTray).toHaveBeenCalledTimes(1);
     expect(services.externalEditManager.cancelAll).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.stopCliServer).toHaveBeenCalledTimes(1);
-    expect(services.persistence.close).toHaveBeenCalledTimes(1);
+    expect(services.db.close).toHaveBeenCalledTimes(1);
   });
 
   it("forwards second-instance and open-url deep link", async () => {

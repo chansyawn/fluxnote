@@ -6,9 +6,10 @@ import { cancelEdit, submitEdit } from "./service";
 
 describe("external-edit service", () => {
   const paths = {
-    getAssetPathForBlock: (id: string) => `/tmp/${id}`,
-    getAssetsRootPath: () => "/tmp",
-    getDatabasePath: () => "/tmp/test.sqlite3",
+    assetPathForBlock: (id: string) => `/tmp/${id}`,
+    assetsRootPath: "/tmp",
+    databasePath: "/tmp/test.sqlite3",
+    userDataPath: "/tmp",
   };
 
   it("submits edit and resolves session as submitted", async () => {

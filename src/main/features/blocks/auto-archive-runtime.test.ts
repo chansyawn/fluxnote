@@ -41,9 +41,7 @@ describe("auto-archive runtime", () => {
     const runtime = createAutoArchiveRuntime({
       emitEvent,
       getWindowVisible: () => true,
-      persistence: {
-        getDb: () => ({ update: vi.fn() }),
-      } as never,
+      getDb: () => ({ update: vi.fn() }) as never,
       readAutoArchiveSettings: async () => ({ enabled: true, idleMinutes: 10 }),
     });
 
@@ -72,9 +70,7 @@ describe("auto-archive runtime", () => {
     const runtime = createAutoArchiveRuntime({
       emitEvent,
       getWindowVisible: () => false,
-      persistence: {
-        getDb: () => ({ update }),
-      } as never,
+      getDb: () => ({ update }) as never,
       readAutoArchiveSettings: async () => ({ enabled: true, idleMinutes: 10 }),
     });
 
@@ -98,9 +94,7 @@ describe("auto-archive runtime", () => {
     const runtime = createAutoArchiveRuntime({
       emitEvent,
       getWindowVisible: () => false,
-      persistence: {
-        getDb: () => ({ update: vi.fn() }),
-      } as never,
+      getDb: () => ({ update: vi.fn() }) as never,
       readAutoArchiveSettings: async () => ({ enabled: false, idleMinutes: 10 }),
     });
 

@@ -1,6 +1,6 @@
+import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
-import type { PersistencePaths } from "@main/core/persistence";
 
 import type { ExternalEditManager } from "./manager";
 import { cancelEdit, submitEdit } from "./service";
@@ -8,7 +8,7 @@ import { cancelEdit, submitEdit } from "./service";
 interface ExternalEditCommandDeps {
   manager: ExternalEditManager;
   db: AppDatabase;
-  paths: PersistencePaths;
+  paths: AppDataPaths;
 }
 
 export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditCommandDeps): void {

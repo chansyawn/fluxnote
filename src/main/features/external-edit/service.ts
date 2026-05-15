@@ -1,7 +1,7 @@
+import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import { blocks } from "@main/core/database";
 import { getSqliteChangedRows, nowIsoString } from "@main/core/database";
-import type { PersistencePaths } from "@main/core/persistence";
 import { businessError } from "@shared/ipc/result";
 import { eq } from "drizzle-orm";
 
@@ -14,7 +14,7 @@ interface ExternalEditServiceOptions {
 }
 
 interface SubmitEditServiceOptions extends ExternalEditServiceOptions {
-  paths: PersistencePaths;
+  paths: AppDataPaths;
 }
 
 export async function submitEdit(

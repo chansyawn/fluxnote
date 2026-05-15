@@ -19,8 +19,8 @@ export function createBackendRuntime() {
   }
 
   async function start(): Promise<void> {
-    await services.persistence.init();
-    const db = services.db;
+    await services.db.init();
+    const db = services.db.getDb();
     entrypointRuntime = createEntrypointRuntime({
       createExternalEditSession: (blockId, originalContent, signal) =>
         services.externalEditManager.begin(blockId, originalContent, { signal }).result,
@@ -39,12 +39,12 @@ export function createBackendRuntime() {
       externalEditManager: services.externalEditManager,
       now: () => new Date(),
       openBlockService: services.openBlockService,
-      persistence: services.persistence,
+      paths: services.paths,
       preferencesService: services.preferencesService,
       windowManager: services.windowManager,
     });
 
-    registerAssetProtocol(services.persistence.paths);
+    registerAssetProtocol(services.paths);
     await entrypointRuntime.startCliServer();
     services.windowManager.createMainWindow();
     registerMainWindowToEventBus();
@@ -66,7 +66,7 @@ export function createBackendRuntime() {
     if (entrypointRuntime) {
       await entrypointRuntime.stopCliServer();
     }
-    await services.persistence.close();
+    await services.db.close();
   }
 
   function handleSecondInstance(argv: readonly string[]): void {

@@ -29,7 +29,7 @@ describe("config-store", () => {
   it("creates store with normalized file name and defaults", async () => {
     const { getConfigStore } = await import("./config-store");
 
-    getConfigStore(" preferences.json ", { a: 1 });
+    getConfigStore("/mock/user-data", " preferences.json ", { a: 1 });
 
     expect(mocks.electronStoreCtor).toHaveBeenCalledWith({
       clearInvalidConfig: false,
@@ -43,7 +43,7 @@ describe("config-store", () => {
   it("falls back to empty defaults for non-object", async () => {
     const { getConfigStore } = await import("./config-store");
 
-    getConfigStore("plain", null);
+    getConfigStore("/mock/user-data", "plain", null);
 
     expect(mocks.electronStoreCtor).toHaveBeenCalledWith(
       expect.objectContaining({ defaults: {}, fileExtension: "json", name: "plain" }),
@@ -53,8 +53,8 @@ describe("config-store", () => {
   it("reuses cached store for same normalized name", async () => {
     const { getConfigStore } = await import("./config-store");
 
-    const one = getConfigStore("a.json", {});
-    const two = getConfigStore(" a.json ", { x: 1 });
+    const one = getConfigStore("/mock/user-data", "a.json", {});
+    const two = getConfigStore("/mock/user-data", " a.json ", { x: 1 });
 
     expect(one).toBe(two);
     expect(mocks.electronStoreCtor).toHaveBeenCalledTimes(1);
