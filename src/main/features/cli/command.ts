@@ -1,6 +1,6 @@
 import type { IpcRouter } from "@main/core/ipc";
 
-import { installCli, isCliInstalled, uninstallCli } from "./install-cli";
+import { getCliStatus, installCli, uninstallCli } from "./install-cli";
 
 export function registerCliCommands(ipc: IpcRouter): void {
   ipc.command("cli.install", async () => {
@@ -9,9 +9,7 @@ export function registerCliCommands(ipc: IpcRouter): void {
   });
 
   ipc.command("cli.status", async () => {
-    return {
-      installed: await isCliInstalled(),
-    };
+    return await getCliStatus();
   });
 
   ipc.command("cli.uninstall", async () => {

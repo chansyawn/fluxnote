@@ -22,9 +22,7 @@ function registerDefaultProtocolClient(): void {
   app.setAsDefaultProtocolClient(APP_PROTOCOL);
 }
 
-if (handleSquirrelStartup()) {
-  process.exitCode = 0;
-} else {
+function startApp(): void {
   configureUserDataPath();
   registerDefaultProtocolClient();
 
@@ -35,3 +33,9 @@ if (handleSquirrelStartup()) {
     startPrimaryInstance();
   }
 }
+
+void handleSquirrelStartup().then((squirrelStartupHandled) => {
+  if (!squirrelStartupHandled) {
+    startApp();
+  }
+});

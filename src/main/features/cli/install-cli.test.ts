@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   })(),
   homedir: vi.fn(() => "/Users/tester"),
   isPackaged: false,
+  lstat: vi.fn(),
   mkdir: vi.fn(),
   readFile: vi.fn(),
   readlink: vi.fn(),
@@ -35,6 +36,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("node:fs/promises", () => ({
   default: {
     access: mocks.access,
+    lstat: mocks.lstat,
     mkdir: mocks.mkdir,
     readFile: mocks.readFile,
     readlink: mocks.readlink,
@@ -124,6 +126,7 @@ describe("install-cli", () => {
     });
     mocks.homedir.mockReturnValue("/Users/tester");
     mocks.isPackaged = false;
+    mocks.lstat.mockRejectedValue(new Error("missing"));
     mocks.mkdir.mockResolvedValue(undefined);
     mocks.rm.mockResolvedValue(undefined);
     mocks.symlink.mockResolvedValue(undefined);
@@ -164,8 +167,23 @@ describe("install-cli", () => {
   it("detects installed Windows shim", async () => {
     setPlatform("win32");
     mocks.readFile.mockResolvedValue(getWindowsShim());
+    mocks.exec.mockImplementation((...args: unknown[]) => {
+      getExecCallback(args)(null, `${path.dirname(getWindowsCommandPath())}\n`, "");
+      return {} as never;
+    });
 
     await expect(isCliInstalled()).resolves.toBe(true);
+  });
+
+  it("does not report Windows shim as installed when PATH is missing", async () => {
+    setPlatform("win32");
+    mocks.readFile.mockResolvedValue(getWindowsShim());
+    mocks.exec.mockImplementation((...args: unknown[]) => {
+      getExecCallback(args)(null, "C:\\Tools\n", "");
+      return {} as never;
+    });
+
+    await expect(isCliInstalled()).resolves.toBe(false);
   });
 
   it("installs Windows shim and appends user PATH", async () => {
@@ -249,5 +267,13 @@ describe("install-cli", () => {
     mocks.access.mockRejectedValue(new Error("missing"));
 
     await expect(installCli()).rejects.toThrow(/CLI wrapper not found/);
+  });
+
+  it("does not replace non-owned macOS command path", async () => {
+    mocks.readlink.mockResolvedValue("/usr/local/bin/other-flux");
+    mocks.lstat.mockResolvedValue({ isFile: () => true });
+
+    await expect(installCli()).rejects.toThrow(/already exists/);
+    expect(mocks.symlink).not.toHaveBeenCalled();
   });
 });

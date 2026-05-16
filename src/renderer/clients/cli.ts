@@ -1,7 +1,13 @@
 import { invokeCommand } from "./ipc/invoke";
 
 export interface CliStatus {
+  canInstall: boolean;
+  canUninstall: boolean;
+  commandName: "flux";
   installed: boolean;
+  installPath: string | null;
+  managedBy: "manual-link" | "user-path-shim" | "unsupported";
+  targetPath: string | null;
 }
 
 export async function getCliStatus(): Promise<CliStatus> {
