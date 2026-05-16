@@ -1,6 +1,7 @@
 import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
 
+import { MakerDMG } from "@electron-forge/maker-dmg";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import { MakerZIP } from "@electron-forge/maker-zip";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
@@ -39,7 +40,7 @@ const config: ForgeConfig = {
     },
   },
   rebuildConfig: {},
-  makers: [new MakerZIP({}, ["darwin"]), new MakerSquirrel({})],
+  makers: [new MakerDMG({}, ["darwin"]), new MakerZIP({}, ["darwin"]), new MakerSquirrel({})],
   plugins: [
     new VitePlugin({
       build: [
