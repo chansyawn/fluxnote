@@ -184,6 +184,9 @@ importers:
       '@lingui/cli':
         specifier: 6.0.1
         version: 6.0.1
+      '@lingui/format-po':
+        specifier: 6.0.1
+        version: 6.0.1
       '@lingui/vite-plugin':
         specifier: 6.0.1
         version: 6.0.1(@babel/core@7.29.0)(@lingui/babel-plugin-lingui-macro@6.0.1)(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3))(rolldown@1.0.0-rc.17))(@voidzero-dev/vite-plus-core@0.1.20(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3))(rolldown@1.0.0-rc.17)

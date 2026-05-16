@@ -75,8 +75,9 @@ src/
 
 ### I18n (Lingui)
 
-- Use Lingui explicit IDs for all translatable text; IDs must stay semantic and stable. After adding or changing translatable text, run `vp run lingui:extract` to update `.po` files.
-- The project uses `@lingui/vite-plugin`; do not run `vp run lingui:compile`. `pseudo` is for development/testing only (for example, RTL checks or long-text overflow checks), and must not be translated manually.
+- Use Lingui explicit IDs for all translatable text; IDs must stay semantic and stable. After adding or changing translatable text, run `vp run i18n:extract` to update `.po` files.
+- Run `vp run i18n:check` to verify catalogs are current and shipped locales have no missing translations. `vp staged` runs this for renderer source, locale catalog, and Lingui config changes.
+- The project uses `@lingui/vite-plugin`; do not compile catalogs manually. `pseudo` is for development/testing only (for example, RTL checks or long-text overflow checks), and must not be translated manually.
 
 ## Backend
 

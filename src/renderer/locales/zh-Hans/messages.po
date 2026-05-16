@@ -47,32 +47,32 @@ msgstr "Markdown 块编辑器"
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:99
 msgid "block-editor.link.convert"
-msgstr ""
+msgstr "转换为链接"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:97
 msgid "block-editor.link.copied"
-msgstr ""
+msgstr "已复制"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:96
 msgid "block-editor.link.copy"
-msgstr ""
+msgstr "复制"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:95
 msgid "block-editor.link.open"
-msgstr ""
+msgstr "打开"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:98
 msgid "block-editor.link.remove"
-msgstr ""
+msgstr "移除链接"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:100
 msgid "block-editor.link.url"
-msgstr ""
+msgstr "链接 URL"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/core/block-editor.tsx:64
@@ -243,22 +243,22 @@ msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:30
+#: src/renderer/features/block/actions/external-edit-actions.tsx:38
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+#: src/renderer/features/block/actions/external-edit-actions.tsx:39
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:23
+#: src/renderer/features/block/actions/external-edit-actions.tsx:30
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:24
+#: src/renderer/features/block/actions/external-edit-actions.tsx:31
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "提交"
 

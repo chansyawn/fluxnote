@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createBackendRuntime: vi.fn(),
@@ -23,6 +23,15 @@ vi.mock("./runtime", () => ({ createBackendRuntime: mocks.createBackendRuntime }
 
 import { startPrimaryInstance } from "./bootstrap";
 
+const originalPlatform = process.platform;
+
+function setPlatform(value: NodeJS.Platform): void {
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value,
+  });
+}
+
 describe("startPrimaryInstance", () => {
   const runtime = {
     activate: vi.fn(),
@@ -34,8 +43,13 @@ describe("startPrimaryInstance", () => {
   };
 
   beforeEach(() => {
+    setPlatform("linux");
     vi.clearAllMocks();
     mocks.createBackendRuntime.mockReturnValue(runtime);
+  });
+
+  afterEach(() => {
+    setPlatform(originalPlatform);
   });
 
   it("registers app events and forwards handlers to runtime", async () => {
@@ -50,8 +64,8 @@ describe("startPrimaryInstance", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(mocks.setActivationPolicy).toHaveBeenCalledWith("accessory");
-    expect(mocks.dockHide).toHaveBeenCalledTimes(1);
+    expect(mocks.setActivationPolicy).not.toHaveBeenCalled();
+    expect(mocks.dockHide).not.toHaveBeenCalled();
     expect(runtime.start).toHaveBeenCalledTimes(1);
     expect(mocks.on).toHaveBeenCalledWith("activate", expect.any(Function));
 
@@ -85,5 +99,18 @@ describe("startPrimaryInstance", () => {
     )?.[1] as (() => void) | undefined;
     windowAllClosed?.();
     expect(runtime.quitWhenAllWindowsClosed).toHaveBeenCalledTimes(1);
+  });
+
+  it("configures macOS accessory app behavior when ready", async () => {
+    setPlatform("darwin");
+
+    startPrimaryInstance();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mocks.setActivationPolicy).toHaveBeenCalledWith("accessory");
+    expect(mocks.dockHide).toHaveBeenCalledTimes(1);
+    expect(runtime.start).toHaveBeenCalledTimes(1);
   });
 });
