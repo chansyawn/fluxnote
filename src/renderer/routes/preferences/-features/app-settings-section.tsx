@@ -41,6 +41,8 @@ export function AppSettingsSection() {
   }));
   const cliInstalled = cliStatus?.installed === true;
   const cliDisabled = isCliStatusLoading || isCliPending;
+  const canInstallCli = cliStatus?.canInstall === true;
+  const canUninstallCli = cliStatus?.canUninstall === true;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -134,7 +136,7 @@ export function AppSettingsSection() {
           control={
             cliInstalled ? (
               <Button
-                disabled={cliDisabled}
+                disabled={cliDisabled || !canUninstallCli}
                 size="sm"
                 variant="outline"
                 onClick={handleCliUninstall}
@@ -142,7 +144,7 @@ export function AppSettingsSection() {
                 <Trans id="preferences.cli.uninstall">Uninstall</Trans>
               </Button>
             ) : (
-              <Button disabled={cliDisabled} size="sm" onClick={handleCliInstall}>
+              <Button disabled={cliDisabled || !canInstallCli} size="sm" onClick={handleCliInstall}>
                 <Trans id="preferences.cli.install">Install</Trans>
               </Button>
             )

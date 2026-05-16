@@ -3,6 +3,12 @@ import path from "node:path";
 
 import { app } from "electron";
 
+import {
+  getWindowsCliTarget,
+  installWindowsCli,
+  uninstallWindowsCli,
+} from "../features/cli/windows-cli-shim";
+
 const SQUIRREL_EVENTS = new Set([
   "--squirrel-install",
   "--squirrel-updated",
@@ -25,7 +31,9 @@ function runUpdateExe(args: readonly string[]): void {
   }).unref();
 }
 
-export function handleSquirrelStartup(argv: readonly string[] = process.argv): boolean {
+export async function handleSquirrelStartup(
+  argv: readonly string[] = process.argv,
+): Promise<boolean> {
   if (process.platform !== "win32") {
     return false;
   }
@@ -39,10 +47,12 @@ export function handleSquirrelStartup(argv: readonly string[] = process.argv): b
     case "--squirrel-install":
     case "--squirrel-updated": {
       runUpdateExe(["--createShortcut", path.win32.basename(process.execPath)]);
+      await installWindowsCli(getWindowsCliTarget());
       break;
     }
     case "--squirrel-uninstall": {
       runUpdateExe(["--removeShortcut", path.win32.basename(process.execPath)]);
+      await uninstallWindowsCli(getWindowsCliTarget());
       break;
     }
     case "--squirrel-obsolete": {

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  getCliStatus: vi.fn(),
   installCli: vi.fn(),
-  isCliInstalled: vi.fn(),
   uninstallCli: vi.fn(),
 }));
 
@@ -18,12 +18,20 @@ describe("cli command", () => {
         handlers.set(name, handler),
       ),
     };
-    mocks.isCliInstalled.mockResolvedValue(true);
+    mocks.getCliStatus.mockResolvedValue({
+      canInstall: true,
+      canUninstall: true,
+      commandName: "flux",
+      installed: true,
+      installPath: "/usr/local/bin/flux",
+      managedBy: "manual-link",
+      targetPath: "/Applications/Fluxnotes.app/Contents/Resources/cli/flux",
+    });
 
     registerCliCommands(ipc as never);
 
     await expect(handlers.get("cli.install")?.()).resolves.toBeUndefined();
-    await expect(handlers.get("cli.status")?.()).resolves.toEqual({ installed: true });
+    await expect(handlers.get("cli.status")?.()).resolves.toMatchObject({ installed: true });
     await expect(handlers.get("cli.uninstall")?.()).resolves.toBeUndefined();
 
     expect(mocks.installCli).toHaveBeenCalled();

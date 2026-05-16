@@ -1,6 +1,15 @@
 import { z } from "zod";
 
 const voidSchema = z.undefined();
+const cliStatusSchema = z.object({
+  canInstall: z.boolean(),
+  canUninstall: z.boolean(),
+  commandName: z.literal("flux"),
+  installed: z.boolean(),
+  installPath: z.string().nullable(),
+  managedBy: z.enum(["manual-link", "user-path-shim", "unsupported"]),
+  targetPath: z.string().nullable(),
+});
 
 export const cliContract = {
   commands: {
@@ -10,9 +19,7 @@ export const cliContract = {
     },
     "cli.status": {
       input: voidSchema,
-      output: z.object({
-        installed: z.boolean(),
-      }),
+      output: cliStatusSchema,
     },
     "cli.uninstall": {
       input: voidSchema,

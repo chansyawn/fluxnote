@@ -2,7 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   appQuit: vi.fn(),
+  getWindowsCliTarget: vi.fn(() => ({
+    commandPath: "C:\\Users\\tester\\.flux\\bin\\flux.cmd",
+    wrapperPath: "C:\\App\\resources\\cli\\flux.cmd",
+  })),
+  installWindowsCli: vi.fn(async () => undefined),
   spawn: vi.fn(() => ({ unref: vi.fn() })),
+  uninstallWindowsCli: vi.fn(async () => undefined),
 }));
 
 vi.mock("electron", () => ({
@@ -13,6 +19,12 @@ vi.mock("electron", () => ({
 
 vi.mock("node:child_process", () => ({
   spawn: mocks.spawn,
+}));
+
+vi.mock("../features/cli/windows-cli-shim", () => ({
+  getWindowsCliTarget: mocks.getWindowsCliTarget,
+  installWindowsCli: mocks.installWindowsCli,
+  uninstallWindowsCli: mocks.uninstallWindowsCli,
 }));
 
 import { handleSquirrelStartup } from "./squirrel-startup";
@@ -38,23 +50,23 @@ describe("squirrel startup", () => {
     vi.clearAllMocks();
   });
 
-  it("ignores non-Windows startup", () => {
+  it("ignores non-Windows startup", async () => {
     setPlatform("darwin");
 
-    expect(handleSquirrelStartup(["fluxnotes", "--squirrel-install"])).toBe(false);
+    await expect(handleSquirrelStartup(["fluxnotes", "--squirrel-install"])).resolves.toBe(false);
     expect(mocks.spawn).not.toHaveBeenCalled();
     expect(mocks.appQuit).not.toHaveBeenCalled();
   });
 
-  it("ignores normal Windows startup", () => {
-    expect(handleSquirrelStartup(["fluxnotes"])).toBe(false);
+  it("ignores normal Windows startup", async () => {
+    await expect(handleSquirrelStartup(["fluxnotes"])).resolves.toBe(false);
     expect(mocks.spawn).not.toHaveBeenCalled();
     expect(mocks.appQuit).not.toHaveBeenCalled();
   });
 
-  it("creates shortcuts during install and update", () => {
-    expect(handleSquirrelStartup(["fluxnotes", "--squirrel-install"])).toBe(true);
-    expect(handleSquirrelStartup(["fluxnotes", "--squirrel-updated"])).toBe(true);
+  it("creates shortcuts and installs CLI during install and update", async () => {
+    await expect(handleSquirrelStartup(["fluxnotes", "--squirrel-install"])).resolves.toBe(true);
+    await expect(handleSquirrelStartup(["fluxnotes", "--squirrel-updated"])).resolves.toBe(true);
 
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       1,
@@ -69,10 +81,11 @@ describe("squirrel startup", () => {
       { detached: true, stdio: "ignore" },
     );
     expect(mocks.appQuit).toHaveBeenCalledTimes(2);
+    expect(mocks.installWindowsCli).toHaveBeenCalledTimes(2);
   });
 
-  it("removes shortcuts during uninstall", () => {
-    expect(handleSquirrelStartup(["fluxnotes", "--squirrel-uninstall"])).toBe(true);
+  it("removes shortcuts and uninstalls CLI during uninstall", async () => {
+    await expect(handleSquirrelStartup(["fluxnotes", "--squirrel-uninstall"])).resolves.toBe(true);
 
     expect(mocks.spawn).toHaveBeenCalledWith(
       expect.stringMatching(/Update\.exe$/),
@@ -80,10 +93,11 @@ describe("squirrel startup", () => {
       { detached: true, stdio: "ignore" },
     );
     expect(mocks.appQuit).toHaveBeenCalledTimes(1);
+    expect(mocks.uninstallWindowsCli).toHaveBeenCalledTimes(1);
   });
 
-  it("quits without update command during obsolete event", () => {
-    expect(handleSquirrelStartup(["fluxnotes", "--squirrel-obsolete"])).toBe(true);
+  it("quits without update command during obsolete event", async () => {
+    await expect(handleSquirrelStartup(["fluxnotes", "--squirrel-obsolete"])).resolves.toBe(true);
 
     expect(mocks.spawn).not.toHaveBeenCalled();
     expect(mocks.appQuit).toHaveBeenCalledTimes(1);
