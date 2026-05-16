@@ -39,17 +39,7 @@ const config: ForgeConfig = {
     },
   },
   rebuildConfig: {},
-  makers: [
-    new MakerZIP({}, ["darwin"]),
-    new MakerSquirrel({
-      authors: "Fluxnotes",
-      description: "A lightweight, always-on-top editor for AI-first workflows.",
-      name: "fluxnotes",
-      noMsi: true,
-      setupExe: "Fluxnotes Setup.exe",
-      setupIcon: "src/assets/icons/icon.ico",
-    }),
-  ],
+  makers: [new MakerZIP({}, ["darwin"]), new MakerSquirrel({})],
   plugins: [
     new VitePlugin({
       build: [
