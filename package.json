@@ -17,6 +17,7 @@
     "dev": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "release:version": "node scripts/release/version.mjs",
     "flux": "./src/cli/flux",
     "i18n:extract": "lingui extract --overwrite --clean",
     "i18n:check": "node scripts/check-i18n.mjs"
@@ -92,6 +93,7 @@
     "@vitest/coverage-v8": "^4.1.5",
     "drizzle-kit": "^0.31.10",
     "electron": "41.3.0",
+    "semver": "^7.8.0",
     "typescript": "~5.9.3",
     "vite": "catalog:",
     "vite-plus": "catalog:"
