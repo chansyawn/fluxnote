@@ -288,7 +288,7 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:70
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
 msgid "preferences.app.title"
 msgstr "App"
 
@@ -333,32 +333,32 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:146
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:148
 msgid "preferences.cli.install"
 msgstr "Install"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:151
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:153
 msgid "preferences.cli.path.description"
 msgstr "Install the Flux CLI for terminal workflows. After installation, run `flux --help` to view available commands and usage."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:157
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:159
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:142
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
 msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:131
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:133
 msgid "preferences.font-size.label"
 msgstr "Font size"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:98
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:100
 msgid "preferences.language.label"
 msgstr "Language"
 
