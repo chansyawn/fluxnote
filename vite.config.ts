@@ -29,5 +29,8 @@ export default defineConfig({
   resolve: {
     alias: viteAliases,
   },
-  staged: { "*": "vp check --fix" },
+  staged: {
+    "*": "vp check --fix",
+    "{lingui.config.ts,src/renderer/**/*.{ts,tsx,po}}": "vp run i18n:check",
+  },
 });

@@ -243,22 +243,22 @@ msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:30
+#: src/renderer/features/block/actions/external-edit-actions.tsx:38
 msgid "home-note.block.external-edit.cancel"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+#: src/renderer/features/block/actions/external-edit-actions.tsx:39
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:23
+#: src/renderer/features/block/actions/external-edit-actions.tsx:30
 msgid "home-note.block.external-edit.submit"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:24
+#: src/renderer/features/block/actions/external-edit-actions.tsx:31
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "Submit"
 

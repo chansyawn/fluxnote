@@ -40,7 +40,7 @@ jobs:
         run: vp test
 
       - name: Check i18n
-        run: vp run ci:i18n
+        run: vp run i18n:check
 
       - name: Build package
         run: vp run package
