@@ -19,6 +19,7 @@
     "make": "electron-forge make",
     "flux": "./src/cli/flux",
     "lingui": "lingui",
+    "ci:i18n": "lingui extract --overwrite --clean && git diff --exit-code -- src/renderer/locales",
     "lingui:extract": "lingui extract --overwrite --clean",
     "lingui:compile": "lingui compile --strict"
   },
