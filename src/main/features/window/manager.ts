@@ -48,7 +48,7 @@ function getMainWindowPlatformOptions(): BrowserWindowConstructorOptions {
 
   if (process.platform === "win32")
     return {
-      backgroundMaterial: "mica",
+      backgroundMaterial: "none",
       roundedCorners: true,
       thickFrame: true,
       transparent: false,

@@ -1,10 +1,19 @@
+import { getAppPlatform } from "@renderer/app/platform";
+import { cn } from "@renderer/ui/lib/utils";
 import { Outlet } from "@tanstack/react-router";
 
 import { WindowTitleBar } from "./window-title-bar";
 
 export function AppShell() {
+  const platform = getAppPlatform();
+
   return (
-    <div className="app-window-shell mx-auto flex h-full w-full flex-col overflow-hidden">
+    <div
+      className={cn(
+        "app-window-shell mx-auto flex h-full w-full flex-col overflow-hidden",
+        platform === "win32" && "bg-neutral-300 dark:bg-neutral-800",
+      )}
+    >
       <WindowTitleBar />
       <main
         tabIndex={1}
