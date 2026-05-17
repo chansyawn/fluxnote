@@ -5,7 +5,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./vite.config";
+import { viteAliases } from "./shared.ts";
 
 export default defineConfig({
   server: {

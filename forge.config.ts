@@ -39,24 +39,24 @@ const vitePluginConfig = {
   build: [
     {
       entry: "src/main/index.ts",
-      config: "vite.main.config.ts",
+      config: "config/vite/vite.main.config.ts",
       target: "main",
     },
     {
       entry: "src/preload/index.ts",
-      config: "vite.preload.config.ts",
+      config: "config/vite/vite.preload.config.ts",
       target: "preload",
     },
     {
       entry: "src/cli/index.ts",
-      config: "vite.cli.config.ts",
+      config: "config/vite/vite.cli.config.ts",
       target: "main",
     },
   ],
   renderer: [
     {
       name: "main_window",
-      config: "vite.renderer.config.ts",
+      config: "config/vite/vite.renderer.config.ts",
     },
   ],
 } satisfies ConstructorParameters<typeof VitePlugin>[0];
