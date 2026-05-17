@@ -14,7 +14,7 @@ import {
 } from "@tanstack/react-router";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const clientMocks = vi.hoisted(() => ({
   acknowledgePendingOpenBlock: vi.fn(),
@@ -113,10 +113,16 @@ async function createHarness(
 
 describe("OpenBlockWorkspaceRouteSync", () => {
   let mountedHarness: RouteHarness | null = null;
+  const originalScrollTo = window.scrollTo;
+
+  beforeEach(() => {
+    window.scrollTo = vi.fn();
+  });
 
   afterEach(() => {
     mountedHarness?.unmount();
     mountedHarness = null;
+    window.scrollTo = originalScrollTo;
     clientMocks.acknowledgePendingOpenBlock.mockReset();
     clientMocks.onOpenBlockRequested.mockReset();
     clientMocks.readPendingOpenBlock.mockReset();
