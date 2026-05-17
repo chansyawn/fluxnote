@@ -23,7 +23,7 @@ const packagerConfig = {
   appCopyright: "Copyright (c) 2026 Fluxnotes",
   appCategoryType: "public.app-category.productivity",
   asar: true,
-  executableName: "fluxnotes",
+  executableName: "Fluxnotes",
   extraResource: ["src/main/core/database/drizzle", "src/assets"],
   icon: "src/assets/icons/icon",
   name: "Fluxnotes",
