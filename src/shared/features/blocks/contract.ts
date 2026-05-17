@@ -4,6 +4,7 @@ import {
   blockMutationRequestSchema,
   blockKeepStateRequestSchema,
   blockSchema,
+  blocksDeleteArchivedResponseSchema,
   blocksListRequestSchema,
   blocksListResponseSchema,
   blocksLocateRequestSchema,
@@ -32,6 +33,10 @@ export const blocksContract = {
     "blocks.delete": {
       input: blockMutationRequestSchema,
       output: z.object({ deletedBlockId: z.string() }),
+    },
+    "blocks.delete-archived": {
+      input: voidSchema,
+      output: blocksDeleteArchivedResponseSchema,
     },
     "blocks.list": {
       input: blocksListRequestSchema,

@@ -7,6 +7,7 @@ import { createTestDb, type TestDbContext } from "../test-db";
 import {
   archiveBlock,
   createBlockRecord,
+  deleteArchivedBlocks,
   deleteBlock,
   getPublicBlockById,
   listBlocks,
@@ -23,6 +24,7 @@ describe("blocks service", () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     ctx.close();
     await ctx.cleanup();
   });
@@ -101,5 +103,30 @@ describe("blocks service", () => {
 
     expect(result).toEqual({ deletedBlockId: block.id });
     expect(rmMock).toHaveBeenCalledWith("/tmp/asset-path", { force: true, recursive: true });
+  });
+
+  it("deletes archived blocks and keeps active blocks", async () => {
+    const rmMock = vi.spyOn(fs, "rm").mockResolvedValue(undefined);
+    const active = await createBlockRecord(ctx.db, "active");
+    const archived = await createBlockRecord(ctx.db, "archived");
+    await archiveBlock(ctx.db, archived.id);
+
+    const result = await deleteArchivedBlocks(ctx.db, (blockId) => `/tmp/${blockId}`);
+    const activeResult = await listBlocks(ctx.db, undefined, "active", 0, 10);
+    const archivedResult = await listBlocks(ctx.db, undefined, "archived", 0, 10);
+
+    expect(result).toEqual({ deletedCount: 1 });
+    expect(activeResult.blocks.map((block) => block.id)).toContain(active.id);
+    expect(archivedResult.blocks).toEqual([]);
+    expect(rmMock).toHaveBeenCalledWith(`/tmp/${archived.id}`, { force: true, recursive: true });
+  });
+
+  it("returns zero when no archived blocks exist", async () => {
+    const rmMock = vi.spyOn(fs, "rm").mockResolvedValue(undefined);
+
+    const result = await deleteArchivedBlocks(ctx.db, (blockId) => `/tmp/${blockId}`);
+
+    expect(result).toEqual({ deletedCount: 0 });
+    expect(rmMock).not.toHaveBeenCalled();
   });
 });

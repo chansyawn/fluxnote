@@ -33,6 +33,9 @@ export type DeleteBlockRequest = z.input<
 export type DeleteBlockResult = z.infer<
   (typeof blocksContract)["commands"]["blocks.delete"]["output"]
 >;
+export type DeleteArchivedBlocksResult = z.infer<
+  (typeof blocksContract)["commands"]["blocks.delete-archived"]["output"]
+>;
 
 export const listBlocks = (req: ListBlocksRequest = {}): Promise<ListBlocksResult> =>
   invokeCommand("blocks.list", {
@@ -56,6 +59,9 @@ export const updateBlockContent = (req: UpdateBlockContentRequest): Promise<Bloc
 
 export const deleteBlock = (req: DeleteBlockRequest): Promise<DeleteBlockResult> =>
   invokeCommand("blocks.delete", req);
+
+export const deleteArchivedBlocks = (): Promise<DeleteArchivedBlocksResult> =>
+  invokeCommand("blocks.delete-archived", undefined);
 
 export const archiveBlock = (req: BlockMutationRequest): Promise<Block> =>
   invokeCommand("blocks.archive", req);

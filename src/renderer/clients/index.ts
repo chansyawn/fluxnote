@@ -19,6 +19,7 @@ export {
 export {
   archiveBlock,
   createBlock,
+  deleteArchivedBlocks,
   deleteBlock,
   listBlocks,
   locateBlock,
@@ -59,6 +60,7 @@ export type {
   Block,
   BlockMutationRequest,
   BlockVisibility,
+  DeleteArchivedBlocksResult,
   DeleteBlockResult,
   ListBlocksRequest,
   ListBlocksResult,

@@ -3,6 +3,7 @@ export {
   archiveBlock,
   assertBlockExists,
   createBlockRecord,
+  deleteArchivedBlocks,
   deleteBlock,
   getPublicBlockById,
   listBlocks,

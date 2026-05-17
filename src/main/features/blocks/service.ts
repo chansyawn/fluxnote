@@ -341,3 +341,27 @@ export async function deleteBlock(
   await fs.rm(assetPath, { force: true, recursive: true });
   return { deletedBlockId: blockId };
 }
+
+export async function deleteArchivedBlocks(
+  db: AppDatabase,
+  getAssetPathForBlock: (blockId: string) => string,
+): Promise<{ deletedCount: number }> {
+  const archivedBlockRows = await db
+    .select({ id: blocks.id })
+    .from(blocks)
+    .where(isNotNull(blocks.archivedAt))
+    .all();
+  const archivedBlockIds = archivedBlockRows.map((block) => block.id);
+  if (archivedBlockIds.length === 0) {
+    return { deletedCount: 0 };
+  }
+
+  await db.delete(blocks).where(inArray(blocks.id, archivedBlockIds)).run();
+  await Promise.all(
+    archivedBlockIds.map(async (blockId) => {
+      await fs.rm(getAssetPathForBlock(blockId), { force: true, recursive: true });
+    }),
+  );
+
+  return { deletedCount: archivedBlockIds.length };
+}

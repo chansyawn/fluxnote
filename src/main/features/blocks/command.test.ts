@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   archiveBlock: vi.fn(),
   createBlockRecord: vi.fn(),
+  deleteArchivedBlocks: vi.fn(),
   deleteBlock: vi.fn(),
   listBlocks: vi.fn(),
   locateBlock: vi.fn(),
@@ -54,6 +55,16 @@ describe("blocks command", () => {
 
     expect(mocks.deleteBlock).toHaveBeenCalledWith(deps.db, "b1", "/tmp/b1");
     expect(result).toEqual({ deletedBlockId: "b1" });
+  });
+
+  it("dispatches delete archived command", async () => {
+    mocks.deleteArchivedBlocks.mockResolvedValue({ deletedCount: 2 });
+    registerBlocksCommands(ipc as never, deps);
+
+    const result = await handlers.get("blocks.delete-archived")?.(undefined);
+
+    expect(mocks.deleteArchivedBlocks).toHaveBeenCalledWith(deps.db, deps.getAssetPathForBlock);
+    expect(result).toEqual({ deletedCount: 2 });
   });
 
   it("dispatches list command with default visibility", async () => {

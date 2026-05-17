@@ -12,6 +12,7 @@ import {
   archiveBlock,
   createBlockRecord,
   deleteBlock,
+  deleteArchivedBlocks,
   listBlocks,
   locateBlock,
   restoreBlock,
@@ -51,6 +52,10 @@ export function registerBlocksCommands(ipc: IpcRouter, deps: BlocksCommandDeps):
 
   ipc.command("blocks.delete", async (input) => {
     return await deleteBlock(deps.db, input.blockId, deps.getAssetPathForBlock(input.blockId));
+  });
+
+  ipc.command("blocks.delete-archived", async () => {
+    return await deleteArchivedBlocks(deps.db, deps.getAssetPathForBlock);
   });
 
   ipc.command("blocks.list", async (input) => {
