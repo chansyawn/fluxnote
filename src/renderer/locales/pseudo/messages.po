@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:40
-#: src/renderer/routes/-layout/window-title-bar.tsx:101
+#: src/renderer/features/error-boundary/error-title-bar.tsx:38
+#: src/renderer/routes/-layout/window-title-bar.tsx:99
 msgid "app.title"
 msgstr ""
 
