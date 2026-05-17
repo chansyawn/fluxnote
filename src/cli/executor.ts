@@ -134,13 +134,20 @@ export async function executeExternalEdit(
   tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  const resolvedPath = resolveTextFilePath(filePath, deps.cwd());
+  const cwd = deps.cwd();
+  const resolvedPath = resolveTextFilePath(filePath, cwd);
   const originalContent = await readTextFile(filePath, deps);
 
   try {
     const result = await deps.dispatchCommand("block.create-external-edit", {
       content: originalContent,
       tagNames,
+      trigger: {
+        cwd,
+        requestedFilePath: filePath,
+        source: "cli",
+        targetFilePath: resolvedPath,
+      },
     });
     if (result.status === "submitted") {
       await deps.writeFile(resolvedPath, result.content, "utf8");

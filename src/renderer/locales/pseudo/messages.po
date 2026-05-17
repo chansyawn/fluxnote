@@ -243,22 +243,42 @@ msgid "home-note.block.delete.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:38
+#: src/renderer/features/block/actions/external-edit-actions.tsx:43
 msgid "home-note.block.external-edit.cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:39
+#: src/renderer/features/block/actions/external-edit-actions.tsx:44
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:30
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:65
+msgid "home-note.block.external-edit.metadata.cwd"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:69
+msgid "home-note.block.external-edit.metadata.file"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:61
+msgid "home-note.block.external-edit.metadata.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:29
+msgid "home-note.block.external-edit.metadata.source.cli"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:35
 msgid "home-note.block.external-edit.submit"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+#: src/renderer/features/block/actions/external-edit-actions.tsx:36
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr ""
 

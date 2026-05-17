@@ -22,8 +22,8 @@ export function createBackendRuntime() {
     await services.db.init();
     const db = services.db.getDb();
     entrypointRuntime = createEntrypointRuntime({
-      createExternalEditSession: (blockId, originalContent, signal) =>
-        services.externalEditManager.begin(blockId, originalContent, { signal }).result,
+      createExternalEditSession: (blockId, originalContent, trigger, signal) =>
+        services.externalEditManager.begin(blockId, originalContent, trigger, { signal }).result,
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
         services.openBlockService.requestOpen({ blockId });

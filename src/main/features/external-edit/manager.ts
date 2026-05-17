@@ -2,6 +2,7 @@ import type { EventBus } from "@main/core/ipc";
 import type {
   ExternalEditResult,
   ExternalEditSession,
+  ExternalEditTrigger,
 } from "@shared/features/external-edit/session-contracts";
 import { businessError } from "@shared/ipc/result";
 
@@ -44,12 +45,14 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
   function begin(
     blockId: string,
     originalContent: string,
+    trigger: ExternalEditTrigger,
     options?: { signal?: AbortSignal },
   ): BeginExternalEditResult {
     const session: ExternalEditSession = {
       blockId,
       createdAt: nowIsoString(),
       editId: crypto.randomUUID(),
+      trigger,
     };
     const result = new Promise<ExternalEditResult>((resolve) => {
       pendingEdits.set(session.editId, {

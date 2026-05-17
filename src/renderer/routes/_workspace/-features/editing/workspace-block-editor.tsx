@@ -10,6 +10,7 @@ import {
   keyboardEventMatchesShortcut,
   type ShortcutPreferences,
 } from "@renderer/features/shortcut/shortcut-utils";
+import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { memo, useCallback, useRef, useState } from "react";
 
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
@@ -90,12 +91,14 @@ function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockE
 function WorkspaceExternalEditActions({
   blockId,
   editId,
+  trigger,
   commands,
   shortcuts,
   isPending,
 }: {
   blockId: string;
   editId: string;
+  trigger: ExternalEditTrigger;
   commands: WorkspaceCommands;
   shortcuts: ShortcutPreferences;
   isPending: boolean;
@@ -104,6 +107,7 @@ function WorkspaceExternalEditActions({
     <ExternalEditActions
       shortcuts={shortcuts}
       pending={isPending}
+      trigger={trigger}
       onCancel={() => {
         commands.cancelExternalEdit(editId);
       }}
@@ -188,6 +192,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
             <WorkspaceExternalEditActions
               blockId={block.id}
               editId={state.externalEditSession.editId}
+              trigger={state.externalEditSession.trigger}
               commands={commands}
               shortcuts={shortcuts}
               isPending={state.isExternalEditPending}

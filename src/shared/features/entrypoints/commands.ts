@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { externalEditResultSchema } from "../external-edit/session-contracts";
+import {
+  externalEditResultSchema,
+  externalEditTriggerSchema,
+} from "../external-edit/session-contracts";
 
 export const backendCommandKeys = [
   "app.open",
@@ -15,6 +18,9 @@ const blockCreationRequestSchema = z.object({
   content: z.string(),
   tagNames: z.array(z.string()).optional(),
 });
+const externalEditBlockCreationRequestSchema = blockCreationRequestSchema.extend({
+  trigger: externalEditTriggerSchema,
+});
 
 export const backendCommandContracts = {
   "app.open": {
@@ -28,7 +34,7 @@ export const backendCommandContracts = {
     }),
   },
   "block.create-external-edit": {
-    request: blockCreationRequestSchema,
+    request: externalEditBlockCreationRequestSchema,
     response: externalEditResultSchema,
   },
   "block.open": {

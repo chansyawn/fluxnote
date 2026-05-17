@@ -243,22 +243,42 @@ msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:38
+#: src/renderer/features/block/actions/external-edit-actions.tsx:43
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:39
+#: src/renderer/features/block/actions/external-edit-actions.tsx:44
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:30
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:65
+msgid "home-note.block.external-edit.metadata.cwd"
+msgstr "工作目录"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:69
+msgid "home-note.block.external-edit.metadata.file"
+msgstr "目标文件"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:61
+msgid "home-note.block.external-edit.metadata.source"
+msgstr "来源"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:29
+msgid "home-note.block.external-edit.metadata.source.cli"
+msgstr "命令行"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:35
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+#: src/renderer/features/block/actions/external-edit-actions.tsx:36
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "提交"
 
