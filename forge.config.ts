@@ -84,16 +84,9 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerDMG(
-      (arch) => ({
-        name: path.basename(
-          getReleaseArtifactName({
-            arch,
-            kind: "dmg",
-            platform: "darwin",
-            version: packageVersion,
-          }),
-          ".dmg",
-        ),
+      (_arch) => ({
+        name: "Fluxnotes",
+        title: "Fluxnotes",
       }),
       ["darwin"],
     ),

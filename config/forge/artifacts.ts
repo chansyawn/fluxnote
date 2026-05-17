@@ -116,6 +116,10 @@ export async function normalizeMakeArtifacts(
           ...makeResult,
           artifacts: await Promise.all(
             makeResult.artifacts.map(async (artifact) => {
+              if (artifact.endsWith(".dmg")) {
+                return await renameArtifact(artifact, { arch, kind: "dmg", platform, version });
+              }
+
               if (artifact.endsWith(".zip")) {
                 return await renameArtifact(artifact, { arch, kind: "zip", platform, version });
               }
