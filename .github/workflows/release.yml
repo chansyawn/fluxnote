@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -61,7 +61,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -102,7 +102,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -130,7 +130,7 @@ jobs:
           fi
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: out/make/**/*
@@ -139,6 +139,7 @@ jobs:
   release:
     name: Publish
     runs-on: ubuntu-latest
+    environment: release
     needs:
       - prepare
       - build
@@ -146,10 +147,18 @@ jobs:
       contents: write
 
     steps:
+      - name: Create release app token
+        id: release-app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          token: ${{ steps.release-app.outputs.token }}
 
       - name: Setup Vite+
         uses: voidzero-dev/setup-vp@v1
@@ -161,7 +170,7 @@ jobs:
         run: vp install
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: release-artifacts
 
@@ -179,8 +188,8 @@ jobs:
         run: |
           vp run release:version -- write
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "fluxnotes-release-bot[bot]"
+          git config user.email "fluxnotes-release-bot[bot]@users.noreply.github.com"
           git add package.json
 
           if git diff --cached --quiet; then
@@ -195,6 +204,8 @@ jobs:
 
       - name: Create release
         uses: softprops/action-gh-release@v3
+        env:
+          GITHUB_TOKEN: ${{ steps.release-app.outputs.token }}
         with:
           tag_name: ${{ needs.prepare.outputs.tag }}
           name: ${{ needs.prepare.outputs.tag }}
