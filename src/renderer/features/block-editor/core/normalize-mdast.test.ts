@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
-import { h, doc, p, t, tbl, td, tr } from "../test-helper/mdast-builders";
+import { code, h, doc, li, p, quote, t, tbl, td, tr, ul } from "../test-helper/mdast-builders";
 import { normalizeMdast } from "./normalize-mdast";
 
 describe("normalizeMdast", () => {
@@ -51,5 +51,43 @@ describe("normalizeMdast", () => {
     const result = normalizeMdast({ children: [], type: "root" });
     expect(result.children).toHaveLength(1);
     expect(result.children[0].type).toBe("paragraph");
+  });
+
+  it("keeps list items paragraph-first when nested blocks start the item", () => {
+    const result = normalizeMdast(
+      doc(
+        ul(
+          li([quote(p(t("quoted")))]),
+          li([code("const a = 1;", "ts")]),
+          li([ul(li([p(t("nested"))]))]),
+        ),
+      ),
+    );
+
+    const list = result.children[0];
+    expect(list.type).toBe("list");
+    if (list.type === "list") {
+      expect(list.children.map((item) => item.children[0]?.type)).toEqual([
+        "paragraph",
+        "paragraph",
+        "paragraph",
+      ]);
+      expect(list.children[0].children[1]?.type).toBe("blockquote");
+      expect(list.children[1].children[1]?.type).toBe("code");
+      expect(list.children[2].children[1]?.type).toBe("list");
+    }
+  });
+
+  it("does not add another paragraph when a list item already starts with one", () => {
+    const result = normalizeMdast(doc(ul(li([p(t("lead")), quote(p(t("quoted")))]))));
+
+    const list = result.children[0];
+    expect(list.type).toBe("list");
+    if (list.type === "list") {
+      expect(list.children[0].children).toMatchObject([
+        { children: [{ type: "text", value: "lead" }], type: "paragraph" },
+        { type: "blockquote" },
+      ]);
+    }
   });
 });

@@ -94,7 +94,14 @@ export function wrapListItemInlineChildrenInParagraphs(listItem: ListItemNode): 
 }
 
 export function ensureListItemHasParagraph(listItem: ListItemNode): boolean {
-  return ensureContainerHasParagraph(listItem);
+  const changed = ensureContainerHasParagraph(listItem);
+  const firstChild = listItem.getFirstChild();
+  if ($isParagraphNode(firstChild)) {
+    return changed;
+  }
+
+  listItem.splice(0, 0, [$createParagraphNode()]);
+  return true;
 }
 
 /*
@@ -115,6 +122,7 @@ export function repairListItemSelection(
  * Normalize runtime list items to the editor's block-container shape:
  * - empty items receive an editable paragraph;
  * - raw inline children are wrapped into paragraphs;
+ * - structured first children are preceded by an editable paragraph;
  * - collapsed selection on the item moves into a child block.
  */
 export function normalizeListItemForEditing(

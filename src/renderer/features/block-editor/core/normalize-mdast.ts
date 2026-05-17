@@ -72,13 +72,19 @@ function normalizeContainerChildren(children: ReadonlyArray<BlockContent>): Bloc
   return blocks.length > 0 ? blocks : [{ children: [], type: "paragraph" }];
 }
 
+function ensureListItemStartsWithParagraph(children: ReadonlyArray<BlockContent>): BlockContent[] {
+  return children[0]?.type === "paragraph"
+    ? [...children]
+    : [{ children: [], type: "paragraph" }, ...children];
+}
+
 function shouldSpreadListItem(children: ReadonlyArray<BlockContent>): boolean {
   return children.length > 1;
 }
 
 function normalizeListItem(item: ListItem): ListItem {
-  const children = normalizeContainerChildren(
-    item.children as BlockContent[],
+  const children = ensureListItemStartsWithParagraph(
+    normalizeContainerChildren(item.children as BlockContent[]),
   ) as ListItem["children"];
 
   return {
