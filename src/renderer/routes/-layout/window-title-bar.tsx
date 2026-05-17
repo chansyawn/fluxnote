@@ -85,9 +85,7 @@ export function WindowTitleBar() {
   const isWindows = platform === "win32";
 
   return (
-    <header
-      className={cn("z-20 mb-1 h-8 select-none [-webkit-app-region:drag]", !isWindows && "pt-1")}
-    >
+    <header className={cn("z-20 mb-1 h-8 select-none pt-1 [-webkit-app-region:drag]")}>
       <div
         className={cn("relative z-10 flex h-full items-center gap-2", isWindows ? "ps-3" : "px-3")}
       >
