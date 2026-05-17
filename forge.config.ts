@@ -1,5 +1,5 @@
-import { cp, mkdir } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { MakerDMG } from "@electron-forge/maker-dmg";
 import { MakerSquirrel } from "@electron-forge/maker-squirrel";
@@ -7,76 +7,107 @@ import { MakerZIP } from "@electron-forge/maker-zip";
 import { FusesPlugin } from "@electron-forge/plugin-fuses";
 import { VitePlugin } from "@electron-forge/plugin-vite";
 import type { ForgeConfig } from "@electron-forge/shared-types";
+import type { FuseConfig } from "@electron/fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
+import { convertVersion } from "electron-winstaller";
 
-async function copyCliResources(buildPath: string): Promise<void> {
-  const resourcesCliPath = path.resolve(buildPath, "..", "cli");
-  await mkdir(resourcesCliPath, { recursive: true });
-  await cp("src/cli/flux", path.join(resourcesCliPath, "flux"));
-  await cp("src/cli/flux.cmd", path.join(resourcesCliPath, "flux.cmd"));
-  await cp(".vite/cli/flux-cli.mjs", path.join(resourcesCliPath, "flux-cli.mjs"));
-}
+import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts";
+import { copyCliResources } from "./config/forge/cli-resources";
+import { readPackageVersion } from "./config/forge/package-version";
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const packageVersion = readPackageVersion(rootDir);
+
+const packagerConfig = {
+  appBundleId: "app.fluxnotes",
+  appCopyright: "Copyright (c) 2026 Fluxnotes",
+  appCategoryType: "public.app-category.productivity",
+  asar: true,
+  executableName: "fluxnotes",
+  extraResource: ["src/main/core/database/drizzle", "src/assets"],
+  icon: "src/assets/icons/icon",
+  name: "Fluxnotes",
+  protocols: [
+    {
+      name: "Fluxnotes",
+      schemes: ["flux"],
+    },
+  ],
+} satisfies ForgeConfig["packagerConfig"];
+
+const vitePluginConfig = {
+  build: [
+    {
+      entry: "src/main/index.ts",
+      config: "config/vite/vite.main.config.ts",
+      target: "main",
+    },
+    {
+      entry: "src/preload/index.ts",
+      config: "config/vite/vite.preload.config.ts",
+      target: "preload",
+    },
+    {
+      entry: "src/cli/index.ts",
+      config: "config/vite/vite.cli.config.ts",
+      target: "main",
+    },
+  ],
+  renderer: [
+    {
+      name: "main_window",
+      config: "config/vite/vite.renderer.config.ts",
+    },
+  ],
+} satisfies ConstructorParameters<typeof VitePlugin>[0];
+
+const fuseConfig = {
+  version: FuseVersion.V1,
+  [FuseV1Options.RunAsNode]: true,
+  [FuseV1Options.EnableCookieEncryption]: true,
+  [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
+  [FuseV1Options.EnableNodeCliInspectArguments]: false,
+  [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
+  [FuseV1Options.OnlyLoadAppFromAsar]: true,
+} satisfies FuseConfig;
 
 const config: ForgeConfig = {
-  packagerConfig: {
-    appBundleId: "app.fluxnotes",
-    appCopyright: "Copyright (c) 2026 Fluxnotes",
-    appCategoryType: "public.app-category.productivity",
-    asar: true,
-    executableName: "fluxnotes",
-    extraResource: ["src/main/core/database/drizzle", "src/assets"],
-    icon: "src/assets/icons/icon",
-    name: "Fluxnotes",
-    protocols: [
-      {
-        name: "Fluxnotes",
-        schemes: ["flux"],
-      },
-    ],
-  },
+  packagerConfig,
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
       await copyCliResources(buildPath);
     },
+    postMake: async (_config, makeResults) => {
+      return await normalizeMakeArtifacts(makeResults);
+    },
   },
   rebuildConfig: {},
-  makers: [new MakerDMG({}, ["darwin"]), new MakerZIP({}, ["darwin"]), new MakerSquirrel({})],
-  plugins: [
-    new VitePlugin({
-      build: [
-        {
-          entry: "src/main/index.ts",
-          config: "vite.main.config.ts",
-          target: "main",
-        },
-        {
-          entry: "src/preload/index.ts",
-          config: "vite.preload.config.ts",
-          target: "preload",
-        },
-        {
-          entry: "src/cli/index.ts",
-          config: "vite.cli.config.ts",
-          target: "main",
-        },
-      ],
-      renderer: [
-        {
-          name: "main_window",
-          config: "vite.renderer.config.ts",
-        },
-      ],
-    }),
-    new FusesPlugin({
-      version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: true,
-      [FuseV1Options.EnableCookieEncryption]: true,
-      [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-      [FuseV1Options.EnableNodeCliInspectArguments]: false,
-      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-      [FuseV1Options.OnlyLoadAppFromAsar]: true,
-    }),
+  makers: [
+    new MakerDMG(
+      (arch) => ({
+        name: path.basename(
+          getReleaseArtifactName({
+            arch,
+            kind: "dmg",
+            platform: "darwin",
+            version: packageVersion,
+          }),
+          ".dmg",
+        ),
+      }),
+      ["darwin"],
+    ),
+    new MakerZIP({}, ["darwin"]),
+    new MakerSquirrel((arch) => ({
+      setupExe: getReleaseArtifactName({
+        arch,
+        kind: "setup",
+        platform: "win32",
+        version: convertVersion(packageVersion),
+      }),
+    })),
   ],
+  plugins: [new VitePlugin(vitePluginConfig), new FusesPlugin(fuseConfig)],
 };
 
 export default config;
