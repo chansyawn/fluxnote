@@ -1,3 +1,4 @@
+import { normalizeAppPlatform, type AppEnvironment } from "@shared/app/platform";
 import type { IpcResult } from "@shared/ipc/result";
 import type {
   CommandInput,
@@ -39,4 +40,9 @@ const ipc = {
   },
 };
 
+const appEnvironment: AppEnvironment = {
+  platform: normalizeAppPlatform(process.platform),
+};
+
 contextBridge.exposeInMainWorld("ipc", ipc);
+contextBridge.exposeInMainWorld("appEnvironment", appEnvironment);

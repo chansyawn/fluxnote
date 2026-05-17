@@ -1,39 +1,46 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { getAppPlatform } from "@renderer/app/platform";
 import { destroyWindow, hideWindow } from "@renderer/clients";
-import { XIcon } from "lucide-react";
+import { WindowCloseButton } from "@renderer/features/window/window-close-button";
+import { cn } from "@renderer/ui/lib/utils";
 
 export function ErrorTitleBar() {
   const { i18n } = useLingui();
+  const platform = getAppPlatform();
+  const isWindows = platform === "win32";
+
+  const closeButton = (
+    <WindowCloseButton
+      ariaLabel={i18n._({
+        id: "error.global.exit-app",
+        message: "Exit app",
+      })}
+      onClick={() => {
+        void destroyWindow().catch((destroyError) => {
+          console.error("Failed to destroy window, fallback to hide", destroyError);
+          return hideWindow();
+        });
+      }}
+    >
+      <Trans id="error.global.exit-app">Exit app</Trans>
+    </WindowCloseButton>
+  );
 
   return (
-    <header className="z-20 mb-1 h-8 pt-1 select-none [-webkit-app-region:drag]">
-      <div className="relative z-10 flex h-full items-center gap-2 px-3">
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            aria-label={i18n._({
-              id: "error.global.exit-app",
-              message: "Exit app",
-            })}
-            className="group flex size-3 items-center justify-center rounded-full bg-red-500/85 text-red-950 transition-all [-webkit-app-region:no-drag] hover:brightness-95 dark:bg-red-400/85 dark:text-red-950"
-            type="button"
-            onClick={() => {
-              void destroyWindow().catch((destroyError) => {
-                console.error("Failed to destroy window, fallback to hide", destroyError);
-                return hideWindow();
-              });
-            }}
-          >
-            <XIcon className="size-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100" />
-            <span className="sr-only">
-              <Trans id="error.global.exit-app">Exit app</Trans>
-            </span>
-          </button>
-        </div>
+    <header
+      className={cn("z-20 mb-1 h-8 select-none [-webkit-app-region:drag]", !isWindows && "pt-1")}
+    >
+      <div
+        className={cn("relative z-10 flex h-full items-center gap-2", isWindows ? "ps-3" : "px-3")}
+      >
+        {!isWindows ? <div className="flex shrink-0 items-center gap-2">{closeButton}</div> : null}
 
         <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
           <Trans id="app.title">Fluxnotes</Trans>
         </div>
+
+        {isWindows ? <div className="ms-auto flex shrink-0 items-center">{closeButton}</div> : null}
       </div>
     </header>
   );

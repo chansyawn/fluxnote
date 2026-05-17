@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:35
-#: src/renderer/routes/-layout/window-title-bar.tsx:94
+#: src/renderer/features/error-boundary/error-title-bar.tsx:40
+#: src/renderer/routes/-layout/window-title-bar.tsx:101
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -186,8 +186,8 @@ msgid "error.global.description"
 msgstr "Fluxnotes encountered an unexpected error. You can retry or exit the app."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:14
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
+#: src/renderer/features/error-boundary/error-title-bar.tsx:15
+#: src/renderer/features/error-boundary/error-title-bar.tsx:26
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr "Exit app"
@@ -203,22 +203,22 @@ msgid "error.global.title"
 msgstr "Something went wrong"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:26
+#: src/renderer/routes/-layout/window-title-bar.tsx:29
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:55
+#: src/renderer/routes/-layout/window-title-bar.tsx:58
 msgid "header.go-lab"
 msgstr "Go to lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:53
+#: src/renderer/routes/-layout/window-title-bar.tsx:56
 msgid "header.open-lab"
 msgstr "Open lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:28
+#: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
@@ -476,8 +476,8 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:67
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:70
+#: src/renderer/routes/-layout/window-title-bar.tsx:78
 msgid "window.hide"
 msgstr "Hide window"
 

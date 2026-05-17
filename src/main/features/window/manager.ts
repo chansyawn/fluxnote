@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import type { EventBus } from "@main/core/ipc";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, type BrowserWindowConstructorOptions } from "electron";
 
 import { calculateWindowPosition, saveWindowPosition } from "./position";
 
@@ -10,6 +10,7 @@ const MAIN_WINDOW_MAX_WIDTH = 640;
 const MAIN_WINDOW_MIN_WIDTH = 320;
 const MAIN_WINDOW_WIDTH = 640;
 const MAIN_WINDOW_VIBRANCY = "under-window" as const;
+const MAIN_WINDOW_WINDOWS_BACKGROUND_MATERIAL = "acrylic" as const;
 const MAIN_WINDOW_WORKSPACE_OPTIONS = {
   visibleOnFullScreen: true,
   skipTransformProcessType: true,
@@ -36,6 +37,23 @@ function resolveIconPath(iconName: string): string {
   return app.isPackaged
     ? path.join(process.resourcesPath, "assets/icons", iconName)
     : path.resolve(process.cwd(), "src/assets/icons", iconName);
+}
+
+function getMainWindowPlatformOptions(): BrowserWindowConstructorOptions {
+  if (process.platform === "darwin") {
+    return {
+      vibrancy: MAIN_WINDOW_VIBRANCY,
+      visualEffectState: "active",
+    };
+  }
+
+  if (process.platform === "win32") {
+    return {
+      backgroundMaterial: MAIN_WINDOW_WINDOWS_BACKGROUND_MATERIAL,
+    };
+  }
+
+  return {};
 }
 
 export function createWindowManager(services: WindowManagerServices): WindowManager {
@@ -131,14 +149,6 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       return;
     }
 
-    const macOSVibrancyOptions =
-      process.platform === "darwin"
-        ? {
-            vibrancy: MAIN_WINDOW_VIBRANCY,
-            visualEffectState: "active" as const,
-          }
-        : {};
-
     const createdWindow = new BrowserWindow({
       acceptFirstMouse: true,
       alwaysOnTop: true,
@@ -162,7 +172,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         sandbox: true,
       },
       width: MAIN_WINDOW_WIDTH,
-      ...macOSVibrancyOptions,
+      ...getMainWindowPlatformOptions(),
     });
     mainWindow = createdWindow;
 

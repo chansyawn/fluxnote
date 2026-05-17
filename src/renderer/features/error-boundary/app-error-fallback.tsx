@@ -4,7 +4,7 @@ import type { FallbackProps } from "react-error-boundary";
 
 export function AppErrorFallback({ error }: FallbackProps) {
   return (
-    <div className="mx-auto flex flex-col overflow-hidden rounded-xl">
+    <div className="app-window-shell mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
       <ErrorTitleBar />
       <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <section className="mx-auto flex h-full w-full max-w-3xl items-center justify-center px-6 py-3">

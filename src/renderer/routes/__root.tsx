@@ -18,7 +18,7 @@ function RootComponent() {
   return (
     <OpenBlockRequestProvider>
       <OpenBlockWorkspaceRouteSync />
-      <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
+      <div className="app-window-shell mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
         <WindowTitleBar />
         <main
           tabIndex={1}
