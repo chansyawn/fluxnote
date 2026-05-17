@@ -9,8 +9,7 @@ const MAIN_WINDOW_HEIGHT = 600;
 const MAIN_WINDOW_MAX_WIDTH = 640;
 const MAIN_WINDOW_MIN_WIDTH = 320;
 const MAIN_WINDOW_WIDTH = 640;
-const MAIN_WINDOW_VIBRANCY = "under-window" as const;
-const MAIN_WINDOW_WINDOWS_BACKGROUND_MATERIAL = "acrylic" as const;
+
 const MAIN_WINDOW_WORKSPACE_OPTIONS = {
   visibleOnFullScreen: true,
   skipTransformProcessType: true,
@@ -40,18 +39,10 @@ function resolveIconPath(iconName: string): string {
 }
 
 function getMainWindowPlatformOptions(): BrowserWindowConstructorOptions {
-  if (process.platform === "darwin") {
-    return {
-      vibrancy: MAIN_WINDOW_VIBRANCY,
-      visualEffectState: "active",
-    };
-  }
+  if (process.platform === "darwin")
+    return { vibrancy: "under-window", visualEffectState: "active" };
 
-  if (process.platform === "win32") {
-    return {
-      backgroundMaterial: MAIN_WINDOW_WINDOWS_BACKGROUND_MATERIAL,
-    };
-  }
+  if (process.platform === "win32") return { backgroundMaterial: "acrylic" };
 
   return {};
 }

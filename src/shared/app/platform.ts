@@ -1,16 +1,4 @@
-const APP_PLATFORMS = [
-  "aix",
-  "android",
-  "darwin",
-  "freebsd",
-  "haiku",
-  "linux",
-  "openbsd",
-  "sunos",
-  "win32",
-  "cygwin",
-  "netbsd",
-] as const;
+const APP_PLATFORMS = ["darwin", "win32", "unsupported"] as const;
 
 export type AppPlatform = (typeof APP_PLATFORMS)[number];
 
@@ -21,5 +9,5 @@ export interface AppEnvironment {
 export function normalizeAppPlatform(value: string): AppPlatform {
   const platform = APP_PLATFORMS.find((candidate) => candidate === value);
 
-  return platform ?? "linux";
+  return platform ?? "unsupported";
 }

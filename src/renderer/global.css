@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/noto-sans";
 @import "./scrollbar.css";
+@import "./shell.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -51,10 +52,6 @@
 
 :root {
   --app-font-size-px: 16px;
-  --app-window-border: oklch(1 0 0 / 38%);
-  --app-window-shadow: 0 18px 54px oklch(0 0 0 / 18%);
-  --app-window-surface: oklch(1 0 0 / 72%);
-  --windows-close-hover: #c42b1c;
   --background: oklch(1 0 0 / 80%);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0 / 60%);
@@ -90,9 +87,6 @@
 }
 
 .dark {
-  --app-window-border: oklch(1 0 0 / 12%);
-  --app-window-shadow: 0 18px 54px oklch(0 0 0 / 38%);
-  --app-window-surface: oklch(0.145 0 0 / 72%);
   --background: oklch(0.145 0 0 / 80%);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0 / 60%);
@@ -126,14 +120,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-html[data-platform="win32"] {
-  --app-window-surface: oklch(1 0 0 / 58%);
-}
-
-html.dark[data-platform="win32"] {
-  --app-window-surface: oklch(0.145 0 0 / 58%);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -149,25 +135,8 @@ html.dark[data-platform="win32"] {
     @apply h-full;
   }
 
-  body {
-    background: transparent;
-  }
-
   .lucide {
     width: 1em;
     height: 1em;
-  }
-}
-
-@layer components {
-  .app-window-shell {
-    background: var(--app-window-surface);
-    border: 1px solid var(--app-window-border);
-    box-shadow: var(--app-window-shadow);
-  }
-
-  html[data-platform="win32"] .app-window-shell {
-    -webkit-backdrop-filter: blur(24px) saturate(1.35);
-    backdrop-filter: blur(24px) saturate(1.35);
   }
 }

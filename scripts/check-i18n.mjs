@@ -1,15 +1,19 @@
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { formatter } from "@lingui/format-po";
 
 import linguiConfig from "../lingui.config.ts";
 
+const require = createRequire(import.meta.url);
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const localesDir = path.join(rootDir, "src/renderer/locales");
 const poFormatter = formatter();
+const linguiCliPath = path.join(path.dirname(require.resolve("@lingui/cli")), "lingui.js");
 
 function run(command, args) {
   return new Promise((resolve, reject) => {
@@ -77,7 +81,7 @@ async function findMissingTranslations() {
 }
 
 const beforeExtract = await readCatalogSnapshot();
-await run("lingui", ["extract", "--overwrite", "--clean"]);
+await run(process.execPath, [linguiCliPath, "extract", "--overwrite", "--clean"]);
 
 const changedCatalogs = findChangedCatalogs(beforeExtract, await readCatalogSnapshot());
 const missing = await findMissingTranslations();

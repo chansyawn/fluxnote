@@ -1,0 +1,32 @@
+:root {
+  --app-window-border: oklch(1 0 0 / 38%);
+  --app-window-shadow: 0 18px 54px oklch(0 0 0 / 18%);
+  --app-window-surface: oklch(1 0 0 / 72%);
+  --windows-close-hover: #c42b1c;
+}
+
+.dark {
+  --app-window-border: oklch(1 0 0 / 12%);
+  --app-window-shadow: 0 18px 54px oklch(0 0 0 / 38%);
+  --app-window-surface: oklch(0.145 0 0 / 72%);
+}
+
+html[data-platform="win32"] {
+  --app-window-surface: oklch(1 0 0 / 58%);
+}
+
+html.dark[data-platform="win32"] {
+  --app-window-surface: oklch(0.145 0 0 / 58%);
+}
+
+@layer components {
+  body {
+    background: transparent;
+  }
+
+  .app-window-shell {
+    background: var(--app-window-surface);
+    border: 1px solid var(--app-window-border);
+    box-shadow: var(--app-window-shadow);
+  }
+}

@@ -1,11 +1,7 @@
-import { normalizeAppPlatform, type AppPlatform } from "@shared/app/platform";
+import type { AppPlatform } from "@shared/app/platform";
 
 export function getAppPlatform(): AppPlatform {
-  if (typeof window === "undefined") {
-    return "linux";
-  }
-
-  return normalizeAppPlatform(window.appEnvironment?.platform ?? "linux");
+  return window.appEnvironment.platform;
 }
 
 export function applyAppPlatformAttribute(): void {
