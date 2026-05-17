@@ -14,8 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:35
-#: src/renderer/routes/-layout/window-title-bar.tsx:94
+#: src/renderer/features/error-boundary/error-title-bar.tsx:40
+#: src/renderer/routes/-layout/window-title-bar.tsx:101
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -186,8 +186,8 @@ msgid "error.global.description"
 msgstr "Fluxnotes 遇到了意外错误。你可以重试或退出应用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/error-title-bar.tsx:14
-#: src/renderer/features/error-boundary/error-title-bar.tsx:29
+#: src/renderer/features/error-boundary/error-title-bar.tsx:15
+#: src/renderer/features/error-boundary/error-title-bar.tsx:26
 #: src/renderer/features/error-boundary/global-error-content.tsx:56
 msgid "error.global.exit-app"
 msgstr "退出应用"
@@ -203,22 +203,22 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:26
+#: src/renderer/routes/-layout/window-title-bar.tsx:29
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:55
+#: src/renderer/routes/-layout/window-title-bar.tsx:58
 msgid "header.go-lab"
 msgstr "前往实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:53
+#: src/renderer/routes/-layout/window-title-bar.tsx:56
 msgid "header.open-lab"
 msgstr "打开实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:28
+#: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
@@ -476,8 +476,8 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:67
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:70
+#: src/renderer/routes/-layout/window-title-bar.tsx:78
 msgid "window.hide"
 msgstr "隐藏窗口"
 

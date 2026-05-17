@@ -31,12 +31,15 @@ function getProductionCandidates(cliDir: string): CliContext[] {
   }
 
   if (process.platform === "win32") {
-    return ["fluxnotes.exe", "Fluxnotes.exe"].map((executableName) => ({
-      appPath: path.join(appDir, executableName),
-      launchArgs: [],
-      mode: "production" as const,
-      probePath: path.join(appDir, executableName),
-    }));
+    const executableName = "Fluxnotes.exe";
+    return [
+      {
+        appPath: path.join(appDir, executableName),
+        launchArgs: [],
+        mode: "production" as const,
+        probePath: path.join(appDir, executableName),
+      },
+    ];
   }
 
   const executablePath = path.join(appDir, "fluxnotes");

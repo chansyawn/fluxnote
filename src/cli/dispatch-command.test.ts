@@ -179,7 +179,7 @@ describe("dispatch-command", () => {
 
     await expect(dispatchCommand("app.open", null)).resolves.toBeNull();
     expect(mocks.spawn).toHaveBeenCalledTimes(1);
-    expect(mocks.spawn).toHaveBeenCalledWith(expect.stringMatching(/fluxnotes\.exe$/), [], {
+    expect(mocks.spawn).toHaveBeenCalledWith(expect.stringMatching(/Fluxnotes\.exe$/), [], {
       detached: true,
       env: expect.not.objectContaining({ ELECTRON_RUN_AS_NODE: "1" }),
       stdio: "ignore",

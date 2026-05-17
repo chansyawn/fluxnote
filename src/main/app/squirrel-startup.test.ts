@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   appQuit: vi.fn(),
   getWindowsCliTarget: vi.fn(() => ({
+    cliScriptPath: "C:\\App\\resources\\cli\\flux-cli.mjs",
     commandPath: "C:\\Users\\tester\\.flux\\bin\\flux.cmd",
-    wrapperPath: "C:\\App\\resources\\cli\\flux.cmd",
+    electronPath: "C:\\App\\Fluxnotes.exe",
   })),
   installWindowsCli: vi.fn(async () => undefined),
   spawn: vi.fn(() => ({ unref: vi.fn() })),

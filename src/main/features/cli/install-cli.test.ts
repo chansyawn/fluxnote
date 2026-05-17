@@ -74,12 +74,30 @@ function getWindowsCommandPath(): string {
   return path.join("/Users/tester", ".flux", "bin", "flux.cmd");
 }
 
+function getWindowsCliScriptPath(): string {
+  return path.join(process.cwd(), ".vite", "cli", "flux-cli.mjs");
+}
+
 function getWindowsShim(): string {
-  return ["@echo off", `call "${getTestCliWrapperPath("flux.cmd")}" %*`, ""].join("\r\n");
+  return [
+    "@echo off",
+    "setlocal",
+    'set "ELECTRON_RUN_AS_NODE=1"',
+    `"C:\\App\\Fluxnotes.exe" "${getWindowsCliScriptPath()}" %*`,
+    "exit /b %ERRORLEVEL%",
+    "",
+  ].join("\r\n");
 }
 
 function setPlatform(value: NodeJS.Platform): void {
   Object.defineProperty(process, "platform", {
+    configurable: true,
+    value,
+  });
+}
+
+function setExecPath(value: string): void {
+  Object.defineProperty(process, "execPath", {
     configurable: true,
     value,
   });
@@ -118,6 +136,7 @@ function getExecCallback(args: unknown[]): ExecCallback {
 describe("install-cli", () => {
   beforeEach(() => {
     setPlatform("darwin");
+    setExecPath("C:\\App\\Fluxnotes.exe");
     vi.clearAllMocks();
     mocks.access.mockResolvedValue(undefined);
     mocks.exec.mockImplementation((...args: unknown[]) => {
@@ -267,6 +286,13 @@ describe("install-cli", () => {
     mocks.access.mockRejectedValue(new Error("missing"));
 
     await expect(installCli()).rejects.toThrow(/CLI wrapper not found/);
+  });
+
+  it("throws on Windows when CLI script does not exist", async () => {
+    setPlatform("win32");
+    mocks.access.mockRejectedValue(new Error("missing"));
+
+    await expect(installCli()).rejects.toThrow(/CLI script not found/);
   });
 
   it("does not replace non-owned macOS command path", async () => {

@@ -1,15 +1,10 @@
 @echo off
 setlocal
 
-set "SCRIPT=%~f0"
 set "CLI_DIR=%~dp0"
-for %%I in ("%CLI_DIR%..") do set "RESOURCES_DIR=%%~fI"
-for %%I in ("%RESOURCES_DIR%..") do set "APP_DIR=%%~fI"
 
-set "ELECTRON=%APP_DIR%\fluxnotes.exe"
+set "ELECTRON=%CLI_DIR%..\..\Fluxnotes.exe"
 set "CLI_JS=%CLI_DIR%flux-cli.mjs"
-
-if not exist "%ELECTRON%" set "ELECTRON=%APP_DIR%\Fluxnotes.exe"
 
 if not exist "%ELECTRON%" (
   for %%I in ("%CLI_DIR%..\..") do set "ROOT_DIR=%%~fI"
@@ -32,3 +27,4 @@ if not exist "%CLI_JS%" (
 
 set "ELECTRON_RUN_AS_NODE=1"
 "%ELECTRON%" "%CLI_JS%" %*
+exit /b %ERRORLEVEL%

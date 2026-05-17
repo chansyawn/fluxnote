@@ -10,8 +10,8 @@ import { internalError } from "@shared/ipc/result";
 import {
   CLI_COMMAND_NAME,
   type CliInstallStatus,
-  type CliInstallTarget,
-  getCliResourcePath,
+  type WindowsCliInstallTarget,
+  getCliScriptResourcePath,
 } from "./cli-install-target";
 
 const execAsync = promisify(exec);
@@ -22,10 +22,11 @@ export function getWindowsCliDirectory(): string {
   return path.join(os.homedir(), APP_USER_DATA_DIR_NAME, WINDOWS_CLI_DIR_NAME);
 }
 
-export function getWindowsCliTarget(): CliInstallTarget {
+export function getWindowsCliTarget(): WindowsCliInstallTarget {
   return {
+    cliScriptPath: getCliScriptResourcePath(),
     commandPath: path.join(getWindowsCliDirectory(), WINDOWS_CLI_FILE_NAME),
-    wrapperPath: getCliResourcePath(WINDOWS_CLI_FILE_NAME),
+    electronPath: process.execPath,
   };
 }
 
@@ -107,8 +108,15 @@ async function removeWindowsPathDirectory(cliDirectory: string): Promise<void> {
   await writeWindowsUserPath(segments.join(";"));
 }
 
-function createWindowsShim(wrapperPath: string): string {
-  return ["@echo off", `call "${wrapperPath}" %*`, ""].join("\r\n");
+function createWindowsShim(target: WindowsCliInstallTarget): string {
+  return [
+    "@echo off",
+    "setlocal",
+    'set "ELECTRON_RUN_AS_NODE=1"',
+    `"${target.electronPath}" "${target.cliScriptPath}" %*`,
+    "exit /b %ERRORLEVEL%",
+    "",
+  ].join("\r\n");
 }
 
 async function isSameFileContent(filePath: string, expectedContent: string): Promise<boolean> {
@@ -122,10 +130,7 @@ async function isSameFileContent(filePath: string, expectedContent: string): Pro
 export async function getWindowsCliStatus(): Promise<CliInstallStatus> {
   const target = getWindowsCliTarget();
   const cliDirectory = path.dirname(target.commandPath);
-  const ownsShim = await isSameFileContent(
-    target.commandPath,
-    createWindowsShim(target.wrapperPath),
-  );
+  const ownsShim = await isSameFileContent(target.commandPath, createWindowsShim(target));
   const pathReady = await hasWindowsPathDirectory(cliDirectory);
   const installed = ownsShim && pathReady;
 
@@ -136,18 +141,18 @@ export async function getWindowsCliStatus(): Promise<CliInstallStatus> {
     installed,
     installPath: target.commandPath,
     managedBy: "user-path-shim",
-    targetPath: ownsShim ? target.wrapperPath : null,
+    targetPath: ownsShim ? target.cliScriptPath : null,
   };
 }
 
-export async function installWindowsCli(target: CliInstallTarget): Promise<void> {
+export async function installWindowsCli(target: WindowsCliInstallTarget): Promise<void> {
   await fs.mkdir(path.dirname(target.commandPath), { recursive: true });
-  await fs.writeFile(target.commandPath, createWindowsShim(target.wrapperPath), "utf8");
+  await fs.writeFile(target.commandPath, createWindowsShim(target), "utf8");
   await ensureWindowsPathDirectory(path.dirname(target.commandPath));
 }
 
-export async function uninstallWindowsCli(target: CliInstallTarget): Promise<void> {
-  if (await isSameFileContent(target.commandPath, createWindowsShim(target.wrapperPath))) {
+export async function uninstallWindowsCli(target: WindowsCliInstallTarget): Promise<void> {
+  if (await isSameFileContent(target.commandPath, createWindowsShim(target))) {
     await fs.rm(target.commandPath, { force: true });
   }
 

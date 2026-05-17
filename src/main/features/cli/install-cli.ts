@@ -1,6 +1,7 @@
 import {
   assertCliPlatformSupported,
   assertCliWrapperExists,
+  assertWindowsCliScriptExists,
   createUnsupportedCliStatus,
   type CliInstallStatus,
 } from "./cli-install-target";
@@ -38,7 +39,7 @@ export async function installCli(): Promise<void> {
 
   if (process.platform === "win32") {
     const target = getWindowsCliTarget();
-    await assertCliWrapperExists(target);
+    await assertWindowsCliScriptExists(target);
     await installWindowsCli(target);
     return;
   }

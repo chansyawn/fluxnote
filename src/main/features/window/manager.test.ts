@@ -1,3 +1,4 @@
+import type { BrowserWindowConstructorOptions } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
@@ -11,6 +12,7 @@ const mocks = vi.hoisted(() => {
     destroyed = false;
     visible = false;
     minimized = false;
+    options: unknown;
     handlers = new Map<string, Array<(...args: unknown[]) => void>>();
     onceHandlers = new Map<string, (...args: unknown[]) => void>();
     webContents = {
@@ -19,7 +21,8 @@ const mocks = vi.hoisted(() => {
       }),
       openDevTools: vi.fn(),
     };
-    constructor(_options: unknown) {
+    constructor(options: unknown) {
+      this.options = options;
       instances.push(this);
     }
     on(event: string, handler: (...args: unknown[]) => void) {
@@ -96,6 +99,21 @@ vi.mock("./position", () => ({
 
 import { createWindowManager } from "./manager";
 
+function setPlatform(platform: NodeJS.Platform): () => void {
+  const originalPlatform = process.platform;
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value: platform,
+  });
+
+  return () => {
+    Object.defineProperty(process, "platform", {
+      configurable: true,
+      value: originalPlatform,
+    });
+  };
+}
+
 describe("window manager", () => {
   beforeEach(() => {
     vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
@@ -137,11 +155,7 @@ describe("window manager", () => {
   });
 
   it("keeps the main window visible across macOS workspaces", () => {
-    const platform = process.platform;
-    Object.defineProperty(process, "platform", {
-      configurable: true,
-      value: "darwin",
-    });
+    const restorePlatform = setPlatform("darwin");
 
     try {
       const manager = createWindowManager({
@@ -163,10 +177,55 @@ describe("window manager", () => {
       expect(win.setVisibleOnAllWorkspaces).toHaveBeenCalledTimes(3);
       expect(win.show).toHaveBeenCalled();
     } finally {
-      Object.defineProperty(process, "platform", {
-        configurable: true,
-        value: platform,
+      restorePlatform();
+    }
+  });
+
+  it("uses macOS vibrancy options for the main window", () => {
+    const restorePlatform = setPlatform("darwin");
+
+    try {
+      const manager = createWindowManager({
+        emitEvent: mocks.emitEvent,
+        onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onOpenBlockReady: mocks.onOpenBlockReady,
       });
+
+      manager.createMainWindow();
+      const win = mocks.BrowserWindow.instances[0];
+      const options = win.options as BrowserWindowConstructorOptions;
+
+      expect(options.vibrancy).toBe("under-window");
+      expect(options.visualEffectState).toBe("active");
+      expect(options.backgroundMaterial).toBeUndefined();
+    } finally {
+      restorePlatform();
+    }
+  });
+
+  it("uses Windows native rounded window options without macOS vibrancy", () => {
+    const restorePlatform = setPlatform("win32");
+
+    try {
+      const manager = createWindowManager({
+        emitEvent: mocks.emitEvent,
+        onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onOpenBlockReady: mocks.onOpenBlockReady,
+      });
+
+      manager.createMainWindow();
+      const win = mocks.BrowserWindow.instances[0];
+      const options = win.options as BrowserWindowConstructorOptions;
+
+      expect(options.backgroundMaterial).toBe("none");
+      expect(options.vibrancy).toBeUndefined();
+      expect(options.visualEffectState).toBeUndefined();
+      expect(options.roundedCorners).toBe(true);
+      expect(options.thickFrame).toBe(true);
+      expect(options.transparent).toBe(false);
+      expect(options.hasShadow).toBe(true);
+    } finally {
+      restorePlatform();
     }
   });
 

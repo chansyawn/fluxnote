@@ -4,8 +4,10 @@ import {
   OpenBlockWorkspaceRouteSync,
 } from "@renderer/features/open-block/open-block-request-context";
 import { useBindWindowCloseRequest } from "@renderer/routes/-layout/use-bind-window-close-request";
-import { WindowTitleBar } from "@renderer/routes/-layout/window-title-bar";
+import { WindowShell } from "@renderer/routes/-layout/window-shell";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+
+import { WindowTitleBar } from "./-layout/window-title-bar";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -18,7 +20,7 @@ function RootComponent() {
   return (
     <OpenBlockRequestProvider>
       <OpenBlockWorkspaceRouteSync />
-      <div className="mx-auto flex h-full w-full flex-col overflow-hidden rounded-xl">
+      <WindowShell>
         <WindowTitleBar />
         <main
           tabIndex={1}
@@ -26,7 +28,7 @@ function RootComponent() {
         >
           <Outlet />
         </main>
-      </div>
+      </WindowShell>
     </OpenBlockRequestProvider>
   );
 }

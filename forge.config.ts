@@ -9,7 +9,6 @@ import { VitePlugin } from "@electron-forge/plugin-vite";
 import type { ForgeConfig } from "@electron-forge/shared-types";
 import type { FuseConfig } from "@electron/fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
-import { convertVersion } from "electron-winstaller";
 
 import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts";
 import { copyCliResources } from "./config/forge/cli-resources";
@@ -96,7 +95,7 @@ const config: ForgeConfig = {
         arch,
         kind: "setup",
         platform: "win32",
-        version: convertVersion(packageVersion),
+        version: packageVersion,
       }),
     })),
   ],

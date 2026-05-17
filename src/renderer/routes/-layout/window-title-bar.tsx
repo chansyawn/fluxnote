@@ -1,9 +1,12 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { getAppPlatform } from "@renderer/app/platform";
 import { hideWindow } from "@renderer/clients";
+import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
 import { Button } from "@renderer/ui/components/button";
+import { cn } from "@renderer/ui/lib/utils";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { FlaskConicalIcon, HouseIcon, Settings2Icon, XIcon } from "lucide-react";
+import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "lucide-react";
 
 function HeaderActionButton() {
   const location = useLocation();
@@ -63,32 +66,34 @@ function HeaderCloseButton() {
   const { i18n } = useLingui();
 
   return (
-    <button
-      aria-label={i18n._({
+    <WindowCloseButton
+      ariaLabel={i18n._({
         id: "window.hide",
         message: "Hide window",
       })}
-      className="group flex size-3 items-center justify-center rounded-full bg-red-500/85 text-red-950 transition-all [-webkit-app-region:no-drag] hover:brightness-95 dark:bg-red-400/85 dark:text-red-950"
-      type="button"
       onClick={() => {
         void hideWindow();
       }}
     >
-      <XIcon className="size-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100" />
-      <span className="sr-only">
-        <Trans id="window.hide">Hide window</Trans>
-      </span>
-    </button>
+      <Trans id="window.hide">Hide window</Trans>
+    </WindowCloseButton>
   );
 }
 
 export function WindowTitleBar() {
+  const platform = getAppPlatform();
+  const isWindows = platform === "win32";
+
   return (
-    <header className="z-20 mb-1 h-8 pt-1 select-none [-webkit-app-region:drag]">
-      <div className="relative z-10 flex h-full items-center gap-2 px-3">
-        <div className="flex shrink-0 items-center gap-2">
-          <HeaderCloseButton />
-        </div>
+    <header className={cn("z-20 mb-1 h-8 select-none pt-1 [-webkit-app-region:drag]")}>
+      <div
+        className={cn("relative z-10 flex h-full items-center gap-2", isWindows ? "ps-3" : "px-3")}
+      >
+        {!isWindows ? (
+          <div className="flex shrink-0 items-center gap-2">
+            <HeaderCloseButton />
+          </div>
+        ) : null}
 
         <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
           <Trans id="app.title">Fluxnotes</Trans>
@@ -103,6 +108,7 @@ export function WindowTitleBar() {
             id="titlebar-workspace-actions"
           />
           <HeaderActionButton />
+          {isWindows ? <HeaderCloseButton /> : null}
         </div>
       </div>
     </header>

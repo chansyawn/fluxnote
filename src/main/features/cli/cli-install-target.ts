@@ -11,6 +11,12 @@ export interface CliInstallTarget {
   wrapperPath: string;
 }
 
+export interface WindowsCliInstallTarget {
+  cliScriptPath: string;
+  commandPath: string;
+  electronPath: string;
+}
+
 export type CliInstallManager = "manual-link" | "user-path-shim" | "unsupported";
 
 export interface CliInstallStatus {
@@ -29,6 +35,14 @@ export function getCliResourcePath(fileName: string): string {
   }
 
   return path.join(process.cwd(), "src", "cli", fileName);
+}
+
+export function getCliScriptResourcePath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "cli", "flux-cli.mjs");
+  }
+
+  return path.join(process.cwd(), ".vite", "cli", "flux-cli.mjs");
 }
 
 export async function pathExists(filePath: string): Promise<boolean> {
@@ -59,6 +73,17 @@ export async function assertCliWrapperExists(target: CliInstallTarget): Promise<
   throw businessError(
     "BUSINESS.NOT_FOUND",
     `CLI wrapper not found at ${target.wrapperPath}. Run 'vp run package' or 'vp run dev' first.`,
+  );
+}
+
+export async function assertWindowsCliScriptExists(target: WindowsCliInstallTarget): Promise<void> {
+  if (await pathExists(target.cliScriptPath)) {
+    return;
+  }
+
+  throw businessError(
+    "BUSINESS.NOT_FOUND",
+    `CLI script not found at ${target.cliScriptPath}. Run 'vp run package' or 'vp run dev' first.`,
   );
 }
 
