@@ -23,7 +23,7 @@ const packagerConfig = {
   appCopyright: "Copyright (c) 2026 Fluxnotes",
   appCategoryType: "public.app-category.productivity",
   asar: true,
-  executableName: "fluxnotes",
+  executableName: "Fluxnotes",
   extraResource: ["src/main/core/database/drizzle", "src/assets"],
   icon: "src/assets/icons/icon",
   name: "Fluxnotes",
@@ -84,16 +84,9 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerDMG(
-      (arch) => ({
-        name: path.basename(
-          getReleaseArtifactName({
-            arch,
-            kind: "dmg",
-            platform: "darwin",
-            version: packageVersion,
-          }),
-          ".dmg",
-        ),
+      (_arch) => ({
+        name: "Fluxnotes",
+        title: "Fluxnotes",
       }),
       ["darwin"],
     ),

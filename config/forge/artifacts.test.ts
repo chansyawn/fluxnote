@@ -53,7 +53,7 @@ describe("forge artifact naming", () => {
 });
 
 describe("normalizeMakeArtifacts", () => {
-  it("renames darwin zip artifacts and keeps other artifacts", async () => {
+  it("renames darwin dmg and zip artifacts", async () => {
     const directory = await mkdtemp(path.join(tmpdir(), "fluxnotes-forge-"));
     const zipPath = await writeArtifact(directory, "Fluxnotes-darwin-arm64-1.2.3.zip");
     const dmgPath = await writeArtifact(directory, "Fluxnotes.dmg");
@@ -64,7 +64,7 @@ describe("normalizeMakeArtifacts", () => {
 
     expect(result?.artifacts).toEqual([
       path.join(directory, "fluxnotes-1.2.3-macos-arm64.zip"),
-      dmgPath,
+      path.join(directory, "fluxnotes-1.2.3-macos-arm64.dmg"),
     ]);
   });
 
