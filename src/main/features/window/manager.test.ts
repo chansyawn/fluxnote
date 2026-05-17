@@ -217,7 +217,7 @@ describe("window manager", () => {
       const win = mocks.BrowserWindow.instances[0];
       const options = win.options as BrowserWindowConstructorOptions;
 
-      expect(options.backgroundMaterial).toBe("mica");
+      expect(options.backgroundMaterial).toBe("none");
       expect(options.vibrancy).toBeUndefined();
       expect(options.visualEffectState).toBeUndefined();
       expect(options.roundedCorners).toBe(true);

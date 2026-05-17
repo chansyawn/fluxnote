@@ -36,7 +36,7 @@ export function WindowCloseButton({
         aria-hidden="true"
         className={cn(
           isWindows
-            ? "size-4 stroke-[1.5]"
+            ? "size-4"
             : "size-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100",
         )}
       />
