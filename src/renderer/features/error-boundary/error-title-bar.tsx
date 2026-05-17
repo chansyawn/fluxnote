@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { getAppPlatform } from "@renderer/app/platform";
 import { destroyWindow, hideWindow } from "@renderer/clients";
-import { WindowCloseButton } from "@renderer/features/window/window-close-button";
+import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
 import { cn } from "@renderer/ui/lib/utils";
 
 export function ErrorTitleBar() {

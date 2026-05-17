@@ -203,7 +203,7 @@ describe("window manager", () => {
     }
   });
 
-  it("uses Windows acrylic material without macOS vibrancy", () => {
+  it("uses Windows native rounded window options without macOS vibrancy", () => {
     const restorePlatform = setPlatform("win32");
 
     try {
@@ -217,9 +217,13 @@ describe("window manager", () => {
       const win = mocks.BrowserWindow.instances[0];
       const options = win.options as BrowserWindowConstructorOptions;
 
-      expect(options.backgroundMaterial).toBe("acrylic");
+      expect(options.backgroundMaterial).toBe("mica");
       expect(options.vibrancy).toBeUndefined();
       expect(options.visualEffectState).toBeUndefined();
+      expect(options.roundedCorners).toBe(true);
+      expect(options.thickFrame).toBe(true);
+      expect(options.transparent).toBe(false);
+      expect(options.hasShadow).toBe(true);
     } finally {
       restorePlatform();
     }

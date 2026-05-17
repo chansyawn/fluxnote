@@ -40,9 +40,19 @@ function resolveIconPath(iconName: string): string {
 
 function getMainWindowPlatformOptions(): BrowserWindowConstructorOptions {
   if (process.platform === "darwin")
-    return { vibrancy: "under-window", visualEffectState: "active" };
+    return {
+      vibrancy: "under-window",
+      visualEffectState: "active",
+      transparent: true,
+    };
 
-  if (process.platform === "win32") return { backgroundMaterial: "acrylic" };
+  if (process.platform === "win32")
+    return {
+      backgroundMaterial: "mica",
+      roundedCorners: true,
+      thickFrame: true,
+      transparent: false,
+    };
 
   return {};
 }
@@ -155,7 +165,6 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       show: false,
       skipTaskbar: true,
       title: "Fluxnotes",
-      transparent: true,
       webPreferences: {
         contextIsolation: true,
         nodeIntegration: false,

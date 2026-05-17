@@ -25,7 +25,7 @@ export function WindowCloseButton({
       className={cn(
         "group flex items-center justify-center transition-all [-webkit-app-region:no-drag]",
         isWindows
-          ? "h-8 w-[46px] text-foreground/80 hover:bg-[var(--windows-close-hover)] hover:text-white focus-visible:bg-[var(--windows-close-hover)] focus-visible:text-white focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none"
+          ? "h-8 w-10 text-foreground/80 hover:bg-destructive hover:text-white focus-visible:bg-destructive focus-visible:text-white"
           : "size-3 rounded-full bg-red-500/85 text-red-950 hover:brightness-95 dark:bg-red-400/85 dark:text-red-950",
       )}
       data-platform={platform}

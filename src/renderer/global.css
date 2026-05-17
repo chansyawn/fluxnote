@@ -3,7 +3,6 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/noto-sans";
 @import "./scrollbar.css";
-@import "./shell.css";
 
 @custom-variant dark (&:is(.dark *));
 
