@@ -38,7 +38,7 @@ interface ExternalEditActionsSnapshot {
 
 interface ExternalEditActionsHarnessProps {
   getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
-  navigateToBlock?: (blockId: string) => void;
+  navigateToBlock?: (blockId: string) => Promise<void>;
   onSnapshot: (snapshot: ExternalEditActionsSnapshot) => void;
 }
 
@@ -126,7 +126,7 @@ describe("useExternalEditActions", () => {
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),
     };
-    const navigateToBlock = vi.fn();
+    const navigateToBlock = vi.fn(async () => undefined);
     const harness = createHarness({
       getEditor: vi.fn(() => editor),
       navigateToBlock,

@@ -2,10 +2,10 @@ import { queryClient } from "@renderer/app/query";
 import { useOpenBlockRequest } from "@renderer/features/open-block/open-block-request-context";
 import { useEffect } from "react";
 
-import type { BlockNavigationOptions } from "./navigation/use-block-navigation";
+import { isBlockNavigationCancelledError } from "./navigation/use-block-navigation";
 
 interface UseOpenBlockNavigationParams {
-  navigateToBlock: (blockId: string, options?: BlockNavigationOptions) => void;
+  navigateToBlock: (blockId: string) => Promise<void>;
 }
 
 export function useOpenBlockNavigation({ navigateToBlock }: UseOpenBlockNavigationParams): void {
@@ -18,12 +18,16 @@ export function useOpenBlockNavigation({ navigateToBlock }: UseOpenBlockNavigati
 
     void queryClient.invalidateQueries({ queryKey: ["blocks"] });
 
-    navigateToBlock(pendingTarget.blockId, {
-      acknowledge: () => {
+    void (async () => {
+      try {
+        await navigateToBlock(pendingTarget.blockId);
+      } catch (error) {
+        if (!isBlockNavigationCancelledError(error)) {
+          console.warn("Failed to open requested block", error);
+        }
+      } finally {
         acknowledgePendingBlockId(pendingTarget.blockId);
-      },
-      onNotFound: () => undefined,
-      viewMode: "active-unfiltered",
-    });
+      }
+    })();
   }, [acknowledgePendingBlockId, navigateToBlock, pendingTarget]);
 }

@@ -13,7 +13,7 @@ import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 interface UseExternalEditActionsParams {
   getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
-  navigateToBlock?: (blockId: string) => void;
+  navigateToBlock?: (blockId: string) => Promise<void>;
 }
 
 interface UseExternalEditActionsResult {
@@ -69,7 +69,7 @@ export function useExternalEditActions({
         }
         await submitExternalEdit({ content: normalizeExternalMarkdown(content), editId });
         void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-        navigateToBlock?.(blockId);
+        void navigateToBlock?.(blockId).catch(() => undefined);
       } catch (error) {
         toast.error(toAppInvokeError(error).message);
       } finally {

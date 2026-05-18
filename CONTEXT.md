@@ -52,6 +52,10 @@ _Avoid_: External job, edit task
 The source and file context that started an **External Edit**.
 _Avoid_: Origin metadata, launch data
 
+**Block Navigation**:
+The Workspace workflow that locates a **Block**, prepares the right **Workspace** view, scrolls the **Block** into view, and focuses its **Block Editor**.
+_Avoid_: Scroll controller, focus controller, route navigation
+
 ## Relationships
 
 - A **Workspace** contains zero or more **Blocks**.
@@ -61,6 +65,7 @@ _Avoid_: Origin metadata, launch data
 - A **Kept Block** is an **Active Block** excluded from **Auto Archive**.
 - An **External Edit Session** belongs to exactly one **Block**.
 - An **External Edit Trigger** starts exactly one **External Edit Session**.
+- **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
 
 ## Example Dialogue
 

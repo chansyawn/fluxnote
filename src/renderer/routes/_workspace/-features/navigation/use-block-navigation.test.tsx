@@ -1,14 +1,18 @@
 // @vitest-environment jsdom
 
-import type { Block, LocateBlockResult } from "@renderer/clients";
-import { act, useLayoutEffect } from "react";
+import type { Block, BlockVisibility, LocateBlockResult } from "@renderer/clients";
+import { act, useCallback, useLayoutEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import type { EditorRegistry } from "../editing/use-editor-registry";
-import { type BlockScrollTarget, useBlockNavigation } from "./use-block-navigation";
+import {
+  BlockNavigationCancelledError,
+  type BlockScrollTarget,
+  useBlockNavigation,
+} from "./use-block-navigation";
 
-function createBlock(id: string): Block {
+function createBlock(id: string, overrides?: Partial<Block>): Block {
   return {
     archivedAt: null,
     content: "",
@@ -19,15 +23,22 @@ function createBlock(id: string): Block {
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
     willArchive: false,
+    ...overrides,
   };
 }
 
 interface NavigationSnapshot {
   activeBlockId: string | null;
   navigateToBlock: ReturnType<typeof useBlockNavigation>["navigateToBlock"];
-  navigateToIndex: ReturnType<typeof useBlockNavigation>["navigateToIndex"];
   scrollTarget: BlockScrollTarget | null;
+  selectedTagIds: string[];
   targetRendered: ReturnType<typeof useBlockNavigation>["targetRendered"];
+  visibility: BlockVisibility;
+}
+
+interface LocateView {
+  selectedTagIds: string[];
+  visibility: BlockVisibility;
 }
 
 interface NavigationHarnessProps {
@@ -36,7 +47,9 @@ interface NavigationHarnessProps {
     options?: { refresh?: boolean },
   ) => Promise<Block | undefined>;
   getBlockAtIndex: (index: number) => Block | undefined;
-  locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
+  initialSelectedTagIds?: string[];
+  initialVisibility?: BlockVisibility;
+  locateBlockInView: (blockId: string, view: LocateView) => Promise<LocateBlockResult>;
   onSnapshot: (snapshot: NavigationSnapshot) => void;
   registry: EditorRegistry;
 }
@@ -44,23 +57,31 @@ interface NavigationHarnessProps {
 function NavigationHarness({
   ensureBlockIndexLoaded,
   getBlockAtIndex,
+  initialSelectedTagIds = [],
+  initialVisibility = "active",
   locateBlockInView,
   onSnapshot,
   registry,
 }: NavigationHarnessProps) {
+  const [visibility, setVisibility] = useState<BlockVisibility>(initialVisibility);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(initialSelectedTagIds);
+  const locateCurrentView = useCallback(
+    (blockId: string) => locateBlockInView(blockId, { selectedTagIds, visibility }),
+    [locateBlockInView, selectedTagIds, visibility],
+  );
   const navigation = useBlockNavigation({
     ensureBlockIndexLoaded,
     getBlockAtIndex,
-    locateBlockInView,
+    locateBlockInView: locateCurrentView,
     registry,
-    selectedTagIds: [],
-    setSelectedTagIds: vi.fn(),
-    setVisibility: vi.fn(),
-    visibility: "active",
+    selectedTagIds,
+    setSelectedTagIds,
+    setVisibility,
+    visibility,
   });
 
   useLayoutEffect(() => {
-    onSnapshot(navigation);
+    onSnapshot({ ...navigation, selectedTagIds, visibility });
   });
 
   return null;
@@ -72,9 +93,19 @@ async function flushEffects(): Promise<void> {
   });
 }
 
+function createRegistry(): EditorRegistry {
+  return {
+    getEditor: vi.fn(),
+    registerEditor: vi.fn(() => () => undefined),
+    requestEditorFocus: vi.fn(),
+  };
+}
+
 function createHarness(options: {
   ensureBlockIndexLoaded: NavigationHarnessProps["ensureBlockIndexLoaded"];
   getBlockAtIndex: NavigationHarnessProps["getBlockAtIndex"];
+  initialSelectedTagIds?: string[];
+  initialVisibility?: BlockVisibility;
   locateBlockInView: NavigationHarnessProps["locateBlockInView"];
   registry: EditorRegistry;
 }) {
@@ -88,6 +119,8 @@ function createHarness(options: {
       <NavigationHarness
         ensureBlockIndexLoaded={options.ensureBlockIndexLoaded}
         getBlockAtIndex={options.getBlockAtIndex}
+        initialSelectedTagIds={options.initialSelectedTagIds}
+        initialVisibility={options.initialVisibility}
         locateBlockInView={options.locateBlockInView}
         onSnapshot={(nextSnapshot) => {
           snapshot = nextSnapshot;
@@ -113,6 +146,23 @@ function createHarness(options: {
   };
 }
 
+async function renderScrollTarget(harness: ReturnType<typeof createHarness>, blockId: string) {
+  await flushEffects();
+  const scrollTarget = harness.getSnapshot().scrollTarget;
+  if (!scrollTarget) {
+    throw new Error("Expected a scroll target.");
+  }
+
+  act(() => {
+    harness.getSnapshot().targetRendered({
+      blockId,
+      index: scrollTarget.index,
+      requestId: scrollTarget.requestId,
+    });
+  });
+  await flushEffects();
+}
+
 describe("useBlockNavigation", () => {
   let mountedRoot: { unmount: () => void } | null = null;
 
@@ -121,15 +171,11 @@ describe("useBlockNavigation", () => {
     mountedRoot = null;
   });
 
-  it("refreshes the located page before focusing an externally created block", async () => {
+  it("refreshes the located page before focusing a block", async () => {
     const targetBlock = createBlock("new-block");
     const staleBlock = createBlock("stale-block");
     let renderedBlock = staleBlock;
-    const registry = {
-      getEditor: vi.fn(),
-      registerEditor: vi.fn(() => () => undefined),
-      requestEditorFocus: vi.fn(),
-    } satisfies EditorRegistry;
+    const registry = createRegistry();
     const ensureBlockIndexLoaded = vi.fn(
       async (_index: number, options?: { refresh?: boolean }) => {
         if (options?.refresh) {
@@ -147,8 +193,9 @@ describe("useBlockNavigation", () => {
     });
     mountedRoot = harness;
 
+    let navigationPromise!: Promise<void>;
     act(() => {
-      harness.getSnapshot().navigateToBlock(targetBlock.id);
+      navigationPromise = harness.getSnapshot().navigateToBlock(targetBlock.id);
     });
     await flushEffects();
     await flushEffects();
@@ -156,67 +203,68 @@ describe("useBlockNavigation", () => {
     expect(ensureBlockIndexLoaded).toHaveBeenCalledWith(0, { refresh: true });
     expect(harness.getSnapshot().scrollTarget).toMatchObject({ index: 0 });
 
-    act(() => {
-      const scrollTarget = harness.getSnapshot().scrollTarget;
-      if (!scrollTarget) {
-        throw new Error("Expected a scroll target.");
-      }
-      harness.getSnapshot().targetRendered({
-        blockId: renderedBlock.id,
-        index: 0,
-        requestId: scrollTarget.requestId,
-      });
-    });
-    await flushEffects();
+    await renderScrollTarget(harness, renderedBlock.id);
 
+    await expect(navigationPromise).resolves.toBeUndefined();
     expect(registry.requestEditorFocus).toHaveBeenCalledWith(targetBlock.id, expect.any(Number));
     expect(harness.getSnapshot().activeBlockId).toBe(targetBlock.id);
   });
 
-  it("focuses the refreshed row for index navigation after list mutations", async () => {
-    const staleBlock = createBlock("archived-block");
-    const nextBlock = createBlock("next-block");
-    let renderedBlock = staleBlock;
-    const registry = {
-      getEditor: vi.fn(),
-      registerEditor: vi.fn(() => () => undefined),
-      requestEditorFocus: vi.fn(),
-    } satisfies EditorRegistry;
-    const ensureBlockIndexLoaded = vi.fn(async () => {
-      renderedBlock = nextBlock;
-      return nextBlock;
+  it("switches to archived blocks when the target is archived", async () => {
+    const archivedBlock = createBlock("archived-block", {
+      archivedAt: "2026-01-02T00:00:00.000Z",
+    });
+    const registry = createRegistry();
+    const locateBlockInView = vi.fn(async (_blockId: string, view: LocateView) => {
+      if (view.visibility === "archived") {
+        return { block: archivedBlock, index: 0 };
+      }
+      return null;
     });
     const harness = createHarness({
-      ensureBlockIndexLoaded,
-      getBlockAtIndex: () => renderedBlock,
-      locateBlockInView: vi.fn(),
+      ensureBlockIndexLoaded: vi.fn(async () => archivedBlock),
+      getBlockAtIndex: () => archivedBlock,
+      locateBlockInView,
       registry,
     });
     mountedRoot = harness;
 
+    let navigationPromise!: Promise<void>;
     act(() => {
-      harness.getSnapshot().navigateToIndex(0);
+      navigationPromise = harness.getSnapshot().navigateToBlock(archivedBlock.id);
     });
     await flushEffects();
     await flushEffects();
-
-    expect(ensureBlockIndexLoaded).toHaveBeenCalledWith(0, { refresh: false });
-    expect(harness.getSnapshot().scrollTarget).toMatchObject({ index: 0 });
-
-    act(() => {
-      const scrollTarget = harness.getSnapshot().scrollTarget;
-      if (!scrollTarget) {
-        throw new Error("Expected a scroll target.");
-      }
-      harness.getSnapshot().targetRendered({
-        blockId: nextBlock.id,
-        index: 0,
-        requestId: scrollTarget.requestId,
-      });
-    });
     await flushEffects();
 
-    expect(registry.requestEditorFocus).toHaveBeenCalledWith(nextBlock.id, expect.any(Number));
-    expect(harness.getSnapshot().activeBlockId).toBe(nextBlock.id);
+    expect(harness.getSnapshot().visibility).toBe("archived");
+    expect(harness.getSnapshot().selectedTagIds).toEqual([]);
+
+    await renderScrollTarget(harness, archivedBlock.id);
+
+    await expect(navigationPromise).resolves.toBeUndefined();
+    expect(registry.requestEditorFocus).toHaveBeenCalledWith(archivedBlock.id, expect.any(Number));
+  });
+
+  it("rejects a superseded navigation request", async () => {
+    const targetBlock = createBlock("block-2");
+    const registry = createRegistry();
+    const harness = createHarness({
+      ensureBlockIndexLoaded: vi.fn(async () => targetBlock),
+      getBlockAtIndex: () => targetBlock,
+      locateBlockInView: vi.fn(async () => ({ block: targetBlock, index: 0 })),
+      registry,
+    });
+    mountedRoot = harness;
+
+    let firstNavigation!: Promise<void>;
+    let secondNavigation!: Promise<void>;
+    act(() => {
+      firstNavigation = harness.getSnapshot().navigateToBlock("block-1");
+      secondNavigation = harness.getSnapshot().navigateToBlock("block-2");
+    });
+    void secondNavigation.catch(() => undefined);
+
+    await expect(firstNavigation).rejects.toBeInstanceOf(BlockNavigationCancelledError);
   });
 });
