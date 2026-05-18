@@ -19,6 +19,12 @@ const block = {
   updatedAt: "2026-01-01T00:00:00.000Z",
   willArchive: false,
 };
+const externalEditTrigger = {
+  cwd: "/workspace",
+  requestedFilePath: "note.md",
+  source: "cli" as const,
+  targetFilePath: "/workspace/note.md",
+};
 
 vi.mock("../blocks/service", () => ({
   createBlockRecord: mocks.createBlockRecord,
@@ -84,7 +90,7 @@ describe("entrypoint service", () => {
     const abortController = new AbortController();
 
     const result = await service.createExternalEdit(
-      { content: "hello", tagNames: ["work"] },
+      { content: "hello", tagNames: ["work"], trigger: externalEditTrigger },
       abortController.signal,
     );
 
@@ -92,6 +98,7 @@ describe("entrypoint service", () => {
     expect(createExternalEditSession).toHaveBeenCalledWith(
       "block-1",
       "hello",
+      externalEditTrigger,
       abortController.signal,
     );
     expect(requestOpenBlock).toHaveBeenCalledWith("block-1");

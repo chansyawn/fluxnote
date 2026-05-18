@@ -102,6 +102,19 @@ describe("list", () => {
 
       expect(result).toBe(true);
     });
+
+    it("normalizes direct nested blocks behind an empty first paragraph", () => {
+      const editor = editorFromMdast(doc(ul(li([quote(p(t("Quoted")))]))));
+
+      const list = getList(readMdast(editor));
+      expect(list.children[0].children).toMatchObject([
+        { children: [], type: "paragraph" },
+        {
+          children: [{ children: [{ type: "text", value: "Quoted" }], type: "paragraph" }],
+          type: "blockquote",
+        },
+      ]);
+    });
   });
 
   describe("interactions", () => {

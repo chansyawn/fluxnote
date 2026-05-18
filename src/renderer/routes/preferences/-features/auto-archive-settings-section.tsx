@@ -1,12 +1,25 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { queryClient } from "@renderer/app/query";
+import { deleteArchivedBlocks } from "@renderer/clients";
 import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
   SettingsRow,
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@renderer/ui/components/alert-dialog";
+import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
 import { InputGroup, InputGroupInput } from "@renderer/ui/components/input-group";
 import {
@@ -26,8 +39,10 @@ import {
   type AutoArchiveDurationUnit,
 } from "@shared/features/preferences/auto-archive";
 import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@shared/features/preferences/settings";
-import { ArchiveIcon, ClockIcon } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
   days: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / (24 * 60)),
@@ -51,6 +66,28 @@ function clampAmount(amount: number, unit: AutoArchiveDurationUnit): number {
 export function AutoArchiveSettingsSection() {
   const { i18n } = useLingui();
   const { autoArchive, patchAutoArchive } = useAutoArchivePreference();
+  const deleteArchivedBlocksMutation = useMutation({
+    mutationKey: ["blocks", "delete-archived"],
+    mutationFn: deleteArchivedBlocks,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      toast.success(
+        i18n._({
+          id: "preferences.archive.clear.success",
+          message: "Archived data cleared.",
+        }),
+      );
+    },
+    onError: (error) => {
+      console.error("Failed to clear archived data.", error);
+      toast.error(
+        i18n._({
+          id: "preferences.archive.clear.error",
+          message: "Failed to clear archived data.",
+        }),
+      );
+    },
+  });
   const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_SETTINGS;
   const duration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
   const [amountText, setAmountText] = useState(String(duration.amount));
@@ -127,7 +164,7 @@ export function AutoArchiveSettingsSection() {
   };
 
   return (
-    <SettingsSection title={<Trans id="preferences.auto-archive.title">Auto archive</Trans>}>
+    <SettingsSection title={<Trans id="preferences.archive.title">Archive</Trans>}>
       <SettingsGroup>
         <SettingsRow
           control={
@@ -194,7 +231,60 @@ export function AutoArchiveSettingsSection() {
             </Trans>
           }
           icon={ClockIcon}
-          label={<Trans id="preferences.auto-archive.threshold.label">Archive after</Trans>}
+          label={<Trans id="preferences.auto-archive.threshold.label">Auto archive after</Trans>}
+        />
+        <SettingsRow
+          control={
+            <AlertDialog>
+              <AlertDialogTrigger
+                disabled={deleteArchivedBlocksMutation.isPending}
+                render={
+                  <Button size="sm" variant="destructive">
+                    {deleteArchivedBlocksMutation.isPending ? (
+                      <LoaderCircleIcon className="animate-spin" data-icon="inline-start" />
+                    ) : null}
+                    <Trans id="preferences.archive.clear.action">Clear</Trans>
+                  </Button>
+                }
+              />
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    <Trans id="preferences.archive.clear.dialog.title">Clear archived data?</Trans>
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <Trans id="preferences.archive.clear.dialog.description">
+                      This permanently deletes all archived blocks. Active blocks and tags are kept.
+                    </Trans>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleteArchivedBlocksMutation.isPending}>
+                    <Trans id="preferences.archive.clear.dialog.cancel">Cancel</Trans>
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={deleteArchivedBlocksMutation.isPending}
+                    variant="destructive"
+                    onClick={() => {
+                      deleteArchivedBlocksMutation.mutate();
+                    }}
+                  >
+                    {deleteArchivedBlocksMutation.isPending ? (
+                      <LoaderCircleIcon className="animate-spin" data-icon="inline-start" />
+                    ) : null}
+                    <Trans id="preferences.archive.clear.dialog.confirm">Clear archive</Trans>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          }
+          description={
+            <Trans id="preferences.archive.clear.description">
+              Permanently delete every archived block. Active blocks and tags are not affected.
+            </Trans>
+          }
+          icon={DatabaseZapIcon}
+          label={<Trans id="preferences.archive.clear.label">Clear archived data</Trans>}
         />
       </SettingsGroup>
     </SettingsSection>

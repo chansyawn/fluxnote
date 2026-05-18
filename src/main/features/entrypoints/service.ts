@@ -3,7 +3,10 @@ import type {
   BackendCommandResponse,
   ParsedBackendCommandRequest,
 } from "@shared/features/entrypoints/commands";
-import type { ExternalEditResult } from "@shared/features/external-edit/session-contracts";
+import type {
+  ExternalEditResult,
+  ExternalEditTrigger,
+} from "@shared/features/external-edit/session-contracts";
 
 import { createBlockRecord } from "../blocks/service";
 import { setBlockTagsByName } from "../tags/service";
@@ -12,6 +15,7 @@ interface EntrypointServiceDeps {
   createExternalEditSession: (
     blockId: string,
     originalContent: string,
+    trigger: ExternalEditTrigger,
     signal?: AbortSignal,
   ) => Promise<ExternalEditResult>;
   getDb: () => Promise<AppDatabase>;
@@ -48,7 +52,12 @@ export function createEntrypointService(services: EntrypointServiceDeps) {
     signal?: AbortSignal,
   ): Promise<BackendCommandResponse<"block.create-external-edit">> {
     const { blockId } = await createBlock(request);
-    return await services.createExternalEditSession(blockId, request.content, signal);
+    return await services.createExternalEditSession(
+      blockId,
+      request.content,
+      request.trigger,
+      signal,
+    );
   }
 
   function openBlock(

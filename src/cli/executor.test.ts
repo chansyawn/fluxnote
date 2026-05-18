@@ -154,6 +154,12 @@ describe("executor", () => {
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
       content: "original",
       tagNames: ["work"],
+      trigger: {
+        cwd: "/workspace",
+        requestedFilePath: "note.md",
+        source: "cli",
+        targetFilePath: "/workspace/note.md",
+      },
     });
     expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "updated", "utf8");
   });
@@ -161,7 +167,7 @@ describe("executor", () => {
   it("does not write file when external edit is canceled", async () => {
     const deps = createDeps();
     deps.readFile.mockResolvedValue("original");
-    deps.dispatchCommand.mockResolvedValue({ status: "canceled" });
+    deps.dispatchCommand.mockResolvedValue({ status: "cancelled" });
 
     await executeExternalEdit("note.md", [], deps);
 

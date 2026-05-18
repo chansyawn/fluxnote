@@ -13,12 +13,13 @@
     "#global.css": "./src/renderer/global.css"
   },
   "scripts": {
-    "db:generate": "drizzle-kit generate",
+    "postinstall": "vp config",
     "dev": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "release:version": "node scripts/release/version.mjs",
     "flux": "./src/cli/flux",
+    "release:version": "node scripts/release/version.mjs",
+    "db:generate": "drizzle-kit generate",
     "i18n:extract": "lingui extract --overwrite --clean",
     "i18n:check": "node scripts/check-i18n.mjs"
   },

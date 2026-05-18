@@ -22,6 +22,12 @@ const block = {
   updatedAt: "2026-01-01T00:00:00.000Z",
   willArchive: false,
 };
+const externalEditTrigger = {
+  cwd: "/workspace",
+  requestedFilePath: "note.md",
+  source: "cli" as const,
+  targetFilePath: "/workspace/note.md",
+};
 
 vi.mock("../features/blocks/service", () => ({
   createBlockRecord: mocks.createBlockRecord,
@@ -123,6 +129,7 @@ describe("createEntrypointRuntime", () => {
     const result = await runtime.dispatchCommand("block.create-external-edit", {
       content: "hello",
       tagNames: ["work"],
+      trigger: externalEditTrigger,
     });
 
     expect(result).toEqual({
@@ -130,7 +137,12 @@ describe("createEntrypointRuntime", () => {
       ok: true,
     });
     expect(mocks.setBlockTagsByName).toHaveBeenCalledWith(db, "block-1", ["work"]);
-    expect(createExternalEditSession).toHaveBeenCalledWith("block-1", "hello", undefined);
+    expect(createExternalEditSession).toHaveBeenCalledWith(
+      "block-1",
+      "hello",
+      externalEditTrigger,
+      undefined,
+    );
   });
 
   it("returns business error when payload is invalid", async () => {

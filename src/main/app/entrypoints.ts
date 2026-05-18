@@ -4,6 +4,7 @@ import {
   type BackendCommandResponse,
   type ParsedBackendCommandRequest,
 } from "@shared/features/entrypoints/commands";
+import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import type { IpcResult } from "@shared/ipc/result";
 import { businessError, toIpcErrorPayload } from "@shared/ipc/result";
 import { ZodError } from "zod";
@@ -17,6 +18,7 @@ interface EntrypointRuntimeServices {
   createExternalEditSession: (
     blockId: string,
     originalContent: string,
+    trigger: ExternalEditTrigger,
     signal?: AbortSignal,
   ) => Promise<BackendCommandResponse<"block.create-external-edit">>;
   getDb: () => Promise<AppDatabase>;

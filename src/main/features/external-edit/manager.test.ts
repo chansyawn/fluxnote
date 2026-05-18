@@ -3,12 +3,25 @@ import { describe, expect, it, vi } from "vitest";
 import { createExternalEditManager } from "./manager";
 
 describe("external-edit manager", () => {
+  const trigger = {
+    cwd: "/workspace",
+    requestedFilePath: "note.md",
+    source: "cli" as const,
+    targetFilePath: "/workspace/note.md",
+  };
+
   it("begins and claims a session", async () => {
     const emitEvent = vi.fn(() => true);
     const manager = createExternalEditManager({ emitEvent });
 
-    const begun = manager.begin("b1", "original");
-    expect(manager.listSessions()).toHaveLength(1);
+    const begun = manager.begin("b1", "original", trigger);
+    expect(manager.listSessions()).toEqual([
+      expect.objectContaining({
+        blockId: "b1",
+        editId: begun.session.editId,
+        trigger,
+      }),
+    ]);
 
     const claimed = manager.claim(begun.session.editId);
     claimed.resolve({ blockId: "b1", content: "next", status: "submitted" });
@@ -31,8 +44,8 @@ describe("external-edit manager", () => {
   it("cancels all pending sessions", async () => {
     const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
 
-    const one = manager.begin("b1", "a");
-    const two = manager.begin("b2", "b");
+    const one = manager.begin("b1", "a", trigger);
+    const two = manager.begin("b2", "b", trigger);
     manager.cancelAll();
 
     await expect(one.result).resolves.toEqual({ blockId: "b1", status: "cancelled" });
@@ -43,7 +56,7 @@ describe("external-edit manager", () => {
   it("aborts pending session when signal aborts", async () => {
     const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
     const controller = new AbortController();
-    const begun = manager.begin("b1", "original", { signal: controller.signal });
+    const begun = manager.begin("b1", "original", trigger, { signal: controller.signal });
 
     controller.abort();
 

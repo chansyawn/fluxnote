@@ -40,6 +40,9 @@ export const blocksListResponseSchema = z.object({
   limit: z.number().int().min(1),
   totalCount: z.number().int().min(0),
 });
+export const blocksDeleteArchivedResponseSchema = z.object({
+  deletedCount: z.number().int().min(0),
+});
 export const blocksLocateRequestSchema = z.object({
   blockId: z.string().min(1),
   tagIds: z.array(z.string()).optional(),

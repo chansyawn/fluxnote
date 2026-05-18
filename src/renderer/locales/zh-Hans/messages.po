@@ -243,22 +243,42 @@ msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:38
+#: src/renderer/features/block/actions/external-edit-actions.tsx:43
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:39
+#: src/renderer/features/block/actions/external-edit-actions.tsx:44
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:30
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:68
+msgid "home-note.block.external-edit.metadata.cwd"
+msgstr "工作目录"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:72
+msgid "home-note.block.external-edit.metadata.file"
+msgstr "目标文件"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:64
+msgid "home-note.block.external-edit.metadata.source"
+msgstr "来源"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:29
+msgid "home-note.block.external-edit.metadata.source.cli"
+msgstr "命令行"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block/actions/external-edit-actions.tsx:35
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-actions.tsx:31
+#: src/renderer/features/block/actions/external-edit-actions.tsx:36
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "提交"
 
@@ -293,42 +313,87 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:145
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:246
+msgid "preferences.archive.clear.action"
+msgstr "清空"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:282
+msgid "preferences.archive.clear.description"
+msgstr "永久删除所有归档区块。活跃区块和标签不会受到影响。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:263
+msgid "preferences.archive.clear.dialog.cancel"
+msgstr "取消"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:275
+msgid "preferences.archive.clear.dialog.confirm"
+msgstr "清空归档"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:256
+msgid "preferences.archive.clear.dialog.description"
+msgstr "这会永久删除所有归档区块。活跃区块和标签会保留。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:253
+msgid "preferences.archive.clear.dialog.title"
+msgstr "清空归档数据？"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:84
+msgid "preferences.archive.clear.error"
+msgstr "清空归档数据失败。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:287
+msgid "preferences.archive.clear.label"
+msgstr "清空归档数据"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:75
+msgid "preferences.archive.clear.success"
+msgstr "归档数据已清空。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:167
+msgid "preferences.archive.title"
+msgstr "归档"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:182
 msgid "preferences.auto-archive.enable.description"
 msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:152
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:189
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:197
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:234
 msgid "preferences.auto-archive.threshold.label"
-msgstr "归档时间"
+msgstr "自动归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:192
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:229
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:130
-msgid "preferences.auto-archive.title"
-msgstr "自动归档"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:59
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:96
 msgid "preferences.auto-archive.unit.days"
 msgstr "天"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:97
 msgid "preferences.auto-archive.unit.hours"
 msgstr "小时"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:61
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:98
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
