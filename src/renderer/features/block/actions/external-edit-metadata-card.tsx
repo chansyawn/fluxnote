@@ -33,7 +33,9 @@ function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["sour
 function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <>
-      <dt className="text-muted-foreground min-w-0 text-end wrap-break-word hyphens-auto">{label}</dt>
+      <dt className="text-muted-foreground min-w-0 text-end wrap-break-word hyphens-auto">
+        {label}
+      </dt>
       <dd className="min-w-0 font-mono break-all">{value}</dd>
     </>
   );

@@ -253,17 +253,17 @@ msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:65
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:68
 msgid "home-note.block.external-edit.metadata.cwd"
 msgstr "工作目录"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:69
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:72
 msgid "home-note.block.external-edit.metadata.file"
 msgstr "目标文件"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:61
+#: src/renderer/features/block/actions/external-edit-metadata-card.tsx:64
 msgid "home-note.block.external-edit.metadata.source"
 msgstr "来源"
 
