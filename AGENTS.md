@@ -132,3 +132,17 @@ vp run package
 ### Spec Maintenance
 
 - Update `AGENTS.md` promptly whenever repository conventions or infrastructure are added or changed.
+
+## Agent skills
+
+### Issue tracker
+
+@docs/agents/issue-tracker.md
+
+### Triage labels
+
+@docs/agents/triage-labels.md
+
+### Domain docs
+
+@docs/agents/domain.md
