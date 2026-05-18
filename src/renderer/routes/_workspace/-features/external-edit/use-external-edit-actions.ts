@@ -6,6 +6,7 @@ import {
   toAppInvokeError,
 } from "@renderer/clients";
 import type { BlockEditorControllerHandle } from "@renderer/features/block";
+import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markdown/external-markdown";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -65,7 +66,7 @@ export function useExternalEditActions({
           toast.error("Cannot submit: block content unavailable.");
           return;
         }
-        await submitExternalEdit({ content, editId });
+        await submitExternalEdit({ content: normalizeExternalMarkdown(content), editId });
         void queryClient.invalidateQueries({ queryKey: ["blocks"] });
         navigateToBlock?.(blockId);
       } catch (error) {

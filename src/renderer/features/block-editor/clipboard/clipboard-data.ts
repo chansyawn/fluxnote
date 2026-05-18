@@ -8,6 +8,7 @@ import {
 } from "lexical";
 
 import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../core/types";
+import { normalizeExternalMarkdown } from "../markdown/external-markdown";
 import { rewriteClipboardAssetUrls } from "./clipboard-assets";
 import {
   exportClipboardSnapshotFromDocument,
@@ -51,7 +52,9 @@ async function createClipboardDataFromSnapshot(
     html,
     ...(imageFileUrl ? { imageFileUrl } : {}),
     nodes: snapshot.nodes,
-    text: assetUrlMap.size > 0 ? exportClipboardNodesToMarkdown(externalNodes) : snapshot.markdown,
+    text: normalizeExternalMarkdown(
+      assetUrlMap.size > 0 ? exportClipboardNodesToMarkdown(externalNodes) : snapshot.markdown,
+    ),
   };
 }
 
