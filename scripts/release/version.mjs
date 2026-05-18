@@ -1,11 +1,38 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 import semver from "semver";
 
 const supportedVersionPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-beta\.(0|[1-9]\d*))?$/;
+
+export function isSupportedReleaseVersion(version) {
+  return supportedVersionPattern.test(version) && semver.valid(version) === version;
+}
+
+export function isStableVersion(version) {
+  return semver.valid(version) === version && semver.prerelease(version) === null;
+}
+
+export function getLatestVersion(versions) {
+  return semver.rsort(versions).at(0) ?? null;
+}
+
+export function getAutomaticReleaseVersion({ packageVersion, tagVersions }) {
+  const validPackageVersion = isStableVersion(packageVersion) ? packageVersion : null;
+  const stableTagVersions = tagVersions.filter(isStableVersion);
+  const baselineVersion = getLatestVersion(
+    [validPackageVersion, ...stableTagVersions].filter(Boolean),
+  );
+
+  if (!baselineVersion) {
+    throw new Error("No stable baseline version found. Provide RELEASE_VERSION manually.");
+  }
+
+  return semver.inc(baselineVersion, "patch");
+}
 
 function readPackageJson() {
   return JSON.parse(readFileSync("package.json", "utf8"));
@@ -19,24 +46,32 @@ function getReleaseVersion() {
   const version = process.env.RELEASE_VERSION?.trim();
 
   if (!version) {
-    throw new Error("RELEASE_VERSION is required.");
+    const automaticVersion = getAutomaticReleaseVersion({
+      packageVersion: readPackageJson().version,
+      tagVersions: getTagVersions(),
+    });
+
+    console.log(`No RELEASE_VERSION provided. Using ${automaticVersion}.`);
+    return automaticVersion;
   }
 
-  if (!supportedVersionPattern.test(version) || semver.valid(version) !== version) {
+  if (!isSupportedReleaseVersion(version)) {
     throw new Error(`Invalid version: ${version}. Use x.y.z or x.y.z-beta.n.`);
   }
 
   return version;
 }
 
-function getLatestTagVersion() {
-  const tags = execFileSync("git", ["tag", "--list", "v*"], { encoding: "utf8" })
+function getTagVersions() {
+  return execFileSync("git", ["tag", "--list", "v*"], { encoding: "utf8" })
     .split(/\r?\n/)
     .map((tag) => tag.trim().replace(/^v/, ""))
     .filter(Boolean)
     .filter((tag) => semver.valid(tag));
+}
 
-  return semver.rsort(tags).at(0) ?? null;
+function getLatestTagVersion() {
+  return getLatestVersion(getTagVersions());
 }
 
 function getBaselineVersion() {
@@ -83,15 +118,21 @@ function writeReleaseVersion() {
   console.log(`Updated package.json version to ${version}.`);
 }
 
-const command = process.argv.slice(2).find((argument) => argument !== "--");
+function main() {
+  const command = process.argv.slice(2).find((argument) => argument !== "--");
 
-switch (command) {
-  case "validate":
-    validateReleaseVersion();
-    break;
-  case "write":
-    writeReleaseVersion();
-    break;
-  default:
-    throw new Error("Usage: node scripts/release/version.mjs <validate|write>");
+  switch (command) {
+    case "validate":
+      validateReleaseVersion();
+      break;
+    case "write":
+      writeReleaseVersion();
+      break;
+    default:
+      throw new Error("Usage: node scripts/release/version.mjs <validate|write>");
+  }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
 }
