@@ -1,9 +1,9 @@
-import type { BlockEditorControllerHandle } from "@renderer/features/block";
+import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { createContext, useContext, type ReactNode } from "react";
 
 export interface EditorRegistryContextValue {
-  registerEditor: (blockId: string, handle: BlockEditorControllerHandle | null) => void;
-  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
+  registerEditor: (blockId: string, handle: PersistedBlockEditorHandle | null) => void;
+  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
 }
 
 const EditorRegistryContext = createContext<EditorRegistryContextValue | null>(null);

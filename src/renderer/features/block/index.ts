@@ -1,2 +1,1 @@
-export { BlockActions, ExternalEditActions } from "./actions";
-export { BlockEditorController, BlockEditorView, type BlockEditorControllerHandle } from "./editor";
+export { BlockEditorFrame, PersistedBlockEditor, type PersistedBlockEditorHandle } from "./editor";

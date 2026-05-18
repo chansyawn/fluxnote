@@ -7,13 +7,19 @@ import {
   type ListBlocksResult,
   type LocateBlockResult,
 } from "@renderer/clients";
-import {
-  BLOCKS_PAGE_SIZE,
-  blockListPageQueryKey,
-  getBlockPageOffset,
-} from "@renderer/features/block/query-key";
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+const BLOCKS_PAGE_SIZE = 10;
+
+const blockListQueryKey = (tagIds: string[], visibility: BlockVisibility) =>
+  ["blocks", visibility, [...tagIds].sort((left, right) => left.localeCompare(right))] as const;
+
+const blockListPageQueryKey = (tagIds: string[], visibility: BlockVisibility, offset: number) =>
+  [...blockListQueryKey(tagIds, visibility), "page", offset] as const;
+
+const getBlockPageOffset = (index: number) =>
+  Math.floor(index / BLOCKS_PAGE_SIZE) * BLOCKS_PAGE_SIZE;
 
 interface UseBlockListParams {
   visibility: BlockVisibility;

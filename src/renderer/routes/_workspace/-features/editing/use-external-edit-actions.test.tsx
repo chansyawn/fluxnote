@@ -2,7 +2,7 @@
 
 import { queryClient } from "@renderer/app/query";
 import type { Block, ListBlocksResult } from "@renderer/clients";
-import type { BlockEditorControllerHandle } from "@renderer/features/block";
+import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -36,7 +36,7 @@ interface ExternalEditActionsSnapshot {
 }
 
 interface ExternalEditActionsHarnessProps {
-  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
+  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
   navigateToBlock?: (blockId: string) => void;
   onSnapshot: (snapshot: ExternalEditActionsSnapshot) => void;
 }
@@ -120,7 +120,7 @@ describe("useExternalEditActions", () => {
 
   it("normalizes live editor content before external edit submission", async () => {
     clientMocks.submitExternalEdit.mockResolvedValue(createBlock("block-1", ""));
-    const editor: BlockEditorControllerHandle = {
+    const editor: PersistedBlockEditorHandle = {
       copy: vi.fn(async () => undefined),
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),

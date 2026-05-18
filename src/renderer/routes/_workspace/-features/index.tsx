@@ -19,9 +19,9 @@ export function BlockWorkspace() {
     blockNavigation,
     commands,
     editorRegistry,
-    stateContextValue,
     tagData,
     viewState,
+    workspaceContextValue,
   } = useWorkspaceDataBoundary();
   const registryContextValue = useMemo(
     () => ({
@@ -85,7 +85,7 @@ export function BlockWorkspace() {
           <WorkspaceFilteredEmptyState visibility={visibility} />
         )
       ) : (
-        <WorkspaceStateProvider value={stateContextValue}>
+        <WorkspaceStateProvider value={workspaceContextValue}>
           <EditorRegistryProvider value={registryContextValue}>
             <VirtualBlockList
               totalCount={totalBlockCount}

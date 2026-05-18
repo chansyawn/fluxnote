@@ -1,10 +1,5 @@
 import type { Block, Tag } from "@renderer/clients";
-import {
-  BlockActions,
-  BlockEditorController,
-  ExternalEditActions,
-  type BlockEditorControllerHandle,
-} from "@renderer/features/block";
+import { PersistedBlockEditor, type PersistedBlockEditorHandle } from "@renderer/features/block";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   keyboardEventMatchesShortcut,
@@ -14,7 +9,9 @@ import type { ExternalEditTrigger } from "@shared/features/external-edit/session
 import { memo, useCallback, useRef, useState } from "react";
 
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
+import { BlockActions } from "./block-actions";
 import { useEditorRegistryContext } from "./editor-registry-context";
+import { ExternalEditActions } from "./external-edit-actions";
 
 interface WorkspaceBlockEditorProps {
   block: Block;
@@ -130,7 +127,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   const { shortcuts } = useShortcutState();
 
   const setEditorRef = useCallback(
-    (handle: BlockEditorControllerHandle | null) => {
+    (handle: PersistedBlockEditorHandle | null) => {
       registry.registerEditor(block.id, handle);
     },
     [block.id, registry],
@@ -179,7 +176,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         setIsActionAreaActive(false);
       }}
     >
-      <BlockEditorController
+      <PersistedBlockEditor
         ref={setEditorRef}
         actions={
           shouldRenderActions ? (

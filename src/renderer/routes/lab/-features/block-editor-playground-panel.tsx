@@ -1,5 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { BlockEditorView } from "@renderer/features/block";
+import { BlockEditorFrame } from "@renderer/features/block";
 import type { BlockEditorRuntime } from "@renderer/features/block-editor";
 import { Button } from "@renderer/ui/components/button";
 import { useMemo, useState } from "react";
@@ -126,7 +126,7 @@ export function BlockEditorPlaygroundPanel() {
         </Button>
       </div>
 
-      <BlockEditorView
+      <BlockEditorFrame
         key={editorVersion}
         blockId="playground-block"
         runtime={runtime}

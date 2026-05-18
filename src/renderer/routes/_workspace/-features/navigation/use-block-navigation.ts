@@ -28,12 +28,12 @@ export interface BlockScrollTargetRenderedPayload {
   requestId: number;
 }
 
-interface NavigationCallbacks {
+export interface BlockNavigationCallbacks {
   acknowledge?: () => void;
   onNotFound?: () => void;
 }
 
-interface NavigationOptions extends NavigationCallbacks {
+export interface BlockNavigationOptions extends BlockNavigationCallbacks {
   align?: BlockNavigationAlign;
   focus?: BlockNavigationFocus;
   viewMode?: BlockNavigationViewMode;
@@ -156,15 +156,19 @@ interface UseBlockNavigationParams {
 
 interface UseBlockNavigationResult {
   activeBlockId: string | null;
-  navigateToBlock: (blockId: string, options?: NavigationOptions) => void;
-  navigateToIndex: (index: number, options?: NavigationOptions) => void;
-  navigateToLocatedBlock: (blockId: string, index: number, options?: NavigationOptions) => void;
+  navigateToBlock: (blockId: string, options?: BlockNavigationOptions) => void;
+  navigateToIndex: (index: number, options?: BlockNavigationOptions) => void;
+  navigateToLocatedBlock: (
+    blockId: string,
+    index: number,
+    options?: BlockNavigationOptions,
+  ) => void;
   scrollTarget: BlockScrollTarget | null;
   setActiveBlockId: (blockId: string | null) => void;
   targetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
 }
 
-function normalizeOptions(options: NavigationOptions | undefined) {
+function normalizeOptions(options: BlockNavigationOptions | undefined) {
   return {
     align: options?.align ?? "start",
     focus: options?.focus ?? "editor",
@@ -184,19 +188,22 @@ export function useBlockNavigation({
 }: UseBlockNavigationParams): UseBlockNavigationResult {
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const [state, dispatch] = useReducer(blockNavigationReducer, { phase: "idle" });
-  const callbacksRef = useRef(new Map<number, NavigationCallbacks>());
+  const callbacksRef = useRef(new Map<number, BlockNavigationCallbacks>());
   const nextRequestIdRef = useRef(0);
 
   const isActiveUnfiltered = visibility === "active" && selectedTagIds.length === 0;
 
-  const startRequest = useCallback((request: NavigationRequest, callbacks: NavigationCallbacks) => {
-    callbacksRef.current.clear();
-    callbacksRef.current.set(request.requestId, callbacks);
-    dispatch({ type: "start", request });
-  }, []);
+  const startRequest = useCallback(
+    (request: NavigationRequest, callbacks: BlockNavigationCallbacks) => {
+      callbacksRef.current.clear();
+      callbacksRef.current.set(request.requestId, callbacks);
+      dispatch({ type: "start", request });
+    },
+    [],
+  );
 
   const buildRequestBase = useCallback(
-    (options: NavigationOptions | undefined) => ({
+    (options: BlockNavigationOptions | undefined) => ({
       requestId: (nextRequestIdRef.current += 1),
       ...normalizeOptions(options),
     }),
@@ -204,7 +211,7 @@ export function useBlockNavigation({
   );
 
   const navigateToBlock = useCallback(
-    (blockId: string, options?: NavigationOptions) => {
+    (blockId: string, options?: BlockNavigationOptions) => {
       const request = {
         ...buildRequestBase(options),
         blockId,
@@ -219,7 +226,7 @@ export function useBlockNavigation({
   );
 
   const navigateToIndex = useCallback(
-    (index: number, options?: NavigationOptions) => {
+    (index: number, options?: BlockNavigationOptions) => {
       const request = {
         ...buildRequestBase(options),
         index,
@@ -234,7 +241,7 @@ export function useBlockNavigation({
   );
 
   const navigateToLocatedBlock = useCallback(
-    (blockId: string, index: number, options?: NavigationOptions) => {
+    (blockId: string, index: number, options?: BlockNavigationOptions) => {
       const request = {
         ...buildRequestBase(options),
         blockId,

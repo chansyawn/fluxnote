@@ -20,9 +20,9 @@ import {
 import { useBlockPersistence } from "./persistence";
 import { createBlockRuntime } from "./runtime";
 
-export type BlockEditorControllerHandle = BlockEditorHandle;
+export type PersistedBlockEditorHandle = BlockEditorHandle;
 
-interface BlockEditorViewProps {
+interface BlockEditorFrameProps {
   blockId: string;
   editorConfig?: BlockEditorConfigInput;
   initialMarkdown: string;
@@ -38,7 +38,7 @@ interface BlockEditorViewProps {
   ref?: Ref<BlockEditorHandle>;
 }
 
-export function BlockEditorView({
+export function BlockEditorFrame({
   blockId,
   editorConfig,
   initialMarkdown,
@@ -52,7 +52,7 @@ export function BlockEditorView({
   onBlur,
   onFocus,
   ref,
-}: BlockEditorViewProps) {
+}: BlockEditorFrameProps) {
   return (
     <article
       className={cn(
@@ -87,23 +87,23 @@ export function BlockEditorView({
   );
 }
 
-interface BlockEditorControllerProps {
+interface PersistedBlockEditorProps {
   block: Block;
   actions?: ReactNode;
   isExternalEditPending?: boolean;
   leadingActions?: ReactNode;
   onFocus: (blockId: string) => void;
-  ref?: Ref<BlockEditorControllerHandle>;
+  ref?: Ref<PersistedBlockEditorHandle>;
 }
 
-export function BlockEditorController({
+export function PersistedBlockEditor({
   block,
   actions,
   isExternalEditPending = false,
   leadingActions,
   onFocus,
   ref,
-}: BlockEditorControllerProps) {
+}: PersistedBlockEditorProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createBlockRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
@@ -146,7 +146,7 @@ export function BlockEditorController({
   );
 
   return (
-    <BlockEditorView
+    <BlockEditorFrame
       ref={editorRef}
       blockId={block.id}
       editorConfig={editorConfig}
