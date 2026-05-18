@@ -105,6 +105,10 @@ src/
 
 ## Workflow & Verification
 
+### Contribution Policy
+
+- Agents handling issues, pull requests, commits, or contribution-related work must read and follow `CONTRIBUTING.md`.
+
 ### Standard Verification
 
 After any code change, run:
