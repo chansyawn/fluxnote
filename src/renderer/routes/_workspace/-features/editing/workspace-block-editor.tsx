@@ -1,5 +1,4 @@
 import type { Block, Tag } from "@renderer/clients";
-import { PersistedBlockEditor, type PersistedBlockEditorHandle } from "@renderer/features/block";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   keyboardEventMatchesShortcut,
@@ -12,6 +11,7 @@ import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-
 import { BlockActions } from "./block-actions";
 import { useEditorRegistryContext } from "./editor-registry-context";
 import { ExternalEditActions } from "./external-edit-actions";
+import { PersistedBlockEditor, type PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 interface WorkspaceBlockEditorProps {
   block: Block;

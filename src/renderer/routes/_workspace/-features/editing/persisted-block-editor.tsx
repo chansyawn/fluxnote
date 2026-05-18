@@ -17,8 +17,8 @@ import {
   type Ref,
 } from "react";
 
-import { useBlockPersistence } from "./persistence";
-import { createBlockRuntime } from "./runtime";
+import { useBlockEditorPersistence } from "./block-editor-persistence";
+import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 
 export type PersistedBlockEditorHandle = BlockEditorHandle;
 
@@ -38,7 +38,7 @@ interface BlockEditorFrameProps {
   ref?: Ref<BlockEditorHandle>;
 }
 
-export function BlockEditorFrame({
+function BlockEditorFrame({
   blockId,
   editorConfig,
   initialMarkdown,
@@ -105,7 +105,7 @@ export function PersistedBlockEditor({
   ref,
 }: PersistedBlockEditorProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
-  const runtime = useMemo(() => createBlockRuntime(block.id), [block.id]);
+  const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
@@ -116,7 +116,7 @@ export function PersistedBlockEditor({
     [codeBlock],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
-    useBlockPersistence(block);
+    useBlockEditorPersistence(block);
 
   useEffect(() => {
     return () => {

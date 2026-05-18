@@ -5,10 +5,11 @@ import {
   type ListBlocksResult,
   toAppInvokeError,
 } from "@renderer/clients";
-import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markdown/external-markdown";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+
+import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 interface UseExternalEditActionsParams {
   getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;

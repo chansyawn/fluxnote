@@ -1,5 +1,6 @@
-import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { useCallback, useRef } from "react";
+
+import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 export interface EditorRegistry {
   registerEditor: (blockId: string, handle: PersistedBlockEditorHandle | null) => void;

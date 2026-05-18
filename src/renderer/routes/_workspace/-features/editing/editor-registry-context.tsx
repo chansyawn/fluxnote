@@ -1,5 +1,6 @@
-import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { createContext, useContext, type ReactNode } from "react";
+
+import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 export interface EditorRegistryContextValue {
   registerEditor: (blockId: string, handle: PersistedBlockEditorHandle | null) => void;

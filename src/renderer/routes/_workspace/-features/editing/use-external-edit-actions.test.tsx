@@ -2,10 +2,11 @@
 
 import { queryClient } from "@renderer/app/query";
 import type { Block, ListBlocksResult } from "@renderer/clients";
-import type { PersistedBlockEditorHandle } from "@renderer/features/block";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+
+import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 const clientMocks = vi.hoisted(() => ({
   cancelExternalEdit: vi.fn(),

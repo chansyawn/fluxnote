@@ -23,7 +23,7 @@ function updateBlockInCache(blockId: string, updateBlock: (block: Block) => Bloc
   });
 }
 
-export function useBlockPersistence(block: Block): BlockPersistence {
+export function useBlockEditorPersistence(block: Block): BlockPersistence {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
   const latestRequestIdRef = useRef(0);
