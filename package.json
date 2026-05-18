@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "private": true,
   "description": "A lightweight, always-on-top editor for AI-first workflows.",
+  "license": "MIT",
   "author": "Fluxnotes",
   "bin": {
     "flux": ".vite/cli/flux-cli.mjs"
