@@ -3,7 +3,12 @@ import { defineConfig } from "vite-plus";
 import { viteAliases } from "./config/vite/shared.ts";
 
 // ignore these files for linting and formatting
-const ignorePatterns = ["*.gen.ts", "src/renderer/locales/**", "src/main/core/database/drizzle/**"];
+const ignorePatterns = [
+  ".agents/skills/**",
+  "*.gen.ts",
+  "src/renderer/locales/**",
+  "src/main/core/database/drizzle/**",
+];
 
 export default defineConfig({
   fmt: {
