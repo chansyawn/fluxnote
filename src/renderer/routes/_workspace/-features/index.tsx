@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { EditorRegistryProvider } from "./editing/editor-registry-context";
+import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
 import { VirtualBlockList } from "./list/virtual-block-list";
 import {
   LoadingState,
@@ -81,7 +81,7 @@ export function BlockWorkspace() {
         )
       ) : (
         <WorkspaceStateProvider value={workspaceContextValue}>
-          <EditorRegistryProvider value={registryContextValue}>
+          <BlockEditorRegistryProvider value={registryContextValue}>
             <VirtualBlockList
               totalCount={totalBlockCount}
               getBlockAtIndex={blockList.getBlockAtIndex}
@@ -89,7 +89,7 @@ export function BlockWorkspace() {
               scrollTarget={blockNavigation.scrollTarget}
               onScrollTargetRendered={blockNavigation.targetRendered}
             />
-          </EditorRegistryProvider>
+          </BlockEditorRegistryProvider>
         </WorkspaceStateProvider>
       )}
     </section>

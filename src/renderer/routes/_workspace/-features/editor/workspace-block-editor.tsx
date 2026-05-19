@@ -7,15 +7,18 @@ import {
 import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { memo, useCallback, useRef, useState } from "react";
 
-import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
-import { BlockActions } from "./block-actions";
-import { useEditorRegistryContext } from "./editor-registry-context";
-import { ExternalEditActions } from "./external-edit-actions";
-import { PersistedBlockEditor, type PersistedBlockEditorHandle } from "./persisted-block-editor";
+import { BlockActions } from "../block-actions/block-actions";
 import {
   useWorkspaceBlockActionsModel,
   type WorkspaceBlockActionsModel,
-} from "./workspace-block-actions-model";
+} from "../block-actions/block-actions-model";
+import { useBlockEditorRegistryContext } from "../editor-registry/block-editor-registry-context";
+import { ExternalEditActions } from "../external-edit/external-edit-actions";
+import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
+import {
+  WorkspaceBlockEditorSurface,
+  type WorkspaceBlockEditorHandle,
+} from "./workspace-block-editor-surface";
 
 interface WorkspaceBlockEditorProps {
   block: Block;
@@ -97,11 +100,11 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
 }: WorkspaceBlockEditorProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [isActionAreaActive, setIsActionAreaActive] = useState(false);
-  const registry = useEditorRegistryContext();
+  const registry = useBlockEditorRegistryContext();
   const { shortcuts } = useShortcutState();
 
   const setEditorRef = useCallback(
-    (handle: PersistedBlockEditorHandle | null) => {
+    (handle: WorkspaceBlockEditorHandle | null) => {
       registry.registerEditor(block.id, handle);
     },
     [block.id, registry],
@@ -156,7 +159,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         setIsActionAreaActive(false);
       }}
     >
-      <PersistedBlockEditor
+      <WorkspaceBlockEditorSurface
         ref={setEditorRef}
         actions={
           shouldRenderActions ? (

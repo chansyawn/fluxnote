@@ -3,10 +3,10 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { refreshWorkspaceBlocks } from "../block-collection/workspace-block-collection";
-import type { BlockContentSource } from "./block-content-source";
+import type { SubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditSubmissionParams {
-  blockContentSource: BlockContentSource;
+  submittableBlockContent: SubmittableBlockContent;
   navigateToBlock?: (blockId: string) => Promise<void>;
 }
 
@@ -17,7 +17,7 @@ interface ExternalEditSubmission {
 }
 
 export function useExternalEditSubmission({
-  blockContentSource,
+  submittableBlockContent,
   navigateToBlock,
 }: UseExternalEditSubmissionParams): ExternalEditSubmission {
   const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
@@ -55,7 +55,7 @@ export function useExternalEditSubmission({
     async (blockId: string, editId: string) => {
       markPending(editId);
       try {
-        const content = await blockContentSource.getSubmittableMarkdown(blockId);
+        const content = await submittableBlockContent.getSubmittableMarkdown(blockId);
         if (content === null) {
           toast.error("Cannot submit: block content unavailable.");
           return;
@@ -69,7 +69,7 @@ export function useExternalEditSubmission({
         unmarkPending(editId);
       }
     },
-    [blockContentSource, markPending, navigateToBlock, unmarkPending],
+    [markPending, navigateToBlock, submittableBlockContent, unmarkPending],
   );
 
   return {

@@ -5,9 +5,9 @@ import { cn } from "@renderer/ui/lib/utils";
 import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { CheckIcon, XIcon } from "lucide-react";
 
-import { ACTION_BAR_CLS, ACTION_BAR_DISABLED_CLS } from "./block-actions";
+import { ACTION_BAR_CLS, ACTION_BAR_DISABLED_CLS } from "../block-actions/block-actions";
+import { IconAction } from "../block-actions/icon-action";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
-import { IconAction } from "./icon-action";
 
 interface ExternalEditActionsProps {
   shortcuts?: Partial<Pick<ShortcutPreferences, "submit-external-edit" | "cancel-external-edit">>;

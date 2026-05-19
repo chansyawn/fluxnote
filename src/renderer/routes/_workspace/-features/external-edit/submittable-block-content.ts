@@ -2,19 +2,19 @@ import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markd
 import { useCallback, useMemo } from "react";
 
 import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-collection";
-import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 
-export interface BlockContentSource {
+export interface SubmittableBlockContent {
   getSubmittableMarkdown: (blockId: string) => Promise<string | null>;
 }
 
-interface UseBlockContentSourceParams {
-  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
+interface UseSubmittableBlockContentParams {
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
 }
 
-export function useBlockContentSource({
+export function useSubmittableBlockContent({
   getEditor,
-}: UseBlockContentSourceParams): BlockContentSource {
+}: UseSubmittableBlockContentParams): SubmittableBlockContent {
   const getSubmittableMarkdown = useCallback(
     async (blockId: string) => {
       const editorContent = await getEditor(blockId)?.flush();

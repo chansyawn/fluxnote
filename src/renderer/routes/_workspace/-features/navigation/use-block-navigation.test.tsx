@@ -5,7 +5,7 @@ import { act, useCallback, useLayoutEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import type { EditorRegistry } from "../editing/use-editor-registry";
+import type { BlockEditorRegistry } from "../editor-registry/use-block-editor-registry";
 import {
   BlockNavigationCancelledError,
   type BlockScrollTarget,
@@ -51,7 +51,7 @@ interface NavigationHarnessProps {
   initialVisibility?: BlockVisibility;
   locateBlockInView: (blockId: string, view: LocateView) => Promise<LocateBlockResult>;
   onSnapshot: (snapshot: NavigationSnapshot) => void;
-  registry: EditorRegistry;
+  registry: BlockEditorRegistry;
 }
 
 function NavigationHarness({
@@ -104,7 +104,7 @@ async function flushEffects(): Promise<void> {
   });
 }
 
-function createRegistry(): EditorRegistry {
+function createRegistry(): BlockEditorRegistry {
   return {
     getEditor: vi.fn(),
     registerEditor: vi.fn(() => () => undefined),
@@ -118,7 +118,7 @@ function createHarness(options: {
   initialSelectedTagIds?: string[];
   initialVisibility?: BlockVisibility;
   locateBlockInView: NavigationHarnessProps["locateBlockInView"];
-  registry: EditorRegistry;
+  registry: BlockEditorRegistry;
 }) {
   const container = document.createElement("div");
   document.body.append(container);

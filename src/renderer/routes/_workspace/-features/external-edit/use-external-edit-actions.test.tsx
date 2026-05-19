@@ -6,7 +6,7 @@ import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 
 const clientMocks = vi.hoisted(() => ({
   cancelExternalEdit: vi.fn(),
@@ -37,7 +37,7 @@ interface ExternalEditActionsSnapshot {
 }
 
 interface ExternalEditActionsHarnessProps {
-  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   navigateToBlock?: (blockId: string) => Promise<void>;
   onSnapshot: (snapshot: ExternalEditActionsSnapshot) => void;
 }
@@ -121,7 +121,7 @@ describe("useExternalEditActions", () => {
 
   it("normalizes live editor content before external edit submission", async () => {
     clientMocks.submitExternalEdit.mockResolvedValue(createBlock("block-1", ""));
-    const editor: PersistedBlockEditorHandle = {
+    const editor: WorkspaceBlockEditorHandle = {
       copy: vi.fn(async () => undefined),
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),

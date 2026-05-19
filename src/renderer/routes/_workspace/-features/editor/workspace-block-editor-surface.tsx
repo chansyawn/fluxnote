@@ -20,7 +20,7 @@ import {
 import { useBlockEditorPersistence } from "./block-editor-persistence";
 import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 
-export type PersistedBlockEditorHandle = BlockEditorHandle;
+export type WorkspaceBlockEditorHandle = BlockEditorHandle;
 
 interface BlockEditorFrameProps {
   blockId: string;
@@ -87,23 +87,23 @@ function BlockEditorFrame({
   );
 }
 
-interface PersistedBlockEditorProps {
+interface WorkspaceBlockEditorSurfaceProps {
   block: Block;
   actions?: ReactNode;
   isExternalEditPending?: boolean;
   leadingActions?: ReactNode;
   onFocus: (blockId: string) => void;
-  ref?: Ref<PersistedBlockEditorHandle>;
+  ref?: Ref<WorkspaceBlockEditorHandle>;
 }
 
-export function PersistedBlockEditor({
+export function WorkspaceBlockEditorSurface({
   block,
   actions,
   isExternalEditPending = false,
   leadingActions,
   onFocus,
   ref,
-}: PersistedBlockEditorProps) {
+}: WorkspaceBlockEditorSurfaceProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();

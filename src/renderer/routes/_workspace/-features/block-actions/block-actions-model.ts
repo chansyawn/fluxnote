@@ -1,13 +1,13 @@
 import type { Block } from "@renderer/clients";
 import { useCallback, useMemo } from "react";
 
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
-import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
 
 interface WorkspaceBlockActionsModelParams {
   block: Block;
   commands: WorkspaceCommands;
-  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   state: WorkspaceBlockState;
 }
 

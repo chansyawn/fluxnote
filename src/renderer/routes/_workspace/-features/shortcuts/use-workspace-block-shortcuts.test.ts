@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   shortcuts: {
@@ -24,7 +24,7 @@ vi.mock("@tanstack/react-hotkeys", () => ({
   useHotkeys: mocks.useHotkeys,
 }));
 
-import { useBlockShortcuts } from "./use-block-shortcuts";
+import { useWorkspaceBlockShortcuts } from "./use-workspace-block-shortcuts";
 
 function createActiveBlockFocus(isFocused: boolean) {
   return {
@@ -34,7 +34,7 @@ function createActiveBlockFocus(isFocused: boolean) {
   };
 }
 
-describe("useBlockShortcuts", () => {
+describe("useWorkspaceBlockShortcuts", () => {
   beforeEach(() => {
     mocks.useHotkeys.mockReset();
     mocks.shortcuts["archive-block"] = "Mod+E";
@@ -53,7 +53,7 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    useBlockShortcuts({
+    useWorkspaceBlockShortcuts({
       activeBlockFocus: createActiveBlockFocus(false),
       createBlockWithFocus,
       deleteBlockWithFocus,
@@ -86,7 +86,7 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    useBlockShortcuts({
+    useWorkspaceBlockShortcuts({
       activeBlockFocus: createActiveBlockFocus(false),
       createBlockWithFocus,
       deleteBlockWithFocus,
@@ -119,7 +119,7 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    useBlockShortcuts({
+    useWorkspaceBlockShortcuts({
       activeBlockFocus: createActiveBlockFocus(true),
       createBlockWithFocus,
       deleteBlockWithFocus,
@@ -152,7 +152,7 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    useBlockShortcuts({
+    useWorkspaceBlockShortcuts({
       activeBlockFocus: createActiveBlockFocus(true),
       createBlockWithFocus,
       deleteBlockWithFocus,

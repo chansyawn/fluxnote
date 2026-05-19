@@ -3,14 +3,14 @@ import { useCallback, useMemo } from "react";
 
 import { useWorkspaceBlockCollection } from "./block-collection/workspace-block-collection";
 import { useWorkspaceBlockView } from "./block-collection/workspace-block-view";
-import { useBlockShortcuts } from "./editing/use-block-shortcuts";
-import { useEditorRegistry } from "./editing/use-editor-registry";
-import { useExternalEditActions } from "./editing/use-external-edit-actions";
-import { useExternalEditSessions } from "./editing/use-external-edit-sessions";
+import { useBlockEditorRegistry } from "./editor-registry/use-block-editor-registry";
+import { useExternalEditActions } from "./external-edit/use-external-edit-actions";
+import { useExternalEditSessions } from "./external-edit/use-external-edit-sessions";
+import { useOpenBlockNavigation } from "./navigation/open-block-navigation";
 import { useActiveBlockFocus } from "./navigation/use-active-block-focus";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
-import { useOpenBlockNavigation } from "./open-block-navigation";
+import { useWorkspaceBlockShortcuts } from "./shortcuts/use-workspace-block-shortcuts";
 import { useBlockMutations } from "./use-block-mutations";
 import { useWorkspaceCommandsValue } from "./workspace-commands";
 import { useWorkspaceContextValue } from "./workspace-context-value";
@@ -20,7 +20,7 @@ export function useWorkspaceRuntime() {
   const blockList = useWorkspaceBlockCollection(blockView.collectionView);
   const blockMutations = useBlockMutations();
   const tagData = useTagData();
-  const editorRegistry = useEditorRegistry();
+  const editorRegistry = useBlockEditorRegistry();
   const { sessionsByBlockId } = useExternalEditSessions();
   const blockNavigationCollection = useMemo(
     () => ({
@@ -70,7 +70,7 @@ export function useWorkspaceRuntime() {
     setActiveBlockId: activeBlockFocus.focusBlock,
   });
 
-  useBlockShortcuts({
+  useWorkspaceBlockShortcuts({
     activeBlockFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,

@@ -5,8 +5,8 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
-import { BlockNavigationCancelledError } from "./navigation/use-block-navigation";
 import { useOpenBlockNavigation } from "./open-block-navigation";
+import { BlockNavigationCancelledError } from "./use-block-navigation";
 
 const openBlockMocks = vi.hoisted(() => ({
   acknowledgePendingBlockId: vi.fn(),

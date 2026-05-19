@@ -1,10 +1,10 @@
 import { useCallback, useRef } from "react";
 
-import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 
-export interface EditorRegistry {
-  registerEditor: (blockId: string, handle: PersistedBlockEditorHandle | null) => void;
-  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
+export interface BlockEditorRegistry {
+  registerEditor: (blockId: string, handle: WorkspaceBlockEditorHandle | null) => void;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   requestEditorFocus: (blockId: string | null, requestId?: number) => boolean;
 }
 
@@ -13,8 +13,8 @@ interface PendingFocusRequest {
   requestId: number;
 }
 
-export function useEditorRegistry(): EditorRegistry {
-  const editorsRef = useRef(new Map<string, PersistedBlockEditorHandle>());
+export function useBlockEditorRegistry(): BlockEditorRegistry {
+  const editorsRef = useRef(new Map<string, WorkspaceBlockEditorHandle>());
   const focusTargetRef = useRef<PendingFocusRequest | null>(null);
   const fallbackRequestIdRef = useRef(0);
 
@@ -28,7 +28,7 @@ export function useEditorRegistry(): EditorRegistry {
   }, []);
 
   const registerEditor = useCallback(
-    (blockId: string, handle: PersistedBlockEditorHandle | null) => {
+    (blockId: string, handle: WorkspaceBlockEditorHandle | null) => {
       if (handle) {
         editorsRef.current.set(blockId, handle);
         const pendingFocus = focusTargetRef.current;

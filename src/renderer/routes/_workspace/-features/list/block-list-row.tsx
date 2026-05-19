@@ -1,7 +1,7 @@
 import type { Block } from "@renderer/clients";
 import { memo } from "react";
 
-import { WorkspaceBlockEditor } from "../editing/workspace-block-editor";
+import { WorkspaceBlockEditor } from "../editor/workspace-block-editor";
 import {
   useWorkspaceBlockState,
   useWorkspaceCommands,

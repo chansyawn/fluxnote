@@ -5,7 +5,7 @@ import type { ExternalEditTrigger } from "@shared/features/external-edit/session
 import { SquareTerminalIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { ACTION_BAR_CLS } from "./block-actions";
+import { ACTION_BAR_CLS } from "../block-actions/block-actions";
 
 interface ExternalEditMetadataCardProps {
   trigger: ExternalEditTrigger;

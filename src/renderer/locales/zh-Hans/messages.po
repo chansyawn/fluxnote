@@ -223,62 +223,62 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/icon-action.tsx:85
+#: src/renderer/routes/_workspace/-features/block-actions/icon-action.tsx:85
 msgid "home-note.block.copy"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/icon-action.tsx:86
+#: src/renderer/routes/_workspace/-features/block-actions/icon-action.tsx:86
 msgid "home-note.block.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:119
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:119
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:120
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:120
 msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-actions.tsx:43
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:43
 msgid "home-note.block.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-actions.tsx:44
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:44
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-metadata-card.tsx:68
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:68
 msgid "home-note.block.external-edit.metadata.cwd"
 msgstr "工作目录"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-metadata-card.tsx:72
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:72
 msgid "home-note.block.external-edit.metadata.file"
 msgstr "目标文件"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-metadata-card.tsx:64
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:64
 msgid "home-note.block.external-edit.metadata.source"
 msgstr "来源"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-metadata-card.tsx:29
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:29
 msgid "home-note.block.external-edit.metadata.source.cli"
 msgstr "命令行"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-actions.tsx:35
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:35
 msgid "home-note.block.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/external-edit-actions.tsx:36
+#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:36
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "提交"
 
@@ -572,42 +572,42 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:102
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:102
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:109
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:109
 msgid "workspace.blocks.archive.tooltip"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:75
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:75
 msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:82
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:82
 msgid "workspace.blocks.keep.tooltip"
 msgstr "保留"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:100
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:100
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:107
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:107
 msgid "workspace.blocks.restore.tooltip"
 msgstr "恢复"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:73
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:73
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:80
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:80
 msgid "workspace.blocks.unkeep.tooltip"
 msgstr "取消保留"
 
@@ -642,12 +642,12 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:59
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:59
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editing/block-actions.tsx:48
+#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:48
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 

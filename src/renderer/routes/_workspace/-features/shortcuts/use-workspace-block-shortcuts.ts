@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import type { ActiveBlockFocus } from "../navigation/use-active-block-focus";
 
-export interface UseBlockShortcutsParams {
+export interface UseWorkspaceBlockShortcutsParams {
   activeBlockFocus: ActiveBlockFocus;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
@@ -12,13 +12,13 @@ export interface UseBlockShortcutsParams {
   toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
-export function useBlockShortcuts({
+export function useWorkspaceBlockShortcuts({
   activeBlockFocus,
   createBlockWithFocus,
   deleteBlockWithFocus,
   toggleArchiveBlockWithFocus,
   toggleKeepBlockWithFocus,
-}: UseBlockShortcutsParams): void {
+}: UseWorkspaceBlockShortcutsParams): void {
   const { shortcuts } = useShortcutState();
   const { activeBlockId, isActiveBlockEditorFocused } = activeBlockFocus;
 

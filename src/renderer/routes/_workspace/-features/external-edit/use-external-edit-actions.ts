@@ -1,9 +1,9 @@
-import { useBlockContentSource } from "./block-content-source";
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 import { useExternalEditSubmission } from "./external-edit-submission";
-import type { PersistedBlockEditorHandle } from "./persisted-block-editor";
+import { useSubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditActionsParams {
-  getEditor: (blockId: string) => PersistedBlockEditorHandle | undefined;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   navigateToBlock?: (blockId: string) => Promise<void>;
 }
 
@@ -17,8 +17,8 @@ export function useExternalEditActions({
   getEditor,
   navigateToBlock,
 }: UseExternalEditActionsParams): UseExternalEditActionsResult {
-  const blockContentSource = useBlockContentSource({ getEditor });
-  const submission = useExternalEditSubmission({ blockContentSource, navigateToBlock });
+  const submittableBlockContent = useSubmittableBlockContent({ getEditor });
+  const submission = useExternalEditSubmission({ submittableBlockContent, navigateToBlock });
 
   return {
     pendingExternalEditIds: submission.pendingExternalEditIds,

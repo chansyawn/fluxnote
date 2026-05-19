@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import type { WorkspaceBlockCollection } from "../block-collection/workspace-block-collection";
-import type { EditorRegistry } from "../editing/use-editor-registry";
+import type { BlockEditorRegistry } from "../editor-registry/use-block-editor-registry";
 
 export type BlockNavigationAlign = "start" | "auto";
 
@@ -137,7 +137,7 @@ interface UseBlockNavigationParams {
     WorkspaceBlockCollection,
     "ensureBlockIndexLoaded" | "getBlockAtIndex" | "locateBlockInView"
   >;
-  registry: EditorRegistry;
+  registry: BlockEditorRegistry;
   workspaceView: {
     isUnfiltered: (visibility: BlockVisibility) => boolean;
     showUnfiltered: (visibility: BlockVisibility) => void;
