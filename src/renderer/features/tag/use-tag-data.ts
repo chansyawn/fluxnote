@@ -1,5 +1,5 @@
-import { queryClient } from "@renderer/app/query";
 import { createTag, deleteTag, listTags, type Tag } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { tagListQueryKey } from "@renderer/features/tag/tag-query-key";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
@@ -56,7 +56,7 @@ export function useTagData(): UseTagDataResult {
     mutationFn: async (tagId: string) => await deleteTag({ tagId }),
     onSuccess: () => {
       void tagsQuery.refetch();
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      refreshBlocks();
     },
     onError: (error) => {
       console.error("Failed to delete tag.", error);

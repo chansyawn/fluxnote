@@ -1,29 +1,25 @@
-import { queryClient } from "@renderer/app/query";
 import {
   onAutoArchiveStateChanged,
   onExternalEditSessionsChanged,
   onWindowFocusChanged,
 } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useEffect } from "react";
 
 export function AutoArchiveSync() {
   useEffect(() => {
-    const invalidateBlockQueries = () => {
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    };
-
     const unlistenStateChanged = onAutoArchiveStateChanged(() => {
-      invalidateBlockQueries();
+      refreshBlocks();
     });
     const unlistenExternalEditSessionsChanged = onExternalEditSessionsChanged(() => {
-      invalidateBlockQueries();
+      refreshBlocks();
     });
     const unlistenFocusChanged = onWindowFocusChanged((focused) => {
       if (!focused) {
         return;
       }
 
-      invalidateBlockQueries();
+      refreshBlocks();
     });
     return () => {
       unlistenStateChanged();

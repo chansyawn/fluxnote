@@ -6,17 +6,17 @@ import type { BlockMutationOperation } from "./use-block-mutations";
 export type WorkspacePendingBlockOps = Record<BlockMutationOperation, Set<string>>;
 
 export interface WorkspaceCommands {
-  archiveBlock: (blockId: string) => void;
+  archiveBlock: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
-  cancelExternalEdit: (editId: string) => void;
+  cancelExternalEdit: (editId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
-  deleteBlock: (blockId: string) => void;
+  deleteBlock: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
   focusBlock: (blockId: string | null) => void;
-  restoreBlock: (blockId: string) => void;
-  setBlockKeepState: (blockId: string, isKept: boolean) => void;
-  submitExternalEdit: (blockId: string, editId: string) => void;
+  restoreBlock: (blockId: string) => Promise<void>;
+  setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
+  submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
 }
 
 export interface WorkspaceBlockState {
@@ -30,24 +30,48 @@ export interface WorkspaceBlockState {
   visibility: BlockVisibility;
 }
 
-interface WorkspaceStateContextValue {
-  commands: WorkspaceCommands;
+export interface WorkspaceViewContextValue {
   isTagCreatePending: boolean;
-  pendingBlockOps: WorkspacePendingBlockOps;
-  pendingExternalEditIds: Set<string>;
-  sessionsByBlockId: Map<string, ExternalEditSession>;
   tags: Tag[];
   visibility: BlockVisibility;
 }
 
-const WorkspaceStateContext = createContext<WorkspaceStateContextValue | null>(null);
+export interface WorkspaceBlockRuntimeContextValue {
+  pendingBlockOps: WorkspacePendingBlockOps;
+  pendingExternalEditIds: Set<string>;
+  sessionsByBlockId: Map<string, ExternalEditSession>;
+}
 
-function useWorkspaceStateContext(): WorkspaceStateContextValue {
-  const ctx = useContext(WorkspaceStateContext);
-  if (!ctx) {
-    throw new Error("useWorkspaceStateContext must be used within WorkspaceStateProvider");
+export interface WorkspaceStateContextValue {
+  commands: WorkspaceCommands;
+  runtime: WorkspaceBlockRuntimeContextValue;
+  view: WorkspaceViewContextValue;
+}
+
+const WorkspaceCommandsContext = createContext<WorkspaceCommands | null>(null);
+const WorkspaceBlockRuntimeContext = createContext<WorkspaceBlockRuntimeContextValue | null>(null);
+const WorkspaceViewContext = createContext<WorkspaceViewContextValue | null>(null);
+
+function useRequiredContext<T>(context: T | null, hookName: string): T {
+  if (!context) {
+    throw new Error(`${hookName} must be used within WorkspaceStateProvider`);
   }
-  return ctx;
+  return context;
+}
+
+function useWorkspaceBlockRuntimeContext(): WorkspaceBlockRuntimeContextValue {
+  const ctx = useContext(WorkspaceBlockRuntimeContext);
+  return useRequiredContext(ctx, "useWorkspaceBlockRuntimeContext");
+}
+
+function useWorkspaceViewContext(): WorkspaceViewContextValue {
+  const ctx = useContext(WorkspaceViewContext);
+  return useRequiredContext(ctx, "useWorkspaceViewContext");
+}
+
+function useWorkspaceCommandsContext(): WorkspaceCommands {
+  const ctx = useContext(WorkspaceCommandsContext);
+  return useRequiredContext(ctx, "useWorkspaceCommandsContext");
 }
 
 export function WorkspaceStateProvider({
@@ -57,51 +81,60 @@ export function WorkspaceStateProvider({
   value: WorkspaceStateContextValue;
   children: ReactNode;
 }) {
-  return <WorkspaceStateContext.Provider value={value}>{children}</WorkspaceStateContext.Provider>;
+  return (
+    <WorkspaceCommandsContext.Provider value={value.commands}>
+      <WorkspaceViewContext.Provider value={value.view}>
+        <WorkspaceBlockRuntimeContext.Provider value={value.runtime}>
+          {children}
+        </WorkspaceBlockRuntimeContext.Provider>
+      </WorkspaceViewContext.Provider>
+    </WorkspaceCommandsContext.Provider>
+  );
 }
 
 export function useWorkspaceCommands(): WorkspaceCommands {
-  return useWorkspaceStateContext().commands;
+  return useWorkspaceCommandsContext();
 }
 
 export function useWorkspaceTags(): Tag[] {
-  return useWorkspaceStateContext().tags;
+  return useWorkspaceViewContext().tags;
 }
 
 export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
-  const ctx = useWorkspaceStateContext();
+  const runtime = useWorkspaceBlockRuntimeContext();
+  const view = useWorkspaceViewContext();
   return useMemo(() => {
-    const externalEditSession = ctx.sessionsByBlockId.get(blockId);
+    const externalEditSession = runtime.sessionsByBlockId.get(blockId);
     const isExternalEditPending = externalEditSession
-      ? ctx.pendingExternalEditIds.has(externalEditSession.editId)
+      ? runtime.pendingExternalEditIds.has(externalEditSession.editId)
       : false;
     const isArchivePending =
-      ctx.pendingBlockOps[ctx.visibility === "active" ? "archive" : "restore"].has(blockId);
-    const isDeletePending = ctx.pendingBlockOps.delete.has(blockId);
+      runtime.pendingBlockOps[view.visibility === "active" ? "archive" : "restore"].has(blockId);
+    const isDeletePending = runtime.pendingBlockOps.delete.has(blockId);
     const isLocked =
       isExternalEditPending ||
-      ctx.pendingBlockOps.archive.has(blockId) ||
-      ctx.pendingBlockOps.restore.has(blockId) ||
-      ctx.pendingBlockOps.delete.has(blockId) ||
-      ctx.pendingBlockOps.setKeep.has(blockId) ||
-      ctx.pendingBlockOps.setTags.has(blockId);
+      runtime.pendingBlockOps.archive.has(blockId) ||
+      runtime.pendingBlockOps.restore.has(blockId) ||
+      runtime.pendingBlockOps.delete.has(blockId) ||
+      runtime.pendingBlockOps.setKeep.has(blockId) ||
+      runtime.pendingBlockOps.setTags.has(blockId);
 
     return {
       externalEditSession,
       isArchivePending,
       isDeletePending,
       isExternalEditPending,
-      isKeepPending: ctx.pendingBlockOps.setKeep.has(blockId),
+      isKeepPending: runtime.pendingBlockOps.setKeep.has(blockId),
       isLocked,
-      isTagCreatePending: ctx.isTagCreatePending,
-      visibility: ctx.visibility,
+      isTagCreatePending: view.isTagCreatePending,
+      visibility: view.visibility,
     };
   }, [
     blockId,
-    ctx.isTagCreatePending,
-    ctx.pendingBlockOps,
-    ctx.pendingExternalEditIds,
-    ctx.sessionsByBlockId,
-    ctx.visibility,
+    runtime.pendingBlockOps,
+    runtime.pendingExternalEditIds,
+    runtime.sessionsByBlockId,
+    view.isTagCreatePending,
+    view.visibility,
   ]);
 }

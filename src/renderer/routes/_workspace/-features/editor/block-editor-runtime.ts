@@ -46,7 +46,7 @@ async function writeClipboardWithFallback(
   }
 }
 
-export function createBlockRuntime(blockId: string): BlockEditorRuntime {
+export function createWorkspaceBlockEditorRuntime(blockId: string): BlockEditorRuntime {
   return {
     assets: {
       copy: ({ assetUrls, sourceBlockId }) =>

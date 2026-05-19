@@ -1,9 +1,10 @@
-import type { BlockEditorControllerHandle } from "@renderer/features/block";
 import { useCallback, useRef } from "react";
 
-export interface EditorRegistry {
-  registerEditor: (blockId: string, handle: BlockEditorControllerHandle | null) => void;
-  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
+
+export interface BlockEditorRegistry {
+  registerEditor: (blockId: string, handle: WorkspaceBlockEditorHandle | null) => void;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   requestEditorFocus: (blockId: string | null, requestId?: number) => boolean;
 }
 
@@ -12,8 +13,8 @@ interface PendingFocusRequest {
   requestId: number;
 }
 
-export function useEditorRegistry(): EditorRegistry {
-  const editorsRef = useRef(new Map<string, BlockEditorControllerHandle>());
+export function useBlockEditorRegistry(): BlockEditorRegistry {
+  const editorsRef = useRef(new Map<string, WorkspaceBlockEditorHandle>());
   const focusTargetRef = useRef<PendingFocusRequest | null>(null);
   const fallbackRequestIdRef = useRef(0);
 
@@ -27,7 +28,7 @@ export function useEditorRegistry(): EditorRegistry {
   }, []);
 
   const registerEditor = useCallback(
-    (blockId: string, handle: BlockEditorControllerHandle | null) => {
+    (blockId: string, handle: WorkspaceBlockEditorHandle | null) => {
       if (handle) {
         editorsRef.current.set(blockId, handle);
         const pendingFocus = focusTargetRef.current;

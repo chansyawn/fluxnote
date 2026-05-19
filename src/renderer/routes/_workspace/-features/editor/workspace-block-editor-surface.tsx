@@ -17,42 +17,40 @@ import {
   type Ref,
 } from "react";
 
-import { useBlockPersistence } from "./persistence";
-import { createBlockRuntime } from "./runtime";
+import { useBlockEditorPersistence } from "./block-editor-persistence";
+import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 
-export type BlockEditorControllerHandle = BlockEditorHandle;
+export type WorkspaceBlockEditorHandle = BlockEditorHandle;
 
-interface BlockEditorViewProps {
+interface BlockEditorFrameProps {
   blockId: string;
+  adornments?: ReactNode;
   editorConfig?: BlockEditorConfigInput;
   initialMarkdown: string;
   isExternalEditPending?: boolean;
   isKept: boolean;
-  leadingActions?: ReactNode;
   runtime: BlockEditorRuntime;
   willArchive: boolean;
-  actions?: ReactNode;
   onMarkdownChange: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
   ref?: Ref<BlockEditorHandle>;
 }
 
-export function BlockEditorView({
+function BlockEditorFrame({
   blockId,
+  adornments,
   editorConfig,
   initialMarkdown,
   isExternalEditPending = false,
   isKept,
-  leadingActions,
   runtime,
   willArchive,
-  actions,
   onMarkdownChange,
   onBlur,
   onFocus,
   ref,
-}: BlockEditorViewProps) {
+}: BlockEditorFrameProps) {
   return (
     <article
       className={cn(
@@ -64,13 +62,8 @@ export function BlockEditorView({
       data-block-id={blockId}
       onFocusCapture={onFocus}
     >
-      {actions ? (
-        <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
-          {actions}
-        </div>
-      ) : null}
-      {leadingActions ? (
-        <div className="absolute top-0 left-1 z-10 -translate-y-1/2">{leadingActions}</div>
+      {adornments ? (
+        <div className="absolute top-0 right-1 left-1 z-10 -translate-y-1/2">{adornments}</div>
       ) : null}
 
       <div className="min-h-16 px-3 pt-3 pb-2">
@@ -87,25 +80,23 @@ export function BlockEditorView({
   );
 }
 
-interface BlockEditorControllerProps {
+interface WorkspaceBlockEditorSurfaceProps {
   block: Block;
-  actions?: ReactNode;
+  adornments?: ReactNode;
   isExternalEditPending?: boolean;
-  leadingActions?: ReactNode;
   onFocus: (blockId: string) => void;
-  ref?: Ref<BlockEditorControllerHandle>;
+  ref?: Ref<WorkspaceBlockEditorHandle>;
 }
 
-export function BlockEditorController({
+export function WorkspaceBlockEditorSurface({
   block,
-  actions,
+  adornments,
   isExternalEditPending = false,
-  leadingActions,
   onFocus,
   ref,
-}: BlockEditorControllerProps) {
+}: WorkspaceBlockEditorSurfaceProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
-  const runtime = useMemo(() => createBlockRuntime(block.id), [block.id]);
+  const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
@@ -116,7 +107,7 @@ export function BlockEditorController({
     [codeBlock],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
-    useBlockPersistence(block);
+    useBlockEditorPersistence(block);
 
   useEffect(() => {
     return () => {
@@ -146,17 +137,16 @@ export function BlockEditorController({
   );
 
   return (
-    <BlockEditorView
+    <BlockEditorFrame
       ref={editorRef}
       blockId={block.id}
+      adornments={adornments}
       editorConfig={editorConfig}
       runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}
       isKept={block.isKept}
-      leadingActions={leadingActions}
       willArchive={block.willArchive}
-      actions={actions}
       onBlur={() => {
         void flush();
       }}

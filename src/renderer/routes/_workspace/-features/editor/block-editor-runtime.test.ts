@@ -17,7 +17,7 @@ vi.mock("@renderer/clients", () => ({
   writeBlockEditorClipboard: mocks.writeBlockEditorClipboard,
 }));
 
-import { createBlockRuntime } from "./runtime";
+import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 
 const clipboardData: BlockEditorClipboardWriteData = {
   html: "<p>Text</p>",
@@ -44,7 +44,7 @@ describe("block editor runtime", () => {
   });
 
   it("closes over the current block id for asset writes", async () => {
-    const runtime = createBlockRuntime("target-block");
+    const runtime = createWorkspaceBlockEditorRuntime("target-block");
     const assets = [{ dataBase64: "AQID", fileName: "photo.png", mimeType: "image/png" }];
     mocks.createAsset.mockResolvedValue({ assets: [] });
     mocks.copyAsset.mockResolvedValue({ assets: [] });
@@ -67,7 +67,7 @@ describe("block editor runtime", () => {
   });
 
   it("passes asset resolve requests through unchanged", async () => {
-    const runtime = createBlockRuntime("block-1");
+    const runtime = createWorkspaceBlockEditorRuntime("block-1");
     mocks.resolveAsset.mockResolvedValue({
       assets: [{ assetUrl: "assets://block-1/photo.png", fileUrl: "file:///tmp/photo.png" }],
     });
@@ -80,7 +80,7 @@ describe("block editor runtime", () => {
   });
 
   it("writes clipboard data with the closed-over source block id", async () => {
-    const runtime = createBlockRuntime("block-1");
+    const runtime = createWorkspaceBlockEditorRuntime("block-1");
     const writeText = vi.fn(async () => undefined);
     mocks.writeBlockEditorClipboard.mockResolvedValue(undefined);
     setNavigatorClipboard(writeText);
@@ -100,7 +100,7 @@ describe("block editor runtime", () => {
   });
 
   it("falls back to plain text clipboard writes when rich clipboard write fails", async () => {
-    const runtime = createBlockRuntime("block-1");
+    const runtime = createWorkspaceBlockEditorRuntime("block-1");
     const writeText = vi.fn(async () => undefined);
     mocks.writeBlockEditorClipboard.mockRejectedValue(new Error("unavailable"));
     setNavigatorClipboard(writeText);
@@ -111,7 +111,7 @@ describe("block editor runtime", () => {
   });
 
   it("writes plain text through the browser clipboard runtime", async () => {
-    const runtime = createBlockRuntime("block-1");
+    const runtime = createWorkspaceBlockEditorRuntime("block-1");
     const writeText = vi.fn(async () => undefined);
     setNavigatorClipboard(writeText);
 
@@ -122,7 +122,7 @@ describe("block editor runtime", () => {
   });
 
   it("opens external links through the client runtime", async () => {
-    const runtime = createBlockRuntime("block-1");
+    const runtime = createWorkspaceBlockEditorRuntime("block-1");
     mocks.openExternalUrl.mockResolvedValue(undefined);
 
     await runtime.links.openExternal("https://example.com");

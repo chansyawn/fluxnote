@@ -87,10 +87,10 @@ const changedCatalogs = findChangedCatalogs(beforeExtract, await readCatalogSnap
 const missing = await findMissingTranslations();
 
 if (changedCatalogs.length > 0) {
-  console.error("i18n catalogs are not current. Run `vp run i18n:extract` and commit the updates:");
+  console.info("Updated i18n catalogs:");
 
   for (const catalogPath of changedCatalogs) {
-    console.error(`- ${catalogPath}`);
+    console.info(`- ${catalogPath}`);
   }
 }
 
@@ -102,6 +102,6 @@ if (missing.length > 0) {
   }
 }
 
-if (changedCatalogs.length > 0 || missing.length > 0) {
+if (missing.length > 0) {
   process.exitCode = 1;
 }

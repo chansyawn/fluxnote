@@ -7,6 +7,7 @@
 import "./index.css";
 
 export { BlockEditor } from "./core/block-editor";
+export { normalizeExternalMarkdown } from "./markdown/external-markdown";
 export type {
   BlockEditorCodeBlockConfig,
   BlockEditorConfig,

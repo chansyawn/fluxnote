@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { EditorRegistryProvider } from "./editing/editor-registry-context";
+import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
 import { VirtualBlockList } from "./list/virtual-block-list";
 import {
   LoadingState,
@@ -9,7 +9,7 @@ import {
   WorkspaceFilteredEmptyState,
 } from "./view/workspace-empty-state";
 import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-actions-portal";
-import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
+import { useWorkspaceRuntime } from "./workspace-runtime";
 import { WorkspaceStateProvider } from "./workspace-state-context";
 
 export function BlockWorkspace() {
@@ -19,10 +19,10 @@ export function BlockWorkspace() {
     blockNavigation,
     commands,
     editorRegistry,
-    stateContextValue,
     tagData,
     viewState,
-  } = useWorkspaceDataBoundary();
+    workspaceContextValue,
+  } = useWorkspaceRuntime();
   const registryContextValue = useMemo(
     () => ({
       getEditor: editorRegistry.getEditor,
@@ -49,16 +49,11 @@ export function BlockWorkspace() {
       onSetSelectedTagIds={viewState.setSelectedTagIds}
       onCreateTag={async (name) => {
         const createdTag = await commands.createTag(name);
-        viewState.setSelectedTagIds((currentTagIds) => {
-          if (currentTagIds.includes(createdTag.id)) {
-            return currentTagIds;
-          }
-          return [...currentTagIds, createdTag.id];
-        });
+        viewState.addTagFilter(createdTag.id);
       }}
       onDeleteTag={async (tagId) => {
         await commands.deleteTag(tagId);
-        viewState.setSelectedTagIds((currentTagIds) => currentTagIds.filter((id) => id !== tagId));
+        viewState.removeTagFilter(tagId);
       }}
     />
   );
@@ -85,8 +80,8 @@ export function BlockWorkspace() {
           <WorkspaceFilteredEmptyState visibility={visibility} />
         )
       ) : (
-        <WorkspaceStateProvider value={stateContextValue}>
-          <EditorRegistryProvider value={registryContextValue}>
+        <WorkspaceStateProvider value={workspaceContextValue}>
+          <BlockEditorRegistryProvider value={registryContextValue}>
             <VirtualBlockList
               totalCount={totalBlockCount}
               getBlockAtIndex={blockList.getBlockAtIndex}
@@ -94,7 +89,7 @@ export function BlockWorkspace() {
               scrollTarget={blockNavigation.scrollTarget}
               onScrollTargetRendered={blockNavigation.targetRendered}
             />
-          </EditorRegistryProvider>
+          </BlockEditorRegistryProvider>
         </WorkspaceStateProvider>
       )}
     </section>

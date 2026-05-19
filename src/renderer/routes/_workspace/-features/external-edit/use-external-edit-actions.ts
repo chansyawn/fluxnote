@@ -1,17 +1,10 @@
-import { queryClient } from "@renderer/app/query";
-import {
-  cancelExternalEdit,
-  submitExternalEdit,
-  type ListBlocksResult,
-  toAppInvokeError,
-} from "@renderer/clients";
-import type { BlockEditorControllerHandle } from "@renderer/features/block";
-import { useCallback, useState } from "react";
-import { toast } from "sonner";
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
+import { useExternalEditSubmission } from "./external-edit-submission";
+import { useSubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditActionsParams {
-  getEditor: (blockId: string) => BlockEditorControllerHandle | undefined;
-  navigateToBlock?: (blockId: string) => void;
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
+  navigateToBlock?: (blockId: string) => Promise<void>;
 }
 
 interface UseExternalEditActionsResult {
@@ -24,66 +17,12 @@ export function useExternalEditActions({
   getEditor,
   navigateToBlock,
 }: UseExternalEditActionsParams): UseExternalEditActionsResult {
-  const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
-    () => new Set(),
-  );
-
-  const handleCancelExternalEdit = useCallback(async (editId: string) => {
-    setPendingExternalEditIds((current) => new Set(current).add(editId));
-    try {
-      await cancelExternalEdit({ editId });
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-    } catch (error) {
-      toast.error(toAppInvokeError(error).message);
-    } finally {
-      setPendingExternalEditIds((current) => {
-        const next = new Set(current);
-        next.delete(editId);
-        return next;
-      });
-    }
-  }, []);
-
-  const handleSubmitExternalEdit = useCallback(
-    async (blockId: string, editId: string) => {
-      setPendingExternalEditIds((current) => new Set(current).add(editId));
-      try {
-        const editorContent = await getEditor(blockId)?.flush();
-        let content = editorContent;
-        if (content === undefined) {
-          for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
-            queryKey: ["blocks"],
-          })) {
-            const found = cached?.blocks.find((b) => b.id === blockId);
-            if (found) {
-              content = found.content;
-              break;
-            }
-          }
-        }
-        if (content === undefined) {
-          toast.error("Cannot submit: block content unavailable.");
-          return;
-        }
-        await submitExternalEdit({ content, editId });
-        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
-        navigateToBlock?.(blockId);
-      } catch (error) {
-        toast.error(toAppInvokeError(error).message);
-      } finally {
-        setPendingExternalEditIds((current) => {
-          const next = new Set(current);
-          next.delete(editId);
-          return next;
-        });
-      }
-    },
-    [getEditor, navigateToBlock],
-  );
+  const submittableBlockContent = useSubmittableBlockContent({ getEditor });
+  const submission = useExternalEditSubmission({ submittableBlockContent, navigateToBlock });
 
   return {
-    pendingExternalEditIds,
-    handleCancelExternalEdit,
-    handleSubmitExternalEdit,
+    pendingExternalEditIds: submission.pendingExternalEditIds,
+    handleCancelExternalEdit: submission.cancelExternalEdit,
+    handleSubmitExternalEdit: submission.submitExternalEdit,
   };
 }

@@ -25,6 +25,15 @@ describe("clipboard data", () => {
     expect(resolveAssets).not.toHaveBeenCalled();
   });
 
+  it("normalizes markdown text for external clipboard writes", async () => {
+    const editor = editorFromMarkdown("a_b $5");
+    const resolveAssets = vi.fn(async () => ({ assets: [] }));
+
+    const data = await createClipboardDataFromDocument(editor, resolveAssets);
+
+    expect(data?.text.trim()).toBe("a_b $5");
+  });
+
   it("rewrites image assets for external clipboard formats while preserving payload nodes", async () => {
     const editor = editorFromMarkdown("");
 

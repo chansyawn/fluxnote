@@ -3,10 +3,7 @@ import { useFontSizePreference } from "@renderer/features/preferences/preference
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import type {
-  BlockScrollTarget,
-  BlockScrollTargetRenderedPayload,
-} from "../navigation/use-block-navigation";
+import type { BlockScrollTarget } from "../navigation/use-block-navigation";
 import { BlockListRow } from "./block-list-row";
 
 const BLOCK_ESTIMATED_SIZE_AT_BASE_PX = 140;
@@ -46,7 +43,7 @@ interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockRange: (startIndex: number, endIndex: number) => void;
-  onScrollTargetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
+  onScrollTargetRendered: (blockId: string) => void;
   scrollTarget: BlockScrollTarget | null;
 }
 
@@ -62,7 +59,6 @@ export function VirtualBlockList({
 
   const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
   const listElementRef = useRef<HTMLDivElement | null>(null);
-  const navigationAnchorRef = useRef<HTMLSpanElement | null>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
 
   const getBlockItemKey = useCallback(
@@ -156,32 +152,8 @@ export function VirtualBlockList({
       return;
     }
 
-    if (scrollTarget.align !== "start") {
-      blockVirtualizer.scrollToIndex(scrollTarget.index, {
-        align: scrollTarget.align,
-        behavior: "smooth",
-      });
-      return;
-    }
-
-    const anchorElement = navigationAnchorRef.current;
-    const targetElement = listElementRef.current?.querySelector<HTMLElement>(
-      `[data-index="${scrollTarget.index}"]`,
-    );
-
-    if (!anchorElement || !targetElement) {
-      blockVirtualizer.scrollToIndex(scrollTarget.index, {
-        align: "start",
-        behavior: "smooth",
-      });
-      return;
-    }
-
-    const anchorTop = anchorElement.getBoundingClientRect().top;
-    const targetTop = targetElement.getBoundingClientRect().top;
-    const nextScrollTop = scrollElement.scrollTop + (targetTop - anchorTop);
-    scrollElement.scrollTo({
-      top: Math.max(0, nextScrollTop),
+    blockVirtualizer.scrollToIndex(scrollTarget.index, {
+      align: scrollTarget.align,
       behavior: "smooth",
     });
   }, [blockVirtualizer, scrollAlign, scrollElement, scrollIndex, scrollRequestId, totalCount]);
@@ -203,11 +175,7 @@ export function VirtualBlockList({
       return;
     }
 
-    onScrollTargetRendered({
-      blockId: block.id,
-      index: scrollTarget.index,
-      requestId: scrollTarget.requestId,
-    });
+    onScrollTargetRendered(block.id);
   }, [getBlockAtIndex, onScrollTargetRendered, scrollTarget, virtualBlocks]);
 
   const firstVirtualBlock = virtualBlocks[0];
@@ -220,11 +188,6 @@ export function VirtualBlockList({
           height: `${blockVirtualizer.getTotalSize()}px`,
         }}
       >
-        <span
-          ref={navigationAnchorRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-0 h-0 w-0"
-        />
         <div
           className="absolute top-0 left-0 flex w-full flex-col gap-3"
           style={{

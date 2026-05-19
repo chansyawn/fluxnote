@@ -1,6 +1,5 @@
 import { Trans } from "@lingui/react/macro";
-import { BlockEditorView } from "@renderer/features/block";
-import type { BlockEditorRuntime } from "@renderer/features/block-editor";
+import { BlockEditor, type BlockEditorRuntime } from "@renderer/features/block-editor";
 import { Button } from "@renderer/ui/components/button";
 import { useMemo, useState } from "react";
 
@@ -126,19 +125,18 @@ export function BlockEditorPlaygroundPanel() {
         </Button>
       </div>
 
-      <BlockEditorView
-        key={editorVersion}
-        blockId="playground-block"
-        runtime={runtime}
-        initialMarkdown={markdown}
-        isKept={false}
-        willArchive={false}
-        onBlur={() => {}}
-        onFocus={() => {}}
-        onMarkdownChange={(latestMarkdown) => {
-          setMarkdown(latestMarkdown);
-        }}
-      />
+      <article className="bg-card rounded-xl border">
+        <div className="min-h-16 px-3 pt-3 pb-2">
+          <BlockEditor
+            key={editorVersion}
+            runtime={runtime}
+            initialMarkdown={markdown}
+            onMarkdownChange={(latestMarkdown) => {
+              setMarkdown(latestMarkdown);
+            }}
+          />
+        </div>
+      </article>
     </section>
   );
 }
