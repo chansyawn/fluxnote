@@ -1,7 +1,7 @@
 import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markdown/external-markdown";
 import { useCallback, useMemo } from "react";
 
-import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-collection";
+import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-cache";
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 
 export interface SubmittableBlockContent {

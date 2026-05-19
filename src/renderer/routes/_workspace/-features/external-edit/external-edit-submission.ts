@@ -1,8 +1,8 @@
 import { cancelExternalEdit, submitExternalEdit, toAppInvokeError } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-import { refreshWorkspaceBlocks } from "../block-collection/workspace-block-collection";
 import type { SubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditSubmissionParams {
@@ -41,7 +41,7 @@ export function useExternalEditSubmission({
       markPending(editId);
       try {
         await cancelExternalEdit({ editId });
-        refreshWorkspaceBlocks();
+        refreshBlocks();
       } catch (error) {
         toast.error(toAppInvokeError(error).message);
       } finally {
@@ -61,7 +61,7 @@ export function useExternalEditSubmission({
           return;
         }
         await submitExternalEdit({ content, editId });
-        refreshWorkspaceBlocks();
+        refreshBlocks();
         void navigateToBlock?.(blockId).catch(() => undefined);
       } catch (error) {
         toast.error(toAppInvokeError(error).message);

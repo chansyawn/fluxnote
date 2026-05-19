@@ -1,18 +1,16 @@
 import { useTagData } from "@renderer/features/tag/use-tag-data";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { useWorkspaceBlockCollection } from "./block-collection/workspace-block-collection";
 import { useWorkspaceBlockView } from "./block-collection/workspace-block-view";
 import { useBlockEditorRegistry } from "./editor-registry/use-block-editor-registry";
-import { useExternalEditActions } from "./external-edit/use-external-edit-actions";
 import { useExternalEditSessions } from "./external-edit/use-external-edit-sessions";
 import { useOpenBlockNavigation } from "./navigation/open-block-navigation";
 import { useActiveBlockFocus } from "./navigation/use-active-block-focus";
-import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
 import { useWorkspaceBlockShortcuts } from "./shortcuts/use-workspace-block-shortcuts";
 import { useBlockMutations } from "./use-block-mutations";
-import { useWorkspaceCommandsValue } from "./workspace-commands";
+import { useWorkspaceCommandRuntime } from "./workspace-command-runtime";
 import { useWorkspaceContextValue } from "./workspace-context-value";
 
 export function useWorkspaceRuntime() {
@@ -41,63 +39,25 @@ export function useWorkspaceRuntime() {
     setActiveBlockId: blockNavigation.setActiveBlockId,
   });
 
-  const createBlockInCurrentTagFilter = useCallback(async () => {
-    const block = await blockMutations.createBlock();
-    if (blockView.selectedTagIds.length > 0) {
-      return await blockMutations.assignBlockTags(block.id, blockView.selectedTagIds);
-    }
-    return block;
-  }, [blockMutations.assignBlockTags, blockMutations.createBlock, blockView.selectedTagIds]);
-
-  const {
-    archiveBlockWithFocus,
-    createBlockWithFocus,
-    deleteBlockWithFocus,
-    restoreBlockWithFocus,
-    toggleArchiveBlockWithFocus,
-    toggleKeepBlockWithFocus,
-  } = useBlockFocusActions({
-    activeBlockId: blockNavigation.activeBlockId,
-    archiveBlock: blockMutations.archiveBlock,
-    restoreBlock: blockMutations.restoreBlock,
-    totalBlockCount: blockList.totalBlockCount,
-    createBlock: createBlockInCurrentTagFilter,
-    deleteBlock: blockMutations.deleteBlock,
-    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
-    navigateToBlock: blockNavigation.navigateToBlock,
-    locateBlockInView: blockList.locateBlockInView,
-    setBlockKeepState: blockMutations.setKeepState,
-    setActiveBlockId: activeBlockFocus.focusBlock,
+  const { commands, externalEditActions, focusActions } = useWorkspaceCommandRuntime({
+    activeBlockFocus,
+    blockList,
+    blockMutations,
+    blockNavigation,
+    blockView,
+    editorRegistry,
+    tagData,
   });
 
   useWorkspaceBlockShortcuts({
     activeBlockFocus,
-    createBlockWithFocus,
-    deleteBlockWithFocus,
-    toggleArchiveBlockWithFocus,
-    toggleKeepBlockWithFocus,
-  });
-
-  const externalEditActions = useExternalEditActions({
-    getEditor: editorRegistry.getEditor,
-    navigateToBlock: blockNavigation.navigateToBlock,
+    createBlockWithFocus: focusActions.createBlockWithFocus,
+    deleteBlockWithFocus: focusActions.deleteBlockWithFocus,
+    toggleArchiveBlockWithFocus: focusActions.toggleArchiveBlockWithFocus,
+    toggleKeepBlockWithFocus: focusActions.toggleKeepBlockWithFocus,
   });
 
   useOpenBlockNavigation({ navigateToBlock: blockNavigation.navigateToBlock });
-
-  const commands = useWorkspaceCommandsValue({
-    archiveBlockWithFocus,
-    assignBlockTags: blockMutations.assignBlockTags,
-    cancelExternalEdit: externalEditActions.handleCancelExternalEdit,
-    createBlockWithFocus,
-    createTag: tagData.createTag,
-    deleteBlockWithFocus,
-    deleteTag: tagData.deleteTag,
-    focusBlock: activeBlockFocus.focusBlock,
-    restoreBlockWithFocus,
-    setBlockKeepState: blockMutations.setKeepState,
-    submitExternalEdit: externalEditActions.handleSubmitExternalEdit,
-  });
 
   const workspaceContextValue = useWorkspaceContextValue({
     commands,

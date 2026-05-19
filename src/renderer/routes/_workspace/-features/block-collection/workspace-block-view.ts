@@ -1,7 +1,7 @@
 import type { BlockVisibility } from "@renderer/clients";
 import { useCallback, useMemo, useState } from "react";
 
-import type { WorkspaceBlockView } from "./workspace-block-collection";
+import type { WorkspaceBlockView } from "./workspace-block-cache";
 
 export interface WorkspaceBlockViewState {
   collectionView: WorkspaceBlockView;

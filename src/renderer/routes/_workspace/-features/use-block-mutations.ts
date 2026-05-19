@@ -7,11 +7,10 @@ import {
   setBlockKeepState,
   type Block,
 } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useMutation, useMutationState } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
-
-import { refreshWorkspaceBlocks } from "./block-collection/workspace-block-collection";
 
 export type BlockMutationOperation = "archive" | "restore" | "delete" | "setKeep" | "setTags";
 
@@ -78,7 +77,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationKey: ["blocks", "create"],
     mutationFn: async () => await createBlock(),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to create block.", error);
@@ -89,7 +88,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationKey: ["blocks", "archive"],
     mutationFn: async (blockId: string) => await archiveBlock({ blockId }),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to archive block.", error);
@@ -100,7 +99,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationKey: ["blocks", "restore"],
     mutationFn: async (blockId: string) => await restoreBlock({ blockId }),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to restore block.", error);
@@ -111,7 +110,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationKey: ["blocks", "delete"],
     mutationFn: async (blockId: string) => await deleteBlock({ blockId }),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to delete block.", error);
@@ -123,7 +122,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationFn: async ({ blockId, tagIds }: { blockId: string; tagIds: string[] }) =>
       await setBlockTags({ blockId, tagIds }),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to update block tags.", error);
@@ -135,7 +134,7 @@ export function useBlockMutations(): UseBlockMutationsResult {
     mutationFn: async ({ blockId, isKept }: { blockId: string; isKept: boolean }) =>
       await setBlockKeepState({ blockId, isKept }),
     onSuccess: () => {
-      refreshWorkspaceBlocks();
+      refreshBlocks();
     },
     onError: (error) => {
       handleMutationError("Failed to update block keep state.", error);

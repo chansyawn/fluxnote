@@ -1,7 +1,7 @@
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useOpenBlockRequest } from "@renderer/features/open-block/open-block-request-context";
 import { useEffect } from "react";
 
-import { refreshWorkspaceBlocks } from "../block-collection/workspace-block-collection";
 import { isBlockNavigationCancelledError } from "./use-block-navigation";
 
 interface UseOpenBlockNavigationParams {
@@ -16,7 +16,7 @@ export function useOpenBlockNavigation({ navigateToBlock }: UseOpenBlockNavigati
       return;
     }
 
-    refreshWorkspaceBlocks();
+    refreshBlocks();
 
     void (async () => {
       try {

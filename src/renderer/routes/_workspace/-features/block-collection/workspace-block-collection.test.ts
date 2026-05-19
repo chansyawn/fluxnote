@@ -9,7 +9,7 @@ import {
   patchWorkspaceBlock,
   workspaceBlockListPageQueryKey,
   workspaceBlockListQueryKey,
-} from "./workspace-block-collection";
+} from "./workspace-block-cache";
 
 function createBlock(id: string, content = ""): Block {
   return {

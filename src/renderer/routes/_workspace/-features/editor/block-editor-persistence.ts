@@ -2,7 +2,7 @@ import { type Block, updateBlockContent } from "@renderer/clients";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 
-import { patchWorkspaceBlock } from "../block-collection/workspace-block-collection";
+import { patchWorkspaceBlock } from "../block-collection/workspace-block-cache";
 
 interface BlockPersistence {
   getLatestContent: () => string;
