@@ -1,11 +1,14 @@
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  keyboardEventMatchesShortcut,
+  type ShortcutBinding,
+} from "@renderer/features/shortcut/shortcut-utils";
 import {
   useHotkeys,
   type UseHotkeyDefinition,
   type UseHotkeyOptions,
 } from "@tanstack/react-hotkeys";
-import { useMemo } from "react";
+import { useCallback, useMemo, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
@@ -27,6 +30,10 @@ export interface UseWorkspaceBlockActionShortcutsParams {
   state: WorkspaceBlockState;
   target: UseHotkeyOptions["target"];
 }
+
+export type WorkspaceBlockActionShortcutCaptureHandler = (
+  event: ReactKeyboardEvent<HTMLElement>,
+) => void;
 
 function createShortcutDefinition({
   callback,
@@ -91,14 +98,16 @@ export function useWorkspaceBlockActionShortcuts({
   isActiveBlockEditorFocused,
   state,
   target,
-}: UseWorkspaceBlockActionShortcutsParams): void {
+}: UseWorkspaceBlockActionShortcutsParams): WorkspaceBlockActionShortcutCaptureHandler {
   const { shortcuts } = useShortcutState();
+  const hasExternalEditSession = Boolean(state.externalEditSession);
+  const canRunExternalEditAction = useCallback(
+    () => hasExternalEditSession && !state.isExternalEditPending && isActiveBlockEditorFocused(),
+    [hasExternalEditSession, isActiveBlockEditorFocused, state.isExternalEditPending],
+  );
 
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
-    const hasExternalEditSession = Boolean(state.externalEditSession);
     const canRunFocusedBlockAction = () => !state.isLocked && isActiveBlockEditorFocused();
-    const canRunExternalEditAction = () =>
-      hasExternalEditSession && !state.isExternalEditPending && isActiveBlockEditorFocused();
     const definitions = [
       createShortcutDefinition({
         hotkey: shortcuts["keep-block"],
@@ -143,12 +152,35 @@ export function useWorkspaceBlockActionShortcuts({
     actions.submitExternalEdit,
     actions.toggleArchive,
     actions.toggleKeep,
+    canRunExternalEditAction,
+    hasExternalEditSession,
     isActiveBlockEditorFocused,
     shortcuts,
-    state.externalEditSession,
     state.isExternalEditPending,
     state.isLocked,
   ]);
 
   useWorkspaceHotkeys(hotkeyDefinitions, { target });
+
+  return useCallback(
+    (event) => {
+      if (event.repeat || !canRunExternalEditAction()) {
+        return;
+      }
+
+      if (keyboardEventMatchesShortcut(event, shortcuts["submit-external-edit"])) {
+        event.preventDefault();
+        event.stopPropagation();
+        void actions.submitExternalEdit();
+        return;
+      }
+
+      if (keyboardEventMatchesShortcut(event, shortcuts["cancel-external-edit"])) {
+        event.preventDefault();
+        event.stopPropagation();
+        void actions.cancelExternalEdit();
+      }
+    },
+    [actions.cancelExternalEdit, actions.submitExternalEdit, canRunExternalEditAction, shortcuts],
+  );
 }

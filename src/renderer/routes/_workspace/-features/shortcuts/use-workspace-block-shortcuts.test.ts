@@ -1,19 +1,27 @@
 import type { ExternalEditSession } from "@renderer/clients";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
-const mocks = vi.hoisted(() => ({
-  shortcuts: {
+import type { WorkspaceBlockActionShortcutCaptureHandler } from "./use-workspace-block-shortcuts";
+
+const mocks = vi.hoisted(() => {
+  const defaultShortcuts = {
     "archive-block": "Mod+E",
     "cancel-external-edit": "Mod+\\",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
     "submit-external-edit": "Mod+Enter",
-  } as Record<string, string | null>,
-  useHotkeys: vi.fn(),
-}));
+  } as const;
+
+  return {
+    defaultShortcuts,
+    shortcuts: { ...defaultShortcuts } as Record<string, string | null>,
+    useHotkeys: vi.fn(),
+  };
+});
 
 vi.mock("react", () => ({
+  useCallback: <T extends (...args: never[]) => unknown>(callback: T) => callback,
   useMemo: <T>(factory: () => T) => factory(),
 }));
 
@@ -23,9 +31,13 @@ vi.mock("@renderer/features/shortcut/shortcut-state", () => ({
   }),
 }));
 
-vi.mock("@tanstack/react-hotkeys", () => ({
-  useHotkeys: mocks.useHotkeys,
-}));
+vi.mock("@tanstack/react-hotkeys", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-hotkeys")>();
+  return {
+    ...actual,
+    useHotkeys: mocks.useHotkeys,
+  };
+});
 
 import {
   useWorkspaceBlockActionShortcuts,
@@ -111,8 +123,34 @@ function triggerShortcut(hotkey: string) {
   return { preventDefault, stopPropagation };
 }
 
+type ShortcutCaptureEvent = Parameters<WorkspaceBlockActionShortcutCaptureHandler>[0] & {
+  preventDefault: ReturnType<typeof vi.fn>;
+  stopPropagation: ReturnType<typeof vi.fn>;
+};
+
+function createKeyboardCaptureEvent(
+  overrides?: Partial<
+    Pick<KeyboardEvent, "altKey" | "ctrlKey" | "key" | "metaKey" | "shiftKey">
+  > & {
+    repeat?: boolean;
+  },
+) {
+  return {
+    altKey: false,
+    ctrlKey: false,
+    key: "Enter",
+    metaKey: true,
+    repeat: false,
+    shiftKey: false,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
+    ...overrides,
+  } as ShortcutCaptureEvent;
+}
+
 describe("workspace block shortcuts", () => {
   beforeEach(() => {
+    Object.assign(mocks.shortcuts, mocks.defaultShortcuts);
     mocks.useHotkeys.mockReset();
   });
 
@@ -197,6 +235,78 @@ describe("workspace block shortcuts", () => {
     triggerShortcut("Mod+Enter");
 
     expect(actions.submitExternalEdit).toHaveBeenCalledOnce();
+  });
+
+  it("captures external edit submit before the editor handles Enter", () => {
+    const actions = createActions();
+
+    const handleKeyDownCapture = useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession }),
+      target: createShortcutTarget(),
+    });
+    const event = createKeyboardCaptureEvent();
+
+    handleKeyDownCapture(event);
+
+    expect(actions.submitExternalEdit).toHaveBeenCalledOnce();
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+    expect(event.stopPropagation).toHaveBeenCalledOnce();
+  });
+
+  it("captures external edit cancel before the editor handles the shortcut", () => {
+    const actions = createActions();
+
+    const handleKeyDownCapture = useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession }),
+      target: createShortcutTarget(),
+    });
+    const event = createKeyboardCaptureEvent({ key: "\\" });
+
+    handleKeyDownCapture(event);
+
+    expect(actions.cancelExternalEdit).toHaveBeenCalledOnce();
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+    expect(event.stopPropagation).toHaveBeenCalledOnce();
+  });
+
+  it("does not capture external edit shortcuts when the action cannot run", () => {
+    const actions = createActions();
+
+    const handleKeyDownCapture = useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession, isExternalEditPending: true }),
+      target: createShortcutTarget(),
+    });
+    const event = createKeyboardCaptureEvent();
+
+    handleKeyDownCapture(event);
+
+    expect(actions.submitExternalEdit).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(event.stopPropagation).not.toHaveBeenCalled();
+  });
+
+  it("does not capture repeated external edit shortcuts", () => {
+    const actions = createActions();
+
+    const handleKeyDownCapture = useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession }),
+      target: createShortcutTarget(),
+    });
+    const event = createKeyboardCaptureEvent({ repeat: true });
+
+    handleKeyDownCapture(event);
+
+    expect(actions.submitExternalEdit).not.toHaveBeenCalled();
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(event.stopPropagation).not.toHaveBeenCalled();
   });
 
   it("blocks external edit shortcut while submission is pending", () => {

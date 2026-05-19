@@ -43,7 +43,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     getEditor: registry.getEditor,
     state,
   });
-  useWorkspaceBlockActionShortcuts({
+  const handleShortcutKeyDownCapture = useWorkspaceBlockActionShortcuts({
     actions,
     isActiveBlockEditorFocused: () => {
       const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-block-id]");
@@ -65,6 +65,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
       onFocusCapture={() => {
         setIsActionAreaActive(true);
       }}
+      onKeyDownCapture={handleShortcutKeyDownCapture}
       onMouseEnter={() => {
         setIsActionAreaActive(true);
       }}
