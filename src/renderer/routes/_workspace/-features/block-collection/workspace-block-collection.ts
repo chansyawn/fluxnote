@@ -8,10 +8,9 @@ import {
   type ListBlocksResult,
   type LocateBlockResult,
 } from "@renderer/clients";
+import { BLOCKS_QUERY_KEY, refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-export const WORKSPACE_BLOCKS_QUERY_KEY = ["blocks"] as const;
 
 const BLOCKS_PAGE_SIZE = 10;
 
@@ -46,7 +45,7 @@ export function normalizeWorkspaceBlockView({ tagIds, visibility }: WorkspaceBlo
 
 export function workspaceBlockListQueryKey(view: WorkspaceBlockView) {
   const normalizedView = normalizeWorkspaceBlockView(view);
-  return [...WORKSPACE_BLOCKS_QUERY_KEY, normalizedView.visibility, normalizedView.tagIds] as const;
+  return [...BLOCKS_QUERY_KEY, normalizedView.visibility, normalizedView.tagIds] as const;
 }
 
 export function workspaceBlockListPageQueryKey(view: WorkspaceBlockView, offset: number) {
@@ -68,30 +67,25 @@ function toListBlocksRequest(view: WorkspaceBlockView, offset: number): ListBloc
 }
 
 export function refreshWorkspaceBlocks(): void {
-  void queryClient.invalidateQueries({ queryKey: WORKSPACE_BLOCKS_QUERY_KEY });
+  refreshBlocks();
 }
 
 export function patchWorkspaceBlock(updatedBlock: Block): void {
-  queryClient.setQueriesData<ListBlocksResult>(
-    { queryKey: WORKSPACE_BLOCKS_QUERY_KEY },
-    (current) => {
-      if (!current) {
-        return current;
-      }
+  queryClient.setQueriesData<ListBlocksResult>({ queryKey: BLOCKS_QUERY_KEY }, (current) => {
+    if (!current) {
+      return current;
+    }
 
-      return {
-        ...current,
-        blocks: current.blocks.map((block) =>
-          block.id === updatedBlock.id ? updatedBlock : block,
-        ),
-      };
-    },
-  );
+    return {
+      ...current,
+      blocks: current.blocks.map((block) => (block.id === updatedBlock.id ? updatedBlock : block)),
+    };
+  });
 }
 
 export function getCachedWorkspaceBlock(blockId: string): Block | undefined {
   for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
-    queryKey: WORKSPACE_BLOCKS_QUERY_KEY,
+    queryKey: BLOCKS_QUERY_KEY,
   })) {
     const found = cached?.blocks.find((block) => block.id === blockId);
     if (found) {

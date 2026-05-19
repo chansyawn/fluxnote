@@ -210,6 +210,12 @@ describe("useBlockNavigation", () => {
     expect(ensureBlockIndexLoaded).toHaveBeenCalledWith(0, { refresh: true });
     expect(harness.getSnapshot().scrollTarget).toMatchObject({ index: 0 });
 
+    act(() => {
+      harness.getSnapshot().targetRendered("other-block");
+    });
+    await flushEffects();
+    expect(registry.requestEditorFocus).not.toHaveBeenCalled();
+
     await renderScrollTarget(harness, renderedBlock.id);
 
     await expect(navigationPromise).resolves.toBeUndefined();

@@ -7,6 +7,7 @@ import { useBlockShortcuts } from "./editing/use-block-shortcuts";
 import { useEditorRegistry } from "./editing/use-editor-registry";
 import { useExternalEditActions } from "./editing/use-external-edit-actions";
 import { useExternalEditSessions } from "./editing/use-external-edit-sessions";
+import { useActiveBlockFocus } from "./navigation/use-active-block-focus";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
 import { useOpenBlockNavigation } from "./open-block-navigation";
@@ -14,7 +15,7 @@ import { useBlockMutations } from "./use-block-mutations";
 import { useWorkspaceCommandsValue } from "./workspace-commands";
 import { useWorkspaceContextValue } from "./workspace-context-value";
 
-export function useWorkspaceDataBoundary() {
+export function useWorkspaceRuntime() {
   const blockView = useWorkspaceBlockView();
   const blockList = useWorkspaceBlockCollection(blockView.collectionView);
   const blockMutations = useBlockMutations();
@@ -35,12 +36,10 @@ export function useWorkspaceDataBoundary() {
     workspaceView: blockView.navigationView,
   });
 
-  const focusBlock = useCallback(
-    (blockId: string | null) => {
-      blockNavigation.setActiveBlockId(blockId);
-    },
-    [blockNavigation.setActiveBlockId],
-  );
+  const activeBlockFocus = useActiveBlockFocus({
+    activeBlockId: blockNavigation.activeBlockId,
+    setActiveBlockId: blockNavigation.setActiveBlockId,
+  });
 
   const createBlockInCurrentTagFilter = useCallback(async () => {
     const block = await blockMutations.createBlock();
@@ -68,11 +67,11 @@ export function useWorkspaceDataBoundary() {
     navigateToBlock: blockNavigation.navigateToBlock,
     locateBlockInView: blockList.locateBlockInView,
     setBlockKeepState: blockMutations.setKeepState,
-    setActiveBlockId: focusBlock,
+    setActiveBlockId: activeBlockFocus.focusBlock,
   });
 
   useBlockShortcuts({
-    activeBlockId: blockNavigation.activeBlockId,
+    activeBlockFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
     toggleArchiveBlockWithFocus,
@@ -94,7 +93,7 @@ export function useWorkspaceDataBoundary() {
     createTag: tagData.createTag,
     deleteBlockWithFocus,
     deleteTag: tagData.deleteTag,
-    focusBlock,
+    focusBlock: activeBlockFocus.focusBlock,
     restoreBlockWithFocus,
     setBlockKeepState: blockMutations.setKeepState,
     submitExternalEdit: externalEditActions.handleSubmitExternalEdit,

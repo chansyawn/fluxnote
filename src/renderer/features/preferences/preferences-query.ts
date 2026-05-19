@@ -13,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
+import { refreshBlocks } from "../blocks/block-query";
 import { normalizeShortcutPreferences, type ShortcutBinding } from "../shortcut/shortcut-utils";
 
 export const SETTINGS_QUERY_KEY = ["preferences", "settings"] as const;
@@ -38,7 +39,7 @@ export function usePatchSettingsMutation() {
     onSuccess: (settings, patch) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
       if (patch.autoArchive) {
-        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+        refreshBlocks();
       }
     },
   });
@@ -52,7 +53,7 @@ export function useResetSettingsMutation() {
     onError: showSettingsError,
     onSuccess: (settings) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      refreshBlocks();
     },
   });
 }

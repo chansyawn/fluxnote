@@ -9,7 +9,7 @@ import {
   WorkspaceFilteredEmptyState,
 } from "./view/workspace-empty-state";
 import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-actions-portal";
-import { useWorkspaceDataBoundary } from "./workspace-data-boundary";
+import { useWorkspaceRuntime } from "./workspace-runtime";
 import { WorkspaceStateProvider } from "./workspace-state-context";
 
 export function BlockWorkspace() {
@@ -22,7 +22,7 @@ export function BlockWorkspace() {
     tagData,
     viewState,
     workspaceContextValue,
-  } = useWorkspaceDataBoundary();
+  } = useWorkspaceRuntime();
   const registryContextValue = useMemo(
     () => ({
       getEditor: editorRegistry.getEditor,

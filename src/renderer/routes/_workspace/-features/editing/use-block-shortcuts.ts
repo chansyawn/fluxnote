@@ -1,9 +1,11 @@
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { useHotkeys, type UseHotkeyDefinition } from "@tanstack/react-hotkeys";
-import { useEffectEvent, useMemo } from "react";
+import { useMemo } from "react";
+
+import type { ActiveBlockFocus } from "../navigation/use-active-block-focus";
 
 export interface UseBlockShortcutsParams {
-  activeBlockId: string | null;
+  activeBlockFocus: ActiveBlockFocus;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   toggleArchiveBlockWithFocus: (blockId: string) => Promise<void>;
@@ -11,23 +13,14 @@ export interface UseBlockShortcutsParams {
 }
 
 export function useBlockShortcuts({
-  activeBlockId,
+  activeBlockFocus,
   createBlockWithFocus,
   deleteBlockWithFocus,
   toggleArchiveBlockWithFocus,
   toggleKeepBlockWithFocus,
 }: UseBlockShortcutsParams): void {
   const { shortcuts } = useShortcutState();
-
-  const isActiveBlockFocused = useEffectEvent(() => {
-    if (!activeBlockId) {
-      return false;
-    }
-
-    const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-block-id]");
-
-    return focusedBlockEditor?.dataset.blockId === activeBlockId;
-  });
+  const { activeBlockId, isActiveBlockEditorFocused } = activeBlockFocus;
 
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
     const definitions: UseHotkeyDefinition[] = [];
@@ -58,7 +51,7 @@ export function useBlockShortcuts({
       definitions.push({
         hotkey: keepBlockShortcut,
         callback: (event) => {
-          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+          if (event.repeat || !activeBlockId || !isActiveBlockEditorFocused()) {
             return;
           }
 
@@ -76,7 +69,7 @@ export function useBlockShortcuts({
       definitions.push({
         hotkey: archiveBlockShortcut,
         callback: (event) => {
-          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+          if (event.repeat || !activeBlockId || !isActiveBlockEditorFocused()) {
             return;
           }
 
@@ -94,7 +87,7 @@ export function useBlockShortcuts({
       definitions.push({
         hotkey: deleteBlockShortcut,
         callback: (event) => {
-          if (event.repeat || !activeBlockId || !isActiveBlockFocused()) {
+          if (event.repeat || !activeBlockId || !isActiveBlockEditorFocused()) {
             return;
           }
 
@@ -113,7 +106,7 @@ export function useBlockShortcuts({
     activeBlockId,
     createBlockWithFocus,
     deleteBlockWithFocus,
-    isActiveBlockFocused,
+    isActiveBlockEditorFocused,
     shortcuts,
     toggleArchiveBlockWithFocus,
     toggleKeepBlockWithFocus,

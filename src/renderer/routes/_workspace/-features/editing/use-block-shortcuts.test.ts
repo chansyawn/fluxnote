@@ -11,7 +11,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("react", () => ({
-  useEffectEvent: <T extends (...args: never[]) => unknown>(fn: T) => fn,
   useMemo: <T>(factory: () => T) => factory(),
 }));
 
@@ -26,6 +25,14 @@ vi.mock("@tanstack/react-hotkeys", () => ({
 }));
 
 import { useBlockShortcuts } from "./use-block-shortcuts";
+
+function createActiveBlockFocus(isFocused: boolean) {
+  return {
+    activeBlockId: "block-1",
+    focusBlock: vi.fn(),
+    isActiveBlockEditorFocused: vi.fn(() => isFocused),
+  };
+}
 
 describe("useBlockShortcuts", () => {
   beforeEach(() => {
@@ -47,7 +54,7 @@ describe("useBlockShortcuts", () => {
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
     useBlockShortcuts({
-      activeBlockId: "block-1",
+      activeBlockFocus: createActiveBlockFocus(false),
       createBlockWithFocus,
       deleteBlockWithFocus,
       toggleArchiveBlockWithFocus,
@@ -79,13 +86,8 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    const activeElement = {
-      closest: () => null,
-    };
-    vi.stubGlobal("document", { activeElement });
-
     useBlockShortcuts({
-      activeBlockId: "block-1",
+      activeBlockFocus: createActiveBlockFocus(false),
       createBlockWithFocus,
       deleteBlockWithFocus,
       toggleArchiveBlockWithFocus,
@@ -117,13 +119,8 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    const activeElement = {
-      closest: () => ({ dataset: { blockId: "block-1" } }),
-    };
-    vi.stubGlobal("document", { activeElement });
-
     useBlockShortcuts({
-      activeBlockId: "block-1",
+      activeBlockFocus: createActiveBlockFocus(true),
       createBlockWithFocus,
       deleteBlockWithFocus,
       toggleArchiveBlockWithFocus,
@@ -155,13 +152,8 @@ describe("useBlockShortcuts", () => {
     const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
     const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    const activeElement = {
-      closest: () => ({ dataset: { blockId: "block-1" } }),
-    };
-    vi.stubGlobal("document", { activeElement });
-
     useBlockShortcuts({
-      activeBlockId: "block-1",
+      activeBlockFocus: createActiveBlockFocus(true),
       createBlockWithFocus,
       deleteBlockWithFocus,
       toggleArchiveBlockWithFocus,

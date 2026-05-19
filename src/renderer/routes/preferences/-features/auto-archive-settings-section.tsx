@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { queryClient } from "@renderer/app/query";
 import { deleteArchivedBlocks } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
@@ -70,7 +70,7 @@ export function AutoArchiveSettingsSection() {
     mutationKey: ["blocks", "delete-archived"],
     mutationFn: deleteArchivedBlocks,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      refreshBlocks();
       toast.success(
         i18n._({
           id: "preferences.archive.clear.success",
@@ -113,7 +113,7 @@ export function AutoArchiveSettingsSection() {
   ) => {
     const nextPreferences = updater(preferences);
     patchAutoArchive(nextPreferences);
-    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+    refreshBlocks();
   };
 
   const saveIdleMinutes = (idleMinutes: number) => {

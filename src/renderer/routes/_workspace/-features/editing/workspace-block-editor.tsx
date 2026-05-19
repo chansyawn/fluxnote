@@ -12,6 +12,10 @@ import { BlockActions } from "./block-actions";
 import { useEditorRegistryContext } from "./editor-registry-context";
 import { ExternalEditActions } from "./external-edit-actions";
 import { PersistedBlockEditor, type PersistedBlockEditorHandle } from "./persisted-block-editor";
+import {
+  useWorkspaceBlockActionsModel,
+  type WorkspaceBlockActionsModel,
+} from "./workspace-block-actions-model";
 
 interface WorkspaceBlockEditorProps {
   block: Block;
@@ -20,29 +24,15 @@ interface WorkspaceBlockEditorProps {
   tags: Tag[];
 }
 
-function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockEditorProps) {
-  const registry = useEditorRegistryContext();
+interface WorkspaceBlockActionsProps {
+  actions: WorkspaceBlockActionsModel;
+  block: Block;
+  state: WorkspaceBlockState;
+  tags: Tag[];
+}
+
+function WorkspaceBlockActions({ actions, block, state, tags }: WorkspaceBlockActionsProps) {
   const { shortcuts } = useShortcutState();
-
-  const handleCopy = useCallback(() => {
-    void registry.getEditor(block.id)?.copy();
-  }, [block.id, registry]);
-
-  const handleCreateTag = useCallback(
-    async (name: string) => {
-      const tag = await commands.createTag(name);
-      const currentTagIds = block.tags.map((t) => t.id);
-      await commands.assignBlockTags(block.id, [...new Set([...currentTagIds, tag.id])]);
-    },
-    [block.id, block.tags, commands],
-  );
-
-  const handleAssignTags = useCallback(
-    async (tagIds: string[]) => {
-      await commands.assignBlockTags(block.id, tagIds);
-    },
-    [block.id, commands],
-  );
 
   return (
     <BlockActions
@@ -60,43 +50,27 @@ function WorkspaceBlockActions({ block, commands, state, tags }: WorkspaceBlockE
         },
       }}
       handlers={{
-        onCopy: handleCopy,
-        onToggleKeep: () => {
-          commands.setBlockKeepState(block.id, !block.isKept);
-        },
-        onToggleArchive: () => {
-          if (state.visibility === "active") {
-            commands.archiveBlock(block.id);
-          } else {
-            commands.restoreBlock(block.id);
-          }
-        },
-        onDelete: () => {
-          if (state.externalEditSession) {
-            commands.cancelExternalEdit(state.externalEditSession.editId);
-            return;
-          }
-          commands.deleteBlock(block.id);
-        },
-        onCreateTag: handleCreateTag,
-        onAssignTags: handleAssignTags,
+        onCopy: actions.copy,
+        onToggleKeep: actions.toggleKeep,
+        onToggleArchive: actions.toggleArchive,
+        onDelete: actions.deleteOrCancelExternalEdit,
+        onCreateTag: actions.createTag,
+        onAssignTags: actions.assignTags,
       }}
     />
   );
 }
 
 function WorkspaceExternalEditActions({
-  blockId,
   editId,
   trigger,
-  commands,
+  actions,
   shortcuts,
   isPending,
 }: {
-  blockId: string;
   editId: string;
   trigger: ExternalEditTrigger;
-  commands: WorkspaceCommands;
+  actions: WorkspaceBlockActionsModel;
   shortcuts: ShortcutPreferences;
   isPending: boolean;
 }) {
@@ -106,10 +80,10 @@ function WorkspaceExternalEditActions({
       pending={isPending}
       trigger={trigger}
       onCancel={() => {
-        commands.cancelExternalEdit(editId);
+        actions.cancelExternalEdit(editId);
       }}
       onSubmit={() => {
-        commands.submitExternalEdit(blockId, editId);
+        actions.submitExternalEdit(editId);
       }}
     />
   );
@@ -135,6 +109,12 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
 
   const shouldRenderActions = isActionAreaActive || Boolean(state.externalEditSession);
   const externalEditId = state.externalEditSession?.editId ?? null;
+  const actions = useWorkspaceBlockActionsModel({
+    block,
+    commands,
+    getEditor: registry.getEditor,
+    state,
+  });
 
   return (
     <div
@@ -156,14 +136,14 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         if (keyboardEventMatchesShortcut(event, shortcuts["submit-external-edit"])) {
           event.preventDefault();
           event.stopPropagation();
-          commands.submitExternalEdit(block.id, externalEditId);
+          actions.submitExternalEdit(externalEditId);
           return;
         }
 
         if (keyboardEventMatchesShortcut(event, shortcuts["cancel-external-edit"])) {
           event.preventDefault();
           event.stopPropagation();
-          commands.cancelExternalEdit(externalEditId);
+          actions.cancelExternalEdit(externalEditId);
         }
       }}
       onMouseEnter={() => {
@@ -180,17 +160,16 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         ref={setEditorRef}
         actions={
           shouldRenderActions ? (
-            <WorkspaceBlockActions block={block} commands={commands} state={state} tags={tags} />
+            <WorkspaceBlockActions actions={actions} block={block} state={state} tags={tags} />
           ) : null
         }
         isExternalEditPending={Boolean(state.externalEditSession)}
         leadingActions={
           state.externalEditSession ? (
             <WorkspaceExternalEditActions
-              blockId={block.id}
               editId={state.externalEditSession.editId}
               trigger={state.externalEditSession.trigger}
-              commands={commands}
+              actions={actions}
               shortcuts={shortcuts}
               isPending={state.isExternalEditPending}
             />
