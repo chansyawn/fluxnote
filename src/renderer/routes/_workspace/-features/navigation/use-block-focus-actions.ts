@@ -1,6 +1,7 @@
 import type { Block, LocateBlockResult } from "@renderer/clients";
 import { useEffectEvent } from "react";
 
+import type { BlockNavigationAlign } from "./use-block-navigation";
 import { isBlockNavigationCancelledError } from "./use-block-navigation";
 
 export interface UseBlockFocusActionsParams {
@@ -14,7 +15,7 @@ export interface UseBlockFocusActionsParams {
     index: number,
     options?: { refresh?: boolean },
   ) => Promise<Block | undefined>;
-  navigateToBlock: (blockId: string) => Promise<void>;
+  navigateToBlock: (blockId: string, options?: { align?: BlockNavigationAlign }) => Promise<void>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setActiveBlockId: (blockId: string | null) => void;
@@ -41,10 +42,11 @@ export function getNextFocusIndexAfterMutation(
 
 async function navigateToBlockUnlessCancelled(
   blockId: string,
-  navigateToBlock: (blockId: string) => Promise<void>,
+  navigateToBlock: (blockId: string, options?: { align?: BlockNavigationAlign }) => Promise<void>,
+  options?: { align?: BlockNavigationAlign },
 ): Promise<void> {
   try {
-    await navigateToBlock(blockId);
+    await navigateToBlock(blockId, options);
   } catch (error) {
     if (!isBlockNavigationCancelledError(error)) {
       throw error;
@@ -79,7 +81,7 @@ export function useBlockFocusActions({
         return;
       }
 
-      await navigateToBlockUnlessCancelled(nextBlock.id, navigateToBlock);
+      await navigateToBlockUnlessCancelled(nextBlock.id, navigateToBlock, { align: "auto" });
     },
   );
 

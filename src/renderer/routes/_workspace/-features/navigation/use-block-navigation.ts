@@ -82,6 +82,10 @@ interface StartNavigationRequestParams {
   view?: BlockNavigationView;
 }
 
+interface NavigateToBlockOptions {
+  align?: BlockNavigationAlign;
+}
+
 function isCurrentRequest(state: NavigationState, requestId: number): boolean {
   return state.phase !== "idle" && state.request.requestId === requestId;
 }
@@ -143,7 +147,7 @@ interface UseBlockNavigationParams {
 
 interface UseBlockNavigationResult {
   activeBlockId: string | null;
-  navigateToBlock: (blockId: string) => Promise<void>;
+  navigateToBlock: (blockId: string, options?: NavigateToBlockOptions) => Promise<void>;
   scrollTarget: BlockScrollTarget | null;
   setActiveBlockId: (blockId: string | null) => void;
   targetRendered: (blockId: string) => void;
@@ -190,7 +194,8 @@ export function useBlockNavigation({
   );
 
   const navigateToBlock = useCallback(
-    (blockId: string) => startRequest({ blockId }),
+    (blockId: string, options?: NavigateToBlockOptions) =>
+      startRequest({ align: options?.align, blockId }),
     [startRequest],
   );
 

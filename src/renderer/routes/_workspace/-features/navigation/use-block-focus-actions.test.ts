@@ -54,7 +54,7 @@ describe("useBlockFocusActions", () => {
 
     expect(archiveBlock).toHaveBeenCalledWith("block-1");
     expect(restoreBlock).not.toHaveBeenCalled();
-    expect(navigateToBlock).toHaveBeenCalledWith("block-2");
+    expect(navigateToBlock).toHaveBeenCalledWith("block-2", { align: "auto" });
   });
 
   it("toggles an archived block into active", async () => {
@@ -82,6 +82,6 @@ describe("useBlockFocusActions", () => {
 
     expect(restoreBlock).toHaveBeenCalledWith("block-1");
     expect(archiveBlock).not.toHaveBeenCalled();
-    expect(navigateToBlock).toHaveBeenCalledWith("block-2");
+    expect(navigateToBlock).toHaveBeenCalledWith("block-2", { align: "auto" });
   });
 });
