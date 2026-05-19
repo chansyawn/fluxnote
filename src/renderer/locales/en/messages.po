@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:188
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:189
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:157
 msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
@@ -582,85 +582,75 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:169
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:137
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:176
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:144
 msgid "workspace.blocks.archive.tooltip"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:201
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:121
-msgid "workspace.blocks.keep.tooltip"
-msgstr "Keep"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:200
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:209
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:168
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
 msgid "workspace.blocks.more-actions"
 msgstr "More block actions"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:230
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:229
+msgid "workspace.blocks.move"
+msgstr "Move"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:247
 msgid "workspace.blocks.move-down"
 msgstr "Move down"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:239
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:256
 msgid "workspace.blocks.move-to-top"
 msgstr "Move to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:238
 msgid "workspace.blocks.move-up"
 msgstr "Move up"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:140
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
 msgid "workspace.blocks.pin"
 msgstr "Pin to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:147
-msgid "workspace.blocks.pin.tooltip"
-msgstr "Pin"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:167
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:135
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:174
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:142
 msgid "workspace.blocks.restore.tooltip"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:183
+msgid "workspace.blocks.status"
+msgstr "Status"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:119
-msgid "workspace.blocks.unkeep.tooltip"
-msgstr "Unkeep"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:138
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
 msgid "workspace.blocks.unpin"
 msgstr "Unpin from top"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
-msgid "workspace.blocks.unpin.tooltip"
-msgstr "Unpin"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
@@ -693,12 +683,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:98
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:87
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

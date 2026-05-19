@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:188
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
 msgid "home-note.block.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:189
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:157
 msgid "home-note.block.delete.tooltip"
 msgstr ""
 
@@ -582,84 +582,74 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:169
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:137
 msgid "workspace.blocks.archive"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:176
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:144
 msgid "workspace.blocks.archive.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:201
 msgid "workspace.blocks.keep"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:121
-msgid "workspace.blocks.keep.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:200
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:209
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:168
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
 msgid "workspace.blocks.more-actions"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:230
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:229
+msgid "workspace.blocks.move"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:247
 msgid "workspace.blocks.move-down"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:239
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:256
 msgid "workspace.blocks.move-to-top"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:238
 msgid "workspace.blocks.move-up"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:140
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
 msgid "workspace.blocks.pin"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:147
-msgid "workspace.blocks.pin.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:167
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:135
 msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:174
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:142
 msgid "workspace.blocks.restore.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:183
+msgid "workspace.blocks.status"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
 msgid "workspace.blocks.unkeep"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:119
-msgid "workspace.blocks.unkeep.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:138
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
 msgid "workspace.blocks.unpin"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
-msgid "workspace.blocks.unpin.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -693,12 +683,12 @@ msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:98
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
 msgid "workspace.tags.assign.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:87
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.tags.assign.placeholder"
 msgstr ""
 

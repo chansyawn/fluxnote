@@ -1,7 +1,11 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { Block, Tag } from "@renderer/clients";
-import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
@@ -10,6 +14,9 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@renderer/ui/components/dropdown-menu";
 import { cn } from "@renderer/ui/lib/utils";
@@ -20,7 +27,10 @@ import {
   ArrowUpIcon,
   ChevronsUpIcon,
   EllipsisIcon,
+  FlagOffIcon,
   FlagIcon,
+  LoaderCircleIcon,
+  PinOffIcon,
   PinIcon,
   TagIcon,
   Trash2Icon,
@@ -66,6 +76,16 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   };
 }
 
+function BlockActionMenuShortcut({ shortcut }: { shortcut?: ShortcutBinding }) {
+  const shortcutLabel = formatShortcutTokens(shortcut ?? null).join("+");
+
+  if (!shortcutLabel) {
+    return null;
+  }
+
+  return <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>;
+}
+
 export function BlockActions({ block, className, position, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
   const { tags, shortcuts, copied = false, disabled, pending = {} } = state;
@@ -102,58 +122,6 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
           onCreateTag={handlers.onCreateTag}
           onSelectedTagIdsChange={handlers.onAssignTags}
         />
-        {isArchived ? null : (
-          <IconAction
-            active={block.isKept}
-            icon={<FlagIcon className={cn("size-3", block.isKept && "fill-primary")} />}
-            shortcut={shortcuts?.["keep-block"]}
-            label={
-              block.isKept ? (
-                <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
-              ) : (
-                <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
-              )
-            }
-            tooltipLabel={
-              block.isKept ? (
-                <Trans id="workspace.blocks.unkeep.tooltip">Unkeep</Trans>
-              ) : (
-                <Trans id="workspace.blocks.keep.tooltip">Keep</Trans>
-              )
-            }
-            disabled={disabled}
-            pending={pending.keep}
-            onClick={() => {
-              void handlers.onToggleKeep();
-            }}
-          />
-        )}
-        {isArchived ? null : (
-          <IconAction
-            active={block.isPinned}
-            icon={<PinIcon className={cn("size-3", block.isPinned && "fill-primary")} />}
-            shortcut={shortcuts?.["toggle-pin-block"]}
-            label={
-              block.isPinned ? (
-                <Trans id="workspace.blocks.unpin">Unpin from top</Trans>
-              ) : (
-                <Trans id="workspace.blocks.pin">Pin to top</Trans>
-              )
-            }
-            tooltipLabel={
-              block.isPinned ? (
-                <Trans id="workspace.blocks.unpin.tooltip">Unpin</Trans>
-              ) : (
-                <Trans id="workspace.blocks.pin.tooltip">Pin</Trans>
-              )
-            }
-            disabled={disabled}
-            pending={pending.pinned}
-            onClick={() => {
-              void handlers.onTogglePinned();
-            }}
-          />
-        )}
         <IconAction
           icon={
             isArchived ? (
@@ -201,7 +169,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                 id: "workspace.blocks.more-actions",
                 message: "More block actions",
               })}
-              disabled={reorderDisabled}
+              disabled={disabled}
               render={<Button size="icon-xs" variant="ghost" />}
             >
               <EllipsisIcon className="size-3" />
@@ -209,8 +177,57 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                 <Trans id="workspace.blocks.more-actions">More block actions</Trans>
               </span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-auto min-w-36">
+            <DropdownMenuContent align="end" className="w-auto min-w-48">
               <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <Trans id="workspace.blocks.status">Status</Trans>
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={disabled || pending.keep}
+                  onClick={() => {
+                    void handlers.onToggleKeep();
+                  }}
+                >
+                  {pending.keep ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : block.isKept ? (
+                    <FlagOffIcon />
+                  ) : (
+                    <FlagIcon />
+                  )}
+                  {block.isKept ? (
+                    <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+                  ) : (
+                    <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+                  )}
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["keep-block"]} />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={disabled || pending.pinned}
+                  onClick={() => {
+                    void handlers.onTogglePinned();
+                  }}
+                >
+                  {pending.pinned ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : block.isPinned ? (
+                    <PinOffIcon />
+                  ) : (
+                    <PinIcon />
+                  )}
+                  {block.isPinned ? (
+                    <Trans id="workspace.blocks.unpin">Unpin from top</Trans>
+                  ) : (
+                    <Trans id="workspace.blocks.pin">Pin to top</Trans>
+                  )}
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["toggle-pin-block"]} />
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <Trans id="workspace.blocks.move">Move</Trans>
+                </DropdownMenuLabel>
                 <DropdownMenuItem
                   disabled={reorderDisabled || !position.canMoveUp}
                   onClick={() => {
