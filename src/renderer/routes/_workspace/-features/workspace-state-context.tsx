@@ -6,17 +6,17 @@ import type { BlockMutationOperation } from "./use-block-mutations";
 export type WorkspacePendingBlockOps = Record<BlockMutationOperation, Set<string>>;
 
 export interface WorkspaceCommands {
-  archiveBlock: (blockId: string) => void;
+  archiveBlock: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
-  cancelExternalEdit: (editId: string) => void;
+  cancelExternalEdit: (editId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
-  deleteBlock: (blockId: string) => void;
+  deleteBlock: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
   focusBlock: (blockId: string | null) => void;
-  restoreBlock: (blockId: string) => void;
-  setBlockKeepState: (blockId: string, isKept: boolean) => void;
-  submitExternalEdit: (blockId: string, editId: string) => void;
+  restoreBlock: (blockId: string) => Promise<void>;
+  setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
+  submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
 }
 
 export interface WorkspaceBlockState {

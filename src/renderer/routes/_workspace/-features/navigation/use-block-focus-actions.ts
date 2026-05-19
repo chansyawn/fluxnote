@@ -17,7 +17,6 @@ export interface UseBlockFocusActionsParams {
   ) => Promise<Block | undefined>;
   navigateToBlock: (blockId: string, options?: { align?: BlockNavigationAlign }) => Promise<void>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
-  setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setActiveBlockId: (blockId: string | null) => void;
 }
 
@@ -26,8 +25,6 @@ export interface UseBlockFocusActionsResult {
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
-  toggleArchiveBlockWithFocus: (blockId: string) => Promise<void>;
-  toggleKeepBlockWithFocus: (blockId: string) => Promise<void>;
 }
 
 export function getNextFocusIndexAfterMutation(
@@ -64,7 +61,6 @@ export function useBlockFocusActions({
   ensureBlockIndexLoaded,
   navigateToBlock,
   locateBlockInView,
-  setBlockKeepState,
   setActiveBlockId,
 }: UseBlockFocusActionsParams): UseBlockFocusActionsResult {
   const focusNextBlockAfterMutation = useEffectEvent(
@@ -90,86 +86,37 @@ export function useBlockFocusActions({
     await navigateToBlockUnlessCancelled(newBlock.id, navigateToBlock);
   });
 
+  const runViewRemovingMutationWithFocus = useEffectEvent(
+    async (blockId: string, mutateBlock: (blockId: string) => Promise<unknown>) => {
+      const shouldMoveFocus = activeBlockId === blockId;
+      const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
+      const countBeforeMutation = totalBlockCount;
+
+      await mutateBlock(blockId);
+
+      if (!shouldMoveFocus) {
+        return;
+      }
+
+      if (!currentLocation) {
+        setActiveBlockId(null);
+        return;
+      }
+
+      await focusNextBlockAfterMutation(currentLocation.index, countBeforeMutation);
+    },
+  );
+
   const archiveBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    const shouldMoveFocus = activeBlockId === blockId;
-    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
-    const countBeforeArchive = totalBlockCount;
-
-    await archiveBlock(blockId);
-
-    if (!shouldMoveFocus) {
-      return;
-    }
-
-    if (!currentLocation) {
-      setActiveBlockId(null);
-      return;
-    }
-
-    await focusNextBlockAfterMutation(currentLocation.index, countBeforeArchive);
+    await runViewRemovingMutationWithFocus(blockId, archiveBlock);
   });
 
   const restoreBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    const shouldMoveFocus = activeBlockId === blockId;
-    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
-    const countBeforeRestore = totalBlockCount;
-
-    await restoreBlock(blockId);
-
-    if (!shouldMoveFocus) {
-      return;
-    }
-
-    if (!currentLocation) {
-      setActiveBlockId(null);
-      return;
-    }
-
-    await focusNextBlockAfterMutation(currentLocation.index, countBeforeRestore);
-  });
-
-  const toggleArchiveBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    const locatedBlock = await locateBlockInView(blockId);
-
-    if (!locatedBlock) {
-      return;
-    }
-
-    if (locatedBlock.block.archivedAt === null) {
-      await archiveBlockWithFocus(blockId);
-      return;
-    }
-
-    await restoreBlockWithFocus(blockId);
+    await runViewRemovingMutationWithFocus(blockId, restoreBlock);
   });
 
   const deleteBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    const shouldMoveFocus = activeBlockId === blockId;
-    const currentLocation = shouldMoveFocus ? await locateBlockInView(blockId) : null;
-    const countBeforeDelete = totalBlockCount;
-
-    await deleteBlock(blockId);
-
-    if (!shouldMoveFocus) {
-      return;
-    }
-
-    if (!currentLocation) {
-      setActiveBlockId(null);
-      return;
-    }
-
-    await focusNextBlockAfterMutation(currentLocation.index, countBeforeDelete);
-  });
-
-  const toggleKeepBlockWithFocus = useEffectEvent(async (blockId: string) => {
-    const locatedBlock = await locateBlockInView(blockId);
-
-    if (!locatedBlock || locatedBlock.block.archivedAt !== null) {
-      return;
-    }
-
-    await setBlockKeepState(blockId, !locatedBlock.block.isKept);
+    await runViewRemovingMutationWithFocus(blockId, deleteBlock);
   });
 
   return {
@@ -177,7 +124,5 @@ export function useBlockFocusActions({
     createBlockWithFocus,
     deleteBlockWithFocus,
     restoreBlockWithFocus,
-    toggleArchiveBlockWithFocus,
-    toggleKeepBlockWithFocus,
   };
 }

@@ -29,7 +29,7 @@ describe("useBlockFocusActions", () => {
     expect(getNextFocusIndexAfterMutation(0, 1)).toBeNull();
   });
 
-  it("toggles an active block into archive", async () => {
+  it("archives active block and moves focus", async () => {
     const activeBlock = createBlock();
     const nextBlock = createBlock({ id: "block-2" });
     const archiveBlock = vi.fn(async () => createBlock({ archivedAt: "2026-01-02T00:00:00.000Z" }));
@@ -47,17 +47,16 @@ describe("useBlockFocusActions", () => {
       navigateToBlock,
       locateBlockInView: vi.fn(async () => ({ block: activeBlock, index: 0 })),
       setActiveBlockId: vi.fn(),
-      setBlockKeepState: vi.fn(async () => activeBlock),
     });
 
-    await actions.toggleArchiveBlockWithFocus("block-1");
+    await actions.archiveBlockWithFocus("block-1");
 
     expect(archiveBlock).toHaveBeenCalledWith("block-1");
     expect(restoreBlock).not.toHaveBeenCalled();
     expect(navigateToBlock).toHaveBeenCalledWith("block-2", { align: "auto" });
   });
 
-  it("toggles an archived block into active", async () => {
+  it("restores archived block and moves focus", async () => {
     const archivedBlock = createBlock({ archivedAt: "2026-01-02T00:00:00.000Z" });
     const nextBlock = createBlock({ id: "block-2" });
     const archiveBlock = vi.fn(async () => archivedBlock);
@@ -75,10 +74,9 @@ describe("useBlockFocusActions", () => {
       navigateToBlock,
       locateBlockInView: vi.fn(async () => ({ block: archivedBlock, index: 0 })),
       setActiveBlockId: vi.fn(),
-      setBlockKeepState: vi.fn(async () => archivedBlock),
     });
 
-    await actions.toggleArchiveBlockWithFocus("block-1");
+    await actions.restoreBlockWithFocus("block-1");
 
     expect(restoreBlock).toHaveBeenCalledWith("block-1");
     expect(archiveBlock).not.toHaveBeenCalled();

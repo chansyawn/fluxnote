@@ -67,7 +67,7 @@ export function IconAction({
 
 interface CopyActionProps {
   disabled?: boolean;
-  onCopy: () => void;
+  onCopy: () => Promise<void>;
 }
 
 export function CopyAction({ disabled, onCopy }: CopyActionProps) {
@@ -85,8 +85,8 @@ export function CopyAction({ disabled, onCopy }: CopyActionProps) {
       label={<Trans id="home-note.block.copy">Copy block</Trans>}
       tooltipLabel={<Trans id="home-note.block.copy.tooltip">Copy</Trans>}
       disabled={disabled}
-      onClick={() => {
-        onCopy();
+      onClick={async () => {
+        await onCopy();
         setCopied(true);
       }}
     />

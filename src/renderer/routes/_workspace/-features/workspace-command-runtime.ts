@@ -51,7 +51,6 @@ export function useWorkspaceCommandRuntime({
     ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
     navigateToBlock: blockNavigation.navigateToBlock,
     locateBlockInView: blockList.locateBlockInView,
-    setBlockKeepState: blockMutations.setKeepState,
     setActiveBlockId: activeBlockFocus.focusBlock,
   });
 

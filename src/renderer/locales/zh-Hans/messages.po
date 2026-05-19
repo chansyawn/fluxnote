@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:116
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:119
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:117
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:120
 msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
@@ -572,42 +572,42 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:99
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:100
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:106
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.blocks.archive.tooltip"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:72
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:71
 msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:79
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:78
 msgid "workspace.blocks.keep.tooltip"
 msgstr "保留"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:97
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:98
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:104
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:105
 msgid "workspace.blocks.restore.tooltip"
 msgstr "恢复"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:70
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:69
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:77
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:76
 msgid "workspace.blocks.unkeep.tooltip"
 msgstr "取消保留"
 
@@ -642,12 +642,12 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:56
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:55
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:45
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:44
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 

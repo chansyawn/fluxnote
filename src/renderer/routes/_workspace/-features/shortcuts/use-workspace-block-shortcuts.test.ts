@@ -1,11 +1,14 @@
+import type { ExternalEditSession } from "@renderer/clients";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   shortcuts: {
     "archive-block": "Mod+E",
+    "cancel-external-edit": "Mod+\\",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
+    "submit-external-edit": "Mod+Enter",
   } as Record<string, string | null>,
   useHotkeys: vi.fn(),
 }));
@@ -24,23 +27,81 @@ vi.mock("@tanstack/react-hotkeys", () => ({
   useHotkeys: mocks.useHotkeys,
 }));
 
-import { useWorkspaceBlockShortcuts } from "./use-workspace-block-shortcuts";
+import {
+  useWorkspaceBlockActionShortcuts,
+  useWorkspaceCreateBlockShortcut,
+} from "./use-workspace-block-shortcuts";
 
-function createActiveBlockFocus(isFocused: boolean) {
+type ShortcutCallback = (event: KeyboardEvent & { repeat: boolean }) => void;
+
+interface CapturedShortcutDefinition {
+  hotkey: string;
+  callback: ShortcutCallback;
+}
+
+const externalEditSession: ExternalEditSession = {
+  blockId: "block-1",
+  createdAt: "2026-01-01T00:00:00.000Z",
+  editId: "edit-1",
+  trigger: {
+    cwd: "/tmp",
+    requestedFilePath: "/tmp/requested.md",
+    source: "cli",
+    targetFilePath: "/tmp/target.md",
+  },
+};
+
+function createActions() {
   return {
-    activeBlockId: "block-1",
-    focusBlock: vi.fn(),
-    isActiveBlockEditorFocused: vi.fn(() => isFocused),
+    assignTags: vi.fn(async () => undefined),
+    cancelExternalEdit: vi.fn(async () => undefined),
+    copy: vi.fn(async () => undefined),
+    createTag: vi.fn(async () => undefined),
+    deleteOrCancelExternalEdit: vi.fn(async () => undefined),
+    submitExternalEdit: vi.fn(async () => undefined),
+    toggleArchive: vi.fn(async () => undefined),
+    toggleKeep: vi.fn(async () => undefined),
   };
 }
 
-describe("useWorkspaceBlockShortcuts", () => {
+function createState(overrides?: {
+  externalEditSession?: ExternalEditSession | undefined;
+  isExternalEditPending?: boolean;
+  isLocked?: boolean;
+}) {
+  return {
+    externalEditSession: overrides?.externalEditSession,
+    isArchivePending: false,
+    isDeletePending: false,
+    isExternalEditPending: overrides?.isExternalEditPending ?? false,
+    isKeepPending: false,
+    isLocked: overrides?.isLocked ?? false,
+    isTagCreatePending: false,
+    visibility: "active" as const,
+  };
+}
+
+function getDefinitions(): CapturedShortcutDefinition[] {
+  return mocks.useHotkeys.mock.calls.at(-1)?.[0] as CapturedShortcutDefinition[];
+}
+
+function triggerShortcut(hotkey: string) {
+  const definition = getDefinitions().find((candidate) => candidate.hotkey === hotkey);
+  const preventDefault = vi.fn();
+  const stopPropagation = vi.fn();
+
+  definition?.callback({
+    repeat: false,
+    preventDefault,
+    stopPropagation,
+  } as unknown as KeyboardEvent & { repeat: boolean });
+
+  return { preventDefault, stopPropagation };
+}
+
+describe("workspace block shortcuts", () => {
   beforeEach(() => {
     mocks.useHotkeys.mockReset();
-    mocks.shortcuts["archive-block"] = "Mod+E";
-    mocks.shortcuts["create-block"] = "Mod+N";
-    mocks.shortcuts["delete-block"] = "Mod+D";
-    mocks.shortcuts["keep-block"] = "Mod+K";
   });
 
   afterEach(() => {
@@ -49,133 +110,87 @@ describe("useWorkspaceBlockShortcuts", () => {
 
   it("triggers create block without active block focus", () => {
     const createBlockWithFocus = vi.fn(async () => undefined);
-    const deleteBlockWithFocus = vi.fn(async () => undefined);
-    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
-    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
 
-    useWorkspaceBlockShortcuts({
-      activeBlockFocus: createActiveBlockFocus(false),
-      createBlockWithFocus,
-      deleteBlockWithFocus,
-      toggleArchiveBlockWithFocus,
-      toggleKeepBlockWithFocus,
-    });
+    useWorkspaceCreateBlockShortcut({ createBlockWithFocus });
 
-    const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
-      hotkey: string;
-      callback: (event: KeyboardEvent & { repeat: boolean }) => void;
-    }>;
-    const createDefinition = definitions.find((definition) => definition.hotkey === "Mod+N");
-    const preventDefault = vi.fn();
-    const stopPropagation = vi.fn();
-
-    createDefinition?.callback({
-      repeat: false,
-      preventDefault,
-      stopPropagation,
-    } as unknown as KeyboardEvent & { repeat: boolean });
+    const { preventDefault, stopPropagation } = triggerShortcut("Mod+N");
 
     expect(createBlockWithFocus).toHaveBeenCalledOnce();
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
 
-  it("keeps delete block focus guard", () => {
-    const createBlockWithFocus = vi.fn(async () => undefined);
-    const deleteBlockWithFocus = vi.fn(async () => undefined);
-    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
-    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
+  it("keeps focused block action guard", () => {
+    const actions = createActions();
 
-    useWorkspaceBlockShortcuts({
-      activeBlockFocus: createActiveBlockFocus(false),
-      createBlockWithFocus,
-      deleteBlockWithFocus,
-      toggleArchiveBlockWithFocus,
-      toggleKeepBlockWithFocus,
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => false,
+      state: createState(),
     });
 
-    const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
-      hotkey: string;
-      callback: (event: KeyboardEvent & { repeat: boolean }) => void;
-    }>;
-    const deleteDefinition = definitions.find((definition) => definition.hotkey === "Mod+D");
-    const preventDefault = vi.fn();
-    const stopPropagation = vi.fn();
+    const { preventDefault, stopPropagation } = triggerShortcut("Mod+K");
 
-    deleteDefinition?.callback({
-      repeat: false,
-      preventDefault,
-      stopPropagation,
-    } as unknown as KeyboardEvent & { repeat: boolean });
-
-    expect(deleteBlockWithFocus).not.toHaveBeenCalled();
+    expect(actions.toggleKeep).not.toHaveBeenCalled();
     expect(preventDefault).not.toHaveBeenCalled();
     expect(stopPropagation).not.toHaveBeenCalled();
   });
 
-  it("triggers keep block when active block is focused", () => {
-    const createBlockWithFocus = vi.fn(async () => undefined);
-    const deleteBlockWithFocus = vi.fn(async () => undefined);
-    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
-    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
+  it("runs focused block action", () => {
+    const actions = createActions();
 
-    useWorkspaceBlockShortcuts({
-      activeBlockFocus: createActiveBlockFocus(true),
-      createBlockWithFocus,
-      deleteBlockWithFocus,
-      toggleArchiveBlockWithFocus,
-      toggleKeepBlockWithFocus,
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState(),
     });
 
-    const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
-      hotkey: string;
-      callback: (event: KeyboardEvent & { repeat: boolean }) => void;
-    }>;
-    const keepDefinition = definitions.find((definition) => definition.hotkey === "Mod+K");
-    const preventDefault = vi.fn();
-    const stopPropagation = vi.fn();
+    const { preventDefault, stopPropagation } = triggerShortcut("Mod+E");
 
-    keepDefinition?.callback({
-      repeat: false,
-      preventDefault,
-      stopPropagation,
-    } as unknown as KeyboardEvent & { repeat: boolean });
-
-    expect(toggleKeepBlockWithFocus).toHaveBeenCalledWith("block-1");
+    expect(actions.toggleArchive).toHaveBeenCalledOnce();
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
 
-  it("toggles block archive state when active block is focused", () => {
-    const createBlockWithFocus = vi.fn(async () => undefined);
-    const deleteBlockWithFocus = vi.fn(async () => undefined);
-    const toggleArchiveBlockWithFocus = vi.fn(async () => undefined);
-    const toggleKeepBlockWithFocus = vi.fn(async () => undefined);
+  it("blocks shortcuts while block is locked", () => {
+    const actions = createActions();
 
-    useWorkspaceBlockShortcuts({
-      activeBlockFocus: createActiveBlockFocus(true),
-      createBlockWithFocus,
-      deleteBlockWithFocus,
-      toggleArchiveBlockWithFocus,
-      toggleKeepBlockWithFocus,
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ isLocked: true }),
     });
 
-    const definitions = mocks.useHotkeys.mock.calls[0]?.[0] as Array<{
-      hotkey: string;
-      callback: (event: KeyboardEvent & { repeat: boolean }) => void;
-    }>;
-    const archiveDefinition = definitions.find((definition) => definition.hotkey === "Mod+E");
-    const preventDefault = vi.fn();
-    const stopPropagation = vi.fn();
+    triggerShortcut("Mod+D");
 
-    archiveDefinition?.callback({
-      repeat: false,
-      preventDefault,
-      stopPropagation,
-    } as unknown as KeyboardEvent & { repeat: boolean });
+    expect(actions.deleteOrCancelExternalEdit).not.toHaveBeenCalled();
+  });
 
-    expect(toggleArchiveBlockWithFocus).toHaveBeenCalledWith("block-1");
-    expect(preventDefault).toHaveBeenCalledOnce();
-    expect(stopPropagation).toHaveBeenCalledOnce();
+  it("runs external edit shortcut only for active non-pending session", () => {
+    const actions = createActions();
+
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession }),
+    });
+
+    triggerShortcut("Mod+Enter");
+
+    expect(actions.submitExternalEdit).toHaveBeenCalledOnce();
+  });
+
+  it("blocks external edit shortcut while submission is pending", () => {
+    const actions = createActions();
+
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ externalEditSession, isExternalEditPending: true }),
+    });
+
+    triggerShortcut("Mod+\\");
+
+    expect(actions.cancelExternalEdit).not.toHaveBeenCalled();
   });
 });

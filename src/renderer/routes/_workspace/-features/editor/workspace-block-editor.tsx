@@ -1,11 +1,11 @@
 import type { Block, Tag } from "@renderer/clients";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import { memo, useCallback, useRef, useState } from "react";
 
+import { useWorkspaceBlockActions } from "../actions/workspace-block-actions";
 import { BlockAdornments } from "../adornments/block-adornments";
-import { useWorkspaceBlockActionHandlers } from "../adornments/use-block-action-handlers";
 import { useBlockEditorRegistryContext } from "../editor-registry/block-editor-registry-context";
+import { useWorkspaceBlockActionShortcuts } from "../shortcuts/use-workspace-block-shortcuts";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 import {
   WorkspaceBlockEditorSurface,
@@ -37,11 +37,18 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     [block.id, registry],
   );
 
-  const externalEditId = state.externalEditSession?.editId ?? null;
-  const actions = useWorkspaceBlockActionHandlers({
+  const actions = useWorkspaceBlockActions({
     block,
     commands,
     getEditor: registry.getEditor,
+    state,
+  });
+  useWorkspaceBlockActionShortcuts({
+    actions,
+    isActiveBlockEditorFocused: () => {
+      const focusedBlockEditor = document.activeElement?.closest<HTMLElement>("[data-block-id]");
+      return focusedBlockEditor?.dataset.blockId === block.id;
+    },
     state,
   });
 
@@ -56,24 +63,6 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
       }}
       onFocusCapture={() => {
         setIsActionAreaActive(true);
-      }}
-      onKeyDownCapture={(event) => {
-        if (!externalEditId || event.repeat) {
-          return;
-        }
-
-        if (keyboardEventMatchesShortcut(event, shortcuts["submit-external-edit"])) {
-          event.preventDefault();
-          event.stopPropagation();
-          actions.submitExternalEdit(externalEditId);
-          return;
-        }
-
-        if (keyboardEventMatchesShortcut(event, shortcuts["cancel-external-edit"])) {
-          event.preventDefault();
-          event.stopPropagation();
-          actions.cancelExternalEdit(externalEditId);
-        }
       }}
       onMouseEnter={() => {
         setIsActionAreaActive(true);

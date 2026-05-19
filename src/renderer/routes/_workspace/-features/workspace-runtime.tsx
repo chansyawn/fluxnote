@@ -8,7 +8,7 @@ import { useExternalEditSessions } from "./external-edit/use-external-edit-sessi
 import { useOpenBlockNavigation } from "./navigation/open-block-navigation";
 import { useActiveBlockFocus } from "./navigation/use-active-block-focus";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
-import { useWorkspaceBlockShortcuts } from "./shortcuts/use-workspace-block-shortcuts";
+import { useWorkspaceCreateBlockShortcut } from "./shortcuts/use-workspace-block-shortcuts";
 import { useBlockMutations } from "./use-block-mutations";
 import { useWorkspaceCommandRuntime } from "./workspace-command-runtime";
 import { useWorkspaceContextValue } from "./workspace-context-value";
@@ -49,12 +49,8 @@ export function useWorkspaceRuntime() {
     tagData,
   });
 
-  useWorkspaceBlockShortcuts({
-    activeBlockFocus,
+  useWorkspaceCreateBlockShortcut({
     createBlockWithFocus: focusActions.createBlockWithFocus,
-    deleteBlockWithFocus: focusActions.deleteBlockWithFocus,
-    toggleArchiveBlockWithFocus: focusActions.toggleArchiveBlockWithFocus,
-    toggleKeepBlockWithFocus: focusActions.toggleKeepBlockWithFocus,
   });
 
   useOpenBlockNavigation({ navigateToBlock: blockNavigation.navigateToBlock });

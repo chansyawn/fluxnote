@@ -32,29 +32,17 @@ export function useWorkspaceCommandsValue({
 }: UseWorkspaceCommandsParams): WorkspaceCommands {
   return useMemo<WorkspaceCommands>(
     () => ({
-      archiveBlock: (blockId) => {
-        void archiveBlockWithFocus(blockId);
-      },
+      archiveBlock: archiveBlockWithFocus,
       assignBlockTags,
-      cancelExternalEdit: (editId) => {
-        void cancelExternalEdit(editId);
-      },
+      cancelExternalEdit,
       createBlockWithFocus,
       createTag,
-      deleteBlock: (blockId) => {
-        void deleteBlockWithFocus(blockId);
-      },
+      deleteBlock: deleteBlockWithFocus,
       deleteTag,
       focusBlock,
-      restoreBlock: (blockId) => {
-        void restoreBlockWithFocus(blockId);
-      },
-      setBlockKeepState: (blockId, isKept) => {
-        void setBlockKeepState(blockId, isKept);
-      },
-      submitExternalEdit: (blockId, editId) => {
-        void submitExternalEdit(blockId, editId);
-      },
+      restoreBlock: restoreBlockWithFocus,
+      setBlockKeepState,
+      submitExternalEdit,
     }),
     [
       archiveBlockWithFocus,

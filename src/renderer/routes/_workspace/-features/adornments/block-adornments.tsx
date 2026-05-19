@@ -1,15 +1,15 @@
 import type { Block, Tag } from "@renderer/clients";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 
+import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
 import { AdornmentCluster } from "./adornment-cluster";
 import { BlockActions } from "./block-actions";
 import { ExternalEditControls } from "./external-edit-controls";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
-import type { WorkspaceBlockActionHandlers } from "./use-block-action-handlers";
 
 interface BlockAdornmentsProps {
-  actions: WorkspaceBlockActionHandlers;
+  actions: WorkspaceBlockActions;
   active: boolean;
   block: Block;
   shortcuts: ShortcutPreferences;
@@ -41,10 +41,10 @@ export function BlockAdornments({
             shortcuts={shortcuts}
             pending={state.isExternalEditPending}
             onCancel={() => {
-              actions.cancelExternalEdit(externalEditSession.editId);
+              void actions.cancelExternalEdit();
             }}
             onSubmit={() => {
-              actions.submitExternalEdit(externalEditSession.editId);
+              void actions.submitExternalEdit();
             }}
           />
           <ExternalEditMetadataCard className="min-w-0" trigger={externalEditSession.trigger} />
@@ -55,7 +55,6 @@ export function BlockAdornments({
           className="ml-auto shrink-0"
           block={block}
           state={{
-            visibility: state.visibility,
             tags,
             shortcuts,
             disabled: state.isLocked,
