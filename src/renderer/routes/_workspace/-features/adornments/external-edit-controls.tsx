@@ -1,35 +1,29 @@
 import { Trans } from "@lingui/react/macro";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
-import { cn } from "@renderer/ui/lib/utils";
-import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { CheckIcon, XIcon } from "lucide-react";
+import type { ComponentProps } from "react";
 
-import { ACTION_BAR_CLS, ACTION_BAR_DISABLED_CLS } from "../block-actions/block-actions";
-import { IconAction } from "../block-actions/icon-action";
-import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
+import { AdornmentBar } from "./adornment-bar";
+import { IconAction } from "./icon-action";
 
-interface ExternalEditActionsProps {
+interface ExternalEditControlsProps extends Pick<ComponentProps<"div">, "className"> {
   shortcuts?: Partial<Pick<ShortcutPreferences, "submit-external-edit" | "cancel-external-edit">>;
   pending?: boolean;
-  trigger?: ExternalEditTrigger;
   onSubmit: () => void;
   onCancel: () => void;
 }
 
-export function ExternalEditActions({
+export function ExternalEditControls({
+  className,
   shortcuts,
   pending,
-  trigger,
   onSubmit,
   onCancel,
-}: ExternalEditActionsProps) {
+}: ExternalEditControlsProps) {
   return (
-    <div className="flex w-fit max-w-full items-center gap-1.5">
-      <ButtonGroup
-        aria-disabled={pending}
-        className={cn(ACTION_BAR_CLS, pending && ACTION_BAR_DISABLED_CLS)}
-      >
+    <AdornmentBar className={className} disabled={pending}>
+      <ButtonGroup>
         <IconAction
           icon={<CheckIcon className="size-3" />}
           label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
@@ -47,7 +41,6 @@ export function ExternalEditActions({
           onClick={onCancel}
         />
       </ButtonGroup>
-      {trigger ? <ExternalEditMetadataCard trigger={trigger} /> : null}
-    </div>
+    </AdornmentBar>
   );
 }

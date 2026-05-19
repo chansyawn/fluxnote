@@ -4,14 +4,14 @@ import { useCallback, useMemo } from "react";
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 
-interface WorkspaceBlockActionsModelParams {
+interface WorkspaceBlockActionHandlersParams {
   block: Block;
   commands: WorkspaceCommands;
   getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   state: WorkspaceBlockState;
 }
 
-export interface WorkspaceBlockActionsModel {
+export interface WorkspaceBlockActionHandlers {
   assignTags: (tagIds: string[]) => Promise<void>;
   copy: () => void;
   createTag: (name: string) => Promise<void>;
@@ -22,12 +22,12 @@ export interface WorkspaceBlockActionsModel {
   toggleKeep: () => void;
 }
 
-export function useWorkspaceBlockActionsModel({
+export function useWorkspaceBlockActionHandlers({
   block,
   commands,
   getEditor,
   state,
-}: WorkspaceBlockActionsModelParams): WorkspaceBlockActionsModel {
+}: WorkspaceBlockActionHandlersParams): WorkspaceBlockActionHandlers {
   const copy = useCallback(() => {
     void getEditor(block.id)?.copy();
   }, [block.id, getEditor]);

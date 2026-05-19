@@ -223,62 +223,62 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/icon-action.tsx:85
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:85
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/icon-action.tsx:86
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:86
 msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:119
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:116
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:120
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:117
 msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:43
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
 msgid "home-note.block.external-edit.cancel"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:44
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:38
 msgid "home-note.block.external-edit.cancel.tooltip"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:68
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
 msgid "home-note.block.external-edit.metadata.cwd"
 msgstr "Working directory"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:72
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
 msgid "home-note.block.external-edit.metadata.file"
 msgstr "Target file"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:64
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
 msgid "home-note.block.external-edit.metadata.source"
 msgstr "Source"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-metadata-card.tsx:29
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
 msgid "home-note.block.external-edit.metadata.source.cli"
 msgstr "Command line"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:35
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:29
 msgid "home-note.block.external-edit.submit"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/external-edit/external-edit-actions.tsx:36
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:30
 msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "Submit"
 
@@ -572,42 +572,42 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:102
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:99
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:109
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:106
 msgid "workspace.blocks.archive.tooltip"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:75
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:72
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:82
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:79
 msgid "workspace.blocks.keep.tooltip"
 msgstr "Keep"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:100
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:97
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:107
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:104
 msgid "workspace.blocks.restore.tooltip"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:73
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:70
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:80
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:77
 msgid "workspace.blocks.unkeep.tooltip"
 msgstr "Unkeep"
 
@@ -642,12 +642,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:59
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:56
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/block-actions/block-actions.tsx:48
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:45
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

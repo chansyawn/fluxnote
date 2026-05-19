@@ -1,19 +1,11 @@
 import type { Block, Tag } from "@renderer/clients";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import {
-  keyboardEventMatchesShortcut,
-  type ShortcutPreferences,
-} from "@renderer/features/shortcut/shortcut-utils";
-import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
+import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import { memo, useCallback, useRef, useState } from "react";
 
-import { BlockActions } from "../block-actions/block-actions";
-import {
-  useWorkspaceBlockActionsModel,
-  type WorkspaceBlockActionsModel,
-} from "../block-actions/block-actions-model";
+import { BlockAdornments } from "../adornments/block-adornments";
+import { useWorkspaceBlockActionHandlers } from "../adornments/use-block-action-handlers";
 import { useBlockEditorRegistryContext } from "../editor-registry/block-editor-registry-context";
-import { ExternalEditActions } from "../external-edit/external-edit-actions";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 import {
   WorkspaceBlockEditorSurface,
@@ -25,71 +17,6 @@ interface WorkspaceBlockEditorProps {
   commands: WorkspaceCommands;
   state: WorkspaceBlockState;
   tags: Tag[];
-}
-
-interface WorkspaceBlockActionsProps {
-  actions: WorkspaceBlockActionsModel;
-  block: Block;
-  state: WorkspaceBlockState;
-  tags: Tag[];
-}
-
-function WorkspaceBlockActions({ actions, block, state, tags }: WorkspaceBlockActionsProps) {
-  const { shortcuts } = useShortcutState();
-
-  return (
-    <BlockActions
-      block={block}
-      state={{
-        visibility: state.visibility,
-        tags,
-        shortcuts,
-        disabled: state.isLocked,
-        pending: {
-          archive: state.isArchivePending,
-          delete: state.isDeletePending,
-          keep: state.isKeepPending,
-          tag: state.isTagCreatePending,
-        },
-      }}
-      handlers={{
-        onCopy: actions.copy,
-        onToggleKeep: actions.toggleKeep,
-        onToggleArchive: actions.toggleArchive,
-        onDelete: actions.deleteOrCancelExternalEdit,
-        onCreateTag: actions.createTag,
-        onAssignTags: actions.assignTags,
-      }}
-    />
-  );
-}
-
-function WorkspaceExternalEditActions({
-  editId,
-  trigger,
-  actions,
-  shortcuts,
-  isPending,
-}: {
-  editId: string;
-  trigger: ExternalEditTrigger;
-  actions: WorkspaceBlockActionsModel;
-  shortcuts: ShortcutPreferences;
-  isPending: boolean;
-}) {
-  return (
-    <ExternalEditActions
-      shortcuts={shortcuts}
-      pending={isPending}
-      trigger={trigger}
-      onCancel={() => {
-        actions.cancelExternalEdit(editId);
-      }}
-      onSubmit={() => {
-        actions.submitExternalEdit(editId);
-      }}
-    />
-  );
 }
 
 export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
@@ -110,9 +37,8 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     [block.id, registry],
   );
 
-  const shouldRenderActions = isActionAreaActive || Boolean(state.externalEditSession);
   const externalEditId = state.externalEditSession?.editId ?? null;
-  const actions = useWorkspaceBlockActionsModel({
+  const actions = useWorkspaceBlockActionHandlers({
     block,
     commands,
     getEditor: registry.getEditor,
@@ -161,23 +87,17 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     >
       <WorkspaceBlockEditorSurface
         ref={setEditorRef}
-        actions={
-          shouldRenderActions ? (
-            <WorkspaceBlockActions actions={actions} block={block} state={state} tags={tags} />
-          ) : null
+        adornments={
+          <BlockAdornments
+            actions={actions}
+            active={isActionAreaActive}
+            block={block}
+            shortcuts={shortcuts}
+            state={state}
+            tags={tags}
+          />
         }
         isExternalEditPending={Boolean(state.externalEditSession)}
-        leadingActions={
-          state.externalEditSession ? (
-            <WorkspaceExternalEditActions
-              editId={state.externalEditSession.editId}
-              trigger={state.externalEditSession.trigger}
-              actions={actions}
-              shortcuts={shortcuts}
-              isPending={state.isExternalEditPending}
-            />
-          ) : null
-        }
         block={block}
         onFocus={commands.focusBlock}
       />

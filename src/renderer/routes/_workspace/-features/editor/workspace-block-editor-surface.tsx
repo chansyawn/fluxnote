@@ -24,14 +24,13 @@ export type WorkspaceBlockEditorHandle = BlockEditorHandle;
 
 interface BlockEditorFrameProps {
   blockId: string;
+  adornments?: ReactNode;
   editorConfig?: BlockEditorConfigInput;
   initialMarkdown: string;
   isExternalEditPending?: boolean;
   isKept: boolean;
-  leadingActions?: ReactNode;
   runtime: BlockEditorRuntime;
   willArchive: boolean;
-  actions?: ReactNode;
   onMarkdownChange: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
@@ -40,14 +39,13 @@ interface BlockEditorFrameProps {
 
 function BlockEditorFrame({
   blockId,
+  adornments,
   editorConfig,
   initialMarkdown,
   isExternalEditPending = false,
   isKept,
-  leadingActions,
   runtime,
   willArchive,
-  actions,
   onMarkdownChange,
   onBlur,
   onFocus,
@@ -64,13 +62,8 @@ function BlockEditorFrame({
       data-block-id={blockId}
       onFocusCapture={onFocus}
     >
-      {actions ? (
-        <div className="pointer-events-none absolute top-0 right-1 z-10 -translate-y-1/2 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
-          {actions}
-        </div>
-      ) : null}
-      {leadingActions ? (
-        <div className="absolute top-0 left-1 z-10 -translate-y-1/2">{leadingActions}</div>
+      {adornments ? (
+        <div className="absolute top-0 right-1 left-1 z-10 -translate-y-1/2">{adornments}</div>
       ) : null}
 
       <div className="min-h-16 px-3 pt-3 pb-2">
@@ -89,18 +82,16 @@ function BlockEditorFrame({
 
 interface WorkspaceBlockEditorSurfaceProps {
   block: Block;
-  actions?: ReactNode;
+  adornments?: ReactNode;
   isExternalEditPending?: boolean;
-  leadingActions?: ReactNode;
   onFocus: (blockId: string) => void;
   ref?: Ref<WorkspaceBlockEditorHandle>;
 }
 
 export function WorkspaceBlockEditorSurface({
   block,
-  actions,
+  adornments,
   isExternalEditPending = false,
-  leadingActions,
   onFocus,
   ref,
 }: WorkspaceBlockEditorSurfaceProps) {
@@ -149,14 +140,13 @@ export function WorkspaceBlockEditorSurface({
     <BlockEditorFrame
       ref={editorRef}
       blockId={block.id}
+      adornments={adornments}
       editorConfig={editorConfig}
       runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}
       isKept={block.isKept}
-      leadingActions={leadingActions}
       willArchive={block.willArchive}
-      actions={actions}
       onBlur={() => {
         void flush();
       }}

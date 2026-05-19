@@ -3,11 +3,11 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/ui/comp
 import { cn } from "@renderer/ui/lib/utils";
 import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { SquareTerminalIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
-import { ACTION_BAR_CLS } from "../block-actions/block-actions";
+import { AdornmentBar } from "./adornment-bar";
 
-interface ExternalEditMetadataCardProps {
+interface ExternalEditMetadataCardProps extends Pick<ComponentProps<"div">, "className"> {
   trigger: ExternalEditTrigger;
 }
 
@@ -41,23 +41,22 @@ function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: R
   );
 }
 
-export function ExternalEditMetadataCard({ trigger }: ExternalEditMetadataCardProps) {
+export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMetadataCardProps) {
   const fileName = getFileName(trigger.targetFilePath);
 
   return (
     <HoverCard>
-      <HoverCardTrigger
-        delay={100}
-        closeDelay={150}
+      <AdornmentBar
+        render={<HoverCardTrigger delay={100} closeDelay={150} />}
         className={cn(
-          ACTION_BAR_CLS,
-          "text-muted-foreground flex h-6 max-w-44 min-w-0 items-center gap-1.5 px-2 font-mono text-[0.6875rem] outline-hidden",
+          "text-muted-foreground flex h-6 max-w-full min-w-0 items-center gap-1.5 px-2 font-mono text-[0.6875rem] outline-hidden",
+          className,
         )}
         title={trigger.targetFilePath}
       >
         <ExternalEditSourceIcon source={trigger.source} />
         <span className="truncate">{fileName}</span>
-      </HoverCardTrigger>
+      </AdornmentBar>
       <HoverCardContent align="start" className="w-[min(24rem,calc(100vw-2rem))]" side="bottom">
         <dl className="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-3 gap-y-2">
           <ExternalEditMetadataItem
