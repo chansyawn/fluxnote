@@ -3,26 +3,62 @@ import { Trans } from "@lingui/react/macro";
 import type { Block, Tag } from "@renderer/clients";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
+import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@renderer/ui/components/dropdown-menu";
 import { cn } from "@renderer/ui/lib/utils";
-import { ArchiveIcon, ArchiveRestoreIcon, FlagIcon, TagIcon, Trash2Icon } from "lucide-react";
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronsUpIcon,
+  EllipsisIcon,
+  FlagIcon,
+  PinIcon,
+  TagIcon,
+  Trash2Icon,
+} from "lucide-react";
 import type { ComponentProps } from "react";
 
+import type { BlockReorderOperation } from "../use-block-mutations";
 import { AdornmentBar } from "./adornment-bar";
 import { CopyAction, IconAction } from "./icon-action";
 
+export interface BlockActionPosition {
+  canMoveDown: boolean;
+  canMoveToTop: boolean;
+  canMoveUp: boolean;
+}
+
 interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   block: Block;
+  position: BlockActionPosition;
   state: {
     tags: Tag[];
     shortcuts?: ShortcutPreferences;
     copied?: boolean;
     disabled?: boolean;
-    pending?: { archive?: boolean; delete?: boolean; keep?: boolean; tag?: boolean };
+    pending?: {
+      archive?: boolean;
+      delete?: boolean;
+      keep?: boolean;
+      pinned?: boolean;
+      reorder?: boolean;
+      tag?: boolean;
+    };
   };
   handlers: {
     onCopy: () => Promise<void>;
+    onReorder: (operation: BlockReorderOperation) => Promise<void>;
     onToggleKeep: () => Promise<void>;
+    onTogglePinned: () => Promise<void>;
     onToggleArchive: () => Promise<void>;
     onDelete: () => Promise<void>;
     onCreateTag: (name: string) => Promise<void>;
@@ -30,10 +66,11 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   };
 }
 
-export function BlockActions({ block, className, state, handlers }: BlockActionsProps) {
+export function BlockActions({ block, className, position, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
   const { tags, shortcuts, copied = false, disabled, pending = {} } = state;
   const isArchived = block.archivedAt !== null;
+  const reorderDisabled = disabled || pending.reorder;
 
   return (
     <AdornmentBar className={className} disabled={disabled}>
@@ -91,6 +128,32 @@ export function BlockActions({ block, className, state, handlers }: BlockActions
             }}
           />
         )}
+        {isArchived ? null : (
+          <IconAction
+            active={block.isPinned}
+            icon={<PinIcon className={cn("size-3", block.isPinned && "fill-primary")} />}
+            shortcut={shortcuts?.["toggle-pin-block"]}
+            label={
+              block.isPinned ? (
+                <Trans id="workspace.blocks.unpin">Unpin from top</Trans>
+              ) : (
+                <Trans id="workspace.blocks.pin">Pin to top</Trans>
+              )
+            }
+            tooltipLabel={
+              block.isPinned ? (
+                <Trans id="workspace.blocks.unpin.tooltip">Unpin</Trans>
+              ) : (
+                <Trans id="workspace.blocks.pin.tooltip">Pin</Trans>
+              )
+            }
+            disabled={disabled}
+            pending={pending.pinned}
+            onClick={() => {
+              void handlers.onTogglePinned();
+            }}
+          />
+        )}
         <IconAction
           icon={
             isArchived ? (
@@ -131,6 +194,54 @@ export function BlockActions({ block, className, state, handlers }: BlockActions
             void handlers.onDelete();
           }}
         />
+        {isArchived ? null : (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={i18n._({
+                id: "workspace.blocks.more-actions",
+                message: "More block actions",
+              })}
+              disabled={reorderDisabled}
+              render={<Button size="icon-xs" variant="ghost" />}
+            >
+              <EllipsisIcon className="size-3" />
+              <span className="sr-only">
+                <Trans id="workspace.blocks.more-actions">More block actions</Trans>
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto min-w-36">
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveUp}
+                  onClick={() => {
+                    void handlers.onReorder("move-up");
+                  }}
+                >
+                  <ArrowUpIcon />
+                  <Trans id="workspace.blocks.move-up">Move up</Trans>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveDown}
+                  onClick={() => {
+                    void handlers.onReorder("move-down");
+                  }}
+                >
+                  <ArrowDownIcon />
+                  <Trans id="workspace.blocks.move-down">Move down</Trans>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveToTop}
+                  onClick={() => {
+                    void handlers.onReorder("move-to-top");
+                  }}
+                >
+                  <ChevronsUpIcon />
+                  <Trans id="workspace.blocks.move-to-top">Move to top</Trans>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </ButtonGroup>
     </AdornmentBar>
   );

@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => {
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
     "submit-external-edit": "Mod+Enter",
+    "toggle-pin-block": "Mod+T",
   } as const;
 
   return {
@@ -75,9 +76,11 @@ function createActions() {
     copy: vi.fn(async () => undefined),
     createTag: vi.fn(async () => undefined),
     deleteOrCancelExternalEdit: vi.fn(async () => undefined),
+    reorder: vi.fn(async () => undefined),
     submitExternalEdit: vi.fn(async () => undefined),
     toggleArchive: vi.fn(async () => undefined),
     toggleKeep: vi.fn(async () => undefined),
+    togglePinned: vi.fn(async () => undefined),
   };
 }
 
@@ -94,6 +97,8 @@ function createState(overrides?: {
     isExternalEditPending: overrides?.isExternalEditPending ?? false,
     isKeepPending: false,
     isLocked: overrides?.isLocked ?? false,
+    isPinnedPending: false,
+    isReorderPending: false,
     isTagCreatePending: false,
     visibility: overrides?.visibility ?? ("active" as const),
   };
@@ -205,6 +210,23 @@ describe("workspace block shortcuts", () => {
     const { preventDefault, stopPropagation } = triggerShortcut("Mod+E");
 
     expect(actions.toggleArchive).toHaveBeenCalledOnce();
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(stopPropagation).toHaveBeenCalledOnce();
+  });
+
+  it("toggles pin on focused block shortcut", () => {
+    const actions = createActions();
+
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState(),
+      target: createShortcutTarget(),
+    });
+
+    const { preventDefault, stopPropagation } = triggerShortcut("Mod+T");
+
+    expect(actions.togglePinned).toHaveBeenCalledOnce();
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
   });

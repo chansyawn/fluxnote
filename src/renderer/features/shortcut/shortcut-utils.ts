@@ -151,6 +151,9 @@ export function normalizeShortcutPreferences(
     "keep-block": shortcuts["keep-block"]
       ? normalizeShortcutBinding(shortcuts["keep-block"], platform)
       : null,
+    "toggle-pin-block": shortcuts["toggle-pin-block"]
+      ? normalizeShortcutBinding(shortcuts["toggle-pin-block"], platform)
+      : null,
     "archive-block": shortcuts["archive-block"]
       ? normalizeShortcutBinding(shortcuts["archive-block"], platform)
       : null,

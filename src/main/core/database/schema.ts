@@ -18,6 +18,8 @@ export const blocks = sqliteTable(
     contentUpdatedAt: text("content_updated_at").notNull().default(sqliteNowIsoExpression),
     archivedAt: text("archived_at"),
     isKept: integer("is_kept", { mode: "boolean" }).notNull().default(false),
+    isPinned: integer("is_pinned", { mode: "boolean" }).notNull().default(false),
+    orderIndex: integer("order_index").notNull().default(0),
     createdAt: text("created_at").notNull().default(sqliteNowIsoExpression),
     updatedAt: text("updated_at")
       .notNull()
@@ -27,6 +29,7 @@ export const blocks = sqliteTable(
   (table) => [
     index("idx_blocks_archived_at").on(table.archivedAt),
     index("idx_blocks_created_at").on(table.createdAt),
+    index("idx_blocks_active_order").on(table.archivedAt, table.isPinned, table.orderIndex),
   ],
 );
 

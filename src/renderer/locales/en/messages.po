@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:125
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:188
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:126
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:189
 msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
@@ -443,12 +443,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:61
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:67
 msgid "preferences.shortcuts.archive-block.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:84
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:90
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr "Cancel external edit"
 
@@ -459,17 +459,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:46
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
 msgid "preferences.shortcuts.copy-block.label"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:41
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
 msgid "preferences.shortcuts.create-block.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:56
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:62
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "Delete block"
 
@@ -495,17 +495,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:51
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:52
 msgid "preferences.shortcuts.keep-block.label"
 msgstr "Keep block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:68
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:74
 msgid "preferences.shortcuts.quick-create-block.description"
 msgstr "Quickly create a new block and bring the window forward for fast capture."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:66
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:72
 msgid "preferences.shortcuts.quick-create-block.label"
 msgstr "Quick create block"
 
@@ -526,17 +526,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:77
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:83
 msgid "preferences.shortcuts.submit-external-edit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:105
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:111
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:36
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:57
+msgid "preferences.shortcuts.toggle-pin-block.label"
+msgstr "Pin/unpin block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
 
@@ -577,44 +582,85 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:106
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:169
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:113
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:176
 msgid "workspace.blocks.archive.tooltip"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:77
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:84
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:121
 msgid "workspace.blocks.keep.tooltip"
 msgstr "Keep"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:104
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:200
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:209
+msgid "workspace.blocks.more-actions"
+msgstr "More block actions"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:230
+msgid "workspace.blocks.move-down"
+msgstr "Move down"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:239
+msgid "workspace.blocks.move-to-top"
+msgstr "Move to top"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+msgid "workspace.blocks.move-up"
+msgstr "Move up"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:140
+msgid "workspace.blocks.pin"
+msgstr "Pin to top"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:147
+msgid "workspace.blocks.pin.tooltip"
+msgstr "Pin"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:167
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:111
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:174
 msgid "workspace.blocks.restore.tooltip"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:75
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:82
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:119
 msgid "workspace.blocks.unkeep.tooltip"
 msgstr "Unkeep"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:138
+msgid "workspace.blocks.unpin"
+msgstr "Unpin from top"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
+msgid "workspace.blocks.unpin.tooltip"
+msgstr "Unpin"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
@@ -647,12 +693,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:61
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:98
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:50
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:87
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 

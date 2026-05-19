@@ -28,6 +28,7 @@ const mocks = vi.hoisted(() => ({
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
     "quick-create-block": "Ctrl+Alt+N",
+    "toggle-pin-block": "Mod+T",
     "submit-external-edit": "Mod+Enter",
     "toggle-window": "Alt+N",
   },
@@ -132,6 +133,8 @@ function createBlock(id: string): Block {
     createdAt: "2026-01-01T00:00:00.000Z",
     id,
     isKept: false,
+    isPinned: false,
+    orderIndex: 0,
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
     willArchive: false,
@@ -146,6 +149,8 @@ function createState(): WorkspaceBlockState {
     isExternalEditPending: false,
     isKeepPending: false,
     isLocked: false,
+    isPinnedPending: false,
+    isReorderPending: false,
     isTagCreatePending: false,
     visibility: "active",
   };
@@ -166,8 +171,10 @@ function createCommands(): WorkspaceCommands {
     deleteBlock: vi.fn(async () => undefined),
     deleteTag: vi.fn(async () => undefined),
     focusBlock: vi.fn(),
+    reorderBlock: vi.fn(async () => createBlock("block-1")),
     restoreBlock: vi.fn(async () => undefined),
     setBlockKeepState: vi.fn(async () => createBlock("block-1")),
+    setBlockPinnedState: vi.fn(async () => createBlock("block-1")),
     submitExternalEdit: vi.fn(async () => undefined),
   };
 }
@@ -197,6 +204,7 @@ function renderWorkspaceBlockEditors(blocks: Block[]) {
             key={block.id}
             block={block}
             commands={createCommands()}
+            position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
             state={createState()}
             tags={[] satisfies Tag[]}
           />

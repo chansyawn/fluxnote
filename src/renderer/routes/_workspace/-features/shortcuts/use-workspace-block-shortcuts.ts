@@ -122,6 +122,12 @@ export function useWorkspaceBlockActionShortcuts({
         name: "Keep block",
       }),
       createShortcutDefinition({
+        hotkey: shortcuts["toggle-pin-block"],
+        callback: actions.togglePinned,
+        canRun: canRunFocusedBlockAction,
+        name: "Pin or unpin block",
+      }),
+      createShortcutDefinition({
         hotkey: shortcuts["archive-block"],
         callback: actions.toggleArchive,
         canRun: canRunFocusedBlockAction,
@@ -159,6 +165,7 @@ export function useWorkspaceBlockActionShortcuts({
     actions.submitExternalEdit,
     actions.toggleArchive,
     actions.toggleKeep,
+    actions.togglePinned,
     canRunExternalEditAction,
     hasExternalEditSession,
     isActiveBlockEditorFocused,

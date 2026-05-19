@@ -3,11 +3,13 @@ import type { ShortcutAction } from "@shared/features/preferences/settings";
 import { useCallback, useMemo } from "react";
 
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
+import type { BlockReorderOperation } from "../use-block-mutations";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 
 export type WorkspaceBlockShortcutAction =
   | "copy-block"
   | "keep-block"
+  | "toggle-pin-block"
   | "archive-block"
   | "delete-block"
   | "submit-external-edit"
@@ -16,6 +18,7 @@ export type WorkspaceBlockShortcutAction =
 export const WORKSPACE_BLOCK_SHORTCUT_ACTIONS = [
   "copy-block",
   "keep-block",
+  "toggle-pin-block",
   "archive-block",
   "delete-block",
   "submit-external-edit",
@@ -28,9 +31,11 @@ export interface WorkspaceBlockActions {
   copy: () => Promise<void>;
   createTag: (name: string) => Promise<void>;
   deleteOrCancelExternalEdit: () => Promise<void>;
+  reorder: (operation: BlockReorderOperation) => Promise<void>;
   submitExternalEdit: () => Promise<void>;
   toggleArchive: () => Promise<void>;
   toggleKeep: () => Promise<void>;
+  togglePinned: () => Promise<void>;
 }
 
 interface UseWorkspaceBlockActionsParams {
@@ -94,6 +99,25 @@ export function useWorkspaceBlockActions({
     await commands.setBlockKeepState(block.id, !block.isKept);
   }, [block, canRunBlockAction, commands]);
 
+  const togglePinned = useCallback(async () => {
+    if (!canRunBlockAction || isArchived(block)) {
+      return;
+    }
+
+    await commands.setBlockPinnedState(block.id, !block.isPinned);
+  }, [block, canRunBlockAction, commands]);
+
+  const reorder = useCallback(
+    async (operation: BlockReorderOperation) => {
+      if (!canRunBlockAction || isArchived(block)) {
+        return;
+      }
+
+      await commands.reorderBlock(block.id, operation);
+    },
+    [block, canRunBlockAction, commands],
+  );
+
   const toggleArchive = useCallback(async () => {
     if (!canRunBlockAction) {
       return;
@@ -147,9 +171,11 @@ export function useWorkspaceBlockActions({
       copy,
       createTag,
       deleteOrCancelExternalEdit,
+      reorder,
       submitExternalEdit,
       toggleArchive,
       toggleKeep,
+      togglePinned,
     }),
     [
       assignTags,
@@ -157,9 +183,11 @@ export function useWorkspaceBlockActions({
       copy,
       createTag,
       deleteOrCancelExternalEdit,
+      reorder,
       submitExternalEdit,
       toggleArchive,
       toggleKeep,
+      togglePinned,
     ],
   );
 }

@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
     "keep-block": "Mod+K",
     "quick-create-block": "Ctrl+Alt+N",
     "submit-external-edit": "Mod+Enter",
+    "toggle-pin-block": "Mod+T",
     "toggle-window": "Alt+N",
   },
 }));
@@ -36,9 +37,11 @@ function createActions(): WorkspaceBlockActions {
     copy: vi.fn(async () => undefined),
     createTag: vi.fn(async () => undefined),
     deleteOrCancelExternalEdit: vi.fn(async () => undefined),
+    reorder: vi.fn(async () => undefined),
     submitExternalEdit: vi.fn(async () => undefined),
     toggleArchive: vi.fn(async () => undefined),
     toggleKeep: vi.fn(async () => undefined),
+    togglePinned: vi.fn(async () => undefined),
   };
 }
 
@@ -50,6 +53,8 @@ function createState(): WorkspaceBlockState {
     isExternalEditPending: false,
     isKeepPending: false,
     isLocked: false,
+    isPinnedPending: false,
+    isReorderPending: false,
     isTagCreatePending: false,
     visibility: "active",
   };

@@ -1,6 +1,7 @@
 import type { Block, Tag } from "@renderer/clients";
 import { useMemo } from "react";
 
+import type { BlockReorderOperation } from "./use-block-mutations";
 import type { WorkspaceCommands } from "./workspace-state-context";
 
 interface UseWorkspaceCommandsParams {
@@ -12,8 +13,10 @@ interface UseWorkspaceCommandsParams {
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
   focusBlock: (blockId: string | null) => void;
+  reorderBlock: (blockId: string, operation: BlockReorderOperation) => Promise<Block>;
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
+  setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
   submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
 }
 
@@ -26,8 +29,10 @@ export function useWorkspaceCommandsValue({
   deleteBlockWithFocus,
   deleteTag,
   focusBlock,
+  reorderBlock,
   restoreBlockWithFocus,
   setBlockKeepState,
+  setBlockPinnedState,
   submitExternalEdit,
 }: UseWorkspaceCommandsParams): WorkspaceCommands {
   return useMemo<WorkspaceCommands>(
@@ -40,8 +45,10 @@ export function useWorkspaceCommandsValue({
       deleteBlock: deleteBlockWithFocus,
       deleteTag,
       focusBlock,
+      reorderBlock,
       restoreBlock: restoreBlockWithFocus,
       setBlockKeepState,
+      setBlockPinnedState,
       submitExternalEdit,
     }),
     [
@@ -53,8 +60,10 @@ export function useWorkspaceCommandsValue({
       deleteBlockWithFocus,
       deleteTag,
       focusBlock,
+      reorderBlock,
       restoreBlockWithFocus,
       setBlockKeepState,
+      setBlockPinnedState,
       submitExternalEdit,
     ],
   );

@@ -13,7 +13,7 @@ User-controlled app-level choices that affect how Fluxnotes behaves and presents
 _Avoid_: Settings, config, runtime state
 
 **Block**:
-A standalone note unit with Markdown content, archive state, keep state, and tags.
+A standalone note unit with Markdown content, archive state, keep state, pin state, and tags.
 _Avoid_: Note, document, item
 
 **Block Editor**:
@@ -31,6 +31,14 @@ _Avoid_: Hidden block, completed block
 **Kept Block**:
 An **Active Block** that the user has protected from automatic archiving.
 _Avoid_: Pinned block, favorite block
+
+**Pinned Block**:
+An **Active Block** fixed to the top area of the **Workspace**.
+_Avoid_: Kept block, favorite block
+
+**Block Order**:
+The user-controlled order of **Active Blocks** in the **Workspace**.
+_Avoid_: Sort key, rank, position
 
 **Auto Archive**:
 The policy that moves eligible inactive **Blocks** into the archive.
@@ -65,6 +73,8 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - A **Workspace** contains zero or more **Blocks**.
 - A **Block** is either an **Active Block** or an **Archived Block**.
 - A **Block** can have zero or more **Tags**.
+- A **Block Order** arranges **Active Blocks** in the **Workspace**.
+- A **Pinned Block** appears before unpinned **Active Blocks** in the **Block Order**.
 - A **Tag Filter** selects zero or more **Tags** and narrows the **Workspace** to matching **Blocks**.
 - A **Kept Block** is an **Active Block** excluded from **Auto Archive**.
 - An **External Edit Session** belongs to exactly one **Block**.
@@ -85,4 +95,5 @@ _Avoid_: Scroll controller, focus controller, route navigation
 
 - "Editor" can mean the app-level editing feature or the **Block Editor**; resolved: use **Block Editor** for the user-facing editing surface of one **Block**.
 - "Keep" can be confused with saving content; resolved: **Kept Block** only means protected from **Auto Archive**.
+- "Pinned" can be confused with **Kept Block**; resolved: **Pinned Block** only means fixed to the top area of the **Workspace**.
 - "Settings" and "config" can mean implementation details or user choices; resolved: use **User Preferences** for user-controlled app-level choices.

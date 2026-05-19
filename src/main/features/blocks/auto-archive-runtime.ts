@@ -193,6 +193,7 @@ async function archiveBlocks(
     .update(blocks)
     .set({
       archivedAt,
+      isPinned: false,
     })
     .where(
       and(isNull(blocks.archivedAt), eq(blocks.isKept, false), inArray(blocks.id, [...blockIds])),

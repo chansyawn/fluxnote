@@ -3,6 +3,7 @@ import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useWorkspaceBlockActions } from "../actions/workspace-block-actions";
+import type { BlockActionPosition } from "../adornments/block-actions";
 import { BlockAdornments } from "../adornments/block-adornments";
 import { COPY_FEEDBACK_DURATION_MS } from "../adornments/copy-feedback";
 import { useBlockEditorRegistryContext } from "../editor-registry/block-editor-registry-context";
@@ -16,6 +17,7 @@ import {
 interface WorkspaceBlockEditorProps {
   block: Block;
   commands: WorkspaceCommands;
+  position: BlockActionPosition;
   state: WorkspaceBlockState;
   tags: Tag[];
 }
@@ -23,6 +25,7 @@ interface WorkspaceBlockEditorProps {
 export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   block,
   commands,
+  position,
   state,
   tags,
 }: WorkspaceBlockEditorProps) {
@@ -120,6 +123,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
             active={isActionAreaActive}
             block={block}
             copyFeedbackActive={isCopyFeedbackActive}
+            position={position}
             shortcuts={shortcuts}
             state={state}
             tags={tags}

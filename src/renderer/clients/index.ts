@@ -23,8 +23,10 @@ export {
   deleteBlock,
   listBlocks,
   locateBlock,
+  reorderBlock,
   restoreBlock,
   setBlockKeepState,
+  setBlockPinnedState,
   updateBlockContent,
 } from "./blocks";
 export { createTag, deleteTag, listTags, setBlockTags } from "./tags";
@@ -66,7 +68,10 @@ export type {
   ListBlocksResult,
   LocateBlockRequest,
   LocateBlockResult,
+  ReorderBlockRequest,
+  ReorderBlockResult,
   SetBlockKeepStateRequest,
+  SetBlockPinnedStateRequest,
   UpdateBlockContentRequest,
 } from "./blocks";
 export type { CreateTagRequest, DeleteTagRequest, SetBlockTagsRequest, Tag } from "./tags";

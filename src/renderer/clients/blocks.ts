@@ -24,6 +24,15 @@ export type UpdateBlockContentRequest = z.input<
 export type SetBlockKeepStateRequest = z.input<
   (typeof blocksContract)["commands"]["blocks.set-keep-state"]["input"]
 >;
+export type SetBlockPinnedStateRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.set-pinned-state"]["input"]
+>;
+export type ReorderBlockRequest = z.input<
+  (typeof blocksContract)["commands"]["blocks.reorder"]["input"]
+>;
+export type ReorderBlockResult = z.infer<
+  (typeof blocksContract)["commands"]["blocks.reorder"]["output"]
+>;
 export type BlockMutationRequest = z.input<
   (typeof blocksContract)["commands"]["blocks.archive"]["input"]
 >;
@@ -71,3 +80,9 @@ export const restoreBlock = (req: BlockMutationRequest): Promise<Block> =>
 
 export const setBlockKeepState = (req: SetBlockKeepStateRequest): Promise<Block> =>
   invokeCommand("blocks.set-keep-state", req);
+
+export const setBlockPinnedState = (req: SetBlockPinnedStateRequest): Promise<Block> =>
+  invokeCommand("blocks.set-pinned-state", req);
+
+export const reorderBlock = (req: ReorderBlockRequest): Promise<ReorderBlockResult> =>
+  invokeCommand("blocks.reorder", req);

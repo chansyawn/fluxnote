@@ -3,6 +3,9 @@ import { z } from "zod";
 import {
   blockMutationRequestSchema,
   blockKeepStateRequestSchema,
+  blockPinnedStateRequestSchema,
+  blockReorderRequestSchema,
+  blockReorderResponseSchema,
   blockSchema,
   blocksDeleteArchivedResponseSchema,
   blocksListRequestSchema,
@@ -50,8 +53,16 @@ export const blocksContract = {
       input: blockMutationRequestSchema,
       output: blockSchema,
     },
+    "blocks.reorder": {
+      input: blockReorderRequestSchema,
+      output: blockReorderResponseSchema,
+    },
     "blocks.set-keep-state": {
       input: blockKeepStateRequestSchema,
+      output: blockSchema,
+    },
+    "blocks.set-pinned-state": {
+      input: blockPinnedStateRequestSchema,
       output: blockSchema,
     },
     "blocks.update-content": {

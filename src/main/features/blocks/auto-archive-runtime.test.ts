@@ -68,7 +68,8 @@ describe("auto-archive runtime", () => {
       .mockResolvedValueOnce([]);
 
     const run = vi.fn(async () => ({ changes: 2 }));
-    const update = vi.fn(() => ({ set: () => ({ where: () => ({ run }) }) }));
+    const set = vi.fn(() => ({ where: () => ({ run }) }));
+    const update = vi.fn(() => ({ set }));
     const emitEvent = vi.fn(() => true);
 
     const runtime = createAutoArchiveRuntime({
@@ -85,6 +86,10 @@ describe("auto-archive runtime", () => {
     await runtime.trigger(true);
 
     expect(update).toHaveBeenCalled();
+    expect(set).toHaveBeenCalledWith({
+      archivedAt: expect.any(String),
+      isPinned: false,
+    });
     expect(emitEvent).toHaveBeenLastCalledWith("blocks.auto-archive-state-changed", {
       archivedCount: 2,
       pendingCount: 0,
