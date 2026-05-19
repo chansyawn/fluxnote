@@ -26,15 +26,16 @@ describe("settings", () => {
     expect(normalizeSettings({ schemaVersion: 999 })).toEqual(DEFAULT_SETTINGS);
   });
 
-  it("should normalize nested fields with catch defaults", () => {
+  it("should normalize nested fields without dropping valid sibling fields", () => {
     const normalized = normalizeSettings({
       schemaVersion: 1,
       appearance: {
         locale: "invalid",
-        fontSize: 999,
+        fontSize: 18,
+        unknown: true,
       },
       autoArchive: {
-        enabled: "bad",
+        enabled: false,
         idleMinutes: 0,
       },
       shortcuts: {
@@ -50,12 +51,21 @@ describe("settings", () => {
         codeBlock: {
           showLineNumbers: "bad",
           wordWrap: true,
+          unknown: true,
         },
+        unknown: true,
       },
+      unknown: true,
     });
 
-    expect(normalized.appearance).toEqual(DEFAULT_SETTINGS.appearance);
-    expect(normalized.autoArchive).toEqual(DEFAULT_SETTINGS.autoArchive);
+    expect(normalized.appearance).toEqual({
+      locale: "en",
+      fontSize: 18,
+    });
+    expect(normalized.autoArchive).toEqual({
+      enabled: false,
+      idleMinutes: DEFAULT_SETTINGS.autoArchive.idleMinutes,
+    });
     expect(normalized.shortcuts).toEqual({
       "toggle-window": "Alt+N",
       "create-block": null,
@@ -72,6 +82,10 @@ describe("settings", () => {
         wordWrap: true,
       },
     });
+    expect(normalized).not.toHaveProperty("unknown");
+    expect(normalized.appearance).not.toHaveProperty("unknown");
+    expect(normalized.markdown).not.toHaveProperty("unknown");
+    expect(normalized.markdown.codeBlock).not.toHaveProperty("unknown");
   });
 
   it("should parse valid settings patch", () => {

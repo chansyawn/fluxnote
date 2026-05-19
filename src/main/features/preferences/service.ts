@@ -44,11 +44,48 @@ function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
   });
 }
 
+function areJsonValuesEqual(left: unknown, right: unknown): boolean {
+  if (left === right) {
+    return true;
+  }
+
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) {
+      return false;
+    }
+
+    return left.every((value, index) => areJsonValuesEqual(value, right[index]));
+  }
+
+  if (!left || !right || typeof left !== "object" || typeof right !== "object") {
+    return false;
+  }
+
+  const leftRecord = left as Record<string, unknown>;
+  const rightRecord = right as Record<string, unknown>;
+  const leftKeys = Object.keys(leftRecord).sort();
+  const rightKeys = Object.keys(rightRecord).sort();
+
+  if (leftKeys.length !== rightKeys.length) {
+    return false;
+  }
+
+  return leftKeys.every(
+    (key, index) =>
+      key === rightKeys[index] && areJsonValuesEqual(leftRecord[key], rightRecord[key]),
+  );
+}
+
 export function createPreferencesService(
   storage: PreferencesStorage = { store: DEFAULT_SETTINGS },
 ): PreferencesService {
   function readSettings(): Settings {
-    return normalizeSettings(storage.store);
+    const settings = normalizeSettings(storage.store);
+    if (!areJsonValuesEqual(storage.store, settings)) {
+      return writeSettings(settings);
+    }
+
+    return settings;
   }
 
   function writeSettings(settings: Settings): Settings {
