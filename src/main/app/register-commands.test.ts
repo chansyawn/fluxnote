@@ -50,13 +50,14 @@ describe("registerFeatureCommands", () => {
   it("registers all feature commands and finalizes ipc registration", () => {
     const ipc = { register: vi.fn() } as never;
     const deps = {
+      autoArchiveRuntime: { refreshState: vi.fn() },
       db: {} as never,
       events: { emit: vi.fn() },
       externalEditManager: { listSessions: vi.fn() },
       now: () => new Date("2025-01-01T00:00:00.000Z"),
       openBlockService: { requestOpen: vi.fn() },
       paths: { assetPathForBlock: vi.fn() },
-      preferencesService: { readAutoArchiveSettings: vi.fn() },
+      preferencesService: { readSettings: vi.fn() },
       windowManager: { requestQuit: vi.fn() },
     } as never;
 

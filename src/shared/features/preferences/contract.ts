@@ -19,5 +19,7 @@ export const preferencesContract = {
       output: settingsSchema,
     },
   },
-  events: {},
+  events: {
+    "preferences.changed": settingsSchema,
+  },
 } as const;

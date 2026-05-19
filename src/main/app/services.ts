@@ -6,17 +6,14 @@ import {
   type DbRuntime,
 } from "@main/core/database";
 import { createEventBus, type EventBus } from "@main/core/ipc";
+import { getConfigStore } from "@main/core/persistence";
 import {
   createAutoArchiveRuntime,
   type AutoArchiveRuntime,
 } from "@main/features/blocks/auto-archive-runtime";
 import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
-import {
-  createPreferencesService,
-  getConfigStore,
-  type PreferencesService,
-} from "@main/features/preferences";
+import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
 import { createTrayManager, createWindowManager, type WindowManager } from "@main/features/window";
 import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
 import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
@@ -45,10 +42,11 @@ export function createMainServices(): MainServices {
     migrateDatabase,
   });
   const events = createEventBus();
-  const preferencesService = createPreferencesService(
-    getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
-  );
   const emitEvent: EventBus["emit"] = (name, payload) => events.emit(name, payload);
+  const preferencesService = createPreferencesService({
+    emitEvent,
+    storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
+  });
 
   let windowManager: WindowManager;
   const externalEditManager = createExternalEditManager({ emitEvent });
@@ -57,7 +55,7 @@ export function createMainServices(): MainServices {
     getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
     getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
     getDb: () => db.getDb(),
-    readAutoArchiveSettings: preferencesService.readAutoArchiveSettings,
+    readSettings: preferencesService.readSettings,
   });
   const openBlockService = createOpenBlockService({
     emitEvent,

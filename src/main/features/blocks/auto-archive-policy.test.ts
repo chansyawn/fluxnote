@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -9,7 +10,10 @@ import {
 
 describe("auto-archive policy", () => {
   it("resolves settings and falls back on error", async () => {
-    const ok = await resolveAutoArchiveSettings(async () => ({ enabled: false, idleMinutes: 5 }));
+    const ok = await resolveAutoArchiveSettings(async () => ({
+      ...DEFAULT_SETTINGS,
+      autoArchive: { enabled: false, idleMinutes: 5 },
+    }));
     const fallback = await resolveAutoArchiveSettings(async () => {
       throw new Error("boom");
     });

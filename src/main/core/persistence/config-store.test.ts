@@ -1,14 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  appGetPath: vi.fn(() => "/mock/user-data"),
   electronStoreCtor: vi.fn(),
-}));
-
-vi.mock("electron", () => ({
-  app: {
-    getPath: mocks.appGetPath,
-  },
 }));
 
 vi.mock("electron-store", () => ({
@@ -21,8 +14,6 @@ vi.mock("electron-store", () => ({
 describe("config-store", () => {
   beforeEach(() => {
     vi.resetModules();
-    mocks.appGetPath.mockReset();
-    mocks.appGetPath.mockReturnValue("/mock/user-data");
     mocks.electronStoreCtor.mockReset();
   });
 

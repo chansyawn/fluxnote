@@ -3,7 +3,7 @@ import { blocks } from "@main/core/database";
 import { getSqliteChangedRows } from "@main/core/database";
 import type { EventBus } from "@main/core/ipc";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
-import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
+import type { Settings } from "@shared/features/preferences/settings";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import {
@@ -18,10 +18,11 @@ interface AutoArchiveRuntimeOptions {
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
   getDb: () => AppDatabase;
-  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
+  readSettings: () => Settings | Promise<Settings>;
 }
 
 export interface AutoArchiveRuntime {
+  refreshState: () => Promise<void>;
   start: () => Promise<void>;
   stop: () => void;
   trigger: (forceArchiveWhenHidden: boolean) => Promise<void>;
@@ -64,7 +65,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
   }
 
   async function scan(forceArchiveWhenHidden: boolean): Promise<void> {
-    const config = await resolveAutoArchiveSettings(options.readAutoArchiveSettings);
+    const config = await resolveAutoArchiveSettings(options.readSettings);
     const windowVisible = options.getWindowVisible();
 
     if (!config.enabled) {
@@ -118,7 +119,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
       return;
     }
 
-    const config = await resolveAutoArchiveSettings(options.readAutoArchiveSettings);
+    const config = await resolveAutoArchiveSettings(options.readSettings);
     timer = setTimeout(
       () => {
         void (async () => {
@@ -163,7 +164,16 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
     await scan(forceArchiveWhenHidden);
   }
 
+  async function refreshState(): Promise<void> {
+    if (!running) {
+      return;
+    }
+
+    await scan(false);
+  }
+
   return {
+    refreshState,
     start,
     stop,
     trigger,

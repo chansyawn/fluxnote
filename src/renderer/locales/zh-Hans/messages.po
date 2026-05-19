@@ -313,32 +313,32 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:245
 msgid "preferences.archive.clear.action"
 msgstr "清空"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:282
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:281
 msgid "preferences.archive.clear.description"
 msgstr "永久删除所有归档区块。活跃区块和标签不会受到影响。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:263
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:262
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:275
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:274
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "清空归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:256
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:255
 msgid "preferences.archive.clear.dialog.description"
 msgstr "这会永久删除所有归档区块。活跃区块和标签会保留。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:253
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:252
 msgid "preferences.archive.clear.dialog.title"
 msgstr "清空归档数据？"
 
@@ -348,7 +348,7 @@ msgid "preferences.archive.clear.error"
 msgstr "清空归档数据失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:287
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:286
 msgid "preferences.archive.clear.label"
 msgstr "清空归档数据"
 
@@ -358,27 +358,27 @@ msgid "preferences.archive.clear.success"
 msgstr "归档数据已清空。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:167
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:166
 msgid "preferences.archive.title"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:182
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:181
 msgid "preferences.auto-archive.enable.description"
 msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:189
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:188
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:234
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:233
 msgid "preferences.auto-archive.threshold.label"
 msgstr "自动归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:229
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:228
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 

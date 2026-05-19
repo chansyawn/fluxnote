@@ -1,8 +1,8 @@
+import type { EventBus } from "@main/core/ipc";
 import {
   DEFAULT_SETTINGS,
   normalizeSettings,
   normalizeSettingsPatch,
-  type AutoArchiveSettings,
   type Settings,
   type SettingsPatch,
 } from "@shared/features/preferences/settings";
@@ -13,9 +13,13 @@ interface PreferencesStorage {
 
 export interface PreferencesService {
   patchSettings: (patch: SettingsPatch) => Settings;
-  readAutoArchiveSettings: () => AutoArchiveSettings;
   readSettings: () => Settings;
   resetSettings: () => Settings;
+}
+
+interface PreferencesServiceOptions {
+  emitEvent?: EventBus["emit"];
+  storage?: PreferencesStorage;
 }
 
 function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
@@ -77,8 +81,12 @@ function areJsonValuesEqual(left: unknown, right: unknown): boolean {
 }
 
 export function createPreferencesService(
-  storage: PreferencesStorage = { store: DEFAULT_SETTINGS },
+  options: PreferencesServiceOptions | PreferencesStorage = {},
 ): PreferencesService {
+  const serviceOptions = "store" in options ? { storage: options } : options;
+  const storage = serviceOptions.storage ?? { store: DEFAULT_SETTINGS };
+  const emitEvent = serviceOptions.emitEvent;
+
   function readSettings(): Settings {
     const settings = normalizeSettings(storage.store);
     if (!areJsonValuesEqual(storage.store, settings)) {
@@ -93,23 +101,24 @@ export function createPreferencesService(
     return settings;
   }
 
+  function writeAndNotify(settings: Settings): Settings {
+    const writtenSettings = writeSettings(settings);
+    emitEvent?.("preferences.changed", writtenSettings);
+    return writtenSettings;
+  }
+
   function patchSettings(input: SettingsPatch): Settings {
     const patch = normalizeSettingsPatch(input);
     const nextSettings = mergeSettings(readSettings(), patch);
-    return writeSettings(nextSettings);
+    return writeAndNotify(nextSettings);
   }
 
   function resetSettings(): Settings {
-    return writeSettings(DEFAULT_SETTINGS);
-  }
-
-  function readAutoArchiveSettings(): AutoArchiveSettings {
-    return readSettings().autoArchive;
+    return writeAndNotify(DEFAULT_SETTINGS);
   }
 
   return {
     patchSettings,
-    readAutoArchiveSettings,
     readSettings,
     resetSettings,
   };

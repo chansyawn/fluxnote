@@ -1,6 +1,6 @@
 export { AppInvokeError, invokeCommand, subscribeEvent, toAppInvokeError } from "./ipc/invoke";
 export { getCliStatus, installCli, uninstallCli } from "./cli";
-export { patchSettings, readSettings, resetSettings } from "./preferences";
+export { onPreferencesChanged, patchSettings, readSettings, resetSettings } from "./preferences";
 export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
 export { writeBlockEditorClipboard } from "./clipboard";
 export {

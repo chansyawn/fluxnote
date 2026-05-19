@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -42,7 +43,10 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => true,
       getDb: () => ({ update: vi.fn() }) as never,
-      readAutoArchiveSettings: async () => ({ enabled: true, idleMinutes: 10 }),
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        autoArchive: { enabled: true, idleMinutes: 10 },
+      }),
     });
 
     await runtime.start();
@@ -71,7 +75,10 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => false,
       getDb: () => ({ update }) as never,
-      readAutoArchiveSettings: async () => ({ enabled: true, idleMinutes: 10 }),
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        autoArchive: { enabled: true, idleMinutes: 10 },
+      }),
     });
 
     await runtime.start();
@@ -95,7 +102,10 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => false,
       getDb: () => ({ update: vi.fn() }) as never,
-      readAutoArchiveSettings: async () => ({ enabled: false, idleMinutes: 10 }),
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        autoArchive: { enabled: false, idleMinutes: 10 },
+      }),
     });
 
     await runtime.start();
@@ -103,6 +113,35 @@ describe("auto-archive runtime", () => {
     expect(emitEvent).toHaveBeenCalledWith("blocks.auto-archive-state-changed", {
       archivedCount: 0,
       pendingCount: 0,
+      windowVisible: false,
+    });
+
+    runtime.stop();
+  });
+
+  it("refreshes pending state without archiving", async () => {
+    mocks.resolveAutoArchiveSettings.mockResolvedValue({ enabled: true, idleMinutes: 10 });
+    mocks.listAutoArchiveCandidateBlockIds.mockResolvedValue(["b1"]);
+
+    const update = vi.fn();
+    const emitEvent = vi.fn(() => true);
+    const runtime = createAutoArchiveRuntime({
+      emitEvent,
+      getWindowVisible: () => false,
+      getDb: () => ({ update }) as never,
+      readSettings: async () => ({
+        ...DEFAULT_SETTINGS,
+        autoArchive: { enabled: true, idleMinutes: 10 },
+      }),
+    });
+
+    await runtime.start();
+    await runtime.refreshState();
+
+    expect(update).not.toHaveBeenCalled();
+    expect(emitEvent).toHaveBeenLastCalledWith("blocks.auto-archive-state-changed", {
+      archivedCount: 0,
+      pendingCount: 1,
       windowVisible: false,
     });
 

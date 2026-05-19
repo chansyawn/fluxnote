@@ -9,32 +9,57 @@ describe("preferences command", () => {
   };
   const preferencesService = {
     patchSettings: vi.fn(),
-    readAutoArchiveSettings: vi.fn(),
     readSettings: vi.fn(),
     resetSettings: vi.fn(),
   };
+  const onAutoArchivePreferencesChanged = vi.fn(async () => undefined);
 
   beforeEach(() => {
     handlers.clear();
     ipc.command.mockClear();
+    onAutoArchivePreferencesChanged.mockClear();
     Object.values(preferencesService).forEach((fn) => fn.mockReset());
   });
 
-  it("dispatches patch/read/reset commands", () => {
+  it("dispatches patch/read/reset commands", async () => {
     preferencesService.patchSettings.mockReturnValue({
       appearance: { locale: "en", fontSize: 16 },
     });
     preferencesService.readSettings.mockReturnValue({ schemaVersion: 1 });
     preferencesService.resetSettings.mockReturnValue({ schemaVersion: 1 });
-    registerPreferencesCommands(ipc as never, { preferencesService } as never);
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        onAutoArchivePreferencesChanged,
+        preferencesService,
+      } as never,
+    );
 
-    const patchResult = handlers.get("preferences.patch")?.({ appearance: { locale: "en" } });
+    const patchResult = await handlers.get("preferences.patch")?.({
+      appearance: { locale: "en" },
+    });
     const readResult = handlers.get("preferences.read")?.({});
-    const resetResult = handlers.get("preferences.reset")?.({});
+    const resetResult = await handlers.get("preferences.reset")?.({});
 
     expect(preferencesService.patchSettings).toHaveBeenCalled();
     expect(readResult).toEqual({ schemaVersion: 1 });
     expect(resetResult).toEqual({ schemaVersion: 1 });
     expect(patchResult).toEqual({ appearance: { locale: "en", fontSize: 16 } });
+    expect(onAutoArchivePreferencesChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies auto archive changes after auto archive patch", async () => {
+    preferencesService.patchSettings.mockReturnValue({ schemaVersion: 1 });
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        onAutoArchivePreferencesChanged,
+        preferencesService,
+      } as never,
+    );
+
+    await handlers.get("preferences.patch")?.({ autoArchive: { enabled: false } });
+
+    expect(onAutoArchivePreferencesChanged).toHaveBeenCalledTimes(1);
   });
 });

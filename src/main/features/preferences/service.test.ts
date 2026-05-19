@@ -1,11 +1,11 @@
 import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createPreferencesService } from "./service";
 
 describe("preferences service", () => {
   it("reads default settings from storage", () => {
-    const service = createPreferencesService({ store: DEFAULT_SETTINGS });
+    const service = createPreferencesService({ storage: { store: DEFAULT_SETTINGS } });
 
     expect(service.readSettings()).toEqual(DEFAULT_SETTINGS);
   });
@@ -29,7 +29,7 @@ describe("preferences service", () => {
         unknown: true,
       },
     };
-    const service = createPreferencesService(storage);
+    const service = createPreferencesService({ storage });
 
     const settings = service.readSettings();
 
@@ -57,7 +57,7 @@ describe("preferences service", () => {
       },
     };
     const originalStore = storage.store;
-    const service = createPreferencesService(storage);
+    const service = createPreferencesService({ storage });
 
     const settings = service.readSettings();
 
@@ -66,7 +66,7 @@ describe("preferences service", () => {
   });
 
   it("patches nested settings with normalization", () => {
-    const service = createPreferencesService({ store: DEFAULT_SETTINGS });
+    const service = createPreferencesService({ storage: { store: DEFAULT_SETTINGS } });
 
     const result = service.patchSettings({
       appearance: { locale: "zh-Hans", fontSize: 20 },
@@ -81,7 +81,6 @@ describe("preferences service", () => {
       showLineNumbers: false,
       wordWrap: true,
     });
-    expect(service.readAutoArchiveSettings()).toEqual(result.autoArchive);
   });
 
   it("repairs stored settings before applying patch", () => {
@@ -92,7 +91,7 @@ describe("preferences service", () => {
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: "invalid" } },
       },
     };
-    const service = createPreferencesService(storage);
+    const service = createPreferencesService({ storage });
 
     const result = service.patchSettings({
       markdown: { codeBlock: { wordWrap: true } },
@@ -111,7 +110,7 @@ describe("preferences service", () => {
 
   it("rejects invalid patches without writing settings", () => {
     const storage = { store: DEFAULT_SETTINGS };
-    const service = createPreferencesService(storage);
+    const service = createPreferencesService({ storage });
 
     expect(() =>
       service.patchSettings({
@@ -123,14 +122,30 @@ describe("preferences service", () => {
 
   it("resets settings to defaults", () => {
     const service = createPreferencesService({
-      store: {
-        ...DEFAULT_SETTINGS,
-        appearance: { ...DEFAULT_SETTINGS.appearance, locale: "zh-Hans" },
+      storage: {
+        store: {
+          ...DEFAULT_SETTINGS,
+          appearance: { ...DEFAULT_SETTINGS.appearance, locale: "zh-Hans" },
+        },
       },
     });
 
     service.resetSettings();
 
     expect(service.readSettings()).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("emits changed event after patch and reset writes", () => {
+    const emitEvent = vi.fn();
+    const service = createPreferencesService({
+      emitEvent,
+      storage: { store: DEFAULT_SETTINGS },
+    });
+
+    const patched = service.patchSettings({ appearance: { locale: "zh-Hans" } });
+    const reset = service.resetSettings();
+
+    expect(emitEvent).toHaveBeenNthCalledWith(1, "preferences.changed", patched);
+    expect(emitEvent).toHaveBeenNthCalledWith(2, "preferences.changed", reset);
   });
 });

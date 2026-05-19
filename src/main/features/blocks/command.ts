@@ -1,7 +1,7 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
-import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
+import type { Settings } from "@shared/features/preferences/settings";
 
 import {
   createAutoArchiveEvaluationContext,
@@ -22,7 +22,7 @@ import {
 
 interface BlocksCommandDeps {
   db: AppDatabase;
-  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
+  readSettings: () => Settings | Promise<Settings>;
   listExternalEditSessions: () => ExternalEditSession[];
   getAssetPathForBlock: (blockId: string) => string;
   now: () => Date;
@@ -31,7 +31,7 @@ interface BlocksCommandDeps {
 async function getAutoArchiveEvaluationContext(
   deps: BlocksCommandDeps,
 ): Promise<AutoArchiveEvaluationContext> {
-  const settings = await resolveAutoArchiveSettings(deps.readAutoArchiveSettings);
+  const settings = await resolveAutoArchiveSettings(deps.readSettings);
 
   return createAutoArchiveEvaluationContext({
     now: deps.now(),

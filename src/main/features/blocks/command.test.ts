@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -28,7 +29,10 @@ describe("blocks command", () => {
     getAssetPathForBlock: (blockId: string) => `/tmp/${blockId}`,
     listExternalEditSessions: () => [],
     now: () => new Date("2026-01-01T00:00:00.000Z"),
-    readAutoArchiveSettings: () => ({ enabled: true, idleMinutes: 60 }),
+    readSettings: () => ({
+      ...DEFAULT_SETTINGS,
+      autoArchive: { enabled: true, idleMinutes: 60 },
+    }),
   };
 
   beforeEach(() => {

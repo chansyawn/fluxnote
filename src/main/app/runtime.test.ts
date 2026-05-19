@@ -42,6 +42,7 @@ describe("createBackendRuntime", () => {
 
   const services = {
     autoArchiveRuntime: {
+      refreshState: vi.fn(async () => undefined),
       start: vi.fn(async () => undefined),
       stop: vi.fn(),
     },
@@ -70,7 +71,7 @@ describe("createBackendRuntime", () => {
       userDataPath: "/tmp",
     },
     preferencesService: {
-      readAutoArchiveSettings: vi.fn(),
+      readSettings: vi.fn(),
     },
     trayManager: {
       createTray: vi.fn(),

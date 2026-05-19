@@ -71,6 +71,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - An **External Edit Trigger** starts exactly one **External Edit Session**.
 - **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
 - **User Preferences** can affect **Workspace** presentation and app-level behavior.
+- **User Preferences** configure **Auto Archive**, but changing them does not itself move **Blocks** into the archive.
 
 ## Example Dialogue
 
