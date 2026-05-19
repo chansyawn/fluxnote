@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => {
   const defaultShortcuts = {
     "archive-block": "Mod+E",
     "cancel-external-edit": "Mod+\\",
+    "copy-block": "Mod+Shift+C",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
@@ -84,6 +85,7 @@ function createState(overrides?: {
   externalEditSession?: ExternalEditSession | undefined;
   isExternalEditPending?: boolean;
   isLocked?: boolean;
+  visibility?: "active" | "archived";
 }) {
   return {
     externalEditSession: overrides?.externalEditSession,
@@ -93,7 +95,7 @@ function createState(overrides?: {
     isKeepPending: false,
     isLocked: overrides?.isLocked ?? false,
     isTagCreatePending: false,
-    visibility: "active" as const,
+    visibility: overrides?.visibility ?? ("active" as const),
   };
 }
 
@@ -207,6 +209,23 @@ describe("workspace block shortcuts", () => {
     expect(stopPropagation).toHaveBeenCalledOnce();
   });
 
+  it("copies focused archived block", () => {
+    const actions = createActions();
+
+    useWorkspaceBlockActionShortcuts({
+      actions,
+      isActiveBlockEditorFocused: () => true,
+      state: createState({ visibility: "archived" }),
+      target: createShortcutTarget(),
+    });
+
+    const { preventDefault, stopPropagation } = triggerShortcut("Mod+Shift+C");
+
+    expect(actions.copy).toHaveBeenCalledOnce();
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(stopPropagation).toHaveBeenCalledOnce();
+  });
+
   it("blocks shortcuts while block is locked", () => {
     const actions = createActions();
 
@@ -218,8 +237,10 @@ describe("workspace block shortcuts", () => {
     });
 
     triggerShortcut("Mod+D");
+    triggerShortcut("Mod+Shift+C");
 
     expect(actions.deleteOrCancelExternalEdit).not.toHaveBeenCalled();
+    expect(actions.copy).not.toHaveBeenCalled();
   });
 
   it("runs external edit shortcut only for active non-pending session", () => {

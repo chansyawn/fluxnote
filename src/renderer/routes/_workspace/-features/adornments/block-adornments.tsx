@@ -12,6 +12,7 @@ interface BlockAdornmentsProps {
   actions: WorkspaceBlockActions;
   active: boolean;
   block: Block;
+  copyFeedbackActive: boolean;
   shortcuts: ShortcutPreferences;
   state: WorkspaceBlockState;
   tags: Tag[];
@@ -21,6 +22,7 @@ export function BlockAdornments({
   actions,
   active,
   block,
+  copyFeedbackActive,
   shortcuts,
   state,
   tags,
@@ -57,6 +59,7 @@ export function BlockAdornments({
           state={{
             tags,
             shortcuts,
+            copied: copyFeedbackActive,
             disabled: state.isLocked,
             pending: {
               archive: state.isArchivePending,

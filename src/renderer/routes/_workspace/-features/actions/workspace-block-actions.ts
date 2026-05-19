@@ -6,6 +6,7 @@ import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-edito
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 
 export type WorkspaceBlockShortcutAction =
+  | "copy-block"
   | "keep-block"
   | "archive-block"
   | "delete-block"
@@ -13,6 +14,7 @@ export type WorkspaceBlockShortcutAction =
   | "cancel-external-edit";
 
 export const WORKSPACE_BLOCK_SHORTCUT_ACTIONS = [
+  "copy-block",
   "keep-block",
   "archive-block",
   "delete-block",

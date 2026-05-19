@@ -110,6 +110,12 @@ export function useWorkspaceBlockActionShortcuts({
     const canRunFocusedBlockAction = () => !state.isLocked && isActiveBlockEditorFocused();
     const definitions = [
       createShortcutDefinition({
+        hotkey: shortcuts["copy-block"],
+        callback: actions.copy,
+        canRun: canRunFocusedBlockAction,
+        name: "Copy block",
+      }),
+      createShortcutDefinition({
         hotkey: shortcuts["keep-block"],
         callback: actions.toggleKeep,
         canRun: canRunFocusedBlockAction,
@@ -148,6 +154,7 @@ export function useWorkspaceBlockActionShortcuts({
     );
   }, [
     actions.cancelExternalEdit,
+    actions.copy,
     actions.deleteOrCancelExternalEdit,
     actions.submitExternalEdit,
     actions.toggleArchive,

@@ -69,6 +69,7 @@ describe("settings", () => {
     expect(normalized.shortcuts).toEqual({
       "toggle-window": "Alt+N",
       "create-block": null,
+      "copy-block": "Mod+Shift+C",
       "keep-block": "Mod+K",
       "archive-block": "Mod+E",
       "delete-block": "Mod+Delete",
@@ -93,13 +94,13 @@ describe("settings", () => {
       normalizeSettingsPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
-        shortcuts: { "archive-block": "Mod+E" },
+        shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
-      shortcuts: { "archive-block": "Mod+E" },
+      shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
     });
   });

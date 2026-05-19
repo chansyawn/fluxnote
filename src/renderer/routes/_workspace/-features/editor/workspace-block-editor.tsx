@@ -1,9 +1,10 @@
 import type { Block, Tag } from "@renderer/clients";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useWorkspaceBlockActions } from "../actions/workspace-block-actions";
 import { BlockAdornments } from "../adornments/block-adornments";
+import { COPY_FEEDBACK_DURATION_MS } from "../adornments/copy-feedback";
 import { useBlockEditorRegistryContext } from "../editor-registry/block-editor-registry-context";
 import { useWorkspaceBlockActionShortcuts } from "../shortcuts/use-workspace-block-shortcuts";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
@@ -26,9 +27,27 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   tags,
 }: WorkspaceBlockEditorProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const copyFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isActionAreaActive, setIsActionAreaActive] = useState(false);
+  const [isCopyFeedbackActive, setIsCopyFeedbackActive] = useState(false);
   const registry = useBlockEditorRegistryContext();
   const { shortcuts } = useShortcutState();
+
+  const clearCopyFeedbackTimer = useCallback(() => {
+    if (!copyFeedbackTimerRef.current) {
+      return;
+    }
+
+    clearTimeout(copyFeedbackTimerRef.current);
+    copyFeedbackTimerRef.current = null;
+  }, []);
+
+  useEffect(
+    () => () => {
+      clearCopyFeedbackTimer();
+    },
+    [clearCopyFeedbackTimer],
+  );
 
   const setEditorRef = useCallback(
     (handle: WorkspaceBlockEditorHandle | null) => {
@@ -37,12 +56,29 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
     [block.id, registry],
   );
 
-  const actions = useWorkspaceBlockActions({
+  const blockActions = useWorkspaceBlockActions({
     block,
     commands,
     getEditor: registry.getEditor,
     state,
   });
+  const copyWithFeedback = useCallback(async () => {
+    await blockActions.copy();
+    clearCopyFeedbackTimer();
+    setIsCopyFeedbackActive(true);
+    copyFeedbackTimerRef.current = setTimeout(() => {
+      setIsCopyFeedbackActive(false);
+      copyFeedbackTimerRef.current = null;
+    }, COPY_FEEDBACK_DURATION_MS);
+  }, [blockActions, clearCopyFeedbackTimer]);
+
+  const actions = useMemo(
+    () => ({
+      ...blockActions,
+      copy: copyWithFeedback,
+    }),
+    [blockActions, copyWithFeedback],
+  );
   const handleShortcutKeyDownCapture = useWorkspaceBlockActionShortcuts({
     actions,
     isActiveBlockEditorFocused: () => {
@@ -83,6 +119,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
             actions={actions}
             active={isActionAreaActive}
             block={block}
+            copyFeedbackActive={isCopyFeedbackActive}
             shortcuts={shortcuts}
             state={state}
             tags={tags}

@@ -16,6 +16,7 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   state: {
     tags: Tag[];
     shortcuts?: ShortcutPreferences;
+    copied?: boolean;
     disabled?: boolean;
     pending?: { archive?: boolean; delete?: boolean; keep?: boolean; tag?: boolean };
   };
@@ -31,13 +32,18 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
 
 export function BlockActions({ block, className, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
-  const { tags, shortcuts, disabled, pending = {} } = state;
+  const { tags, shortcuts, copied = false, disabled, pending = {} } = state;
   const isArchived = block.archivedAt !== null;
 
   return (
     <AdornmentBar className={className} disabled={disabled}>
       <ButtonGroup>
-        <CopyAction disabled={disabled} onCopy={handlers.onCopy} />
+        <CopyAction
+          copied={copied}
+          disabled={disabled}
+          shortcut={shortcuts?.["copy-block"]}
+          onCopy={handlers.onCopy}
+        />
         <TagComboboxPopover
           disabled={disabled}
           isCreatingTag={pending.tag ?? false}

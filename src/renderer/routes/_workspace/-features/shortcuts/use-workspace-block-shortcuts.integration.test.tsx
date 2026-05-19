@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   shortcuts: {
     "archive-block": "Mod+E",
     "cancel-external-edit": "Mod+\\",
+    "copy-block": "Mod+Shift+C",
     "create-block": "Mod+N",
     "delete-block": "Mod+D",
     "keep-block": "Mod+K",
