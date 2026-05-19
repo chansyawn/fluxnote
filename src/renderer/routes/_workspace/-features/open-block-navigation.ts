@@ -1,7 +1,7 @@
-import { queryClient } from "@renderer/app/query";
 import { useOpenBlockRequest } from "@renderer/features/open-block/open-block-request-context";
 import { useEffect } from "react";
 
+import { refreshWorkspaceBlocks } from "./block-collection/workspace-block-collection";
 import { isBlockNavigationCancelledError } from "./navigation/use-block-navigation";
 
 interface UseOpenBlockNavigationParams {
@@ -16,7 +16,7 @@ export function useOpenBlockNavigation({ navigateToBlock }: UseOpenBlockNavigati
       return;
     }
 
-    void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+    refreshWorkspaceBlocks();
 
     void (async () => {
       try {

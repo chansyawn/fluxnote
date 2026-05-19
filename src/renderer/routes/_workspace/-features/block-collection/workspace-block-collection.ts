@@ -4,29 +4,23 @@ import {
   locateBlock,
   type Block,
   type BlockVisibility,
+  type ListBlocksRequest,
   type ListBlocksResult,
   type LocateBlockResult,
 } from "@renderer/clients";
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+export const WORKSPACE_BLOCKS_QUERY_KEY = ["blocks"] as const;
+
 const BLOCKS_PAGE_SIZE = 10;
 
-const blockListQueryKey = (tagIds: string[], visibility: BlockVisibility) =>
-  ["blocks", visibility, [...tagIds].sort((left, right) => left.localeCompare(right))] as const;
-
-const blockListPageQueryKey = (tagIds: string[], visibility: BlockVisibility, offset: number) =>
-  [...blockListQueryKey(tagIds, visibility), "page", offset] as const;
-
-const getBlockPageOffset = (index: number) =>
-  Math.floor(index / BLOCKS_PAGE_SIZE) * BLOCKS_PAGE_SIZE;
-
-interface UseBlockListParams {
-  visibility: BlockVisibility;
+export interface WorkspaceBlockView {
   tagIds: string[];
+  visibility: BlockVisibility;
 }
 
-interface UseBlockListResult {
+export interface WorkspaceBlockCollection {
   totalBlockCount: number;
   isInitialLoading: boolean;
   isRefreshing: boolean;
@@ -38,14 +32,78 @@ interface UseBlockListResult {
     options?: { refresh?: boolean },
   ) => Promise<Block | undefined>;
   locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
+  refresh: () => void;
+  patchBlock: (block: Block) => void;
+  getCachedBlock: (blockId: string) => Block | undefined;
 }
 
-export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlockListResult {
-  const normalizedTagIds = useMemo(
-    () => [...tagIds].sort((left, right) => left.localeCompare(right)),
-    [tagIds],
+export function normalizeWorkspaceBlockView({ tagIds, visibility }: WorkspaceBlockView) {
+  return {
+    tagIds: [...tagIds].sort((left, right) => left.localeCompare(right)),
+    visibility,
+  };
+}
+
+export function workspaceBlockListQueryKey(view: WorkspaceBlockView) {
+  const normalizedView = normalizeWorkspaceBlockView(view);
+  return [...WORKSPACE_BLOCKS_QUERY_KEY, normalizedView.visibility, normalizedView.tagIds] as const;
+}
+
+export function workspaceBlockListPageQueryKey(view: WorkspaceBlockView, offset: number) {
+  return [...workspaceBlockListQueryKey(view), "page", offset] as const;
+}
+
+export function getWorkspaceBlockPageOffset(index: number) {
+  return Math.floor(index / BLOCKS_PAGE_SIZE) * BLOCKS_PAGE_SIZE;
+}
+
+function toListBlocksRequest(view: WorkspaceBlockView, offset: number): ListBlocksRequest {
+  const normalizedView = normalizeWorkspaceBlockView(view);
+  return {
+    tagIds: normalizedView.tagIds.length > 0 ? normalizedView.tagIds : undefined,
+    visibility: normalizedView.visibility,
+    offset,
+    limit: BLOCKS_PAGE_SIZE,
+  };
+}
+
+export function refreshWorkspaceBlocks(): void {
+  void queryClient.invalidateQueries({ queryKey: WORKSPACE_BLOCKS_QUERY_KEY });
+}
+
+export function patchWorkspaceBlock(updatedBlock: Block): void {
+  queryClient.setQueriesData<ListBlocksResult>(
+    { queryKey: WORKSPACE_BLOCKS_QUERY_KEY },
+    (current) => {
+      if (!current) {
+        return current;
+      }
+
+      return {
+        ...current,
+        blocks: current.blocks.map((block) =>
+          block.id === updatedBlock.id ? updatedBlock : block,
+        ),
+      };
+    },
   );
-  const viewCacheKey = `${visibility}:${normalizedTagIds.join("\u0000")}`;
+}
+
+export function getCachedWorkspaceBlock(blockId: string): Block | undefined {
+  for (const [, cached] of queryClient.getQueriesData<ListBlocksResult>({
+    queryKey: WORKSPACE_BLOCKS_QUERY_KEY,
+  })) {
+    const found = cached?.blocks.find((block) => block.id === blockId);
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}
+
+export function useWorkspaceBlockCollection(view: WorkspaceBlockView): WorkspaceBlockCollection {
+  const normalizedView = useMemo(() => normalizeWorkspaceBlockView(view), [view]);
+  const viewCacheKey = `${normalizedView.visibility}:${normalizedView.tagIds.join("\u0000")}`;
   const [requestedPageOffsets, setRequestedPageOffsets] = useState<Set<number>>(() => new Set([0]));
 
   useEffect(() => {
@@ -62,7 +120,7 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
       return;
     }
 
-    const offset = getBlockPageOffset(index);
+    const offset = getWorkspaceBlockPageOffset(index);
     setRequestedPageOffsets((currentOffsets) => {
       if (currentOffsets.has(offset)) {
         return currentOffsets;
@@ -79,8 +137,8 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
       return;
     }
 
-    const startOffset = getBlockPageOffset(Math.max(0, startIndex));
-    const endOffset = getBlockPageOffset(endIndex);
+    const startOffset = getWorkspaceBlockPageOffset(Math.max(0, startIndex));
+    const endOffset = getWorkspaceBlockPageOffset(endIndex);
 
     setRequestedPageOffsets((currentOffsets) => {
       let changed = false;
@@ -99,14 +157,8 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
 
   const pageQueries = useQueries({
     queries: requestedOffsets.map((offset) => ({
-      queryKey: blockListPageQueryKey(normalizedTagIds, visibility, offset),
-      queryFn: async () =>
-        await listBlocks({
-          tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
-          visibility,
-          offset,
-          limit: BLOCKS_PAGE_SIZE,
-        }),
+      queryKey: workspaceBlockListPageQueryKey(normalizedView, offset),
+      queryFn: async () => await listBlocks(toListBlocksRequest(normalizedView, offset)),
       placeholderData: (previousData: ListBlocksResult | undefined) => previousData,
     })),
   });
@@ -138,7 +190,7 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
         return undefined;
       }
 
-      const offset = getBlockPageOffset(index);
+      const offset = getWorkspaceBlockPageOffset(index);
       const page = pagesByOffset.get(offset);
       return page?.blocks[index - offset];
     },
@@ -148,18 +200,13 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
   const ensureBlockIndexLoaded = useCallback(
     async (index: number, options?: { refresh?: boolean }) => {
       if (index < 0) {
-        return;
+        return undefined;
       }
 
       ensureBlockIndex(index);
-      const offset = getBlockPageOffset(index);
-      const queryKey = blockListPageQueryKey(normalizedTagIds, visibility, offset);
-      const request = {
-        tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
-        visibility,
-        offset,
-        limit: BLOCKS_PAGE_SIZE,
-      };
+      const offset = getWorkspaceBlockPageOffset(index);
+      const queryKey = workspaceBlockListPageQueryKey(normalizedView, offset);
+      const request = toListBlocksRequest(normalizedView, offset);
       let page: ListBlocksResult;
       if (options?.refresh) {
         await queryClient.cancelQueries({ exact: true, queryKey });
@@ -174,17 +221,17 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
       }
       return page.blocks[index - offset];
     },
-    [ensureBlockIndex, normalizedTagIds, visibility],
+    [ensureBlockIndex, normalizedView],
   );
 
   const locateBlockInView = useCallback(
     async (blockId: string) =>
       await locateBlock({
         blockId,
-        tagIds: normalizedTagIds.length > 0 ? normalizedTagIds : undefined,
-        visibility,
+        tagIds: normalizedView.tagIds.length > 0 ? normalizedView.tagIds : undefined,
+        visibility: normalizedView.visibility,
       }),
-    [normalizedTagIds, visibility],
+    [normalizedView],
   );
 
   return {
@@ -196,5 +243,8 @@ export function useBlockList({ visibility, tagIds }: UseBlockListParams): UseBlo
     ensureBlockRange,
     ensureBlockIndexLoaded,
     locateBlockInView,
+    refresh: refreshWorkspaceBlocks,
+    patchBlock: patchWorkspaceBlock,
+    getCachedBlock: getCachedWorkspaceBlock,
   };
 }

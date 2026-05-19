@@ -70,14 +70,25 @@ function NavigationHarness({
     [locateBlockInView, selectedTagIds, visibility],
   );
   const navigation = useBlockNavigation({
-    ensureBlockIndexLoaded,
-    getBlockAtIndex,
-    locateBlockInView: locateCurrentView,
+    blockCollection: {
+      ensureBlockIndexLoaded,
+      getBlockAtIndex,
+      locateBlockInView: locateCurrentView,
+    },
     registry,
-    selectedTagIds,
-    setSelectedTagIds,
-    setVisibility,
-    visibility,
+    workspaceView: {
+      isUnfiltered: (nextVisibility) =>
+        visibility === nextVisibility && selectedTagIds.length === 0,
+      showUnfiltered: (nextVisibility) => {
+        if (visibility !== nextVisibility) {
+          setVisibility(nextVisibility);
+        }
+        if (selectedTagIds.length > 0) {
+          setSelectedTagIds([]);
+        }
+      },
+      visibility,
+    },
   });
 
   useLayoutEffect(() => {
@@ -154,11 +165,7 @@ async function renderScrollTarget(harness: ReturnType<typeof createHarness>, blo
   }
 
   act(() => {
-    harness.getSnapshot().targetRendered({
-      blockId,
-      index: scrollTarget.index,
-      requestId: scrollTarget.requestId,
-    });
+    harness.getSnapshot().targetRendered(blockId);
   });
   await flushEffects();
 }

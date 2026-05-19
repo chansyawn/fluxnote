@@ -167,4 +167,20 @@ describe("useExternalEditActions", () => {
       editId: "edit-1",
     });
   });
+
+  it("does not submit external edit when block content is unavailable", async () => {
+    const harness = createHarness({
+      getEditor: vi.fn(() => undefined),
+    });
+    mountedRoot = harness;
+
+    await act(async () => {
+      await harness.getSnapshot().handleSubmitExternalEdit("missing-block", "edit-1");
+    });
+
+    expect(clientMocks.submitExternalEdit).not.toHaveBeenCalled();
+    expect(clientMocks.toastError).toHaveBeenCalledWith(
+      "Cannot submit: block content unavailable.",
+    );
+  });
 });

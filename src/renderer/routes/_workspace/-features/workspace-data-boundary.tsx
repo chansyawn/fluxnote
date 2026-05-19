@@ -1,12 +1,12 @@
-import type { BlockVisibility } from "@renderer/clients";
 import { useTagData } from "@renderer/features/tag/use-tag-data";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo } from "react";
 
+import { useWorkspaceBlockCollection } from "./block-collection/workspace-block-collection";
+import { useWorkspaceBlockView } from "./block-collection/workspace-block-view";
 import { useBlockShortcuts } from "./editing/use-block-shortcuts";
 import { useEditorRegistry } from "./editing/use-editor-registry";
 import { useExternalEditActions } from "./editing/use-external-edit-actions";
 import { useExternalEditSessions } from "./editing/use-external-edit-sessions";
-import { useBlockList } from "./list/use-block-list";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import { useBlockNavigation } from "./navigation/use-block-navigation";
 import { useOpenBlockNavigation } from "./open-block-navigation";
@@ -15,24 +15,24 @@ import { useWorkspaceCommandsValue } from "./workspace-commands";
 import { useWorkspaceContextValue } from "./workspace-context-value";
 
 export function useWorkspaceDataBoundary() {
-  const [visibility, setVisibility] = useState<BlockVisibility>("active");
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-
-  const blockList = useBlockList({ visibility, tagIds: selectedTagIds });
+  const blockView = useWorkspaceBlockView();
+  const blockList = useWorkspaceBlockCollection(blockView.collectionView);
   const blockMutations = useBlockMutations();
   const tagData = useTagData();
   const editorRegistry = useEditorRegistry();
   const { sessionsByBlockId } = useExternalEditSessions();
-
+  const blockNavigationCollection = useMemo(
+    () => ({
+      ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
+      getBlockAtIndex: blockList.getBlockAtIndex,
+      locateBlockInView: blockList.locateBlockInView,
+    }),
+    [blockList.ensureBlockIndexLoaded, blockList.getBlockAtIndex, blockList.locateBlockInView],
+  );
   const blockNavigation = useBlockNavigation({
+    blockCollection: blockNavigationCollection,
     registry: editorRegistry,
-    visibility,
-    selectedTagIds,
-    setVisibility,
-    setSelectedTagIds,
-    getBlockAtIndex: blockList.getBlockAtIndex,
-    ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
-    locateBlockInView: blockList.locateBlockInView,
+    workspaceView: blockView.navigationView,
   });
 
   const focusBlock = useCallback(
@@ -44,11 +44,11 @@ export function useWorkspaceDataBoundary() {
 
   const createBlockInCurrentTagFilter = useCallback(async () => {
     const block = await blockMutations.createBlock();
-    if (selectedTagIds.length > 0) {
-      return await blockMutations.assignBlockTags(block.id, selectedTagIds);
+    if (blockView.selectedTagIds.length > 0) {
+      return await blockMutations.assignBlockTags(block.id, blockView.selectedTagIds);
     }
     return block;
-  }, [blockMutations.assignBlockTags, blockMutations.createBlock, selectedTagIds]);
+  }, [blockMutations.assignBlockTags, blockMutations.createBlock, blockView.selectedTagIds]);
 
   const {
     archiveBlockWithFocus,
@@ -107,7 +107,7 @@ export function useWorkspaceDataBoundary() {
     pendingExternalEditIds: externalEditActions.pendingExternalEditIds,
     sessionsByBlockId,
     tags: tagData.tags,
-    visibility,
+    visibility: blockView.visibility,
   });
 
   return {
@@ -119,10 +119,12 @@ export function useWorkspaceDataBoundary() {
     workspaceContextValue,
     tagData,
     viewState: {
-      selectedTagIds,
-      setSelectedTagIds,
-      setVisibility,
-      visibility,
+      addTagFilter: blockView.addTagFilter,
+      removeTagFilter: blockView.removeTagFilter,
+      selectedTagIds: blockView.selectedTagIds,
+      setSelectedTagIds: blockView.setSelectedTagIds,
+      setVisibility: blockView.setVisibility,
+      visibility: blockView.visibility,
     },
   };
 }

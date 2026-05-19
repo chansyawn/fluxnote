@@ -49,16 +49,11 @@ export function BlockWorkspace() {
       onSetSelectedTagIds={viewState.setSelectedTagIds}
       onCreateTag={async (name) => {
         const createdTag = await commands.createTag(name);
-        viewState.setSelectedTagIds((currentTagIds) => {
-          if (currentTagIds.includes(createdTag.id)) {
-            return currentTagIds;
-          }
-          return [...currentTagIds, createdTag.id];
-        });
+        viewState.addTagFilter(createdTag.id);
       }}
       onDeleteTag={async (tagId) => {
         await commands.deleteTag(tagId);
-        viewState.setSelectedTagIds((currentTagIds) => currentTagIds.filter((id) => id !== tagId));
+        viewState.removeTagFilter(tagId);
       }}
     />
   );

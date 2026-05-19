@@ -3,10 +3,7 @@ import { useFontSizePreference } from "@renderer/features/preferences/preference
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import type {
-  BlockScrollTarget,
-  BlockScrollTargetRenderedPayload,
-} from "../navigation/use-block-navigation";
+import type { BlockScrollTarget } from "../navigation/use-block-navigation";
 import { BlockListRow } from "./block-list-row";
 
 const BLOCK_ESTIMATED_SIZE_AT_BASE_PX = 140;
@@ -46,7 +43,7 @@ interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
   ensureBlockRange: (startIndex: number, endIndex: number) => void;
-  onScrollTargetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
+  onScrollTargetRendered: (blockId: string) => void;
   scrollTarget: BlockScrollTarget | null;
 }
 
@@ -203,11 +200,7 @@ export function VirtualBlockList({
       return;
     }
 
-    onScrollTargetRendered({
-      blockId: block.id,
-      index: scrollTarget.index,
-      requestId: scrollTarget.requestId,
-    });
+    onScrollTargetRendered(block.id);
   }, [getBlockAtIndex, onScrollTargetRendered, scrollTarget, virtualBlocks]);
 
   const firstVirtualBlock = virtualBlocks[0];

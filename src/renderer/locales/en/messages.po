@@ -288,17 +288,17 @@ msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:112
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:111
 msgid "lab.playground.description"
 msgstr "Frontend-only playground. Edit this preset markdown to verify note block behavior."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:125
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:124
 msgid "lab.playground.reset"
 msgstr "Reset preset"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:109
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:108
 msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 

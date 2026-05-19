@@ -288,17 +288,17 @@ msgid "lab.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:112
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:111
 msgid "lab.playground.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:125
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:124
 msgid "lab.playground.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:109
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:108
 msgid "lab.playground.title"
 msgstr ""
 

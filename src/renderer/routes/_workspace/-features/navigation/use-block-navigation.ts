@@ -1,4 +1,4 @@
-import type { Block, BlockVisibility, LocateBlockResult } from "@renderer/clients";
+import type { BlockVisibility } from "@renderer/clients";
 import {
   useCallback,
   useEffect,
@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+import type { WorkspaceBlockCollection } from "../block-collection/workspace-block-collection";
 import type { EditorRegistry } from "../editing/use-editor-registry";
 
 export type BlockNavigationAlign = "start" | "auto";
@@ -35,12 +36,6 @@ export function isBlockNavigationCancelledError(
 
 export interface BlockScrollTarget {
   align: BlockNavigationAlign;
-  index: number;
-  requestId: number;
-}
-
-export interface BlockScrollTargetRenderedPayload {
-  blockId: string;
   index: number;
   requestId: number;
 }
@@ -72,7 +67,7 @@ type NavigationEvent =
   | { type: "view-ready"; requestId: number }
   | { type: "target-resolved"; requestId: number; target: LocatedTarget }
   | { type: "page-loaded"; requestId: number; target: LocatedTarget }
-  | { type: "target-rendered"; requestId: number; target: LocatedTarget }
+  | { type: "target-rendered"; blockId: string }
   | { type: "finish"; requestId: number }
   | { type: "fail"; requestId: number };
 
@@ -120,13 +115,13 @@ export function blockNavigationReducer(
       }
       return { phase: "scrolling", request: state.request, target: event.target };
     case "target-rendered":
-      if (!isCurrentRequest(state, event.requestId) || state.phase !== "scrolling") {
+      if (state.phase !== "scrolling") {
         return state;
       }
-      if (state.target.blockId !== event.target.blockId) {
+      if (state.target.blockId !== event.blockId) {
         return state;
       }
-      return { phase: "focusing", request: state.request, target: event.target };
+      return { phase: "focusing", request: state.request, target: state.target };
     case "finish":
     case "fail":
       return isCurrentRequest(state, event.requestId) ? { phase: "idle" } : state;
@@ -134,17 +129,16 @@ export function blockNavigationReducer(
 }
 
 interface UseBlockNavigationParams {
-  ensureBlockIndexLoaded: (
-    index: number,
-    options?: { refresh?: boolean },
-  ) => Promise<Block | undefined>;
-  getBlockAtIndex: (index: number) => Block | undefined;
-  locateBlockInView: (blockId: string) => Promise<LocateBlockResult>;
+  blockCollection: Pick<
+    WorkspaceBlockCollection,
+    "ensureBlockIndexLoaded" | "getBlockAtIndex" | "locateBlockInView"
+  >;
   registry: EditorRegistry;
-  selectedTagIds: string[];
-  setSelectedTagIds: (tagIds: string[]) => void;
-  setVisibility: (visibility: BlockVisibility) => void;
-  visibility: BlockVisibility;
+  workspaceView: {
+    isUnfiltered: (visibility: BlockVisibility) => boolean;
+    showUnfiltered: (visibility: BlockVisibility) => void;
+    visibility: BlockVisibility;
+  };
 }
 
 interface UseBlockNavigationResult {
@@ -152,7 +146,7 @@ interface UseBlockNavigationResult {
   navigateToBlock: (blockId: string) => Promise<void>;
   scrollTarget: BlockScrollTarget | null;
   setActiveBlockId: (blockId: string | null) => void;
-  targetRendered: (payload: BlockScrollTargetRenderedPayload) => void;
+  targetRendered: (blockId: string) => void;
 }
 
 function createBlockNavigationError(message: string): BlockNavigationError {
@@ -160,22 +154,17 @@ function createBlockNavigationError(message: string): BlockNavigationError {
 }
 
 export function useBlockNavigation({
-  ensureBlockIndexLoaded,
-  getBlockAtIndex,
-  locateBlockInView,
+  blockCollection,
   registry,
-  selectedTagIds,
-  setSelectedTagIds,
-  setVisibility,
-  visibility,
+  workspaceView,
 }: UseBlockNavigationParams): UseBlockNavigationResult {
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const [state, dispatch] = useReducer(blockNavigationReducer, { phase: "idle" });
   const deferredByRequestIdRef = useRef(new Map<number, NavigationDeferred>());
   const nextRequestIdRef = useRef(0);
 
-  const isActiveUnfiltered = visibility === "active" && selectedTagIds.length === 0;
-  const isArchivedUnfiltered = visibility === "archived" && selectedTagIds.length === 0;
+  const isActiveUnfiltered = workspaceView.isUnfiltered("active");
+  const isArchivedUnfiltered = workspaceView.isUnfiltered("archived");
 
   const startRequest = useCallback(
     ({ align = "start", blockId, view = "current" }: StartNavigationRequestParams) => {
@@ -236,24 +225,11 @@ export function useBlockNavigation({
     const isTargetViewReady =
       state.request.view === "archived-unfiltered" ? isArchivedUnfiltered : isActiveUnfiltered;
 
-    if (visibility !== nextVisibility) {
-      setVisibility(nextVisibility);
-    }
-    if (selectedTagIds.length > 0) {
-      setSelectedTagIds([]);
-    }
+    workspaceView.showUnfiltered(nextVisibility);
     if (isTargetViewReady) {
       dispatch({ type: "view-ready", requestId: state.request.requestId });
     }
-  }, [
-    isActiveUnfiltered,
-    isArchivedUnfiltered,
-    selectedTagIds.length,
-    setSelectedTagIds,
-    setVisibility,
-    state,
-    visibility,
-  ]);
+  }, [isActiveUnfiltered, isArchivedUnfiltered, state, workspaceView]);
 
   useEffect(() => {
     if (state.phase !== "resolving-target") {
@@ -274,7 +250,7 @@ export function useBlockNavigation({
     }
 
     async function resolveTarget(): Promise<void> {
-      const result = await locateBlockInView(request.blockId);
+      const result = await blockCollection.locateBlockInView(request.blockId);
       if (cancelled) return;
       if (!result || result.block.id !== request.blockId) {
         const fallbackView = getFallbackView();
@@ -301,7 +277,7 @@ export function useBlockNavigation({
     return () => {
       cancelled = true;
     };
-  }, [failRequest, isActiveUnfiltered, locateBlockInView, state]);
+  }, [blockCollection, failRequest, isActiveUnfiltered, state]);
 
   useEffect(() => {
     if (state.phase !== "ensuring-page") {
@@ -311,11 +287,12 @@ export function useBlockNavigation({
     let cancelled = false;
     const { request, target } = state;
 
-    void ensureBlockIndexLoaded(target.index, { refresh: true })
+    void blockCollection
+      .ensureBlockIndexLoaded(target.index, { refresh: true })
       .then((loadedBlock) => {
         if (cancelled) return;
 
-        const block = loadedBlock ?? getBlockAtIndex(target.index);
+        const block = loadedBlock ?? blockCollection.getBlockAtIndex(target.index);
         if (!block || block.id !== target.blockId) {
           failRequest(request, createBlockNavigationError("Failed to load block"));
           return;
@@ -335,7 +312,7 @@ export function useBlockNavigation({
     return () => {
       cancelled = true;
     };
-  }, [ensureBlockIndexLoaded, failRequest, getBlockAtIndex, state]);
+  }, [blockCollection, failRequest, state]);
 
   useEffect(() => {
     if (state.phase !== "focusing") {
@@ -359,11 +336,10 @@ export function useBlockNavigation({
     };
   }, [state]);
 
-  const targetRendered = useCallback((payload: BlockScrollTargetRenderedPayload) => {
+  const targetRendered = useCallback((blockId: string) => {
     dispatch({
       type: "target-rendered",
-      requestId: payload.requestId,
-      target: { blockId: payload.blockId, index: payload.index },
+      blockId,
     });
   }, []);
 

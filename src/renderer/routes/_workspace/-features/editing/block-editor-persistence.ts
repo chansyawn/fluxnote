@@ -1,7 +1,8 @@
-import { queryClient } from "@renderer/app/query";
-import { type Block, type ListBlocksResult, updateBlockContent } from "@renderer/clients";
+import { type Block, updateBlockContent } from "@renderer/clients";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
+
+import { patchWorkspaceBlock } from "../block-collection/workspace-block-collection";
 
 interface BlockPersistence {
   getLatestContent: () => string;
@@ -10,25 +11,17 @@ interface BlockPersistence {
   waitForPendingSave: () => Promise<void>;
 }
 
-function updateBlockInCache(blockId: string, updateBlock: (block: Block) => Block): void {
-  queryClient.setQueriesData<ListBlocksResult>({ queryKey: ["blocks"] }, (current) => {
-    if (!current) {
-      return current;
-    }
-
-    return {
-      ...current,
-      blocks: current.blocks.map((block) => (block.id === blockId ? updateBlock(block) : block)),
-    };
-  });
-}
-
 export function useBlockEditorPersistence(block: Block): BlockPersistence {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
+  const blockRef = useRef(block);
   const latestRequestIdRef = useRef(0);
   const appliedRequestIdRef = useRef(0);
   const savePromiseRef = useRef<Promise<void> | null>(null);
+
+  useEffect(() => {
+    blockRef.current = block;
+  }, [block]);
 
   useEffect(() => {
     latestContentRef.current = block.content;
@@ -56,7 +49,7 @@ export function useBlockEditorPersistence(block: Block): BlockPersistence {
           if (appliedId < appliedRequestIdRef.current) return;
           appliedRequestIdRef.current = appliedId;
           persistedContentRef.current = updatedBlock.content;
-          updateBlockInCache(updatedBlock.id, () => updatedBlock);
+          patchWorkspaceBlock(updatedBlock);
         })
         .catch(() => {
           // Save errors are intentionally silent in the simplified MVP UI.
@@ -75,10 +68,8 @@ export function useBlockEditorPersistence(block: Block): BlockPersistence {
 
   const snapshotLatestContent = useCallback(() => {
     if (latestContentRef.current === persistedContentRef.current) return;
-    const blockId = block.id;
-    const content = latestContentRef.current;
-    updateBlockInCache(blockId, (current) => ({ ...current, content }));
-  }, [block.id]);
+    patchWorkspaceBlock({ ...blockRef.current, content: latestContentRef.current });
+  }, []);
 
   const saveMarkdown = useCallback(
     (markdown: string) => {
