@@ -13,6 +13,7 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useEditorShellElement } from "../../core/editor-shell-element";
 import {
   getTableCellColumnIndex,
   getTableCellRowIndex,
@@ -43,10 +44,6 @@ interface TableControlDocumentTarget extends Omit<TableControlTarget, "cellKey" 
   cellKey: NodeKey;
   columnStartKey: NodeKey;
   rowStartKey: NodeKey;
-}
-
-export function getEditorShellElement(editorRootElement: HTMLElement | null): HTMLElement | null {
-  return editorRootElement?.closest<HTMLElement>(".block-editor__shell") ?? null;
 }
 
 function toShellRect(shellRect: DOMRect, cellRect: DOMRect, shell: HTMLElement): DOMRect {
@@ -148,8 +145,11 @@ function readDocumentTarget(
   );
 }
 
-function readControlTarget(editor: LexicalEditor, cellKey: NodeKey): TableControlTarget | null {
-  const shell = getEditorShellElement(editor.getRootElement());
+function readControlTarget(
+  editor: LexicalEditor,
+  shell: HTMLElement | null,
+  cellKey: NodeKey,
+): TableControlTarget | null {
   const cellElement = editor.getElementByKey(cellKey);
   if (!shell || !cellElement) return null;
 
@@ -192,7 +192,7 @@ export function useTableControlState(editor: LexicalEditor) {
   const animationFrameIdRef = useRef<number | null>(null);
   const pointerOverControlsRef = useRef(false);
   const activeMenuRef = useRef<TableControlKind | null>(null);
-  const shellElement = getEditorShellElement(editor.getRootElement());
+  const shellElement = useEditorShellElement(editor);
 
   const setOpenMenu = useCallback((nextActiveMenu: TableControlKind | null) => {
     activeMenuRef.current = nextActiveMenu;
@@ -202,12 +202,12 @@ export function useTableControlState(editor: LexicalEditor) {
   const updateTarget = useCallback(
     (cellKey: NodeKey | null) => {
       activeCellKeyRef.current = cellKey;
-      const nextTarget = cellKey ? readControlTarget(editor, cellKey) : null;
+      const nextTarget = cellKey ? readControlTarget(editor, shellElement, cellKey) : null;
       setTarget((previousTarget) =>
         areTargetsEqual(previousTarget, nextTarget) ? previousTarget : nextTarget,
       );
     },
-    [editor],
+    [editor, shellElement],
   );
 
   const clearTarget = useCallback(() => {
@@ -237,6 +237,10 @@ export function useTableControlState(editor: LexicalEditor) {
   }, [editor, scheduleMeasure]);
 
   useEffect(() => {
+    scheduleMeasure();
+  }, [scheduleMeasure]);
+
+  useEffect(() => {
     return () => {
       if (animationFrameIdRef.current !== null) {
         window.cancelAnimationFrame(animationFrameIdRef.current);
@@ -256,8 +260,7 @@ export function useTableControlState(editor: LexicalEditor) {
   }, [scheduleMeasure]);
 
   useEffect(() => {
-    const shell = getEditorShellElement(editor.getRootElement());
-    if (!shell) return;
+    if (!shellElement) return;
 
     const handlePointerMove = (event: PointerEvent) => {
       if (findControlFromTarget(event.target)) return;
@@ -275,14 +278,14 @@ export function useTableControlState(editor: LexicalEditor) {
       clearTargetIfIdle();
     };
 
-    shell.addEventListener("pointermove", handlePointerMove);
-    shell.addEventListener("pointerleave", handlePointerLeave);
+    shellElement.addEventListener("pointermove", handlePointerMove);
+    shellElement.addEventListener("pointerleave", handlePointerLeave);
 
     return () => {
-      shell.removeEventListener("pointermove", handlePointerMove);
-      shell.removeEventListener("pointerleave", handlePointerLeave);
+      shellElement.removeEventListener("pointermove", handlePointerMove);
+      shellElement.removeEventListener("pointerleave", handlePointerLeave);
     };
-  }, [clearTarget, clearTargetIfIdle, editor, updateTarget]);
+  }, [clearTarget, clearTargetIfIdle, editor, shellElement, updateTarget]);
 
   return {
     activeMenu,

@@ -5,6 +5,7 @@ import { $getNodeByKey, $getRoot, $isElementNode, type LexicalNode, type NodeKey
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
+import { useEditorShellElement } from "../../core/editor-shell-element";
 import { CodeCopyButton } from "./code-copy-button";
 import {
   applyCodeBlockDisplayConfig,
@@ -75,10 +76,6 @@ function readCodeBlocks(): CodeBlockDocumentState[] {
   return codeBlocks;
 }
 
-function getEditorShellElement(editorRootElement: HTMLElement | null): HTMLElement | null {
-  return editorRootElement?.closest<HTMLElement>(".block-editor__shell") ?? null;
-}
-
 function areCodeBlockViewsEqual(
   previousBlocks: ReadonlyArray<CodeBlockViewState>,
   nextBlocks: ReadonlyArray<CodeBlockViewState>,
@@ -109,16 +106,15 @@ export function CodeBlockControlsDecorator() {
   } = useBlockEditorConfig();
   const [codeBlocks, setCodeBlocks] = useState<CodeBlockViewState[]>([]);
   const animationFrameIdRef = useRef<number | null>(null);
-  const shellElement = getEditorShellElement(editor.getRootElement());
+  const shellElement = useEditorShellElement(editor);
 
   const measureCodeBlocks = useCallback(() => {
-    const shell = getEditorShellElement(editor.getRootElement());
-    if (!shell) {
+    if (!shellElement) {
       setCodeBlocks([]);
       return;
     }
 
-    const shellRect = shell.getBoundingClientRect();
+    const shellRect = shellElement.getBoundingClientRect();
     editor.getEditorState().read(() => {
       const nextCodeBlocks = readCodeBlocks().flatMap((codeBlock): CodeBlockViewState[] => {
         const element = editor.getElementByKey(codeBlock.key);
@@ -139,13 +135,13 @@ export function CodeBlockControlsDecorator() {
               shellRect,
               codeRect,
               {
-                left: shell.scrollLeft,
-                top: shell.scrollTop,
+                left: shellElement.scrollLeft,
+                top: shellElement.scrollTop,
               },
             ),
             rect: calculateCodeToolbarRect(shellRect, codeRect, {
-              left: shell.scrollLeft,
-              top: shell.scrollTop,
+              left: shellElement.scrollLeft,
+              top: shellElement.scrollTop,
             }),
           },
         ];
@@ -157,7 +153,7 @@ export function CodeBlockControlsDecorator() {
           : nextCodeBlocks,
       );
     });
-  }, [codeBlockConfig, editor]);
+  }, [codeBlockConfig, editor, shellElement]);
 
   const scheduleMeasureCodeBlocks = useCallback(() => {
     if (animationFrameIdRef.current !== null) {
@@ -197,15 +193,14 @@ export function CodeBlockControlsDecorator() {
   }, [scheduleMeasureCodeBlocks]);
 
   useEffect(() => {
-    const shell = getEditorShellElement(editor.getRootElement());
-    if (!shell || typeof ResizeObserver === "undefined") {
+    if (!shellElement || typeof ResizeObserver === "undefined") {
       return;
     }
 
     const resizeObserver = new ResizeObserver(() => {
       scheduleMeasureCodeBlocks();
     });
-    resizeObserver.observe(shell);
+    resizeObserver.observe(shellElement);
 
     for (const codeBlock of codeBlocks) {
       const element = editor.getElementByKey(codeBlock.key);
@@ -217,7 +212,7 @@ export function CodeBlockControlsDecorator() {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [codeBlocks, editor, scheduleMeasureCodeBlocks]);
+  }, [codeBlocks, editor, scheduleMeasureCodeBlocks, shellElement]);
 
   useEffect(() => {
     const scrollableCodeBlocks = codeBlocks.flatMap((codeBlock): HTMLElement[] => {
