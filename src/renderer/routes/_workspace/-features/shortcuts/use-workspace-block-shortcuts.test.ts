@@ -39,6 +39,10 @@ interface CapturedShortcutDefinition {
   callback: ShortcutCallback;
 }
 
+interface CapturedShortcutOptions {
+  target?: unknown;
+}
+
 const externalEditSession: ExternalEditSession = {
   blockId: "block-1",
   createdAt: "2026-01-01T00:00:00.000Z",
@@ -85,6 +89,14 @@ function getDefinitions(): CapturedShortcutDefinition[] {
   return mocks.useHotkeys.mock.calls.at(-1)?.[0] as CapturedShortcutDefinition[];
 }
 
+function getOptions(): CapturedShortcutOptions {
+  return mocks.useHotkeys.mock.calls.at(-1)?.[1] as CapturedShortcutOptions;
+}
+
+function createShortcutTarget() {
+  return { current: null };
+}
+
 function triggerShortcut(hotkey: string) {
   const definition = getDefinitions().find((candidate) => candidate.hotkey === hotkey);
   const preventDefault = vi.fn();
@@ -118,15 +130,18 @@ describe("workspace block shortcuts", () => {
     expect(createBlockWithFocus).toHaveBeenCalledOnce();
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
+    expect(getOptions().target).toBeUndefined();
   });
 
   it("keeps focused block action guard", () => {
     const actions = createActions();
+    const target = createShortcutTarget();
 
     useWorkspaceBlockActionShortcuts({
       actions,
       isActiveBlockEditorFocused: () => false,
       state: createState(),
+      target,
     });
 
     const { preventDefault, stopPropagation } = triggerShortcut("Mod+K");
@@ -134,6 +149,7 @@ describe("workspace block shortcuts", () => {
     expect(actions.toggleKeep).not.toHaveBeenCalled();
     expect(preventDefault).not.toHaveBeenCalled();
     expect(stopPropagation).not.toHaveBeenCalled();
+    expect(getOptions().target).toBe(target);
   });
 
   it("runs focused block action", () => {
@@ -143,6 +159,7 @@ describe("workspace block shortcuts", () => {
       actions,
       isActiveBlockEditorFocused: () => true,
       state: createState(),
+      target: createShortcutTarget(),
     });
 
     const { preventDefault, stopPropagation } = triggerShortcut("Mod+E");
@@ -159,6 +176,7 @@ describe("workspace block shortcuts", () => {
       actions,
       isActiveBlockEditorFocused: () => true,
       state: createState({ isLocked: true }),
+      target: createShortcutTarget(),
     });
 
     triggerShortcut("Mod+D");
@@ -173,6 +191,7 @@ describe("workspace block shortcuts", () => {
       actions,
       isActiveBlockEditorFocused: () => true,
       state: createState({ externalEditSession }),
+      target: createShortcutTarget(),
     });
 
     triggerShortcut("Mod+Enter");
@@ -187,6 +206,7 @@ describe("workspace block shortcuts", () => {
       actions,
       isActiveBlockEditorFocused: () => true,
       state: createState({ externalEditSession, isExternalEditPending: true }),
+      target: createShortcutTarget(),
     });
 
     triggerShortcut("Mod+\\");

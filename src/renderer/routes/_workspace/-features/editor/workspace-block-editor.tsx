@@ -50,6 +50,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
       return focusedBlockEditor?.dataset.blockId === block.id;
     },
     state,
+    target: rootRef,
   });
 
   return (

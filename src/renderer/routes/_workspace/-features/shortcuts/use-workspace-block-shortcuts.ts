@@ -1,6 +1,10 @@
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
-import { useHotkeys, type UseHotkeyDefinition } from "@tanstack/react-hotkeys";
+import {
+  useHotkeys,
+  type UseHotkeyDefinition,
+  type UseHotkeyOptions,
+} from "@tanstack/react-hotkeys";
 import { useMemo } from "react";
 
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
@@ -21,6 +25,7 @@ export interface UseWorkspaceBlockActionShortcutsParams {
   actions: WorkspaceBlockActions;
   isActiveBlockEditorFocused: () => boolean;
   state: WorkspaceBlockState;
+  target: UseHotkeyOptions["target"];
 }
 
 function createShortcutDefinition({
@@ -50,11 +55,15 @@ function createShortcutDefinition({
   };
 }
 
-function useWorkspaceHotkeys(definitions: UseHotkeyDefinition[]): void {
+function useWorkspaceHotkeys(
+  definitions: UseHotkeyDefinition[],
+  options?: Pick<UseHotkeyOptions, "target">,
+): void {
   useHotkeys(definitions, {
     ignoreInputs: false,
     preventDefault: false,
     stopPropagation: false,
+    target: options?.target,
   });
 }
 
@@ -81,6 +90,7 @@ export function useWorkspaceBlockActionShortcuts({
   actions,
   isActiveBlockEditorFocused,
   state,
+  target,
 }: UseWorkspaceBlockActionShortcutsParams): void {
   const { shortcuts } = useShortcutState();
 
@@ -140,5 +150,5 @@ export function useWorkspaceBlockActionShortcuts({
     state.isLocked,
   ]);
 
-  useWorkspaceHotkeys(hotkeyDefinitions);
+  useWorkspaceHotkeys(hotkeyDefinitions, { target });
 }
