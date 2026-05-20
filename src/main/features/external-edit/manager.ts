@@ -7,6 +7,7 @@ import type {
 import { businessError } from "@shared/ipc/result";
 
 interface PendingExternalEdit {
+  claimed: boolean;
   originalContent: string;
   resolve: (result: ExternalEditResult) => void;
   session: ExternalEditSession;
@@ -56,6 +57,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     };
     const result = new Promise<ExternalEditResult>((resolve) => {
       pendingEdits.set(session.editId, {
+        claimed: false,
         originalContent,
         resolve,
         session,
@@ -68,7 +70,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
       "abort",
       () => {
         const entry = pendingEdits.get(session.editId);
-        if (!entry) return;
+        if (!entry || entry.claimed) return;
         pendingEdits.delete(session.editId);
         emitSessionsChanged();
         entry.resolve({ blockId, status: "cancelled" });
@@ -85,10 +87,27 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     if (!entry) {
       throw businessError("BUSINESS.NOT_FOUND", `External edit not found: ${editId}`);
     }
+    if (entry.claimed) {
+      throw businessError(
+        "BUSINESS.INVALID_OPERATION",
+        `External edit already claimed: ${editId}`,
+        {
+          editId,
+        },
+      );
+    }
 
-    pendingEdits.delete(editId);
+    entry.claimed = true;
     emitSessionsChanged();
-    return entry;
+    return {
+      originalContent: entry.originalContent,
+      resolve: (result) => {
+        pendingEdits.delete(editId);
+        emitSessionsChanged();
+        entry.resolve(result);
+      },
+      session: entry.session,
+    };
   }
 
   function cancelAll(): void {
