@@ -15,5 +15,5 @@ Please open an issue first if you would like to discuss a bug, idea, or improvem
 ### Collaborator PR Checklist
 
 - Use a Conventional Commit title.
-- Include `## Summary` and `## Changes` sections that describe the change.
+- PR descriptions must contain only `## Summary` and `## Changes` sections.
 - Keep PR descriptions as concise as possible, and avoid extra content unless it is necessary.

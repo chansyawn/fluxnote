@@ -8,6 +8,7 @@ import { useExternalEditActions } from "./external-edit/use-external-edit-action
 import type { ActiveBlockFocus } from "./navigation/use-active-block-focus";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import type { useBlockNavigation } from "./navigation/use-block-navigation";
+import type { BlockReorderOperation } from "./use-block-mutations";
 import type { UseBlockMutationsResult } from "./use-block-mutations";
 import { useWorkspaceCommandsValue } from "./workspace-commands";
 
@@ -41,6 +42,12 @@ export function useWorkspaceCommandRuntime({
     return block;
   }, [blockMutations.assignBlockTags, blockMutations.createBlock, blockView.selectedTagIds]);
 
+  const reorderBlockInCurrentView = useCallback(
+    (blockId: string, operation: BlockReorderOperation) =>
+      blockMutations.reorderBlock(blockId, operation, blockView.selectedTagIds),
+    [blockMutations.reorderBlock, blockView.selectedTagIds],
+  );
+
   const focusActions = useBlockFocusActions({
     activeBlockId: blockNavigation.activeBlockId,
     archiveBlock: blockMutations.archiveBlock,
@@ -48,6 +55,8 @@ export function useWorkspaceCommandRuntime({
     totalBlockCount: blockList.totalBlockCount,
     createBlock: createBlockInCurrentTagFilter,
     deleteBlock: blockMutations.deleteBlock,
+    reorderBlock: reorderBlockInCurrentView,
+    setBlockPinnedState: blockMutations.setPinnedState,
     ensureBlockIndexLoaded: blockList.ensureBlockIndexLoaded,
     navigateToBlock: blockNavigation.navigateToBlock,
     locateBlockInView: blockList.locateBlockInView,
@@ -68,11 +77,10 @@ export function useWorkspaceCommandRuntime({
     deleteBlockWithFocus: focusActions.deleteBlockWithFocus,
     deleteTag: tagData.deleteTag,
     focusBlock: activeBlockFocus.focusBlock,
-    reorderBlock: (blockId, operation) =>
-      blockMutations.reorderBlock(blockId, operation, blockView.selectedTagIds),
+    reorderBlock: focusActions.reorderBlockWithFocus,
     restoreBlockWithFocus: focusActions.restoreBlockWithFocus,
     setBlockKeepState: blockMutations.setKeepState,
-    setBlockPinnedState: blockMutations.setPinnedState,
+    setBlockPinnedState: focusActions.setBlockPinnedStateWithFocus,
     submitExternalEdit: externalEditActions.handleSubmitExternalEdit,
   });
 

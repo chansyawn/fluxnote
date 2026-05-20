@@ -1,6 +1,7 @@
 import type { Block, LocateBlockResult } from "@renderer/clients";
 import { useEffectEvent } from "react";
 
+import type { BlockReorderOperation } from "../use-block-mutations";
 import type { BlockNavigationAlign } from "./use-block-navigation";
 import { isBlockNavigationCancelledError } from "./use-block-navigation";
 
@@ -11,6 +12,8 @@ export interface UseBlockFocusActionsParams {
   totalBlockCount: number;
   createBlock: () => Promise<Block>;
   deleteBlock: (blockId: string) => Promise<void>;
+  reorderBlock: (blockId: string, operation: BlockReorderOperation) => Promise<Block>;
+  setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
   ensureBlockIndexLoaded: (
     index: number,
     options?: { refresh?: boolean },
@@ -24,7 +27,9 @@ export interface UseBlockFocusActionsResult {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   createBlockWithFocus: () => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
+  reorderBlockWithFocus: (blockId: string, operation: BlockReorderOperation) => Promise<Block>;
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
+  setBlockPinnedStateWithFocus: (blockId: string, isPinned: boolean) => Promise<Block>;
 }
 
 export function getNextFocusIndexAfterMutation(
@@ -58,6 +63,8 @@ export function useBlockFocusActions({
   totalBlockCount,
   createBlock,
   deleteBlock,
+  reorderBlock,
+  setBlockPinnedState,
   ensureBlockIndexLoaded,
   navigateToBlock,
   locateBlockInView,
@@ -119,10 +126,28 @@ export function useBlockFocusActions({
     await runViewRemovingMutationWithFocus(blockId, deleteBlock);
   });
 
+  const reorderBlockWithFocus = useEffectEvent(
+    async (blockId: string, operation: BlockReorderOperation) => {
+      const block = await reorderBlock(blockId, operation);
+      await navigateToBlockUnlessCancelled(blockId, navigateToBlock, { align: "auto" });
+      return block;
+    },
+  );
+
+  const setBlockPinnedStateWithFocus = useEffectEvent(
+    async (blockId: string, isPinned: boolean) => {
+      const block = await setBlockPinnedState(blockId, isPinned);
+      await navigateToBlockUnlessCancelled(blockId, navigateToBlock, { align: "auto" });
+      return block;
+    },
+  );
+
   return {
     archiveBlockWithFocus,
     createBlockWithFocus,
     deleteBlockWithFocus,
+    reorderBlockWithFocus,
     restoreBlockWithFocus,
+    setBlockPinnedStateWithFocus,
   };
 }
