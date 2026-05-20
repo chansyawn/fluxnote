@@ -5,10 +5,10 @@ import { app, BrowserWindow, type BrowserWindowConstructorOptions } from "electr
 
 import { calculateWindowPosition, saveWindowPosition } from "./position";
 
-const MAIN_WINDOW_HEIGHT = 600;
-const MAIN_WINDOW_MAX_WIDTH = 640;
+const MAIN_WINDOW_HEIGHT = 540;
+const MAIN_WINDOW_MAX_WIDTH = 960;
 const MAIN_WINDOW_MIN_WIDTH = 320;
-const MAIN_WINDOW_WIDTH = 640;
+const MAIN_WINDOW_WIDTH = 400;
 
 const MAIN_WINDOW_WORKSPACE_OPTIONS = {
   visibleOnFullScreen: true,

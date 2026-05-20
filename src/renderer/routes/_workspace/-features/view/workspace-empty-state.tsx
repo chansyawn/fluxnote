@@ -12,7 +12,7 @@ import type { ReactElement } from "react";
 
 export function LoadingState(): ReactElement {
   return (
-    <section className="mx-auto flex min-h-[45dvh] w-full max-w-4xl items-center justify-center">
+    <section className="mx-auto flex min-h-[45dvh] w-full items-center justify-center">
       <div className="text-muted-foreground flex items-center gap-2 text-sm">
         <LoaderCircleIcon className="size-4 animate-spin" />
         <Trans id="workspace.loading">Loading your blocks...</Trans>

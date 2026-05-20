@@ -60,7 +60,7 @@ export function BlockWorkspace() {
 
   if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
     return (
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col gap-4">
+      <div className="mx-auto flex h-full min-h-0 w-full flex-1 flex-col gap-4">
         {tagFilter}
         <WorkspaceEmptyState
           isCreatingBlock={blockMutations.isCreatingBlock}
@@ -71,7 +71,7 @@ export function BlockWorkspace() {
   }
 
   return (
-    <section className="z-10 mx-auto flex h-full min-h-0 w-full max-w-4xl flex-1 flex-col gap-4">
+    <section className="z-10 mx-auto flex h-full min-h-0 w-full flex-1 flex-col gap-4">
       {tagFilter}
       {totalBlockCount === 0 ? (
         visibility === "archived" && selectedTagIds.length === 0 ? (
