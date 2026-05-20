@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   deleteTag: vi.fn(),
   listTags: vi.fn(),
   setBlockTags: vi.fn(),
+  updateTag: vi.fn(),
 }));
 
 vi.mock("./service", () => mocks);
@@ -25,13 +26,52 @@ describe("tags command", () => {
   });
 
   it("dispatches create command", async () => {
-    mocks.createTag.mockResolvedValue({ id: "t1", name: "work" });
+    mocks.createTag.mockResolvedValue({ color: "#2563EB", icon: null, id: "t1", name: "work" });
+    registerTagsCommands(ipc as never, deps);
+
+    const result = await handlers.get("tags.create")?.({ color: "#2563EB", name: "work" });
+
+    expect(mocks.createTag).toHaveBeenCalledWith(deps.db, "work", "#2563EB");
+    expect(result).toEqual({ color: "#2563EB", icon: null, id: "t1", name: "work" });
+  });
+
+  it("dispatches create command with null color when color is omitted", async () => {
+    mocks.createTag.mockResolvedValue({ color: null, icon: null, id: "t1", name: "work" });
     registerTagsCommands(ipc as never, deps);
 
     const result = await handlers.get("tags.create")?.({ name: "work" });
 
-    expect(mocks.createTag).toHaveBeenCalledWith(deps.db, "work");
-    expect(result).toEqual({ id: "t1", name: "work" });
+    expect(mocks.createTag).toHaveBeenCalledWith(deps.db, "work", null);
+    expect(result).toEqual({ color: null, icon: null, id: "t1", name: "work" });
+  });
+
+  it("dispatches update command", async () => {
+    mocks.updateTag.mockResolvedValue({
+      color: "#AABBCC",
+      icon: "lucide:rocket",
+      id: "t1",
+      name: "Launch",
+    });
+    registerTagsCommands(ipc as never, deps);
+
+    const result = await handlers.get("tags.update")?.({
+      color: "#AABBCC",
+      icon: "lucide:rocket",
+      name: "Launch",
+      tagId: "t1",
+    });
+
+    expect(mocks.updateTag).toHaveBeenCalledWith(deps.db, "t1", {
+      color: "#AABBCC",
+      icon: "lucide:rocket",
+      name: "Launch",
+    });
+    expect(result).toEqual({
+      color: "#AABBCC",
+      icon: "lucide:rocket",
+      id: "t1",
+      name: "Launch",
+    });
   });
 
   it("dispatches set-block-tags command", async () => {

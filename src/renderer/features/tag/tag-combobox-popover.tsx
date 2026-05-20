@@ -13,10 +13,13 @@ import {
 } from "@renderer/ui/components/combobox";
 import { InputGroupAddon } from "@renderer/ui/components/input-group";
 import type { VariantProps } from "class-variance-authority";
-import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { LoaderCircleIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 
+import { TagAvatar } from "./tag-icon";
+
 type TagOption = {
+  tag: Tag;
   value: string;
   label: string;
 };
@@ -30,9 +33,11 @@ interface TagComboboxPopoverProps {
   disabled?: boolean;
   isCreatingTag: boolean;
   isDeletingTag?: (tagId: string) => boolean;
+  isEditingTag?: (tagId: string) => boolean;
   onSelectedTagIdsChange: (tagIds: string[]) => void | Promise<void>;
   onCreateTag: (name: string) => Promise<void>;
   onDeleteTag?: (tagId: string) => Promise<void>;
+  onEditTag?: (tag: Tag) => void;
 }
 
 function normalizeTagName(tagName: string): string {
@@ -48,15 +53,18 @@ export function TagComboboxPopover({
   disabled = false,
   isCreatingTag,
   isDeletingTag,
+  isEditingTag,
   onSelectedTagIdsChange,
   onCreateTag,
   onDeleteTag,
+  onEditTag,
 }: TagComboboxPopoverProps) {
   const [inputValue, setInputValue] = useState("");
 
   const tagOptions = useMemo<TagOption[]>(
     () =>
       tags.map((tag) => ({
+        tag,
         value: tag.id,
         label: tag.name,
       })),
@@ -159,14 +167,41 @@ export function TagComboboxPopover({
           ) : (
             filteredTagOptions.map((tagOption) => {
               const isDeleting = isDeletingTag?.(tagOption.value) ?? false;
+              const isEditing = isEditingTag?.(tagOption.value) ?? false;
+              const hasItemActions = Boolean(onDeleteTag || onEditTag);
 
               return (
                 <ComboboxItem
                   key={tagOption.value}
-                  className={onDeleteTag ? "group/item pr-14" : undefined}
+                  className={hasItemActions ? "group/item pr-20" : undefined}
                   value={tagOption}
                 >
-                  <span>{tagOption.label}</span>
+                  <TagAvatar tag={tagOption.tag} />
+                  <span className="min-w-0 truncate">{tagOption.label}</span>
+
+                  {onEditTag ? (
+                    <Button
+                      className="text-muted-foreground hover:text-foreground absolute inset-e-12 opacity-0 transition-[opacity,color] group-hover/item:opacity-100 group-data-highlighted/item:opacity-100"
+                      disabled={disabled || isEditing}
+                      size="icon-xs"
+                      type="button"
+                      variant="ghost"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        onEditTag(tagOption.tag);
+                      }}
+                    >
+                      {isEditing ? (
+                        <LoaderCircleIcon className="size-3 animate-spin" />
+                      ) : (
+                        <PencilIcon className="size-3" />
+                      )}
+                      <span className="sr-only">
+                        <Trans id="workspace.tags.edit-inline">Edit tag</Trans>
+                      </span>
+                    </Button>
+                  ) : null}
 
                   {onDeleteTag ? (
                     <Button

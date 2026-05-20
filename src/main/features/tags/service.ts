@@ -2,19 +2,21 @@ import type { AppDatabase } from "@main/core/database";
 import { blockTags, tags, type TagRecord } from "@main/core/database";
 import { getSqliteChangedRows, isSqliteUniqueConstraint } from "@main/core/database";
 import type { Block } from "@shared/features/blocks/models";
-import type { Tag } from "@shared/features/tags/models";
+import { tagSchema, type Tag } from "@shared/features/tags/models";
 import { businessError, internalError } from "@shared/ipc/result";
 import { eq, inArray, or, sql } from "drizzle-orm";
 
 import { assertBlockExists, getPublicBlockById } from "../blocks/service";
 
 function mapTagRow(tag: TagRecord): Tag {
-  return {
+  return tagSchema.parse({
+    color: tag.color,
     id: tag.id,
+    icon: tag.icon,
     name: tag.name,
     createdAt: tag.createdAt,
     updatedAt: tag.updatedAt,
-  };
+  });
 }
 
 function normalizeTagNames(tagNames: readonly string[]): string[] {
@@ -51,7 +53,11 @@ async function listTagsByName(db: AppDatabase, tagNames: readonly string[]): Pro
   return rows.map(mapTagRow);
 }
 
-export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
+export async function createTag(
+  db: AppDatabase,
+  name: string,
+  color: Tag["color"] = null,
+): Promise<Tag> {
   const tagId = crypto.randomUUID();
   const trimmedName = name.trim();
 
@@ -59,7 +65,9 @@ export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
     await db
       .insert(tags)
       .values({
+        color,
         id: tagId,
+        icon: null,
         name: trimmedName,
       })
       .run();
@@ -75,6 +83,44 @@ export async function createTag(db: AppDatabase, name: string): Promise<Tag> {
   const tagRow = await db.select().from(tags).where(eq(tags.id, tagId)).get();
   if (!tagRow) {
     throw internalError("Failed to read created tag");
+  }
+
+  return mapTagRow(tagRow);
+}
+
+export async function updateTag(
+  db: AppDatabase,
+  tagId: string,
+  input: Pick<Tag, "color" | "icon" | "name">,
+): Promise<Tag> {
+  const trimmedName = input.name.trim();
+  const existingTag = await db.select({ id: tags.id }).from(tags).where(eq(tags.id, tagId)).get();
+  if (!existingTag) {
+    throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${tagId}`);
+  }
+
+  try {
+    await db
+      .update(tags)
+      .set({
+        color: input.color,
+        icon: input.icon,
+        name: trimmedName,
+      })
+      .where(eq(tags.id, tagId))
+      .run();
+  } catch (error) {
+    if (isSqliteUniqueConstraint(error)) {
+      throw businessError("BUSINESS.INVALID_OPERATION", "Tag already exists", {
+        name: trimmedName,
+      });
+    }
+    throw error;
+  }
+
+  const tagRow = await db.select().from(tags).where(eq(tags.id, tagId)).get();
+  if (!tagRow) {
+    throw internalError("Failed to read updated tag");
   }
 
   return mapTagRow(tagRow);
@@ -140,7 +186,9 @@ export async function setBlockTagsByName(
     .insert(tags)
     .values(
       normalizedTagNames.map((tagName) => ({
+        color: null,
         id: crypto.randomUUID(),
+        icon: null,
         name: tagName,
       })),
     )

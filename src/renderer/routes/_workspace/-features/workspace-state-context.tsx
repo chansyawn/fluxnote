@@ -1,4 +1,10 @@
-import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
+import type {
+  Block,
+  BlockVisibility,
+  ExternalEditSession,
+  Tag,
+  UpdateTagRequest,
+} from "@renderer/clients";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { BlockMutationOperation, BlockReorderOperation } from "./use-block-mutations";
@@ -19,6 +25,7 @@ export interface WorkspaceCommands {
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
   submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  updateTag: (req: UpdateTagRequest) => Promise<Tag>;
 }
 
 export interface WorkspaceBlockState {

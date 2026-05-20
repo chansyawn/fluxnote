@@ -64,8 +64,10 @@ function createCommands() {
     cancelExternalEdit: vi.fn(async () => undefined),
     createBlockWithFocus: vi.fn(async () => undefined),
     createTag: vi.fn(async () => ({
+      color: "#2563EB",
       createdAt: "2026-01-01T00:00:00.000Z",
       id: "tag-2",
+      icon: null,
       name: "Tag 2",
       updatedAt: "2026-01-01T00:00:00.000Z",
     })),
@@ -77,6 +79,14 @@ function createCommands() {
     setBlockKeepState: vi.fn(async () => createBlock()),
     setBlockPinnedState: vi.fn(async () => createBlock()),
     submitExternalEdit: vi.fn(async () => undefined),
+    updateTag: vi.fn(async () => ({
+      color: "#2563EB",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      id: "tag-2",
+      icon: null,
+      name: "Tag 2",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    })),
   };
 }
 

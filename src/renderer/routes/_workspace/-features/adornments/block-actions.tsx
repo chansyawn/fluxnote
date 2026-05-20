@@ -1,12 +1,11 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { Block, Tag } from "@renderer/clients";
+import type { Block } from "@renderer/clients";
 import {
   formatShortcutTokens,
   type ShortcutBinding,
   type ShortcutPreferences,
 } from "@renderer/features/shortcut/shortcut-utils";
-import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
 import {
@@ -19,7 +18,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@renderer/ui/components/dropdown-menu";
-import { cn } from "@renderer/ui/lib/utils";
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -32,7 +30,6 @@ import {
   LoaderCircleIcon,
   PinOffIcon,
   PinIcon,
-  TagIcon,
   Trash2Icon,
 } from "lucide-react";
 import type { ComponentProps } from "react";
@@ -53,7 +50,6 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   block: Block;
   position: BlockActionPosition;
   state: {
-    tags: Tag[];
     shortcuts?: ShortcutPreferences;
     copied?: boolean;
     disabled?: boolean;
@@ -64,7 +60,6 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
       keep?: boolean;
       pinned?: boolean;
       reorder?: boolean;
-      tag?: boolean;
     };
   };
   handlers: {
@@ -74,8 +69,6 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
     onTogglePinned: () => Promise<void>;
     onToggleArchive: () => Promise<void>;
     onDelete: () => Promise<void>;
-    onCreateTag: (name: string) => Promise<void>;
-    onAssignTags: (tagIds: string[]) => Promise<void>;
   };
 }
 
@@ -117,14 +110,7 @@ function BlockKeepMenuLabel({
 
 export function BlockActions({ block, className, position, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
-  const {
-    tags,
-    shortcuts,
-    copied = false,
-    disabled,
-    protectedKeepReason = null,
-    pending = {},
-  } = state;
+  const { shortcuts, copied = false, disabled, protectedKeepReason = null, pending = {} } = state;
   const isArchived = block.archivedAt !== null;
   const isExternalEditProtected = protectedKeepReason === "external-edit";
   const keepDisabled = disabled || pending.keep || protectedKeepReason !== null;
@@ -138,27 +124,6 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
           disabled={disabled}
           shortcut={shortcuts?.["copy-block"]}
           onCopy={handlers.onCopy}
-        />
-        <TagComboboxPopover
-          disabled={disabled}
-          isCreatingTag={pending.tag ?? false}
-          placeholder={i18n._({
-            id: "workspace.tags.assign.placeholder",
-            message: "Search or assign tags",
-          })}
-          selectedTagIds={block.tags.map((tag) => tag.id)}
-          tags={tags}
-          triggerSize="icon-xs"
-          trigger={
-            <>
-              <TagIcon className={cn("size-3", block.tags.length > 0 && "fill-primary")} />
-              <span className="sr-only">
-                <Trans id="workspace.tags.assign.button">Assign tags</Trans>
-              </span>
-            </>
-          }
-          onCreateTag={handlers.onCreateTag}
-          onSelectedTagIdsChange={handlers.onAssignTags}
         />
         <IconAction
           icon={

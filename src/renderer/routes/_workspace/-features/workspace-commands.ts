@@ -1,4 +1,4 @@
-import type { Block, Tag } from "@renderer/clients";
+import type { Block, Tag, UpdateTagRequest } from "@renderer/clients";
 import { useMemo } from "react";
 
 import type { BlockReorderOperation } from "./use-block-mutations";
@@ -18,6 +18,7 @@ interface UseWorkspaceCommandsParams {
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
   submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  updateTag: (req: UpdateTagRequest) => Promise<Tag>;
 }
 
 export function useWorkspaceCommandsValue({
@@ -34,6 +35,7 @@ export function useWorkspaceCommandsValue({
   setBlockKeepState,
   setBlockPinnedState,
   submitExternalEdit,
+  updateTag,
 }: UseWorkspaceCommandsParams): WorkspaceCommands {
   return useMemo<WorkspaceCommands>(
     () => ({
@@ -50,6 +52,7 @@ export function useWorkspaceCommandsValue({
       setBlockKeepState,
       setBlockPinnedState,
       submitExternalEdit,
+      updateTag,
     }),
     [
       archiveBlockWithFocus,
@@ -65,6 +68,7 @@ export function useWorkspaceCommandsValue({
       setBlockKeepState,
       setBlockPinnedState,
       submitExternalEdit,
+      updateTag,
     ],
   );
 }

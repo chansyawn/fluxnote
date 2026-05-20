@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { Block, Tag } from "@renderer/clients";
+import type { Block } from "@renderer/clients";
 import type { ReactElement, ReactNode } from "react";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -22,7 +22,6 @@ type MockRenderProps = MockChildrenProps & {
   "aria-label"?: string;
   disabled?: boolean;
   render?: ReactElement<MockButtonProps>;
-  trigger?: ReactNode;
 };
 
 vi.mock("@lingui/react", () => ({
@@ -38,22 +37,6 @@ vi.mock("@lingui/react/macro", async () => {
 
   return {
     Trans: ({ children }: MockChildrenProps) => React.createElement(React.Fragment, null, children),
-  };
-});
-
-vi.mock("@renderer/features/tag/tag-combobox-popover", async () => {
-  const React = await import("react");
-
-  return {
-    TagComboboxPopover: ({ disabled, trigger }: MockRenderProps) =>
-      React.createElement(
-        "button",
-        {
-          disabled,
-          type: "button",
-        },
-        trigger,
-      ),
   };
 });
 
@@ -152,9 +135,7 @@ function createBlock(overrides?: Partial<Block>): Block {
 
 function createHandlers() {
   return {
-    onAssignTags: vi.fn(async () => undefined),
     onCopy: vi.fn(async () => undefined),
-    onCreateTag: vi.fn(async () => undefined),
     onDelete: vi.fn(async () => undefined),
     onReorder: vi.fn(async () => undefined),
     onToggleArchive: vi.fn(async () => undefined),
@@ -182,7 +163,6 @@ function renderBlockActions({
         position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
         state={{
           protectedKeepReason,
-          tags: [] satisfies Tag[],
         }}
         handlers={handlers}
       />,

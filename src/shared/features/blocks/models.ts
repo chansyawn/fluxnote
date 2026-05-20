@@ -1,7 +1,11 @@
 import { z } from "zod";
 
+import { tagColorSchema, tagIconSchema } from "../tags/models";
+
 const blockTagSchema = z.object({
+  color: tagColorSchema,
   id: z.string(),
+  icon: tagIconSchema,
   name: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),

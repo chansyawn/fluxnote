@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:194
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:159
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:195
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:160
 msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
@@ -557,7 +557,7 @@ msgid "window.hide"
 msgstr "隐藏窗口"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:67
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
 msgid "workspace.add-block"
 msgstr "添加区块"
 
@@ -582,83 +582,83 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:175
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:140
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:182
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:147
 msgid "workspace.blocks.archive.tooltip"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:94
 msgid "workspace.blocks.keep.protected-by-external-edit"
 msgstr "外部编辑正在保护此区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:108
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
 msgid "workspace.blocks.keep.protected-by-pin"
 msgstr "固定状态正在保护此区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:206
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:215
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:171
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
 msgid "workspace.blocks.more-actions"
 msgstr "更多区块操作"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:263
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:228
 msgid "workspace.blocks.move"
 msgstr "移动"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:281
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:246
 msgid "workspace.blocks.move-down"
 msgstr "下移"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:290
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
 msgid "workspace.blocks.move-to-top"
 msgstr "移到顶部"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:272
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:237
 msgid "workspace.blocks.move-up"
 msgstr "上移"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:220
 msgid "workspace.blocks.pin"
 msgstr "固定到顶部"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:173
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:138
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
 msgid "workspace.blocks.restore.tooltip"
 msgstr "恢复"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:186
 msgid "workspace.blocks.status"
 msgstr "状态"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:105
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:253
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:218
 msgid "workspace.blocks.unpin"
 msgstr "取消固定到顶部"
 
@@ -693,46 +693,102 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:33
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:73
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:63
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:148
+#: src/renderer/features/tag/tag-combobox-popover.tsx:156
 msgid "workspace.tags.create-inline"
 msgstr "创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:190
+#: src/renderer/features/tag/tag-combobox-popover.tsx:225
 msgid "workspace.tags.delete-inline"
 msgstr "删除标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:100
+#: src/renderer/features/tag/tag-combobox-popover.tsx:201
+msgid "workspace.tags.edit-inline"
+msgstr "编辑标签"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:174
+msgid "workspace.tags.edit.color"
+msgstr "颜色"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:188
+msgid "workspace.tags.edit.color-picker"
+msgstr "标签颜色"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:134
+msgid "workspace.tags.edit.description"
+msgstr "修改标签名称、颜色或图标。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:205
+msgid "workspace.tags.edit.icon-mode"
+msgstr "图标"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:233
+msgid "workspace.tags.edit.icon-mode.lucide"
+msgstr "Lucide"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:229
+msgid "workspace.tags.edit.icon-mode.rgb"
+msgstr "RGB"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:237
+msgid "workspace.tags.edit.icon-mode.simpleicon"
+msgstr "Simple Icons"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:158
+msgid "workspace.tags.edit.name"
+msgstr "名称"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:279
+msgid "workspace.tags.edit.save"
+msgstr "保存"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:131
+msgid "workspace.tags.edit.title"
+msgstr "编辑标签"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:106
 msgid "workspace.tags.filter.button"
 msgstr "筛选标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:93
 msgid "workspace.tags.filter.placeholder"
 msgstr "搜索或创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:157
+#: src/renderer/features/tag/tag-combobox-popover.tsx:165
 msgid "workspace.tags.search.empty"
 msgstr "没有匹配的标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:83
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
 msgid "workspace.visibility.show-active"
 msgstr "显示活跃区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:81
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:86
 msgid "workspace.visibility.show-archived"
 msgstr "显示归档区块"

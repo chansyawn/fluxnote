@@ -55,6 +55,7 @@ export function BlockWorkspace() {
         await commands.deleteTag(tagId);
         viewState.removeTagFilter(tagId);
       }}
+      onUpdateTag={commands.updateTag}
     />
   );
 

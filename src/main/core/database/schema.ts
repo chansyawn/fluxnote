@@ -38,6 +38,8 @@ export const tags = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    icon: text("icon"),
+    color: text("color"),
     createdAt: text("created_at").notNull().default(sqliteNowIsoExpression),
     updatedAt: text("updated_at")
       .notNull()

@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:194
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:159
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:195
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:160
 msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
@@ -557,7 +557,7 @@ msgid "window.hide"
 msgstr "Hide window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:67
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:72
 msgid "workspace.add-block"
 msgstr "Add block"
 
@@ -582,83 +582,83 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:175
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:140
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:182
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:147
 msgid "workspace.blocks.archive.tooltip"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:94
 msgid "workspace.blocks.keep.protected-by-external-edit"
 msgstr "External edit keeps this block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:108
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
 msgid "workspace.blocks.keep.protected-by-pin"
 msgstr "Pin keeps this block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:206
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:215
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:171
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
 msgid "workspace.blocks.more-actions"
 msgstr "More block actions"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:263
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:228
 msgid "workspace.blocks.move"
 msgstr "Move"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:281
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:246
 msgid "workspace.blocks.move-down"
 msgstr "Move down"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:290
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
 msgid "workspace.blocks.move-to-top"
 msgstr "Move to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:272
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:237
 msgid "workspace.blocks.move-up"
 msgstr "Move up"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:220
 msgid "workspace.blocks.pin"
 msgstr "Pin to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:173
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:138
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
 msgid "workspace.blocks.restore.tooltip"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:186
 msgid "workspace.blocks.status"
 msgstr "Status"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:105
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:253
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:218
 msgid "workspace.blocks.unpin"
 msgstr "Unpin from top"
 
@@ -693,46 +693,102 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:33
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:73
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:63
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:148
+#: src/renderer/features/tag/tag-combobox-popover.tsx:156
 msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:190
+#: src/renderer/features/tag/tag-combobox-popover.tsx:225
 msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:100
+#: src/renderer/features/tag/tag-combobox-popover.tsx:201
+msgid "workspace.tags.edit-inline"
+msgstr "Edit tag"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:174
+msgid "workspace.tags.edit.color"
+msgstr "Color"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:188
+msgid "workspace.tags.edit.color-picker"
+msgstr "Tag color"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:134
+msgid "workspace.tags.edit.description"
+msgstr "Change the tag name, color, or icon."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:205
+msgid "workspace.tags.edit.icon-mode"
+msgstr "Icon"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:233
+msgid "workspace.tags.edit.icon-mode.lucide"
+msgstr "Lucide"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:229
+msgid "workspace.tags.edit.icon-mode.rgb"
+msgstr "RGB"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:237
+msgid "workspace.tags.edit.icon-mode.simpleicon"
+msgstr "Simple Icons"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:158
+msgid "workspace.tags.edit.name"
+msgstr "Name"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:279
+msgid "workspace.tags.edit.save"
+msgstr "Save"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/tag/tag-edit-dialog.tsx:131
+msgid "workspace.tags.edit.title"
+msgstr "Edit tag"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:106
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:93
 msgid "workspace.tags.filter.placeholder"
 msgstr "Search or create tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:157
+#: src/renderer/features/tag/tag-combobox-popover.tsx:165
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:83
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:88
 msgid "workspace.visibility.show-active"
 msgstr "Show active blocks"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:81
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:86
 msgid "workspace.visibility.show-archived"
 msgstr "Show archived blocks"

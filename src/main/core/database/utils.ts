@@ -7,7 +7,13 @@ export function isSqliteUniqueConstraint(error: unknown): boolean {
     return false;
   }
 
-  return error.message.includes("UNIQUE constraint failed");
+  const cause = (error as { cause?: unknown }).cause;
+  const causeMessage = cause instanceof Error ? cause.message : "";
+
+  return (
+    error.message.includes("UNIQUE constraint failed") ||
+    causeMessage.includes("UNIQUE constraint failed")
+  );
 }
 
 export function getSqliteChangedRows(result: unknown): number {

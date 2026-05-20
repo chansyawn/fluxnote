@@ -4,7 +4,7 @@ import type { AppDatabase } from "@main/core/database";
 import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database";
 import { getSqliteChangedRows, nowIsoString } from "@main/core/database";
 import type { Block, blockReorderOperationSchema } from "@shared/features/blocks/models";
-import type { Tag } from "@shared/features/tags/models";
+import { tagSchema, type Tag } from "@shared/features/tags/models";
 import { businessError } from "@shared/ipc/result";
 import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
@@ -22,13 +22,22 @@ interface BlockOrderRow {
   orderIndex: number;
 }
 
-function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt: string }): Tag {
-  return {
+function mapTagRow(tag: {
+  color: string | null;
+  createdAt: string;
+  icon: string | null;
+  id: string;
+  name: string;
+  updatedAt: string;
+}): Tag {
+  return tagSchema.parse({
+    color: tag.color,
     id: tag.id,
+    icon: tag.icon,
     name: tag.name,
     createdAt: tag.createdAt,
     updatedAt: tag.updatedAt,
-  };
+  });
 }
 
 function mapBlockRow(
@@ -62,7 +71,9 @@ async function getTagsForBlocks(
   const rows = await db
     .select({
       blockId: blockTags.blockId,
+      color: tags.color,
       id: tags.id,
+      icon: tags.icon,
       name: tags.name,
       createdAt: tags.createdAt,
       updatedAt: tags.updatedAt,

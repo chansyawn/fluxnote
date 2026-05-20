@@ -21,7 +21,7 @@ interface IconActionProps {
   shortcut?: ShortcutBinding;
   pending?: boolean;
   disabled?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export function IconAction({

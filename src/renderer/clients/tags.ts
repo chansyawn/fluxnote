@@ -7,6 +7,7 @@ import { invokeCommand } from "./ipc/invoke";
 
 export type CreateTagRequest = z.input<(typeof tagsContract)["commands"]["tags.create"]["input"]>;
 export type DeleteTagRequest = z.input<(typeof tagsContract)["commands"]["tags.delete"]["input"]>;
+export type UpdateTagRequest = z.output<(typeof tagsContract)["commands"]["tags.update"]["input"]>;
 export type SetBlockTagsRequest = z.input<
   (typeof tagsContract)["commands"]["tags.set-block-tags"]["input"]
 >;
@@ -18,6 +19,8 @@ export const createTag = (req: CreateTagRequest): Promise<Tag> => invokeCommand(
 
 export const deleteTag = (req: DeleteTagRequest): Promise<void> =>
   invokeCommand("tags.delete", req);
+
+export const updateTag = (req: UpdateTagRequest): Promise<Tag> => invokeCommand("tags.update", req);
 
 export const setBlockTags = (req: SetBlockTagsRequest): Promise<Block> =>
   invokeCommand("tags.set-block-tags", req);

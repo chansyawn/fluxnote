@@ -12,6 +12,13 @@ describe("database utils", () => {
 
   it("detects unique constraint error", () => {
     expect(isSqliteUniqueConstraint(new Error("UNIQUE constraint failed: tags.name"))).toBe(true);
+    expect(
+      isSqliteUniqueConstraint(
+        new Error("Failed query", {
+          cause: new Error("UNIQUE constraint failed: index 'uq_tags_name_lower'"),
+        }),
+      ),
+    ).toBe(true);
     expect(isSqliteUniqueConstraint(new Error("other"))).toBe(false);
     expect(isSqliteUniqueConstraint("bad")).toBe(false);
   });

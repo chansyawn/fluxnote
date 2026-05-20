@@ -29,7 +29,7 @@ export {
   setBlockPinnedState,
   updateBlockContent,
 } from "./blocks";
-export { createTag, deleteTag, listTags, setBlockTags } from "./tags";
+export { createTag, deleteTag, listTags, setBlockTags, updateTag } from "./tags";
 export { isRegistered, register, unregister, type ShortcutEvent } from "./shortcut";
 export {
   destroyWindow,
@@ -74,4 +74,10 @@ export type {
   SetBlockPinnedStateRequest,
   UpdateBlockContentRequest,
 } from "./blocks";
-export type { CreateTagRequest, DeleteTagRequest, SetBlockTagsRequest, Tag } from "./tags";
+export type {
+  CreateTagRequest,
+  DeleteTagRequest,
+  SetBlockTagsRequest,
+  Tag,
+  UpdateTagRequest,
+} from "./tags";

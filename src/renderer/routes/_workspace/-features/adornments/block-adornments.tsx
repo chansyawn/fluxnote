@@ -5,6 +5,7 @@ import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
 import { AdornmentCluster } from "./adornment-cluster";
 import { BlockActions, type BlockActionPosition, type ProtectedKeepReason } from "./block-actions";
+import { BlockTagActions } from "./block-tag-actions";
 import { ExternalEditControls } from "./external-edit-controls";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
 
@@ -60,12 +61,25 @@ export function BlockAdornments({
         </>
       ) : null}
       {shouldShowBlockActions ? (
+        <BlockTagActions
+          block={block}
+          className="ml-auto"
+          state={{
+            tags,
+            disabled: state.isLocked,
+            pending: state.isTagCreatePending,
+          }}
+          handlers={{
+            onCreateTag: actions.createTag,
+            onAssignTags: actions.assignTags,
+          }}
+        />
+      ) : null}
+      {shouldShowBlockActions ? (
         <BlockActions
-          className="ml-auto shrink-0"
           block={block}
           position={position}
           state={{
-            tags,
             shortcuts,
             copied: copyFeedbackActive,
             disabled: state.isLocked,
@@ -76,7 +90,6 @@ export function BlockAdornments({
               keep: state.isKeepPending,
               pinned: state.isPinnedPending,
               reorder: state.isReorderPending,
-              tag: state.isTagCreatePending,
             },
           }}
           handlers={{
@@ -86,8 +99,6 @@ export function BlockAdornments({
             onTogglePinned: actions.togglePinned,
             onToggleArchive: actions.toggleArchive,
             onDelete: actions.deleteOrCancelExternalEdit,
-            onCreateTag: actions.createTag,
-            onAssignTags: actions.assignTags,
           }}
         />
       ) : null}

@@ -22,7 +22,7 @@ interface UseWorkspaceCommandRuntimeParams {
   blockNavigation: Pick<ReturnType<typeof useBlockNavigation>, "activeBlockId" | "navigateToBlock">;
   blockView: Pick<WorkspaceBlockViewState, "selectedTagIds">;
   editorRegistry: Pick<BlockEditorRegistry, "getEditor">;
-  tagData: Pick<ReturnType<typeof useTagData>, "createTag" | "deleteTag">;
+  tagData: Pick<ReturnType<typeof useTagData>, "createTag" | "deleteTag" | "updateTag">;
 }
 
 export function useWorkspaceCommandRuntime({
@@ -82,6 +82,7 @@ export function useWorkspaceCommandRuntime({
     setBlockKeepState: blockMutations.setKeepState,
     setBlockPinnedState: focusActions.setBlockPinnedStateWithFocus,
     submitExternalEdit: externalEditActions.handleSubmitExternalEdit,
+    updateTag: tagData.updateTag,
   });
 
   return {
