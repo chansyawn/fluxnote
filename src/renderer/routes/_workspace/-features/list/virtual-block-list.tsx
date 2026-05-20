@@ -68,6 +68,21 @@ function getBlockActionPosition({
   };
 }
 
+function shouldShowPinnedSectionDivider(
+  block: Block | undefined,
+  previousBlock: Block | undefined,
+) {
+  return Boolean(block && previousBlock?.isPinned && !block.isPinned);
+}
+
+function PinnedSectionDivider() {
+  return (
+    <div aria-hidden="true" data-pinned-section-divider="" className="mb-3 px-1">
+      <div className="bg-border h-0.25 w-full" />
+    </div>
+  );
+}
+
 interface VirtualBlockListProps {
   totalCount: number;
   getBlockAtIndex: (index: number) => Block | undefined;
@@ -166,7 +181,7 @@ export function VirtualBlockList({
       return;
     }
 
-    ensureBlockRange(visibleRange.start, visibleRange.end);
+    ensureBlockRange(Math.max(0, visibleRange.start - 1), visibleRange.end);
   }, [ensureBlockRange, visibleRange]);
 
   const scrollRequestId = scrollTarget?.requestId;
@@ -227,12 +242,17 @@ export function VirtualBlockList({
         >
           {virtualBlocks.map((virtualBlock) => {
             const block = getBlockAtIndex(virtualBlock.index);
+            const previousBlock =
+              virtualBlock.index > 0 ? getBlockAtIndex(virtualBlock.index - 1) : undefined;
             return (
               <div
                 key={virtualBlock.key}
                 ref={blockVirtualizer.measureElement}
                 data-index={virtualBlock.index}
               >
+                {shouldShowPinnedSectionDivider(block, previousBlock) ? (
+                  <PinnedSectionDivider />
+                ) : null}
                 <BlockListRow
                   block={block}
                   position={getBlockActionPosition({

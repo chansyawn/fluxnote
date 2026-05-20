@@ -29,6 +29,7 @@ interface BlockEditorFrameProps {
   initialMarkdown: string;
   isExternalEditPending?: boolean;
   isKept: boolean;
+  isPinned: boolean;
   runtime: BlockEditorRuntime;
   willArchive: boolean;
   onMarkdownChange: (markdown: string) => void;
@@ -44,6 +45,7 @@ function BlockEditorFrame({
   initialMarkdown,
   isExternalEditPending = false,
   isKept,
+  isPinned: _isPinned,
   runtime,
   willArchive,
   onMarkdownChange,
@@ -54,7 +56,7 @@ function BlockEditorFrame({
   return (
     <article
       className={cn(
-        "group bg-card relative rounded-xl border transition-opacity",
+        "group bg-card relative rounded-lg border transition-opacity",
         isKept ? "border-ring/80" : "border-border",
         isExternalEditPending && "border-dashed",
         willArchive && "opacity-60",
@@ -66,7 +68,7 @@ function BlockEditorFrame({
         <div className="absolute top-0 right-1 left-1 z-10 -translate-y-1/2">{adornments}</div>
       ) : null}
 
-      <div className="min-h-16 px-3 pt-3 pb-2">
+      <div className="px-3 py-2">
         <BlockEditor
           ref={ref}
           runtime={runtime}
@@ -146,6 +148,7 @@ export function WorkspaceBlockEditorSurface({
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}
       isKept={block.isKept}
+      isPinned={block.isPinned}
       willArchive={block.willArchive}
       onBlur={() => {
         void flush();
