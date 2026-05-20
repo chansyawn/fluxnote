@@ -53,6 +53,24 @@ describe("auto-archive", () => {
     expect(toAutoArchiveDurationViewModel(125)).toEqual({ amount: 125, unit: "minutes" });
   });
 
+  it("should prefer requested duration unit when exact", () => {
+    expect(toAutoArchiveDurationViewModel(60, "minutes")).toEqual({
+      amount: 60,
+      unit: "minutes",
+    });
+    expect(toAutoArchiveDurationViewModel(24 * 60, "hours")).toEqual({
+      amount: 24,
+      unit: "hours",
+    });
+  });
+
+  it("should fallback to best duration unit when requested unit is inexact", () => {
+    expect(toAutoArchiveDurationViewModel(90, "hours")).toEqual({
+      amount: 90,
+      unit: "minutes",
+    });
+  });
+
   it("should convert idle minutes to target unit with ceil", () => {
     expect(convertAutoArchiveDurationUnit(130, "hours")).toEqual({ amount: 3, unit: "hours" });
     expect(convertAutoArchiveDurationUnit(130, "days")).toEqual({ amount: 1, unit: "days" });

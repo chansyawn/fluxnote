@@ -96,9 +96,9 @@ export function useAutoArchivePreference() {
   const mutation = usePatchSettingsMutation();
   const patchAutoArchive = useCallback(
     (patch: Partial<AutoArchiveSettings>) => {
-      mutation.mutate({ autoArchive: patch });
+      return mutation.mutateAsync({ autoArchive: patch });
     },
-    [mutation],
+    [mutation.mutateAsync],
   );
 
   return {

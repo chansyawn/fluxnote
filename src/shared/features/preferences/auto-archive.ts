@@ -46,8 +46,18 @@ export function toAutoArchiveIdleMinutes(duration: AutoArchiveDuration): number 
   return idleMinutes;
 }
 
-export function toAutoArchiveDurationViewModel(idleMinutes: unknown): AutoArchiveDuration {
+export function toAutoArchiveDurationViewModel(
+  idleMinutes: unknown,
+  preferredUnit?: AutoArchiveDurationUnit,
+): AutoArchiveDuration {
   const normalizedIdleMinutes = normalizeAutoArchiveIdleMinutes(idleMinutes);
+
+  if (preferredUnit && normalizedIdleMinutes % UNIT_TO_MINUTES[preferredUnit] === 0) {
+    return {
+      amount: normalizedIdleMinutes / UNIT_TO_MINUTES[preferredUnit],
+      unit: preferredUnit,
+    };
+  }
 
   if (normalizedIdleMinutes % UNIT_TO_MINUTES.days === 0) {
     return {
