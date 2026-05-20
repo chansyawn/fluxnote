@@ -126,15 +126,20 @@ function findFiles(directory, predicate) {
     .filter(predicate);
 }
 
-function findDirectories(directory, predicate) {
-  if (!existsSync(directory)) {
+function findPackagedAppBundles() {
+  if (!existsSync("out")) {
     return [];
   }
 
-  return readdirSync(directory, { recursive: true, withFileTypes: true })
+  return readdirSync("out", { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map((entry) => path.join(entry.parentPath, entry.name))
-    .filter(predicate);
+    .flatMap((entry) => {
+      const packageDirectoryPath = path.join(entry.parentPath, entry.name);
+
+      return readdirSync(packageDirectoryPath, { withFileTypes: true })
+        .filter((packageEntry) => packageEntry.isDirectory() && packageEntry.name.endsWith(".app"))
+        .map((packageEntry) => path.join(packageEntry.parentPath, packageEntry.name));
+    });
 }
 
 function notarizeDmgArtifacts() {
@@ -163,7 +168,7 @@ function notarizeDmgArtifacts() {
 }
 
 function verifyMacArtifacts() {
-  const appPaths = findDirectories("out", (directoryPath) => directoryPath.endsWith(".app"));
+  const appPaths = findPackagedAppBundles();
 
   if (appPaths.length === 0) {
     throw new Error("No packaged macOS app found.");
