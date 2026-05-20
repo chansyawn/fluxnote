@@ -75,6 +75,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - A **Block** can have zero or more **Tags**.
 - A **Block Order** arranges **Active Blocks** in the **Workspace**.
 - A **Pinned Block** appears before unpinned **Active Blocks** in the **Block Order**.
+- A **Pinned Block** is excluded from **Auto Archive** without becoming a **Kept Block**.
 - A **Tag Filter** selects zero or more **Tags** and narrows the **Workspace** to matching **Blocks**.
 - A **Kept Block** is an **Active Block** excluded from **Auto Archive**.
 - An **External Edit Session** belongs to exactly one **Block**.
