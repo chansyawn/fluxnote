@@ -155,6 +155,36 @@ describe("useWorkspaceBlockActions", () => {
     expect(commands.setBlockPinnedState).toHaveBeenCalledWith("block-1", true);
   });
 
+  it("does not toggle keep for pinned blocks", async () => {
+    const commands = createCommands();
+    const actions = useWorkspaceBlockActions({
+      block: createBlock({ isPinned: true }),
+      commands,
+      getEditor: vi.fn(),
+      state: createState(),
+    });
+
+    await actions.toggleKeep();
+
+    expect(commands.setBlockKeepState).not.toHaveBeenCalled();
+  });
+
+  it("does not toggle keep or archive for external edit blocks", async () => {
+    const commands = createCommands();
+    const actions = useWorkspaceBlockActions({
+      block: createBlock(),
+      commands,
+      getEditor: vi.fn(),
+      state: createState({ externalEditSession }),
+    });
+
+    await actions.toggleKeep();
+    await actions.toggleArchive();
+
+    expect(commands.setBlockKeepState).not.toHaveBeenCalled();
+    expect(commands.archiveBlock).not.toHaveBeenCalled();
+  });
+
   it("reorders active block", async () => {
     const commands = createCommands();
     const actions = useWorkspaceBlockActions({

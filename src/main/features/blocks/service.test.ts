@@ -101,7 +101,7 @@ describe("blocks service", () => {
     expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockC.id, blockB.id]);
   });
 
-  it("pins block with keep state and unpins into the top of normal section", async () => {
+  it("pins block without changing keep state and unpins into the top of normal section", async () => {
     const blockA = await createBlockRecord(ctx.db, "A");
     const blockB = await createBlockRecord(ctx.db, "B");
 
@@ -110,20 +110,57 @@ describe("blocks service", () => {
     const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
 
     expect(pinned.isPinned).toBe(true);
-    expect(pinned.isKept).toBe(true);
+    expect(pinned.isKept).toBe(false);
     expect(unpinned.isPinned).toBe(false);
-    expect(unpinned.isKept).toBe(true);
+    expect(unpinned.isKept).toBe(false);
     expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockB.id]);
   });
 
-  it("allows keep state to be cleared after pinning block", async () => {
+  it("preserves existing keep state when pinning and unpinning block", async () => {
+    const block = await createBlockRecord(ctx.db, "A");
+
+    await setBlockKeepState(ctx.db, block.id, true);
+    await setBlockPinnedState(ctx.db, block.id, true);
+    const unpinned = await setBlockPinnedState(ctx.db, block.id, false);
+
+    expect(unpinned.isPinned).toBe(false);
+    expect(unpinned.isKept).toBe(true);
+  });
+
+  it("rejects keep state changes for pinned blocks", async () => {
     const block = await createBlockRecord(ctx.db, "A");
 
     await setBlockPinnedState(ctx.db, block.id, true);
-    const unkept = await setBlockKeepState(ctx.db, block.id, false);
 
-    expect(unkept.isPinned).toBe(true);
-    expect(unkept.isKept).toBe(false);
+    await expect(setBlockKeepState(ctx.db, block.id, true)).rejects.toMatchObject({
+      code: "BUSINESS.INVALID_OPERATION",
+    });
+  });
+
+  it("rejects keep state changes for external edit blocks", async () => {
+    const block = await createBlockRecord(ctx.db, "A");
+    const autoArchiveContext = {
+      cutoffIso: "2026-01-01T00:00:00.000Z",
+      protectedBlockIds: new Set([block.id]),
+    };
+
+    await expect(
+      setBlockKeepState(ctx.db, block.id, true, autoArchiveContext),
+    ).rejects.toMatchObject({
+      code: "BUSINESS.INVALID_OPERATION",
+    });
+  });
+
+  it("rejects manual archive for external edit blocks", async () => {
+    const block = await createBlockRecord(ctx.db, "A");
+    const autoArchiveContext = {
+      cutoffIso: "2026-01-01T00:00:00.000Z",
+      protectedBlockIds: new Set([block.id]),
+    };
+
+    await expect(archiveBlock(ctx.db, block.id, autoArchiveContext)).rejects.toMatchObject({
+      code: "BUSINESS.INVALID_OPERATION",
+    });
   });
 
   it("reorders block inside its current section", async () => {

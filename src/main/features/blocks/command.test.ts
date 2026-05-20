@@ -63,6 +63,36 @@ describe("blocks command", () => {
     expect(result).toEqual({ deletedBlockId: "b1" });
   });
 
+  it("dispatches archive command with external edit protection context", async () => {
+    mocks.archiveBlock.mockResolvedValue({ id: "b1" });
+    const depsWithExternalEdit = {
+      ...deps,
+      listExternalEditSessions: () => [
+        {
+          blockId: "b1",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          editId: "edit-1",
+          trigger: {
+            cwd: "/tmp",
+            requestedFilePath: "/tmp/requested.md",
+            source: "cli" as const,
+            targetFilePath: "/tmp/target.md",
+          },
+        },
+      ],
+    };
+    registerBlocksCommands(ipc as never, depsWithExternalEdit);
+
+    const result = await handlers.get("blocks.archive")?.({ blockId: "b1" });
+
+    expect(mocks.archiveBlock).toHaveBeenCalledWith(
+      deps.db,
+      "b1",
+      expect.objectContaining({ protectedBlockIds: new Set(["b1"]) }),
+    );
+    expect(result).toEqual({ id: "b1" });
+  });
+
   it("dispatches delete archived command", async () => {
     mocks.deleteArchivedBlocks.mockResolvedValue({ deletedCount: 2 });
     registerBlocksCommands(ipc as never, deps);

@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:194
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:157
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:195
 msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
@@ -582,73 +582,83 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:137
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:175
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:144
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:182
 msgid "workspace.blocks.archive.tooltip"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:201
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
 msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:168
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
+msgid "workspace.blocks.keep.protected-by-external-edit"
+msgstr "外部编辑正在保护此区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:108
+msgid "workspace.blocks.keep.protected-by-pin"
+msgstr "固定状态正在保护此区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:206
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:215
 msgid "workspace.blocks.more-actions"
 msgstr "更多区块操作"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:229
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:263
 msgid "workspace.blocks.move"
 msgstr "移动"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:247
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:281
 msgid "workspace.blocks.move-down"
 msgstr "下移"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:256
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:290
 msgid "workspace.blocks.move-to-top"
 msgstr "移到顶部"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:238
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:272
 msgid "workspace.blocks.move-up"
 msgstr "上移"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
 msgid "workspace.blocks.pin"
 msgstr "固定到顶部"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:135
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:173
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:142
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
 msgid "workspace.blocks.restore.tooltip"
 msgstr "恢复"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:183
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
 msgid "workspace.blocks.status"
 msgstr "状态"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:253
 msgid "workspace.blocks.unpin"
 msgstr "取消固定到顶部"
 
@@ -683,12 +693,12 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 

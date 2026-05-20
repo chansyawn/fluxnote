@@ -47,7 +47,13 @@ describe("auto-archive policy", () => {
 
     expect(
       blockWillAutoArchive(
-        { archivedAt: null, contentUpdatedAt: "2026-01-01T00:00:00.000Z", id: "b1", isKept: false },
+        {
+          archivedAt: null,
+          contentUpdatedAt: "2026-01-01T00:00:00.000Z",
+          id: "b1",
+          isKept: false,
+          isPinned: false,
+        },
         context,
       ),
     ).toBe(true);
@@ -58,6 +64,7 @@ describe("auto-archive policy", () => {
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
           id: "b1",
           isKept: false,
+          isPinned: false,
         },
         context,
       ),
@@ -69,6 +76,7 @@ describe("auto-archive policy", () => {
           contentUpdatedAt: "2026-01-01T00:06:00.000Z",
           id: "b1",
           isKept: false,
+          isPinned: false,
         },
         context,
       ),
@@ -80,6 +88,7 @@ describe("auto-archive policy", () => {
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
           id: "protected",
           isKept: false,
+          isPinned: false,
         },
         context,
       ),
@@ -91,6 +100,19 @@ describe("auto-archive policy", () => {
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
           id: "b1",
           isKept: true,
+          isPinned: false,
+        },
+        context,
+      ),
+    ).toBe(false);
+    expect(
+      blockWillAutoArchive(
+        {
+          archivedAt: null,
+          contentUpdatedAt: "2026-01-01T00:00:00.000Z",
+          id: "b1",
+          isKept: false,
+          isPinned: true,
         },
         context,
       ),

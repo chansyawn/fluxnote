@@ -49,13 +49,14 @@ export function createAutoArchiveEvaluationContext({
 }
 
 export function blockWillAutoArchive(
-  block: Pick<BlockRecord, "archivedAt" | "contentUpdatedAt" | "id" | "isKept">,
+  block: Pick<BlockRecord, "archivedAt" | "contentUpdatedAt" | "id" | "isKept" | "isPinned">,
   context: AutoArchiveEvaluationContext,
 ): boolean {
   return (
     context.cutoffIso !== null &&
     block.archivedAt === null &&
     !block.isKept &&
+    !block.isPinned &&
     block.contentUpdatedAt < context.cutoffIso &&
     !context.protectedBlockIds.has(block.id)
   );
@@ -76,6 +77,7 @@ export async function listAutoArchiveCandidateBlockIds(
       and(
         isNull(blocks.archivedAt),
         eq(blocks.isKept, false),
+        eq(blocks.isPinned, false),
         lt(blocks.contentUpdatedAt, context.cutoffIso),
       ),
     )

@@ -4,7 +4,7 @@ import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-u
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
 import { AdornmentCluster } from "./adornment-cluster";
-import { BlockActions, type BlockActionPosition } from "./block-actions";
+import { BlockActions, type BlockActionPosition, type ProtectedKeepReason } from "./block-actions";
 import { ExternalEditControls } from "./external-edit-controls";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
 
@@ -31,6 +31,11 @@ export function BlockAdornments({
 }: BlockAdornmentsProps) {
   const externalEditSession = state.externalEditSession;
   const shouldShowBlockActions = active || Boolean(externalEditSession);
+  const protectedKeepReason: ProtectedKeepReason = externalEditSession
+    ? "external-edit"
+    : block.isPinned
+      ? "pinned"
+      : null;
 
   if (!externalEditSession && !shouldShowBlockActions) {
     return null;
@@ -64,6 +69,7 @@ export function BlockAdornments({
             shortcuts,
             copied: copyFeedbackActive,
             disabled: state.isLocked,
+            protectedKeepReason,
             pending: {
               archive: state.isArchivePending,
               delete: state.isDeletePending,
