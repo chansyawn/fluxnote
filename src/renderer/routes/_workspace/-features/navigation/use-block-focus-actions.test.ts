@@ -15,6 +15,8 @@ function createBlock(overrides?: Partial<Block>): Block {
     createdAt: "2026-01-01T00:00:00.000Z",
     id: "block-1",
     isKept: false,
+    isPinned: false,
+    orderIndex: 0,
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
     willArchive: false,

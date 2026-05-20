@@ -1,7 +1,7 @@
 import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
-import type { BlockMutationOperation } from "./use-block-mutations";
+import type { BlockMutationOperation, BlockReorderOperation } from "./use-block-mutations";
 
 export type WorkspacePendingBlockOps = Record<BlockMutationOperation, Set<string>>;
 
@@ -14,8 +14,10 @@ export interface WorkspaceCommands {
   deleteBlock: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;
   focusBlock: (blockId: string | null) => void;
+  reorderBlock: (blockId: string, operation: BlockReorderOperation) => Promise<Block>;
   restoreBlock: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
+  setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
   submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
 }
 
@@ -26,6 +28,8 @@ export interface WorkspaceBlockState {
   isExternalEditPending: boolean;
   isKeepPending: boolean;
   isLocked: boolean;
+  isPinnedPending: boolean;
+  isReorderPending: boolean;
   isTagCreatePending: boolean;
   visibility: BlockVisibility;
 }
@@ -117,6 +121,8 @@ export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
       runtime.pendingBlockOps.restore.has(blockId) ||
       runtime.pendingBlockOps.delete.has(blockId) ||
       runtime.pendingBlockOps.setKeep.has(blockId) ||
+      runtime.pendingBlockOps.setPinned.has(blockId) ||
+      runtime.pendingBlockOps.reorder.has(blockId) ||
       runtime.pendingBlockOps.setTags.has(blockId);
 
     return {
@@ -126,6 +132,8 @@ export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
       isExternalEditPending,
       isKeepPending: runtime.pendingBlockOps.setKeep.has(blockId),
       isLocked,
+      isPinnedPending: runtime.pendingBlockOps.setPinned.has(blockId),
+      isReorderPending: runtime.pendingBlockOps.reorder.has(blockId),
       isTagCreatePending: view.isTagCreatePending,
       visibility: view.visibility,
     };

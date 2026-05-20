@@ -31,6 +31,7 @@ export const contracts = {
     ...externalEditContract.events,
     ...externalUrlContract.events,
     ...openBlockContract.events,
+    ...preferencesContract.events,
     ...shortcutContract.events,
     ...windowContract.events,
   },

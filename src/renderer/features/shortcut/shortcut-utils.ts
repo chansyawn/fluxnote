@@ -145,8 +145,14 @@ export function normalizeShortcutPreferences(
     "create-block": shortcuts["create-block"]
       ? normalizeShortcutBinding(shortcuts["create-block"], platform)
       : null,
+    "copy-block": shortcuts["copy-block"]
+      ? normalizeShortcutBinding(shortcuts["copy-block"], platform)
+      : null,
     "keep-block": shortcuts["keep-block"]
       ? normalizeShortcutBinding(shortcuts["keep-block"], platform)
+      : null,
+    "toggle-pin-block": shortcuts["toggle-pin-block"]
+      ? normalizeShortcutBinding(shortcuts["toggle-pin-block"], platform)
       : null,
     "archive-block": shortcuts["archive-block"]
       ? normalizeShortcutBinding(shortcuts["archive-block"], platform)

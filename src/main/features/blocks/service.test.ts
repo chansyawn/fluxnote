@@ -11,8 +11,10 @@ import {
   deleteBlock,
   getPublicBlockById,
   listBlocks,
+  reorderBlock,
   restoreBlock,
   setBlockKeepState,
+  setBlockPinnedState,
   updateBlockContent,
 } from "./service";
 
@@ -51,13 +53,16 @@ describe("blocks service", () => {
   it("archives block and clears keep state", async () => {
     const block = await createBlockRecord(ctx.db, "kept archive");
     await setBlockKeepState(ctx.db, block.id, true);
+    await setBlockPinnedState(ctx.db, block.id, true);
 
     const archived = await archiveBlock(ctx.db, block.id);
     const loaded = await getPublicBlockById(ctx.db, block.id);
 
     expect(archived.archivedAt).not.toBeNull();
     expect(archived.isKept).toBe(false);
+    expect(archived.isPinned).toBe(false);
     expect(loaded.isKept).toBe(false);
+    expect(loaded.isPinned).toBe(false);
   });
 
   it("lists blocks by visibility", async () => {
@@ -85,14 +90,102 @@ describe("blocks service", () => {
     expect(result.blocks.map((block) => block.id)).not.toContain(blockB.id);
   });
 
+  it("lists active blocks by pinned section and manual order", async () => {
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+    await setBlockPinnedState(ctx.db, blockA.id, true);
+
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
+
+    expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockC.id, blockB.id]);
+  });
+
+  it("pins block with keep state and unpins into the top of normal section", async () => {
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+
+    const pinned = await setBlockPinnedState(ctx.db, blockA.id, true);
+    const unpinned = await setBlockPinnedState(ctx.db, blockA.id, false);
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
+
+    expect(pinned.isPinned).toBe(true);
+    expect(pinned.isKept).toBe(true);
+    expect(unpinned.isPinned).toBe(false);
+    expect(unpinned.isKept).toBe(true);
+    expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockB.id]);
+  });
+
+  it("allows keep state to be cleared after pinning block", async () => {
+    const block = await createBlockRecord(ctx.db, "A");
+
+    await setBlockPinnedState(ctx.db, block.id, true);
+    const unkept = await setBlockKeepState(ctx.db, block.id, false);
+
+    expect(unkept.isPinned).toBe(true);
+    expect(unkept.isKept).toBe(false);
+  });
+
+  it("reorders block inside its current section", async () => {
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+
+    const movedToTop = await reorderBlock(ctx.db, blockA.id, "move-to-top", undefined);
+    const movedUp = await reorderBlock(ctx.db, blockB.id, "move-up", undefined);
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
+
+    expect(movedToTop.changed).toBe(true);
+    expect(movedUp.changed).toBe(true);
+    expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockB.id, blockC.id]);
+  });
+
+  it("reorders block by visible tag-filtered neighbors", async () => {
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+    const blockD = await createBlockRecord(ctx.db, "D");
+    const tag = await createTag(ctx.db, "work");
+    await setBlockTags(ctx.db, blockA.id, [tag.id]);
+    await setBlockTags(ctx.db, blockC.id, [tag.id]);
+
+    await reorderBlock(ctx.db, blockA.id, "move-up", [tag.id]);
+    const allBlocks = await listBlocks(ctx.db, undefined, "active", 0, 10);
+    const taggedBlocks = await listBlocks(ctx.db, [tag.id], "active", 0, 10);
+
+    expect(allBlocks.blocks.map((block) => block.id)).toEqual([
+      blockD.id,
+      blockA.id,
+      blockC.id,
+      blockB.id,
+    ]);
+    expect(taggedBlocks.blocks.map((block) => block.id)).toEqual([blockA.id, blockC.id]);
+  });
+
+  it("keeps manual reorder within pinned section", async () => {
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+    await setBlockPinnedState(ctx.db, blockA.id, true);
+    await setBlockPinnedState(ctx.db, blockB.id, true);
+
+    await reorderBlock(ctx.db, blockA.id, "move-up", undefined);
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
+
+    expect(result.blocks.map((block) => block.id)).toEqual([blockA.id, blockB.id, blockC.id]);
+  });
+
   it("updates content and restores archived block", async () => {
     const block = await createBlockRecord(ctx.db, "before");
+    const otherBlock = await createBlockRecord(ctx.db, "other");
     const updated = await updateBlockContent(ctx.db, block.id, "after");
     await archiveBlock(ctx.db, block.id);
     const restored = await restoreBlock(ctx.db, block.id);
+    const result = await listBlocks(ctx.db, undefined, "active", 0, 10);
 
     expect(updated.content).toBe("after");
     expect(restored.archivedAt).toBeNull();
+    expect(result.blocks.map((item) => item.id)).toEqual([block.id, otherBlock.id]);
   });
 
   it("deletes block and removes asset folder", async () => {

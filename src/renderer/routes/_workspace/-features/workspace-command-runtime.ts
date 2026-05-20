@@ -68,8 +68,11 @@ export function useWorkspaceCommandRuntime({
     deleteBlockWithFocus: focusActions.deleteBlockWithFocus,
     deleteTag: tagData.deleteTag,
     focusBlock: activeBlockFocus.focusBlock,
+    reorderBlock: (blockId, operation) =>
+      blockMutations.reorderBlock(blockId, operation, blockView.selectedTagIds),
     restoreBlockWithFocus: focusActions.restoreBlockWithFocus,
     setBlockKeepState: blockMutations.setKeepState,
+    setBlockPinnedState: blockMutations.setPinnedState,
     submitExternalEdit: externalEditActions.handleSubmitExternalEdit,
   });
 

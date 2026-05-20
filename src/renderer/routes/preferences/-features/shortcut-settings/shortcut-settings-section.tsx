@@ -9,7 +9,9 @@ import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferen
 import {
   CheckIcon,
   ArchiveIcon,
+  CopyIcon,
   KeyboardIcon,
+  PinIcon,
   PlusCircleIcon,
   Trash2Icon,
   WandSparklesIcon,
@@ -40,9 +42,19 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
     title: <Trans id="preferences.shortcuts.create-block.label">Create block</Trans>,
   },
   {
+    action: "copy-block",
+    icon: CopyIcon,
+    title: <Trans id="preferences.shortcuts.copy-block.label">Copy block</Trans>,
+  },
+  {
     action: "keep-block",
     icon: FlagIcon,
     title: <Trans id="preferences.shortcuts.keep-block.label">Keep block</Trans>,
+  },
+  {
+    action: "toggle-pin-block",
+    icon: PinIcon,
+    title: <Trans id="preferences.shortcuts.toggle-pin-block.label">Pin/unpin block</Trans>,
   },
   {
     action: "delete-block",

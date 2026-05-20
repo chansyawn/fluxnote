@@ -4,7 +4,7 @@ import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-u
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
 import { AdornmentCluster } from "./adornment-cluster";
-import { BlockActions } from "./block-actions";
+import { BlockActions, type BlockActionPosition } from "./block-actions";
 import { ExternalEditControls } from "./external-edit-controls";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
 
@@ -12,6 +12,8 @@ interface BlockAdornmentsProps {
   actions: WorkspaceBlockActions;
   active: boolean;
   block: Block;
+  copyFeedbackActive: boolean;
+  position: BlockActionPosition;
   shortcuts: ShortcutPreferences;
   state: WorkspaceBlockState;
   tags: Tag[];
@@ -21,6 +23,8 @@ export function BlockAdornments({
   actions,
   active,
   block,
+  copyFeedbackActive,
+  position,
   shortcuts,
   state,
   tags,
@@ -54,20 +58,26 @@ export function BlockAdornments({
         <BlockActions
           className="ml-auto shrink-0"
           block={block}
+          position={position}
           state={{
             tags,
             shortcuts,
+            copied: copyFeedbackActive,
             disabled: state.isLocked,
             pending: {
               archive: state.isArchivePending,
               delete: state.isDeletePending,
               keep: state.isKeepPending,
+              pinned: state.isPinnedPending,
+              reorder: state.isReorderPending,
               tag: state.isTagCreatePending,
             },
           }}
           handlers={{
             onCopy: actions.copy,
+            onReorder: actions.reorder,
             onToggleKeep: actions.toggleKeep,
+            onTogglePinned: actions.togglePinned,
             onToggleArchive: actions.toggleArchive,
             onDelete: actions.deleteOrCancelExternalEdit,
             onCreateTag: actions.createTag,

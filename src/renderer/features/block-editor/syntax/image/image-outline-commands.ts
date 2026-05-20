@@ -49,7 +49,6 @@ export function registerImageOutlineCommands(editor: LexicalEditor): () => void 
     visibleImageKey = nextImageKey;
   };
 
-  const rootElement = editor.getRootElement();
   const startPointerSelection = () => {
     updateOutline({ isPointerSelecting: true });
   };
@@ -57,19 +56,21 @@ export function registerImageOutlineCommands(editor: LexicalEditor): () => void 
     updateOutline({ isPointerSelecting: false });
   };
 
-  const unregisterRootEvents = rootElement
-    ? () => {
-        rootElement.removeEventListener("pointerdown", startPointerSelection);
-        rootElement.ownerDocument.removeEventListener("pointerup", stopPointerSelection);
-        rootElement.ownerDocument.removeEventListener("pointercancel", stopPointerSelection);
-      }
-    : () => {};
+  const unregisterRootEvents = editor.registerRootListener((rootElement) => {
+    if (!rootElement) {
+      return;
+    }
 
-  if (rootElement) {
     rootElement.addEventListener("pointerdown", startPointerSelection);
     rootElement.ownerDocument.addEventListener("pointerup", stopPointerSelection);
     rootElement.ownerDocument.addEventListener("pointercancel", stopPointerSelection);
-  }
+
+    return () => {
+      rootElement.removeEventListener("pointerdown", startPointerSelection);
+      rootElement.ownerDocument.removeEventListener("pointerup", stopPointerSelection);
+      rootElement.ownerDocument.removeEventListener("pointercancel", stopPointerSelection);
+    };
+  });
 
   const unregisterEditor = mergeRegister(
     editor.registerUpdateListener(({ editorState }) => {

@@ -1,27 +1,74 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { Block, Tag } from "@renderer/clients";
-import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
+import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@renderer/ui/components/dropdown-menu";
 import { cn } from "@renderer/ui/lib/utils";
-import { ArchiveIcon, ArchiveRestoreIcon, FlagIcon, TagIcon, Trash2Icon } from "lucide-react";
+import {
+  ArchiveIcon,
+  ArchiveRestoreIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronsUpIcon,
+  EllipsisIcon,
+  FlagOffIcon,
+  FlagIcon,
+  LoaderCircleIcon,
+  PinOffIcon,
+  PinIcon,
+  TagIcon,
+  Trash2Icon,
+} from "lucide-react";
 import type { ComponentProps } from "react";
 
+import type { BlockReorderOperation } from "../use-block-mutations";
 import { AdornmentBar } from "./adornment-bar";
 import { CopyAction, IconAction } from "./icon-action";
 
+export interface BlockActionPosition {
+  canMoveDown: boolean;
+  canMoveToTop: boolean;
+  canMoveUp: boolean;
+}
+
 interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   block: Block;
+  position: BlockActionPosition;
   state: {
     tags: Tag[];
     shortcuts?: ShortcutPreferences;
+    copied?: boolean;
     disabled?: boolean;
-    pending?: { archive?: boolean; delete?: boolean; keep?: boolean; tag?: boolean };
+    pending?: {
+      archive?: boolean;
+      delete?: boolean;
+      keep?: boolean;
+      pinned?: boolean;
+      reorder?: boolean;
+      tag?: boolean;
+    };
   };
   handlers: {
     onCopy: () => Promise<void>;
+    onReorder: (operation: BlockReorderOperation) => Promise<void>;
     onToggleKeep: () => Promise<void>;
+    onTogglePinned: () => Promise<void>;
     onToggleArchive: () => Promise<void>;
     onDelete: () => Promise<void>;
     onCreateTag: (name: string) => Promise<void>;
@@ -29,15 +76,31 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
   };
 }
 
-export function BlockActions({ block, className, state, handlers }: BlockActionsProps) {
+function BlockActionMenuShortcut({ shortcut }: { shortcut?: ShortcutBinding }) {
+  const shortcutLabel = formatShortcutTokens(shortcut ?? null).join("+");
+
+  if (!shortcutLabel) {
+    return null;
+  }
+
+  return <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>;
+}
+
+export function BlockActions({ block, className, position, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
-  const { tags, shortcuts, disabled, pending = {} } = state;
+  const { tags, shortcuts, copied = false, disabled, pending = {} } = state;
   const isArchived = block.archivedAt !== null;
+  const reorderDisabled = disabled || pending.reorder;
 
   return (
     <AdornmentBar className={className} disabled={disabled}>
       <ButtonGroup>
-        <CopyAction disabled={disabled} onCopy={handlers.onCopy} />
+        <CopyAction
+          copied={copied}
+          disabled={disabled}
+          shortcut={shortcuts?.["copy-block"]}
+          onCopy={handlers.onCopy}
+        />
         <TagComboboxPopover
           disabled={disabled}
           isCreatingTag={pending.tag ?? false}
@@ -59,32 +122,6 @@ export function BlockActions({ block, className, state, handlers }: BlockActions
           onCreateTag={handlers.onCreateTag}
           onSelectedTagIdsChange={handlers.onAssignTags}
         />
-        {isArchived ? null : (
-          <IconAction
-            active={block.isKept}
-            icon={<FlagIcon className={cn("size-3", block.isKept && "fill-primary")} />}
-            shortcut={shortcuts?.["keep-block"]}
-            label={
-              block.isKept ? (
-                <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
-              ) : (
-                <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
-              )
-            }
-            tooltipLabel={
-              block.isKept ? (
-                <Trans id="workspace.blocks.unkeep.tooltip">Unkeep</Trans>
-              ) : (
-                <Trans id="workspace.blocks.keep.tooltip">Keep</Trans>
-              )
-            }
-            disabled={disabled}
-            pending={pending.keep}
-            onClick={() => {
-              void handlers.onToggleKeep();
-            }}
-          />
-        )}
         <IconAction
           icon={
             isArchived ? (
@@ -125,6 +162,103 @@ export function BlockActions({ block, className, state, handlers }: BlockActions
             void handlers.onDelete();
           }}
         />
+        {isArchived ? null : (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={i18n._({
+                id: "workspace.blocks.more-actions",
+                message: "More block actions",
+              })}
+              disabled={disabled}
+              render={<Button size="icon-xs" variant="ghost" />}
+            >
+              <EllipsisIcon className="size-3" />
+              <span className="sr-only">
+                <Trans id="workspace.blocks.more-actions">More block actions</Trans>
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-auto min-w-48">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <Trans id="workspace.blocks.status">Status</Trans>
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={disabled || pending.keep}
+                  onClick={() => {
+                    void handlers.onToggleKeep();
+                  }}
+                >
+                  {pending.keep ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : block.isKept ? (
+                    <FlagOffIcon />
+                  ) : (
+                    <FlagIcon />
+                  )}
+                  {block.isKept ? (
+                    <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+                  ) : (
+                    <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+                  )}
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["keep-block"]} />
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={disabled || pending.pinned}
+                  onClick={() => {
+                    void handlers.onTogglePinned();
+                  }}
+                >
+                  {pending.pinned ? (
+                    <LoaderCircleIcon className="animate-spin" />
+                  ) : block.isPinned ? (
+                    <PinOffIcon />
+                  ) : (
+                    <PinIcon />
+                  )}
+                  {block.isPinned ? (
+                    <Trans id="workspace.blocks.unpin">Unpin from top</Trans>
+                  ) : (
+                    <Trans id="workspace.blocks.pin">Pin to top</Trans>
+                  )}
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["toggle-pin-block"]} />
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>
+                  <Trans id="workspace.blocks.move">Move</Trans>
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveUp}
+                  onClick={() => {
+                    void handlers.onReorder("move-up");
+                  }}
+                >
+                  <ArrowUpIcon />
+                  <Trans id="workspace.blocks.move-up">Move up</Trans>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveDown}
+                  onClick={() => {
+                    void handlers.onReorder("move-down");
+                  }}
+                >
+                  <ArrowDownIcon />
+                  <Trans id="workspace.blocks.move-down">Move down</Trans>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={reorderDisabled || !position.canMoveToTop}
+                  onClick={() => {
+                    void handlers.onReorder("move-to-top");
+                  }}
+                >
+                  <ChevronsUpIcon />
+                  <Trans id="workspace.blocks.move-to-top">Move to top</Trans>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </ButtonGroup>
     </AdornmentBar>
   );

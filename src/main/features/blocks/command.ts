@@ -1,7 +1,7 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
-import type { AutoArchiveSettings } from "@shared/features/preferences/settings";
+import type { Settings } from "@shared/features/preferences/settings";
 
 import {
   createAutoArchiveEvaluationContext,
@@ -15,14 +15,16 @@ import {
   deleteArchivedBlocks,
   listBlocks,
   locateBlock,
+  reorderBlock,
   restoreBlock,
   setBlockKeepState,
+  setBlockPinnedState,
   updateBlockContent,
 } from "./service";
 
 interface BlocksCommandDeps {
   db: AppDatabase;
-  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>;
+  readSettings: () => Settings | Promise<Settings>;
   listExternalEditSessions: () => ExternalEditSession[];
   getAssetPathForBlock: (blockId: string) => string;
   now: () => Date;
@@ -31,7 +33,7 @@ interface BlocksCommandDeps {
 async function getAutoArchiveEvaluationContext(
   deps: BlocksCommandDeps,
 ): Promise<AutoArchiveEvaluationContext> {
-  const settings = await resolveAutoArchiveSettings(deps.readAutoArchiveSettings);
+  const settings = await resolveAutoArchiveSettings(deps.readSettings);
 
   return createAutoArchiveEvaluationContext({
     now: deps.now(),
@@ -86,9 +88,25 @@ export function registerBlocksCommands(ipc: IpcRouter, deps: BlocksCommandDeps):
     return await restoreBlock(deps.db, input.blockId, autoArchiveContext);
   });
 
+  ipc.command("blocks.reorder", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await reorderBlock(
+      deps.db,
+      input.blockId,
+      input.operation,
+      input.tagIds,
+      autoArchiveContext,
+    );
+  });
+
   ipc.command("blocks.set-keep-state", async (input) => {
     const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
     return await setBlockKeepState(deps.db, input.blockId, input.isKept, autoArchiveContext);
+  });
+
+  ipc.command("blocks.set-pinned-state", async (input) => {
+    const autoArchiveContext = await getAutoArchiveEvaluationContext(deps);
+    return await setBlockPinnedState(deps.db, input.blockId, input.isPinned, autoArchiveContext);
   });
 
   ipc.command("blocks.update-content", async (input) => {

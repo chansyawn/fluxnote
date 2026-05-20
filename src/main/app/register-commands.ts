@@ -20,6 +20,9 @@ import type { WindowManager } from "../features/window";
 import { registerWindowCommands } from "../features/window/command";
 
 export interface RegisterFeatureCommandsDeps {
+  autoArchiveRuntime: {
+    refreshState: () => Promise<void>;
+  };
   db: AppDatabase;
   events: EventBus;
   externalEditManager: ExternalEditManager;
@@ -40,7 +43,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
     getAssetPathForBlock: deps.paths.assetPathForBlock,
     listExternalEditSessions: deps.externalEditManager.listSessions,
     now: deps.now,
-    readAutoArchiveSettings: deps.preferencesService.readAutoArchiveSettings,
+    readSettings: deps.preferencesService.readSettings,
   });
   registerClipboardCommands(ipc);
   registerCliCommands(ipc);
@@ -54,6 +57,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
     openBlockService: deps.openBlockService,
   });
   registerPreferencesCommands(ipc, {
+    onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
     preferencesService: deps.preferencesService,
   });
   registerShortcutCommands(ipc, {

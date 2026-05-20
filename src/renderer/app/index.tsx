@@ -5,6 +5,7 @@ import { ThemeStateProvider } from "@renderer/app/theme";
 import { AutoArchiveSync } from "@renderer/features/auto-archive/auto-archive-sync";
 import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-boundary";
 import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-state";
+import { PreferencesSync } from "@renderer/features/preferences/preferences-query";
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
@@ -40,6 +41,7 @@ export function App() {
                 <FontSizeStateProvider>
                   <DirectionStateProvider>
                     <TooltipProvider>
+                      <PreferencesSync />
                       <AutoArchiveSync />
                       <RouterProvider router={router} />
                       <Toaster />

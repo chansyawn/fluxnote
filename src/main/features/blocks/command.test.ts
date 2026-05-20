@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -7,8 +8,10 @@ const mocks = vi.hoisted(() => ({
   deleteBlock: vi.fn(),
   listBlocks: vi.fn(),
   locateBlock: vi.fn(),
+  reorderBlock: vi.fn(),
   restoreBlock: vi.fn(),
   setBlockKeepState: vi.fn(),
+  setBlockPinnedState: vi.fn(),
   updateBlockContent: vi.fn(),
 }));
 
@@ -28,7 +31,10 @@ describe("blocks command", () => {
     getAssetPathForBlock: (blockId: string) => `/tmp/${blockId}`,
     listExternalEditSessions: () => [],
     now: () => new Date("2026-01-01T00:00:00.000Z"),
-    readAutoArchiveSettings: () => ({ enabled: true, idleMinutes: 60 }),
+    readSettings: () => ({
+      ...DEFAULT_SETTINGS,
+      autoArchive: { enabled: true, idleMinutes: 60 },
+    }),
   };
 
   beforeEach(() => {
@@ -117,5 +123,43 @@ describe("blocks command", () => {
       expect.objectContaining({ cutoffIso: expect.any(String) }),
     );
     expect(result).toEqual({ id: "b1", isKept: true });
+  });
+
+  it("dispatches reorder command", async () => {
+    mocks.reorderBlock.mockResolvedValue({ block: { id: "b1" }, changed: true });
+    registerBlocksCommands(ipc as never, deps);
+
+    const result = await handlers.get("blocks.reorder")?.({
+      blockId: "b1",
+      operation: "move-to-top",
+      tagIds: ["t1"],
+    });
+
+    expect(mocks.reorderBlock).toHaveBeenCalledWith(
+      deps.db,
+      "b1",
+      "move-to-top",
+      ["t1"],
+      expect.objectContaining({ cutoffIso: expect.any(String) }),
+    );
+    expect(result).toEqual({ block: { id: "b1" }, changed: true });
+  });
+
+  it("dispatches pinned state command", async () => {
+    mocks.setBlockPinnedState.mockResolvedValue({ id: "b1", isPinned: true });
+    registerBlocksCommands(ipc as never, deps);
+
+    const result = await handlers.get("blocks.set-pinned-state")?.({
+      blockId: "b1",
+      isPinned: true,
+    });
+
+    expect(mocks.setBlockPinnedState).toHaveBeenCalledWith(
+      deps.db,
+      "b1",
+      true,
+      expect.objectContaining({ cutoffIso: expect.any(String) }),
+    );
+    expect(result).toEqual({ id: "b1", isPinned: true });
   });
 });

@@ -1,6 +1,10 @@
 import type { AppDatabase } from "@main/core/database";
 import { blocks, type BlockRecord } from "@main/core/database";
-import { DEFAULT_SETTINGS, type AutoArchiveSettings } from "@shared/features/preferences/settings";
+import {
+  DEFAULT_SETTINGS,
+  type AutoArchiveSettings,
+  type Settings,
+} from "@shared/features/preferences/settings";
 import { and, eq, isNull, lt } from "drizzle-orm";
 
 export interface AutoArchiveEvaluationContext {
@@ -15,10 +19,10 @@ export interface AutoArchiveEvaluationInput {
 }
 
 export async function resolveAutoArchiveSettings(
-  readAutoArchiveSettings: () => AutoArchiveSettings | Promise<AutoArchiveSettings>,
+  readSettings: () => Settings | Promise<Settings>,
 ): Promise<AutoArchiveSettings> {
   try {
-    return await readAutoArchiveSettings();
+    return (await readSettings()).autoArchive;
   } catch {
     return DEFAULT_SETTINGS.autoArchive;
   }

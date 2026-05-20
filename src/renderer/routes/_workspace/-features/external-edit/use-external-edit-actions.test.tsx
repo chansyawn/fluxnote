@@ -64,6 +64,8 @@ function createBlock(id: string, content: string): Block {
     createdAt: "2026-01-01T00:00:00.000Z",
     id,
     isKept: false,
+    isPinned: false,
+    orderIndex: 0,
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
     willArchive: false,

@@ -13,6 +13,8 @@ export const blockSchema = z.object({
   contentUpdatedAt: z.string(),
   archivedAt: z.string().nullable(),
   isKept: z.boolean(),
+  isPinned: z.boolean(),
+  orderIndex: z.number().int(),
   createdAt: z.string(),
   updatedAt: z.string(),
   willArchive: z.boolean(),
@@ -26,6 +28,20 @@ export const blockMutationRequestSchema = z.object({
 export const blockKeepStateRequestSchema = z.object({
   blockId: z.string().min(1),
   isKept: z.boolean(),
+});
+export const blockPinnedStateRequestSchema = z.object({
+  blockId: z.string().min(1),
+  isPinned: z.boolean(),
+});
+export const blockReorderOperationSchema = z.enum(["move-up", "move-down", "move-to-top"]);
+export const blockReorderRequestSchema = z.object({
+  blockId: z.string().min(1),
+  operation: blockReorderOperationSchema,
+  tagIds: z.array(z.string()).optional(),
+});
+export const blockReorderResponseSchema = z.object({
+  block: blockSchema,
+  changed: z.boolean(),
 });
 export const blockVisibilitySchema = z.enum(["active", "archived"]);
 export const blocksListRequestSchema = z.object({

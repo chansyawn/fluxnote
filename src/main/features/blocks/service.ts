@@ -3,12 +3,24 @@ import fs from "node:fs/promises";
 import type { AppDatabase } from "@main/core/database";
 import { blockTags, blocks, tags, type BlockRecord } from "@main/core/database";
 import { getSqliteChangedRows, nowIsoString } from "@main/core/database";
-import type { Block } from "@shared/features/blocks/models";
+import type { Block, blockReorderOperationSchema } from "@shared/features/blocks/models";
 import type { Tag } from "@shared/features/tags/models";
 import { businessError } from "@shared/ipc/result";
-import { and, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import type { z } from "zod";
 
 import { blockWillAutoArchive, type AutoArchiveEvaluationContext } from "./auto-archive-policy";
+
+type AppDbTransaction = Parameters<Parameters<AppDatabase["transaction"]>[0]>[0];
+type BlocksDb = AppDatabase | AppDbTransaction;
+type BlockReorderOperation = z.infer<typeof blockReorderOperationSchema>;
+
+interface BlockOrderRow {
+  id: string;
+  createdAt: string;
+  isPinned: boolean;
+  orderIndex: number;
+}
 
 function mapTagRow(tag: { createdAt: string; id: string; name: string; updatedAt: string }): Tag {
   return {
@@ -30,6 +42,8 @@ function mapBlockRow(
     contentUpdatedAt: block.contentUpdatedAt,
     archivedAt: block.archivedAt,
     isKept: block.isKept,
+    isPinned: block.isPinned,
+    orderIndex: block.orderIndex,
     createdAt: block.createdAt,
     updatedAt: block.updatedAt,
     willArchive: autoArchiveContext ? blockWillAutoArchive(block, autoArchiveContext) : false,
@@ -38,7 +52,7 @@ function mapBlockRow(
 }
 
 async function getTagsForBlocks(
-  db: AppDatabase,
+  db: BlocksDb,
   blockIds: readonly string[],
 ): Promise<Map<string, Tag[]>> {
   if (blockIds.length === 0) {
@@ -68,8 +82,101 @@ async function getTagsForBlocks(
   return grouped;
 }
 
+async function getTopOrderIndex(db: BlocksDb, isPinned: boolean): Promise<number> {
+  const topBlock = await db
+    .select({ orderIndex: blocks.orderIndex })
+    .from(blocks)
+    .where(and(isNull(blocks.archivedAt), eq(blocks.isPinned, isPinned)))
+    .orderBy(asc(blocks.orderIndex), desc(blocks.createdAt), desc(blocks.id))
+    .limit(1)
+    .get();
+
+  return topBlock ? topBlock.orderIndex - 1 : 0;
+}
+
+async function listActiveOrderRows(db: BlocksDb): Promise<BlockOrderRow[]> {
+  return await db
+    .select({
+      id: blocks.id,
+      createdAt: blocks.createdAt,
+      isPinned: blocks.isPinned,
+      orderIndex: blocks.orderIndex,
+    })
+    .from(blocks)
+    .where(isNull(blocks.archivedAt))
+    .orderBy(desc(blocks.isPinned), asc(blocks.orderIndex), desc(blocks.createdAt), desc(blocks.id))
+    .all();
+}
+
+async function getVisibleBlockIdSet(
+  db: BlocksDb,
+  tagIds: readonly string[],
+): Promise<Set<string> | null> {
+  const uniqueTagIds = Array.from(new Set(tagIds));
+  if (uniqueTagIds.length === 0) {
+    return null;
+  }
+
+  const rows = await db
+    .select({ id: blockTags.blockId })
+    .from(blockTags)
+    .where(inArray(blockTags.tagId, uniqueTagIds))
+    .groupBy(blockTags.blockId)
+    .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
+    .all();
+
+  return new Set(rows.map((row) => row.id));
+}
+
+function moveBlockOrderRow(
+  partitionRows: readonly BlockOrderRow[],
+  visibleRows: readonly BlockOrderRow[],
+  targetBlockId: string,
+  operation: BlockReorderOperation,
+): BlockOrderRow[] | null {
+  const visibleIndex = visibleRows.findIndex((row) => row.id === targetBlockId);
+  if (visibleIndex === -1) {
+    throw businessError(
+      "BUSINESS.INVALID_OPERATION",
+      "Block is outside the current workspace view",
+      {
+        blockId: targetBlockId,
+      },
+    );
+  }
+
+  const anchor =
+    operation === "move-down" ? visibleRows[visibleIndex + 1] : visibleRows[visibleIndex - 1];
+  if (operation !== "move-to-top" && !anchor) {
+    return null;
+  }
+  if (operation === "move-to-top" && visibleIndex === 0) {
+    return null;
+  }
+
+  const target = partitionRows.find((row) => row.id === targetBlockId);
+  if (!target) {
+    return null;
+  }
+
+  const rowsWithoutTarget = partitionRows.filter((row) => row.id !== targetBlockId);
+  const anchorId = operation === "move-to-top" ? visibleRows[0].id : anchor?.id;
+  const anchorIndex = rowsWithoutTarget.findIndex((row) => row.id === anchorId);
+  if (anchorIndex === -1) {
+    return null;
+  }
+
+  const insertIndex = operation === "move-down" ? anchorIndex + 1 : anchorIndex;
+  return [
+    ...rowsWithoutTarget.slice(0, insertIndex),
+    target,
+    ...rowsWithoutTarget.slice(insertIndex),
+  ];
+}
+
 export async function createBlockRecord(db: AppDatabase, content = ""): Promise<Block> {
   const blockId = crypto.randomUUID();
+  const orderIndex = await getTopOrderIndex(db, false);
 
   await db
     .insert(blocks)
@@ -77,6 +184,8 @@ export async function createBlockRecord(db: AppDatabase, content = ""): Promise<
       archivedAt: null,
       content,
       id: blockId,
+      isPinned: false,
+      orderIndex,
     })
     .run();
 
@@ -108,12 +217,14 @@ async function countBlocks(
   db: AppDatabase,
   tagIds: readonly string[],
   visibility: "active" | "archived",
-  beforeCreatedAt?: { createdAt: string; id: string },
+  beforeBlock?: BlockOrderRow,
 ): Promise<number> {
   const archivedPredicate =
     visibility === "archived" ? isNotNull(blocks.archivedAt) : isNull(blocks.archivedAt);
-  const beforePredicate = beforeCreatedAt
-    ? sql`(${blocks.createdAt} > ${beforeCreatedAt.createdAt} OR (${blocks.createdAt} = ${beforeCreatedAt.createdAt} AND ${blocks.id} > ${beforeCreatedAt.id}))`
+  const beforePredicate = beforeBlock
+    ? visibility === "active"
+      ? sql`(${blocks.isPinned} > ${beforeBlock.isPinned ? 1 : 0} OR (${blocks.isPinned} = ${beforeBlock.isPinned ? 1 : 0} AND (${blocks.orderIndex} < ${beforeBlock.orderIndex} OR (${blocks.orderIndex} = ${beforeBlock.orderIndex} AND (${blocks.createdAt} > ${beforeBlock.createdAt} OR (${blocks.createdAt} = ${beforeBlock.createdAt} AND ${blocks.id} > ${beforeBlock.id}))))))`
+      : sql`(${blocks.createdAt} > ${beforeBlock.createdAt} OR (${blocks.createdAt} = ${beforeBlock.createdAt} AND ${blocks.id} > ${beforeBlock.id}))`
     : undefined;
 
   if (tagIds.length === 0) {
@@ -157,8 +268,14 @@ export async function listBlocks(
     createdAt: blocks.createdAt,
     id: blocks.id,
     isKept: blocks.isKept,
+    isPinned: blocks.isPinned,
+    orderIndex: blocks.orderIndex,
     updatedAt: blocks.updatedAt,
   } satisfies Record<string, unknown>;
+  const orderBy =
+    visibility === "active"
+      ? [desc(blocks.isPinned), asc(blocks.orderIndex), desc(blocks.createdAt), desc(blocks.id)]
+      : [desc(blocks.createdAt), desc(blocks.id)];
 
   let blockRows: BlockRecord[];
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
@@ -175,10 +292,12 @@ export async function listBlocks(
         blocks.archivedAt,
         blocks.createdAt,
         blocks.isKept,
+        blocks.isPinned,
+        blocks.orderIndex,
         blocks.updatedAt,
       )
       .having(sql`count(distinct ${blockTags.tagId}) = ${uniqueTagIds.length}`)
-      .orderBy(desc(blocks.createdAt), desc(blocks.id))
+      .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
       .all();
@@ -187,7 +306,7 @@ export async function listBlocks(
       .select(selectedFields)
       .from(blocks)
       .where(archivedPredicate)
-      .orderBy(desc(blocks.createdAt), desc(blocks.id))
+      .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
       .all();
@@ -217,7 +336,12 @@ export async function locateBlock(
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
 
   const targetBlock = await db
-    .select({ id: blocks.id, createdAt: blocks.createdAt })
+    .select({
+      id: blocks.id,
+      createdAt: blocks.createdAt,
+      isPinned: blocks.isPinned,
+      orderIndex: blocks.orderIndex,
+    })
     .from(blocks)
     .where(and(archivedPredicate, eq(blocks.id, blockId)))
     .get();
@@ -239,6 +363,8 @@ export async function locateBlock(
   const index = await countBlocks(db, uniqueTagIds, visibility, {
     createdAt: targetBlock.createdAt,
     id: targetBlock.id,
+    isPinned: targetBlock.isPinned,
+    orderIndex: targetBlock.orderIndex,
   });
 
   return {
@@ -279,6 +405,7 @@ export async function archiveBlock(
     .set({
       archivedAt: now,
       isKept: false,
+      isPinned: false,
     })
     .where(eq(blocks.id, blockId))
     .run();
@@ -294,10 +421,13 @@ export async function restoreBlock(
   blockId: string,
   autoArchiveContext?: AutoArchiveEvaluationContext,
 ): Promise<Block> {
+  const orderIndex = await getTopOrderIndex(db, false);
   const result = await db
     .update(blocks)
     .set({
       archivedAt: null,
+      isPinned: false,
+      orderIndex,
     })
     .where(eq(blocks.id, blockId))
     .run();
@@ -306,6 +436,67 @@ export async function restoreBlock(
   }
 
   return await getPublicBlockById(db, blockId, autoArchiveContext);
+}
+
+export async function reorderBlock(
+  db: AppDatabase,
+  blockId: string,
+  operation: BlockReorderOperation,
+  tagIds: string[] | undefined,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<{ block: Block; changed: boolean }> {
+  const changed = await db.transaction(async (tx) => {
+    const targetBlock = await tx
+      .select({ archivedAt: blocks.archivedAt, id: blocks.id })
+      .from(blocks)
+      .where(eq(blocks.id, blockId))
+      .get();
+    if (!targetBlock) {
+      throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+    }
+    if (targetBlock.archivedAt !== null) {
+      throw businessError("BUSINESS.INVALID_OPERATION", "Archived blocks cannot be reordered", {
+        blockId,
+      });
+    }
+
+    const activeRows = await listActiveOrderRows(tx);
+    const targetRow = activeRows.find((row) => row.id === blockId);
+    if (!targetRow) {
+      throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+    }
+
+    const visibleBlockIds = await getVisibleBlockIdSet(tx, tagIds ?? []);
+    const partitionRows = activeRows.filter((row) => row.isPinned === targetRow.isPinned);
+    const visiblePartitionRows = partitionRows.filter(
+      (row) => !visibleBlockIds || visibleBlockIds.has(row.id),
+    );
+    const reorderedRows = moveBlockOrderRow(
+      partitionRows,
+      visiblePartitionRows,
+      blockId,
+      operation,
+    );
+
+    if (!reorderedRows) {
+      return false;
+    }
+
+    const changedOrder = reorderedRows.some((row, index) => row.id !== partitionRows[index]?.id);
+    if (!changedOrder) {
+      return false;
+    }
+
+    for (const [orderIndex, row] of reorderedRows.entries()) {
+      await tx.update(blocks).set({ orderIndex }).where(eq(blocks.id, row.id)).run();
+    }
+    return true;
+  });
+
+  return {
+    block: await getPublicBlockById(db, blockId, autoArchiveContext),
+    changed,
+  };
 }
 
 export async function setBlockKeepState(
@@ -324,6 +515,45 @@ export async function setBlockKeepState(
   if (getSqliteChangedRows(result) === 0) {
     throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
   }
+
+  return await getPublicBlockById(db, blockId, autoArchiveContext);
+}
+
+export async function setBlockPinnedState(
+  db: AppDatabase,
+  blockId: string,
+  isPinned: boolean,
+  autoArchiveContext?: AutoArchiveEvaluationContext,
+): Promise<Block> {
+  await db.transaction(async (tx) => {
+    const targetBlock = await tx
+      .select({ archivedAt: blocks.archivedAt, id: blocks.id, isPinned: blocks.isPinned })
+      .from(blocks)
+      .where(eq(blocks.id, blockId))
+      .get();
+    if (!targetBlock) {
+      throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+    }
+    if (targetBlock.archivedAt !== null) {
+      throw businessError("BUSINESS.INVALID_OPERATION", "Archived blocks cannot be pinned", {
+        blockId,
+      });
+    }
+    if (targetBlock.isPinned === isPinned) {
+      return;
+    }
+
+    const orderIndex = await getTopOrderIndex(tx, isPinned);
+    await tx
+      .update(blocks)
+      .set({
+        isPinned,
+        ...(isPinned ? { isKept: true } : {}),
+        orderIndex,
+      })
+      .where(eq(blocks.id, blockId))
+      .run();
+  });
 
   return await getPublicBlockById(db, blockId, autoArchiveContext);
 }

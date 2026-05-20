@@ -34,6 +34,7 @@ export function createBackendRuntime() {
       isSenderTrusted: services.events.isSenderTrusted,
     });
     registerFeatureCommands(ipc, {
+      autoArchiveRuntime: services.autoArchiveRuntime,
       db,
       events: services.events,
       externalEditManager: services.externalEditManager,

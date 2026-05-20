@@ -7,9 +7,11 @@ import { Button } from "@renderer/ui/components/button";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { CheckIcon, CopyIcon, LoaderCircleIcon } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 
-const COPY_FEEDBACK_DURATION_MS = 2000;
+import { COPY_FEEDBACK_DURATION_MS } from "./copy-feedback";
+
+export { COPY_FEEDBACK_DURATION_MS };
 
 interface IconActionProps {
   active?: boolean;
@@ -66,28 +68,22 @@ export function IconAction({
 }
 
 interface CopyActionProps {
+  copied?: boolean;
   disabled?: boolean;
+  shortcut?: ShortcutBinding;
   onCopy: () => Promise<void>;
 }
 
-export function CopyAction({ disabled, onCopy }: CopyActionProps) {
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
-    return () => clearTimeout(timer);
-  }, [copied]);
-
+export function CopyAction({ copied = false, disabled, shortcut, onCopy }: CopyActionProps) {
   return (
     <IconAction
       icon={copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
       label={<Trans id="home-note.block.copy">Copy block</Trans>}
       tooltipLabel={<Trans id="home-note.block.copy.tooltip">Copy</Trans>}
+      shortcut={shortcut}
       disabled={disabled}
       onClick={async () => {
         await onCopy();
-        setCopied(true);
       }}
     />
   );

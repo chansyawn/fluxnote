@@ -1,4 +1,10 @@
-import { patchSettings, readSettings, resetSettings, toAppInvokeError } from "@renderer/clients";
+import {
+  onPreferencesChanged,
+  patchSettings,
+  readSettings,
+  resetSettings,
+  toAppInvokeError,
+} from "@renderer/clients";
 import {
   DEFAULT_SETTINGS,
   type AutoArchiveSettings,
@@ -10,13 +16,24 @@ import {
   type ShortcutAction,
 } from "@shared/features/preferences/settings";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
-import { refreshBlocks } from "../blocks/block-query";
 import { normalizeShortcutPreferences, type ShortcutBinding } from "../shortcut/shortcut-utils";
 
 export const SETTINGS_QUERY_KEY = ["preferences", "settings"] as const;
+
+export function PreferencesSync() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    return onPreferencesChanged((settings) => {
+      queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+    });
+  }, [queryClient]);
+
+  return null;
+}
 
 export function useSettingsQuery() {
   return useQuery({
@@ -36,11 +53,8 @@ export function usePatchSettingsMutation() {
   return useMutation({
     mutationFn: patchSettings,
     onError: showSettingsError,
-    onSuccess: (settings, patch) => {
+    onSuccess: (settings) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
-      if (patch.autoArchive) {
-        refreshBlocks();
-      }
     },
   });
 }
@@ -53,7 +67,6 @@ export function useResetSettingsMutation() {
     onError: showSettingsError,
     onSuccess: (settings) => {
       queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
-      refreshBlocks();
     },
   });
 }

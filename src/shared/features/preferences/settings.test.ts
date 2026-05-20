@@ -26,21 +26,23 @@ describe("settings", () => {
     expect(normalizeSettings({ schemaVersion: 999 })).toEqual(DEFAULT_SETTINGS);
   });
 
-  it("should normalize nested fields with catch defaults", () => {
+  it("should normalize nested fields without dropping valid sibling fields", () => {
     const normalized = normalizeSettings({
       schemaVersion: 1,
       appearance: {
         locale: "invalid",
-        fontSize: 999,
+        fontSize: 18,
+        unknown: true,
       },
       autoArchive: {
-        enabled: "bad",
+        enabled: false,
         idleMinutes: 0,
       },
       shortcuts: {
         "toggle-window": 1,
         "create-block": null,
         "keep-block": "Mod+K",
+        "toggle-pin-block": "Mod+T",
         "archive-block": "Mod+E",
         "delete-block": "Mod+Delete",
         "submit-external-edit": "Mod+Enter",
@@ -50,16 +52,27 @@ describe("settings", () => {
         codeBlock: {
           showLineNumbers: "bad",
           wordWrap: true,
+          unknown: true,
         },
+        unknown: true,
       },
+      unknown: true,
     });
 
-    expect(normalized.appearance).toEqual(DEFAULT_SETTINGS.appearance);
-    expect(normalized.autoArchive).toEqual(DEFAULT_SETTINGS.autoArchive);
+    expect(normalized.appearance).toEqual({
+      locale: "en",
+      fontSize: 18,
+    });
+    expect(normalized.autoArchive).toEqual({
+      enabled: false,
+      idleMinutes: DEFAULT_SETTINGS.autoArchive.idleMinutes,
+    });
     expect(normalized.shortcuts).toEqual({
       "toggle-window": "Alt+N",
       "create-block": null,
+      "copy-block": "Mod+Shift+C",
       "keep-block": "Mod+K",
+      "toggle-pin-block": "Mod+T",
       "archive-block": "Mod+E",
       "delete-block": "Mod+Delete",
       "quick-create-block": "Ctrl+Alt+N",
@@ -72,6 +85,10 @@ describe("settings", () => {
         wordWrap: true,
       },
     });
+    expect(normalized).not.toHaveProperty("unknown");
+    expect(normalized.appearance).not.toHaveProperty("unknown");
+    expect(normalized.markdown).not.toHaveProperty("unknown");
+    expect(normalized.markdown.codeBlock).not.toHaveProperty("unknown");
   });
 
   it("should parse valid settings patch", () => {
@@ -79,13 +96,13 @@ describe("settings", () => {
       normalizeSettingsPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
-        shortcuts: { "archive-block": "Mod+E" },
+        shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
-      shortcuts: { "archive-block": "Mod+E" },
+      shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
     });
   });

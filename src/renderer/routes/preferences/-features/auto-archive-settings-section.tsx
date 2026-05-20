@@ -113,7 +113,6 @@ export function AutoArchiveSettingsSection() {
   ) => {
     const nextPreferences = updater(preferences);
     patchAutoArchive(nextPreferences);
-    refreshBlocks();
   };
 
   const saveIdleMinutes = (idleMinutes: number) => {

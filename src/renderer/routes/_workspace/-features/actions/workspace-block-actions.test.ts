@@ -16,6 +16,8 @@ function createBlock(overrides?: Partial<Block>): Block {
     createdAt: "2026-01-01T00:00:00.000Z",
     id: "block-1",
     isKept: false,
+    isPinned: false,
+    orderIndex: 0,
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
     willArchive: false,
@@ -48,6 +50,8 @@ function createState(overrides?: {
     isExternalEditPending: overrides?.isExternalEditPending ?? false,
     isKeepPending: false,
     isLocked: overrides?.isLocked ?? false,
+    isPinnedPending: false,
+    isReorderPending: false,
     isTagCreatePending: overrides?.isTagCreatePending ?? false,
     visibility: "active" as const,
   };
@@ -68,8 +72,10 @@ function createCommands() {
     deleteBlock: vi.fn(async () => undefined),
     deleteTag: vi.fn(async () => undefined),
     focusBlock: vi.fn(),
+    reorderBlock: vi.fn(async () => createBlock()),
     restoreBlock: vi.fn(async () => undefined),
     setBlockKeepState: vi.fn(async () => createBlock()),
+    setBlockPinnedState: vi.fn(async () => createBlock()),
     submitExternalEdit: vi.fn(async () => undefined),
   };
 }
@@ -133,6 +139,34 @@ describe("useWorkspaceBlockActions", () => {
 
     expect(commands.deleteBlock).toHaveBeenCalledWith("block-1");
     expect(commands.cancelExternalEdit).not.toHaveBeenCalled();
+  });
+
+  it("toggles active block pin state", async () => {
+    const commands = createCommands();
+    const actions = useWorkspaceBlockActions({
+      block: createBlock(),
+      commands,
+      getEditor: vi.fn(),
+      state: createState(),
+    });
+
+    await actions.togglePinned();
+
+    expect(commands.setBlockPinnedState).toHaveBeenCalledWith("block-1", true);
+  });
+
+  it("reorders active block", async () => {
+    const commands = createCommands();
+    const actions = useWorkspaceBlockActions({
+      block: createBlock(),
+      commands,
+      getEditor: vi.fn(),
+      state: createState(),
+    });
+
+    await actions.reorder("move-to-top");
+
+    expect(commands.reorderBlock).toHaveBeenCalledWith("block-1", "move-to-top");
   });
 
   it("guards locked block mutations", async () => {

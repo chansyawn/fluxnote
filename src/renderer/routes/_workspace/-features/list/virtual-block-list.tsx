@@ -3,6 +3,7 @@ import { useFontSizePreference } from "@renderer/features/preferences/preference
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+import type { BlockActionPosition } from "../adornments/block-actions";
 import type { BlockScrollTarget } from "../navigation/use-block-navigation";
 import { BlockListRow } from "./block-list-row";
 
@@ -37,6 +38,34 @@ function findNearestScrollElement(element: HTMLElement): HTMLElement | null {
   }
 
   return document.documentElement;
+}
+
+function getBlockActionPosition({
+  block,
+  getBlockAtIndex,
+  index,
+  totalCount,
+}: {
+  block: Block | undefined;
+  getBlockAtIndex: (index: number) => Block | undefined;
+  index: number;
+  totalCount: number;
+}): BlockActionPosition {
+  if (!block) {
+    return { canMoveDown: false, canMoveToTop: false, canMoveUp: false };
+  }
+
+  const previousBlock = index > 0 ? getBlockAtIndex(index - 1) : undefined;
+  const nextBlock = index < totalCount - 1 ? getBlockAtIndex(index + 1) : undefined;
+  const canMoveUp = index > 0 && (previousBlock ? previousBlock.isPinned === block.isPinned : true);
+  const canMoveDown =
+    index < totalCount - 1 && (nextBlock ? nextBlock.isPinned === block.isPinned : true);
+
+  return {
+    canMoveDown,
+    canMoveToTop: canMoveUp,
+    canMoveUp,
+  };
 }
 
 interface VirtualBlockListProps {
@@ -196,15 +225,26 @@ export function VirtualBlockList({
               : undefined,
           }}
         >
-          {virtualBlocks.map((virtualBlock) => (
-            <div
-              key={virtualBlock.key}
-              ref={blockVirtualizer.measureElement}
-              data-index={virtualBlock.index}
-            >
-              <BlockListRow block={getBlockAtIndex(virtualBlock.index)} />
-            </div>
-          ))}
+          {virtualBlocks.map((virtualBlock) => {
+            const block = getBlockAtIndex(virtualBlock.index);
+            return (
+              <div
+                key={virtualBlock.key}
+                ref={blockVirtualizer.measureElement}
+                data-index={virtualBlock.index}
+              >
+                <BlockListRow
+                  block={block}
+                  position={getBlockActionPosition({
+                    block,
+                    getBlockAtIndex,
+                    index: virtualBlock.index,
+                    totalCount,
+                  })}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

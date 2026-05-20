@@ -38,7 +38,9 @@ describe("shortcut utils", () => {
         {
           "toggle-window": "Alt+N",
           "create-block": "Mod+N",
+          "copy-block": "Mod+Shift+C",
           "keep-block": "Mod+K",
+          "toggle-pin-block": "Mod+T",
           "archive-block": "Mod+E",
           "delete-block": "Mod+D",
           "quick-create-block": "Ctrl+Alt+N",

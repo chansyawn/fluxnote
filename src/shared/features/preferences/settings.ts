@@ -28,7 +28,9 @@ export const fontSizeSchema = z.union([
 export const shortcutActionSchema = z.enum([
   "toggle-window",
   "create-block",
+  "copy-block",
   "keep-block",
+  "toggle-pin-block",
   "archive-block",
   "delete-block",
   "quick-create-block",
@@ -47,45 +49,37 @@ const autoArchiveIdleMinutesSchema = z.preprocess(
   z.number().int(),
 );
 
-export const autoArchiveSettingsSchema = z
-  .object({
-    enabled: z.boolean().catch(true),
-    idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
-  })
-  .strict();
+export const autoArchiveSettingsSchema = z.object({
+  enabled: z.boolean().catch(true),
+  idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
+});
 
-export const shortcutPreferencesSchema = z
-  .object({
-    "toggle-window": shortcutBindingSchema.catch("Alt+N"),
-    "create-block": shortcutBindingSchema.catch("Mod+N"),
-    "keep-block": shortcutBindingSchema.catch("Mod+K"),
-    "archive-block": shortcutBindingSchema.catch("Mod+E"),
-    "delete-block": shortcutBindingSchema.catch("Mod+D"),
-    "quick-create-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
-    "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
-    "cancel-external-edit": shortcutBindingSchema.catch("Mod+\\"),
-  })
-  .strict();
+export const shortcutPreferencesSchema = z.object({
+  "toggle-window": shortcutBindingSchema.catch("Alt+N"),
+  "create-block": shortcutBindingSchema.catch("Mod+N"),
+  "copy-block": shortcutBindingSchema.catch("Mod+Shift+C"),
+  "keep-block": shortcutBindingSchema.catch("Mod+K"),
+  "toggle-pin-block": shortcutBindingSchema.catch("Mod+T"),
+  "archive-block": shortcutBindingSchema.catch("Mod+E"),
+  "delete-block": shortcutBindingSchema.catch("Mod+D"),
+  "quick-create-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
+  "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
+  "cancel-external-edit": shortcutBindingSchema.catch("Mod+\\"),
+});
 
-export const appearanceSettingsSchema = z
-  .object({
-    locale: localeSchema.catch("en"),
-    fontSize: fontSizeSchema.catch(16),
-  })
-  .strict();
+export const appearanceSettingsSchema = z.object({
+  locale: localeSchema.catch("en"),
+  fontSize: fontSizeSchema.catch(16),
+});
 
-export const markdownCodeBlockSettingsSchema = z
-  .object({
-    showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.showLineNumbers),
-    wordWrap: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.wordWrap),
-  })
-  .strict();
+export const markdownCodeBlockSettingsSchema = z.object({
+  showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.showLineNumbers),
+  wordWrap: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.wordWrap),
+});
 
-export const markdownSettingsSchema = z
-  .object({
-    codeBlock: markdownCodeBlockSettingsSchema.catch(defaultMarkdownCodeBlockSettingsValue),
-  })
-  .strict();
+export const markdownSettingsSchema = z.object({
+  codeBlock: markdownCodeBlockSettingsSchema.catch(defaultMarkdownCodeBlockSettingsValue),
+});
 
 const appearanceSettingsPatchSchema = z
   .object({
@@ -110,7 +104,9 @@ const shortcutPreferencesPatchSchema = z
   .object({
     "toggle-window": shortcutBindingSchema.optional(),
     "create-block": shortcutBindingSchema.optional(),
+    "copy-block": shortcutBindingSchema.optional(),
     "keep-block": shortcutBindingSchema.optional(),
+    "toggle-pin-block": shortcutBindingSchema.optional(),
     "archive-block": shortcutBindingSchema.optional(),
     "delete-block": shortcutBindingSchema.optional(),
     "quick-create-block": shortcutBindingSchema.optional(),
@@ -145,7 +141,9 @@ const defaultSettingsValue = {
   shortcuts: {
     "toggle-window": "Alt+N",
     "create-block": "Mod+N",
+    "copy-block": "Mod+Shift+C",
     "keep-block": "Mod+K",
+    "toggle-pin-block": "Mod+T",
     "archive-block": "Mod+E",
     "delete-block": "Mod+D",
     "quick-create-block": "Ctrl+Alt+N",
@@ -157,15 +155,13 @@ const defaultSettingsValue = {
   },
 } as const;
 
-export const settingsSchema = z
-  .object({
-    schemaVersion: z.literal(SETTINGS_SCHEMA_VERSION),
-    appearance: appearanceSettingsSchema.catch(defaultSettingsValue.appearance),
-    autoArchive: autoArchiveSettingsSchema.catch(defaultSettingsValue.autoArchive),
-    shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
-    markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
-  })
-  .strict();
+export const settingsSchema = z.object({
+  schemaVersion: z.literal(SETTINGS_SCHEMA_VERSION),
+  appearance: appearanceSettingsSchema.catch(defaultSettingsValue.appearance),
+  autoArchive: autoArchiveSettingsSchema.catch(defaultSettingsValue.autoArchive),
+  shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
+  markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
+});
 
 export const settingsPatchSchema = z
   .object({

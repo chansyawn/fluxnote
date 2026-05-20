@@ -223,22 +223,22 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:85
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:81
 msgid "home-note.block.copy"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:86
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:82
 msgid "home-note.block.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:119
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
 msgid "home-note.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:120
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:157
 msgid "home-note.block.delete.tooltip"
 msgstr "删除"
 
@@ -313,32 +313,32 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:245
 msgid "preferences.archive.clear.action"
 msgstr "清空"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:282
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:281
 msgid "preferences.archive.clear.description"
 msgstr "永久删除所有归档区块。活跃区块和标签不会受到影响。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:263
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:262
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:275
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:274
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "清空归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:256
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:255
 msgid "preferences.archive.clear.dialog.description"
 msgstr "这会永久删除所有归档区块。活跃区块和标签会保留。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:253
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:252
 msgid "preferences.archive.clear.dialog.title"
 msgstr "清空归档数据？"
 
@@ -348,7 +348,7 @@ msgid "preferences.archive.clear.error"
 msgstr "清空归档数据失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:287
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:286
 msgid "preferences.archive.clear.label"
 msgstr "清空归档数据"
 
@@ -358,27 +358,27 @@ msgid "preferences.archive.clear.success"
 msgstr "归档数据已清空。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:167
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:166
 msgid "preferences.archive.title"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:182
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:181
 msgid "preferences.auto-archive.enable.description"
 msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:189
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:188
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:234
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:233
 msgid "preferences.auto-archive.threshold.label"
 msgstr "自动归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:229
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:228
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
@@ -443,12 +443,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:55
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:67
 msgid "preferences.shortcuts.archive-block.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:90
 msgid "preferences.shortcuts.cancel-external-edit.label"
 msgstr "取消外部编辑"
 
@@ -459,12 +459,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:40
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+msgid "preferences.shortcuts.copy-block.label"
+msgstr "复制区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
 msgid "preferences.shortcuts.create-block.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:50
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:62
 msgid "preferences.shortcuts.delete-block.label"
 msgstr "删除区块"
 
@@ -490,17 +495,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:45
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:52
 msgid "preferences.shortcuts.keep-block.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:62
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:74
 msgid "preferences.shortcuts.quick-create-block.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:72
 msgid "preferences.shortcuts.quick-create-block.label"
 msgstr "快速记录区块"
 
@@ -521,17 +526,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:71
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:83
 msgid "preferences.shortcuts.submit-external-edit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:99
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:111
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:35
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:57
+msgid "preferences.shortcuts.toggle-pin-block.label"
+msgstr "固定/取消固定区块"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "开启/关闭窗口"
 
@@ -572,44 +582,75 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "没有符合所选标签的归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:100
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:137
 msgid "workspace.blocks.archive"
 msgstr "归档区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:144
 msgid "workspace.blocks.archive.tooltip"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:71
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:201
 msgid "workspace.blocks.keep"
 msgstr "保留，不自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:78
-msgid "workspace.blocks.keep.tooltip"
-msgstr "保留"
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:168
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
+msgid "workspace.blocks.more-actions"
+msgstr "更多区块操作"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:98
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:229
+msgid "workspace.blocks.move"
+msgstr "移动"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:247
+msgid "workspace.blocks.move-down"
+msgstr "下移"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:256
+msgid "workspace.blocks.move-to-top"
+msgstr "移到顶部"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:238
+msgid "workspace.blocks.move-up"
+msgstr "上移"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+msgid "workspace.blocks.pin"
+msgstr "固定到顶部"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:135
 msgid "workspace.blocks.restore"
 msgstr "恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:105
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:142
 msgid "workspace.blocks.restore.tooltip"
 msgstr "恢复"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:69
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:183
+msgid "workspace.blocks.status"
+msgstr "状态"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
 msgid "workspace.blocks.unkeep"
 msgstr "允许自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:76
-msgid "workspace.blocks.unkeep.tooltip"
-msgstr "取消保留"
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
+msgid "workspace.blocks.unpin"
+msgstr "取消固定到顶部"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:49
@@ -642,12 +683,12 @@ msgid "workspace.loading"
 msgstr "正在加载你的区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:55
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
 msgid "workspace.tags.assign.button"
 msgstr "分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:44
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
 msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 
