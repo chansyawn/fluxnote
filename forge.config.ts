@@ -12,6 +12,7 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
 import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts";
 import { copyCliResources } from "./config/forge/cli-resources";
+import { getMacSigningConfig } from "./config/forge/mac-signing";
 import { readPackageVersion } from "./config/forge/package-version";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -32,6 +33,7 @@ const packagerConfig = {
       schemes: ["flux"],
     },
   ],
+  ...getMacSigningConfig(rootDir),
 } satisfies ForgeConfig["packagerConfig"];
 
 const vitePluginConfig = {
