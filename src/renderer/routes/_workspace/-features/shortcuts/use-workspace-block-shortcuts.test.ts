@@ -135,6 +135,12 @@ type ShortcutCaptureEvent = Parameters<WorkspaceBlockActionShortcutCaptureHandle
   stopPropagation: ReturnType<typeof vi.fn>;
 };
 
+function createModModifierKeys() {
+  return process.platform === "darwin"
+    ? { ctrlKey: false, metaKey: true }
+    : { ctrlKey: true, metaKey: false };
+}
+
 function createKeyboardCaptureEvent(
   overrides?: Partial<
     Pick<KeyboardEvent, "altKey" | "ctrlKey" | "key" | "metaKey" | "shiftKey">
@@ -144,9 +150,8 @@ function createKeyboardCaptureEvent(
 ) {
   return {
     altKey: false,
-    ctrlKey: false,
     key: "Enter",
-    metaKey: true,
+    ...createModModifierKeys(),
     repeat: false,
     shiftKey: false,
     preventDefault: vi.fn(),
