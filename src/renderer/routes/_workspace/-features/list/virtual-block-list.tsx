@@ -78,7 +78,7 @@ function shouldShowPinnedSectionDivider(
 function PinnedSectionDivider() {
   return (
     <div aria-hidden="true" data-pinned-section-divider="" className="mb-3 px-1">
-      <div className="bg-muted h-0.25 w-full" />
+      <div className="bg-ring h-0.25 w-full" />
     </div>
   );
 }
