@@ -17,6 +17,7 @@ type BlockReorderOperation = z.infer<typeof blockReorderOperationSchema>;
 
 interface BlockOrderRow {
   id: string;
+  archivedAt: string | null;
   createdAt: string;
   isPinned: boolean;
   orderIndex: number;
@@ -98,6 +99,7 @@ async function listActiveOrderRows(db: BlocksDb): Promise<BlockOrderRow[]> {
   return await db
     .select({
       id: blocks.id,
+      archivedAt: blocks.archivedAt,
       createdAt: blocks.createdAt,
       isPinned: blocks.isPinned,
       orderIndex: blocks.orderIndex,
@@ -224,7 +226,7 @@ async function countBlocks(
   const beforePredicate = beforeBlock
     ? visibility === "active"
       ? sql`(${blocks.isPinned} > ${beforeBlock.isPinned ? 1 : 0} OR (${blocks.isPinned} = ${beforeBlock.isPinned ? 1 : 0} AND (${blocks.orderIndex} < ${beforeBlock.orderIndex} OR (${blocks.orderIndex} = ${beforeBlock.orderIndex} AND (${blocks.createdAt} > ${beforeBlock.createdAt} OR (${blocks.createdAt} = ${beforeBlock.createdAt} AND ${blocks.id} > ${beforeBlock.id}))))))`
-      : sql`(${blocks.createdAt} > ${beforeBlock.createdAt} OR (${blocks.createdAt} = ${beforeBlock.createdAt} AND ${blocks.id} > ${beforeBlock.id}))`
+      : sql`(${blocks.archivedAt} > ${beforeBlock.archivedAt} OR (${blocks.archivedAt} = ${beforeBlock.archivedAt} AND ${blocks.id} > ${beforeBlock.id}))`
     : undefined;
 
   if (tagIds.length === 0) {
@@ -275,7 +277,7 @@ export async function listBlocks(
   const orderBy =
     visibility === "active"
       ? [desc(blocks.isPinned), asc(blocks.orderIndex), desc(blocks.createdAt), desc(blocks.id)]
-      : [desc(blocks.createdAt), desc(blocks.id)];
+      : [desc(blocks.archivedAt), desc(blocks.id)];
 
   let blockRows: BlockRecord[];
   const uniqueTagIds = tagIds ? Array.from(new Set(tagIds)) : [];
@@ -338,6 +340,7 @@ export async function locateBlock(
   const targetBlock = await db
     .select({
       id: blocks.id,
+      archivedAt: blocks.archivedAt,
       createdAt: blocks.createdAt,
       isPinned: blocks.isPinned,
       orderIndex: blocks.orderIndex,
@@ -361,6 +364,7 @@ export async function locateBlock(
   }
 
   const index = await countBlocks(db, uniqueTagIds, visibility, {
+    archivedAt: targetBlock.archivedAt,
     createdAt: targetBlock.createdAt,
     id: targetBlock.id,
     isPinned: targetBlock.isPinned,
