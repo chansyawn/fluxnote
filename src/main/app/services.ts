@@ -7,6 +7,7 @@ import {
 } from "@main/core/database";
 import { createEventBus, type EventBus } from "@main/core/ipc";
 import { getConfigStore } from "@main/core/persistence";
+import { createAppUpdateService, type AppUpdateService } from "@main/features/app-update";
 import {
   createAutoArchiveRuntime,
   type AutoArchiveRuntime,
@@ -22,6 +23,7 @@ import { app } from "electron";
 type TrayManager = ReturnType<typeof createTrayManager>;
 
 export interface MainServices {
+  appUpdateService: AppUpdateService;
   autoArchiveRuntime: AutoArchiveRuntime;
   db: DbRuntime;
   events: EventBus;
@@ -43,6 +45,7 @@ export function createMainServices(): MainServices {
   });
   const events = createEventBus();
   const emitEvent: EventBus["emit"] = (name, payload) => events.emit(name, payload);
+  const appUpdateService = createAppUpdateService({ emitEvent });
   const preferencesService = createPreferencesService({
     emitEvent,
     storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
@@ -75,6 +78,7 @@ export function createMainServices(): MainServices {
   });
 
   return {
+    appUpdateService,
     autoArchiveRuntime,
     db,
     events,

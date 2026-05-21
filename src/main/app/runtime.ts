@@ -34,6 +34,7 @@ export function createBackendRuntime() {
       isSenderTrusted: services.events.isSenderTrusted,
     });
     registerFeatureCommands(ipc, {
+      appUpdateService: services.appUpdateService,
       autoArchiveRuntime: services.autoArchiveRuntime,
       db,
       events: services.events,
@@ -51,6 +52,7 @@ export function createBackendRuntime() {
     registerMainWindowToEventBus();
     services.trayManager.createTray();
     await services.autoArchiveRuntime.start();
+    services.appUpdateService.start();
 
     const startupDeepLink = extractDeepLinkFromArgv(process.argv);
     if (startupDeepLink) {
@@ -60,6 +62,7 @@ export function createBackendRuntime() {
 
   async function stop(): Promise<void> {
     services.windowManager.prepareToQuit();
+    services.appUpdateService.stop();
     services.autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
     services.trayManager.destroyTray();

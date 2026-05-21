@@ -1,4 +1,10 @@
 export { AppInvokeError, invokeCommand, subscribeEvent, toAppInvokeError } from "./ipc/invoke";
+export {
+  checkForAppUpdate,
+  getAppUpdateStatus,
+  onAppUpdateChanged,
+  restartAndInstallAppUpdate,
+} from "./app-update";
 export { getCliStatus, installCli, uninstallCli } from "./cli";
 export { onPreferencesChanged, patchSettings, readSettings, resetSettings } from "./preferences";
 export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
@@ -41,6 +47,7 @@ export {
 } from "./window";
 
 export type { CliStatus } from "./cli";
+export type { AppUpdateStatus } from "./app-update";
 export type { BlockEditorClipboardWriteRequest } from "./clipboard";
 export type {
   ExternalEditCancelRequest,

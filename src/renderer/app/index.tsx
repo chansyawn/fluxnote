@@ -2,6 +2,7 @@ import { DirectionStateProvider } from "@renderer/app/direction";
 import { I18nStateProvider } from "@renderer/app/i18n";
 import { queryClient } from "@renderer/app/query";
 import { ThemeStateProvider } from "@renderer/app/theme";
+import { AppUpdateSync } from "@renderer/features/app-update/app-update-query";
 import { AutoArchiveSync } from "@renderer/features/auto-archive/auto-archive-sync";
 import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-boundary";
 import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-state";
@@ -42,6 +43,7 @@ export function App() {
                   <DirectionStateProvider>
                     <TooltipProvider>
                       <PreferencesSync />
+                      <AppUpdateSync />
                       <AutoArchiveSync />
                       <RouterProvider router={router} />
                       <Toaster />

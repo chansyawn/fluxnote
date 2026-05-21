@@ -14,25 +14,16 @@ interface ReleaseArtifactNameOptions {
 
 type ArtifactIdentity = Omit<ReleaseArtifactNameOptions, "kind">;
 
-const artifactPlatformNames: Partial<Record<ForgePlatform, string>> = {
-  darwin: "macos",
-  win32: "windows",
-};
-
 const artifactNameSuffixes = {
   dmg: ".dmg",
   "full-nupkg": "-full.nupkg",
-  releases: "-releases",
+  releases: "-RELEASES",
   setup: "-setup.exe",
   zip: ".zip",
 } satisfies Record<ReleaseArtifactKind, string>;
 
-function getArtifactPlatformName(platform: ForgePlatform): string {
-  return artifactPlatformNames[platform] ?? platform;
-}
-
 function getArtifactBaseName({ arch, platform, version }: ArtifactIdentity): string {
-  return `fluxnotes-${version}-${getArtifactPlatformName(platform)}-${arch}`;
+  return `fluxnotes-${version}-${platform}-${arch}`;
 }
 
 function getPackageVersion(packageJSON: ForgeMakeResult["packageJSON"]): string {

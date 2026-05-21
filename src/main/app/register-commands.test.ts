@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  registerAppUpdateCommands: vi.fn(),
   registerAssetsCommands: vi.fn(),
   registerBlocksCommands: vi.fn(),
   registerClipboardCommands: vi.fn(),
@@ -14,6 +15,9 @@ const mocks = vi.hoisted(() => ({
   registerWindowCommands: vi.fn(),
 }));
 
+vi.mock("../features/app-update", () => ({
+  registerAppUpdateCommands: mocks.registerAppUpdateCommands,
+}));
 vi.mock("../features/assets/command", () => ({
   registerAssetsCommands: mocks.registerAssetsCommands,
 }));
@@ -51,6 +55,11 @@ describe("registerFeatureCommands", () => {
     const ipc = { register: vi.fn() } as never;
     const deps = {
       autoArchiveRuntime: { refreshState: vi.fn() },
+      appUpdateService: {
+        checkForUpdates: vi.fn(),
+        getStatus: vi.fn(),
+        restartAndInstall: vi.fn(),
+      },
       db: {} as never,
       events: { emit: vi.fn() },
       externalEditManager: { listSessions: vi.fn() },
@@ -63,6 +72,7 @@ describe("registerFeatureCommands", () => {
 
     registerFeatureCommands(ipc, deps);
 
+    expect(mocks.registerAppUpdateCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerAssetsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerBlocksCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerClipboardCommands).toHaveBeenCalledTimes(1);

@@ -1,3 +1,4 @@
+import { appUpdateContract } from "@shared/features/app-update/contract";
 import { assetsContract } from "@shared/features/assets/contract";
 import { blocksContract } from "@shared/features/blocks/contract";
 import { cliContract } from "@shared/features/cli/contract";
@@ -13,6 +14,7 @@ import type { z } from "zod";
 
 export const contracts = {
   commands: {
+    ...appUpdateContract.commands,
     ...assetsContract.commands,
     ...blocksContract.commands,
     ...clipboardContract.commands,
@@ -26,6 +28,7 @@ export const contracts = {
     ...windowContract.commands,
   },
   events: {
+    ...appUpdateContract.events,
     ...blocksContract.events,
     ...clipboardContract.events,
     ...externalEditContract.events,

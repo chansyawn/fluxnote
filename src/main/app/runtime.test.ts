@@ -41,6 +41,10 @@ describe("createBackendRuntime", () => {
   };
 
   const services = {
+    appUpdateService: {
+      start: vi.fn(),
+      stop: vi.fn(),
+    },
     autoArchiveRuntime: {
       refreshState: vi.fn(async () => undefined),
       start: vi.fn(async () => undefined),
@@ -111,6 +115,7 @@ describe("createBackendRuntime", () => {
     expect(services.events.registerWindow).toHaveBeenCalledTimes(1);
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
+    expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
   });
 
   it("handles startup deep link when available", async () => {
@@ -129,6 +134,7 @@ describe("createBackendRuntime", () => {
     await runtime.stop();
 
     expect(services.windowManager.prepareToQuit).toHaveBeenCalledTimes(1);
+    expect(services.appUpdateService.stop).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.stop).toHaveBeenCalledTimes(1);
     expect(mocks.unregisterAll).toHaveBeenCalledTimes(1);
     expect(services.trayManager.destroyTray).toHaveBeenCalledTimes(1);
