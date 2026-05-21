@@ -16,8 +16,10 @@ export const LANGUAGE_OPTIONS = [
 ] as const;
 
 export const FONT_SIZE_OPTIONS = [12, 14, 16, 18, 20] as const;
+export const THEME_PREFERENCE_OPTIONS = ["system", "light", "dark"] as const;
 
 export const localeSchema = z.enum(["en", "zh-Hans", "pseudo"]);
+export const themePreferenceSchema = z.enum(THEME_PREFERENCE_OPTIONS);
 export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[0]),
   z.literal(FONT_SIZE_OPTIONS[1]),
@@ -69,6 +71,7 @@ export const shortcutPreferencesSchema = z.object({
 
 export const appearanceSettingsSchema = z.object({
   locale: localeSchema.catch("en"),
+  theme: themePreferenceSchema.catch("system"),
   fontSize: fontSizeSchema.catch(16),
 });
 
@@ -84,6 +87,7 @@ export const markdownSettingsSchema = z.object({
 const appearanceSettingsPatchSchema = z
   .object({
     locale: localeSchema.optional(),
+    theme: themePreferenceSchema.optional(),
     fontSize: fontSizeSchema.optional(),
   })
   .strict();
@@ -132,6 +136,7 @@ const defaultSettingsValue = {
   schemaVersion: SETTINGS_SCHEMA_VERSION,
   appearance: {
     locale: "en",
+    theme: "system",
     fontSize: 16,
   },
   autoArchive: {
@@ -175,6 +180,7 @@ export const settingsPatchSchema = z
 export type Settings = z.infer<typeof settingsSchema>;
 export type SettingsPatch = z.infer<typeof settingsPatchSchema>;
 export type LocaleCode = z.infer<typeof localeSchema>;
+export type ThemePreference = z.infer<typeof themePreferenceSchema>;
 export type LanguageOption = (typeof LANGUAGE_OPTIONS)[number];
 export type FontSize = z.infer<typeof fontSizeSchema>;
 export type AutoArchiveSettings = z.infer<typeof autoArchiveSettingsSchema>;
@@ -195,6 +201,10 @@ export function isLocaleCode(value: string): value is LocaleCode {
 
 export function isFontSize(value: number): value is FontSize {
   return FONT_SIZE_OPTIONS.some((size) => size === value);
+}
+
+export function isThemePreference(value: string): value is ThemePreference {
+  return THEME_PREFERENCE_OPTIONS.some((theme) => theme === value);
 }
 
 export function normalizeSettings(input: unknown): Settings {

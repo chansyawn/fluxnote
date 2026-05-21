@@ -1,5 +1,8 @@
+import { useThemePreference } from "@renderer/features/preferences/preferences-query";
+import type { ThemePreference } from "@shared/features/preferences/settings";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-export type ThemeMode = "system";
+
+export type ThemeMode = ThemePreference;
 
 type ThemeContextValue = {
   themeMode: ThemeMode;
@@ -14,11 +17,8 @@ type ThemeStateProviderProps = {
 };
 
 export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
+  const { theme: themeMode, setTheme: setThemeMode } = useThemePreference();
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
-  // macOS vibrancy does not reliably follow an app-forced light/dark override,
-  // so Fluxnotes stays pinned to the OS appearance to keep window chrome and
-  // document surfaces visually consistent.
-  const themeMode: ThemeMode = "system";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -43,10 +43,10 @@ export function ThemeStateProvider({ children }: ThemeStateProviderProps) {
   const contextValue = useMemo<ThemeContextValue>(
     () => ({
       themeMode,
-      setThemeMode: () => {},
+      setThemeMode,
       resolvedTheme,
     }),
-    [resolvedTheme],
+    [resolvedTheme, setThemeMode, themeMode],
   );
 
   return <ThemeStateContext.Provider value={contextValue}>{children}</ThemeStateContext.Provider>;

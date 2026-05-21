@@ -16,6 +16,7 @@ describe("preferences service", () => {
         ...DEFAULT_SETTINGS,
         appearance: {
           locale: "invalid",
+          theme: "invalid",
           fontSize: 20,
           unknown: true,
         },
@@ -37,6 +38,7 @@ describe("preferences service", () => {
       ...DEFAULT_SETTINGS,
       appearance: {
         locale: "en",
+        theme: "system",
         fontSize: 20,
       },
       markdown: {
@@ -69,12 +71,13 @@ describe("preferences service", () => {
     const service = createPreferencesService({ storage: { store: DEFAULT_SETTINGS } });
 
     const result = service.patchSettings({
-      appearance: { locale: "zh-Hans", fontSize: 20 },
+      appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
       markdown: { codeBlock: { wordWrap: true } },
     });
 
     expect(result.appearance.locale).toBe("zh-Hans");
+    expect(result.appearance.theme).toBe("dark");
     expect(result.appearance.fontSize).toBe(20);
     expect(result.autoArchive.enabled).toBe(false);
     expect(result.markdown.codeBlock).toEqual({
@@ -87,7 +90,7 @@ describe("preferences service", () => {
     const storage = {
       store: {
         ...DEFAULT_SETTINGS,
-        appearance: { locale: "invalid", fontSize: 20 },
+        appearance: { locale: "invalid", theme: "light", fontSize: 20 },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: "invalid" } },
       },
     };
@@ -99,6 +102,7 @@ describe("preferences service", () => {
 
     expect(result.appearance).toEqual({
       locale: "en",
+      theme: "light",
       fontSize: 20,
     });
     expect(result.markdown.codeBlock).toEqual({

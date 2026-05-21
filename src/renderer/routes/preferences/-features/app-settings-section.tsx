@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { queryClient } from "@renderer/app/query";
@@ -12,7 +13,10 @@ import {
   useAppUpdateStatusQuery,
   useManualAppUpdateCheckMutation,
 } from "@renderer/features/app-update/app-update-query";
-import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
+import {
+  useFontSizePreference,
+  useThemePreference,
+} from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
   SettingsRow,
@@ -27,14 +31,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
-import { FONT_SIZE_OPTIONS, isFontSize, isLocaleCode } from "@shared/features/preferences/settings";
+import {
+  FONT_SIZE_OPTIONS,
+  isFontSize,
+  isLocaleCode,
+  isThemePreference,
+  type ThemePreference,
+} from "@shared/features/preferences/settings";
 import { useQuery } from "@tanstack/react-query";
 import {
   CircleFadingArrowUpIcon,
   LanguagesIcon,
+  MonitorIcon,
+  MoonIcon,
+  PaletteIcon,
   RefreshCwIcon,
+  SunIcon,
   TerminalIcon,
   TypeIcon,
+  type LucideIcon,
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -89,8 +104,10 @@ function AppUpdateStatusDescription({
 }
 
 export function AppSettingsSection() {
+  const { i18n } = useLingui();
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
+  const { theme, setTheme } = useThemePreference();
   const { data: appUpdateStatus } = useAppUpdateStatusQuery();
   const appUpdateCheckMutation = useManualAppUpdateCheckMutation();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
@@ -106,6 +123,26 @@ export function AppSettingsSection() {
     value: String(size),
     label: String(size),
   }));
+  const themeItems: Array<{ value: ThemePreference; label: string; icon: LucideIcon }> = [
+    {
+      value: "system",
+      label: i18n._({ id: "preferences.theme.system", message: "System" }),
+      icon: MonitorIcon,
+    },
+    {
+      value: "light",
+      label: i18n._({ id: "preferences.theme.light", message: "Light" }),
+      icon: SunIcon,
+    },
+    {
+      value: "dark",
+      label: i18n._({ id: "preferences.theme.dark", message: "Dark" }),
+      icon: MoonIcon,
+    },
+  ];
+  const selectedThemeItem =
+    themeItems.find((themeItem) => themeItem.value === theme) ?? themeItems[0];
+  const SelectedThemeIcon = selectedThemeItem.icon;
   const cliInstalled = cliStatus?.installed === true;
   const cliDisabled = isCliStatusLoading || isCliPending;
   const canInstallCli = cliStatus?.canInstall === true;
@@ -143,6 +180,47 @@ export function AppSettingsSection() {
   return (
     <SettingsSection title={<Trans id="preferences.app.title">App</Trans>}>
       <SettingsGroup>
+        <SettingsRow
+          control={
+            <Select
+              items={themeItems}
+              value={theme}
+              onValueChange={(value) => {
+                if (value && isThemePreference(value)) {
+                  setTheme(value);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <span
+                  data-slot="select-value"
+                  className="flex flex-1 items-center gap-1.5 text-start"
+                >
+                  <SelectedThemeIcon />
+                  {selectedThemeItem.label}
+                </span>
+              </SelectTrigger>
+              <SelectContent align="end" alignItemWithTrigger={false}>
+                <SelectGroup>
+                  {themeItems.map((themeItem) => {
+                    const ThemeItemIcon = themeItem.icon;
+
+                    return (
+                      <SelectItem key={themeItem.value} value={themeItem.value}>
+                        <div className="flex items-center gap-1.5">
+                          <ThemeItemIcon />
+                          {themeItem.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          }
+          icon={PaletteIcon}
+          label={<Trans id="preferences.theme.label">Theme</Trans>}
+        />
         <SettingsRow
           control={
             <Select

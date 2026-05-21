@@ -1,9 +1,14 @@
 import type { IpcRouter } from "@main/core/ipc";
-import type { SettingsPatch } from "@shared/features/preferences/settings";
+import type {
+  Settings,
+  SettingsPatch,
+  ThemePreference,
+} from "@shared/features/preferences/settings";
 
 import type { PreferencesService } from "./service";
 
 interface PreferencesCommandDeps {
+  applyThemePreference?: (theme: ThemePreference) => void;
   onAutoArchivePreferencesChanged?: () => Promise<void> | void;
   preferencesService: PreferencesService;
 }
@@ -18,9 +23,14 @@ function notifyAutoArchivePreferencesChanged(deps: PreferencesCommandDeps): void
   });
 }
 
+function applyThemePreference(deps: PreferencesCommandDeps, settings: Settings): void {
+  deps.applyThemePreference?.(settings.appearance.theme);
+}
+
 export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCommandDeps): void {
   ipc.command("preferences.patch", (input) => {
     const settings = deps.preferencesService.patchSettings(input);
+    applyThemePreference(deps, settings);
     if (includesAutoArchivePreferences(input)) {
       notifyAutoArchivePreferencesChanged(deps);
     }
@@ -28,11 +38,14 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
   });
 
   ipc.command("preferences.read", () => {
-    return deps.preferencesService.readSettings();
+    const settings = deps.preferencesService.readSettings();
+    applyThemePreference(deps, settings);
+    return settings;
   });
 
   ipc.command("preferences.reset", () => {
     const settings = deps.preferencesService.resetSettings();
+    applyThemePreference(deps, settings);
     notifyAutoArchivePreferencesChanged(deps);
     return settings;
   });

@@ -45,6 +45,7 @@ describe("createBackendRuntime", () => {
       start: vi.fn(),
       stop: vi.fn(),
     },
+    applyThemePreference: vi.fn(),
     autoArchiveRuntime: {
       refreshState: vi.fn(async () => undefined),
       start: vi.fn(async () => undefined),
@@ -97,6 +98,7 @@ describe("createBackendRuntime", () => {
     mocks.createIpcRouter.mockReturnValue({ register: vi.fn() });
     mocks.createEntrypointRuntime.mockReturnValue(entrypointRuntime);
     mocks.createMainServices.mockReturnValue(services);
+    services.preferencesService.readSettings.mockReturnValue({ appearance: { theme: "system" } });
     services.windowManager.getMainWindow.mockReturnValue({ isVisible: vi.fn(() => true) });
   });
 
@@ -111,6 +113,7 @@ describe("createBackendRuntime", () => {
     expect(mocks.registerFeatureCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerAssetProtocol).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledTimes(1);
+    expect(services.applyThemePreference).toHaveBeenCalledTimes(1);
     expect(services.windowManager.createMainWindow).toHaveBeenCalledTimes(1);
     expect(services.events.registerWindow).toHaveBeenCalledTimes(1);
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);

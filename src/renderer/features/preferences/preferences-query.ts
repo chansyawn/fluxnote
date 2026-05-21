@@ -14,6 +14,7 @@ import {
   type Settings,
   type SettingsPatch,
   type ShortcutAction,
+  type ThemePreference,
 } from "@shared/features/preferences/settings";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
@@ -158,6 +159,22 @@ export function useFontSizePreference() {
   return {
     fontSize: settings.appearance.fontSize,
     setFontSize,
+  };
+}
+
+export function useThemePreference() {
+  const settings = useSettingsValue();
+  const mutation = usePatchSettingsMutation();
+  const setTheme = useCallback(
+    (theme: ThemePreference) => {
+      mutation.mutate({ appearance: { theme } });
+    },
+    [mutation],
+  );
+
+  return {
+    theme: settings.appearance.theme,
+    setTheme,
   };
 }
 

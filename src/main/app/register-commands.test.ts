@@ -60,6 +60,7 @@ describe("registerFeatureCommands", () => {
         getStatus: vi.fn(),
         restartAndInstall: vi.fn(),
       },
+      applyThemePreference: vi.fn(),
       db: {} as never,
       events: { emit: vi.fn() },
       externalEditManager: { listSessions: vi.fn() },

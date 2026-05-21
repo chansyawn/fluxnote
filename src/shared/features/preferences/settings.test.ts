@@ -4,8 +4,10 @@ import {
   DEFAULT_SETTINGS,
   isFontSize,
   isLocaleCode,
+  isThemePreference,
   normalizeSettings,
   normalizeSettingsPatch,
+  THEME_PREFERENCE_OPTIONS,
 } from "./settings";
 
 describe("settings", () => {
@@ -31,6 +33,7 @@ describe("settings", () => {
       schemaVersion: 1,
       appearance: {
         locale: "invalid",
+        theme: "invalid",
         fontSize: 18,
         unknown: true,
       },
@@ -61,6 +64,7 @@ describe("settings", () => {
 
     expect(normalized.appearance).toEqual({
       locale: "en",
+      theme: "system",
       fontSize: 18,
     });
     expect(normalized.autoArchive).toEqual({
@@ -105,6 +109,17 @@ describe("settings", () => {
       shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
     });
+  });
+
+  it("should validate theme preference values", () => {
+    expect(THEME_PREFERENCE_OPTIONS).toEqual(["system", "light", "dark"]);
+    expect(isThemePreference("system")).toBe(true);
+    expect(isThemePreference("dark")).toBe(true);
+    expect(isThemePreference("amoled")).toBe(false);
+    expect(normalizeSettingsPatch({ appearance: { theme: "dark" } })).toEqual({
+      appearance: { theme: "dark" },
+    });
+    expect(() => normalizeSettingsPatch({ appearance: { theme: "amoled" } })).toThrow();
   });
 
   it("should reject settings patch with extra fields", () => {
