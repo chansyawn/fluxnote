@@ -1,5 +1,5 @@
 import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createPreferencesService } from "./service";
 

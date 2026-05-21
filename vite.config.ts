@@ -17,8 +17,12 @@ export default defineConfig({
     ignorePatterns,
   },
   lint: {
+    jsPlugins: ["./config/oxlint/fluxnotes-plugin.ts"],
     options: { typeAware: true, typeCheck: true },
     ignorePatterns,
+    rules: {
+      "fluxnote/no-vitest-import": "error",
+    },
   },
   resolve: {
     alias: viteAliases,

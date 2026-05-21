@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
 

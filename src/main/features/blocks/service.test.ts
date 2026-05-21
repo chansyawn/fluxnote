@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createTag, setBlockTags } from "../tags/service";
 import { createTestDb, type TestDbContext } from "../test-db";

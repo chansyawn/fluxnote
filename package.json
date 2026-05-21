@@ -85,6 +85,7 @@
     "@lingui/cli": "6.0.1",
     "@lingui/format-po": "6.0.1",
     "@lingui/vite-plugin": "6.0.1",
+    "@oxlint/plugins": "^1.66.0",
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
@@ -103,6 +104,9 @@
   },
   "config": {
     "forge": "./forge.config.ts"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "packageManager": "pnpm@10.33.0",
   "pnpm": {

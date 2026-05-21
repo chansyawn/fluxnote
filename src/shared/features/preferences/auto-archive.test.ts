@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import {
   AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,

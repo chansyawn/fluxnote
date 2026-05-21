@@ -1,5 +1,5 @@
 import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   createAutoArchiveEvaluationContext: vi.fn(() => ({

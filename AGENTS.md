@@ -125,6 +125,8 @@ vp run package
 
 ## Test
 
+- Import test APIs from `vite-plus/test`, never from `vitest`.
+- Run tests with `vp test`; do not invoke `vitest` directly.
 - Use the Arrange-Act-Assert structure for readability.
 - Tests must be isolated and must not depend on execution order or shared state.
 - Use descriptive test names, preferably following `action state expected` or `given when then`.

@@ -1,5 +1,5 @@
 import type { BrowserWindowConstructorOptions } from "electron";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
 vi.stubGlobal("MAIN_WINDOW_VITE_NAME", "main_window");

@@ -4,7 +4,7 @@ import type {
 } from "@shared/features/entrypoints/commands";
 import type { EntrypointEnvelope } from "@shared/features/entrypoints/envelope";
 import type { IpcResult } from "@shared/ipc/result";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   createEntrypointEnvelope: vi.fn(),
