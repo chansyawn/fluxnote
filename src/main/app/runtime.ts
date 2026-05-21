@@ -35,6 +35,7 @@ export function createBackendRuntime() {
     });
     registerFeatureCommands(ipc, {
       appUpdateService: services.appUpdateService,
+      applyThemePreference: services.applyThemePreference,
       autoArchiveRuntime: services.autoArchiveRuntime,
       db,
       events: services.events,
@@ -48,6 +49,7 @@ export function createBackendRuntime() {
 
     registerAssetProtocol(services.paths);
     await entrypointRuntime.startCliServer();
+    services.applyThemePreference(services.preferencesService.readSettings().appearance.theme);
     services.windowManager.createMainWindow();
     registerMainWindowToEventBus();
     services.trayManager.createTray();

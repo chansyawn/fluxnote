@@ -3,6 +3,7 @@ import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 import type { EventBus } from "@main/core/ipc";
 import { registerAppUpdateCommands, type AppUpdateService } from "@main/features/app-update";
+import type { ThemePreference } from "@shared/features/preferences/settings";
 
 import { registerAssetsCommands } from "../features/assets/command";
 import { registerBlocksCommands } from "../features/blocks/command";
@@ -22,6 +23,7 @@ import { registerWindowCommands } from "../features/window/command";
 
 export interface RegisterFeatureCommandsDeps {
   appUpdateService: AppUpdateService;
+  applyThemePreference: (theme: ThemePreference) => void;
   autoArchiveRuntime: {
     refreshState: () => Promise<void>;
   };
@@ -62,6 +64,7 @@ export function registerFeatureCommands(ipc: IpcRouter, deps: RegisterFeatureCom
     openBlockService: deps.openBlockService,
   });
   registerPreferencesCommands(ipc, {
+    applyThemePreference: deps.applyThemePreference,
     onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
     preferencesService: deps.preferencesService,
   });

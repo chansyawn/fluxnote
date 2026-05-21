@@ -348,53 +348,53 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:216
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:281
 msgid "preferences.app-update.check"
 msgstr "Check"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:50
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:66
 msgid "preferences.app-update.checking"
 msgstr "Checking for updates."
 
 #. js-lingui-explicit-id
 #. placeholder {0}: status.currentVersion
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:85
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:101
 msgid "preferences.app-update.current-version"
 msgstr "Current version: {0}"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:78
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:94
 msgid "preferences.app-update.error"
 msgstr "Last check failed. Try again when the network is available."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:223
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:288
 msgid "preferences.app-update.label"
 msgstr "App update"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:54
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:70
 msgid "preferences.app-update.loading"
 msgstr "Loading update status."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:88
 msgid "preferences.app-update.ready"
 msgstr "An update is ready to install."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:68
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:84
 msgid "preferences.app-update.ready-version"
 msgstr "Version {versionLabel} is ready to install."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:59
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:75
 msgid "preferences.app-update.unsupported"
 msgstr "App updates are available in packaged macOS and Windows builds."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:179
 msgid "preferences.app.title"
 msgstr "App"
 
@@ -484,32 +484,32 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:238
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:303
 msgid "preferences.cli.install"
 msgstr "Install"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:243
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:308
 msgid "preferences.cli.path.description"
 msgstr "Install the Flux CLI for terminal workflows. After installation, run `flux --help` to view available commands and usage."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:249
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:314
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:234
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:299
 msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:205
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:270
 msgid "preferences.font-size.label"
 msgstr "Font size"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:172
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:237
 msgid "preferences.language.label"
 msgstr "Language"
 
@@ -630,6 +630,26 @@ msgstr "Pin/unpin block"
 #: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
 msgid "preferences.shortcuts.toggle-window.label"
 msgstr "Toggle window"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:140
+msgid "preferences.theme.dark"
+msgstr "Dark"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:209
+msgid "preferences.theme.label"
+msgstr "Theme"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:135
+msgid "preferences.theme.light"
+msgstr "Light"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:130
+msgid "preferences.theme.system"
+msgstr "System"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/index.tsx:17

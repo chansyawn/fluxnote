@@ -43,7 +43,7 @@ function SettingsGroup({ children }: SettingsGroupProps) {
   const rows = Children.toArray(children);
 
   return (
-    <ItemGroup className="bg-muted/90 gap-0 overflow-hidden rounded-lg">
+    <ItemGroup className="bg-secondary/90 gap-0 overflow-hidden rounded-lg">
       {rows.map((row, index) => {
         const rowKey = isValidElement(row) ? row.key : index;
 
