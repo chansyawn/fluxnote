@@ -14,8 +14,48 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:25
+msgid "app-update.check.error"
+msgstr "Failed to check for updates."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:33
+msgid "app-update.check.up-to-date"
+msgstr "Fluxnotes is up to date."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:51
+msgid "app-update.restart-dialog.description"
+msgstr "Fluxnotes will restart and install the downloaded update."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:47
+msgid "app-update.restart-dialog.description-version"
+msgstr "Fluxnotes will restart and install version {versionLabel}."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:59
+msgid "app-update.restart-dialog.later"
+msgstr "Later"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:68
+msgid "app-update.restart-dialog.restart"
+msgstr "Restart"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:43
+msgid "app-update.restart-dialog.title"
+msgstr "Restart to update?"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:35
+msgid "app-update.titlebar.restart"
+msgstr "Install app update"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:99
+#: src/renderer/routes/-layout/window-title-bar.tsx:100
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -203,22 +243,22 @@ msgid "error.global.title"
 msgstr "Something went wrong"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:29
+#: src/renderer/routes/-layout/window-title-bar.tsx:30
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:58
+#: src/renderer/routes/-layout/window-title-bar.tsx:59
 msgid "header.go-lab"
 msgstr "Go to lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:56
+#: src/renderer/routes/-layout/window-title-bar.tsx:57
 msgid "header.open-lab"
 msgstr "Open lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:31
+#: src/renderer/routes/-layout/window-title-bar.tsx:32
 msgid "header.open-preferences"
 msgstr "Open preferences"
 
@@ -308,7 +348,53 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:216
+msgid "preferences.app-update.check"
+msgstr "Check"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:50
+msgid "preferences.app-update.checking"
+msgstr "Checking for updates."
+
+#. js-lingui-explicit-id
+#. placeholder {0}: status.currentVersion
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:85
+msgid "preferences.app-update.current-version"
+msgstr "Current version: {0}"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:78
+msgid "preferences.app-update.error"
+msgstr "Last check failed. Try again when the network is available."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:223
+msgid "preferences.app-update.label"
+msgstr "App update"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:54
+msgid "preferences.app-update.loading"
+msgstr "Loading update status."
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
+msgid "preferences.app-update.ready"
+msgstr "An update is ready to install."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:68
+msgid "preferences.app-update.ready-version"
+msgstr "Version {versionLabel} is ready to install."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:59
+msgid "preferences.app-update.unsupported"
+msgstr "App updates are available in packaged macOS and Windows builds."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
 msgid "preferences.app.title"
 msgstr "App"
 
@@ -398,32 +484,32 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:148
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:238
 msgid "preferences.cli.install"
 msgstr "Install"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:153
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:243
 msgid "preferences.cli.path.description"
 msgstr "Install the Flux CLI for terminal workflows. After installation, run `flux --help` to view available commands and usage."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:159
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:249
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:234
 msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:133
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:205
 msgid "preferences.font-size.label"
 msgstr "Font size"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:100
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:172
 msgid "preferences.language.label"
 msgstr "Language"
 
@@ -551,8 +637,8 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:70
-#: src/renderer/routes/-layout/window-title-bar.tsx:78
+#: src/renderer/routes/-layout/window-title-bar.tsx:71
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr "Hide window"
 

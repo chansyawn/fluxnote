@@ -1,7 +1,17 @@
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { queryClient } from "@renderer/app/query";
-import { getCliStatus, installCli, toAppInvokeError, uninstallCli } from "@renderer/clients";
+import {
+  getCliStatus,
+  installCli,
+  toAppInvokeError,
+  uninstallCli,
+  type AppUpdateStatus,
+} from "@renderer/clients";
+import {
+  useAppUpdateStatusQuery,
+  useManualAppUpdateCheckMutation,
+} from "@renderer/features/app-update/app-update-query";
 import { useFontSizePreference } from "@renderer/features/preferences/preferences-query";
 import {
   SettingsGroup,
@@ -19,13 +29,70 @@ import {
 } from "@renderer/ui/components/select";
 import { FONT_SIZE_OPTIONS, isFontSize, isLocaleCode } from "@shared/features/preferences/settings";
 import { useQuery } from "@tanstack/react-query";
-import { LanguagesIcon, TerminalIcon, TypeIcon } from "lucide-react";
+import {
+  CircleFadingArrowUpIcon,
+  LanguagesIcon,
+  RefreshCwIcon,
+  TerminalIcon,
+  TypeIcon,
+} from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+
+function AppUpdateStatusDescription({
+  isChecking,
+  status,
+}: {
+  isChecking: boolean;
+  status?: AppUpdateStatus;
+}) {
+  if (isChecking) {
+    return <Trans id="preferences.app-update.checking">Checking for updates.</Trans>;
+  }
+
+  if (!status) {
+    return <Trans id="preferences.app-update.loading">Loading update status.</Trans>;
+  }
+
+  if (!status.isSupported) {
+    return (
+      <Trans id="preferences.app-update.unsupported">
+        App updates are available in packaged macOS and Windows builds.
+      </Trans>
+    );
+  }
+
+  if (status.state === "ready") {
+    const versionLabel = status.availableVersion ?? status.releaseName;
+    return versionLabel ? (
+      <Trans id="preferences.app-update.ready-version">
+        Version {versionLabel} is ready to install.
+      </Trans>
+    ) : (
+      <Trans id="preferences.app-update.ready">An update is ready to install.</Trans>
+    );
+  }
+
+  if (status.state === "error") {
+    return (
+      <Trans id="preferences.app-update.error">
+        Last check failed. Try again when the network is available.
+      </Trans>
+    );
+  }
+
+  return (
+    <Trans id="preferences.app-update.current-version">
+      Current version: {status.currentVersion}
+    </Trans>
+  );
+}
 
 export function AppSettingsSection() {
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
+  const { data: appUpdateStatus } = useAppUpdateStatusQuery();
+  const appUpdateCheckMutation = useManualAppUpdateCheckMutation();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
     queryKey: ["cli", "status"],
     queryFn: getCliStatus,
@@ -43,6 +110,11 @@ export function AppSettingsSection() {
   const cliDisabled = isCliStatusLoading || isCliPending;
   const canInstallCli = cliStatus?.canInstall === true;
   const canUninstallCli = cliStatus?.canUninstall === true;
+  const appUpdateChecking =
+    appUpdateStatus?.state === "checking" ||
+    appUpdateStatus?.state === "downloading" ||
+    appUpdateCheckMutation.isPending;
+  const appUpdateSupported = appUpdateStatus?.isSupported !== false;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -131,6 +203,24 @@ export function AppSettingsSection() {
           }
           icon={TypeIcon}
           label={<Trans id="preferences.font-size.label">Font size</Trans>}
+        />
+        <SettingsRow
+          control={
+            <Button
+              disabled={!appUpdateSupported || appUpdateChecking}
+              size="sm"
+              variant="outline"
+              onClick={() => appUpdateCheckMutation.mutate()}
+            >
+              {appUpdateChecking ? <RefreshCwIcon className="animate-spin" /> : <RefreshCwIcon />}
+              <Trans id="preferences.app-update.check">Check</Trans>
+            </Button>
+          }
+          description={
+            <AppUpdateStatusDescription status={appUpdateStatus} isChecking={appUpdateChecking} />
+          }
+          icon={CircleFadingArrowUpIcon}
+          label={<Trans id="preferences.app-update.label">App update</Trans>}
         />
         <SettingsRow
           control={

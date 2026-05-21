@@ -14,8 +14,48 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:25
+msgid "app-update.check.error"
+msgstr "检查更新失败。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:33
+msgid "app-update.check.up-to-date"
+msgstr "Fluxnotes 已是最新版本。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:51
+msgid "app-update.restart-dialog.description"
+msgstr "Fluxnotes 将重启并安装已下载的更新。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:47
+msgid "app-update.restart-dialog.description-version"
+msgstr "Fluxnotes 将重启并安装版本 {versionLabel}。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:59
+msgid "app-update.restart-dialog.later"
+msgstr "稍后"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:68
+msgid "app-update.restart-dialog.restart"
+msgstr "重启"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:43
+msgid "app-update.restart-dialog.title"
+msgstr "重启以更新？"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-titlebar-button.tsx:35
+msgid "app-update.titlebar.restart"
+msgstr "安装应用更新"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:99
+#: src/renderer/routes/-layout/window-title-bar.tsx:100
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -203,22 +243,22 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:29
+#: src/renderer/routes/-layout/window-title-bar.tsx:30
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:58
+#: src/renderer/routes/-layout/window-title-bar.tsx:59
 msgid "header.go-lab"
 msgstr "前往实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:56
+#: src/renderer/routes/-layout/window-title-bar.tsx:57
 msgid "header.open-lab"
 msgstr "打开实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:31
+#: src/renderer/routes/-layout/window-title-bar.tsx:32
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
@@ -308,7 +348,53 @@ msgid "lab.title"
 msgstr "实验室"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:216
+msgid "preferences.app-update.check"
+msgstr "检查"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:50
+msgid "preferences.app-update.checking"
+msgstr "正在检查更新。"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: status.currentVersion
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:85
+msgid "preferences.app-update.current-version"
+msgstr "当前版本：{0}"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:78
+msgid "preferences.app-update.error"
+msgstr "上次检查失败。请在网络可用时重试。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:223
+msgid "preferences.app-update.label"
+msgstr "应用更新"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:54
+msgid "preferences.app-update.loading"
+msgstr "正在加载更新状态。"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
+msgid "preferences.app-update.ready"
+msgstr "有更新已准备好安装。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:68
+msgid "preferences.app-update.ready-version"
+msgstr "版本 {versionLabel} 已准备好安装。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:59
+msgid "preferences.app-update.unsupported"
+msgstr "应用更新可用于已打包的 macOS 和 Windows 版本。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
 msgid "preferences.app.title"
 msgstr "应用"
 
@@ -398,32 +484,32 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:148
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:238
 msgid "preferences.cli.install"
 msgstr "安装"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:153
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:243
 msgid "preferences.cli.path.description"
 msgstr "安装 Flux CLI 以支持终端工作流。安装后可运行 `flux --help` 查看可用命令与用法。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:159
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:249
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:144
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:234
 msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:133
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:205
 msgid "preferences.font-size.label"
 msgstr "字号"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:100
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:172
 msgid "preferences.language.label"
 msgstr "语言"
 
@@ -551,8 +637,8 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:70
-#: src/renderer/routes/-layout/window-title-bar.tsx:78
+#: src/renderer/routes/-layout/window-title-bar.tsx:71
+#: src/renderer/routes/-layout/window-title-bar.tsx:79
 msgid "window.hide"
 msgstr "隐藏窗口"
 

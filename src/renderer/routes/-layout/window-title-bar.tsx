@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { getAppPlatform } from "@renderer/app/platform";
 import { hideWindow } from "@renderer/clients";
+import { AppUpdateTitlebarButton } from "@renderer/features/app-update/app-update-titlebar-button";
 import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
 import { Button } from "@renderer/ui/components/button";
 import { cn } from "@renderer/ui/lib/utils";
@@ -98,6 +99,7 @@ export function WindowTitleBar() {
         <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
           <Trans id="app.title">Fluxnotes</Trans>
         </div>
+        <AppUpdateTitlebarButton />
 
         {import.meta.env.DEV ? <HeaderLabButton /> : null}
 

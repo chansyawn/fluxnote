@@ -32,7 +32,7 @@ describe("forge artifact naming", () => {
         platform: "darwin",
         version: "1.2.3",
       }),
-    ).toBe("fluxnotes-1.2.3-macos-arm64.zip");
+    ).toBe("fluxnotes-1.2.3-darwin-arm64.zip");
     expect(
       getReleaseArtifactName({
         arch: "x64",
@@ -40,7 +40,7 @@ describe("forge artifact naming", () => {
         platform: "win32",
         version: "1.2.3",
       }),
-    ).toBe("fluxnotes-1.2.3-windows-x64-setup.exe");
+    ).toBe("fluxnotes-1.2.3-win32-x64-setup.exe");
     expect(
       getReleaseArtifactName({
         arch: "x64",
@@ -63,8 +63,8 @@ describe("normalizeMakeArtifacts", () => {
     ]);
 
     expect(result?.artifacts).toEqual([
-      path.join(directory, "fluxnotes-1.2.3-macos-arm64.zip"),
-      path.join(directory, "fluxnotes-1.2.3-macos-arm64.dmg"),
+      path.join(directory, "fluxnotes-1.2.3-darwin-arm64.zip"),
+      path.join(directory, "fluxnotes-1.2.3-darwin-arm64.dmg"),
     ]);
   });
 
@@ -86,12 +86,12 @@ describe("normalizeMakeArtifacts", () => {
       }),
     ]);
 
-    const nextReleasesPath = path.join(directory, "fluxnotes-1.2.3-windows-x64-releases");
-    const nextNupkgPath = path.join(directory, "fluxnotes-1.2.3-windows-x64-full.nupkg");
+    const nextReleasesPath = path.join(directory, "fluxnotes-1.2.3-win32-x64-RELEASES");
+    const nextNupkgPath = path.join(directory, "fluxnotes-1.2.3-win32-x64-full.nupkg");
 
     expect(result?.artifacts).toEqual([nextReleasesPath, setupPath, nextNupkgPath]);
     await expect(readFile(nextReleasesPath, "utf8")).resolves.toBe(
-      "hash fluxnotes-1.2.3-windows-x64-full.nupkg 123",
+      "hash fluxnotes-1.2.3-win32-x64-full.nupkg 123",
     );
   });
 });

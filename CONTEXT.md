@@ -12,6 +12,10 @@ _Avoid_: Home, dashboard, note list
 User-controlled app-level choices that affect how Fluxnotes behaves and presents the **Workspace**.
 _Avoid_: Settings, config, runtime state
 
+**App Update**:
+A workflow that updates the installed Fluxnotes application to a newer released version.
+_Avoid_: Block update, content update, software update
+
 **Block**:
 A standalone note unit with Markdown content, archive state, keep state, pin state, and tags.
 _Avoid_: Note, document, item
@@ -82,6 +86,8 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - An **External Edit Trigger** starts exactly one **External Edit Session**.
 - **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
 - **User Preferences** can affect **Workspace** presentation and app-level behavior.
+- **User Preferences** expose manual **App Update** checks.
+- **App Update** does not modify **Blocks**.
 - **User Preferences** configure **Auto Archive**, but changing them does not itself move **Blocks** into the archive.
 
 ## Example Dialogue
@@ -92,9 +98,13 @@ _Avoid_: Scroll controller, focus controller, route navigation
 > **Dev:** "If an **External Edit Session** exists for a **Block**, can the user delete that **Block** directly?"
 > **Domain expert:** "No — the **External Edit** should be submitted or cancelled first so the **Block** has a clear final state."
 
+> **Dev:** "When an **App Update** is ready, should it update existing **Blocks**?"
+> **Domain expert:** "No — an **App Update** only changes the installed Fluxnotes application."
+
 ## Flagged Ambiguities
 
 - "Editor" can mean the app-level editing feature or the **Block Editor**; resolved: use **Block Editor** for the user-facing editing surface of one **Block**.
 - "Keep" can be confused with saving content; resolved: **Kept Block** only means protected from **Auto Archive**.
 - "Pinned" can be confused with **Kept Block**; resolved: **Pinned Block** only means fixed to the top area of the **Workspace**.
 - "Settings" and "config" can mean implementation details or user choices; resolved: use **User Preferences** for user-controlled app-level choices.
+- "Update" can mean changing **Block** content or updating Fluxnotes itself; resolved: use **App Update** for installed application updates.
