@@ -10,7 +10,9 @@ import {
 } from "../workspace-state-context";
 
 function BlockListPlaceholder() {
-  return <div className="bg-card/40 border-border/50 min-h-28 rounded-xl border border-dashed" />;
+  return (
+    <div className="bg-card relative min-h-24 rounded-lg border border-dashed opacity-40 transition-opacity" />
+  );
 }
 
 function BlockListItem({ block, position }: { block: Block; position: BlockActionPosition }) {

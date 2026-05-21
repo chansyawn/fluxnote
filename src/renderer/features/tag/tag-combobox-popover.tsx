@@ -170,7 +170,7 @@ export function TagComboboxPopover({
 
                   {onDeleteTag ? (
                     <Button
-                      className="text-muted-foreground hover:text-foreground absolute inset-e-7 opacity-0 transition-[opacity,color] group-hover/item:opacity-100 group-data-highlighted/item:opacity-100"
+                      className="absolute inset-e-7 opacity-0 transition-[opacity,color] group-hover/item:opacity-100 group-data-highlighted/item:opacity-100"
                       disabled={disabled || isDeleting}
                       size="icon-xs"
                       type="button"
