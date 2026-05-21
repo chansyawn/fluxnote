@@ -399,6 +399,14 @@ export async function archiveBlock(
   blockId: string,
   autoArchiveContext?: AutoArchiveEvaluationContext,
 ): Promise<Block> {
+  if (autoArchiveContext?.protectedBlockIds.has(blockId)) {
+    throw businessError(
+      "BUSINESS.INVALID_OPERATION",
+      "Blocks with active external edits cannot be archived",
+      { blockId },
+    );
+  }
+
   const now = nowIsoString();
   const result = await db
     .update(blocks)
@@ -505,6 +513,27 @@ export async function setBlockKeepState(
   isKept: boolean,
   autoArchiveContext?: AutoArchiveEvaluationContext,
 ): Promise<Block> {
+  const targetBlock = await db
+    .select({ id: blocks.id, isPinned: blocks.isPinned })
+    .from(blocks)
+    .where(eq(blocks.id, blockId))
+    .get();
+  if (!targetBlock) {
+    throw businessError("BUSINESS.NOT_FOUND", `Resource not found: ${blockId}`);
+  }
+  if (targetBlock.isPinned) {
+    throw businessError("BUSINESS.INVALID_OPERATION", "Pinned blocks cannot change keep state", {
+      blockId,
+    });
+  }
+  if (autoArchiveContext?.protectedBlockIds.has(blockId)) {
+    throw businessError(
+      "BUSINESS.INVALID_OPERATION",
+      "Blocks with active external edits cannot change keep state",
+      { blockId },
+    );
+  }
+
   const result = await db
     .update(blocks)
     .set({
@@ -548,7 +577,6 @@ export async function setBlockPinnedState(
       .update(blocks)
       .set({
         isPinned,
-        ...(isPinned ? { isKept: true } : {}),
         orderIndex,
       })
       .where(eq(blocks.id, blockId))

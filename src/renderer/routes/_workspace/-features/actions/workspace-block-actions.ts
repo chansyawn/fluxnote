@@ -56,8 +56,8 @@ export function useWorkspaceBlockActions({
   state,
 }: UseWorkspaceBlockActionsParams): WorkspaceBlockActions {
   const canRunBlockAction = !state.isLocked;
-  const canRunExternalEditAction =
-    Boolean(state.externalEditSession) && !state.isExternalEditPending;
+  const hasExternalEditSession = Boolean(state.externalEditSession);
+  const canRunExternalEditAction = hasExternalEditSession && !state.isExternalEditPending;
 
   const copy = useCallback(async () => {
     if (!canRunBlockAction) {
@@ -92,12 +92,12 @@ export function useWorkspaceBlockActions({
   );
 
   const toggleKeep = useCallback(async () => {
-    if (!canRunBlockAction || isArchived(block)) {
+    if (!canRunBlockAction || isArchived(block) || block.isPinned || hasExternalEditSession) {
       return;
     }
 
     await commands.setBlockKeepState(block.id, !block.isKept);
-  }, [block, canRunBlockAction, commands]);
+  }, [block, canRunBlockAction, commands, hasExternalEditSession]);
 
   const togglePinned = useCallback(async () => {
     if (!canRunBlockAction || isArchived(block)) {
@@ -128,8 +128,12 @@ export function useWorkspaceBlockActions({
       return;
     }
 
+    if (hasExternalEditSession) {
+      return;
+    }
+
     await commands.archiveBlock(block.id);
-  }, [block, canRunBlockAction, commands]);
+  }, [block, canRunBlockAction, commands, hasExternalEditSession]);
 
   const deleteOrCancelExternalEdit = useCallback(async () => {
     if (state.externalEditSession) {

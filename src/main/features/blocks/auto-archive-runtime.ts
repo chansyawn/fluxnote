@@ -196,7 +196,12 @@ async function archiveBlocks(
       isPinned: false,
     })
     .where(
-      and(isNull(blocks.archivedAt), eq(blocks.isKept, false), inArray(blocks.id, [...blockIds])),
+      and(
+        isNull(blocks.archivedAt),
+        eq(blocks.isKept, false),
+        eq(blocks.isPinned, false),
+        inArray(blocks.id, [...blockIds]),
+      ),
     )
     .run();
   return getSqliteChangedRows(result);

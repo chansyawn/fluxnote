@@ -24,6 +24,21 @@ describe("external-edit manager", () => {
     ]);
 
     const claimed = manager.claim(begun.session.editId);
+    expect(manager.listSessions()).toEqual([
+      expect.objectContaining({
+        blockId: "b1",
+        editId: begun.session.editId,
+        trigger,
+      }),
+    ]);
+    let duplicateClaimError: unknown;
+    try {
+      manager.claim(begun.session.editId);
+    } catch (error) {
+      duplicateClaimError = error;
+    }
+    expect(duplicateClaimError).toMatchObject({ code: "BUSINESS.INVALID_OPERATION" });
+
     claimed.resolve({ blockId: "b1", content: "next", status: "submitted" });
 
     await expect(begun.result).resolves.toEqual({
@@ -33,6 +48,31 @@ describe("external-edit manager", () => {
     });
     expect(manager.listSessions()).toHaveLength(0);
     expect(emitEvent).toHaveBeenCalled();
+  });
+
+  it("keeps claimed session protected when abort signal fires", async () => {
+    const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
+    const controller = new AbortController();
+    const begun = manager.begin("b1", "original", trigger, { signal: controller.signal });
+    const claimed = manager.claim(begun.session.editId);
+
+    controller.abort();
+
+    expect(manager.listSessions()).toEqual([
+      expect.objectContaining({
+        blockId: "b1",
+        editId: begun.session.editId,
+      }),
+    ]);
+
+    claimed.resolve({ blockId: "b1", content: "next", status: "submitted" });
+
+    await expect(begun.result).resolves.toEqual({
+      blockId: "b1",
+      content: "next",
+      status: "submitted",
+    });
+    expect(manager.listSessions()).toHaveLength(0);
   });
 
   it("throws not found when claim missing session", () => {

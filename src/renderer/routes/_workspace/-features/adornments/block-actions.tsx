@@ -41,6 +41,8 @@ import type { BlockReorderOperation } from "../use-block-mutations";
 import { AdornmentBar } from "./adornment-bar";
 import { CopyAction, IconAction } from "./icon-action";
 
+export type ProtectedKeepReason = "external-edit" | "pinned" | null;
+
 export interface BlockActionPosition {
   canMoveDown: boolean;
   canMoveToTop: boolean;
@@ -55,6 +57,7 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
     shortcuts?: ShortcutPreferences;
     copied?: boolean;
     disabled?: boolean;
+    protectedKeepReason?: ProtectedKeepReason;
     pending?: {
       archive?: boolean;
       delete?: boolean;
@@ -86,10 +89,45 @@ function BlockActionMenuShortcut({ shortcut }: { shortcut?: ShortcutBinding }) {
   return <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>;
 }
 
+function BlockKeepMenuLabel({
+  block,
+  protectedKeepReason,
+}: {
+  block: Block;
+  protectedKeepReason: ProtectedKeepReason;
+}) {
+  if (protectedKeepReason === "external-edit") {
+    return (
+      <Trans id="workspace.blocks.keep.protected-by-external-edit">
+        External edit keeps this block
+      </Trans>
+    );
+  }
+
+  if (protectedKeepReason === "pinned") {
+    return <Trans id="workspace.blocks.keep.protected-by-pin">Pin keeps this block</Trans>;
+  }
+
+  return block.isKept ? (
+    <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
+  ) : (
+    <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
+  );
+}
+
 export function BlockActions({ block, className, position, state, handlers }: BlockActionsProps) {
   const { i18n } = useLingui();
-  const { tags, shortcuts, copied = false, disabled, pending = {} } = state;
+  const {
+    tags,
+    shortcuts,
+    copied = false,
+    disabled,
+    protectedKeepReason = null,
+    pending = {},
+  } = state;
   const isArchived = block.archivedAt !== null;
+  const isExternalEditProtected = protectedKeepReason === "external-edit";
+  const keepDisabled = disabled || pending.keep || protectedKeepReason !== null;
   const reorderDisabled = disabled || pending.reorder;
 
   return (
@@ -145,7 +183,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
             )
           }
           shortcut={shortcuts?.["archive-block"]}
-          disabled={disabled}
+          disabled={disabled || isExternalEditProtected}
           pending={pending.archive}
           onClick={() => {
             void handlers.onToggleArchive();
@@ -183,7 +221,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                   <Trans id="workspace.blocks.status">Status</Trans>
                 </DropdownMenuLabel>
                 <DropdownMenuItem
-                  disabled={disabled || pending.keep}
+                  disabled={keepDisabled}
                   onClick={() => {
                     void handlers.onToggleKeep();
                   }}
@@ -195,11 +233,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                   ) : (
                     <FlagIcon />
                   )}
-                  {block.isKept ? (
-                    <Trans id="workspace.blocks.unkeep">Allow auto archive</Trans>
-                  ) : (
-                    <Trans id="workspace.blocks.keep">Keep from auto archive</Trans>
-                  )}
+                  <BlockKeepMenuLabel block={block} protectedKeepReason={protectedKeepReason} />
                   <BlockActionMenuShortcut shortcut={shortcuts?.["keep-block"]} />
                 </DropdownMenuItem>
                 <DropdownMenuItem

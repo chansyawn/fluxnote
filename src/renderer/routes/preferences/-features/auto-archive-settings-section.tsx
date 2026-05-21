@@ -41,7 +41,7 @@ import {
 import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@shared/features/preferences/settings";
 import { useMutation } from "@tanstack/react-query";
 import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
@@ -57,6 +57,10 @@ function parseAmountText(value: string): number | null {
   }
 
   return Number(trimmedValue);
+}
+
+function normalizeAmountEditText(value: string): string | null {
+  return /^\d*$/.test(value) ? value : null;
 }
 
 function clampAmount(amount: number, unit: AutoArchiveDurationUnit): number {
@@ -90,8 +94,11 @@ export function AutoArchiveSettingsSection() {
   });
   const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_SETTINGS;
   const duration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
-  const [amountText, setAmountText] = useState(String(duration.amount));
-  const [unit, setUnit] = useState<AutoArchiveDurationUnit>(duration.unit);
+  const [amountText, setAmountTextState] = useState(String(duration.amount));
+  const [unit, setUnitState] = useState<AutoArchiveDurationUnit>(duration.unit);
+  const amountTextRef = useRef(String(duration.amount));
+  const unitRef = useRef<AutoArchiveDurationUnit>(duration.unit);
+  const isAmountFocusedRef = useRef(false);
   const unitLabels: Record<AutoArchiveDurationUnit, string> = {
     days: i18n._({ id: "preferences.auto-archive.unit.days", message: "days" }),
     hours: i18n._({ id: "preferences.auto-archive.unit.hours", message: "hours" }),
@@ -102,40 +109,76 @@ export function AutoArchiveSettingsSection() {
     value: durationUnit,
   }));
 
+  const setAmountText = (value: string) => {
+    amountTextRef.current = value;
+    setAmountTextState(value);
+  };
+
+  const setUnit = (value: AutoArchiveDurationUnit) => {
+    unitRef.current = value;
+    setUnitState(value);
+  };
+
   useEffect(() => {
-    const nextDuration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
-    setAmountText(String(nextDuration.amount));
-    setUnit(nextDuration.unit);
+    if (isAmountFocusedRef.current) {
+      return;
+    }
+
+    const nextDuration = toAutoArchiveDurationViewModel(preferences.idleMinutes, unitRef.current);
+    amountTextRef.current = String(nextDuration.amount);
+    setAmountTextState(String(nextDuration.amount));
+    unitRef.current = nextDuration.unit;
+    setUnitState(nextDuration.unit);
   }, [preferences.idleMinutes]);
 
   const savePreferences = (
     updater: (currentPreferences: typeof preferences) => typeof preferences,
   ) => {
     const nextPreferences = updater(preferences);
-    patchAutoArchive(nextPreferences);
+    return patchAutoArchive(nextPreferences);
   };
 
   const saveIdleMinutes = (idleMinutes: number) => {
-    savePreferences((currentPreferences) => ({
+    return savePreferences((currentPreferences) => ({
       ...currentPreferences,
       idleMinutes,
     }));
   };
 
-  const handleAmountChange = (value: string) => {
-    const nextAmount = parseAmountText(value);
-    if (nextAmount === null) {
-      return;
+  const handleAmountChange = (value: string): boolean => {
+    const nextAmountText = normalizeAmountEditText(value);
+    if (nextAmountText === null) {
+      return false;
     }
 
-    const clampedAmount = clampAmount(nextAmount, unit);
-    const nextIdleMinutes = toAutoArchiveIdleMinutes({ amount: clampedAmount, unit });
+    setAmountText(nextAmountText);
+    return true;
+  };
+
+  const restoreAmountFromPreferences = () => {
+    const nextDuration = toAutoArchiveDurationViewModel(preferences.idleMinutes, unitRef.current);
+    setAmountText(String(nextDuration.amount));
+    setUnit(nextDuration.unit);
+  };
+
+  const handleAmountBlur = () => {
+    isAmountFocusedRef.current = false;
+
+    const nextAmount = parseAmountText(amountTextRef.current) ?? 1;
+    const clampedAmount = clampAmount(nextAmount, unitRef.current);
+    const nextIdleMinutes = toAutoArchiveIdleMinutes({
+      amount: clampedAmount,
+      unit: unitRef.current,
+    });
     if (nextIdleMinutes === null) {
+      restoreAmountFromPreferences();
       return;
     }
 
     setAmountText(String(clampedAmount));
-    saveIdleMinutes(nextIdleMinutes);
+    void saveIdleMinutes(nextIdleMinutes).catch(() => {
+      restoreAmountFromPreferences();
+    });
   };
 
   const handleUnitChange = (value: AutoArchiveDurationUnit | null) => {
@@ -143,7 +186,7 @@ export function AutoArchiveSettingsSection() {
       return;
     }
 
-    const currentAmount = parseAmountText(amountText);
+    const currentAmount = parseAmountText(amountTextRef.current);
     if (currentAmount === null) {
       return;
     }
@@ -159,7 +202,9 @@ export function AutoArchiveSettingsSection() {
 
     setAmountText(String(clampedAmount));
     setUnit(value);
-    saveIdleMinutes(nextIdleMinutes);
+    void saveIdleMinutes(nextIdleMinutes).catch(() => {
+      restoreAmountFromPreferences();
+    });
   };
 
   return (
@@ -170,7 +215,7 @@ export function AutoArchiveSettingsSection() {
             <Switch
               checked={preferences.enabled}
               onCheckedChange={(checked) => {
-                savePreferences((currentPreferences) => ({
+                void savePreferences((currentPreferences) => ({
                   ...currentPreferences,
                   enabled: checked,
                 }));
@@ -193,16 +238,22 @@ export function AutoArchiveSettingsSection() {
               <ButtonGroup>
                 <InputGroup>
                   <InputGroupInput
-                    className="w-fit"
+                    className="w-16"
                     disabled={!preferences.enabled}
                     inputMode="numeric"
                     max={MAX_DURATION_BY_UNIT[unit]}
                     min={1}
+                    onBlur={handleAmountBlur}
                     onChange={(event) => {
-                      handleAmountChange(event.target.value);
+                      if (!handleAmountChange(event.target.value)) {
+                        event.target.value = amountTextRef.current;
+                      }
+                    }}
+                    onFocus={() => {
+                      isAmountFocusedRef.current = true;
                     }}
                     step={1}
-                    type="number"
+                    type="text"
                     value={amountText}
                   />
                 </InputGroup>

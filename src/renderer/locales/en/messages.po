@@ -233,12 +233,12 @@ msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:194
 msgid "home-note.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:157
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:195
 msgid "home-note.block.delete.tooltip"
 msgstr "Delete"
 
@@ -313,87 +313,87 @@ msgid "preferences.app.title"
 msgstr "App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:245
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:296
 msgid "preferences.archive.clear.action"
 msgstr "Clear"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:281
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:332
 msgid "preferences.archive.clear.description"
 msgstr "Permanently delete every archived block. Active blocks and tags are not affected."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:262
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:313
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:274
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:325
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "Clear archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:255
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:306
 msgid "preferences.archive.clear.dialog.description"
 msgstr "This permanently deletes all archived blocks. Active blocks and tags are kept."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:252
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:303
 msgid "preferences.archive.clear.dialog.title"
 msgstr "Clear archived data?"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:84
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:88
 msgid "preferences.archive.clear.error"
 msgstr "Failed to clear archived data."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:286
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:337
 msgid "preferences.archive.clear.label"
 msgstr "Clear archived data"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:75
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:79
 msgid "preferences.archive.clear.success"
 msgstr "Archived data cleared."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:166
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:211
 msgid "preferences.archive.title"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:181
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:226
 msgid "preferences.auto-archive.enable.description"
 msgstr "When enabled, blocks with no content changes for the configured duration enter a pending state. Actual archiving runs when the window is hidden, and pending blocks appear dimmed."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:188
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:233
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:233
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:284
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Auto archive after"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:228
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:279
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "Range: 1-20160 minutes, 1-336 hours, or 1-14 days."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:96
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:103
 msgid "preferences.auto-archive.unit.days"
 msgstr "days"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:97
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:104
 msgid "preferences.auto-archive.unit.hours"
 msgstr "hours"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:98
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:105
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
@@ -582,73 +582,83 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr "No archived blocks match the selected tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:137
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:175
 msgid "workspace.blocks.archive"
 msgstr "Archive block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:144
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:182
 msgid "workspace.blocks.archive.tooltip"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:201
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
 msgid "workspace.blocks.keep"
 msgstr "Keep from auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:168
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
+msgid "workspace.blocks.keep.protected-by-external-edit"
+msgstr "External edit keeps this block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:108
+msgid "workspace.blocks.keep.protected-by-pin"
+msgstr "Pin keeps this block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:206
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:215
 msgid "workspace.blocks.more-actions"
 msgstr "More block actions"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:229
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:263
 msgid "workspace.blocks.move"
 msgstr "Move"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:247
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:281
 msgid "workspace.blocks.move-down"
 msgstr "Move down"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:256
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:290
 msgid "workspace.blocks.move-to-top"
 msgstr "Move to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:238
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:272
 msgid "workspace.blocks.move-up"
 msgstr "Move up"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
 msgid "workspace.blocks.pin"
 msgstr "Pin to top"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:135
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:173
 msgid "workspace.blocks.restore"
 msgstr "Restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:142
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
 msgid "workspace.blocks.restore.tooltip"
 msgstr "Restore"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:183
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
 msgid "workspace.blocks.status"
 msgstr "Status"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
 msgid "workspace.blocks.unkeep"
 msgstr "Allow auto archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:253
 msgid "workspace.blocks.unpin"
 msgstr "Unpin from top"
 
@@ -683,12 +693,12 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:107
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
