@@ -223,12 +223,12 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:81
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:86
 msgid "home-note.block.copy"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:82
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:87
 msgid "home-note.block.copy.tooltip"
 msgstr "Copy"
 
@@ -693,28 +693,28 @@ msgid "workspace.loading"
 msgstr "Loading your blocks..."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:33
-#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:73
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:32
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:56
 msgid "workspace.tags.assign.button"
 msgstr "Assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:63
+#: src/renderer/routes/_workspace/-features/adornments/block-tag-actions.tsx:70
 msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:156
+#: src/renderer/features/tag/tag-combobox-popover.tsx:144
 msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:225
+#: src/renderer/features/tag/tag-combobox-popover.tsx:213
 msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:201
+#: src/renderer/features/tag/tag-combobox-popover.tsx:189
 msgid "workspace.tags.edit-inline"
 msgstr "Edit tag"
 
@@ -769,7 +769,7 @@ msgid "workspace.tags.edit.title"
 msgstr "Edit tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:106
+#: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:110
 msgid "workspace.tags.filter.button"
 msgstr "Filter tags"
 
@@ -779,7 +779,7 @@ msgid "workspace.tags.filter.placeholder"
 msgstr "Search or create tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:165
+#: src/renderer/features/tag/tag-combobox-popover.tsx:153
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 

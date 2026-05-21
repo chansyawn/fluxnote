@@ -54,7 +54,7 @@ export function TagAvatar({ tag, className }: TagAvatarProps) {
   const color = getTagDisplayColor(tag);
 
   return (
-    <Avatar className={cn("bg-background size-3", className)} title={tag.name}>
+    <Avatar className={cn("bg-background size-3.5", className)} title={tag.name}>
       <AvatarFallback
         className={cn("font-medium", hasIcon ? "bg-background" : "text-primary-foreground")}
         style={{

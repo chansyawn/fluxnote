@@ -27,12 +27,10 @@ interface BlockTagActionsProps extends Pick<ComponentProps<"div">, "className"> 
 function BlockTagTrigger({ tags }: { tags: Tag[] }) {
   if (tags.length === 0) {
     return (
-      <AdornmentBar>
-        <IconAction
-          icon={<TagIcon className="size-3" />}
-          label={<Trans id="workspace.tags.assign.button">Assign tags</Trans>}
-        />
-      </AdornmentBar>
+      <IconAction
+        icon={<TagIcon className="size-3" />}
+        label={<Trans id="workspace.tags.assign.button">Assign tags</Trans>}
+      />
     );
   }
 
@@ -40,14 +38,23 @@ function BlockTagTrigger({ tags }: { tags: Tag[] }) {
   const hiddenTagCount = tags.length - visibleTags.length;
 
   return (
-    <AvatarGroup className="-space-x-1.5" aria-hidden="true">
-      {visibleTags.map((tag) => (
-        <TagAvatar key={tag.id} tag={tag} />
-      ))}
-      {hiddenTagCount > 0 ? (
-        <AvatarGroupCount className="size-3 text-[0.625rem]">+{hiddenTagCount}</AvatarGroupCount>
-      ) : null}
-    </AvatarGroup>
+    <IconAction
+      className="p-1"
+      size="xs"
+      icon={
+        <AvatarGroup className="-space-x-1.5" aria-hidden="true">
+          {visibleTags.map((tag) => (
+            <TagAvatar key={tag.id} tag={tag} />
+          ))}
+          {hiddenTagCount > 0 ? (
+            <AvatarGroupCount className="size-3 text-[0.625rem]">
+              +{hiddenTagCount}
+            </AvatarGroupCount>
+          ) : null}
+        </AvatarGroup>
+      }
+      label={<Trans id="workspace.tags.assign.button">Assign tags</Trans>}
+    ></IconAction>
   );
 }
 
@@ -66,17 +73,14 @@ export function BlockTagActions({ block, className, state, handlers }: BlockTagA
         })}
         selectedTagIds={block.tags.map((tag) => tag.id)}
         tags={tags}
-        trigger={
-          <>
-            <BlockTagTrigger tags={block.tags} />
-            <span className="sr-only">
-              <Trans id="workspace.tags.assign.button">Assign tags</Trans>
-            </span>
-          </>
-        }
         onCreateTag={handlers.onCreateTag}
         onSelectedTagIdsChange={handlers.onAssignTags}
-      />
+        nativeButton={false}
+      >
+        <AdornmentBar>
+          <BlockTagTrigger tags={block.tags} />
+        </AdornmentBar>
+      </TagComboboxPopover>
     </div>
   );
 }

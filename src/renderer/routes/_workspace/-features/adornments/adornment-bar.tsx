@@ -18,7 +18,7 @@ export function AdornmentBar({
       {
         "aria-disabled": disabled,
         className: cn(
-          "border-border/70 bg-card/95 rounded-lg border p-0.25",
+          "border-border/70 bg-card/95 rounded-lg border h-6 flex items-center",
           disabled && "pointer-events-none opacity-75",
           className,
         ),

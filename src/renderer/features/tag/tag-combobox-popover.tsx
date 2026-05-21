@@ -1,7 +1,7 @@
 import type { BaseUIEvent } from "@base-ui/react/types";
 import { Trans } from "@lingui/react/macro";
 import type { Tag } from "@renderer/clients";
-import { Button, buttonVariants } from "@renderer/ui/components/button";
+import { Button } from "@renderer/ui/components/button";
 import {
   Combobox,
   ComboboxContent,
@@ -12,9 +12,8 @@ import {
   ComboboxTrigger,
 } from "@renderer/ui/components/combobox";
 import { InputGroupAddon } from "@renderer/ui/components/input-group";
-import type { VariantProps } from "class-variance-authority";
 import { LoaderCircleIcon, PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useMemo, useState, type KeyboardEvent, type ReactElement } from "react";
 
 import { TagAvatar } from "./tag-icon";
 
@@ -27,10 +26,10 @@ type TagOption = {
 interface TagComboboxPopoverProps {
   tags: Tag[];
   selectedTagIds: string[];
-  trigger: ReactNode;
-  triggerSize?: VariantProps<typeof buttonVariants>["size"];
+  children: ReactElement;
   placeholder: string;
   disabled?: boolean;
+  nativeButton?: boolean;
   isCreatingTag: boolean;
   isDeletingTag?: (tagId: string) => boolean;
   isEditingTag?: (tagId: string) => boolean;
@@ -47,8 +46,7 @@ function normalizeTagName(tagName: string): string {
 export function TagComboboxPopover({
   tags,
   selectedTagIds,
-  trigger,
-  triggerSize = "icon",
+  children,
   placeholder,
   disabled = false,
   isCreatingTag,
@@ -58,6 +56,7 @@ export function TagComboboxPopover({
   onCreateTag,
   onDeleteTag,
   onEditTag,
+  nativeButton,
 }: TagComboboxPopoverProps) {
   const [inputValue, setInputValue] = useState("");
 
@@ -108,18 +107,7 @@ export function TagComboboxPopover({
         void onSelectedTagIdsChange(nextValue.map((item) => item.value));
       }}
     >
-      <ComboboxTrigger
-        render={
-          <Button
-            className="[&>svg:last-child]:hidden"
-            disabled={disabled}
-            size={triggerSize}
-            variant="ghost"
-          />
-        }
-      >
-        {trigger}
-      </ComboboxTrigger>
+      <ComboboxTrigger disabled={disabled} render={children} nativeButton={nativeButton} />
 
       <ComboboxContent align="end" className="w-72 min-w-72 p-1">
         <ComboboxInput

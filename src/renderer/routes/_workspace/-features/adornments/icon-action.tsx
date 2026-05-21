@@ -22,6 +22,8 @@ interface IconActionProps {
   pending?: boolean;
   disabled?: boolean;
   onClick?: () => void;
+  className?: string;
+  size?: typeof Button.prototype.size;
 }
 
 export function IconAction({
@@ -33,6 +35,8 @@ export function IconAction({
   pending,
   disabled,
   onClick,
+  className,
+  size = "icon-xs",
 }: IconActionProps) {
   const shortcutTokens = formatShortcutTokens(shortcut ?? null);
   const tooltipContent = tooltipLabel ?? label;
@@ -42,9 +46,10 @@ export function IconAction({
       <TooltipTrigger
         render={
           <Button
+            className={className}
             aria-pressed={active}
             disabled={disabled || pending}
-            size="icon-xs"
+            size={size}
             variant="ghost"
             onClick={onClick}
           />

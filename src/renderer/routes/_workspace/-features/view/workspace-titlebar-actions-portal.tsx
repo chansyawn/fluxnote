@@ -99,19 +99,18 @@ export function WorkspaceTitlebarActionsPortal({
           isEditingTag={(tagId) => isTagOpPending("update", tagId)}
           selectedTagIds={selectedTagIds}
           tags={tags}
-          trigger={
-            <>
-              <TagsIcon className={cn("size-3.5", selectedTagIds.length > 0 && "fill-primary")} />
-              <span className="sr-only">
-                <Trans id="workspace.tags.filter.button">Filter tags</Trans>
-              </span>
-            </>
-          }
           onCreateTag={onCreateTag}
           onDeleteTag={onDeleteTag}
           onEditTag={setEditingTag}
           onSelectedTagIdsChange={onSetSelectedTagIds}
-        />
+        >
+          <Button className="[&>svg:last-child]:hidden" size="icon" variant="ghost">
+            <TagsIcon className={cn("size-3.5", selectedTagIds.length > 0 && "fill-primary")} />
+            <span className="sr-only">
+              <Trans id="workspace.tags.filter.button">Filter tags</Trans>
+            </span>
+          </Button>
+        </TagComboboxPopover>
       </div>
       <TagEditDialog
         open={editingTag !== null}
