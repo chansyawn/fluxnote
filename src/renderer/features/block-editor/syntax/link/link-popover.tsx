@@ -122,12 +122,12 @@ export function LinkHoverControls() {
       <PopoverContent
         ref={setPopoverElement}
         anchor={activeLink.element}
-        className="p-2"
+        className="w-fit max-w-xs p-2"
         align="center"
         finalFocus={false}
         initialFocus={false}
-        side="bottom"
-        sideOffset={6}
+        side="top"
+        sideOffset={2}
         onBlurCapture={(event) => {
           const nextTarget = event.relatedTarget;
           if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return;
