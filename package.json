@@ -27,7 +27,9 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
-    "@fontsource-variable/noto-sans": "^5.2.10",
+    "@fontsource-variable/cascadia-code": "^5.2.2",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/noto-sans-sc": "^5.2.10",
     "@lexical/clipboard": "^0.44.0",
     "@lexical/code": "^0.44.0",
     "@lexical/code-core": "^0.44.0",
