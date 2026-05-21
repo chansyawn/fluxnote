@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
+import { Tabs, TabsList, TabsTrigger } from "@renderer/ui/components/tabs";
 import {
   FONT_SIZE_OPTIONS,
   isFontSize,
@@ -140,9 +141,6 @@ export function AppSettingsSection() {
       icon: MoonIcon,
     },
   ];
-  const selectedThemeItem =
-    themeItems.find((themeItem) => themeItem.value === theme) ?? themeItems[0];
-  const SelectedThemeIcon = selectedThemeItem.icon;
   const cliInstalled = cliStatus?.installed === true;
   const cliDisabled = isCliStatusLoading || isCliPending;
   const canInstallCli = cliStatus?.canInstall === true;
@@ -182,8 +180,7 @@ export function AppSettingsSection() {
       <SettingsGroup>
         <SettingsRow
           control={
-            <Select
-              items={themeItems}
+            <Tabs
               value={theme}
               onValueChange={(value) => {
                 if (value && isThemePreference(value)) {
@@ -191,32 +188,22 @@ export function AppSettingsSection() {
                 }
               }}
             >
-              <SelectTrigger>
-                <span
-                  data-slot="select-value"
-                  className="flex flex-1 items-center gap-1.5 text-start"
-                >
-                  <SelectedThemeIcon />
-                  {selectedThemeItem.label}
-                </span>
-              </SelectTrigger>
-              <SelectContent align="end" alignItemWithTrigger={false}>
-                <SelectGroup>
-                  {themeItems.map((themeItem) => {
-                    const ThemeItemIcon = themeItem.icon;
+              <TabsList>
+                {themeItems.map((themeItem) => {
+                  const ThemeItemIcon = themeItem.icon;
 
-                    return (
-                      <SelectItem key={themeItem.value} value={themeItem.value}>
-                        <div className="flex items-center gap-1.5">
-                          <ThemeItemIcon />
-                          {themeItem.label}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                  return (
+                    <TabsTrigger
+                      key={themeItem.value}
+                      aria-label={themeItem.label}
+                      value={themeItem.value}
+                    >
+                      <ThemeItemIcon />
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </Tabs>
           }
           icon={PaletteIcon}
           label={<Trans id="preferences.theme.label">Theme</Trans>}
