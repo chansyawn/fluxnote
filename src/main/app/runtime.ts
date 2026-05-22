@@ -41,6 +41,9 @@ interface RuntimeCommandDeps {
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  trayManager: {
+    refreshMenu: () => void;
+  };
   windowManager: WindowManager;
 }
 
@@ -76,6 +79,7 @@ function registerRuntimeCommands(
   registerPreferencesCommands(ipc, {
     applyThemePreference: deps.applyThemePreference,
     onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
+    onLocalePreferenceChanged: () => deps.trayManager.refreshMenu(),
     preferencesService: deps.preferencesService,
   });
   registerShortcutCommands(ipc, {
@@ -130,6 +134,7 @@ export function createBackendRuntime() {
       openBlockService: services.openBlockService,
       paths: services.paths,
       preferencesService: services.preferencesService,
+      trayManager: services.trayManager,
       windowManager: services.windowManager,
     });
   }

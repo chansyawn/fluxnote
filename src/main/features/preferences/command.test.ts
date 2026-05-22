@@ -14,12 +14,14 @@ describe("preferences command", () => {
   };
   const applyThemePreference = vi.fn();
   const onAutoArchivePreferencesChanged = vi.fn(async () => undefined);
+  const onLocalePreferenceChanged = vi.fn();
 
   beforeEach(() => {
     handlers.clear();
     ipc.command.mockClear();
     applyThemePreference.mockClear();
     onAutoArchivePreferencesChanged.mockClear();
+    onLocalePreferenceChanged.mockClear();
     Object.values(preferencesService).forEach((fn) => fn.mockReset());
   });
 
@@ -40,6 +42,7 @@ describe("preferences command", () => {
       {
         applyThemePreference,
         onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -58,6 +61,7 @@ describe("preferences command", () => {
     expect(applyThemePreference).toHaveBeenNthCalledWith(2, "light");
     expect(applyThemePreference).toHaveBeenNthCalledWith(3, "system");
     expect(onAutoArchivePreferencesChanged).toHaveBeenCalledTimes(1);
+    expect(onLocalePreferenceChanged).toHaveBeenCalledTimes(2);
   });
 
   it("notifies auto archive changes after auto archive patch", async () => {
@@ -70,6 +74,7 @@ describe("preferences command", () => {
       {
         applyThemePreference,
         onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -89,6 +94,7 @@ describe("preferences command", () => {
       {
         applyThemePreference,
         onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -97,5 +103,6 @@ describe("preferences command", () => {
 
     expect(applyThemePreference).toHaveBeenCalledWith("dark");
     expect(onAutoArchivePreferencesChanged).not.toHaveBeenCalled();
+    expect(onLocalePreferenceChanged).not.toHaveBeenCalled();
   });
 });

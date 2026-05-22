@@ -1,7 +1,7 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
   <mask id="lineCutout">
-    <rect x="3" y="3" width="26" height="26" rx="5.75" fill="white"/>
-    <g stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="1" y="1" width="30" height="30" rx="6.6" fill="white"/>
+    <g transform="translate(16 16) scale(1.153846) translate(-16 -16)" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <path d="M7 12.25
         C8.125 11.5 9.375 10.625 10.5 10
         C11.25 9.5 11.875 9.375 12.375 9.5
@@ -30,5 +30,5 @@
         C18.5 18.5 19.125 18.5 19.5 18.625"/>
     </g>
   </mask>
-  <rect x="3" y="3" width="26" height="26" rx="5.75" fill="black" mask="url(#lineCutout)"/>
+  <rect x="1" y="1" width="30" height="30" rx="6.6" fill="black" mask="url(#lineCutout)"/>
 </svg>

@@ -79,6 +79,7 @@ export function createMainServices(): MainServices {
   });
 
   const trayManager = createTrayManager({
+    getLocale: () => preferencesService.readSettings().appearance.locale,
     openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
     requestQuit: () => windowManager.requestQuit(),
     showMainWindow: () => windowManager.showMainWindow(),

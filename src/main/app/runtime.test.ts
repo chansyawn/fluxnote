@@ -126,6 +126,7 @@ describe("createBackendRuntime", () => {
     trayManager: {
       createTray: vi.fn(),
       destroyTray: vi.fn(),
+      refreshMenu: vi.fn(),
     },
     windowManager: {
       createMainWindow: vi.fn(),
@@ -164,6 +165,12 @@ describe("createBackendRuntime", () => {
     expect(mocks.registerExternalUrlCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerOpenBlockCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerPreferencesCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerPreferencesCommands).toHaveBeenCalledWith(
+      ipc,
+      expect.objectContaining({
+        onLocalePreferenceChanged: expect.any(Function),
+      }),
+    );
     expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTagsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerWindowCommands).toHaveBeenCalledTimes(1);
@@ -189,6 +196,17 @@ describe("createBackendRuntime", () => {
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledBefore(
       services.appUpdateService.start,
     );
+  });
+
+  it("refreshes tray menu after locale preferences change", async () => {
+    const runtime = createBackendRuntime();
+    await runtime.start();
+    const registerCall = mocks.registerPreferencesCommands.mock.calls[0];
+    const deps = registerCall?.[1] as { onLocalePreferenceChanged: () => void };
+
+    deps.onLocalePreferenceChanged();
+
+    expect(services.trayManager.refreshMenu).toHaveBeenCalledTimes(1);
   });
 
   it("handles startup deep link when available", async () => {

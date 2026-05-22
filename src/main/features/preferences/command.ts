@@ -9,12 +9,17 @@ import type { PreferencesService } from "./service";
 
 interface PreferencesCommandDeps {
   applyThemePreference?: (theme: ThemePreference) => void;
+  onLocalePreferenceChanged?: () => void;
   onAutoArchivePreferencesChanged?: () => Promise<void> | void;
   preferencesService: PreferencesService;
 }
 
 function includesAutoArchivePreferences(patch: SettingsPatch): boolean {
   return patch.autoArchive !== undefined;
+}
+
+function includesLocalePreference(patch: SettingsPatch): boolean {
+  return patch.appearance?.locale !== undefined;
 }
 
 function notifyAutoArchivePreferencesChanged(deps: PreferencesCommandDeps): void {
@@ -31,6 +36,9 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
   ipc.command("preferences.patch", (input) => {
     const settings = deps.preferencesService.patchSettings(input);
     applyThemePreference(deps, settings);
+    if (includesLocalePreference(input)) {
+      deps.onLocalePreferenceChanged?.();
+    }
     if (includesAutoArchivePreferences(input)) {
       notifyAutoArchivePreferencesChanged(deps);
     }
@@ -46,6 +54,7 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
   ipc.command("preferences.reset", () => {
     const settings = deps.preferencesService.resetSettings();
     applyThemePreference(deps, settings);
+    deps.onLocalePreferenceChanged?.();
     notifyAutoArchivePreferencesChanged(deps);
     return settings;
   });
