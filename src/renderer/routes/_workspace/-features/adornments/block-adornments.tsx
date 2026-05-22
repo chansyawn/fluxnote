@@ -3,7 +3,6 @@ import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-u
 
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "../workspace-state-context";
-import { AdornmentCluster } from "./adornment-cluster";
 import { BlockActions, type BlockActionPosition, type ProtectedKeepReason } from "./block-actions";
 import { ExternalEditControls } from "./external-edit-controls";
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
@@ -42,7 +41,7 @@ export function BlockAdornments({
   }
 
   return (
-    <AdornmentCluster>
+    <div className="flex min-w-0 items-center gap-1.5">
       {externalEditSession ? (
         <>
           <ExternalEditControls
@@ -91,6 +90,6 @@ export function BlockAdornments({
           }}
         />
       ) : null}
-    </AdornmentCluster>
+    </div>
   );
 }

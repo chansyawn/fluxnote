@@ -91,7 +91,7 @@ export function ShortcutInput({
                 ))}
               </KbdGroup>
             ) : (
-              <span className="text-muted-foreground text-xs">
+              <span className="text-xs">
                 <Trans id="preferences.shortcuts.empty">Not set</Trans>
               </span>
             )}

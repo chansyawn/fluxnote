@@ -58,7 +58,7 @@ function BlockEditorFrame({
       className={cn(
         "group bg-card relative rounded-lg border transition-opacity border-transparent",
         {
-          "border-ring/80": isKept,
+          "border-ring": isKept,
           "border-muted": isPinned,
           "border-dashed": isExternalEditPending,
           "opacity-60": willArchive,

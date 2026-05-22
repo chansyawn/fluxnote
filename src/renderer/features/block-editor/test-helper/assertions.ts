@@ -1,4 +1,4 @@
-import { expect } from "vitest";
+import { expect } from "vite-plus/test";
 
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
 import { editorFromMarkdown, readMarkdown } from "./editor-driver";

@@ -5,10 +5,10 @@ import { app, BrowserWindow, type BrowserWindowConstructorOptions } from "electr
 
 import { calculateWindowPosition, saveWindowPosition } from "./position";
 
-const MAIN_WINDOW_HEIGHT = 540;
 const MAIN_WINDOW_MAX_WIDTH = 960;
 const MAIN_WINDOW_MIN_WIDTH = 320;
-const MAIN_WINDOW_WIDTH = 400;
+const MAIN_WINDOW_HEIGHT = 720;
+const MAIN_WINDOW_WIDTH = 540;
 
 const MAIN_WINDOW_WORKSPACE_OPTIONS = {
   visibleOnFullScreen: true,
@@ -156,7 +156,6 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       backgroundColor: "#00000000",
       frame: false,
       hasShadow: true,
-      height: MAIN_WINDOW_HEIGHT,
       icon: process.platform === "win32" ? resolveIconPath("icon.ico") : undefined,
       maximizable: false,
       maxWidth: MAIN_WINDOW_MAX_WIDTH,
@@ -172,6 +171,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
         sandbox: true,
       },
       width: MAIN_WINDOW_WIDTH,
+      height: MAIN_WINDOW_HEIGHT,
       ...getMainWindowPlatformOptions(),
     });
     mainWindow = createdWindow;

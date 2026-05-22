@@ -46,7 +46,11 @@ export function createMainServices(): MainServices {
   });
   const events = createEventBus();
   const emitEvent: EventBus["emit"] = (name, payload) => events.emit(name, payload);
-  const appUpdateService = createAppUpdateService({ emitEvent });
+  let windowManager: WindowManager;
+  const appUpdateService = createAppUpdateService({
+    emitEvent,
+    prepareToQuitForInstall: () => windowManager.prepareToQuit(),
+  });
   const applyThemePreference = (theme: ThemePreference): void => {
     nativeTheme.themeSource = theme;
   };
@@ -55,7 +59,6 @@ export function createMainServices(): MainServices {
     storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
   });
 
-  let windowManager: WindowManager;
   const externalEditManager = createExternalEditManager({ emitEvent });
   const autoArchiveRuntime = createAutoArchiveRuntime({
     emitEvent,

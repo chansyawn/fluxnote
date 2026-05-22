@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => {
   type Listener = (...args: unknown[]) => void;
@@ -56,6 +56,7 @@ describe("app update service", () => {
       emitEvent,
       now: () => new Date("2026-01-01T00:00:00.000Z"),
       platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
     });
 
     const checkingStatus = service.checkForUpdates("manual");
@@ -83,12 +84,55 @@ describe("app update service", () => {
     );
   });
 
+  it("starts downloading after an available update is found", () => {
+    const emitEvent = vi.fn();
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent,
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-available");
+
+    expect(service.getStatus()).toMatchObject({
+      lastCheckSource: "manual",
+      state: "downloading",
+    });
+    expect(emitEvent).toHaveBeenLastCalledWith(
+      "app-update.changed",
+      expect.objectContaining({ state: "downloading" }),
+    );
+  });
+
+  it("uses the same update flow for automatic checks", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("automatic");
+    mocks.autoUpdater.emit("update-available");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      lastCheckSource: "automatic",
+      state: "ready",
+    });
+  });
+
   it("reports manual check errors through status", () => {
     const service = createAppUpdateService({
       arch: "arm64",
       emitEvent: vi.fn(),
       now: () => new Date("2026-01-01T00:00:00.000Z"),
       platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
     });
 
     service.checkForUpdates("manual");
@@ -102,18 +146,23 @@ describe("app update service", () => {
   });
 
   it("restarts only when an update is ready", () => {
+    const prepareToQuitForInstall = vi.fn();
     const service = createAppUpdateService({
       arch: "arm64",
       emitEvent: vi.fn(),
       platform: "darwin",
+      prepareToQuitForInstall,
     });
 
     expect(() => service.restartAndInstall()).toThrow("No app update is ready to install.");
+    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
 
     service.checkForUpdates("manual");
     mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
     service.restartAndInstall();
 
+    expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
+    expect(prepareToQuitForInstall).toHaveBeenCalledBefore(mocks.autoUpdater.quitAndInstall);
     expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
   });
 
@@ -123,6 +172,7 @@ describe("app update service", () => {
       arch: "arm64",
       emitEvent: vi.fn(),
       platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
     });
 
     expect(service.checkForUpdates("manual")).toMatchObject({

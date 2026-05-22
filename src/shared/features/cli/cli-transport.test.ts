@@ -1,6 +1,6 @@
 import os from "node:os";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createCliEntrypointEnvelope, resolveCliIpcSocketPath } from "./cli-transport";
 

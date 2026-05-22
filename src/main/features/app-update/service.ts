@@ -18,6 +18,7 @@ interface AppUpdateServiceDeps {
   emitEvent: EventBus["emit"];
   now?: () => Date;
   platform?: NodeJS.Platform;
+  prepareToQuitForInstall: () => void;
 }
 
 export interface AppUpdateService {
@@ -57,6 +58,7 @@ export function createAppUpdateService({
   emitEvent,
   now = () => new Date(),
   platform = process.platform,
+  prepareToQuitForInstall,
 }: AppUpdateServiceDeps): AppUpdateService {
   const isSupported = app.isPackaged && isSupportedPlatform(platform);
   let status: AppUpdateStatus = {
@@ -164,6 +166,7 @@ export function createAppUpdateService({
       throw businessError("BUSINESS.INVALID_INVOKE", "No app update is ready to install.");
     }
 
+    prepareToQuitForInstall();
     autoUpdater.quitAndInstall();
   }
 

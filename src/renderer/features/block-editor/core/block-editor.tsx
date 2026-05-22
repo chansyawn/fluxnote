@@ -59,14 +59,14 @@ interface BlockEditorContentProps {
 function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
   const { i18n } = useLingui();
   return (
-    <div className="block-editor__shell">
+    <div className="relative min-h-16 text-sm">
       <ContentEditable
         aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
         ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
-        className="block-editor__content"
+        className="relative resize-none text-sm outline-none"
         onBlur={onBlur}
         placeholder={
-          <div className="block-editor__placeholder">
+          <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
             <Trans id="block-editor.placeholder">Write a note...</Trans>
           </div>
         }
@@ -133,13 +133,11 @@ export function BlockEditor({
   }, [onBlur]);
 
   return (
-    <div className="block-editor">
-      <BlockEditorConfigProvider config={resolvedConfig}>
-        <LexicalExtensionComposer extension={extension} contentEditable={null}>
-          <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
-          <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
-        </LexicalExtensionComposer>
-      </BlockEditorConfigProvider>
-    </div>
+    <BlockEditorConfigProvider config={resolvedConfig}>
+      <LexicalExtensionComposer extension={extension} contentEditable={null}>
+        <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
+        <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
+      </LexicalExtensionComposer>
+    </BlockEditorConfigProvider>
   );
 }

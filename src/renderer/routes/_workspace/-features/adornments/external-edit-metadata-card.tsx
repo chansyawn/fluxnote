@@ -49,7 +49,7 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
       <AdornmentBar
         render={<HoverCardTrigger delay={100} closeDelay={150} />}
         className={cn(
-          "text-muted-foreground flex h-6 max-w-full min-w-0 items-center gap-1.5 px-2 font-mono text-[0.6875rem] outline-hidden",
+          "text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 px-2 font-mono text-xs outline-hidden",
           className,
         )}
         title={trigger.targetFilePath}

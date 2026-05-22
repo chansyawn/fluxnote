@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createTag, setBlockTags } from "../tags/service";
 import { createTestDb, type TestDbContext } from "../test-db";
@@ -11,6 +11,7 @@ import {
   deleteBlock,
   getPublicBlockById,
   listBlocks,
+  locateBlock,
   reorderBlock,
   restoreBlock,
   setBlockKeepState,
@@ -27,6 +28,7 @@ describe("blocks service", () => {
 
   afterEach(async () => {
     vi.restoreAllMocks();
+    vi.useRealTimers();
     ctx.close();
     await ctx.cleanup();
   });
@@ -78,6 +80,25 @@ describe("blocks service", () => {
     expect(archivedResult.blocks.some((block) => block.id === archived.id)).toBe(true);
   });
 
+  it("lists archived blocks by archived time descending", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+
+    vi.setSystemTime(new Date("2026-01-01T00:01:00.000Z"));
+    await archiveBlock(ctx.db, blockA.id);
+    vi.setSystemTime(new Date("2026-01-01T00:03:00.000Z"));
+    await archiveBlock(ctx.db, blockB.id);
+    vi.setSystemTime(new Date("2026-01-01T00:02:00.000Z"));
+    await archiveBlock(ctx.db, blockC.id);
+
+    const result = await listBlocks(ctx.db, undefined, "archived", 0, 10);
+
+    expect(result.blocks.map((block) => block.id)).toEqual([blockB.id, blockC.id, blockA.id]);
+  });
+
   it("filters blocks by tags", async () => {
     const blockA = await createBlockRecord(ctx.db, "A");
     const blockB = await createBlockRecord(ctx.db, "B");
@@ -88,6 +109,49 @@ describe("blocks service", () => {
 
     expect(result.blocks.map((block) => block.id)).toContain(blockA.id);
     expect(result.blocks.map((block) => block.id)).not.toContain(blockB.id);
+  });
+
+  it("lists tag-filtered archived blocks by archived time descending", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+    const tag = await createTag(ctx.db, "work");
+    await setBlockTags(ctx.db, blockA.id, [tag.id]);
+    await setBlockTags(ctx.db, blockB.id, [tag.id]);
+    await setBlockTags(ctx.db, blockC.id, [tag.id]);
+
+    vi.setSystemTime(new Date("2026-01-01T00:01:00.000Z"));
+    await archiveBlock(ctx.db, blockA.id);
+    vi.setSystemTime(new Date("2026-01-01T00:03:00.000Z"));
+    await archiveBlock(ctx.db, blockB.id);
+    vi.setSystemTime(new Date("2026-01-01T00:02:00.000Z"));
+    await archiveBlock(ctx.db, blockC.id);
+
+    const result = await listBlocks(ctx.db, [tag.id], "archived", 0, 10);
+
+    expect(result.blocks.map((block) => block.id)).toEqual([blockB.id, blockC.id, blockA.id]);
+  });
+
+  it("locates archived blocks by archived time descending", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    const blockA = await createBlockRecord(ctx.db, "A");
+    const blockB = await createBlockRecord(ctx.db, "B");
+    const blockC = await createBlockRecord(ctx.db, "C");
+
+    vi.setSystemTime(new Date("2026-01-01T00:01:00.000Z"));
+    await archiveBlock(ctx.db, blockA.id);
+    vi.setSystemTime(new Date("2026-01-01T00:03:00.000Z"));
+    await archiveBlock(ctx.db, blockB.id);
+    vi.setSystemTime(new Date("2026-01-01T00:02:00.000Z"));
+    await archiveBlock(ctx.db, blockC.id);
+
+    const result = await locateBlock(ctx.db, blockC.id, undefined, "archived");
+
+    expect(result?.block.id).toBe(blockC.id);
+    expect(result?.index).toBe(1);
   });
 
   it("lists active blocks by pinned section and manual order", async () => {

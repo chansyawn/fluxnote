@@ -125,8 +125,8 @@ export function BlockEditorPlaygroundPanel() {
         </Button>
       </div>
 
-      <article className="bg-card rounded-xl border">
-        <div className="min-h-16 px-3 pt-3 pb-2">
+      <article className="bg-card rounded-lg border">
+        <div className="p-3">
           <BlockEditor
             key={editorVersion}
             runtime={runtime}

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   appQuit: vi.fn(),
@@ -6,8 +6,19 @@ const mocks = vi.hoisted(() => ({
   createIpcRouter: vi.fn(),
   createMainServices: vi.fn(),
   extractDeepLinkFromArgv: vi.fn<(...argv: unknown[]) => string | null>(() => null),
+  registerAppUpdateCommands: vi.fn(),
   registerAssetProtocol: vi.fn(),
-  registerFeatureCommands: vi.fn(),
+  registerAssetsCommands: vi.fn(),
+  registerBlocksCommands: vi.fn(),
+  registerClipboardCommands: vi.fn(),
+  registerCliCommands: vi.fn(),
+  registerExternalEditCommands: vi.fn(),
+  registerExternalUrlCommands: vi.fn(),
+  registerOpenBlockCommands: vi.fn(),
+  registerPreferencesCommands: vi.fn(),
+  registerShortcutCommands: vi.fn(),
+  registerTagsCommands: vi.fn(),
+  registerWindowCommands: vi.fn(),
   unregisterAll: vi.fn(),
 }));
 
@@ -23,11 +34,42 @@ vi.mock("electron", () => ({
 vi.mock("../features/assets/protocol", () => ({
   registerAssetProtocol: mocks.registerAssetProtocol,
 }));
+vi.mock("../features/app-update", () => ({
+  registerAppUpdateCommands: mocks.registerAppUpdateCommands,
+}));
+vi.mock("../features/assets/command", () => ({
+  registerAssetsCommands: mocks.registerAssetsCommands,
+}));
+vi.mock("../features/blocks/command", () => ({
+  registerBlocksCommands: mocks.registerBlocksCommands,
+}));
+vi.mock("../features/clipboard", () => ({
+  registerClipboardCommands: mocks.registerClipboardCommands,
+}));
+vi.mock("../features/cli/command", () => ({ registerCliCommands: mocks.registerCliCommands }));
 vi.mock("../features/deep-link/handler", () => ({
   extractDeepLinkFromArgv: mocks.extractDeepLinkFromArgv,
 }));
+vi.mock("../features/external-edit/command", () => ({
+  registerExternalEditCommands: mocks.registerExternalEditCommands,
+}));
+vi.mock("../features/external-url", () => ({
+  registerExternalUrlCommands: mocks.registerExternalUrlCommands,
+}));
+vi.mock("../features/open-block/command", () => ({
+  registerOpenBlockCommands: mocks.registerOpenBlockCommands,
+}));
+vi.mock("../features/preferences/command", () => ({
+  registerPreferencesCommands: mocks.registerPreferencesCommands,
+}));
+vi.mock("../features/shortcut/command", () => ({
+  registerShortcutCommands: mocks.registerShortcutCommands,
+}));
+vi.mock("../features/tags/command", () => ({ registerTagsCommands: mocks.registerTagsCommands }));
+vi.mock("../features/window/command", () => ({
+  registerWindowCommands: mocks.registerWindowCommands,
+}));
 vi.mock("../core/ipc", () => ({ createIpcRouter: mocks.createIpcRouter }));
-vi.mock("./register-commands", () => ({ registerFeatureCommands: mocks.registerFeatureCommands }));
 vi.mock("./entrypoints", () => ({ createEntrypointRuntime: mocks.createEntrypointRuntime }));
 vi.mock("./services", () => ({ createMainServices: mocks.createMainServices }));
 
@@ -38,6 +80,9 @@ describe("createBackendRuntime", () => {
     handleDeepLink: vi.fn(async () => undefined),
     startCliServer: vi.fn(async () => undefined),
     stopCliServer: vi.fn(async () => undefined),
+  };
+  const ipc = {
+    register: vi.fn(),
   };
 
   const services = {
@@ -95,7 +140,7 @@ describe("createBackendRuntime", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.extractDeepLinkFromArgv.mockReturnValue(null);
-    mocks.createIpcRouter.mockReturnValue({ register: vi.fn() });
+    mocks.createIpcRouter.mockReturnValue(ipc);
     mocks.createEntrypointRuntime.mockReturnValue(entrypointRuntime);
     mocks.createMainServices.mockReturnValue(services);
     services.preferencesService.readSettings.mockReturnValue({ appearance: { theme: "system" } });
@@ -110,7 +155,19 @@ describe("createBackendRuntime", () => {
     expect(services.db.init).toHaveBeenCalledTimes(1);
     expect(mocks.createEntrypointRuntime).toHaveBeenCalledTimes(1);
     expect(mocks.createIpcRouter).toHaveBeenCalledTimes(1);
-    expect(mocks.registerFeatureCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerAppUpdateCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerAssetsCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerBlocksCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerClipboardCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerCliCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerExternalEditCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerExternalUrlCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerOpenBlockCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerPreferencesCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerTagsCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerWindowCommands).toHaveBeenCalledTimes(1);
+    expect(ipc.register).toHaveBeenCalledTimes(1);
     expect(mocks.registerAssetProtocol).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledTimes(1);
     expect(services.applyThemePreference).toHaveBeenCalledTimes(1);
@@ -119,6 +176,19 @@ describe("createBackendRuntime", () => {
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
     expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
+    expect(services.db.init).toHaveBeenCalledBefore(entrypointRuntime.startCliServer);
+    expect(entrypointRuntime.startCliServer).toHaveBeenCalledBefore(
+      services.windowManager.createMainWindow,
+    );
+    expect(services.windowManager.createMainWindow).toHaveBeenCalledBefore(
+      services.trayManager.createTray,
+    );
+    expect(services.trayManager.createTray).toHaveBeenCalledBefore(
+      services.autoArchiveRuntime.start,
+    );
+    expect(services.autoArchiveRuntime.start).toHaveBeenCalledBefore(
+      services.appUpdateService.start,
+    );
   });
 
   it("handles startup deep link when available", async () => {

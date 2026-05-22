@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { expectMarkdownRoundTripStable } from "../../test-helper/assertions";
 import { applyMarkdownShortcuts } from "../../test-helper/editor-driver";

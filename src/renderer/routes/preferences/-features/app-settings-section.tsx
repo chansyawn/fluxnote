@@ -9,6 +9,7 @@ import {
   uninstallCli,
   type AppUpdateStatus,
 } from "@renderer/clients";
+import { AppUpdateInstallDialog } from "@renderer/features/app-update/app-update-install-dialog";
 import {
   useAppUpdateStatusQuery,
   useManualAppUpdateCheckMutation,
@@ -89,6 +90,10 @@ function AppUpdateStatusDescription({
     );
   }
 
+  if (status.state === "downloading") {
+    return <Trans id="preferences.app-update.downloading">Downloading update</Trans>;
+  }
+
   if (status.state === "error") {
     return (
       <Trans id="preferences.app-update.error">
@@ -146,9 +151,9 @@ export function AppSettingsSection() {
   const canInstallCli = cliStatus?.canInstall === true;
   const canUninstallCli = cliStatus?.canUninstall === true;
   const appUpdateChecking =
-    appUpdateStatus?.state === "checking" ||
-    appUpdateStatus?.state === "downloading" ||
-    appUpdateCheckMutation.isPending;
+    appUpdateStatus?.state === "checking" || appUpdateCheckMutation.isPending;
+  const appUpdateDownloading = appUpdateStatus?.state === "downloading";
+  const appUpdateReady = appUpdateStatus?.state === "ready";
   const appUpdateSupported = appUpdateStatus?.isSupported !== false;
 
   const handleCliInstall = useCallback(async () => {
@@ -271,15 +276,39 @@ export function AppSettingsSection() {
         />
         <SettingsRow
           control={
-            <Button
-              disabled={!appUpdateSupported || appUpdateChecking}
-              size="sm"
-              variant="outline"
-              onClick={() => appUpdateCheckMutation.mutate()}
-            >
-              {appUpdateChecking ? <RefreshCwIcon className="animate-spin" /> : <RefreshCwIcon />}
-              <Trans id="preferences.app-update.check">Check</Trans>
-            </Button>
+            appUpdateDownloading ? (
+              <Button disabled size="sm" variant="outline">
+                <RefreshCwIcon className="animate-spin" />
+                <Trans id="preferences.app-update.downloading">Downloading update</Trans>
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  disabled={!appUpdateSupported || appUpdateChecking}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => appUpdateCheckMutation.mutate()}
+                >
+                  {appUpdateChecking ? (
+                    <RefreshCwIcon className="animate-spin" />
+                  ) : (
+                    <RefreshCwIcon />
+                  )}
+                  <Trans id="preferences.app-update.check">Check</Trans>
+                </Button>
+                {appUpdateReady && appUpdateStatus ? (
+                  <AppUpdateInstallDialog
+                    status={appUpdateStatus}
+                    trigger={
+                      <Button size="sm">
+                        <CircleFadingArrowUpIcon />
+                        <Trans id="preferences.app-update.finish">Finish update</Trans>
+                      </Button>
+                    }
+                  />
+                ) : null}
+              </div>
+            )
           }
           description={
             <AppUpdateStatusDescription status={appUpdateStatus} isChecking={appUpdateChecking} />
