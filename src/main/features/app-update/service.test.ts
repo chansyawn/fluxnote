@@ -84,6 +84,48 @@ describe("app update service", () => {
     );
   });
 
+  it("starts downloading after an available update is found", () => {
+    const emitEvent = vi.fn();
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent,
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-available");
+
+    expect(service.getStatus()).toMatchObject({
+      lastCheckSource: "manual",
+      state: "downloading",
+    });
+    expect(emitEvent).toHaveBeenLastCalledWith(
+      "app-update.changed",
+      expect.objectContaining({ state: "downloading" }),
+    );
+  });
+
+  it("uses the same update flow for automatic checks", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("automatic");
+    mocks.autoUpdater.emit("update-available");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      lastCheckSource: "automatic",
+      state: "ready",
+    });
+  });
+
   it("reports manual check errors through status", () => {
     const service = createAppUpdateService({
       arch: "arm64",
