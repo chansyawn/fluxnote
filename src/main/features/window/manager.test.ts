@@ -269,6 +269,7 @@ describe("window manager", () => {
     manager.prepareToQuit();
     win.emit("close", event);
     expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(win.hide).not.toHaveBeenCalled();
   });
 
   it("loads dev server url and opens devtools in dev mode", () => {
