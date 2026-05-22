@@ -17,6 +17,10 @@ import { readPackageVersion } from "./config/forge/package-version";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const packageVersion = readPackageVersion(rootDir);
+const appIconPath = "src/assets/icons/icon";
+const macInstallerIconPath = "src/assets/icons/icon.icns";
+const windowsInstallerIconPath = "src/assets/icons/icon.ico";
+const dmgBackgroundPath = "src/assets/makers/dmg-background.png";
 
 const packagerConfig = {
   appBundleId: "app.fluxnotes",
@@ -25,7 +29,7 @@ const packagerConfig = {
   asar: true,
   executableName: "Fluxnotes",
   extraResource: ["src/main/core/database/drizzle", "src/assets"],
-  icon: "src/assets/icons/icon",
+  icon: appIconPath,
   name: "Fluxnotes",
   protocols: [
     {
@@ -86,6 +90,14 @@ const config: ForgeConfig = {
   makers: [
     new MakerDMG(
       (_arch) => ({
+        background: dmgBackgroundPath,
+        contents: (opts) => [
+          { path: opts.appPath, type: "file", x: 200, y: 210 },
+          { path: "/Applications", type: "link", x: 460, y: 210 },
+        ],
+        additionalDMGOptions: { window: { size: { width: 660, height: 420 } } },
+        icon: macInstallerIconPath,
+        iconSize: 80,
         name: "Fluxnotes",
         title: "Fluxnotes",
       }),
@@ -93,6 +105,7 @@ const config: ForgeConfig = {
     ),
     new MakerZIP({}, ["darwin"]),
     new MakerSquirrel((arch) => ({
+      setupIcon: windowsInstallerIconPath,
       setupExe: getReleaseArtifactName({
         arch,
         kind: "setup",
