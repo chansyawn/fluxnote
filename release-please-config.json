@@ -1,0 +1,8 @@
+{
+  "packages": {
+    ".": {
+      "draft": true,
+      "release-type": "node"
+    }
+  }
+}

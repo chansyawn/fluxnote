@@ -20,7 +20,6 @@
     "make": "electron-forge make",
     "flux": "./src/cli/flux",
     "release:macos": "node scripts/release/macos.mjs",
-    "release:version": "node scripts/release/version.mjs",
     "db:generate": "drizzle-kit generate",
     "i18n:extract": "lingui extract --overwrite --clean",
     "i18n:check": "node scripts/check-i18n.mjs"
@@ -75,6 +74,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
     "@electron-forge/cli": "8.0.0-alpha.8",
     "@electron-forge/maker-dmg": "8.0.0-alpha.8",
     "@electron-forge/maker-squirrel": "8.0.0-alpha.8",
@@ -99,7 +100,6 @@
     "@vitest/coverage-v8": "^4.1.5",
     "drizzle-kit": "^0.31.10",
     "electron": "41.3.0",
-    "semver": "^7.8.0",
     "typescript": "~5.9.3",
     "vite": "catalog:",
     "vite-plus": "catalog:"

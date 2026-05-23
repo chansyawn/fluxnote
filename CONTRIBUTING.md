@@ -6,6 +6,8 @@ Thanks for your interest in Fluxnotes.
 
 Use Conventional Commits.
 
+Commit messages are checked locally through Vite+ Git hooks. Pull request titles are checked in CI because Fluxnotes uses squash merges and release automation reads the final merge commit.
+
 ## Pull Requests
 
 Thank you for considering a contribution. At this time, pull requests are limited to repository collaborators.
