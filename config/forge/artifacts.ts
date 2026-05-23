@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { ForgeArch, ForgeMakeResult, ForgePlatform } from "@electron-forge/shared-types";
 
-export type ReleaseArtifactKind = "dmg" | "full-nupkg" | "releases" | "setup" | "zip";
+export type ReleaseArtifactKind = "dmg" | "full-nupkg" | "setup" | "zip";
 
 interface ReleaseArtifactNameOptions {
   arch: ForgeArch;
@@ -17,7 +17,6 @@ type ArtifactIdentity = Omit<ReleaseArtifactNameOptions, "kind">;
 const artifactNameSuffixes = {
   dmg: ".dmg",
   "full-nupkg": "-full.nupkg",
-  releases: "-RELEASES",
   setup: "-setup.exe",
   zip: ".zip",
 } satisfies Record<ReleaseArtifactKind, string>;
@@ -69,10 +68,6 @@ async function renameSquirrelArtifacts(
   const fullNupkgPath = artifacts.find((artifact) => artifact.endsWith("-full.nupkg"));
   const renamedArtifacts = await Promise.all(
     artifacts.map(async (artifact) => {
-      if (artifact === releasesPath) {
-        return await renameArtifact(artifact, { arch, kind: "releases", platform, version });
-      }
-
       if (artifact === fullNupkgPath) {
         return await renameArtifact(artifact, { arch, kind: "full-nupkg", platform, version });
       }
