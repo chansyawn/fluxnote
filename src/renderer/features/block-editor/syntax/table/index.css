@@ -5,11 +5,19 @@
 }
 
 .block-editor__table {
-  @apply border-border w-full min-w-max border-collapse text-sm;
+  @apply w-full min-w-max border-separate border-spacing-0 overflow-hidden rounded-md border text-sm;
 }
 
 .block-editor__table-cell {
-  @apply border-border min-w-24 border px-2 py-1 align-top outline-none;
+  @apply border-border bg-muted min-w-24 border-r border-b px-2 py-1 align-top outline-none;
+}
+
+.block-editor__table-row:last-child .block-editor__table-cell {
+  @apply border-b-0;
+}
+
+.block-editor__table-cell:last-child {
+  @apply border-r-0;
 }
 
 .block-editor__table-cell--header {
@@ -17,9 +25,9 @@
 }
 
 .block-editor__table-cell--selected {
-  @apply bg-primary/10;
+  @apply bg-primary/5;
 }
 
 .block-editor__table-selection {
-  @apply bg-primary/15;
+  @apply bg-primary/5;
 }
