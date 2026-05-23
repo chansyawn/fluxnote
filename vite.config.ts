@@ -5,6 +5,7 @@ import { viteAliases } from "./config/vite/shared.ts";
 // ignore these files for linting and formatting
 const ignorePatterns = [
   ".agents/skills/**",
+  "CHANGELOG.md",
   "*.gen.ts",
   "src/renderer/locales/**",
   "src/main/core/database/drizzle/**",
