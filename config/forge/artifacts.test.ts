@@ -68,7 +68,7 @@ describe("normalizeMakeArtifacts", () => {
     ]);
   });
 
-  it("renames windows squirrel artifacts and updates RELEASES", async () => {
+  it("keeps windows squirrel RELEASES canonical and updates its package entry", async () => {
     const directory = await mkdtemp(path.join(tmpdir(), "fluxnotes-forge-"));
     const releasesPath = await writeArtifact(
       directory,
@@ -86,11 +86,10 @@ describe("normalizeMakeArtifacts", () => {
       }),
     ]);
 
-    const nextReleasesPath = path.join(directory, "fluxnotes-1.2.3-win32-x64-RELEASES");
     const nextNupkgPath = path.join(directory, "fluxnotes-1.2.3-win32-x64-full.nupkg");
 
-    expect(result?.artifacts).toEqual([nextReleasesPath, setupPath, nextNupkgPath]);
-    await expect(readFile(nextReleasesPath, "utf8")).resolves.toBe(
+    expect(result?.artifacts).toEqual([releasesPath, setupPath, nextNupkgPath]);
+    await expect(readFile(releasesPath, "utf8")).resolves.toBe(
       "hash fluxnotes-1.2.3-win32-x64-full.nupkg 123",
     );
   });
