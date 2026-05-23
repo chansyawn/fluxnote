@@ -27,6 +27,10 @@ describe("preferences service", () => {
             unknown: true,
           },
         },
+        telemetry: {
+          enabled: "invalid",
+          unknown: true,
+        },
         unknown: true,
       },
     };
@@ -46,6 +50,9 @@ describe("preferences service", () => {
           showLineNumbers: true,
           wordWrap: false,
         },
+      },
+      telemetry: {
+        enabled: true,
       },
     });
     expect(storage.store).toEqual(settings);
@@ -74,6 +81,7 @@ describe("preferences service", () => {
       appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
       markdown: { codeBlock: { wordWrap: true } },
+      telemetry: { enabled: false },
     });
 
     expect(result.appearance.locale).toBe("zh-Hans");
@@ -84,6 +92,7 @@ describe("preferences service", () => {
       showLineNumbers: false,
       wordWrap: true,
     });
+    expect(result.telemetry.enabled).toBe(false);
   });
 
   it("repairs stored settings before applying patch", () => {

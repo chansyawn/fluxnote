@@ -8,6 +8,7 @@ import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-
 import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-state";
 import { PreferencesSync } from "@renderer/features/preferences/preferences-query";
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
+import { GlobalTelemetryErrorListener, TelemetryProvider } from "@renderer/features/telemetry";
 import { routeTree } from "@renderer/route-tree.gen";
 import { Toaster } from "@renderer/ui/components/sonner";
 import { TooltipProvider } from "@renderer/ui/components/tooltip";
@@ -34,27 +35,30 @@ declare module "@tanstack/react-router" {
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeStateProvider>
-        <I18nStateProvider>
-          <AppErrorBoundary>
-            <HotkeysProvider>
-              <ShortcutStateProvider>
-                <FontSizeStateProvider>
-                  <DirectionStateProvider>
-                    <TooltipProvider>
-                      <PreferencesSync />
-                      <AppUpdateSync />
-                      <AutoArchiveSync />
-                      <RouterProvider router={router} />
-                      <Toaster />
-                    </TooltipProvider>
-                  </DirectionStateProvider>
-                </FontSizeStateProvider>
-              </ShortcutStateProvider>
-            </HotkeysProvider>
-          </AppErrorBoundary>
-        </I18nStateProvider>
-      </ThemeStateProvider>
+      <TelemetryProvider>
+        <ThemeStateProvider>
+          <I18nStateProvider>
+            <AppErrorBoundary>
+              <HotkeysProvider>
+                <ShortcutStateProvider>
+                  <FontSizeStateProvider>
+                    <DirectionStateProvider>
+                      <TooltipProvider>
+                        <GlobalTelemetryErrorListener />
+                        <PreferencesSync />
+                        <AppUpdateSync />
+                        <AutoArchiveSync />
+                        <RouterProvider router={router} />
+                        <Toaster />
+                      </TooltipProvider>
+                    </DirectionStateProvider>
+                  </FontSizeStateProvider>
+                </ShortcutStateProvider>
+              </HotkeysProvider>
+            </AppErrorBoundary>
+          </I18nStateProvider>
+        </ThemeStateProvider>
+      </TelemetryProvider>
     </QueryClientProvider>
   );
 }

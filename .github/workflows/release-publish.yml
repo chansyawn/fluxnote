@@ -162,7 +162,21 @@ jobs:
           MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
         run: vp run release:macos -- prepare
 
+      - name: Verify PostHog secrets
+        env:
+          POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
+        shell: bash
+        run: |
+          if [ -z "$POSTHOG_HOST" ] || [ -z "$POSTHOG_KEY" ]; then
+            echo "POSTHOG_HOST and POSTHOG_KEY secrets are required for release builds."
+            exit 1
+          fi
+
       - name: Build package
+        env:
+          VITE_FLUXNOTES_POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
+          VITE_FLUXNOTES_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
         run: vp run make -- --platform=${{ matrix.platform }}
 
       - name: Notarize macOS disk image

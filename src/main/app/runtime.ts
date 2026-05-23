@@ -21,6 +21,8 @@ import type { PreferencesService } from "../features/preferences";
 import { registerPreferencesCommands } from "../features/preferences/command";
 import { registerShortcutCommands } from "../features/shortcut/command";
 import { registerTagsCommands } from "../features/tags/command";
+import type { TelemetryService } from "../features/telemetry";
+import { registerTelemetryCommands } from "../features/telemetry";
 import type { WindowManager } from "../features/window";
 import { registerWindowCommands } from "../features/window/command";
 import { createEntrypointRuntime } from "./entrypoints";
@@ -41,6 +43,7 @@ interface RuntimeCommandDeps {
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  telemetryService: TelemetryService;
   trayManager: {
     refreshMenu: () => void;
   };
@@ -88,6 +91,9 @@ function registerRuntimeCommands(
   registerTagsCommands(ipc, {
     db: deps.db,
   });
+  registerTelemetryCommands(ipc, {
+    telemetryService: deps.telemetryService,
+  });
   registerWindowCommands(ipc, {
     db: deps.db,
     openBlockService: deps.openBlockService,
@@ -134,6 +140,7 @@ export function createBackendRuntime() {
       openBlockService: services.openBlockService,
       paths: services.paths,
       preferencesService: services.preferencesService,
+      telemetryService: services.telemetryService,
       trayManager: services.trayManager,
       windowManager: services.windowManager,
     });
@@ -151,6 +158,7 @@ export function createBackendRuntime() {
     services.trayManager.createTray();
     await services.autoArchiveRuntime.start();
     services.appUpdateService.start();
+    services.telemetryService.captureEvent("app_started");
   }
 
   function handleStartupDeepLink(runtime: EntrypointRuntime): void {
@@ -177,6 +185,7 @@ export function createBackendRuntime() {
     globalShortcut.unregisterAll();
     services.trayManager.destroyTray();
     services.externalEditManager.cancelAll();
+    services.telemetryService.shutdown();
     if (entrypointRuntime) {
       await entrypointRuntime.stopCliServer();
     }
@@ -220,5 +229,6 @@ export function createBackendRuntime() {
     quitWhenAllWindowsClosed,
     start,
     stop,
+    telemetryService: services.telemetryService,
   };
 }

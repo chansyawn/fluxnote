@@ -24,6 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Env
+.env
+
 # Build
 .vite
 out

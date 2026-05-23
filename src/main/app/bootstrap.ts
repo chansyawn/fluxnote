@@ -1,5 +1,6 @@
 import { app } from "electron";
 
+import { reportProcessError } from "../features/telemetry";
 import { registerPrivilegedSchemes } from "./protocols";
 import { createBackendRuntime } from "./runtime";
 
@@ -16,6 +17,16 @@ export function startPrimaryInstance(): void {
   registerPrivilegedSchemes();
 
   const runtime = createBackendRuntime();
+
+  process.on("uncaughtException", (error) => {
+    reportProcessError(runtime.telemetryService, "process.uncaughtException", error);
+    console.error("Uncaught main process exception", error);
+  });
+
+  process.on("unhandledRejection", (error) => {
+    reportProcessError(runtime.telemetryService, "process.unhandledRejection", error);
+    console.error("Unhandled main process rejection", error);
+  });
 
   app.on("second-instance", (_event, argv) => {
     runtime.handleSecondInstance(argv);

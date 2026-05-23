@@ -84,6 +84,10 @@ export const markdownSettingsSchema = z.object({
   codeBlock: markdownCodeBlockSettingsSchema.catch(defaultMarkdownCodeBlockSettingsValue),
 });
 
+export const telemetrySettingsSchema = z.object({
+  enabled: z.boolean().catch(true),
+});
+
 const appearanceSettingsPatchSchema = z
   .object({
     locale: localeSchema.optional(),
@@ -132,6 +136,12 @@ const markdownSettingsPatchSchema = z
   })
   .strict();
 
+const telemetrySettingsPatchSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+  })
+  .strict();
+
 const defaultSettingsValue = {
   schemaVersion: SETTINGS_SCHEMA_VERSION,
   appearance: {
@@ -158,6 +168,9 @@ const defaultSettingsValue = {
   markdown: {
     codeBlock: defaultMarkdownCodeBlockSettingsValue,
   },
+  telemetry: {
+    enabled: true,
+  },
 } as const;
 
 export const settingsSchema = z.object({
@@ -166,6 +179,7 @@ export const settingsSchema = z.object({
   autoArchive: autoArchiveSettingsSchema.catch(defaultSettingsValue.autoArchive),
   shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
   markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
+  telemetry: telemetrySettingsSchema.catch(defaultSettingsValue.telemetry),
 });
 
 export const settingsPatchSchema = z
@@ -174,6 +188,7 @@ export const settingsPatchSchema = z
     autoArchive: autoArchiveSettingsPatchSchema.optional(),
     shortcuts: shortcutPreferencesPatchSchema.optional(),
     markdown: markdownSettingsPatchSchema.optional(),
+    telemetry: telemetrySettingsPatchSchema.optional(),
   })
   .strict();
 
@@ -189,11 +204,13 @@ export type ShortcutBinding = z.infer<typeof shortcutBindingSchema>;
 export type ShortcutPreferences = z.infer<typeof shortcutPreferencesSchema>;
 export type MarkdownSettings = z.infer<typeof markdownSettingsSchema>;
 export type MarkdownCodeBlockSettings = z.infer<typeof markdownCodeBlockSettingsSchema>;
+export type TelemetrySettings = z.infer<typeof telemetrySettingsSchema>;
 
 export const DEFAULT_SETTINGS: Settings = defaultSettingsValue;
 export const DEFAULT_AUTO_ARCHIVE_SETTINGS: AutoArchiveSettings = DEFAULT_SETTINGS.autoArchive;
 export const DEFAULT_MARKDOWN_CODE_BLOCK_SETTINGS: MarkdownCodeBlockSettings =
   DEFAULT_SETTINGS.markdown.codeBlock;
+export const DEFAULT_TELEMETRY_SETTINGS: TelemetrySettings = DEFAULT_SETTINGS.telemetry;
 
 export function isLocaleCode(value: string): value is LocaleCode {
   return LANGUAGE_OPTIONS.some((option) => option.key === value);

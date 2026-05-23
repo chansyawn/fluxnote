@@ -45,6 +45,10 @@ function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
         ...patch.markdown?.codeBlock,
       },
     },
+    telemetry: {
+      ...current.telemetry,
+      ...patch.telemetry,
+    },
   });
 }
 

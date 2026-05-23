@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   registerPreferencesCommands: vi.fn(),
   registerShortcutCommands: vi.fn(),
   registerTagsCommands: vi.fn(),
+  registerTelemetryCommands: vi.fn(),
   registerWindowCommands: vi.fn(),
   unregisterAll: vi.fn(),
 }));
@@ -66,6 +67,9 @@ vi.mock("../features/shortcut/command", () => ({
   registerShortcutCommands: mocks.registerShortcutCommands,
 }));
 vi.mock("../features/tags/command", () => ({ registerTagsCommands: mocks.registerTagsCommands }));
+vi.mock("../features/telemetry", () => ({
+  registerTelemetryCommands: mocks.registerTelemetryCommands,
+}));
 vi.mock("../features/window/command", () => ({
   registerWindowCommands: mocks.registerWindowCommands,
 }));
@@ -123,6 +127,10 @@ describe("createBackendRuntime", () => {
     preferencesService: {
       readSettings: vi.fn(),
     },
+    telemetryService: {
+      captureEvent: vi.fn(),
+      shutdown: vi.fn(),
+    },
     trayManager: {
       createTray: vi.fn(),
       destroyTray: vi.fn(),
@@ -173,6 +181,7 @@ describe("createBackendRuntime", () => {
     );
     expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTagsCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerTelemetryCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerWindowCommands).toHaveBeenCalledTimes(1);
     expect(ipc.register).toHaveBeenCalledTimes(1);
     expect(mocks.registerAssetProtocol).toHaveBeenCalledTimes(1);
@@ -183,6 +192,7 @@ describe("createBackendRuntime", () => {
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
     expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
+    expect(services.telemetryService.captureEvent).toHaveBeenCalledWith("app_started");
     expect(services.db.init).toHaveBeenCalledBefore(entrypointRuntime.startCliServer);
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledBefore(
       services.windowManager.createMainWindow,
@@ -230,6 +240,7 @@ describe("createBackendRuntime", () => {
     expect(mocks.unregisterAll).toHaveBeenCalledTimes(1);
     expect(services.trayManager.destroyTray).toHaveBeenCalledTimes(1);
     expect(services.externalEditManager.cancelAll).toHaveBeenCalledTimes(1);
+    expect(services.telemetryService.shutdown).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.stopCliServer).toHaveBeenCalledTimes(1);
     expect(services.db.close).toHaveBeenCalledTimes(1);
   });

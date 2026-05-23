@@ -15,8 +15,9 @@ import {
 import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
+import { createTelemetryService, type TelemetryService } from "@main/features/telemetry";
 import { createTrayManager, createWindowManager, type WindowManager } from "@main/features/window";
-import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
+import { APP_SETTINGS_STORE_FILE, APP_TELEMETRY_STORE_FILE } from "@shared/app/app-config";
 import { DEFAULT_SETTINGS, type ThemePreference } from "@shared/features/preferences/settings";
 import { app, nativeTheme } from "electron";
 
@@ -32,6 +33,7 @@ export interface MainServices {
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  telemetryService: TelemetryService;
   trayManager: TrayManager;
   windowManager: WindowManager;
 }
@@ -57,6 +59,15 @@ export function createMainServices(): MainServices {
   const preferencesService = createPreferencesService({
     emitEvent,
     storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
+  });
+  const telemetryService = createTelemetryService({
+    appVersion: app.getVersion(),
+    env: {
+      VITE_FLUXNOTES_POSTHOG_HOST: import.meta.env.VITE_FLUXNOTES_POSTHOG_HOST,
+      VITE_FLUXNOTES_POSTHOG_KEY: import.meta.env.VITE_FLUXNOTES_POSTHOG_KEY,
+    },
+    readSettings: preferencesService.readSettings,
+    storage: getConfigStore(userDataPath, APP_TELEMETRY_STORE_FILE, {}),
   });
 
   const externalEditManager = createExternalEditManager({ emitEvent });
@@ -95,6 +106,7 @@ export function createMainServices(): MainServices {
     openBlockService,
     paths,
     preferencesService,
+    telemetryService,
     trayManager,
     windowManager,
   };
