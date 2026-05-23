@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  commitlint:
-    name: Commitlint
+  ci:
+    name: Check
     runs-on: ubuntu-latest
 
     steps:
@@ -34,23 +34,6 @@ jobs:
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: printf '%s\n' "$PR_TITLE" | vp exec commitlint
-
-  ci:
-    name: Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version: "24"
-          cache: true
-
-      - name: Install dependencies
-        run: vp install
 
       - name: Check
         run: vp check
