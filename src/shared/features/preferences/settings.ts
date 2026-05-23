@@ -28,16 +28,16 @@ export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[4]),
 ]);
 export const shortcutActionSchema = z.enum([
-  "toggle-window",
-  "create-block",
-  "copy-block",
-  "keep-block",
-  "toggle-pin-block",
-  "archive-block",
-  "delete-block",
-  "quick-create-block",
-  "submit-external-edit",
-  "cancel-external-edit",
+  "toggleWindow",
+  "createBlock",
+  "copyBlock",
+  "keepBlock",
+  "togglePinBlock",
+  "archiveBlock",
+  "deleteBlock",
+  "quickCreateBlock",
+  "submitExternalEdit",
+  "cancelExternalEdit",
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
@@ -57,16 +57,16 @@ export const autoArchiveSettingsSchema = z.object({
 });
 
 export const shortcutPreferencesSchema = z.object({
-  "toggle-window": shortcutBindingSchema.catch("Alt+N"),
-  "create-block": shortcutBindingSchema.catch("Mod+N"),
-  "copy-block": shortcutBindingSchema.catch("Mod+Shift+C"),
-  "keep-block": shortcutBindingSchema.catch("Mod+K"),
-  "toggle-pin-block": shortcutBindingSchema.catch("Mod+T"),
-  "archive-block": shortcutBindingSchema.catch("Mod+E"),
-  "delete-block": shortcutBindingSchema.catch("Mod+D"),
-  "quick-create-block": shortcutBindingSchema.catch("Ctrl+Alt+N"),
-  "submit-external-edit": shortcutBindingSchema.catch("Mod+Enter"),
-  "cancel-external-edit": shortcutBindingSchema.catch("Mod+\\"),
+  toggleWindow: shortcutBindingSchema.catch("Alt+N"),
+  createBlock: shortcutBindingSchema.catch("Mod+N"),
+  copyBlock: shortcutBindingSchema.catch("Mod+Shift+C"),
+  keepBlock: shortcutBindingSchema.catch("Mod+K"),
+  togglePinBlock: shortcutBindingSchema.catch("Mod+T"),
+  archiveBlock: shortcutBindingSchema.catch("Mod+E"),
+  deleteBlock: shortcutBindingSchema.catch("Mod+D"),
+  quickCreateBlock: shortcutBindingSchema.catch("Ctrl+Alt+N"),
+  submitExternalEdit: shortcutBindingSchema.catch("Mod+Enter"),
+  cancelExternalEdit: shortcutBindingSchema.catch("Mod+\\"),
 });
 
 export const appearanceSettingsSchema = z.object({
@@ -110,16 +110,16 @@ const autoArchiveSettingsPatchSchema = z
 
 const shortcutPreferencesPatchSchema = z
   .object({
-    "toggle-window": shortcutBindingSchema.optional(),
-    "create-block": shortcutBindingSchema.optional(),
-    "copy-block": shortcutBindingSchema.optional(),
-    "keep-block": shortcutBindingSchema.optional(),
-    "toggle-pin-block": shortcutBindingSchema.optional(),
-    "archive-block": shortcutBindingSchema.optional(),
-    "delete-block": shortcutBindingSchema.optional(),
-    "quick-create-block": shortcutBindingSchema.optional(),
-    "submit-external-edit": shortcutBindingSchema.optional(),
-    "cancel-external-edit": shortcutBindingSchema.optional(),
+    toggleWindow: shortcutBindingSchema.optional(),
+    createBlock: shortcutBindingSchema.optional(),
+    copyBlock: shortcutBindingSchema.optional(),
+    keepBlock: shortcutBindingSchema.optional(),
+    togglePinBlock: shortcutBindingSchema.optional(),
+    archiveBlock: shortcutBindingSchema.optional(),
+    deleteBlock: shortcutBindingSchema.optional(),
+    quickCreateBlock: shortcutBindingSchema.optional(),
+    submitExternalEdit: shortcutBindingSchema.optional(),
+    cancelExternalEdit: shortcutBindingSchema.optional(),
   })
   .strict();
 
@@ -154,16 +154,16 @@ const defaultSettingsValue = {
     idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
   },
   shortcuts: {
-    "toggle-window": "Alt+N",
-    "create-block": "Mod+N",
-    "copy-block": "Mod+Shift+C",
-    "keep-block": "Mod+K",
-    "toggle-pin-block": "Mod+T",
-    "archive-block": "Mod+E",
-    "delete-block": "Mod+D",
-    "quick-create-block": "Ctrl+Alt+N",
-    "submit-external-edit": "Mod+Enter",
-    "cancel-external-edit": "Mod+\\",
+    toggleWindow: "Alt+N",
+    createBlock: "Mod+N",
+    copyBlock: "Mod+Shift+C",
+    keepBlock: "Mod+K",
+    togglePinBlock: "Mod+T",
+    archiveBlock: "Mod+E",
+    deleteBlock: "Mod+D",
+    quickCreateBlock: "Ctrl+Alt+N",
+    submitExternalEdit: "Mod+Enter",
+    cancelExternalEdit: "Mod+\\",
   },
   markdown: {
     codeBlock: defaultMarkdownCodeBlockSettingsValue,

@@ -81,7 +81,7 @@ export function useWorkspaceCreateBlockShortcut({
 
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
     const createDefinition = createShortcutDefinition({
-      hotkey: shortcuts["create-block"],
+      hotkey: shortcuts["createBlock"],
       callback: createBlockWithFocus,
       canRun: () => true,
       name: "Create block",
@@ -110,31 +110,31 @@ export function useWorkspaceBlockActionShortcuts({
     const canRunFocusedBlockAction = () => !state.isLocked && isActiveBlockEditorFocused();
     const definitions = [
       createShortcutDefinition({
-        hotkey: shortcuts["copy-block"],
+        hotkey: shortcuts["copyBlock"],
         callback: actions.copy,
         canRun: canRunFocusedBlockAction,
         name: "Copy block",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["keep-block"],
+        hotkey: shortcuts["keepBlock"],
         callback: actions.toggleKeep,
         canRun: canRunFocusedBlockAction,
         name: "Keep block",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["toggle-pin-block"],
+        hotkey: shortcuts["togglePinBlock"],
         callback: actions.togglePinned,
         canRun: canRunFocusedBlockAction,
         name: "Pin or unpin block",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["archive-block"],
+        hotkey: shortcuts["archiveBlock"],
         callback: actions.toggleArchive,
         canRun: canRunFocusedBlockAction,
         name: "Archive or restore block",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["delete-block"],
+        hotkey: shortcuts["deleteBlock"],
         callback: actions.deleteOrCancelExternalEdit,
         canRun: () =>
           isActiveBlockEditorFocused() &&
@@ -142,13 +142,13 @@ export function useWorkspaceBlockActionShortcuts({
         name: "Delete block or cancel external edit",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["submit-external-edit"],
+        hotkey: shortcuts["submitExternalEdit"],
         callback: actions.submitExternalEdit,
         canRun: canRunExternalEditAction,
         name: "Submit external edit",
       }),
       createShortcutDefinition({
-        hotkey: shortcuts["cancel-external-edit"],
+        hotkey: shortcuts["cancelExternalEdit"],
         callback: actions.cancelExternalEdit,
         canRun: canRunExternalEditAction,
         name: "Cancel external edit",
@@ -182,14 +182,14 @@ export function useWorkspaceBlockActionShortcuts({
         return;
       }
 
-      if (keyboardEventMatchesShortcut(event, shortcuts["submit-external-edit"])) {
+      if (keyboardEventMatchesShortcut(event, shortcuts["submitExternalEdit"])) {
         event.preventDefault();
         event.stopPropagation();
         void actions.submitExternalEdit();
         return;
       }
 
-      if (keyboardEventMatchesShortcut(event, shortcuts["cancel-external-edit"])) {
+      if (keyboardEventMatchesShortcut(event, shortcuts["cancelExternalEdit"])) {
         event.preventDefault();
         event.stopPropagation();
         void actions.cancelExternalEdit();

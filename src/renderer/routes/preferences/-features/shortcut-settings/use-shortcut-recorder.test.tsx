@@ -133,7 +133,7 @@ describe("useShortcutRecorder", () => {
     mountedRoot = harness;
 
     act(() => {
-      harness.getSnapshot().startRecording("create-block");
+      harness.getSnapshot().startRecording("createBlock");
     });
 
     const controlDownEvent = {
@@ -176,7 +176,7 @@ describe("useShortcutRecorder", () => {
       phase: "error",
       tokens: formatShortcutTokens(duplicateHotkey),
     });
-    expect(harness.getSnapshot().fieldErrors["create-block"]).toBe("duplicate");
+    expect(harness.getSnapshot().fieldErrors["createBlock"]).toBe("duplicate");
 
     act(() => {
       vi.advanceTimersByTime(1_800);
@@ -187,7 +187,7 @@ describe("useShortcutRecorder", () => {
       phase: "recording",
       tokens: [],
     });
-    expect(harness.getSnapshot().fieldErrors["create-block"]).toBeUndefined();
+    expect(harness.getSnapshot().fieldErrors["createBlock"]).toBeUndefined();
 
     act(() => {
       dispatchKeyboardEvent("keydown", controlDownEvent);
@@ -215,7 +215,7 @@ describe("useShortcutRecorder", () => {
     mountedRoot = harness;
 
     act(() => {
-      harness.getSnapshot().startRecording("create-block");
+      harness.getSnapshot().startRecording("createBlock");
     });
 
     const recordedEvent = {
@@ -235,7 +235,7 @@ describe("useShortcutRecorder", () => {
       dispatchKeyboardEvent("keydown", recordedEvent);
     });
 
-    expect(updateShortcutMock).toHaveBeenCalledWith("create-block", recordedHotkey);
+    expect(updateShortcutMock).toHaveBeenCalledWith("createBlock", recordedHotkey);
     expect(harness.getSnapshot().feedback).toEqual({
       error: null,
       phase: "success",

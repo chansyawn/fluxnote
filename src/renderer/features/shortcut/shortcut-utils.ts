@@ -139,35 +139,35 @@ export function normalizeShortcutPreferences(
   platform?: ShortcutPlatform,
 ): ShortcutPreferences {
   return {
-    "toggle-window": shortcuts["toggle-window"]
-      ? normalizeShortcutBinding(shortcuts["toggle-window"], platform)
+    toggleWindow: shortcuts["toggleWindow"]
+      ? normalizeShortcutBinding(shortcuts["toggleWindow"], platform)
       : null,
-    "create-block": shortcuts["create-block"]
-      ? normalizeShortcutBinding(shortcuts["create-block"], platform)
+    createBlock: shortcuts["createBlock"]
+      ? normalizeShortcutBinding(shortcuts["createBlock"], platform)
       : null,
-    "copy-block": shortcuts["copy-block"]
-      ? normalizeShortcutBinding(shortcuts["copy-block"], platform)
+    copyBlock: shortcuts["copyBlock"]
+      ? normalizeShortcutBinding(shortcuts["copyBlock"], platform)
       : null,
-    "keep-block": shortcuts["keep-block"]
-      ? normalizeShortcutBinding(shortcuts["keep-block"], platform)
+    keepBlock: shortcuts["keepBlock"]
+      ? normalizeShortcutBinding(shortcuts["keepBlock"], platform)
       : null,
-    "toggle-pin-block": shortcuts["toggle-pin-block"]
-      ? normalizeShortcutBinding(shortcuts["toggle-pin-block"], platform)
+    togglePinBlock: shortcuts["togglePinBlock"]
+      ? normalizeShortcutBinding(shortcuts["togglePinBlock"], platform)
       : null,
-    "archive-block": shortcuts["archive-block"]
-      ? normalizeShortcutBinding(shortcuts["archive-block"], platform)
+    archiveBlock: shortcuts["archiveBlock"]
+      ? normalizeShortcutBinding(shortcuts["archiveBlock"], platform)
       : null,
-    "delete-block": shortcuts["delete-block"]
-      ? normalizeShortcutBinding(shortcuts["delete-block"], platform)
+    deleteBlock: shortcuts["deleteBlock"]
+      ? normalizeShortcutBinding(shortcuts["deleteBlock"], platform)
       : null,
-    "quick-create-block": shortcuts["quick-create-block"]
-      ? normalizeShortcutBinding(shortcuts["quick-create-block"], platform)
+    quickCreateBlock: shortcuts["quickCreateBlock"]
+      ? normalizeShortcutBinding(shortcuts["quickCreateBlock"], platform)
       : null,
-    "submit-external-edit": shortcuts["submit-external-edit"]
-      ? normalizeShortcutBinding(shortcuts["submit-external-edit"], platform)
+    submitExternalEdit: shortcuts["submitExternalEdit"]
+      ? normalizeShortcutBinding(shortcuts["submitExternalEdit"], platform)
       : null,
-    "cancel-external-edit": shortcuts["cancel-external-edit"]
-      ? normalizeShortcutBinding(shortcuts["cancel-external-edit"], platform)
+    cancelExternalEdit: shortcuts["cancelExternalEdit"]
+      ? normalizeShortcutBinding(shortcuts["cancelExternalEdit"], platform)
       : null,
   };
 }

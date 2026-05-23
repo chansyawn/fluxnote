@@ -36,19 +36,19 @@ describe("shortcut utils", () => {
     expect(
       normalizeShortcutPreferences(
         {
-          "toggle-window": "Alt+N",
-          "create-block": "Mod+N",
-          "copy-block": "Mod+Shift+C",
-          "keep-block": "Mod+K",
-          "toggle-pin-block": "Mod+T",
-          "archive-block": "Mod+E",
-          "delete-block": "Mod+D",
-          "quick-create-block": "Ctrl+Alt+N",
-          "submit-external-edit": "Mod+Enter",
-          "cancel-external-edit": "Mod+\\",
+          toggleWindow: "Alt+N",
+          createBlock: "Mod+N",
+          copyBlock: "Mod+Shift+C",
+          keepBlock: "Mod+K",
+          togglePinBlock: "Mod+T",
+          archiveBlock: "Mod+E",
+          deleteBlock: "Mod+D",
+          quickCreateBlock: "Ctrl+Alt+N",
+          submitExternalEdit: "Mod+Enter",
+          cancelExternalEdit: "Mod+\\",
         },
         "mac",
-      )["archive-block"],
+      )["archiveBlock"],
     ).toBe("Mod+E");
   });
 
