@@ -1,5 +1,5 @@
-name: Release
-run-name: Release
+name: Release Publish
+run-name: Release Publish
 
 on:
   push:
@@ -10,13 +10,43 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.workflow }}
+  group: release-publish-${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
-  release-please:
-    name: Release Please
+  detect:
+    name: Detect Release Merge
     runs-on: ubuntu-latest
+    outputs:
+      is_release_merge: ${{ steps.detect.outputs.is_release_merge }}
+      release_version: ${{ steps.detect.outputs.release_version }}
+
+    steps:
+      - name: Detect release merge commit
+        id: detect
+        env:
+          AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
+          AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        shell: bash
+        run: |
+          subject="${COMMIT_MESSAGE%%$'\n'*}"
+
+          if [[ "$subject" =~ ^chore\(master\):\ release\ ([0-9]+\.[0-9]+\.[0-9]+(\-[0-9A-Za-z.-]+)?)\ \(#[0-9]+\)$ ]] \
+            && [[ "$AUTHOR_NAME" == "fluxnotes-release-bot[bot]" ]] \
+            && [[ "$AUTHOR_EMAIL" == "285336738+fluxnotes-release-bot[bot]@users.noreply.github.com" ]]; then
+            echo "is_release_merge=true" >> "$GITHUB_OUTPUT"
+            echo "release_version=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release_merge=false" >> "$GITHUB_OUTPUT"
+            echo "release_version=" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.is_release_merge == 'true'
     permissions:
       contents: write
       issues: write
@@ -41,12 +71,30 @@ jobs:
           token: ${{ steps.release-app.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          skip-github-pull-request: true
+
+      - name: Verify release output
+        env:
+          EXPECTED_VERSION: ${{ needs.detect.outputs.release_version }}
+          RELEASE_CREATED: ${{ steps.release.outputs.release_created }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          if [ "$RELEASE_CREATED" != "true" ]; then
+            echo "Expected release-please to create a release for $EXPECTED_VERSION."
+            exit 1
+          fi
+
+          if [ "$VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "Expected release version $EXPECTED_VERSION, got $VERSION."
+            exit 1
+          fi
 
   verify:
     name: Verify
     runs-on: ubuntu-latest
-    needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    needs: release
+    if: needs.release.outputs.release_created == 'true'
 
     steps:
       - name: Checkout
@@ -74,9 +122,9 @@ jobs:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     needs:
-      - release-please
+      - release
       - verify
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release.outputs.release_created == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -148,9 +196,9 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     needs:
-      - release-please
+      - release
       - build
-    if: needs.release-please.outputs.release_created == 'true'
+    if: needs.release.outputs.release_created == 'true'
     permissions:
       contents: write
 
@@ -173,7 +221,7 @@ jobs:
       - name: Upload release assets
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
-          TAG: ${{ needs.release-please.outputs.tag_name }}
+          TAG: ${{ needs.release.outputs.tag_name }}
         shell: bash
         run: |
           shopt -s globstar nullglob
@@ -195,5 +243,5 @@ jobs:
       - name: Publish draft release
         env:
           GH_TOKEN: ${{ steps.release-app.outputs.token }}
-          TAG: ${{ needs.release-please.outputs.tag_name }}
+          TAG: ${{ needs.release.outputs.tag_name }}
         run: gh release edit "$TAG" --draft=false
