@@ -2,13 +2,7 @@ import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { queryClient } from "@renderer/app/query";
-import {
-  getCliStatus,
-  installCli,
-  toAppInvokeError,
-  uninstallCli,
-  type AppUpdateStatus,
-} from "@renderer/clients";
+import { getCliStatus, installCli, toAppInvokeError, uninstallCli } from "@renderer/clients";
 import { AppUpdateInstallDialog } from "@renderer/features/app-update/app-update-install-dialog";
 import {
   useAppUpdateStatusQuery,
@@ -42,6 +36,7 @@ import {
 } from "@shared/features/preferences/settings";
 import { useQuery } from "@tanstack/react-query";
 import {
+  BadgeInfoIcon,
   CircleFadingArrowUpIcon,
   LanguagesIcon,
   MonitorIcon,
@@ -55,59 +50,6 @@ import {
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-
-function AppUpdateStatusDescription({
-  isChecking,
-  status,
-}: {
-  isChecking: boolean;
-  status?: AppUpdateStatus;
-}) {
-  if (isChecking) {
-    return <Trans id="preferences.app-update.checking">Checking for updates.</Trans>;
-  }
-
-  if (!status) {
-    return <Trans id="preferences.app-update.loading">Loading update status.</Trans>;
-  }
-
-  if (!status.isSupported) {
-    return (
-      <Trans id="preferences.app-update.unsupported">
-        App updates are available in packaged macOS and Windows builds.
-      </Trans>
-    );
-  }
-
-  if (status.state === "ready") {
-    const versionLabel = status.availableVersion ?? status.releaseName;
-    return versionLabel ? (
-      <Trans id="preferences.app-update.ready-version">
-        Version {versionLabel} is ready to install.
-      </Trans>
-    ) : (
-      <Trans id="preferences.app-update.ready">An update is ready to install.</Trans>
-    );
-  }
-
-  if (status.state === "downloading") {
-    return <Trans id="preferences.app-update.downloading">Downloading update</Trans>;
-  }
-
-  if (status.state === "error") {
-    return (
-      <Trans id="preferences.app-update.error">
-        Last check failed. Try again when the network is available.
-      </Trans>
-    );
-  }
-
-  return (
-    <Trans id="preferences.app-update.current-version">
-      Current version: {status.currentVersion}
-    </Trans>
-  );
-}
 
 export function AppSettingsSection() {
   const { i18n } = useLingui();
@@ -155,6 +97,7 @@ export function AppSettingsSection() {
   const appUpdateDownloading = appUpdateStatus?.state === "downloading";
   const appUpdateReady = appUpdateStatus?.state === "ready";
   const appUpdateSupported = appUpdateStatus?.isSupported !== false;
+  const appUpdateTargetVersion = appUpdateStatus?.availableVersion ?? appUpdateStatus?.releaseName;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -276,13 +219,34 @@ export function AppSettingsSection() {
         />
         <SettingsRow
           control={
-            appUpdateDownloading ? (
-              <Button disabled size="sm" variant="outline">
-                <RefreshCwIcon className="animate-spin" />
-                <Trans id="preferences.app-update.downloading">Downloading update</Trans>
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              {appUpdateReady && appUpdateStatus ? (
+                <AppUpdateInstallDialog
+                  status={appUpdateStatus}
+                  trigger={
+                    <Button size="sm">
+                      <CircleFadingArrowUpIcon />
+                      {appUpdateTargetVersion ? (
+                        <Trans id="preferences.app-update.install-version">
+                          Update to {appUpdateTargetVersion}
+                        </Trans>
+                      ) : (
+                        <Trans id="preferences.app-update.install">Install update</Trans>
+                      )}
+                    </Button>
+                  }
+                />
+              ) : appUpdateStatus ? (
+                <span className="text-muted-foreground text-sm tabular-nums">
+                  {appUpdateStatus.currentVersion}
+                </span>
+              ) : null}
+              {appUpdateDownloading ? (
+                <Button disabled size="sm" variant="outline">
+                  <RefreshCwIcon className="animate-spin" />
+                  <Trans id="preferences.app-update.downloading">Downloading update</Trans>
+                </Button>
+              ) : (
                 <Button
                   disabled={!appUpdateSupported || appUpdateChecking}
                   size="sm"
@@ -296,25 +260,11 @@ export function AppSettingsSection() {
                   )}
                   <Trans id="preferences.app-update.check">Check</Trans>
                 </Button>
-                {appUpdateReady && appUpdateStatus ? (
-                  <AppUpdateInstallDialog
-                    status={appUpdateStatus}
-                    trigger={
-                      <Button size="sm">
-                        <CircleFadingArrowUpIcon />
-                        <Trans id="preferences.app-update.finish">Finish update</Trans>
-                      </Button>
-                    }
-                  />
-                ) : null}
-              </div>
-            )
+              )}
+            </div>
           }
-          description={
-            <AppUpdateStatusDescription status={appUpdateStatus} isChecking={appUpdateChecking} />
-          }
-          icon={CircleFadingArrowUpIcon}
-          label={<Trans id="preferences.app-update.label">App update</Trans>}
+          icon={BadgeInfoIcon}
+          label={<Trans id="preferences.app-update.label">Version information</Trans>}
         />
         <SettingsRow
           control={
