@@ -58,8 +58,8 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: {
-        FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        FLUXNOTES_POSTHOG_KEY: "key",
+        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
+        VITE_FLUXNOTES_POSTHOG_KEY: "key",
       },
       readSettings: () => ({ telemetry: { enabled: false } }),
       storage: { store: { anonId: "anon-1" } },
@@ -78,8 +78,8 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: {
-        FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        FLUXNOTES_POSTHOG_KEY: "key",
+        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
+        VITE_FLUXNOTES_POSTHOG_KEY: "key",
       },
       platform: "darwin",
       readSettings: () => ({ telemetry: { enabled: true } }),
@@ -112,8 +112,8 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: {
-        FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        FLUXNOTES_POSTHOG_KEY: "key",
+        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
+        VITE_FLUXNOTES_POSTHOG_KEY: "key",
       },
       readSettings: () => ({ telemetry: { enabled: true } }),
       storage: { store: { anonId: "anon-1" } },

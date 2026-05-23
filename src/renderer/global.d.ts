@@ -8,9 +8,6 @@ import type {
 } from "@shared/ipc/types";
 
 declare global {
-  const __FLUXNOTES_POSTHOG_HOST__: string | undefined;
-  const __FLUXNOTES_POSTHOG_KEY__: string | undefined;
-
   interface Window {
     appEnvironment: AppEnvironment;
     ipc: {

@@ -63,8 +63,8 @@ export function createMainServices(): MainServices {
   const telemetryService = createTelemetryService({
     appVersion: app.getVersion(),
     env: {
-      FLUXNOTES_POSTHOG_HOST: __FLUXNOTES_POSTHOG_HOST__,
-      FLUXNOTES_POSTHOG_KEY: __FLUXNOTES_POSTHOG_KEY__,
+      VITE_FLUXNOTES_POSTHOG_HOST: import.meta.env.VITE_FLUXNOTES_POSTHOG_HOST,
+      VITE_FLUXNOTES_POSTHOG_KEY: import.meta.env.VITE_FLUXNOTES_POSTHOG_KEY,
     },
     readSettings: preferencesService.readSettings,
     storage: getConfigStore(userDataPath, APP_TELEMETRY_STORE_FILE, {}),

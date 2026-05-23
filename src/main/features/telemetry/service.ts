@@ -65,8 +65,8 @@ function resolveProjectConfig(
   env: Record<string, string | undefined>,
 ): PostHogProjectConfig | null {
   return resolvePostHogProjectConfig({
-    host: env.FLUXNOTES_POSTHOG_HOST ?? env.VITE_FLUXNOTES_POSTHOG_HOST,
-    key: env.FLUXNOTES_POSTHOG_KEY ?? env.VITE_FLUXNOTES_POSTHOG_KEY,
+    host: env.VITE_FLUXNOTES_POSTHOG_HOST,
+    key: env.VITE_FLUXNOTES_POSTHOG_KEY,
   });
 }
 
