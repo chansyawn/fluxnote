@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.15](https://github.com/chansyawn/fluxnotes/compare/v0.0.14...v0.0.15) (2026-05-23)
+
+
+### Bug Fixes
+
+* split release workflows ([#34](https://github.com/chansyawn/fluxnotes/issues/34)) ([aa0171b](https://github.com/chansyawn/fluxnotes/commit/aa0171ba8e2759b227b13e0d6f0edc7e6f7397f3))
+
 ## [0.0.14](https://github.com/chansyawn/fluxnotes/compare/v0.0.13...v0.0.14) (2026-05-23)
 
 
