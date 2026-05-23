@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.16](https://github.com/chansyawn/fluxnotes/compare/v0.0.15...v0.0.16) (2026-05-23)
+
+
+### Features
+
+* add PostHog diagnostics ([#36](https://github.com/chansyawn/fluxnotes/issues/36)) ([3e73328](https://github.com/chansyawn/fluxnotes/commit/3e73328973ebcc6b1a2418b640671ba6e081f010))
+
 ## [0.0.15](https://github.com/chansyawn/fluxnotes/compare/v0.0.14...v0.0.15) (2026-05-23)
 
 
