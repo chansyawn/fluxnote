@@ -6,7 +6,7 @@ import { ReactExtension } from "@lexical/react/ReactExtension";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { configExtension, defineExtension, type InitialEditorStateType } from "lexical";
-import { useCallback, useImperativeHandle, useMemo, useRef } from "react";
+import { useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
@@ -16,6 +16,7 @@ import {
   createBlockEditorCoreExtension,
 } from "./block-editor-core-extension";
 import { BlockEditorConfigProvider, resolveBlockEditorConfig } from "./config";
+import { BlockEditorOverlayContainerProvider } from "./editor-overlay-container";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
 import { importMarkdownToEditor } from "./markdown-editor-io";
@@ -59,20 +60,18 @@ interface BlockEditorContentProps {
 function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
   const { i18n } = useLingui();
   return (
-    <div className="relative min-h-16 text-sm">
-      <ContentEditable
-        aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
-        ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
-        className="relative resize-none text-sm outline-none"
-        onBlur={onBlur}
-        placeholder={
-          <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
-            <Trans id="block-editor.placeholder">Write a note...</Trans>
-          </div>
-        }
-        spellCheck
-      />
-    </div>
+    <ContentEditable
+      aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
+      ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
+      className="relative resize-none text-sm outline-none"
+      onBlur={onBlur}
+      placeholder={
+        <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
+          <Trans id="block-editor.placeholder">Write a note...</Trans>
+        </div>
+      }
+      spellCheck
+    />
   );
 }
 
@@ -126,6 +125,7 @@ export function BlockEditor({
     [],
   );
   const resolvedConfig = useMemo(() => resolveBlockEditorConfig(config), [config]);
+  const [overlayContainer, setOverlayContainer] = useState<HTMLElement | null>(null);
 
   const handleBlur = useCallback(() => {
     markdownRef.current?.flush();
@@ -133,11 +133,15 @@ export function BlockEditor({
   }, [onBlur]);
 
   return (
-    <BlockEditorConfigProvider config={resolvedConfig}>
-      <LexicalExtensionComposer extension={extension} contentEditable={null}>
-        <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
-        <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
-      </LexicalExtensionComposer>
-    </BlockEditorConfigProvider>
+    <div ref={setOverlayContainer} className="relative min-h-16 text-sm">
+      <BlockEditorOverlayContainerProvider container={overlayContainer}>
+        <BlockEditorConfigProvider config={resolvedConfig}>
+          <LexicalExtensionComposer extension={extension} contentEditable={null}>
+            <MarkdownChangePlugin ref={markdownRef} onMarkdownChange={onMarkdownChange} />
+            <BlockEditorImperative ref={ref} onBlur={handleBlur} flushMarkdown={flushMarkdown} />
+          </LexicalExtensionComposer>
+        </BlockEditorConfigProvider>
+      </BlockEditorOverlayContainerProvider>
+    </div>
   );
 }

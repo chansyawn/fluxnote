@@ -19,7 +19,7 @@ export function TableControlsDecorator() {
     scheduleMeasure,
     setActiveMenu,
     setPointerOverControls,
-    shellElement,
+    overlayContainer,
     target,
   } = useTableControlState(editor);
 
@@ -56,7 +56,7 @@ export function TableControlsDecorator() {
     [clearTarget, editor, scheduleMeasure, setActiveMenu, target],
   );
 
-  if (!shellElement || !target) return null;
+  if (!overlayContainer || !target) return null;
 
   return createPortal(
     <div
@@ -79,6 +79,6 @@ export function TableControlsDecorator() {
         target={target}
       />
     </div>,
-    shellElement,
+    overlayContainer,
   );
 }

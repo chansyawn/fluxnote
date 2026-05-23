@@ -1,11 +1,11 @@
 import { $isCodeNode } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useBlockEditorConfig } from "@renderer/features/block-editor/core/config";
+import { useEditorOverlayContainer } from "@renderer/features/block-editor/core/editor-overlay-container";
 import { $getNodeByKey, $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 
-import { useEditorShellElement } from "../../core/editor-shell-element";
 import { CodeCopyButton } from "./code-copy-button";
 import {
   applyCodeBlockDisplayConfig,
@@ -106,15 +106,15 @@ export function CodeBlockControlsDecorator() {
   } = useBlockEditorConfig();
   const [codeBlocks, setCodeBlocks] = useState<CodeBlockViewState[]>([]);
   const animationFrameIdRef = useRef<number | null>(null);
-  const shellElement = useEditorShellElement(editor);
+  const overlayContainer = useEditorOverlayContainer();
 
   const measureCodeBlocks = useCallback(() => {
-    if (!shellElement) {
+    if (!overlayContainer) {
       setCodeBlocks([]);
       return;
     }
 
-    const shellRect = shellElement.getBoundingClientRect();
+    const shellRect = overlayContainer.getBoundingClientRect();
     editor.getEditorState().read(() => {
       const nextCodeBlocks = readCodeBlocks().flatMap((codeBlock): CodeBlockViewState[] => {
         const element = editor.getElementByKey(codeBlock.key);
@@ -135,13 +135,13 @@ export function CodeBlockControlsDecorator() {
               shellRect,
               codeRect,
               {
-                left: shellElement.scrollLeft,
-                top: shellElement.scrollTop,
+                left: overlayContainer.scrollLeft,
+                top: overlayContainer.scrollTop,
               },
             ),
             rect: calculateCodeToolbarRect(shellRect, codeRect, {
-              left: shellElement.scrollLeft,
-              top: shellElement.scrollTop,
+              left: overlayContainer.scrollLeft,
+              top: overlayContainer.scrollTop,
             }),
           },
         ];
@@ -153,7 +153,7 @@ export function CodeBlockControlsDecorator() {
           : nextCodeBlocks,
       );
     });
-  }, [codeBlockConfig, editor, shellElement]);
+  }, [codeBlockConfig, editor, overlayContainer]);
 
   const scheduleMeasureCodeBlocks = useCallback(() => {
     if (animationFrameIdRef.current !== null) {
@@ -168,9 +168,17 @@ export function CodeBlockControlsDecorator() {
 
   useEffect(() => {
     scheduleMeasureCodeBlocks();
-    return editor.registerUpdateListener(() => {
+    const unregisterRootListener = editor.registerRootListener(() => {
       scheduleMeasureCodeBlocks();
     });
+    const unregisterUpdateListener = editor.registerUpdateListener(() => {
+      scheduleMeasureCodeBlocks();
+    });
+
+    return () => {
+      unregisterRootListener();
+      unregisterUpdateListener();
+    };
   }, [editor, scheduleMeasureCodeBlocks]);
 
   useEffect(() => {
@@ -193,14 +201,14 @@ export function CodeBlockControlsDecorator() {
   }, [scheduleMeasureCodeBlocks]);
 
   useEffect(() => {
-    if (!shellElement || typeof ResizeObserver === "undefined") {
+    if (!overlayContainer || typeof ResizeObserver === "undefined") {
       return;
     }
 
     const resizeObserver = new ResizeObserver(() => {
       scheduleMeasureCodeBlocks();
     });
-    resizeObserver.observe(shellElement);
+    resizeObserver.observe(overlayContainer);
 
     for (const codeBlock of codeBlocks) {
       const element = editor.getElementByKey(codeBlock.key);
@@ -212,7 +220,7 @@ export function CodeBlockControlsDecorator() {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [codeBlocks, editor, scheduleMeasureCodeBlocks, shellElement]);
+  }, [codeBlocks, editor, overlayContainer, scheduleMeasureCodeBlocks]);
 
   useEffect(() => {
     const scrollableCodeBlocks = codeBlocks.flatMap((codeBlock): HTMLElement[] => {
@@ -249,7 +257,7 @@ export function CodeBlockControlsDecorator() {
     return null;
   }
 
-  if (!shellElement) {
+  if (!overlayContainer) {
     return null;
   }
 
@@ -297,6 +305,6 @@ export function CodeBlockControlsDecorator() {
         </div>
       ))}
     </>,
-    shellElement,
+    overlayContainer,
   );
 }

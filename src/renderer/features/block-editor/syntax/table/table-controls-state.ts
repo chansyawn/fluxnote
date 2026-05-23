@@ -13,7 +13,7 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useEditorShellElement } from "../../core/editor-shell-element";
+import { useEditorOverlayContainer } from "../../core/editor-overlay-container";
 import {
   getTableCellColumnIndex,
   getTableCellRowIndex,
@@ -192,7 +192,7 @@ export function useTableControlState(editor: LexicalEditor) {
   const animationFrameIdRef = useRef<number | null>(null);
   const pointerOverControlsRef = useRef(false);
   const activeMenuRef = useRef<TableControlKind | null>(null);
-  const shellElement = useEditorShellElement(editor);
+  const overlayContainer = useEditorOverlayContainer();
 
   const setOpenMenu = useCallback((nextActiveMenu: TableControlKind | null) => {
     activeMenuRef.current = nextActiveMenu;
@@ -202,12 +202,12 @@ export function useTableControlState(editor: LexicalEditor) {
   const updateTarget = useCallback(
     (cellKey: NodeKey | null) => {
       activeCellKeyRef.current = cellKey;
-      const nextTarget = cellKey ? readControlTarget(editor, shellElement, cellKey) : null;
+      const nextTarget = cellKey ? readControlTarget(editor, overlayContainer, cellKey) : null;
       setTarget((previousTarget) =>
         areTargetsEqual(previousTarget, nextTarget) ? previousTarget : nextTarget,
       );
     },
-    [editor, shellElement],
+    [editor, overlayContainer],
   );
 
   const clearTarget = useCallback(() => {
@@ -260,7 +260,7 @@ export function useTableControlState(editor: LexicalEditor) {
   }, [scheduleMeasure]);
 
   useEffect(() => {
-    if (!shellElement) return;
+    if (!overlayContainer) return;
 
     const handlePointerMove = (event: PointerEvent) => {
       if (findControlFromTarget(event.target)) return;
@@ -278,14 +278,14 @@ export function useTableControlState(editor: LexicalEditor) {
       clearTargetIfIdle();
     };
 
-    shellElement.addEventListener("pointermove", handlePointerMove);
-    shellElement.addEventListener("pointerleave", handlePointerLeave);
+    overlayContainer.addEventListener("pointermove", handlePointerMove);
+    overlayContainer.addEventListener("pointerleave", handlePointerLeave);
 
     return () => {
-      shellElement.removeEventListener("pointermove", handlePointerMove);
-      shellElement.removeEventListener("pointerleave", handlePointerLeave);
+      overlayContainer.removeEventListener("pointermove", handlePointerMove);
+      overlayContainer.removeEventListener("pointerleave", handlePointerLeave);
     };
-  }, [clearTarget, clearTargetIfIdle, editor, shellElement, updateTarget]);
+  }, [clearTarget, clearTargetIfIdle, editor, overlayContainer, updateTarget]);
 
   return {
     activeMenu,
@@ -296,7 +296,7 @@ export function useTableControlState(editor: LexicalEditor) {
     setPointerOverControls: (nextPointerOverControls: boolean) => {
       pointerOverControlsRef.current = nextPointerOverControls;
     },
-    shellElement,
+    overlayContainer,
     target,
   };
 }
