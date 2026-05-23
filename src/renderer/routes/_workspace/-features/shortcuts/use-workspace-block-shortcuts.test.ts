@@ -5,14 +5,14 @@ import type { WorkspaceBlockActionShortcutCaptureHandler } from "./use-workspace
 
 const mocks = vi.hoisted(() => {
   const defaultShortcuts = {
-    "archive-block": "Mod+E",
-    "cancel-external-edit": "Mod+\\",
-    "copy-block": "Mod+Shift+C",
-    "create-block": "Mod+N",
-    "delete-block": "Mod+D",
-    "keep-block": "Mod+K",
-    "submit-external-edit": "Mod+Enter",
-    "toggle-pin-block": "Mod+T",
+    archiveBlock: "Mod+E",
+    cancelExternalEdit: "Mod+\\",
+    copyBlock: "Mod+Shift+C",
+    createBlock: "Mod+N",
+    deleteBlock: "Mod+D",
+    keepBlock: "Mod+K",
+    submitExternalEdit: "Mod+Enter",
+    togglePinBlock: "Mod+T",
   } as const;
 
   return {

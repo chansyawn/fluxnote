@@ -42,14 +42,14 @@ describe("settings", () => {
         idleMinutes: 0,
       },
       shortcuts: {
-        "toggle-window": 1,
-        "create-block": null,
-        "keep-block": "Mod+K",
-        "toggle-pin-block": "Mod+T",
-        "archive-block": "Mod+E",
-        "delete-block": "Mod+Delete",
-        "submit-external-edit": "Mod+Enter",
-        "cancel-external-edit": "Mod+\\",
+        toggleWindow: 1,
+        createBlock: null,
+        keepBlock: "Mod+K",
+        togglePinBlock: "Mod+T",
+        archiveBlock: "Mod+E",
+        deleteBlock: "Mod+Delete",
+        submitExternalEdit: "Mod+Enter",
+        cancelExternalEdit: "Mod+\\",
       },
       markdown: {
         codeBlock: {
@@ -76,16 +76,16 @@ describe("settings", () => {
       idleMinutes: DEFAULT_SETTINGS.autoArchive.idleMinutes,
     });
     expect(normalized.shortcuts).toEqual({
-      "toggle-window": "Alt+N",
-      "create-block": null,
-      "copy-block": "Mod+Shift+C",
-      "keep-block": "Mod+K",
-      "toggle-pin-block": "Mod+T",
-      "archive-block": "Mod+E",
-      "delete-block": "Mod+Delete",
-      "quick-create-block": "Ctrl+Alt+N",
-      "submit-external-edit": "Mod+Enter",
-      "cancel-external-edit": "Mod+\\",
+      toggleWindow: "Alt+N",
+      createBlock: null,
+      copyBlock: "Mod+Shift+C",
+      keepBlock: "Mod+K",
+      togglePinBlock: "Mod+T",
+      archiveBlock: "Mod+E",
+      deleteBlock: "Mod+Delete",
+      quickCreateBlock: "Ctrl+Alt+N",
+      submitExternalEdit: "Mod+Enter",
+      cancelExternalEdit: "Mod+\\",
     });
     expect(normalized.markdown).toEqual({
       codeBlock: {
@@ -105,14 +105,14 @@ describe("settings", () => {
       normalizeSettingsPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
-        shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
+        shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
         telemetry: { enabled: false },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
-      shortcuts: { "archive-block": "Mod+E", "copy-block": "Mod+Shift+C" },
+      shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       telemetry: { enabled: false },
     });

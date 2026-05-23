@@ -32,63 +32,59 @@ interface ShortcutFieldDefinition {
 
 const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
   {
-    action: "toggle-window",
+    action: "toggleWindow",
     icon: KeyboardIcon,
-    title: <Trans id="preferences.shortcuts.toggle-window.label">Toggle window</Trans>,
+    title: <Trans id="preferences.shortcuts.toggleWindow.label">Toggle window</Trans>,
   },
   {
-    action: "create-block",
+    action: "createBlock",
     icon: PlusCircleIcon,
-    title: <Trans id="preferences.shortcuts.create-block.label">Create block</Trans>,
+    title: <Trans id="preferences.shortcuts.createBlock.label">Create block</Trans>,
   },
   {
-    action: "copy-block",
+    action: "copyBlock",
     icon: CopyIcon,
-    title: <Trans id="preferences.shortcuts.copy-block.label">Copy block</Trans>,
+    title: <Trans id="preferences.shortcuts.copyBlock.label">Copy block</Trans>,
   },
   {
-    action: "keep-block",
+    action: "keepBlock",
     icon: FlagIcon,
-    title: <Trans id="preferences.shortcuts.keep-block.label">Keep block</Trans>,
+    title: <Trans id="preferences.shortcuts.keepBlock.label">Keep block</Trans>,
   },
   {
-    action: "toggle-pin-block",
+    action: "togglePinBlock",
     icon: PinIcon,
-    title: <Trans id="preferences.shortcuts.toggle-pin-block.label">Pin/unpin block</Trans>,
+    title: <Trans id="preferences.shortcuts.togglePinBlock.label">Pin/unpin block</Trans>,
   },
   {
-    action: "delete-block",
+    action: "deleteBlock",
     icon: Trash2Icon,
-    title: <Trans id="preferences.shortcuts.delete-block.label">Delete block</Trans>,
+    title: <Trans id="preferences.shortcuts.deleteBlock.label">Delete block</Trans>,
   },
   {
-    action: "archive-block",
+    action: "archiveBlock",
     icon: ArchiveIcon,
-    title: <Trans id="preferences.shortcuts.archive-block.label">Archive/restore block</Trans>,
+    title: <Trans id="preferences.shortcuts.archiveBlock.label">Archive/restore block</Trans>,
   },
   {
-    action: "quick-create-block",
+    action: "quickCreateBlock",
     icon: WandSparklesIcon,
-    title: <Trans id="preferences.shortcuts.quick-create-block.label">Quick create block</Trans>,
+    title: <Trans id="preferences.shortcuts.quickCreateBlock.label">Quick create block</Trans>,
     description: (
-      <Trans id="preferences.shortcuts.quick-create-block.description">
+      <Trans id="preferences.shortcuts.quickCreateBlock.description">
         Quickly create a new block and bring the window forward for fast capture.
       </Trans>
     ),
   },
   {
-    action: "submit-external-edit",
+    action: "submitExternalEdit",
     icon: CheckIcon,
-    title: (
-      <Trans id="preferences.shortcuts.submit-external-edit.label">Submit external edit</Trans>
-    ),
+    title: <Trans id="preferences.shortcuts.submitExternalEdit.label">Submit external edit</Trans>,
   },
   {
-    action: "cancel-external-edit",
+    action: "cancelExternalEdit",
     icon: XIcon,
-    title: (
-      <Trans id="preferences.shortcuts.cancel-external-edit.label">Cancel external edit</Trans>
-    ),
+    title: <Trans id="preferences.shortcuts.cancelExternalEdit.label">Cancel external edit</Trans>,
   },
 ];
 
@@ -114,7 +110,7 @@ export function ShortcutSettingsSection() {
           const isRecording = recordingAction === field.action;
           const shortcut = shortcuts[field.action];
           const fieldError =
-            (field.action === "toggle-window" || field.action === "quick-create-block") &&
+            (field.action === "toggleWindow" || field.action === "quickCreateBlock") &&
             shortcut !== null &&
             globalShortcutErrors[field.action] === shortcut
               ? ("unavailable" as const)

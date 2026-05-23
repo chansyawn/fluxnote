@@ -9,16 +9,16 @@ import type { WorkspaceBlockState } from "../workspace-state-context";
 
 const mocks = vi.hoisted(() => ({
   shortcuts: {
-    "archive-block": "Mod+E",
-    "cancel-external-edit": "Mod+\\",
-    "copy-block": "Mod+Shift+C",
-    "create-block": "Mod+N",
-    "delete-block": "Mod+D",
-    "keep-block": "Mod+K",
-    "quick-create-block": "Ctrl+Alt+N",
-    "submit-external-edit": "Mod+Enter",
-    "toggle-pin-block": "Mod+T",
-    "toggle-window": "Alt+N",
+    archiveBlock: "Mod+E",
+    cancelExternalEdit: "Mod+\\",
+    copyBlock: "Mod+Shift+C",
+    createBlock: "Mod+N",
+    deleteBlock: "Mod+D",
+    keepBlock: "Mod+K",
+    quickCreateBlock: "Ctrl+Alt+N",
+    submitExternalEdit: "Mod+Enter",
+    togglePinBlock: "Mod+T",
+    toggleWindow: "Alt+N",
   },
 }));
 

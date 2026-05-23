@@ -8,7 +8,7 @@ import { AdornmentBar } from "./adornment-bar";
 import { IconAction } from "./icon-action";
 
 interface ExternalEditControlsProps extends Pick<ComponentProps<"div">, "className"> {
-  shortcuts?: Partial<Pick<ShortcutPreferences, "submit-external-edit" | "cancel-external-edit">>;
+  shortcuts?: Partial<Pick<ShortcutPreferences, "submitExternalEdit" | "cancelExternalEdit">>;
   pending?: boolean;
   onSubmit: () => void;
   onCancel: () => void;
@@ -28,7 +28,7 @@ export function ExternalEditControls({
           icon={<CheckIcon className="size-3" />}
           label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
           tooltipLabel={<Trans id="home-note.block.external-edit.submit.tooltip">Submit</Trans>}
-          shortcut={shortcuts?.["submit-external-edit"]}
+          shortcut={shortcuts?.["submitExternalEdit"]}
           pending={pending}
           onClick={onSubmit}
         />
@@ -36,7 +36,7 @@ export function ExternalEditControls({
           icon={<XIcon className="size-3" />}
           label={<Trans id="home-note.block.external-edit.cancel">Cancel external edit</Trans>}
           tooltipLabel={<Trans id="home-note.block.external-edit.cancel.tooltip">Cancel</Trans>}
-          shortcut={shortcuts?.["cancel-external-edit"]}
+          shortcut={shortcuts?.["cancelExternalEdit"]}
           disabled={pending}
           onClick={onCancel}
         />

@@ -136,7 +136,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
         <CopyAction
           copied={copied}
           disabled={disabled}
-          shortcut={shortcuts?.["copy-block"]}
+          shortcut={shortcuts?.["copyBlock"]}
           onCopy={handlers.onCopy}
         />
         <TagComboboxPopover
@@ -182,7 +182,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
               <Trans id="workspace.blocks.archive.tooltip">Archive</Trans>
             )
           }
-          shortcut={shortcuts?.["archive-block"]}
+          shortcut={shortcuts?.["archiveBlock"]}
           disabled={disabled || isExternalEditProtected}
           pending={pending.archive}
           onClick={() => {
@@ -193,7 +193,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
           icon={<Trash2Icon className="size-3" />}
           label={<Trans id="home-note.block.delete">Delete block</Trans>}
           tooltipLabel={<Trans id="home-note.block.delete.tooltip">Delete</Trans>}
-          shortcut={shortcuts?.["delete-block"]}
+          shortcut={shortcuts?.["deleteBlock"]}
           disabled={disabled}
           pending={pending.delete}
           onClick={() => {
@@ -234,7 +234,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                     <FlagIcon />
                   )}
                   <BlockKeepMenuLabel block={block} protectedKeepReason={protectedKeepReason} />
-                  <BlockActionMenuShortcut shortcut={shortcuts?.["keep-block"]} />
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["keepBlock"]} />
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={disabled || pending.pinned}
@@ -254,7 +254,7 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                   ) : (
                     <Trans id="workspace.blocks.pin">Pin to top</Trans>
                   )}
-                  <BlockActionMenuShortcut shortcut={shortcuts?.["toggle-pin-block"]} />
+                  <BlockActionMenuShortcut shortcut={shortcuts?.["togglePinBlock"]} />
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
