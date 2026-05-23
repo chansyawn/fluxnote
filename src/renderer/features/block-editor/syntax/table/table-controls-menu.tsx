@@ -196,7 +196,7 @@ export function TableHandleMenu({
       <DropdownMenuTrigger
         aria-label={getMenuLabel(i18n, kind)}
         className={cn(
-          "absolute h-3 w-4.5 -translate-x-1/2 -translate-y-1/2 leading-0",
+          "absolute h-3 w-4.5 -translate-x-1/2 -translate-y-1/2 leading-0 bg-muted",
           kind === "row" && "rotate-90",
         )}
         data-table-control
