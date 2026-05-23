@@ -30,6 +30,11 @@ jobs:
       - name: Install dependencies
         run: vp install
 
+      - name: Check PR title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | vp exec commitlint
+
       - name: Check
         run: vp check
 
