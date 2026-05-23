@@ -16,6 +16,10 @@ _Avoid_: Settings, config, runtime state
 A **User Preferences** choice that controls whether Fluxnotes follows the system appearance or uses a light or dark appearance.
 _Avoid_: Theme config, color mode state
 
+**Telemetry Preference**:
+A **User Preferences** choice that controls whether Fluxnotes shares anonymous diagnostics.
+_Avoid_: Tracking config, analytics state
+
 **App Update**:
 A workflow that updates the installed Fluxnotes application to a newer released version.
 _Avoid_: Block update, content update, software update
@@ -91,6 +95,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
 - **User Preferences** can affect **Workspace** presentation and app-level behavior.
 - **Theme Preference** belongs to **User Preferences**.
+- **Telemetry Preference** belongs to **User Preferences**.
 - **User Preferences** expose manual **App Update** checks.
 - **App Update** does not modify **Blocks**.
 - **User Preferences** configure **Auto Archive**, but changing them does not itself move **Blocks** into the archive.
@@ -113,4 +118,5 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - "Pinned" can be confused with **Kept Block**; resolved: **Pinned Block** only means fixed to the top area of the **Workspace**.
 - "Settings" and "config" can mean implementation details or user choices; resolved: use **User Preferences** for user-controlled app-level choices.
 - "Theme" can mean either the user's choice or the resolved light/dark appearance; resolved: use **Theme Preference** for the user-controlled choice.
+- "Telemetry" can mean implementation diagnostics or the user's sharing choice; resolved: use **Telemetry Preference** for the user-controlled choice.
 - "Update" can mean changing **Block** content or updating Fluxnotes itself; resolved: use **App Update** for installed application updates.

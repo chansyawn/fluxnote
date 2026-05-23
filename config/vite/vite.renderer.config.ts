@@ -5,9 +5,10 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./shared.ts";
+import { postHogDefines, viteAliases } from "./shared.ts";
 
 export default defineConfig({
+  define: postHogDefines,
   server: {
     port: 6124,
   },

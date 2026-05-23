@@ -14,6 +14,7 @@ import {
   type Settings,
   type SettingsPatch,
   type ShortcutAction,
+  type TelemetrySettings,
   type ThemePreference,
 } from "@shared/features/preferences/settings";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -191,5 +192,21 @@ export function useMarkdownCodeBlockPreference() {
   return {
     codeBlock: settings.markdown.codeBlock,
     patchCodeBlock,
+  };
+}
+
+export function useTelemetryPreference() {
+  const settings = useSettingsValue();
+  const mutation = usePatchSettingsMutation();
+  const patchTelemetry = useCallback(
+    (patch: Partial<TelemetrySettings>) => {
+      mutation.mutate({ telemetry: patch });
+    },
+    [mutation],
+  );
+
+  return {
+    patchTelemetry,
+    telemetry: settings.telemetry,
   };
 }

@@ -9,6 +9,7 @@ import { openBlockContract } from "@shared/features/open-block/contract";
 import { preferencesContract } from "@shared/features/preferences/contract";
 import { shortcutContract } from "@shared/features/shortcut/contract";
 import { tagsContract } from "@shared/features/tags/contract";
+import { telemetryContract } from "@shared/features/telemetry/contract";
 import { windowContract } from "@shared/features/window/contract";
 import type { z } from "zod";
 
@@ -25,6 +26,7 @@ export const contracts = {
     ...preferencesContract.commands,
     ...shortcutContract.commands,
     ...tagsContract.commands,
+    ...telemetryContract.commands,
     ...windowContract.commands,
   },
   events: {
@@ -37,6 +39,7 @@ export const contracts = {
     ...preferencesContract.events,
     ...shortcutContract.events,
     ...windowContract.events,
+    ...telemetryContract.events,
   },
 } as const;
 

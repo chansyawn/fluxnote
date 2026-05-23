@@ -10,6 +10,7 @@ import {
 } from "@renderer/features/app-update/app-update-query";
 import {
   useFontSizePreference,
+  useTelemetryPreference,
   useThemePreference,
 } from "@renderer/features/preferences/preferences-query";
 import {
@@ -26,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
+import { Switch } from "@renderer/ui/components/switch";
 import { Tabs, TabsList, TabsTrigger } from "@renderer/ui/components/tabs";
 import {
   FONT_SIZE_OPTIONS,
@@ -42,6 +44,7 @@ import {
   MonitorIcon,
   MoonIcon,
   PaletteIcon,
+  SendIcon,
   RefreshCwIcon,
   SunIcon,
   TerminalIcon,
@@ -56,6 +59,7 @@ export function AppSettingsSection() {
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
   const { theme, setTheme } = useThemePreference();
+  const { telemetry, patchTelemetry } = useTelemetryPreference();
   const { data: appUpdateStatus } = useAppUpdateStatusQuery();
   const appUpdateCheckMutation = useManualAppUpdateCheckMutation();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
@@ -216,6 +220,28 @@ export function AppSettingsSection() {
           }
           icon={TypeIcon}
           label={<Trans id="preferences.font-size.label">Font size</Trans>}
+        />
+        <SettingsRow
+          control={
+            <Switch
+              aria-label={i18n._({
+                id: "preferences.telemetry.label",
+                message: "Share anonymous diagnostics",
+              })}
+              checked={telemetry.enabled}
+              onCheckedChange={(enabled) => {
+                patchTelemetry({ enabled });
+              }}
+            />
+          }
+          description={
+            <Trans id="preferences.telemetry.description">
+              Share anonymous diagnostics and crash reports. Block content, tags, file paths, and
+              clipboard data are never included.
+            </Trans>
+          }
+          icon={SendIcon}
+          label={<Trans id="preferences.telemetry.label">Share anonymous diagnostics</Trans>}
         />
         <SettingsRow
           control={
