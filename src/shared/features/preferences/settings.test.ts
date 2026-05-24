@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import {
+  createDefaultSettings,
   DEFAULT_SETTINGS,
   isFontSize,
   isLocaleCode,
   isThemePreference,
   normalizeSettings,
   normalizeSettingsPatch,
+  resolvePreferredLocale,
   THEME_PREFERENCE_OPTIONS,
 } from "./settings";
 
@@ -26,6 +28,13 @@ describe("settings", () => {
     expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
     expect(normalizeSettings({})).toEqual(DEFAULT_SETTINGS);
     expect(normalizeSettings({ schemaVersion: 999 })).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("should fallback to runtime defaults for invalid input", () => {
+    const defaults = createDefaultSettings("zh-Hans");
+
+    expect(normalizeSettings(null, defaults)).toEqual(defaults);
+    expect(normalizeSettings({ schemaVersion: 999 }, defaults)).toEqual(defaults);
   });
 
   it("should normalize nested fields without dropping valid sibling fields", () => {
@@ -127,6 +136,28 @@ describe("settings", () => {
       appearance: { theme: "dark" },
     });
     expect(() => normalizeSettingsPatch({ appearance: { theme: "amoled" } })).toThrow();
+  });
+
+  it("should resolve preferred locale from supported language families", () => {
+    expect(resolvePreferredLocale(["zh-CN"])).toBe("zh-Hans");
+    expect(resolvePreferredLocale(["zh_Hans_CN"])).toBe("zh-Hans");
+    expect(resolvePreferredLocale(["zh"])).toBe("zh-Hans");
+    expect(resolvePreferredLocale(["en-US"])).toBe("en");
+    expect(resolvePreferredLocale(["en"])).toBe("en");
+    expect(resolvePreferredLocale(["fr-FR", "zh-CN"])).toBe("zh-Hans");
+    expect(resolvePreferredLocale(["fr-FR", "en-GB"])).toBe("en");
+    expect(resolvePreferredLocale([])).toBe("en");
+    expect(resolvePreferredLocale(["", "fr-FR"])).toBe("en");
+  });
+
+  it("should create default settings with runtime locale", () => {
+    expect(createDefaultSettings("zh-Hans")).toEqual({
+      ...DEFAULT_SETTINGS,
+      appearance: {
+        ...DEFAULT_SETTINGS.appearance,
+        locale: "zh-Hans",
+      },
+    });
   });
 
   it("should reject settings patch with extra fields", () => {

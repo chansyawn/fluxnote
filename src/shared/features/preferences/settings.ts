@@ -212,6 +212,88 @@ export const DEFAULT_MARKDOWN_CODE_BLOCK_SETTINGS: MarkdownCodeBlockSettings =
   DEFAULT_SETTINGS.markdown.codeBlock;
 export const DEFAULT_TELEMETRY_SETTINGS: TelemetrySettings = DEFAULT_SETTINGS.telemetry;
 
+function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings> {
+  return z.object({
+    schemaVersion: z.literal(SETTINGS_SCHEMA_VERSION),
+    appearance: z
+      .object({
+        locale: localeSchema.catch(defaults.appearance.locale),
+        theme: themePreferenceSchema.catch(defaults.appearance.theme),
+        fontSize: fontSizeSchema.catch(defaults.appearance.fontSize),
+      })
+      .catch(defaults.appearance),
+    autoArchive: z
+      .object({
+        enabled: z.boolean().catch(defaults.autoArchive.enabled),
+        idleMinutes: autoArchiveIdleMinutesSchema.catch(defaults.autoArchive.idleMinutes),
+      })
+      .catch(defaults.autoArchive),
+    shortcuts: z
+      .object({
+        toggleWindow: shortcutBindingSchema.catch(defaults.shortcuts.toggleWindow),
+        createBlock: shortcutBindingSchema.catch(defaults.shortcuts.createBlock),
+        copyBlock: shortcutBindingSchema.catch(defaults.shortcuts.copyBlock),
+        keepBlock: shortcutBindingSchema.catch(defaults.shortcuts.keepBlock),
+        togglePinBlock: shortcutBindingSchema.catch(defaults.shortcuts.togglePinBlock),
+        archiveBlock: shortcutBindingSchema.catch(defaults.shortcuts.archiveBlock),
+        deleteBlock: shortcutBindingSchema.catch(defaults.shortcuts.deleteBlock),
+        quickCreateBlock: shortcutBindingSchema.catch(defaults.shortcuts.quickCreateBlock),
+        submitExternalEdit: shortcutBindingSchema.catch(defaults.shortcuts.submitExternalEdit),
+        cancelExternalEdit: shortcutBindingSchema.catch(defaults.shortcuts.cancelExternalEdit),
+      })
+      .catch(defaults.shortcuts),
+    markdown: z
+      .object({
+        codeBlock: z
+          .object({
+            showLineNumbers: z.boolean().catch(defaults.markdown.codeBlock.showLineNumbers),
+            wordWrap: z.boolean().catch(defaults.markdown.codeBlock.wordWrap),
+          })
+          .catch(defaults.markdown.codeBlock),
+      })
+      .catch(defaults.markdown),
+    telemetry: z
+      .object({
+        enabled: z.boolean().catch(defaults.telemetry.enabled),
+      })
+      .catch(defaults.telemetry),
+  });
+}
+
+function normalizeLanguageTag(value: string): string {
+  return value.trim().toLowerCase().replaceAll("_", "-");
+}
+
+function matchesLanguageFamily(language: string, family: string): boolean {
+  return language === family || language.startsWith(`${family}-`);
+}
+
+export function resolvePreferredLocale(preferredLanguages: readonly string[]): LocaleCode {
+  for (const preferredLanguage of preferredLanguages) {
+    const language = normalizeLanguageTag(preferredLanguage);
+
+    if (matchesLanguageFamily(language, "zh")) {
+      return "zh-Hans";
+    }
+
+    if (matchesLanguageFamily(language, "en")) {
+      return "en";
+    }
+  }
+
+  return DEFAULT_SETTINGS.appearance.locale;
+}
+
+export function createDefaultSettings(locale: LocaleCode): Settings {
+  return {
+    ...DEFAULT_SETTINGS,
+    appearance: {
+      ...DEFAULT_SETTINGS.appearance,
+      locale,
+    },
+  };
+}
+
 export function isLocaleCode(value: string): value is LocaleCode {
   return LANGUAGE_OPTIONS.some((option) => option.key === value);
 }
@@ -224,11 +306,11 @@ export function isThemePreference(value: string): value is ThemePreference {
   return THEME_PREFERENCE_OPTIONS.some((theme) => theme === value);
 }
 
-export function normalizeSettings(input: unknown): Settings {
-  const result = settingsSchema.safeParse(input);
+export function normalizeSettings(input: unknown, defaults: Settings = DEFAULT_SETTINGS): Settings {
+  const result = createSettingsNormalizerSchema(defaults).safeParse(input);
 
   if (!result.success) {
-    return DEFAULT_SETTINGS;
+    return defaults;
   }
 
   return result.data;

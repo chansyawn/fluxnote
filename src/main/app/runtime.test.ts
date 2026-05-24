@@ -159,6 +159,8 @@ describe("createBackendRuntime", () => {
   it("starts runtime and wires startup flow", async () => {
     const runtime = createBackendRuntime();
 
+    expect(mocks.createMainServices).toHaveBeenCalledTimes(1);
+
     await runtime.start();
 
     expect(services.db.init).toHaveBeenCalledTimes(1);

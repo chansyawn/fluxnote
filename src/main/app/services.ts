@@ -18,7 +18,11 @@ import { createPreferencesService, type PreferencesService } from "@main/feature
 import { createTelemetryService, type TelemetryService } from "@main/features/telemetry";
 import { createTrayManager, createWindowManager, type WindowManager } from "@main/features/window";
 import { APP_SETTINGS_STORE_FILE, APP_TELEMETRY_STORE_FILE } from "@shared/app/app-config";
-import { DEFAULT_SETTINGS, type ThemePreference } from "@shared/features/preferences/settings";
+import {
+  createDefaultSettings,
+  resolvePreferredLocale,
+  type ThemePreference,
+} from "@shared/features/preferences/settings";
 import { app, nativeTheme } from "electron";
 
 type TrayManager = ReturnType<typeof createTrayManager>;
@@ -40,6 +44,9 @@ export interface MainServices {
 
 export function createMainServices(): MainServices {
   const userDataPath = app.getPath("userData");
+  const defaultSettings = createDefaultSettings(
+    resolvePreferredLocale(app.getPreferredSystemLanguages()),
+  );
   const paths = createAppDataPaths({ userDataPath });
   const db = createDbRuntime({
     createDatabaseClient,
@@ -57,8 +64,9 @@ export function createMainServices(): MainServices {
     nativeTheme.themeSource = theme;
   };
   const preferencesService = createPreferencesService({
+    defaults: defaultSettings,
     emitEvent,
-    storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, DEFAULT_SETTINGS),
+    storage: getConfigStore(userDataPath, APP_SETTINGS_STORE_FILE, defaultSettings),
   });
   const telemetryService = createTelemetryService({
     appVersion: app.getVersion(),
