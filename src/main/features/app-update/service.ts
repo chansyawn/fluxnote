@@ -11,6 +11,7 @@ const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 type Timer = ReturnType<typeof setTimeout>;
 type Interval = ReturnType<typeof setInterval>;
+type UpdateCheckIntent = "normal" | "ready-refresh" | "install-refresh";
 
 interface AppUpdateServiceDeps {
   arch?: string;
@@ -33,8 +34,8 @@ function isSupportedPlatform(platform: NodeJS.Platform): boolean {
   return platform === "darwin" || platform === "win32";
 }
 
-function getFeedUrl(platform: NodeJS.Platform, arch: string): string {
-  return `${UPDATE_HOST}/${UPDATE_REPO}/${platform}-${arch}/${app.getVersion()}`;
+function getFeedUrl(platform: NodeJS.Platform, arch: string, baseVersion: string): string {
+  return `${UPDATE_HOST}/${UPDATE_REPO}/${platform}-${arch}/${baseVersion}`;
 }
 
 function getStartupDelay(argv: readonly string[]): number {
@@ -44,8 +45,10 @@ function getStartupDelay(argv: readonly string[]): number {
 }
 
 function getAvailableVersion(releaseName: string): string | undefined {
-  const normalized = releaseName.trim().replace(/^v/, "");
-  return normalized.length > 0 ? normalized : undefined;
+  const match = /^v?(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?)$/.exec(
+    releaseName.trim(),
+  );
+  return match?.[1];
 }
 
 function getErrorMessage(error: Error): string {
@@ -70,6 +73,7 @@ export function createAppUpdateService({
   let started = false;
   let startupTimer: Timer | null = null;
   let interval: Interval | null = null;
+  let updateCheckIntent: UpdateCheckIntent = "normal";
 
   function emitStatus(): AppUpdateStatus {
     emitEvent("app-update.changed", status);
@@ -84,12 +88,19 @@ export function createAppUpdateService({
     return emitStatus();
   }
 
-  function setFeedUrl(): void {
+  function getReadyRefreshBaseVersion(): string {
+    return status.availableVersion ?? app.getVersion();
+  }
+
+  function setFeedUrl(baseVersion = app.getVersion()): void {
+    // Electron's built-in updater downloads as soon as it finds an update. When an
+    // update is already ready, use that downloaded version as the feed baseline so
+    // the refresh asks whether anything newer exists instead of redownloading it.
     autoUpdater.setFeedURL({
       headers: {
         "User-Agent": `fluxnotes/${app.getVersion()} (${platform}: ${arch})`,
       },
-      url: getFeedUrl(platform, arch),
+      url: getFeedUrl(platform, arch, baseVersion),
     });
   }
 
@@ -102,12 +113,14 @@ export function createAppUpdateService({
       });
     }
 
-    if (status.state === "checking" || status.state === "downloading" || status.state === "ready") {
+    if (status.state === "checking" || status.state === "downloading") {
       return status;
     }
 
+    updateCheckIntent = status.state === "ready" ? "ready-refresh" : "normal";
+    setFeedUrl(updateCheckIntent === "ready-refresh" ? getReadyRefreshBaseVersion() : undefined);
+
     if (!started) {
-      setFeedUrl();
       started = true;
     }
 
@@ -122,10 +135,12 @@ export function createAppUpdateService({
     } catch (error) {
       const message =
         error instanceof Error ? getErrorMessage(error) : "Failed to check for app updates.";
+      const nextState = updateCheckIntent === "ready-refresh" ? "ready" : "error";
+      updateCheckIntent = "normal";
       return setStatus({
         errorMessage: message,
         lastCheckedAt: now().toISOString(),
-        state: "error",
+        state: nextState,
       });
     }
 
@@ -166,6 +181,27 @@ export function createAppUpdateService({
       throw businessError("BUSINESS.INVALID_INVOKE", "No app update is ready to install.");
     }
 
+    if (!isSupported || !status.availableVersion) {
+      installReadyUpdate();
+      return;
+    }
+
+    updateCheckIntent = "install-refresh";
+    setFeedUrl(getReadyRefreshBaseVersion());
+    setStatus({
+      errorMessage: undefined,
+      state: "checking",
+    });
+
+    try {
+      autoUpdater.checkForUpdates();
+    } catch {
+      updateCheckIntent = "normal";
+      installReadyUpdate();
+    }
+  }
+
+  function installReadyUpdate(): void {
     prepareToQuitForInstall();
     autoUpdater.quitAndInstall();
   }
@@ -178,6 +214,7 @@ export function createAppUpdateService({
   });
 
   autoUpdater.on("update-available", () => {
+    updateCheckIntent = "normal";
     setStatus({
       errorMessage: undefined,
       state: "downloading",
@@ -185,6 +222,28 @@ export function createAppUpdateService({
   });
 
   autoUpdater.on("update-not-available", () => {
+    if (updateCheckIntent === "ready-refresh") {
+      updateCheckIntent = "normal";
+      setStatus({
+        errorMessage: undefined,
+        lastCheckedAt: now().toISOString(),
+        state: "ready",
+      });
+      return;
+    }
+
+    if (updateCheckIntent === "install-refresh") {
+      updateCheckIntent = "normal";
+      setStatus({
+        errorMessage: undefined,
+        lastCheckedAt: now().toISOString(),
+        state: "ready",
+      });
+      installReadyUpdate();
+      return;
+    }
+
+    updateCheckIntent = "normal";
     setStatus({
       errorMessage: undefined,
       lastCheckedAt: now().toISOString(),
@@ -193,6 +252,7 @@ export function createAppUpdateService({
   });
 
   autoUpdater.on("update-downloaded", (_event, _releaseNotes, releaseName) => {
+    updateCheckIntent = "normal";
     setStatus({
       availableVersion: getAvailableVersion(releaseName),
       errorMessage: undefined,
@@ -203,10 +263,18 @@ export function createAppUpdateService({
   });
 
   autoUpdater.on("error", (error) => {
+    if (updateCheckIntent === "install-refresh") {
+      updateCheckIntent = "normal";
+      installReadyUpdate();
+      return;
+    }
+
+    const nextState = updateCheckIntent === "ready-refresh" ? "ready" : "error";
+    updateCheckIntent = "normal";
     setStatus({
       errorMessage: getErrorMessage(error),
       lastCheckedAt: now().toISOString(),
-      state: "error",
+      state: nextState,
     });
   });
 

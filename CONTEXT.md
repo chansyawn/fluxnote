@@ -21,7 +21,7 @@ A **User Preferences** choice that controls whether Fluxnotes shares anonymous d
 _Avoid_: Tracking config, analytics state
 
 **App Update**:
-A workflow that updates the installed Fluxnotes application to a newer released version.
+A workflow that updates the installed Fluxnotes application to the newest available released version the app can confirm.
 _Avoid_: Block update, content update, software update
 
 **Block**:

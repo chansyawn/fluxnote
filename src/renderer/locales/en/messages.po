@@ -14,12 +14,17 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:25
+#: src/renderer/features/app-update/app-update-query.ts:26
 msgid "app-update.check.error"
 msgstr "Failed to check for updates."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:33
+#: src/renderer/features/app-update/app-update-query.ts:48
+msgid "app-update.check.ready-latest"
+msgstr "The downloaded update is the latest available version."
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:34
 msgid "app-update.check.up-to-date"
 msgstr "Fluxnotes is up to date."
 

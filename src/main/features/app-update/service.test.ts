@@ -68,7 +68,7 @@ describe("app update service", () => {
       headers: {
         "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
       },
-      url: expect.stringContaining("/chansyawn/fluxnotes/"),
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.0",
     });
     expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
     expect(service.getStatus()).toMatchObject({
@@ -126,6 +126,74 @@ describe("app update service", () => {
     });
   });
 
+  it("refreshes a ready update using the downloaded version as the feed baseline", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    service.checkForUpdates("manual");
+
+    expect(mocks.autoUpdater.setFeedURL).toHaveBeenLastCalledWith({
+      headers: {
+        "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
+      },
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.1",
+    });
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledTimes(2);
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      state: "checking",
+    });
+  });
+
+  it("keeps a ready update ready when the ready refresh finds no newer update", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      now: () => new Date("2026-01-01T00:00:00.000Z"),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-not-available");
+
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      lastCheckedAt: "2026-01-01T00:00:00.000Z",
+      state: "ready",
+    });
+  });
+
+  it("replaces the ready update when the ready refresh downloads a newer update", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    service.checkForUpdates("automatic");
+    mocks.autoUpdater.emit("update-available");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.2", new Date(), "");
+
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.2",
+      lastCheckSource: "automatic",
+      releaseName: "v1.0.2",
+      state: "ready",
+    });
+  });
+
   it("reports manual check errors through status", () => {
     const service = createAppUpdateService({
       arch: "arm64",
@@ -145,7 +213,7 @@ describe("app update service", () => {
     });
   });
 
-  it("restarts only when an update is ready", () => {
+  it("checks for newer updates before installing a ready update", () => {
     const prepareToQuitForInstall = vi.fn();
     const service = createAppUpdateService({
       arch: "arm64",
@@ -161,9 +229,84 @@ describe("app update service", () => {
     mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
     service.restartAndInstall();
 
+    expect(mocks.autoUpdater.setFeedURL).toHaveBeenLastCalledWith({
+      headers: {
+        "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
+      },
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.1",
+    });
+    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
+
+    mocks.autoUpdater.emit("update-not-available");
+
     expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
     expect(prepareToQuitForInstall).toHaveBeenCalledBefore(mocks.autoUpdater.quitAndInstall);
     expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
+  });
+
+  it("does not install immediately when the install refresh finds a newer update", () => {
+    const prepareToQuitForInstall = vi.fn();
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall,
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    service.restartAndInstall();
+    mocks.autoUpdater.emit("update-available");
+
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      state: "downloading",
+    });
+    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
+    expect(mocks.autoUpdater.quitAndInstall).not.toHaveBeenCalled();
+  });
+
+  it("installs the ready update when the install refresh fails", () => {
+    const prepareToQuitForInstall = vi.fn();
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall,
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    service.restartAndInstall();
+    mocks.autoUpdater.emit("error", new Error("Network unavailable"));
+
+    expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
+    expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
+  });
+
+  it("falls back to the app version when a downloaded update has no parseable version", () => {
+    const service = createAppUpdateService({
+      arch: "arm64",
+      emitEvent: vi.fn(),
+      platform: "darwin",
+      prepareToQuitForInstall: vi.fn(),
+    });
+
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-downloaded", {}, "", "Fluxnotes release", new Date(), "");
+    service.checkForUpdates("manual");
+
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: undefined,
+      releaseName: "Fluxnotes release",
+      state: "checking",
+    });
+    expect(mocks.autoUpdater.setFeedURL).toHaveBeenLastCalledWith({
+      headers: {
+        "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
+      },
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.0",
+    });
   });
 
   it("returns unavailable when app is not packaged", () => {

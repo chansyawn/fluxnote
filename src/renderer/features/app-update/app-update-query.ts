@@ -18,6 +18,7 @@ export function AppUpdateSync() {
 
   useEffect(() => {
     return onAppUpdateChanged((status) => {
+      const previousStatus = queryClient.getQueryData<AppUpdateStatus>(APP_UPDATE_QUERY_KEY);
       queryClient.setQueryData<AppUpdateStatus>(APP_UPDATE_QUERY_KEY, status);
       if (status.state === "error" && status.lastCheckSource === "manual") {
         toast.error(
@@ -33,6 +34,20 @@ export function AppUpdateSync() {
           i18n._({
             id: "app-update.check.up-to-date",
             message: "Fluxnotes is up to date.",
+          }),
+        );
+      }
+      if (
+        status.state === "ready" &&
+        status.lastCheckSource === "manual" &&
+        previousStatus?.state === "checking" &&
+        previousStatus.availableVersion &&
+        previousStatus.availableVersion === status.availableVersion
+      ) {
+        toast.info(
+          i18n._({
+            id: "app-update.check.ready-latest",
+            message: "The downloaded update is the latest available version.",
           }),
         );
       }
