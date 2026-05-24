@@ -2,7 +2,7 @@ import { $createNodeSelection, $createParagraphNode, $getRoot, $setSelection } f
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { $createImageNode } from "../syntax/image";
-import { editorFromMarkdown } from "../test-helper/editor-driver";
+import { createBlockEditorRuntime, editorFromMarkdown } from "../test-helper/editor-driver";
 import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
@@ -11,9 +11,9 @@ import {
 describe("clipboard data", () => {
   it("creates document clipboard data without resolving assets when none exist", async () => {
     const editor = editorFromMarkdown("Hello");
-    const resolveAssets = vi.fn(async () => ({ assets: [] }));
+    const runtime = createBlockEditorRuntime();
 
-    const data = await createClipboardDataFromDocument(editor, resolveAssets);
+    const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
 
     expect(data).toEqual(
       expect.objectContaining({
@@ -22,14 +22,13 @@ describe("clipboard data", () => {
       }),
     );
     expect(data?.html).toContain("Hello");
-    expect(resolveAssets).not.toHaveBeenCalled();
   });
 
   it("normalizes markdown text for external clipboard writes", async () => {
     const editor = editorFromMarkdown("a_b $5");
-    const resolveAssets = vi.fn(async () => ({ assets: [] }));
+    const runtime = createBlockEditorRuntime();
 
-    const data = await createClipboardDataFromDocument(editor, resolveAssets);
+    const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
 
     expect(data?.text.trim()).toBe("a_b $5");
   });

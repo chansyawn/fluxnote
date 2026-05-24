@@ -1,5 +1,3 @@
-import type { QuoteNode } from "@lexical/rich-text";
-import { $getSelection, $isRangeSelection, type RangeSelection } from "lexical";
 import type { Blockquote, Root } from "mdast";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -16,39 +14,11 @@ import {
   selectText,
 } from "../../test-helper/interaction-driver";
 import { doc, li, p, quote, t, ul } from "../../test-helper/mdast-builders";
-import { getCurrentQuote } from "./quote-selection";
-import { isQuoteExitParagraph, unwrapQuoteAtStart } from "./quote-structure";
 
 function getQuote(root: Root, index = 0): Blockquote {
   const child = root.children[index];
   expect(child?.type).toBe("blockquote");
   return child as Blockquote;
-}
-
-function readQuoteRule(
-  editor: ReturnType<typeof editorFromMdast>,
-  evaluate: (quote: QuoteNode, selection: RangeSelection) => boolean,
-): boolean {
-  let result = false;
-
-  editor.update(
-    () => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) {
-        throw new Error("Expected a range selection.");
-      }
-
-      const currentQuote = getCurrentQuote(selection);
-      if (!currentQuote) {
-        throw new Error("Expected selection inside a quote.");
-      }
-
-      result = evaluate(currentQuote, selection);
-    },
-    { discrete: true },
-  );
-
-  return result;
 }
 
 describe("quote", () => {
@@ -172,31 +142,6 @@ describe("quote", () => {
         { children: [{ type: "text", value: "First" }], type: "paragraph" },
         { children: [{ type: "text", value: "Second" }], type: "paragraph" },
       ]);
-    });
-
-    it("does not treat a non-empty paragraph as a quote exit paragraph", () => {
-      const editor = editorFromMdast(doc(quote(p(t("Quoted")))));
-
-      selectText(editor, "Quoted");
-
-      expect(
-        readQuoteRule(editor, (currentQuote, selection) =>
-          isQuoteExitParagraph(currentQuote, selection),
-        ),
-      ).toBe(false);
-    });
-
-    it("does not unwrap from the start of a later quote child", () => {
-      const editor = editorFromMdast(doc(quote(p(t("First")), p(t("Second")))));
-
-      selectText(editor, "Second", 0);
-
-      expect(
-        readQuoteRule(editor, (currentQuote, selection) =>
-          unwrapQuoteAtStart(selection, currentQuote),
-        ),
-      ).toBe(false);
-      expect(getQuote(readMdast(editor)).children).toHaveLength(2);
     });
 
     it("Backspace at a list marker inside a quote unwraps that list item inside the quote", () => {

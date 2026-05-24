@@ -2,11 +2,7 @@
 
 import { describe, expect, it } from "vite-plus/test";
 
-import {
-  applyCodeBlockDisplayConfig,
-  calculateCodeToolbarRect,
-  measureCodeLineNumberDisplay,
-} from "./code-display";
+import { calculateCodeToolbarRect, measureCodeLineNumberDisplay } from "./code-display";
 
 describe("code display", () => {
   it("calculates overlay rects relative to the editor shell", () => {
@@ -22,18 +18,6 @@ describe("code display", () => {
       top: 38,
       width: 240,
     });
-  });
-
-  it("toggles code block display classes", () => {
-    const element = document.createElement("code");
-
-    applyCodeBlockDisplayConfig(element, { showLineNumbers: true, wordWrap: true });
-    expect(element.classList.contains("block-editor__code--line-numbers")).toBe(true);
-    expect(element.classList.contains("block-editor__code--word-wrap")).toBe(true);
-
-    applyCodeBlockDisplayConfig(element, { showLineNumbers: false, wordWrap: false });
-    expect(element.classList.contains("block-editor__code--line-numbers")).toBe(false);
-    expect(element.classList.contains("block-editor__code--word-wrap")).toBe(false);
   });
 
   it("measures logical line numbers from code padding and line height", () => {

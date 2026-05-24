@@ -2,99 +2,35 @@ import {
   encodeBlockEditorClipboardHtml,
   type BlockEditorClipboardPayload,
 } from "@shared/features/block-editor/clipboard";
-import type { LexicalEditor, PasteCommandType } from "lexical";
-import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
-const mocks = vi.hoisted(() => ({
-  insertClipboardPayloadAtSelection: vi.fn(),
-  insertImageFilesAtSelection: vi.fn(),
-  insertMarkdownAtSelection: vi.fn(),
-  insertRichTextDataAtSelection: vi.fn(),
-}));
-
-vi.mock("../assets/image-insert", () => ({
-  insertImageFilesAtSelection: mocks.insertImageFilesAtSelection,
-}));
-
-vi.mock("./clipboard-insert", () => ({
-  insertClipboardPayloadAtSelection: mocks.insertClipboardPayloadAtSelection,
-  insertRichTextDataAtSelection: mocks.insertRichTextDataAtSelection,
-}));
-
-vi.mock("./markdown-paste", () => ({
-  insertMarkdownAtSelection: mocks.insertMarkdownAtSelection,
-}));
-
+import {
+  createBlockEditorRuntime,
+  editorFromMarkdown,
+  readMarkdown,
+} from "../test-helper/editor-driver";
+import { pasteIntoEditor, TestDataTransfer } from "../test-helper/interaction-driver";
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./clipboard-paste";
 
-interface TestFile {
-  name: string;
-  type: string;
-}
-
-interface TestPasteEvent {
-  event: PasteCommandType;
-  preventDefault: ReturnType<typeof vi.fn>;
-  stopPropagation: ReturnType<typeof vi.fn>;
-}
-
-class TestDataTransfer {
-  private readonly data: Map<string, string>;
-  readonly files: TestFile[];
-  readonly items = [];
-  readonly types: string[];
-
-  constructor(data: Map<string, string>, files: TestFile[] = []) {
-    this.data = data;
-    this.files = files;
-    this.types = Array.from(data.keys());
-  }
-
-  getData(type: string): string {
-    return this.data.get(type) ?? "";
-  }
-
-  setData(): void {}
-
-  clearData(): void {}
-
-  setDragImage(): void {}
-
-  dropEffect = "none" as const;
-  effectAllowed = "none" as const;
-}
-
-function createPasteEvent(dataTransfer: DataTransfer | null): TestPasteEvent {
-  const preventDefault = vi.fn();
-  const stopPropagation = vi.fn();
-
+function textNode(text: string) {
   return {
-    preventDefault,
-    stopPropagation,
-    event: {
-      clipboardData: dataTransfer,
-      preventDefault,
-      stopPropagation,
-    } as unknown as PasteCommandType,
+    detail: 0,
+    format: 0,
+    mode: "normal",
+    style: "",
+    text,
+    type: "text",
+    version: 1,
   };
 }
 
-const editor = {} as LexicalEditor;
-const runtime = {} as Parameters<typeof handleBlockEditorPaste>[1];
 const payload: BlockEditorClipboardPayload = {
-  nodes: [{ text: "Text", type: "text", version: 1 }],
-  sourceBlockId: "block-1",
+  nodes: [textNode("Text")],
+  sourceBlockId: "source-block",
 };
 
 describe("clipboard paste", () => {
-  beforeEach(() => {
-    mocks.insertClipboardPayloadAtSelection.mockReset();
-    mocks.insertImageFilesAtSelection.mockReset();
-    mocks.insertMarkdownAtSelection.mockReset();
-    mocks.insertRichTextDataAtSelection.mockReset();
-  });
-
-  it("snapshots clipboard data and strips internal html metadata", () => {
+  it("strips internal clipboard metadata from html exposed to fallback rich text insertion", () => {
     const dataTransfer = new TestDataTransfer(
       new Map([
         ["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)],
@@ -111,80 +47,85 @@ describe("clipboard paste", () => {
     expect(snapshot.files).toEqual([]);
   });
 
-  it("returns false when paste events do not include clipboard data", () => {
-    const paste = createPasteEvent(null);
+  it("ignores paste events without clipboard data", () => {
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    const event = {
+      clipboardData: null,
+      preventDefault,
+      stopPropagation,
+    } as unknown as Parameters<typeof handleBlockEditorPaste>[2];
 
-    expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(false);
-    expect(paste.preventDefault).not.toHaveBeenCalled();
-    expect(paste.stopPropagation).not.toHaveBeenCalled();
+    expect(
+      handleBlockEditorPaste(
+        editorFromMarkdown("Existing"),
+        createBlockEditorRuntime(),
+        event,
+        null,
+      ),
+    ).toBe(false);
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(stopPropagation).not.toHaveBeenCalled();
   });
 
-  it("inserts pasted image files before reading editor payloads", () => {
-    const file = { name: "photo.png", type: "image/png" };
-    const dataTransfer = new TestDataTransfer(
-      new Map([["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)]]),
-      [file],
-    ) as unknown as DataTransfer;
-    const paste = createPasteEvent(dataTransfer);
+  it("restores internal Block Editor payloads before markdown fallback", async () => {
+    const editor = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime();
 
-    expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
+    expect(
+      pasteIntoEditor(
+        editor,
+        runtime,
+        new Map([
+          ["text/html", encodeBlockEditorClipboardHtml("<p>fallback</p>", payload)],
+          ["text/plain", "# fallback"],
+        ]),
+      ),
+    ).toBe(true);
 
-    expect(paste.preventDefault).toHaveBeenCalledOnce();
-    expect(paste.stopPropagation).toHaveBeenCalledOnce();
-    expect(mocks.insertImageFilesAtSelection).toHaveBeenCalledWith(editor, runtime, [file], null);
-    expect(mocks.insertClipboardPayloadAtSelection).not.toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor).trim()).toBe("Text");
+    });
   });
 
-  it("decodes internal payloads from raw html ahead of markdown parsing", () => {
-    const dataTransfer = new TestDataTransfer(
-      new Map([
-        ["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)],
-        ["text/plain", "Text"],
-      ]),
-    ) as unknown as DataTransfer;
-    const paste = createPasteEvent(dataTransfer);
+  it("parses pasted plain text as markdown", () => {
+    const editor = editorFromMarkdown("");
 
-    expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([["text/plain", "# Heading\n\n- item"]]),
+      ),
+    ).toBe(true);
 
-    expect(mocks.insertClipboardPayloadAtSelection).toHaveBeenCalledWith(
-      editor,
-      runtime,
-      payload,
-      null,
-    );
-    expect(mocks.insertMarkdownAtSelection).not.toHaveBeenCalled();
-    expect(mocks.insertRichTextDataAtSelection).not.toHaveBeenCalled();
+    expect(readMarkdown(editor)).toContain("# Heading");
+    expect(readMarkdown(editor)).toContain("- item");
   });
 
-  it("parses plain text as markdown when no internal payload is present", () => {
-    const dataTransfer = new TestDataTransfer(
-      new Map([
-        ["text/html", "<p>fallback</p>"],
-        ["text/plain", "# Heading\n\n- item"],
-      ]),
-    ) as unknown as DataTransfer;
-    const paste = createPasteEvent(dataTransfer);
+  it("inserts pasted image files through the runtime asset boundary", async () => {
+    const editor = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime({
+      assets: {
+        create: vi.fn(async () => ({
+          assets: [{ altText: "Photo", assetUrl: "assets://created/photo.png" }],
+        })),
+      },
+    });
+    const image = new File(["image"], "photo.png", { type: "image/png" });
 
-    expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
-
-    expect(mocks.insertMarkdownAtSelection).toHaveBeenCalledWith(
-      editor,
-      "# Heading\n\n- item",
-      null,
-    );
-    expect(mocks.insertRichTextDataAtSelection).not.toHaveBeenCalled();
-  });
-
-  it("falls back to rich text insertion when plain text is empty", () => {
-    const dataTransfer = new TestDataTransfer(
-      new Map([["text/html", "<p>fallback</p>"]]),
-    ) as unknown as DataTransfer;
-    const paste = createPasteEvent(dataTransfer);
-
-    expect(handleBlockEditorPaste(editor, runtime, paste.event, null)).toBe(true);
-
-    expect(mocks.insertMarkdownAtSelection).not.toHaveBeenCalled();
-    const [, richTextData] = mocks.insertRichTextDataAtSelection.mock.calls[0] ?? [];
-    expect(richTextData.getData("text/html")).toBe("<p>fallback</p>");
+    expect(pasteIntoEditor(editor, runtime, new Map(), [image])).toBe(true);
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor)).toContain("assets://created/photo.png");
+    });
+    expect(runtime.assets.create).toHaveBeenCalledWith({
+      assets: [
+        {
+          dataBase64: "aW1hZ2U=",
+          fileName: "photo.png",
+          mimeType: "image/png",
+        },
+      ],
+    });
   });
 });
