@@ -72,9 +72,6 @@ importers:
       '@lingui/core':
         specifier: 6.0.1
         version: 6.0.1
-      '@lingui/detect-locale':
-        specifier: 6.0.1
-        version: 6.0.1
       '@lingui/react':
         specifier: 6.0.1
         version: 6.0.1(react@19.2.4)
@@ -1374,10 +1371,6 @@ packages:
     peerDependenciesMeta:
       babel-plugin-macros:
         optional: true
-
-  '@lingui/detect-locale@6.0.1':
-    resolution: {integrity: sha512-pQS8Y2Ho09llqs9YvFXUkouxQZd7VNl9F77a7PpOWd/pKKrJZyCzgPu7Kw3mr+zcbg2owBTzdIfoXfv1BXQUmg==}
-    engines: {node: '>=22.19.0'}
 
   '@lingui/format-po@6.0.1':
     resolution: {integrity: sha512-kt3naP/2kpAPJ4dwwFnkhbvR5XkGaNdbK8W6ofpIJFhY3MvGZJ9rYY0KMp++3DAaXf7r6tHq0W0To3akSDejvg==}
@@ -6914,8 +6907,6 @@ snapshots:
       '@lingui/message-utils': 6.0.1
     transitivePeerDependencies:
       - supports-color
-
-  '@lingui/detect-locale@6.0.1': {}
 
   '@lingui/format-po@6.0.1':
     dependencies:
