@@ -123,6 +123,10 @@ vp run package
 
 - For database schema changes, run `vp run db:generate` before verification and commit the generated migration files.
 
+### Spec Maintenance
+
+- Update `AGENTS.md` promptly whenever repository conventions or infrastructure are added or changed.
+
 ## Test
 
 - Import test APIs from `vite-plus/test`, never from `vitest`.
@@ -133,21 +137,7 @@ vp run package
 - Add comments only when they clarify non-obvious intent or setup.
 - Use `vp test --coverage` as a reference, not as the primary quality target.
 
-## Appendix
-
-### Spec Maintenance
-
-- Update `AGENTS.md` promptly whenever repository conventions or infrastructure are added or changed.
-
 ## Agent skills
-
-### Issue tracker
-
-@docs/agents/issue-tracker.md
-
-### Triage labels
-
-@docs/agents/triage-labels.md
 
 ### Domain docs
 

@@ -378,32 +378,32 @@ msgid "preferences.app.title"
 msgstr "App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:296
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:310
 msgid "preferences.archive.clear.action"
 msgstr "Clear"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:332
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:346
 msgid "preferences.archive.clear.description"
 msgstr "Permanently delete every archived block. Active blocks and tags are not affected."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:313
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:327
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:325
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:339
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "Clear archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:306
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:320
 msgid "preferences.archive.clear.dialog.description"
 msgstr "This permanently deletes all archived blocks. Active blocks and tags are kept."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:303
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:317
 msgid "preferences.archive.clear.dialog.title"
 msgstr "Clear archived data?"
 
@@ -413,7 +413,7 @@ msgid "preferences.archive.clear.error"
 msgstr "Failed to clear archived data."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:337
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:351
 msgid "preferences.archive.clear.label"
 msgstr "Clear archived data"
 
@@ -423,29 +423,40 @@ msgid "preferences.archive.clear.success"
 msgstr "Archived data cleared."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:211
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:223
 msgid "preferences.archive.title"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:226
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:239
 msgid "preferences.auto-archive.enable.description"
 msgstr "When enabled, blocks with no content changes for the configured duration enter a pending state. Actual archiving runs when the window is hidden, and pending blocks appear dimmed."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:233
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:119
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:246
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:284
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:111
+msgid "preferences.auto-archive.threshold.amount.label"
+msgstr "Auto archive duration amount"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:298
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Auto archive after"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:279
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:293
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "Range: 1-20160 minutes, 1-336 hours, or 1-14 days."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:115
+msgid "preferences.auto-archive.threshold.unit.label"
+msgstr "Auto archive duration unit"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:103

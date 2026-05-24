@@ -32,4 +32,7 @@ export default defineConfig({
     "*": "vp check --fix",
     "{lingui.config.ts,src/renderer/**/*.{ts,tsx,po}}": "vp run i18n:check",
   },
+  test: {
+    setupFiles: ["./src/test/setup.ts"],
+  },
 });

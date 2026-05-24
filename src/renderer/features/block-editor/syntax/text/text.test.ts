@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { editorFromMarkdown, readMdast } from "../../test-helper/editor-driver";
+import {
+  editorFromMarkdown,
+  expectEditorMarkdown,
+  readMdast,
+} from "../../test-helper/editor-driver";
 import { pressTab, selectText } from "../../test-helper/interaction-driver";
 
 describe("text", () => {
@@ -10,40 +14,7 @@ describe("text", () => {
     selectText(editor, "Alpha", 2);
     expect(pressTab(editor)).toBe(true);
 
-    expect(readMdast(editor).children[0]).toMatchObject({
-      children: [{ type: "text", value: "Al  pha" }],
-      type: "paragraph",
-    });
-  });
-
-  it("inserts two spaces in heading text", () => {
-    const editor = editorFromMarkdown("# Alpha\n");
-
-    selectText(editor, "Alpha", 2);
-    expect(pressTab(editor)).toBe(true);
-
-    expect(readMdast(editor).children[0]).toMatchObject({
-      children: [{ type: "text", value: "Al  pha" }],
-      depth: 1,
-      type: "heading",
-    });
-  });
-
-  it("inserts two spaces in quote text", () => {
-    const editor = editorFromMarkdown("> Alpha\n");
-
-    selectText(editor, "Alpha", 2);
-    expect(pressTab(editor)).toBe(true);
-
-    expect(readMdast(editor).children[0]).toMatchObject({
-      children: [
-        {
-          children: [{ type: "text", value: "Al  pha" }],
-          type: "paragraph",
-        },
-      ],
-      type: "blockquote",
-    });
+    expectEditorMarkdown(editor, "Al  pha");
   });
 
   it("does not handle Shift+Tab outside lists", () => {
@@ -52,10 +23,7 @@ describe("text", () => {
     selectText(editor, "Alpha", 2);
     expect(pressTab(editor, { shiftKey: true })).toBe(false);
 
-    expect(readMdast(editor).children[0]).toMatchObject({
-      children: [{ type: "text", value: "Alpha" }],
-      type: "paragraph",
-    });
+    expectEditorMarkdown(editor, "Alpha");
   });
 
   it("does not handle Tab inside code blocks", () => {

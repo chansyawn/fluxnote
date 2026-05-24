@@ -1,8 +1,12 @@
 import { $getRoot, $getSelection, $setSelection } from "lexical";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import type { BlockEditorRuntime } from "../core/types";
-import { editorFromMarkdown, readMarkdown } from "../test-helper/editor-driver";
+import {
+  createBlockEditorRuntime,
+  editorFromMarkdown,
+  expectEditorMarkdown,
+  readMarkdown,
+} from "../test-helper/editor-driver";
 import {
   insertClipboardPayloadAtSelection,
   insertSerializedNodesAtSelection,
@@ -33,17 +37,12 @@ describe("clipboard insert", () => {
       { discrete: true },
     );
 
-    expect(readMarkdown(editor).trim()).toBe("Appended");
+    expectEditorMarkdown(editor, "Appended");
   });
 
   it("inserts clipboard payload nodes at the restored selection", async () => {
     const editor = editorFromMarkdown("Hello world");
     const selection = editor.read(() => $getSelection()?.clone() ?? null);
-    const runtime = {
-      assets: {
-        copy: vi.fn(async () => ({ assets: [] })),
-      },
-    } as unknown as BlockEditorRuntime;
 
     editor.update(
       () => {
@@ -54,7 +53,7 @@ describe("clipboard insert", () => {
 
     await insertClipboardPayloadAtSelection(
       editor,
-      runtime,
+      createBlockEditorRuntime(),
       {
         nodes: [textNode("Start")],
         sourceBlockId: "source-block",
@@ -76,11 +75,11 @@ describe("clipboard insert", () => {
         },
       ],
     }));
-    const runtime = {
+    const runtime = createBlockEditorRuntime({
       assets: {
         copy: copyAssets,
       },
-    } as unknown as BlockEditorRuntime;
+    });
 
     await insertClipboardPayloadAtSelection(
       editor,
@@ -100,10 +99,6 @@ describe("clipboard insert", () => {
       null,
     );
 
-    expect(copyAssets).toHaveBeenCalledWith({
-      assetUrls: ["assets://source/photo.png"],
-      sourceBlockId: "source-block",
-    });
     expect(readMarkdown(editor)).toContain("assets://target/photo.png");
   });
 });

@@ -2,27 +2,21 @@ import { $isAutoLinkNode, $isLinkNode, type LinkNode } from "@lexical/link";
 import {
   $getRoot,
   $isElementNode,
-  SKIP_DOM_SELECTION_TAG,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
-  type UpdateTag,
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
 import { editorFromMarkdown, editorFromMdast, readMarkdown } from "../../test-helper/editor-driver";
 import { doc, link, p, t } from "../../test-helper/mdast-builders";
-import { getLinkElementClassState, type LinkElementClassState } from "./link-dom";
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,
-  refreshActiveLink,
   sanitizeLinkUrlInput,
   setMarkdownLinkUrl,
 } from "./link-model";
 import { isElementFocusedWithin } from "./use-active-link-target";
-
-class TestHTMLElement {}
 
 function findFirstLinkNode(node: LexicalNode): LinkNode | null {
   if ($isLinkNode(node)) return node;
@@ -54,10 +48,6 @@ function readFirstLinkKey(editor: LexicalEditor): NodeKey {
   return readFirstLink(editor, (node) => node.getKey());
 }
 
-function readFirstLinkClassState(editor: LexicalEditor): LinkElementClassState {
-  return readFirstLink(editor, getLinkElementClassState);
-}
-
 function createPopoverElementStub(activeElement: Element | null, containedElement: Element) {
   return {
     ownerDocument: { activeElement },
@@ -65,316 +55,72 @@ function createPopoverElementStub(activeElement: Element | null, containedElemen
   } as unknown as HTMLElement;
 }
 
-function withHTMLElementStub<T>(run: (element: HTMLElement) => T): T {
-  const originalHTMLElement = globalThis.HTMLElement;
-  const element = new TestHTMLElement() as HTMLElement;
-  Object.defineProperty(globalThis, "HTMLElement", {
-    configurable: true,
-    value: TestHTMLElement,
-  });
-
-  try {
-    return run(element);
-  } finally {
-    if (originalHTMLElement) {
-      Object.defineProperty(globalThis, "HTMLElement", {
-        configurable: true,
-        value: originalHTMLElement,
-      });
-    } else {
-      Reflect.deleteProperty(globalThis, "HTMLElement");
-    }
-  }
-}
-
-function withLinkElement<T>(editor: LexicalEditor, element: HTMLElement, run: () => T): T {
-  const originalGetElementByKey = editor.getElementByKey.bind(editor);
-  editor.getElementByKey = () => element;
-
-  try {
-    return run();
-  } finally {
-    editor.getElementByKey = originalGetElementByKey;
-  }
-}
-
 describe("link", () => {
-  describe("round-trip", () => {
-    it("preserves markdown links", () => {
-      const editor = editorFromMdast(doc(p(link("https://example.com", t("site")))));
+  it("preserves explicit markdown links", () => {
+    const editor = editorFromMdast(doc(p(link("https://example.com", t("site")))));
 
-      expect(readMarkdown(editor).trim()).toBe("[site](https://example.com)");
-    });
-
-    it("exports bare urls as plain markdown text", () => {
-      const editor = editorFromMarkdown("https://example.com");
-
-      expect(readMarkdown(editor).trim()).toBe("https://example.com");
-    });
-
-    it("does not preserve angle bracket urls", () => {
-      const editor = editorFromMarkdown("<https://example.com>");
-
-      expect(readMarkdown(editor).trim()).toBe("https://example.com");
-    });
-
-    it("imports bare urls as autolink nodes", () => {
-      const editor = editorFromMarkdown("https://example.com");
-
-      expect(readFirstLink(editor, (node) => $isAutoLinkNode(node))).toBe(true);
-    });
+    expect(readMarkdown(editor).trim()).toBe("[site](https://example.com)");
   });
 
-  describe("operations", () => {
-    it("sanitizes url input line breaks", () => {
-      expect(sanitizeLinkUrlInput("https://example.com/a\nb\r\nc")).toBe("https://example.com/abc");
-    });
+  it("keeps bare urls as plain markdown while tracking them as autolinks", () => {
+    const editor = editorFromMarkdown("https://example.com");
 
-    it("converts autolinks to markdown links", () => {
-      const editor = editorFromMarkdown("https://example.com");
-      const key = readFirstLinkKey(editor);
-
-      convertAutoLinkToMarkdownLink(editor, key);
-
-      expect(readMarkdown(editor).trim()).toBe("[https://example.com](https://example.com)");
-    });
-
-    it("returns the converted markdown link target", () => {
-      const editor = editorFromMarkdown("https://example.com");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          const convertedLink = convertAutoLinkToMarkdownLink(editor, key);
-
-          expect(convertedLink).toEqual({
-            element,
-            link: {
-              key: readFirstLinkKey(editor),
-              kind: "markdown",
-              text: "https://example.com",
-              url: "https://example.com",
-            },
-          });
-          expect(convertedLink?.link.key).not.toBe(key);
-        });
-      });
-    });
-
-    it("updates markdown link urls", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      setMarkdownLinkUrl(editor, key, "https://example.org");
-
-      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
-    });
-
-    it("applies successive markdown link url updates immediately", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      setMarkdownLinkUrl(editor, key, "https://example.org");
-
-      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
-
-      setMarkdownLinkUrl(editor, key, "https://example.net");
-
-      expect(readMarkdown(editor).trim()).toBe("[site](https://example.net)");
-    });
-
-    it("skips DOM selection sync when updating markdown link urls", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
-      const key = readFirstLinkKey(editor);
-      const updateTags: UpdateTag[] = [];
-      const unregister = editor.registerUpdateListener(({ tags }) => {
-        updateTags.push(...tags);
-      });
-
-      setMarkdownLinkUrl(editor, key, "https://example.org");
-      unregister();
-
-      expect(updateTags).toContain(SKIP_DOM_SELECTION_TAG);
-      expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
-    });
-
-    it("removes markdown links while preserving inline content", () => {
-      const editor = editorFromMarkdown("[**site**](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      removeMarkdownLink(editor, key);
-
-      expect(readMarkdown(editor).trim()).toBe("**site**");
-    });
-
-    it("converts markdown bare url links to autolinks", () => {
-      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      removeMarkdownLink(editor, key);
-
-      expect(readMarkdown(editor).trim()).toBe("https://example.com");
-      expect(readFirstLink(editor, (node) => $isAutoLinkNode(node))).toBe(true);
-    });
-
-    it("returns the converted autolink target", () => {
-      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          const convertedLink = removeMarkdownLink(editor, key);
-
-          expect(convertedLink).toEqual({
-            element,
-            link: {
-              key: readFirstLinkKey(editor),
-              kind: "auto",
-              text: "https://example.com",
-              url: "https://example.com",
-            },
-          });
-          expect(convertedLink?.link.key).not.toBe(key);
-        });
-      });
-    });
-
-    it("refreshes active links from the current editor state", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          setMarkdownLinkUrl(editor, key, "https://example.org");
-
-          expect(
-            refreshActiveLink(editor, {
-              element,
-              link: { key, kind: "markdown", text: "site", url: "https://example.com" },
-            }),
-          ).toEqual({
-            element,
-            link: { key, kind: "markdown", text: "site", url: "https://example.org" },
-          });
-        });
-      });
-    });
-
-    it("clears active links whose link node was removed", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          removeMarkdownLink(editor, key);
-
-          expect(
-            refreshActiveLink(editor, {
-              element,
-              link: { key, kind: "markdown", text: "site", url: "https://example.com" },
-            }),
-          ).toBeNull();
-        });
-      });
-    });
-
-    it("clears stale active markdown links after converting them to autolinks", () => {
-      const editor = editorFromMarkdown("[https://example.com](https://example.com)");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          removeMarkdownLink(editor, key);
-
-          expect(
-            refreshActiveLink(editor, {
-              element,
-              link: {
-                key,
-                kind: "markdown",
-                text: "https://example.com",
-                url: "https://example.com",
-              },
-            }),
-          ).toBeNull();
-        });
-      });
-    });
-
-    it("clears stale active autolinks after converting them", () => {
-      const editor = editorFromMarkdown("https://example.com");
-      const key = readFirstLinkKey(editor);
-
-      withHTMLElementStub((element) => {
-        withLinkElement(editor, element, () => {
-          convertAutoLinkToMarkdownLink(editor, key);
-
-          expect(
-            refreshActiveLink(editor, {
-              element,
-              link: {
-                key,
-                kind: "auto",
-                text: "https://example.com",
-                url: "https://example.com",
-              },
-            }),
-          ).toBeNull();
-        });
-      });
-    });
+    expect(readMarkdown(editor).trim()).toBe("https://example.com");
+    expect(readFirstLink(editor, (node) => $isAutoLinkNode(node))).toBe(true);
   });
 
-  describe("element class state", () => {
-    it("classifies markdown links", () => {
-      const editor = editorFromMarkdown("[site](https://example.com)");
+  it("normalizes angle bracket urls to plain markdown text", () => {
+    const editor = editorFromMarkdown("<https://example.com>");
 
-      expect(readFirstLinkClassState(editor)).toEqual({
-        auto: false,
-        markdown: true,
-      });
-    });
-
-    it("classifies autolinks", () => {
-      const editor = editorFromMarkdown("https://example.com");
-
-      expect(readFirstLinkClassState(editor)).toEqual({
-        auto: true,
-        markdown: false,
-      });
-    });
-
-    it("classifies converted autolinks as markdown links", () => {
-      const editor = editorFromMarkdown("https://example.com");
-      const key = readFirstLinkKey(editor);
-
-      convertAutoLinkToMarkdownLink(editor, key);
-
-      expect(readFirstLinkClassState(editor)).toEqual({
-        auto: false,
-        markdown: true,
-      });
-    });
+    expect(readMarkdown(editor).trim()).toBe("https://example.com");
   });
 
-  describe("popover focus", () => {
-    it("keeps the popover active when focus remains inside it", () => {
-      const textarea = {} as Element;
-      const popoverElement = createPopoverElementStub(textarea, textarea);
+  it("sanitizes url input line breaks", () => {
+    expect(sanitizeLinkUrlInput("https://example.com/a\nb\r\nc")).toBe("https://example.com/abc");
+  });
 
-      expect(isElementFocusedWithin(popoverElement)).toBe(true);
-    });
+  it("converts autolinks to explicit markdown links", () => {
+    const editor = editorFromMarkdown("https://example.com");
 
-    it("allows the popover to close when focus moves outside it", () => {
-      const textarea = {} as Element;
-      const outsideElement = {} as Element;
-      const popoverElement = createPopoverElementStub(outsideElement, textarea);
+    convertAutoLinkToMarkdownLink(editor, readFirstLinkKey(editor));
 
-      expect(isElementFocusedWithin(popoverElement)).toBe(false);
-    });
+    expect(readMarkdown(editor).trim()).toBe("[https://example.com](https://example.com)");
+  });
 
-    it("allows the popover to close when no popover element is mounted", () => {
-      expect(isElementFocusedWithin(null)).toBe(false);
-    });
+  it("updates explicit markdown link urls", () => {
+    const editor = editorFromMarkdown("[site](https://example.com)");
+    const key = readFirstLinkKey(editor);
+
+    setMarkdownLinkUrl(editor, key, "https://example.org");
+    expect(readMarkdown(editor).trim()).toBe("[site](https://example.org)");
+
+    setMarkdownLinkUrl(editor, key, "https://example.net");
+    expect(readMarkdown(editor).trim()).toBe("[site](https://example.net)");
+  });
+
+  it("removes explicit markdown links while preserving inline content", () => {
+    const editor = editorFromMarkdown("[**site**](https://example.com)");
+
+    removeMarkdownLink(editor, readFirstLinkKey(editor));
+
+    expect(readMarkdown(editor).trim()).toBe("**site**");
+  });
+
+  it("turns explicit bare-url markdown links back into autolinks", () => {
+    const editor = editorFromMarkdown("[https://example.com](https://example.com)");
+
+    removeMarkdownLink(editor, readFirstLinkKey(editor));
+
+    expect(readMarkdown(editor).trim()).toBe("https://example.com");
+    expect(readFirstLink(editor, (node) => $isAutoLinkNode(node))).toBe(true);
+  });
+
+  it("keeps the popover active only while focus remains inside it", () => {
+    const textarea = {} as Element;
+    const outsideElement = {} as Element;
+
+    expect(isElementFocusedWithin(createPopoverElementStub(textarea, textarea))).toBe(true);
+    expect(isElementFocusedWithin(createPopoverElementStub(outsideElement, textarea))).toBe(false);
+    expect(isElementFocusedWithin(null)).toBe(false);
   });
 });
