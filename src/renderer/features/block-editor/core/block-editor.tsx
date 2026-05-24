@@ -63,7 +63,7 @@ function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
     <ContentEditable
       aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
       ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
-      className="relative resize-none text-sm outline-none"
+      className="relative min-h-16 resize-none outline-none"
       onBlur={onBlur}
       placeholder={
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
@@ -133,7 +133,7 @@ export function BlockEditor({
   }, [onBlur]);
 
   return (
-    <div ref={setOverlayContainer} className="relative min-h-16 text-sm">
+    <div ref={setOverlayContainer} className="relative text-sm">
       <BlockEditorOverlayContainerProvider container={overlayContainer}>
         <BlockEditorConfigProvider config={resolvedConfig}>
           <LexicalExtensionComposer extension={extension} contentEditable={null}>
