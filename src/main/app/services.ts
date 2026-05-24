@@ -70,6 +70,7 @@ export function createMainServices(): MainServices {
   });
   const telemetryService = createTelemetryService({
     appVersion: app.getVersion(),
+    emitEvent,
     env: {
       VITE_FLUXNOTES_POSTHOG_HOST: import.meta.env.VITE_FLUXNOTES_POSTHOG_HOST,
       VITE_FLUXNOTES_POSTHOG_KEY: import.meta.env.VITE_FLUXNOTES_POSTHOG_KEY,

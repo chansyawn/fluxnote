@@ -83,6 +83,7 @@ function registerRuntimeCommands(
     applyThemePreference: deps.applyThemePreference,
     onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
     onLocalePreferenceChanged: () => deps.trayManager.refreshMenu(),
+    onTelemetryPreferenceChanged: () => deps.telemetryService.notifyPreferenceChanged(),
     preferencesService: deps.preferencesService,
   });
   registerShortcutCommands(ipc, {

@@ -7,7 +7,7 @@ export {
 } from "./app-update";
 export { getCliStatus, installCli, uninstallCli } from "./cli";
 export { onPreferencesChanged, patchSettings, readSettings, resetSettings } from "./preferences";
-export { readTelemetryBootstrap } from "./telemetry";
+export { onTelemetryChanged, readTelemetryBootstrap } from "./telemetry";
 export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
 export { writeBlockEditorClipboard } from "./clipboard";
 export {

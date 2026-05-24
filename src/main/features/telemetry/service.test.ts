@@ -14,6 +14,11 @@ function createClientMock() {
 }
 
 describe("telemetry service", () => {
+  const postHogEnv = {
+    VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
+    VITE_FLUXNOTES_POSTHOG_KEY: "key",
+  };
+
   it("returns disabled bootstrap when PostHog config is incomplete", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
@@ -57,10 +62,7 @@ describe("telemetry service", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
       createClient,
-      env: {
-        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        VITE_FLUXNOTES_POSTHOG_KEY: "key",
-      },
+      env: postHogEnv,
       readSettings: () => ({ telemetry: { enabled: false } }),
       storage: { store: { anonId: "anon-1" } },
     });
@@ -77,10 +79,7 @@ describe("telemetry service", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
       createClient,
-      env: {
-        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        VITE_FLUXNOTES_POSTHOG_KEY: "key",
-      },
+      env: postHogEnv,
       platform: "darwin",
       readSettings: () => ({ telemetry: { enabled: true } }),
       storage: { store: { anonId: "anon-1" } },
@@ -111,10 +110,7 @@ describe("telemetry service", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
       createClient,
-      env: {
-        VITE_FLUXNOTES_POSTHOG_HOST: "https://posthog.example",
-        VITE_FLUXNOTES_POSTHOG_KEY: "key",
-      },
+      env: postHogEnv,
       readSettings: () => ({ telemetry: { enabled: true } }),
       storage: { store: { anonId: "anon-1" } },
     });
@@ -129,5 +125,46 @@ describe("telemetry service", () => {
       process: "main",
       source: "test",
     });
+  });
+
+  it("emits current telemetry bootstrap after Telemetry Preference changes", () => {
+    let telemetryEnabled = true;
+    const emitEvent = vi.fn();
+    const service = createTelemetryService({
+      appVersion: "1.0.0",
+      emitEvent,
+      env: postHogEnv,
+      readSettings: () => ({ telemetry: { enabled: telemetryEnabled } }),
+      storage: { store: { anonId: "anon-1" } },
+    });
+
+    telemetryEnabled = false;
+    service.notifyPreferenceChanged();
+
+    expect(emitEvent).toHaveBeenCalledWith("telemetry.changed", {
+      anonId: "anon-1",
+      enabled: false,
+      posthogHost: "https://posthog.example",
+      posthogKey: "key",
+    });
+  });
+
+  it("uses latest Telemetry Preference for later captures", async () => {
+    let telemetryEnabled = true;
+    const { client, createClient } = createClientMock();
+    const service = createTelemetryService({
+      appVersion: "1.0.0",
+      createClient,
+      env: postHogEnv,
+      readSettings: () => ({ telemetry: { enabled: telemetryEnabled } }),
+      storage: { store: { anonId: "anon-1" } },
+    });
+
+    telemetryEnabled = false;
+    service.captureEvent("app_started");
+    await Promise.resolve();
+
+    expect(createClient).not.toHaveBeenCalled();
+    expect(client.capture).not.toHaveBeenCalled();
   });
 });

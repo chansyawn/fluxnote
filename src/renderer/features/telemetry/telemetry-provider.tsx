@@ -1,4 +1,4 @@
-import { onPreferencesChanged, readTelemetryBootstrap } from "@renderer/clients";
+import { onTelemetryChanged, readTelemetryBootstrap } from "@renderer/clients";
 import {
   configureRendererTelemetry,
   getPostHogClient,
@@ -38,13 +38,7 @@ export function TelemetryProvider({ children }: TelemetryProviderProps) {
   }, []);
 
   useEffect(() => {
-    return onPreferencesChanged(() => {
-      void readTelemetryBootstrap()
-        .then(configureRendererTelemetry)
-        .catch((error) => {
-          console.error("Failed to refresh telemetry", error);
-        });
-    });
+    return onTelemetryChanged(configureRendererTelemetry);
   }, []);
 
   if (!ready) {

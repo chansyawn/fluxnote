@@ -11,6 +11,7 @@ interface PreferencesCommandDeps {
   applyThemePreference?: (theme: ThemePreference) => void;
   onLocalePreferenceChanged?: () => void;
   onAutoArchivePreferencesChanged?: () => Promise<void> | void;
+  onTelemetryPreferenceChanged?: () => void;
   preferencesService: PreferencesService;
 }
 
@@ -20,6 +21,10 @@ function includesAutoArchivePreferences(patch: SettingsPatch): boolean {
 
 function includesLocalePreference(patch: SettingsPatch): boolean {
   return patch.appearance?.locale !== undefined;
+}
+
+function includesTelemetryPreference(patch: SettingsPatch): boolean {
+  return patch.telemetry !== undefined;
 }
 
 function notifyAutoArchivePreferencesChanged(deps: PreferencesCommandDeps): void {
@@ -42,6 +47,9 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
     if (includesAutoArchivePreferences(input)) {
       notifyAutoArchivePreferencesChanged(deps);
     }
+    if (includesTelemetryPreference(input)) {
+      deps.onTelemetryPreferenceChanged?.();
+    }
     return settings;
   });
 
@@ -56,6 +64,7 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
     applyThemePreference(deps, settings);
     deps.onLocalePreferenceChanged?.();
     notifyAutoArchivePreferencesChanged(deps);
+    deps.onTelemetryPreferenceChanged?.();
     return settings;
   });
 }

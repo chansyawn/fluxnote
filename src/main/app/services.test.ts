@@ -1,6 +1,9 @@
 import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
 import { createDefaultSettings } from "@shared/features/preferences/settings";
+import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+
+type TelemetryEventEmitter = (name: "telemetry.changed", payload: TelemetryBootstrap) => boolean;
 
 const mocks = vi.hoisted(() => ({
   appGetPath: vi.fn(() => "/mock/user-data"),
@@ -40,10 +43,11 @@ const mocks = vi.hoisted(() => ({
     requestOpen: vi.fn(),
   })),
   createPreferencesService: vi.fn(() => ({ readSettings: vi.fn() })),
-  createTelemetryService: vi.fn(() => ({
+  createTelemetryService: vi.fn((_options: { emitEvent: TelemetryEventEmitter }) => ({
     captureError: vi.fn(),
     captureEvent: vi.fn(),
     getBootstrap: vi.fn(),
+    notifyPreferenceChanged: vi.fn(),
     shutdown: vi.fn(),
   })),
   createTrayManager: vi.fn(() => ({
@@ -137,5 +141,23 @@ describe("createMainServices", () => {
         storage: { store: {} },
       }),
     );
+  });
+
+  it("passes the app event emitter to telemetry service", () => {
+    createMainServices();
+    const events = mocks.createEventBus.mock.results[0]?.value as {
+      emit: ReturnType<typeof vi.fn>;
+    };
+    const createTelemetryCall = mocks.createTelemetryService.mock.calls[0]![0];
+    const bootstrap = {
+      anonId: "anon-1",
+      enabled: false,
+      posthogHost: null,
+      posthogKey: null,
+    } satisfies TelemetryBootstrap;
+
+    createTelemetryCall.emitEvent("telemetry.changed", bootstrap);
+
+    expect(events.emit).toHaveBeenCalledWith("telemetry.changed", bootstrap);
   });
 });

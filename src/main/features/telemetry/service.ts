@@ -3,9 +3,12 @@ import {
   type PostHogProjectConfig,
 } from "@shared/features/telemetry/config";
 import type { TelemetryBootstrap, TelemetryEventName } from "@shared/features/telemetry/contract";
-import type { PostHog } from "posthog-node";
 
-type PostHogNodeClient = Pick<PostHog, "capture" | "captureException" | "shutdown">;
+import {
+  createTelemetryTransport,
+  type PostHogNodeClient,
+  type TelemetryClientFactoryDeps,
+} from "./transport";
 
 interface TelemetryStorage {
   store: Record<string, unknown>;
@@ -19,14 +22,12 @@ interface TelemetrySettingsReader {
   };
 }
 
-interface TelemetryClientFactoryDeps {
-  apiHost: string;
-  apiKey: string;
-}
+type TelemetryEventEmitter = (name: "telemetry.changed", payload: TelemetryBootstrap) => boolean;
 
 interface TelemetryServiceDeps {
   appVersion: string;
   createClient?: (deps: TelemetryClientFactoryDeps) => PostHogNodeClient;
+  emitEvent?: TelemetryEventEmitter;
   env?: Record<string, string | undefined>;
   platform?: string;
   readSettings: TelemetrySettingsReader["readSettings"];
@@ -37,6 +38,7 @@ export interface TelemetryService {
   captureError: (error: unknown, properties?: Record<string, unknown>) => void;
   captureEvent: (event: TelemetryEventName, properties?: Record<string, unknown>) => void;
   getBootstrap: () => TelemetryBootstrap;
+  notifyPreferenceChanged: () => void;
   shutdown: () => void;
 }
 
@@ -70,20 +72,10 @@ function resolveProjectConfig(
   });
 }
 
-async function createPostHogNodeClient({
-  apiHost,
-  apiKey,
-}: TelemetryClientFactoryDeps): Promise<PostHogNodeClient> {
-  const { PostHog } = await import("posthog-node");
-  return new PostHog(apiKey, {
-    host: apiHost,
-    enableExceptionAutocapture: false,
-  });
-}
-
 export function createTelemetryService({
   appVersion,
   createClient,
+  emitEvent,
   env = process.env,
   platform = process.platform,
   readSettings,
@@ -91,40 +83,9 @@ export function createTelemetryService({
 }: TelemetryServiceDeps): TelemetryService {
   const projectConfig = resolveProjectConfig(env);
   const anonId = getOrCreateAnonId(storage);
-  let client: PostHogNodeClient | null = null;
-  let clientPromise: Promise<PostHogNodeClient> | null = null;
 
   function isEnabled(): boolean {
     return readSettings().telemetry.enabled && projectConfig !== null;
-  }
-
-  function getClient(): Promise<PostHogNodeClient> | null {
-    if (!isEnabled() || !projectConfig) {
-      return null;
-    }
-
-    if (client) {
-      return Promise.resolve(client);
-    }
-
-    clientPromise ??= (
-      createClient
-        ? Promise.resolve(
-            createClient({
-              apiHost: projectConfig.host,
-              apiKey: projectConfig.key,
-            }),
-          )
-        : createPostHogNodeClient({
-            apiHost: projectConfig.host,
-            apiKey: projectConfig.key,
-          })
-    ).then((createdClient) => {
-      client = createdClient;
-      return createdClient;
-    });
-
-    return clientPromise;
   }
 
   function getBaseProperties(): Record<string, unknown> {
@@ -135,36 +96,20 @@ export function createTelemetryService({
     };
   }
 
-  function captureEvent(event: TelemetryEventName, properties: Record<string, unknown> = {}): void {
-    const pendingClient = getClient();
-    if (!pendingClient) {
-      return;
-    }
+  const transport = createTelemetryTransport({
+    anonId,
+    createClient,
+    getBaseProperties,
+    isEnabled,
+    projectConfig,
+  });
 
-    void pendingClient.then((posthog) => {
-      posthog.capture({
-        distinctId: anonId,
-        event,
-        properties: {
-          ...getBaseProperties(),
-          ...properties,
-        },
-      });
-    });
+  function captureEvent(event: TelemetryEventName, properties: Record<string, unknown> = {}): void {
+    transport.captureEvent(event, properties);
   }
 
   function captureError(error: unknown, properties: Record<string, unknown> = {}): void {
-    const pendingClient = getClient();
-    if (!pendingClient) {
-      return;
-    }
-
-    void pendingClient.then((posthog) => {
-      posthog.captureException(error, anonId, {
-        ...getBaseProperties(),
-        ...properties,
-      });
-    });
+    transport.captureError(error, properties);
   }
 
   function getBootstrap(): TelemetryBootstrap {
@@ -176,14 +121,19 @@ export function createTelemetryService({
     };
   }
 
+  function notifyPreferenceChanged(): void {
+    emitEvent?.("telemetry.changed", getBootstrap());
+  }
+
   function shutdown(): void {
-    void client?.shutdown();
+    transport.shutdown();
   }
 
   return {
     captureError,
     captureEvent,
     getBootstrap,
+    notifyPreferenceChanged,
     shutdown,
   };
 }

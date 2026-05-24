@@ -129,6 +129,7 @@ describe("createBackendRuntime", () => {
     },
     telemetryService: {
       captureEvent: vi.fn(),
+      notifyPreferenceChanged: vi.fn(),
       shutdown: vi.fn(),
     },
     trayManager: {
@@ -219,6 +220,17 @@ describe("createBackendRuntime", () => {
     deps.onLocalePreferenceChanged();
 
     expect(services.trayManager.refreshMenu).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies telemetry after telemetry preferences change", async () => {
+    const runtime = createBackendRuntime();
+    await runtime.start();
+    const registerCall = mocks.registerPreferencesCommands.mock.calls[0];
+    const deps = registerCall?.[1] as { onTelemetryPreferenceChanged: () => void };
+
+    deps.onTelemetryPreferenceChanged();
+
+    expect(services.telemetryService.notifyPreferenceChanged).toHaveBeenCalledTimes(1);
   });
 
   it("handles startup deep link when available", async () => {
