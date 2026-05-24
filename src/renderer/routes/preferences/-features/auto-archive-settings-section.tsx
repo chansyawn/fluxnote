@@ -108,6 +108,18 @@ export function AutoArchiveSettingsSection() {
     label: unitLabels[durationUnit],
     value: durationUnit,
   }));
+  const thresholdAmountLabel = i18n._({
+    id: "preferences.auto-archive.threshold.amount.label",
+    message: "Auto archive duration amount",
+  });
+  const thresholdUnitLabel = i18n._({
+    id: "preferences.auto-archive.threshold.unit.label",
+    message: "Auto archive duration unit",
+  });
+  const enableAutoArchiveLabel = i18n._({
+    id: "preferences.auto-archive.enable.label",
+    message: "Enable auto-archive",
+  });
 
   const setAmountText = (value: string) => {
     amountTextRef.current = value;
@@ -213,6 +225,7 @@ export function AutoArchiveSettingsSection() {
         <SettingsRow
           control={
             <Switch
+              aria-label={enableAutoArchiveLabel}
               checked={preferences.enabled}
               onCheckedChange={(checked) => {
                 void savePreferences((currentPreferences) => ({
@@ -238,6 +251,7 @@ export function AutoArchiveSettingsSection() {
               <ButtonGroup>
                 <InputGroup>
                   <InputGroupInput
+                    aria-label={thresholdAmountLabel}
                     className="w-16"
                     disabled={!preferences.enabled}
                     inputMode="numeric"
@@ -258,7 +272,7 @@ export function AutoArchiveSettingsSection() {
                   />
                 </InputGroup>
                 <Select items={unitItems} value={unit} onValueChange={handleUnitChange}>
-                  <SelectTrigger disabled={!preferences.enabled}>
+                  <SelectTrigger aria-label={thresholdUnitLabel} disabled={!preferences.enabled}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent align="end" alignItemWithTrigger={false}>

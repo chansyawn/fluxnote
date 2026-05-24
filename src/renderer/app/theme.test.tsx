@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 
+import { mockMatchMedia } from "@renderer/test/events";
+import { renderWithProviders } from "@renderer/test/render";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { act } from "react";
-import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const preferenceMocks = vi.hoisted(() => ({
@@ -15,79 +18,78 @@ vi.mock("@renderer/features/preferences/preferences-query", () => ({
 
 import { ThemeStateProvider, useThemeState } from "./theme";
 
-function ThemeProbe() {
+function ThemePreferenceProbe() {
   const { resolvedTheme, setThemeMode, themeMode } = useThemeState();
 
   return (
-    <button type="button" onClick={() => setThemeMode("light")}>
-      {themeMode}:{resolvedTheme}
-    </button>
+    <section aria-label="Theme Preference">
+      <p>{`${themeMode}:${resolvedTheme}`}</p>
+      <button type="button" onClick={() => setThemeMode("light")}>
+        Use light theme
+      </button>
+    </section>
   );
 }
 
-function renderThemeProvider() {
-  const container = document.createElement("div");
-  document.body.append(container);
-  const root = createRoot(container);
-
-  act(() => {
-    root.render(
-      <ThemeStateProvider>
-        <ThemeProbe />
-      </ThemeStateProvider>,
-    );
-  });
-
-  return {
-    container,
-    unmount(): void {
-      act(() => {
-        root.unmount();
-      });
-      container.remove();
-    },
-  };
-}
-
 describe("ThemeStateProvider", () => {
-  let mountedRoot: { container: HTMLElement; unmount: () => void } | null = null;
-
   beforeEach(() => {
     preferenceMocks.useThemePreference.mockReturnValue({
-      theme: "dark",
       setTheme: preferenceMocks.setTheme,
-    });
-    window.matchMedia = vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
+      theme: "dark",
     });
   });
 
   afterEach(() => {
-    mountedRoot?.unmount();
-    mountedRoot = null;
     document.documentElement.classList.remove("dark");
     preferenceMocks.setTheme.mockReset();
     preferenceMocks.useThemePreference.mockReset();
     vi.restoreAllMocks();
   });
 
-  it("exposes theme preference and applies resolved dark class", () => {
-    mountedRoot = renderThemeProvider();
+  it("exposes the Theme Preference and applies the resolved dark appearance", () => {
+    mockMatchMedia(true);
 
-    expect(mountedRoot.container.textContent).toBe("dark:dark");
-    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    renderWithProviders(
+      <ThemeStateProvider>
+        <ThemePreferenceProbe />
+      </ThemeStateProvider>,
+    );
+
+    expect(screen.getByLabelText("Theme Preference")).toHaveTextContent("dark:dark");
+    expect(document.documentElement).toHaveClass("dark");
   });
 
-  it("writes theme preference changes", () => {
-    mountedRoot = renderThemeProvider();
+  it("updates the resolved appearance when the system preference changes", () => {
+    const media = mockMatchMedia(false);
+
+    renderWithProviders(
+      <ThemeStateProvider>
+        <ThemePreferenceProbe />
+      </ThemeStateProvider>,
+    );
+
+    expect(screen.getByLabelText("Theme Preference")).toHaveTextContent("dark:light");
+    expect(document.documentElement).not.toHaveClass("dark");
 
     act(() => {
-      mountedRoot?.container
-        .querySelector("button")
-        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      media.setMatches(true);
     });
+
+    expect(screen.getByLabelText("Theme Preference")).toHaveTextContent("dark:dark");
+    expect(document.documentElement).toHaveClass("dark");
+  });
+
+  it("writes Theme Preference changes through the User Preferences boundary", async () => {
+    const user = userEvent.setup();
+    mockMatchMedia(true);
+
+    renderWithProviders(
+      <ThemeStateProvider>
+        <ThemePreferenceProbe />
+      </ThemeStateProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Use light theme" }));
 
     expect(preferenceMocks.setTheme).toHaveBeenCalledWith("light");
   });

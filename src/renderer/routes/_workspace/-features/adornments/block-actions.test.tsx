@@ -1,37 +1,32 @@
 // @vitest-environment jsdom
 
-import type { Block, Tag } from "@renderer/clients";
-import type { ReactElement, ReactNode } from "react";
-import { act } from "react";
-import { createRoot, type Root } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import type { Tag } from "@renderer/clients";
+import { createRendererBlock } from "@renderer/test/fixtures";
+import { renderWithProviders } from "@renderer/test/render";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 type MockChildrenProps = {
   children?: ReactNode;
 };
 
-type MockButtonProps = MockChildrenProps & {
-  "aria-label"?: string;
-  "aria-pressed"?: boolean;
+type MockTagComboboxPopoverProps = {
+  disabled?: boolean;
+  trigger: ReactNode;
+};
+
+type MockMenuItemProps = MockChildrenProps & {
   disabled?: boolean;
   onClick?: () => void;
-  type?: "button";
 };
 
-type MockRenderProps = MockChildrenProps & {
+type MockMenuTriggerProps = MockChildrenProps & {
   "aria-label"?: string;
   disabled?: boolean;
-  render?: ReactElement<MockButtonProps>;
-  trigger?: ReactNode;
+  render?: React.ReactElement<Record<string, unknown>>;
 };
-
-vi.mock("@lingui/react", () => ({
-  useLingui: () => ({
-    i18n: {
-      _: ({ message }: { message: string }) => message,
-    },
-  }),
-}));
 
 vi.mock("@lingui/react/macro", async () => {
   const React = await import("react");
@@ -45,7 +40,7 @@ vi.mock("@renderer/features/tag/tag-combobox-popover", async () => {
   const React = await import("react");
 
   return {
-    TagComboboxPopover: ({ disabled, trigger }: MockRenderProps) =>
+    TagComboboxPopover: ({ disabled, trigger }: MockTagComboboxPopoverProps) =>
       React.createElement(
         "button",
         {
@@ -57,98 +52,57 @@ vi.mock("@renderer/features/tag/tag-combobox-popover", async () => {
   };
 });
 
-vi.mock("@renderer/ui/components/button", async () => {
-  const React = await import("react");
-
-  return {
-    Button: ({ children, disabled, onClick, ...props }: MockButtonProps) =>
-      React.createElement(
-        "button",
-        {
-          "aria-label": props["aria-label"],
-          "aria-pressed": props["aria-pressed"],
-          disabled,
-          onClick,
-          type: "button",
-        },
-        children,
-      ),
-  };
-});
-
 vi.mock("@renderer/ui/components/dropdown-menu", async () => {
   const React = await import("react");
-
-  function renderWithTrigger({
-    children,
-    disabled,
-    render,
-    ...props
-  }: MockRenderProps): ReactElement {
-    if (render) {
-      return React.cloneElement(render, {
-        "aria-label": props["aria-label"],
-        children,
-        disabled,
-      });
-    }
-
-    return React.createElement("button", { disabled, type: "button" }, children);
-  }
 
   return {
     DropdownMenu: ({ children }: MockChildrenProps) =>
       React.createElement(React.Fragment, null, children),
     DropdownMenuContent: ({ children }: MockChildrenProps) =>
-      React.createElement("div", null, children),
+      React.createElement("div", { role: "menu" }, children),
     DropdownMenuGroup: ({ children }: MockChildrenProps) =>
-      React.createElement("div", null, children),
-    DropdownMenuItem: ({ children, disabled, onClick }: MockButtonProps) =>
-      React.createElement("button", { disabled, onClick, type: "button" }, children),
+      React.createElement(React.Fragment, null, children),
+    DropdownMenuItem: ({ children, disabled, onClick }: MockMenuItemProps) =>
+      React.createElement(
+        "button",
+        {
+          "data-disabled": disabled ? "" : undefined,
+          disabled,
+          onClick,
+          role: "menuitem",
+          type: "button",
+        },
+        children,
+      ),
     DropdownMenuLabel: ({ children }: MockChildrenProps) =>
       React.createElement("div", null, children),
     DropdownMenuSeparator: () => React.createElement("hr"),
     DropdownMenuShortcut: ({ children }: MockChildrenProps) =>
       React.createElement("span", null, children),
-    DropdownMenuTrigger: renderWithTrigger,
-  };
-});
-
-vi.mock("@renderer/ui/components/tooltip", async () => {
-  const React = await import("react");
-
-  return {
-    Tooltip: ({ children }: MockChildrenProps) =>
-      React.createElement(React.Fragment, null, children),
-    TooltipContent: ({ children }: MockChildrenProps) => React.createElement("div", null, children),
-    TooltipTrigger: ({ children, render }: MockRenderProps) => {
+    DropdownMenuTrigger: ({
+      "aria-label": ariaLabel,
+      children,
+      disabled,
+      render,
+    }: MockMenuTriggerProps) => {
       if (render) {
-        return React.cloneElement(render, { children });
+        return React.cloneElement(render, {
+          "aria-label": ariaLabel,
+          children,
+          disabled,
+        });
       }
 
-      return React.createElement("button", { type: "button" }, children);
+      return React.createElement(
+        "button",
+        { "aria-label": ariaLabel, disabled, type: "button" },
+        children,
+      );
     },
   };
 });
 
 import { BlockActions, type ProtectedKeepReason } from "./block-actions";
-
-function createBlock(overrides?: Partial<Block>): Block {
-  return {
-    archivedAt: null,
-    content: "",
-    contentUpdatedAt: "2026-01-01T00:00:00.000Z",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    id: "block-1",
-    isKept: false,
-    isPinned: false,
-    orderIndex: 0,
-    tags: [],
-    updatedAt: "2026-01-01T00:00:00.000Z",
-    willArchive: false,
-    ...overrides,
-  };
-}
 
 function createHandlers() {
   return {
@@ -164,76 +118,53 @@ function createHandlers() {
 }
 
 function renderBlockActions({
-  block = createBlock(),
   protectedKeepReason = null,
 }: {
-  block?: Block;
   protectedKeepReason?: ProtectedKeepReason;
-}) {
-  const container = document.createElement("div");
-  document.body.append(container);
-  const root = createRoot(container);
+} = {}) {
   const handlers = createHandlers();
-
-  act(() => {
-    root.render(
-      <BlockActions
-        block={block}
-        position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
-        state={{
-          protectedKeepReason,
-          tags: [] satisfies Tag[],
-        }}
-        handlers={handlers}
-      />,
-    );
-  });
-
-  return { container, handlers, root };
-}
-
-function findButtonByText(container: HTMLElement, text: string): HTMLButtonElement {
-  const button = Array.from(container.querySelectorAll("button")).find((candidate) =>
-    candidate.textContent?.includes(text),
+  renderWithProviders(
+    <BlockActions
+      block={createRendererBlock({ isPinned: protectedKeepReason === "pinned" })}
+      handlers={handlers}
+      position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
+      state={{
+        protectedKeepReason,
+        tags: [] satisfies Tag[],
+      }}
+    />,
   );
-  if (!button) {
-    throw new Error(`Button with text "${text}" was not rendered.`);
-  }
-
-  return button;
+  return { handlers };
 }
 
 describe("BlockActions", () => {
-  let mountedRoot: Root | null = null;
-  let mountedContainer: HTMLElement | null = null;
+  it("prevents archived and kept state changes while a Block has an External Edit Session", async () => {
+    renderBlockActions({ protectedKeepReason: "external-edit" });
+    const user = userEvent.setup();
 
-  afterEach(() => {
-    mountedRoot?.unmount();
-    mountedRoot = null;
-    mountedContainer?.remove();
-    mountedContainer = null;
+    expect(
+      screen.getByRole("menuitem", { name: /External edit keeps this block/ }),
+    ).toHaveAttribute("data-disabled");
+    expect(screen.getByRole("button", { name: "Archive block" })).toBeDisabled();
+
+    await user.click(screen.getByRole("menuitem", { name: /External edit keeps this block/ }));
+    await user.click(screen.getByRole("button", { name: "Archive block" }));
   });
 
-  it("disables keep and archive for external edit blocks", () => {
-    const rendered = renderBlockActions({ protectedKeepReason: "external-edit" });
-    mountedRoot = rendered.root;
-    mountedContainer = rendered.container;
+  it("explains that a Pinned Block is already protected from Auto Archive", async () => {
+    const { handlers } = renderBlockActions({ protectedKeepReason: "pinned" });
+    const user = userEvent.setup();
 
-    expect(findButtonByText(rendered.container, "External edit keeps this block").disabled).toBe(
-      true,
+    expect(screen.getByRole("menuitem", { name: /Pin keeps this block/ })).toHaveAttribute(
+      "data-disabled",
     );
-    expect(findButtonByText(rendered.container, "Archive block").disabled).toBe(true);
-  });
+    expect(screen.getByRole("button", { name: "Archive block" })).toBeEnabled();
 
-  it("disables keep with pinned protection copy", () => {
-    const rendered = renderBlockActions({
-      block: createBlock({ isPinned: true }),
-      protectedKeepReason: "pinned",
-    });
-    mountedRoot = rendered.root;
-    mountedContainer = rendered.container;
+    await user.click(screen.getByRole("menuitem", { name: "Unpin from top" }));
+    await user.click(screen.getByRole("button", { name: "Archive block" }));
 
-    expect(findButtonByText(rendered.container, "Pin keeps this block").disabled).toBe(true);
-    expect(findButtonByText(rendered.container, "Archive block").disabled).toBe(false);
+    expect(handlers.onTogglePinned).toHaveBeenCalledOnce();
+    expect(handlers.onToggleArchive).toHaveBeenCalledOnce();
+    expect(handlers.onToggleKeep).not.toHaveBeenCalled();
   });
 });

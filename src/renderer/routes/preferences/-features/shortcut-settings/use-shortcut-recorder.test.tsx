@@ -5,43 +5,40 @@ import {
   formatShortcutTokens,
   normalizeShortcutRecorderHotkey,
 } from "@renderer/features/shortcut/shortcut-utils";
+import { dispatchDocumentKeyboardEvent } from "@renderer/test/events";
+import { renderWithProviders } from "@renderer/test/render";
 import type { ShortcutAction } from "@shared/features/preferences/settings";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { act, useLayoutEffect } from "react";
-import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";
 import { useShortcutRecorder } from "./use-shortcut-recorder";
 
-interface RecorderSnapshot {
-  recordingAction: ShortcutAction | null;
+type ShortcutUpdateResult =
+  | { ok: true; shortcut: Hotkey }
+  | { ok: false; error?: ShortcutInputError };
+
+type RecorderSnapshot = {
+  cancelRecording: () => void;
+  clearFieldError: (action: ShortcutAction) => void;
   feedback: ShortcutRecordingState | null;
   fieldErrors: Partial<Record<ShortcutAction, ShortcutInputError>>;
+  recordingAction: ShortcutAction | null;
   startRecording: (action: ShortcutAction) => void;
-  cancelRecording: () => void;
-}
+};
 
-interface RecorderHarnessProps {
+type UpdateShortcut = (action: ShortcutAction, shortcut: string) => ShortcutUpdateResult;
+
+function RecorderHarness({
+  clearShortcut,
+  onSnapshot,
+  updateShortcut,
+}: {
   clearShortcut: (action: ShortcutAction) => void;
   onSnapshot: (snapshot: RecorderSnapshot) => void;
-  updateShortcut: (
-    action: ShortcutAction,
-    shortcut: string,
-  ) =>
-    | {
-        ok: true;
-        shortcut: Hotkey;
-      }
-    | {
-        ok: false;
-        error?: ShortcutInputError;
-      };
-}
-
-type UpdateShortcutHandler = RecorderHarnessProps["updateShortcut"];
-
-function RecorderHarness({ clearShortcut, onSnapshot, updateShortcut }: RecorderHarnessProps) {
+  updateShortcut: UpdateShortcut;
+}) {
   const recorder = useShortcutRecorder({ clearShortcut, updateShortcut });
 
   useLayoutEffect(() => {
@@ -51,132 +48,92 @@ function RecorderHarness({ clearShortcut, onSnapshot, updateShortcut }: Recorder
   return null;
 }
 
-function dispatchKeyboardEvent(type: "keydown" | "keyup", init: KeyboardEventInit): void {
-  document.dispatchEvent(
-    new KeyboardEvent(type, {
-      bubbles: true,
-      cancelable: true,
-      ...init,
-    }),
-  );
-}
-
-function createHarness(options?: {
-  clearShortcut?: (action: ShortcutAction) => void;
-  updateShortcut?: UpdateShortcutHandler;
-}) {
-  const container = document.createElement("div");
-  document.body.append(container);
-  const root = createRoot(container);
+function createRecorderHarness(
+  options: {
+    clearShortcut?: (action: ShortcutAction) => void;
+    updateShortcut?: UpdateShortcut;
+  } = {},
+) {
   let snapshot: RecorderSnapshot | null = null;
-  const clearShortcut = options?.clearShortcut ?? vi.fn();
-  const updateShortcutMock =
-    options?.updateShortcut ??
-    vi.fn<UpdateShortcutHandler>(
-      (_action: ShortcutAction, shortcut: string) =>
-        ({ ok: true, shortcut: shortcut as Hotkey }) as const,
+  const clearShortcut = options.clearShortcut ?? vi.fn();
+  const updateShortcut =
+    options.updateShortcut ??
+    vi.fn<UpdateShortcut>(
+      (_action, shortcut) => ({ ok: true, shortcut: shortcut as Hotkey }) as const,
     );
-  const updateShortcut: UpdateShortcutHandler = (action, shortcut) =>
-    updateShortcutMock(action, shortcut);
 
-  act(() => {
-    root.render(
-      <RecorderHarness
-        clearShortcut={clearShortcut}
-        onSnapshot={(nextSnapshot) => {
-          snapshot = nextSnapshot;
-        }}
-        updateShortcut={updateShortcut}
-      />,
-    );
-  });
+  const rendered = renderWithProviders(
+    <RecorderHarness
+      clearShortcut={clearShortcut}
+      updateShortcut={updateShortcut}
+      onSnapshot={(nextSnapshot) => {
+        snapshot = nextSnapshot;
+      }}
+    />,
+  );
 
   return {
     clearShortcut,
     getSnapshot(): RecorderSnapshot {
       if (!snapshot) {
-        throw new Error("Recorder snapshot is unavailable.");
+        throw new Error("Shortcut recorder snapshot is unavailable.");
       }
-
       return snapshot;
     },
-    unmount(): void {
-      act(() => {
-        root.unmount();
-      });
-      container.remove();
-    },
+    updateShortcut,
+    ...rendered,
   };
 }
 
 describe("useShortcutRecorder", () => {
-  let mountedRoot: { unmount: () => void } | null = null;
-
   afterEach(() => {
     vi.useRealTimers();
-    mountedRoot?.unmount();
-    mountedRoot = null;
   });
 
-  it("shows live modifier previews and resumes recording after validation errors", () => {
+  it("previews modifier keys and resumes recording after duplicate shortcut feedback", () => {
     vi.useFakeTimers();
-    const updateShortcutMock = vi.fn<UpdateShortcutHandler>(
-      () =>
-        ({
-          ok: false,
-          error: "duplicate" as const,
-        }) as const,
+    const updateShortcut = vi.fn<UpdateShortcut>(
+      () => ({ ok: false, error: "duplicate" }) as const,
     );
-    const harness = createHarness({
-      updateShortcut: (action, shortcut) => updateShortcutMock(action, shortcut),
-    });
-    mountedRoot = harness;
+    const harness = createRecorderHarness({ updateShortcut });
 
     act(() => {
       harness.getSnapshot().startRecording("createBlock");
     });
 
-    const controlDownEvent = {
-      altKey: false,
-      ctrlKey: true,
-      key: "Control",
-      metaKey: false,
-      shiftKey: false,
-    } as KeyboardEvent;
-
+    let controlDownEvent: KeyboardEvent;
     act(() => {
-      dispatchKeyboardEvent("keydown", controlDownEvent);
+      controlDownEvent = dispatchDocumentKeyboardEvent("keydown", {
+        ctrlKey: true,
+        key: "Control",
+      });
     });
 
     expect(harness.getSnapshot().feedback).toEqual({
       error: null,
       phase: "recording",
-      tokens: formatShortcutRecorderTokens(controlDownEvent),
+      tokens: formatShortcutRecorderTokens(controlDownEvent!),
     });
 
-    const duplicateEvent = {
-      altKey: false,
-      ctrlKey: true,
-      key: "k",
-      metaKey: false,
-      shiftKey: false,
-    } as KeyboardEvent;
-    const duplicateHotkey = normalizeShortcutRecorderHotkey(duplicateEvent);
+    let duplicateEvent: KeyboardEvent;
+    act(() => {
+      duplicateEvent = dispatchDocumentKeyboardEvent("keydown", {
+        ctrlKey: true,
+        key: "k",
+      });
+    });
+    const duplicateHotkey = normalizeShortcutRecorderHotkey(duplicateEvent!);
 
     if (!duplicateHotkey) {
-      throw new Error("Expected a normalized duplicate hotkey.");
+      throw new Error("Expected the duplicate shortcut to normalize.");
     }
-
-    act(() => {
-      dispatchKeyboardEvent("keydown", duplicateEvent);
-    });
 
     expect(harness.getSnapshot().feedback).toEqual({
       error: "duplicate",
       phase: "error",
       tokens: formatShortcutTokens(duplicateHotkey),
     });
-    expect(harness.getSnapshot().fieldErrors["createBlock"]).toBe("duplicate");
+    expect(harness.getSnapshot().fieldErrors.createBlock).toBe("duplicate");
 
     act(() => {
       vi.advanceTimersByTime(1_800);
@@ -187,55 +144,49 @@ describe("useShortcutRecorder", () => {
       phase: "recording",
       tokens: [],
     });
-    expect(harness.getSnapshot().fieldErrors["createBlock"]).toBeUndefined();
+    expect(harness.getSnapshot().fieldErrors.createBlock).toBeUndefined();
 
+    let resumedEvent: KeyboardEvent;
     act(() => {
-      dispatchKeyboardEvent("keydown", controlDownEvent);
+      resumedEvent = dispatchDocumentKeyboardEvent("keydown", {
+        ctrlKey: true,
+        key: "Control",
+      });
     });
 
     expect(harness.getSnapshot().feedback).toEqual({
       error: null,
       phase: "recording",
-      tokens: formatShortcutRecorderTokens(controlDownEvent),
+      tokens: formatShortcutRecorderTokens(resumedEvent!),
     });
   });
 
-  it("records a valid shortcut and closes after the success timeout", () => {
+  it("records a valid shortcut and closes after success feedback", () => {
     vi.useFakeTimers();
-    const updateShortcutMock = vi.fn<UpdateShortcutHandler>(
-      (_action: ShortcutAction, shortcut: string) =>
-        ({
-          ok: true,
-          shortcut: shortcut as Hotkey,
-        }) as const,
+    const updateShortcut = vi.fn<UpdateShortcut>(
+      (_action, shortcut) => ({ ok: true, shortcut: shortcut as Hotkey }) as const,
     );
-    const harness = createHarness({
-      updateShortcut: (action, shortcut) => updateShortcutMock(action, shortcut),
-    });
-    mountedRoot = harness;
+    const harness = createRecorderHarness({ updateShortcut });
 
     act(() => {
       harness.getSnapshot().startRecording("createBlock");
     });
 
-    const recordedEvent = {
-      altKey: false,
-      ctrlKey: true,
-      key: "k",
-      metaKey: false,
-      shiftKey: true,
-    } as KeyboardEvent;
-    const recordedHotkey = normalizeShortcutRecorderHotkey(recordedEvent);
+    let recordedEvent: KeyboardEvent;
+    act(() => {
+      recordedEvent = dispatchDocumentKeyboardEvent("keydown", {
+        ctrlKey: true,
+        key: "k",
+        shiftKey: true,
+      });
+    });
+    const recordedHotkey = normalizeShortcutRecorderHotkey(recordedEvent!);
 
     if (!recordedHotkey) {
-      throw new Error("Expected a normalized hotkey.");
+      throw new Error("Expected the recorded shortcut to normalize.");
     }
 
-    act(() => {
-      dispatchKeyboardEvent("keydown", recordedEvent);
-    });
-
-    expect(updateShortcutMock).toHaveBeenCalledWith("createBlock", recordedHotkey);
+    expect(updateShortcut).toHaveBeenCalledWith("createBlock", recordedHotkey);
     expect(harness.getSnapshot().feedback).toEqual({
       error: null,
       phase: "success",
@@ -244,6 +195,34 @@ describe("useShortcutRecorder", () => {
 
     act(() => {
       vi.advanceTimersByTime(1_200);
+    });
+
+    expect(harness.getSnapshot().feedback).toBeNull();
+    expect(harness.getSnapshot().recordingAction).toBeNull();
+  });
+
+  it("lets the user clear or cancel a Shortcut Preference recording", () => {
+    vi.useFakeTimers();
+    const clearShortcut = vi.fn();
+    const harness = createRecorderHarness({ clearShortcut });
+
+    act(() => {
+      harness.getSnapshot().startRecording("createBlock");
+    });
+    act(() => {
+      dispatchDocumentKeyboardEvent("keydown", { key: "Backspace" });
+    });
+
+    expect(clearShortcut).toHaveBeenCalledWith("createBlock");
+    expect(harness.getSnapshot().feedback?.phase).toBe("success");
+
+    act(() => {
+      vi.advanceTimersByTime(1_200);
+      harness.getSnapshot().startRecording("archiveBlock");
+    });
+
+    act(() => {
+      dispatchDocumentKeyboardEvent("keydown", { key: "Escape" });
     });
 
     expect(harness.getSnapshot().feedback).toBeNull();
