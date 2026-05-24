@@ -3,6 +3,14 @@ import { describe, expect, it } from "vite-plus/test";
 import { normalizeExternalMarkdown } from "./external-markdown";
 
 describe("normalizeExternalMarkdown", () => {
+  it("decodes horizontal whitespace entities in plain markdown chunks", () => {
+    expect(normalizeExternalMarkdown("&#x20;a&#32;\na&#x9;\na&#9;")).toBe(" a \na\t\na\t");
+  });
+
+  it("keeps non-whitespace entities unchanged", () => {
+    expect(normalizeExternalMarkdown("&amp; &#60; &#x3c;")).toBe("&amp; &#60; &#x3c;");
+  });
+
   it("removes word-internal underscore escapes", () => {
     expect(normalizeExternalMarkdown(String.raw`a\_b abc\_123 1\_2`)).toBe("a_b abc_123 1_2");
   });
@@ -43,6 +51,7 @@ describe("normalizeExternalMarkdown", () => {
     const markdown = [
       "```ts",
       String.raw`const key = "a\_b";`,
+      "const trailing = '&#x20;';",
       "```not a closing fence a\\_b",
       String.raw`const price = "\$5";`,
       "```",
@@ -53,6 +62,7 @@ describe("normalizeExternalMarkdown", () => {
       [
         "```ts",
         String.raw`const key = "a\_b";`,
+        "const trailing = '&#x20;';",
         "```not a closing fence a\\_b",
         String.raw`const price = "\$5";`,
         "```",
@@ -70,8 +80,8 @@ describe("normalizeExternalMarkdown", () => {
   });
 
   it("skips inline code spans", () => {
-    expect(normalizeExternalMarkdown("`a\\_b \\$5` and a\\_b \\$5")).toBe(
-      "`a\\_b \\$5` and a_b $5",
+    expect(normalizeExternalMarkdown("`a\\_b \\$5 &#x20;` and a\\_b \\$5 &#x20;")).toBe(
+      "`a\\_b \\$5 &#x20;` and a_b $5  ",
     );
   });
 
