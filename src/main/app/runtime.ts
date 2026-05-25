@@ -81,8 +81,11 @@ function registerRuntimeCommands(
   });
   registerPreferencesCommands(ipc, {
     applyThemePreference: deps.applyThemePreference,
+    onAppUpdatePreferencesChanged: (settings) =>
+      deps.appUpdateService.setAutomaticChecksEnabled(settings.appUpdate.automaticChecksEnabled),
     onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
     onLocalePreferenceChanged: () => deps.trayManager.refreshMenu(),
+    onTelemetryPreferenceChanged: () => deps.telemetryService.notifyPreferenceChanged(),
     preferencesService: deps.preferencesService,
   });
   registerShortcutCommands(ipc, {
@@ -157,7 +160,10 @@ export function createBackendRuntime() {
     registerMainWindowToEventBus();
     services.trayManager.createTray();
     await services.autoArchiveRuntime.start();
-    services.appUpdateService.start();
+    services.appUpdateService.start({
+      automaticChecksEnabled:
+        services.preferencesService.readSettings().appUpdate.automaticChecksEnabled,
+    });
     services.telemetryService.captureEvent("app_started");
   }
 

@@ -2,7 +2,12 @@ import { $createNodeSelection, $createParagraphNode, $getRoot, $setSelection } f
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { $createImageNode } from "../syntax/image";
-import { createBlockEditorRuntime, editorFromMarkdown } from "../test-helper/editor-driver";
+import {
+  createBlockEditorRuntime,
+  editorFromMarkdown,
+  editorFromMdast,
+} from "../test-helper/editor-driver";
+import { doc, p, t } from "../test-helper/mdast-builders";
 import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
@@ -31,6 +36,24 @@ describe("clipboard data", () => {
     const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
 
     expect(data?.text.trim()).toBe("a_b $5");
+  });
+
+  it("decodes markdown whitespace entities for external clipboard text", async () => {
+    const editor = editorFromMdast(doc(p(t("Alpha "))));
+    const runtime = createBlockEditorRuntime();
+
+    const data = await createClipboardDataFromDocument(editor, runtime.assets.resolve);
+
+    expect(data?.text).toBe("Alpha \n");
+    expect(data?.text).not.toContain("&#x20;");
+    expect(data?.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          children: expect.arrayContaining([expect.objectContaining({ text: "Alpha " })]),
+          type: "paragraph",
+        }),
+      ]),
+    );
   });
 
   it("rewrites image assets for external clipboard formats while preserving payload nodes", async () => {

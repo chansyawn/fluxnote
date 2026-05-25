@@ -40,6 +40,9 @@ describe("startPrimaryInstance", () => {
     quitWhenAllWindowsClosed: vi.fn(),
     start: vi.fn(async () => undefined),
     stop: vi.fn(async () => undefined),
+    telemetryService: {
+      captureError: vi.fn(),
+    },
   };
 
   beforeEach(() => {
@@ -56,14 +59,22 @@ describe("startPrimaryInstance", () => {
     startPrimaryInstance();
 
     expect(mocks.registerPrivilegedSchemes).toHaveBeenCalledTimes(1);
+    expect(mocks.createBackendRuntime).not.toHaveBeenCalled();
     expect(mocks.on).toHaveBeenCalledWith("second-instance", expect.any(Function));
     expect(mocks.on).toHaveBeenCalledWith("open-url", expect.any(Function));
     expect(mocks.on).toHaveBeenCalledWith("before-quit", expect.any(Function));
     expect(mocks.on).toHaveBeenCalledWith("window-all-closed", expect.any(Function));
 
+    const secondInstance = mocks.on.mock.calls.find(
+      ([name]) => name === "second-instance",
+    )?.[1] as (event: unknown, argv: string[]) => void;
+    secondInstance({}, ["flux://open/before-ready"]);
+    expect(runtime.handleSecondInstance).not.toHaveBeenCalled();
+
     await Promise.resolve();
     await Promise.resolve();
 
+    expect(mocks.createBackendRuntime).toHaveBeenCalledTimes(1);
     expect(mocks.setActivationPolicy).not.toHaveBeenCalled();
     expect(mocks.dockHide).not.toHaveBeenCalled();
     expect(runtime.start).toHaveBeenCalledTimes(1);
@@ -73,9 +84,6 @@ describe("startPrimaryInstance", () => {
     activate();
     expect(runtime.activate).toHaveBeenCalledTimes(1);
 
-    const secondInstance = mocks.on.mock.calls.find(
-      ([name]) => name === "second-instance",
-    )?.[1] as (event: unknown, argv: string[]) => void;
     secondInstance({}, ["flux://open/1"]);
     expect(runtime.handleSecondInstance).toHaveBeenCalledWith(["flux://open/1"]);
 

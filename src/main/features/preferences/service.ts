@@ -18,38 +18,46 @@ export interface PreferencesService {
 }
 
 interface PreferencesServiceOptions {
+  defaults?: Settings;
   emitEvent?: EventBus["emit"];
   storage?: PreferencesStorage;
 }
 
-function mergeSettings(current: Settings, patch: SettingsPatch): Settings {
-  return normalizeSettings({
-    ...current,
-    appearance: {
-      ...current.appearance,
-      ...patch.appearance,
-    },
-    autoArchive: {
-      ...current.autoArchive,
-      ...patch.autoArchive,
-    },
-    shortcuts: {
-      ...current.shortcuts,
-      ...patch.shortcuts,
-    },
-    markdown: {
-      ...current.markdown,
-      ...patch.markdown,
-      codeBlock: {
-        ...current.markdown.codeBlock,
-        ...patch.markdown?.codeBlock,
+function mergeSettings(current: Settings, patch: SettingsPatch, defaults: Settings): Settings {
+  return normalizeSettings(
+    {
+      ...current,
+      appearance: {
+        ...current.appearance,
+        ...patch.appearance,
+      },
+      autoArchive: {
+        ...current.autoArchive,
+        ...patch.autoArchive,
+      },
+      shortcuts: {
+        ...current.shortcuts,
+        ...patch.shortcuts,
+      },
+      markdown: {
+        ...current.markdown,
+        ...patch.markdown,
+        codeBlock: {
+          ...current.markdown.codeBlock,
+          ...patch.markdown?.codeBlock,
+        },
+      },
+      telemetry: {
+        ...current.telemetry,
+        ...patch.telemetry,
+      },
+      appUpdate: {
+        ...current.appUpdate,
+        ...patch.appUpdate,
       },
     },
-    telemetry: {
-      ...current.telemetry,
-      ...patch.telemetry,
-    },
-  });
+    defaults,
+  );
 }
 
 function areJsonValuesEqual(left: unknown, right: unknown): boolean {
@@ -88,11 +96,12 @@ export function createPreferencesService(
   options: PreferencesServiceOptions | PreferencesStorage = {},
 ): PreferencesService {
   const serviceOptions = "store" in options ? { storage: options } : options;
-  const storage = serviceOptions.storage ?? { store: DEFAULT_SETTINGS };
+  const defaults = serviceOptions.defaults ?? DEFAULT_SETTINGS;
+  const storage = serviceOptions.storage ?? { store: defaults };
   const emitEvent = serviceOptions.emitEvent;
 
   function readSettings(): Settings {
-    const settings = normalizeSettings(storage.store);
+    const settings = normalizeSettings(storage.store, defaults);
     if (!areJsonValuesEqual(storage.store, settings)) {
       return writeSettings(settings);
     }
@@ -113,12 +122,12 @@ export function createPreferencesService(
 
   function patchSettings(input: SettingsPatch): Settings {
     const patch = normalizeSettingsPatch(input);
-    const nextSettings = mergeSettings(readSettings(), patch);
+    const nextSettings = mergeSettings(readSettings(), patch, defaults);
     return writeAndNotify(nextSettings);
   }
 
   function resetSettings(): Settings {
-    return writeAndNotify(DEFAULT_SETTINGS);
+    return writeAndNotify(defaults);
   }
 
   return {

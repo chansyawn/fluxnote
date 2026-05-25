@@ -19,7 +19,9 @@ export const telemetryContract = {
       output: telemetryBootstrapSchema,
     },
   },
-  events: {},
+  events: {
+    "telemetry.changed": telemetryBootstrapSchema,
+  },
 } as const;
 
 export type TelemetryBootstrap = z.infer<typeof telemetryBootstrapSchema>;

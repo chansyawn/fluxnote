@@ -81,7 +81,7 @@ export function ShortcutInput({
             />
           }
         >
-          <span className="flex min-w-16 items-center truncate">
+          <span className="flex min-w-8 items-center truncate">
             {shortcutTokens.length > 0 ? (
               <KbdGroup className="max-w-full flex-nowrap overflow-hidden">
                 {shortcutTokens.map((token) => (

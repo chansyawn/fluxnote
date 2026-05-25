@@ -13,15 +13,19 @@ describe("preferences command", () => {
     resetSettings: vi.fn(),
   };
   const applyThemePreference = vi.fn();
+  const onAppUpdatePreferencesChanged = vi.fn();
   const onAutoArchivePreferencesChanged = vi.fn(async () => undefined);
   const onLocalePreferenceChanged = vi.fn();
+  const onTelemetryPreferenceChanged = vi.fn();
 
   beforeEach(() => {
     handlers.clear();
     ipc.command.mockClear();
     applyThemePreference.mockClear();
+    onAppUpdatePreferencesChanged.mockClear();
     onAutoArchivePreferencesChanged.mockClear();
     onLocalePreferenceChanged.mockClear();
+    onTelemetryPreferenceChanged.mockClear();
     Object.values(preferencesService).forEach((fn) => fn.mockReset());
   });
 
@@ -41,8 +45,10 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -62,6 +68,34 @@ describe("preferences command", () => {
     expect(applyThemePreference).toHaveBeenNthCalledWith(3, "system");
     expect(onAutoArchivePreferencesChanged).toHaveBeenCalledTimes(1);
     expect(onLocalePreferenceChanged).toHaveBeenCalledTimes(2);
+    expect(onTelemetryPreferenceChanged).toHaveBeenCalledTimes(1);
+    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies app update changes after app update patch", async () => {
+    const settings = {
+      appUpdate: { automaticChecksEnabled: false },
+      appearance: { theme: "system" },
+      schemaVersion: 1,
+    };
+    preferencesService.patchSettings.mockReturnValue(settings);
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        applyThemePreference,
+        onAppUpdatePreferencesChanged,
+        onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
+        preferencesService,
+      } as never,
+    );
+
+    await handlers.get("preferences.patch")?.({
+      appUpdate: { automaticChecksEnabled: false },
+    });
+
+    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledWith(settings);
   });
 
   it("notifies auto archive changes after auto archive patch", async () => {
@@ -73,8 +107,10 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -93,8 +129,10 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
         preferencesService,
       } as never,
     );
@@ -104,5 +142,50 @@ describe("preferences command", () => {
     expect(applyThemePreference).toHaveBeenCalledWith("dark");
     expect(onAutoArchivePreferencesChanged).not.toHaveBeenCalled();
     expect(onLocalePreferenceChanged).not.toHaveBeenCalled();
+    expect(onTelemetryPreferenceChanged).not.toHaveBeenCalled();
+  });
+
+  it("notifies telemetry changes after telemetry patch", async () => {
+    preferencesService.patchSettings.mockReturnValue({
+      schemaVersion: 1,
+      appearance: { theme: "system" },
+    });
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        applyThemePreference,
+        onAppUpdatePreferencesChanged,
+        onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
+        preferencesService,
+      } as never,
+    );
+
+    await handlers.get("preferences.patch")?.({ telemetry: { enabled: false } });
+
+    expect(onTelemetryPreferenceChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not notify telemetry changes after non telemetry patch", async () => {
+    preferencesService.patchSettings.mockReturnValue({
+      schemaVersion: 1,
+      appearance: { theme: "dark" },
+    });
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        applyThemePreference,
+        onAppUpdatePreferencesChanged,
+        onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
+        preferencesService,
+      } as never,
+    );
+
+    await handlers.get("preferences.patch")?.({ appearance: { theme: "dark" } });
+
+    expect(onTelemetryPreferenceChanged).not.toHaveBeenCalled();
   });
 });

@@ -242,7 +242,7 @@ export function AutoArchiveSettingsSection() {
               appear dimmed.
             </Trans>
           }
-          icon={ArchiveIcon}
+          icon={<ArchiveIcon />}
           label={<Trans id="preferences.auto-archive.enable.label">Enable auto-archive</Trans>}
         />
         <SettingsRow
@@ -294,7 +294,7 @@ export function AutoArchiveSettingsSection() {
               Range: 1-20160 minutes, 1-336 hours, or 1-14 days.
             </Trans>
           }
-          icon={ClockIcon}
+          icon={<ClockIcon />}
           label={<Trans id="preferences.auto-archive.threshold.label">Auto archive after</Trans>}
         />
         <SettingsRow
@@ -347,7 +347,7 @@ export function AutoArchiveSettingsSection() {
               Permanently delete every archived block. Active blocks and tags are not affected.
             </Trans>
           }
-          icon={DatabaseZapIcon}
+          icon={<DatabaseZapIcon />}
           label={<Trans id="preferences.archive.clear.label">Clear archived data</Trans>}
         />
       </SettingsGroup>

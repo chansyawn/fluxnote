@@ -7,6 +7,7 @@ import {
 } from "@renderer/clients";
 import {
   DEFAULT_SETTINGS,
+  type AppUpdateSettings,
   type AutoArchiveSettings,
   type FontSize,
   type LocaleCode,
@@ -208,5 +209,21 @@ export function useTelemetryPreference() {
   return {
     patchTelemetry,
     telemetry: settings.telemetry,
+  };
+}
+
+export function useAppUpdatePreference() {
+  const settings = useSettingsValue();
+  const mutation = usePatchSettingsMutation();
+  const patchAppUpdate = useCallback(
+    (patch: Partial<AppUpdateSettings>) => {
+      mutation.mutate({ appUpdate: patch });
+    },
+    [mutation],
+  );
+
+  return {
+    appUpdate: settings.appUpdate,
+    patchAppUpdate,
   };
 }

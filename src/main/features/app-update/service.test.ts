@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => {
   type Listener = (...args: unknown[]) => void;
@@ -41,6 +41,23 @@ vi.mock("electron", () => ({
 
 import { createAppUpdateService } from "./service";
 
+function createService(
+  options: { platform?: NodeJS.Platform; prepareToQuitForInstall?: () => void } = {},
+) {
+  return createAppUpdateService({
+    arch: "arm64",
+    emitEvent: vi.fn(),
+    now: () => new Date("2026-01-01T00:00:00.000Z"),
+    platform: options.platform ?? "darwin",
+    prepareToQuitForInstall: options.prepareToQuitForInstall ?? vi.fn(),
+  });
+}
+
+function emitDownloadedUpdate(releaseName = "v1.0.1"): void {
+  mocks.autoUpdater.emit("update-available");
+  mocks.autoUpdater.emit("update-downloaded", {}, "", releaseName, new Date(), "");
+}
+
 describe("app update service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -49,136 +66,221 @@ describe("app update service", () => {
     mocks.app.isPackaged = true;
   });
 
-  it("checks for updates and moves to ready when an update is downloaded", () => {
-    const emitEvent = vi.fn();
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent,
-      now: () => new Date("2026-01-01T00:00:00.000Z"),
-      platform: "darwin",
-      prepareToQuitForInstall: vi.fn(),
-    });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("moves to ready when an update is downloaded", () => {
+    const service = createService();
 
     const checkingStatus = service.checkForUpdates("manual");
-    mocks.autoUpdater.emit("update-available");
-    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    emitDownloadedUpdate("v1.0.1");
 
     expect(checkingStatus.state).toBe("checking");
     expect(mocks.autoUpdater.setFeedURL).toHaveBeenCalledWith({
       headers: {
         "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
       },
-      url: expect.stringContaining("/chansyawn/fluxnotes/"),
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.0",
     });
-    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
     expect(service.getStatus()).toMatchObject({
       availableVersion: "1.0.1",
-      lastCheckedAt: "2026-01-01T00:00:00.000Z",
-      lastCheckSource: "manual",
+      lastCheck: {
+        checkedAt: "2026-01-01T00:00:00.000Z",
+        outcome: "update-ready",
+        source: "manual",
+      },
       releaseName: "v1.0.1",
       state: "ready",
     });
-    expect(emitEvent).toHaveBeenLastCalledWith(
-      "app-update.changed",
-      expect.objectContaining({ state: "ready" }),
-    );
   });
 
-  it("starts downloading after an available update is found", () => {
-    const emitEvent = vi.fn();
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent,
-      platform: "darwin",
-      prepareToQuitForInstall: vi.fn(),
-    });
+  it("reports up to date when no update is available", () => {
+    const service = createService();
 
     service.checkForUpdates("manual");
-    mocks.autoUpdater.emit("update-available");
+    mocks.autoUpdater.emit("update-not-available");
 
     expect(service.getStatus()).toMatchObject({
-      lastCheckSource: "manual",
-      state: "downloading",
+      lastCheck: {
+        outcome: "up-to-date",
+        source: "manual",
+      },
+      state: "up-to-date",
     });
-    expect(emitEvent).toHaveBeenLastCalledWith(
-      "app-update.changed",
-      expect.objectContaining({ state: "downloading" }),
-    );
   });
 
-  it("uses the same update flow for automatic checks", () => {
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent: vi.fn(),
-      platform: "darwin",
-      prepareToQuitForInstall: vi.fn(),
+  it("keeps a ready update ready when the ready refresh finds no newer update", () => {
+    const service = createService();
+
+    service.checkForUpdates("manual");
+    emitDownloadedUpdate("v1.0.1");
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("update-not-available");
+
+    expect(mocks.autoUpdater.setFeedURL).toHaveBeenLastCalledWith({
+      headers: {
+        "User-Agent": expect.stringContaining("fluxnotes/1.0.0"),
+      },
+      url: "https://update.electronjs.org/chansyawn/fluxnotes/darwin-arm64/1.0.1",
     });
-
-    service.checkForUpdates("automatic");
-    mocks.autoUpdater.emit("update-available");
-    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
-
-    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
     expect(service.getStatus()).toMatchObject({
       availableVersion: "1.0.1",
-      lastCheckSource: "automatic",
+      lastCheck: {
+        outcome: "ready-latest",
+        source: "manual",
+      },
+      releaseName: "v1.0.1",
       state: "ready",
     });
   });
 
-  it("reports manual check errors through status", () => {
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent: vi.fn(),
-      now: () => new Date("2026-01-01T00:00:00.000Z"),
-      platform: "darwin",
-      prepareToQuitForInstall: vi.fn(),
+  it("keeps a ready update ready when the ready refresh fails", () => {
+    const service = createService();
+
+    service.checkForUpdates("manual");
+    emitDownloadedUpdate("v1.0.1");
+    service.checkForUpdates("manual");
+    mocks.autoUpdater.emit("error", new Error("Network unavailable"));
+
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      lastCheck: {
+        errorMessage: "Network unavailable",
+        outcome: "failed",
+        source: "manual",
+      },
+      state: "ready",
     });
+  });
+
+  it("reports errors from normal checks", () => {
+    const service = createService();
 
     service.checkForUpdates("manual");
     mocks.autoUpdater.emit("error", new Error("Network unavailable"));
 
     expect(service.getStatus()).toMatchObject({
       errorMessage: "Network unavailable",
-      lastCheckSource: "manual",
+      lastCheck: {
+        errorMessage: "Network unavailable",
+        outcome: "failed",
+        source: "manual",
+      },
       state: "error",
     });
   });
 
-  it("restarts only when an update is ready", () => {
+  it("checks for newer updates before installing a ready update", () => {
     const prepareToQuitForInstall = vi.fn();
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent: vi.fn(),
-      platform: "darwin",
-      prepareToQuitForInstall,
-    });
+    const service = createService({ prepareToQuitForInstall });
 
     expect(() => service.restartAndInstall()).toThrow("No app update is ready to install.");
-    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
 
     service.checkForUpdates("manual");
-    mocks.autoUpdater.emit("update-downloaded", {}, "", "v1.0.1", new Date(), "");
+    emitDownloadedUpdate("v1.0.1");
     service.restartAndInstall();
+    mocks.autoUpdater.emit("update-not-available");
 
     expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
     expect(prepareToQuitForInstall).toHaveBeenCalledBefore(mocks.autoUpdater.quitAndInstall);
     expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
   });
 
-  it("returns unavailable when app is not packaged", () => {
-    mocks.app.isPackaged = false;
-    const service = createAppUpdateService({
-      arch: "arm64",
-      emitEvent: vi.fn(),
-      platform: "darwin",
-      prepareToQuitForInstall: vi.fn(),
+  it("downloads the newer update instead of installing immediately", () => {
+    const prepareToQuitForInstall = vi.fn();
+    const service = createService({ prepareToQuitForInstall });
+
+    service.checkForUpdates("manual");
+    emitDownloadedUpdate("v1.0.1");
+    service.restartAndInstall();
+    mocks.autoUpdater.emit("update-available");
+
+    expect(service.getStatus()).toMatchObject({
+      lastCheck: {
+        outcome: "newer-update",
+        source: "manual",
+      },
+      state: "downloading",
     });
+    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
+    expect(mocks.autoUpdater.quitAndInstall).not.toHaveBeenCalled();
+  });
+
+  it("installs the ready update when the install refresh fails", () => {
+    const prepareToQuitForInstall = vi.fn();
+    const service = createService({ prepareToQuitForInstall });
+
+    service.checkForUpdates("manual");
+    emitDownloadedUpdate("v1.0.1");
+    service.restartAndInstall();
+    mocks.autoUpdater.emit("error", new Error("Network unavailable"));
+
+    expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
+    expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
+  });
+
+  it("falls back to direct install when a downloaded update has no parseable version", () => {
+    const prepareToQuitForInstall = vi.fn();
+    const service = createService({ prepareToQuitForInstall });
+
+    service.checkForUpdates("manual");
+    emitDownloadedUpdate("Fluxnotes release");
+    service.restartAndInstall();
+
+    expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+  });
+
+  it("returns unsupported when app is not packaged", () => {
+    mocks.app.isPackaged = false;
+    const service = createService();
 
     expect(service.checkForUpdates("manual")).toMatchObject({
       isSupported: false,
-      state: "unavailable",
+      state: "unsupported",
+      unsupportedReason: "not-packaged",
     });
     expect(mocks.autoUpdater.checkForUpdates).not.toHaveBeenCalled();
+  });
+
+  it("returns unsupported for unsupported platforms", () => {
+    const service = createService({ platform: "linux" });
+
+    expect(service.getStatus()).toMatchObject({
+      isSupported: false,
+      state: "unsupported",
+      unsupportedReason: "platform",
+    });
+  });
+
+  it("starts automatic checks only when enabled", () => {
+    vi.useFakeTimers();
+    const service = createService();
+
+    service.start({ automaticChecksEnabled: false });
+    vi.advanceTimersByTime(30_000);
+    expect(mocks.autoUpdater.checkForUpdates).not.toHaveBeenCalled();
+
+    service.setAutomaticChecksEnabled(true);
+
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+  });
+
+  it("cancels future automatic checks without cancelling a ready update", () => {
+    vi.useFakeTimers();
+    const service = createService();
+
+    service.start({ automaticChecksEnabled: true });
+    vi.advanceTimersByTime(30_000);
+    emitDownloadedUpdate("v1.0.1");
+    service.setAutomaticChecksEnabled(false);
+    vi.advanceTimersByTime(6 * 60 * 60 * 1000);
+
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+    expect(service.getStatus()).toMatchObject({
+      availableVersion: "1.0.1",
+      state: "ready",
+    });
   });
 });

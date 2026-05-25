@@ -10,8 +10,14 @@ import type { PreferencesService } from "./service";
 interface PreferencesCommandDeps {
   applyThemePreference?: (theme: ThemePreference) => void;
   onLocalePreferenceChanged?: () => void;
+  onAppUpdatePreferencesChanged?: (settings: Settings) => void;
   onAutoArchivePreferencesChanged?: () => Promise<void> | void;
+  onTelemetryPreferenceChanged?: () => void;
   preferencesService: PreferencesService;
+}
+
+function includesAppUpdatePreferences(patch: SettingsPatch): boolean {
+  return patch.appUpdate !== undefined;
 }
 
 function includesAutoArchivePreferences(patch: SettingsPatch): boolean {
@@ -20,6 +26,10 @@ function includesAutoArchivePreferences(patch: SettingsPatch): boolean {
 
 function includesLocalePreference(patch: SettingsPatch): boolean {
   return patch.appearance?.locale !== undefined;
+}
+
+function includesTelemetryPreference(patch: SettingsPatch): boolean {
+  return patch.telemetry !== undefined;
 }
 
 function notifyAutoArchivePreferencesChanged(deps: PreferencesCommandDeps): void {
@@ -39,8 +49,14 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
     if (includesLocalePreference(input)) {
       deps.onLocalePreferenceChanged?.();
     }
+    if (includesAppUpdatePreferences(input)) {
+      deps.onAppUpdatePreferencesChanged?.(settings);
+    }
     if (includesAutoArchivePreferences(input)) {
       notifyAutoArchivePreferencesChanged(deps);
+    }
+    if (includesTelemetryPreference(input)) {
+      deps.onTelemetryPreferenceChanged?.();
     }
     return settings;
   });
@@ -55,7 +71,9 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
     const settings = deps.preferencesService.resetSettings();
     applyThemePreference(deps, settings);
     deps.onLocalePreferenceChanged?.();
+    deps.onAppUpdatePreferencesChanged?.(settings);
     notifyAutoArchivePreferencesChanged(deps);
+    deps.onTelemetryPreferenceChanged?.();
     return settings;
   });
 }

@@ -1,9 +1,13 @@
 const ESCAPED_DOLLAR_PATTERN = /\\\$/g;
+const HORIZONTAL_WHITESPACE_ENTITY_PATTERN = /&#(?:x20|X20|32|x9|X9|9);/g;
 const WORD_INTERNAL_UNDERSCORE_PATTERN = /(?<=[A-Za-z0-9])\\_(?=[A-Za-z0-9])/g;
 const FENCE_START_PATTERN = /^( {0,3})(`{3,}|~{3,})/;
 
 function cleanPlainMarkdownChunk(value: string): string {
   return value
+    .replaceAll(HORIZONTAL_WHITESPACE_ENTITY_PATTERN, (entity) =>
+      entity === "&#x9;" || entity === "&#X9;" || entity === "&#9;" ? "\t" : " ",
+    )
     .replaceAll(WORD_INTERNAL_UNDERSCORE_PATTERN, "_")
     .split(/(\n)/)
     .map((part) => (part === "\n" ? part : cleanEscapedDollars(part)))

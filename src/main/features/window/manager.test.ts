@@ -75,6 +75,7 @@ const mocks = vi.hoisted(() => {
     BrowserWindow: FakeBrowserWindow,
     appFocus: vi.fn(),
     appQuit: vi.fn(),
+    appRelaunch: vi.fn(),
     setActivationPolicy: vi.fn(),
     emitEvent: vi.fn(() => true),
     onAutoArchiveTrigger: vi.fn(),
@@ -88,6 +89,7 @@ vi.mock("electron", () => ({
   app: {
     focus: mocks.appFocus,
     quit: mocks.appQuit,
+    relaunch: mocks.appRelaunch,
   },
   BrowserWindow: mocks.BrowserWindow,
 }));
@@ -121,6 +123,7 @@ describe("window manager", () => {
     mocks.BrowserWindow.instances.length = 0;
     mocks.appFocus.mockReset();
     mocks.appQuit.mockReset();
+    mocks.appRelaunch.mockReset();
     mocks.emitEvent.mockReset();
     mocks.emitEvent.mockReturnValue(true);
     mocks.onAutoArchiveTrigger.mockReset();
@@ -245,6 +248,23 @@ describe("window manager", () => {
 
     manager.requestQuit();
     expect(mocks.appQuit).toHaveBeenCalled();
+  });
+
+  it("relaunches and quits when restarting the app", () => {
+    const manager = createWindowManager({
+      emitEvent: mocks.emitEvent,
+      onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onOpenBlockReady: mocks.onOpenBlockReady,
+    });
+
+    manager.createMainWindow();
+    const win = mocks.BrowserWindow.instances[0];
+
+    manager.restartApp();
+
+    expect(mocks.appRelaunch).toHaveBeenCalledOnce();
+    expect(win.destroyed).toBe(true);
+    expect(mocks.appQuit).toHaveBeenCalledOnce();
   });
 
   it("shows hidden/minimized window and handles close while quitting", () => {

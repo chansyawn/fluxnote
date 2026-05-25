@@ -21,8 +21,12 @@ A **User Preferences** choice that controls whether Fluxnotes shares anonymous d
 _Avoid_: Tracking config, analytics state
 
 **App Update**:
-A workflow that updates the installed Fluxnotes application to a newer released version.
+A workflow that discovers, downloads, and installs a released version of the Fluxnotes application. Fluxnotes may try to confirm whether a newer release exists before installation, but a downloaded release can still be an **App Update** when that confirmation is unavailable.
 _Avoid_: Block update, content update, software update
+
+**App Update Check Preference**:
+A **User Preferences** choice that controls whether Fluxnotes automatically checks for **App Updates** in the background. It does not automatically install an **App Update**.
+_Avoid_: Automatic update, update notification setting
 
 **Block**:
 A standalone note unit with Markdown content, archive state, keep state, pin state, and tags.
@@ -96,7 +100,9 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - **User Preferences** can affect **Workspace** presentation and app-level behavior.
 - **Theme Preference** belongs to **User Preferences**.
 - **Telemetry Preference** belongs to **User Preferences**.
+- **App Update Check Preference** belongs to **User Preferences**.
 - **User Preferences** expose manual **App Update** checks.
+- **App Update Check Preference** does not disable manual **App Update** checks.
 - **App Update** does not modify **Blocks**.
 - **User Preferences** configure **Auto Archive**, but changing them does not itself move **Blocks** into the archive.
 
@@ -120,3 +126,4 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - "Theme" can mean either the user's choice or the resolved light/dark appearance; resolved: use **Theme Preference** for the user-controlled choice.
 - "Telemetry" can mean implementation diagnostics or the user's sharing choice; resolved: use **Telemetry Preference** for the user-controlled choice.
 - "Update" can mean changing **Block** content or updating Fluxnotes itself; resolved: use **App Update** for installed application updates.
+- "Automatic update" can mean checking for an **App Update** or installing one; resolved: use **App Update Check Preference** for automatic checking, and do not imply automatic installation.

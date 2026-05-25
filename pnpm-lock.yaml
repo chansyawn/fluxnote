@@ -72,9 +72,6 @@ importers:
       '@lingui/core':
         specifier: 6.0.1
         version: 6.0.1
-      '@lingui/detect-locale':
-        specifier: 6.0.1
-        version: 6.0.1
       '@lingui/react':
         specifier: 6.0.1
         version: 6.0.1(react@19.2.4)
@@ -147,6 +144,9 @@ importers:
       shadcn:
         specifier: ^4.1.2
         version: 4.1.2(@types/node@25.5.0)(typescript@5.9.3)
+      simple-icons:
+        specifier: ^16.21.0
+        version: 16.21.0
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1374,10 +1374,6 @@ packages:
     peerDependenciesMeta:
       babel-plugin-macros:
         optional: true
-
-  '@lingui/detect-locale@6.0.1':
-    resolution: {integrity: sha512-pQS8Y2Ho09llqs9YvFXUkouxQZd7VNl9F77a7PpOWd/pKKrJZyCzgPu7Kw3mr+zcbg2owBTzdIfoXfv1BXQUmg==}
-    engines: {node: '>=22.19.0'}
 
   '@lingui/format-po@6.0.1':
     resolution: {integrity: sha512-kt3naP/2kpAPJ4dwwFnkhbvR5XkGaNdbK8W6ofpIJFhY3MvGZJ9rYY0KMp++3DAaXf7r6tHq0W0To3akSDejvg==}
@@ -5080,6 +5076,10 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
+  simple-icons@16.21.0:
+    resolution: {integrity: sha512-kH6LEx5yvBGVNaVrHnZ7D17G16CmmHiI8DD7MwIwgnWmDFTiFu4PhFZLNdV6bMGr61qbHMMTXLoo/T6C25dMGA==}
+    engines: {node: '>=0.12.18'}
+
   sirv@3.0.2:
     resolution: {integrity: sha512-2wcC/oGxHis/BoHkkPwldgiPSYcpZK3JU28WoMVv55yHJgcZ8rlXvuG9iZggz+sU1d4bRgIGASwyWqjxu3FM0g==}
     engines: {node: '>=18'}
@@ -6914,8 +6914,6 @@ snapshots:
       '@lingui/message-utils': 6.0.1
     transitivePeerDependencies:
       - supports-color
-
-  '@lingui/detect-locale@6.0.1': {}
 
   '@lingui/format-po@6.0.1':
     dependencies:
@@ -10687,6 +10685,8 @@ snapshots:
   signal-exit@3.0.7: {}
 
   signal-exit@4.1.0: {}
+
+  simple-icons@16.21.0: {}
 
   sirv@3.0.2:
     dependencies:
