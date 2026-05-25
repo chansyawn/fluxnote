@@ -231,24 +231,29 @@ msgid "error.block.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:41
+#: src/renderer/features/error-boundary/global-error-content.tsx:61
 msgid "error.global.description"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:15
 #: src/renderer/features/error-boundary/error-title-bar.tsx:26
-#: src/renderer/features/error-boundary/global-error-content.tsx:56
+#: src/renderer/features/error-boundary/global-error-content.tsx:80
 msgid "error.global.exit-app"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:52
-msgid "error.global.retry"
+#: src/renderer/features/error-boundary/global-error-content.tsx:72
+msgid "error.global.report-issue"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:38
+#: src/renderer/features/error-boundary/global-error-content.tsx:76
+msgid "error.global.restart-app"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:58
 msgid "error.global.title"
 msgstr ""
 

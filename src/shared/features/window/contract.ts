@@ -18,6 +18,10 @@ export const windowContract = {
       input: voidSchema,
       output: voidSchema,
     },
+    "window.restart": {
+      input: voidSchema,
+      output: voidSchema,
+    },
     "window.toggle": {
       input: voidSchema,
       output: voidSchema,

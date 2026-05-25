@@ -1,4 +1,4 @@
-import { AppErrorFallback } from "@renderer/features/error-boundary/app-error-fallback";
+import { AppErrorFallback } from "@renderer/features/error-boundary/global-error-fallback";
 import { captureRendererError } from "@renderer/features/telemetry";
 import type { ReactNode } from "react";
 import { ErrorBoundary } from "react-error-boundary";

@@ -231,24 +231,29 @@ msgid "error.block.title"
 msgstr "This block failed to render"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:41
+#: src/renderer/features/error-boundary/global-error-content.tsx:61
 msgid "error.global.description"
-msgstr "Fluxnotes encountered an unexpected error. You can retry or exit the app."
+msgstr "Fluxnotes encountered an unexpected error. You can report the issue or restart the app."
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:15
 #: src/renderer/features/error-boundary/error-title-bar.tsx:26
-#: src/renderer/features/error-boundary/global-error-content.tsx:56
+#: src/renderer/features/error-boundary/global-error-content.tsx:80
 msgid "error.global.exit-app"
 msgstr "Exit app"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:52
-msgid "error.global.retry"
-msgstr "Retry"
+#: src/renderer/features/error-boundary/global-error-content.tsx:72
+msgid "error.global.report-issue"
+msgstr "Report issue"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:38
+#: src/renderer/features/error-boundary/global-error-content.tsx:76
+msgid "error.global.restart-app"
+msgstr "Restart app"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:58
 msgid "error.global.title"
 msgstr "Something went wrong"
 

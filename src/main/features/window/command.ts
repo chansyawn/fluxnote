@@ -22,6 +22,11 @@ export function registerWindowCommands(ipc: IpcRouter, deps: WindowCommandDeps):
     return undefined;
   });
 
+  ipc.command("window.restart", () => {
+    deps.windowManager.restartApp();
+    return undefined;
+  });
+
   ipc.command("window.toggle", () => {
     deps.windowManager.toggleMainWindow();
     return undefined;

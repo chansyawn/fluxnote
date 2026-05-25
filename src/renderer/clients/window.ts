@@ -8,6 +8,10 @@ export async function hideWindow(): Promise<void> {
   await invokeCommand("window.hide", undefined);
 }
 
+export async function restartApp(): Promise<void> {
+  await invokeCommand("window.restart", undefined);
+}
+
 export async function toggleMainWindowVisibility(): Promise<void> {
   await invokeCommand("window.toggle", undefined);
 }

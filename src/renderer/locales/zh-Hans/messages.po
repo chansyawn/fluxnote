@@ -231,24 +231,29 @@ msgid "error.block.title"
 msgstr "此区块渲染失败"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:41
+#: src/renderer/features/error-boundary/global-error-content.tsx:61
 msgid "error.global.description"
-msgstr "Fluxnotes 遇到了意外错误。你可以重试或退出应用。"
+msgstr "Fluxnotes 遇到了意外错误。你可以反馈问题或重启应用。"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:15
 #: src/renderer/features/error-boundary/error-title-bar.tsx:26
-#: src/renderer/features/error-boundary/global-error-content.tsx:56
+#: src/renderer/features/error-boundary/global-error-content.tsx:80
 msgid "error.global.exit-app"
 msgstr "退出应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:52
-msgid "error.global.retry"
-msgstr "重试"
+#: src/renderer/features/error-boundary/global-error-content.tsx:72
+msgid "error.global.report-issue"
+msgstr "反馈问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/global-error-content.tsx:38
+#: src/renderer/features/error-boundary/global-error-content.tsx:76
+msgid "error.global.restart-app"
+msgstr "重启应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:58
 msgid "error.global.title"
 msgstr "出了点问题"
 

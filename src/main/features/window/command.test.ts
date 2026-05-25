@@ -21,6 +21,7 @@ describe("window command", () => {
     const windowManager = {
       requestQuit: vi.fn(),
       hideMainWindow: vi.fn(),
+      restartApp: vi.fn(),
       toggleMainWindow: vi.fn(),
       showMainWindow: vi.fn(),
     };
@@ -34,9 +35,11 @@ describe("window command", () => {
 
     expect(handlers.get("window.destroy")?.()).toBeUndefined();
     expect(handlers.get("window.hide")?.()).toBeUndefined();
+    expect(handlers.get("window.restart")?.()).toBeUndefined();
     expect(handlers.get("window.toggle")?.()).toBeUndefined();
     expect(windowManager.requestQuit).toHaveBeenCalled();
     expect(windowManager.hideMainWindow).toHaveBeenCalled();
+    expect(windowManager.restartApp).toHaveBeenCalled();
     expect(windowManager.toggleMainWindow).toHaveBeenCalled();
   });
 
@@ -51,6 +54,7 @@ describe("window command", () => {
     const windowManager = {
       requestQuit: vi.fn(),
       hideMainWindow: vi.fn(),
+      restartApp: vi.fn(),
       toggleMainWindow: vi.fn(),
       showMainWindow: vi.fn(),
     };

@@ -28,6 +28,7 @@ export interface WindowManager {
   openMainWindowDevTools: () => void;
   prepareToQuit: () => void;
   requestQuit: () => void;
+  restartApp: () => void;
   showMainWindow: () => void;
   toggleMainWindow: () => void;
 }
@@ -143,6 +144,11 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     app.quit();
   }
 
+  function restartApp(): void {
+    app.relaunch();
+    requestQuit();
+  }
+
   function createMainWindow(): void {
     const existingWindow = getMainWindow();
     if (existingWindow) {
@@ -239,6 +245,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     openMainWindowDevTools,
     prepareToQuit,
     requestQuit,
+    restartApp,
     showMainWindow,
     toggleMainWindow,
   };

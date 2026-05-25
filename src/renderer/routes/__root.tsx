@@ -1,4 +1,4 @@
-import { RouterErrorFallback } from "@renderer/features/error-boundary";
+import { RootRouterErrorFallback } from "@renderer/features/error-boundary";
 import {
   OpenBlockRequestProvider,
   OpenBlockWorkspaceRouteSync,
@@ -11,7 +11,7 @@ import { WindowTitleBar } from "./-layout/window-title-bar";
 
 export const Route = createRootRoute({
   component: RootComponent,
-  errorComponent: RouterErrorFallback,
+  errorComponent: RootRouterErrorFallback,
 });
 
 function RootComponent() {
