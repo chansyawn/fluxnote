@@ -18,14 +18,14 @@ import {
   XIcon,
   FlagIcon,
 } from "lucide-react";
-import { type ReactElement } from "react";
+import { type ReactElement, type SVGProps } from "react";
 
 import { ShortcutInput } from "./shortcut-input";
 import { useShortcutRecorder } from "./use-shortcut-recorder";
 
 interface ShortcutFieldDefinition {
   action: ShortcutAction;
-  icon: typeof KeyboardIcon;
+  icon: ReactElement<SVGProps<SVGSVGElement>>;
   title: ReactElement;
   description?: ReactElement;
 }
@@ -33,42 +33,42 @@ interface ShortcutFieldDefinition {
 const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
   {
     action: "toggleWindow",
-    icon: KeyboardIcon,
+    icon: <KeyboardIcon />,
     title: <Trans id="preferences.shortcuts.toggleWindow.label">Toggle window</Trans>,
   },
   {
     action: "createBlock",
-    icon: PlusCircleIcon,
+    icon: <PlusCircleIcon />,
     title: <Trans id="preferences.shortcuts.createBlock.label">Create block</Trans>,
   },
   {
     action: "copyBlock",
-    icon: CopyIcon,
+    icon: <CopyIcon />,
     title: <Trans id="preferences.shortcuts.copyBlock.label">Copy block</Trans>,
   },
   {
     action: "keepBlock",
-    icon: FlagIcon,
+    icon: <FlagIcon />,
     title: <Trans id="preferences.shortcuts.keepBlock.label">Keep block</Trans>,
   },
   {
     action: "togglePinBlock",
-    icon: PinIcon,
+    icon: <PinIcon />,
     title: <Trans id="preferences.shortcuts.togglePinBlock.label">Pin/unpin block</Trans>,
   },
   {
     action: "deleteBlock",
-    icon: Trash2Icon,
+    icon: <Trash2Icon />,
     title: <Trans id="preferences.shortcuts.deleteBlock.label">Delete block</Trans>,
   },
   {
     action: "archiveBlock",
-    icon: ArchiveIcon,
+    icon: <ArchiveIcon />,
     title: <Trans id="preferences.shortcuts.archiveBlock.label">Archive/restore block</Trans>,
   },
   {
     action: "quickCreateBlock",
-    icon: WandSparklesIcon,
+    icon: <WandSparklesIcon />,
     title: <Trans id="preferences.shortcuts.quickCreateBlock.label">Quick create block</Trans>,
     description: (
       <Trans id="preferences.shortcuts.quickCreateBlock.description">
@@ -78,12 +78,12 @@ const SHORTCUT_FIELD_DEFINITIONS: ShortcutFieldDefinition[] = [
   },
   {
     action: "submitExternalEdit",
-    icon: CheckIcon,
+    icon: <CheckIcon />,
     title: <Trans id="preferences.shortcuts.submitExternalEdit.label">Submit external edit</Trans>,
   },
   {
     action: "cancelExternalEdit",
-    icon: XIcon,
+    icon: <XIcon />,
     title: <Trans id="preferences.shortcuts.cancelExternalEdit.label">Cancel external edit</Trans>,
   },
 ];

@@ -15,17 +15,19 @@ import {
   SettingsRow,
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
+import { BrandIcon } from "@renderer/ui/components/brand-icon";
 import { Button } from "@renderer/ui/components/button";
 import { Switch } from "@renderer/ui/components/switch";
 import {
   BadgeInfoIcon,
   BugIcon,
   CircleFadingArrowUpIcon,
-  GitBranchIcon,
+  HomeIcon,
   RefreshCwIcon,
   SendIcon,
 } from "lucide-react";
 import { useCallback } from "react";
+import { siGithub } from "simple-icons";
 import { toast } from "sonner";
 
 const GITHUB_REPOSITORY_URL = "https://github.com/chansyawn/fluxnotes";
@@ -91,7 +93,7 @@ export function AboutSettingsSection() {
               )}
             </div>
           }
-          icon={BadgeInfoIcon}
+          icon={<BadgeInfoIcon />}
           label={<Trans id="preferences.app-version.label">Version</Trans>}
         />
         <SettingsRow
@@ -124,7 +126,7 @@ export function AboutSettingsSection() {
               </Trans>
             )
           }
-          icon={RefreshCwIcon}
+          icon={<RefreshCwIcon />}
           label={<Trans id="preferences.app-update.auto-check.label">Auto updates</Trans>}
         />
         <SettingsRow
@@ -146,7 +148,7 @@ export function AboutSettingsSection() {
               data are never included.
             </Trans>
           }
-          icon={SendIcon}
+          icon={<SendIcon />}
           label={<Trans id="preferences.telemetry.label">Telemetry</Trans>}
         />
         <SettingsRow
@@ -157,7 +159,7 @@ export function AboutSettingsSection() {
                 variant="outline"
                 onClick={() => handleOpenExternalUrl(GITHUB_REPOSITORY_URL)}
               >
-                <GitBranchIcon />
+                <HomeIcon />
                 <Trans id="preferences.github.repository.open">Repository</Trans>
               </Button>
               <Button
@@ -170,7 +172,7 @@ export function AboutSettingsSection() {
               </Button>
             </div>
           }
-          icon={GitBranchIcon}
+          icon={<BrandIcon icon={siGithub} />}
           label={<Trans id="preferences.github.label">GitHub</Trans>}
         />
       </SettingsGroup>

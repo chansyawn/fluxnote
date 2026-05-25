@@ -23,7 +23,7 @@ export function MarkdownSettingsSection() {
               }}
             />
           }
-          icon={ListOrderedIcon}
+          icon={<ListOrderedIcon />}
           label={
             <Trans id="preferences.markdown.code-block.line-numbers.label">Show line numbers</Trans>
           }
@@ -37,7 +37,7 @@ export function MarkdownSettingsSection() {
               }}
             />
           }
-          icon={WrapTextIcon}
+          icon={<WrapTextIcon />}
           label={<Trans id="preferences.markdown.code-block.word-wrap.label">Word wrap</Trans>}
         />
       </SettingsGroup>

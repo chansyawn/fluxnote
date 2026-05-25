@@ -358,48 +358,48 @@ msgid "lab.title"
 msgstr "Lab"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:56
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:58
 msgid "preferences.about.title"
 msgstr "About"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:121
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:123
 msgid "preferences.app-update.auto-check.description"
 msgstr "Fluxnotes checks for updates in the background and shows an install option when one is ready."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:100
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:128
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:102
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:130
 msgid "preferences.app-update.auto-check.label"
 msgstr "Auto updates"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:113
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:115
 msgid "preferences.app-update.auto-check.unavailable-development"
 msgstr "App updates are unavailable while Fluxnotes is running from a development build."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:117
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:119
 msgid "preferences.app-update.auto-check.unavailable-platform"
 msgstr "App updates are unavailable on this platform."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:89
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:91
 msgid "preferences.app-update.check"
 msgstr "Check"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:75
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:77
 msgid "preferences.app-update.downloading"
 msgstr "Downloading"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:68
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:70
 msgid "preferences.app-update.install"
 msgstr "Update"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:95
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:97
 msgid "preferences.app-version.label"
 msgstr "Version"
 
@@ -530,17 +530,17 @@ msgid "preferences.font-size.label"
 msgstr "Font size"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:169
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:171
 msgid "preferences.github.issues.open"
 msgstr "Issues"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:174
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:176
 msgid "preferences.github.label"
 msgstr "GitHub"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:161
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:163
 msgid "preferences.github.repository.open"
 msgstr "Repository"
 
@@ -668,13 +668,13 @@ msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "Toggle window"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:144
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:146
 msgid "preferences.telemetry.description"
 msgstr "Shares anonymous diagnostics and crash reports. Notes, tags, file paths, and clipboard data are never included."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:133
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:150
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:135
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:152
 msgid "preferences.telemetry.label"
 msgstr "Telemetry"
 

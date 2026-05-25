@@ -9,8 +9,15 @@ import {
 } from "@renderer/ui/components/item";
 import { Separator } from "@renderer/ui/components/separator";
 import { cn } from "@renderer/ui/lib/utils";
-import type { LucideIcon } from "lucide-react";
-import { Children, Fragment, isValidElement, type ReactNode } from "react";
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  type SVGProps,
+} from "react";
 
 interface SettingsSectionProps {
   title: ReactNode;
@@ -21,8 +28,10 @@ interface SettingsGroupProps {
   children: ReactNode;
 }
 
+type SettingsRowIcon = ReactElement<SVGProps<SVGSVGElement>>;
+
 interface SettingsRowProps {
-  icon: LucideIcon;
+  icon: SettingsRowIcon;
   label: ReactNode;
   control: ReactNode;
   description?: ReactNode;
@@ -59,7 +68,7 @@ function SettingsGroup({ children }: SettingsGroupProps) {
 }
 
 function SettingsRow({
-  icon: Icon,
+  icon,
   label,
   control,
   description,
@@ -69,7 +78,10 @@ function SettingsRow({
   return (
     <Item className={cn("h-10 flex-nowrap rounded-none border-none", className)}>
       <ItemMedia className="text-foreground" variant="icon">
-        <Icon aria-hidden="true" className="size-3.5" />
+        {cloneElement(icon, {
+          "aria-hidden": true,
+          className: cn("size-3.5", icon.props.className),
+        })}
       </ItemMedia>
       <ItemContent className="min-w-0 flex-1 gap-0">
         <HoverCard>

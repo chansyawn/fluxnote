@@ -358,48 +358,48 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:56
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:58
 msgid "preferences.about.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:121
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:123
 msgid "preferences.app-update.auto-check.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:100
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:128
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:102
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:130
 msgid "preferences.app-update.auto-check.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:113
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:115
 msgid "preferences.app-update.auto-check.unavailable-development"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:117
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:119
 msgid "preferences.app-update.auto-check.unavailable-platform"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:89
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:91
 msgid "preferences.app-update.check"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:75
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:77
 msgid "preferences.app-update.downloading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:68
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:70
 msgid "preferences.app-update.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:95
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:97
 msgid "preferences.app-version.label"
 msgstr ""
 
@@ -530,17 +530,17 @@ msgid "preferences.font-size.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:169
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:171
 msgid "preferences.github.issues.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:174
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:176
 msgid "preferences.github.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:161
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:163
 msgid "preferences.github.repository.open"
 msgstr ""
 
@@ -668,13 +668,13 @@ msgid "preferences.shortcuts.toggleWindow.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:144
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:146
 msgid "preferences.telemetry.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:133
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:150
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:135
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:152
 msgid "preferences.telemetry.label"
 msgstr ""
 

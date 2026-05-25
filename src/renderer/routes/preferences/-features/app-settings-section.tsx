@@ -137,7 +137,7 @@ export function AppSettingsSection() {
               </TabsList>
             </Tabs>
           }
-          icon={PaletteIcon}
+          icon={<PaletteIcon />}
           label={<Trans id="preferences.theme.label">Theme</Trans>}
         />
         <SettingsRow
@@ -165,7 +165,7 @@ export function AppSettingsSection() {
               </SelectContent>
             </Select>
           }
-          icon={LanguagesIcon}
+          icon={<LanguagesIcon />}
           label={<Trans id="preferences.language.label">Language</Trans>}
         />
         <SettingsRow
@@ -198,7 +198,7 @@ export function AppSettingsSection() {
               </SelectContent>
             </Select>
           }
-          icon={TypeIcon}
+          icon={<TypeIcon />}
           label={<Trans id="preferences.font-size.label">Font size</Trans>}
         />
         <SettingsRow
@@ -224,7 +224,7 @@ export function AppSettingsSection() {
               view available commands and usage.
             </Trans>
           }
-          icon={TerminalIcon}
+          icon={<TerminalIcon />}
           label={<Trans id="preferences.cli.path.label">Flux CLI</Trans>}
         />
       </SettingsGroup>
