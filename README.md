@@ -1,93 +1,92 @@
 # Fluxnotes
 
+![Fluxnotes](./src/assets/banner.png)
+
 <p align="center">
-  <img src="./src/assets/icons/icon.png" alt="Fluxnotes Logo" height="96" />
+  <img alt="License" src="https://img.shields.io/github/license/chansyawn/fluxnotes" />
+  <a href="https://github.com/chansyawn/fluxnotes/releases"><img alt="Release" src="https://img.shields.io/github/v/release/chansyawn/fluxnotes?sort=semver&display_name=tag" /></a>
+  <a href="https://github.com/chansyawn/fluxnotes/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/chansyawn/fluxnotes/total" /></a>
 </p>
 
-[English](./README.md) | [中文](./README.zh.md)
+<p align="center">
+  English | <a href="./README.zh.md">中文</a>
+</p>
 
-Fluxnotes is a lightweight, always-on-top editor designed for AI-first workflows.
+Fluxnotes is a lightweight[^lightweight], always-on-top Markdown Block editor for AI-era workflows.
 
-It was built from a real daily problem: AI input boxes are rarely good at long prompt drafting, structured organization, and multi-round iteration. Fluxnotes acts as a lightweight drafting layer for AI workflows, especially for CLI agents while still fitting web chat tools.
+It is not another knowledge base, and it is not a full Markdown editor. It is a visible context buffer: each Block is an input draft that can be edited, organized, and archived independently.
 
-## Why Fluxnotes
+- **Polish input**: organize and revise longer text before sending it to chat tools, CLI agents, or other input boxes.
+- **Organize context**: keep temporary working context while switching between tasks, windows, and tools.
+- **Capture temporary notes**: save ideas, snippets, and pending items before moving them into a more formal knowledge base or document.
 
-If you work with AI every day, prompt quality and iteration speed matter, but most AI input boxes are optimized for quick messages, not serious drafting.
+## Getting Started
 
-That creates predictable friction:
+Download the latest version from [GitHub Releases](https://github.com/chansyawn/fluxnotes/releases).
 
-- long prompts become hard to revise cleanly
-- structure gets lost across iterations
-- parallel tasks get mixed together in one document
-
-Fluxnotes gives you a lightweight drafting pad before final submission to any AI tool:
-
-- draft and polish long prompts comfortably
-- separate parallel tasks with blocks instead of forcing everything into one document
-- hand off refined input to CLI agents and web chat tools with less context switching
-
-## Product Direction
-
-Fluxnotes aims to be a lightweight, global, workflow-friendly Markdown / Block editor for AI work.
-
-Core design goals:
-
-- lightweight and fast for everyday use
-- always available as a top-level utility
-- optimized for prompt writing and handoff
+> Fluxnotes is still in early development. Some parts may be unstable or incomplete. Issues and suggestions are welcome on [GitHub Issues](https://github.com/chansyawn/fluxnotes/issues)[^feedback].
 
 ## Features
 
-### Available today
+- **Always on top**: stays visible while you move between browsers, IDEs, terminals, documents, and AI tools, acting as a temporary context buffer for the current work.
+- **Auto archive**: automatically moves inactive Blocks out of the active Workspace to reduce buildup from long-running parallel tasks.
+- **WYSIWYG Markdown**: write Markdown in a close-to-what-you-see-is-what-you-get editing experience for structured prompts and notes.
+- **Input handoff**: use the `flux` CLI to open Fluxnotes, create Blocks, or connect it as an external editor for CLI agents such as Codex and Claude Code. More launch and handoff paths will be explored over time.
 
-- **Lightweight always-on-top editing experience**
-- **Block-based content organization** for clearer separation across parallel tasks
-- **Auto-archive workflow** to keep active space clean
-- **Markdown editing support** for structured prompt authoring
-- **Command-line integration** for opening external edits from tools like Claude Code and Codex
+## Usage
 
-### In progress / planned
+### Install Flux CLI
 
-- **Broader Markdown coverage** toward full syntax support
-- **Browser integration** through plugins, URL schema, and Native Message
-- **Smoother editing flow inside web AI tools**
-
-## Use Fluxnotes as `$EDITOR` (Claude Code / Codex)
-
-If you want Claude Code or Codex to open external edits in Fluxnotes, set your shell editor to:
+Open Fluxnotes Preferences, go to the App section, find Flux CLI, and click Install. After installation, run:
 
 ```bash
-export EDITOR="flux edit"
+flux --help
 ```
 
-To make it persistent:
+to view available commands and options.
 
-```bash
-echo 'export EDITOR="flux edit"' >> ~/.zshrc
-source ~/.zshrc
-```
+### Use With Codex / Claude Code
 
-Then when Claude Code or Codex triggers an external editor flow, the target file will open in Fluxnotes for editing and submit/cancel handling.
-
-If you prefer enabling this only for Codex / Claude commands (without changing global `EDITOR`), add aliases:
+Use aliases to enable Fluxnotes only for Codex / Claude Code:
 
 ```bash
 alias cdx='EDITOR="flux edit" codex'
 alias cld='EDITOR="flux edit" claude'
 ```
 
-Then use `cdx` or `cld` when you want Fluxnotes-backed external editing.
+Then start the tools with `cdx` or `cld`. When they enter an external edit flow, the content opens in Fluxnotes. You can polish the input there, then submit or cancel the edit.
 
-## Who It Is For
+Avoid setting `EDITOR="flux edit"` as your global default editor. A global `EDITOR` affects Git, shell commands, and other CLI tools.
 
-Fluxnotes is for builders, developers, and AI power users who:
+### Create Content From the Terminal
 
-- rely heavily on CLI agents (Codex, Claude Code, etc.) and need a better external editing experience
-- use web chat AI tools but prefer drafting and structuring input before pasting
-- work across multiple AI tools and want one lightweight place to draft and refine prompts
+```bash
+flux
+flux add "Summarize the current task context and next step"
+flux add --file prompt.md --tag codex
+```
 
-## Current Stage
+- `flux`: open Fluxnotes.
+- `flux add "..."`: create a Block from inline text.
+- `flux add --file prompt.md --tag codex`: create a Block from a UTF-8 text file and add a Tag.
 
-Fluxnotes is under active early development.
+## Why Fluxnotes
 
-Some capabilities are already usable, while others are being completed incrementally based on real usage feedback.
+Most AI products are conversational: web chat, desktop chat, CLI agents. Their input boxes are usually great for sending a quick message, but not for carefully shaping structured input.
+
+At the same time, AI increases how much work can happen in parallel. Multiple tools, projects, and tasks interrupt each other often, and people need one place to organize their own context.
+
+Fluxnotes focuses on that middle layer: before sending something to an AI tool, you get a lightweight, visible Workspace for drafting and iteration.
+
+## Roadmap
+
+- Broader Markdown syntax support and a better editing experience.
+- Smoother input handoff: explore Accessibility APIs, browser extensions, and other ways to launch Fluxnotes from input boxes or send content directly to different AI apps.
+
+## Another Option
+
+If Fluxnotes is not mature or stable enough for you yet, try [Raycast Notes](https://www.raycast.com/core-features/notes). It inspired Fluxnotes and is more mature, simpler, and more restrained.
+
+[^lightweight]: "Lightweight" here refers to the product shape and workflow. Fluxnotes is built with Electron, so the underlying stack itself is not lightweight.
+
+[^feedback]: Sorry, external PRs are not accepted at this stage. The product direction and internal architecture are still changing quickly, and accepting external contributions too early would add maintenance overhead.
