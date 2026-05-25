@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.17](https://github.com/chansyawn/fluxnotes/compare/v0.0.16...v0.0.17) (2026-05-25)
+
+
+### Features
+
+* optimize settings, updates, and recovery ([#41](https://github.com/chansyawn/fluxnotes/issues/41)) ([7cf7aaa](https://github.com/chansyawn/fluxnotes/commit/7cf7aaaf933a0506658fe85bda4e43017ced284e))
+
 ## [0.0.16](https://github.com/chansyawn/fluxnotes/compare/v0.0.15...v0.0.16) (2026-05-23)
 
 
