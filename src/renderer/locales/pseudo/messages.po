@@ -358,53 +358,53 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:275
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:56
+msgid "preferences.about.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:121
 msgid "preferences.app-update.auto-check.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:254
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:283
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:100
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:128
 msgid "preferences.app-update.auto-check.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:267
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:113
 msgid "preferences.app-update.auto-check.unavailable-development"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:271
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:117
 msgid "preferences.app-update.auto-check.unavailable-platform"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:329
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:89
 msgid "preferences.app-update.check"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:315
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:75
 msgid "preferences.app-update.downloading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:302
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:68
 msgid "preferences.app-update.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:298
-msgid "preferences.app-update.install-version"
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:95
+msgid "preferences.app-version.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:335
-msgid "preferences.app-update.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:111
 msgid "preferences.app.title"
 msgstr ""
 
@@ -505,32 +505,47 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:350
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:217
 msgid "preferences.cli.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:355
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:222
 msgid "preferences.cli.path.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:361
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:228
 msgid "preferences.cli.path.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:346
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:213
 msgid "preferences.cli.uninstall"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:227
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:202
 msgid "preferences.font-size.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:194
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:169
+msgid "preferences.github.issues.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:174
+msgid "preferences.github.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:161
+msgid "preferences.github.repository.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:169
 msgid "preferences.language.label"
 msgstr ""
 
@@ -653,38 +668,38 @@ msgid "preferences.shortcuts.toggleWindow.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:243
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:144
 msgid "preferences.telemetry.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:232
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:249
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:133
+#: src/renderer/routes/preferences/-features/about-settings-section.tsx:150
 msgid "preferences.telemetry.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:93
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:77
 msgid "preferences.theme.dark"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:166
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:141
 msgid "preferences.theme.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:88
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
 msgid "preferences.theme.light"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:83
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:67
 msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:17
+#: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
 msgstr ""
 

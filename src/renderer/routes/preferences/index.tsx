@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { AboutSettingsSection } from "@renderer/routes/preferences/-features/about-settings-section";
 import { AppSettingsSection } from "@renderer/routes/preferences/-features/app-settings-section";
 import { AutoArchiveSettingsSection } from "@renderer/routes/preferences/-features/auto-archive-settings-section";
 import { MarkdownSettingsSection } from "@renderer/routes/preferences/-features/markdown-settings-section";
@@ -23,6 +24,7 @@ function RouteComponent() {
         <MarkdownSettingsSection />
         <AutoArchiveSettingsSection />
         <ShortcutSettingsSection />
+        <AboutSettingsSection />
       </div>
     </section>
   );

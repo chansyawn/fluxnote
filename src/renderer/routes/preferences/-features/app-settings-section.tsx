@@ -3,15 +3,8 @@ import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
 import { queryClient } from "@renderer/app/query";
 import { getCliStatus, installCli, toAppInvokeError, uninstallCli } from "@renderer/clients";
-import { AppUpdateInstallDialog } from "@renderer/features/app-update/app-update-install-dialog";
 import {
-  useAppUpdateStatusQuery,
-  useManualAppUpdateCheckMutation,
-} from "@renderer/features/app-update/app-update-query";
-import {
-  useAppUpdatePreference,
   useFontSizePreference,
-  useTelemetryPreference,
   useThemePreference,
 } from "@renderer/features/preferences/preferences-query";
 import {
@@ -28,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@renderer/ui/components/select";
-import { Switch } from "@renderer/ui/components/switch";
 import { Tabs, TabsList, TabsTrigger } from "@renderer/ui/components/tabs";
 import {
   FONT_SIZE_OPTIONS,
@@ -39,14 +31,10 @@ import {
 } from "@shared/features/preferences/settings";
 import { useQuery } from "@tanstack/react-query";
 import {
-  BadgeInfoIcon,
-  CircleFadingArrowUpIcon,
   LanguagesIcon,
   MonitorIcon,
   MoonIcon,
   PaletteIcon,
-  SendIcon,
-  RefreshCwIcon,
   SunIcon,
   TerminalIcon,
   TypeIcon,
@@ -60,10 +48,6 @@ export function AppSettingsSection() {
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
   const { theme, setTheme } = useThemePreference();
-  const { telemetry, patchTelemetry } = useTelemetryPreference();
-  const { appUpdate, patchAppUpdate } = useAppUpdatePreference();
-  const { data: appUpdateStatus } = useAppUpdateStatusQuery();
-  const appUpdateCheckMutation = useManualAppUpdateCheckMutation();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
     queryKey: ["cli", "status"],
     queryFn: getCliStatus,
@@ -98,15 +82,6 @@ export function AppSettingsSection() {
   const cliDisabled = isCliStatusLoading || isCliPending;
   const canInstallCli = cliStatus?.canInstall === true;
   const canUninstallCli = cliStatus?.canUninstall === true;
-  const appUpdateChecking =
-    appUpdateStatus?.state === "checking" || appUpdateCheckMutation.isPending;
-  const appUpdateDownloading = appUpdateStatus?.state === "downloading";
-  const appUpdateReadyStatus = appUpdateStatus?.state === "ready" ? appUpdateStatus : null;
-  const appUpdateSupported = appUpdateStatus?.isSupported === true;
-  const appUpdateUnsupportedReason =
-    appUpdateStatus?.state === "unsupported" ? appUpdateStatus.unsupportedReason : null;
-  const appUpdateTargetVersion =
-    appUpdateReadyStatus?.availableVersion ?? appUpdateReadyStatus?.releaseName;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -225,114 +200,6 @@ export function AppSettingsSection() {
           }
           icon={TypeIcon}
           label={<Trans id="preferences.font-size.label">Font size</Trans>}
-        />
-        <SettingsRow
-          control={
-            <Switch
-              aria-label={i18n._({
-                id: "preferences.telemetry.label",
-                message: "Share anonymous diagnostics",
-              })}
-              checked={telemetry.enabled}
-              onCheckedChange={(enabled) => {
-                patchTelemetry({ enabled });
-              }}
-            />
-          }
-          description={
-            <Trans id="preferences.telemetry.description">
-              Share anonymous diagnostics and crash reports. Block content, tags, file paths, and
-              clipboard data are never included.
-            </Trans>
-          }
-          icon={SendIcon}
-          label={<Trans id="preferences.telemetry.label">Share anonymous diagnostics</Trans>}
-        />
-        <SettingsRow
-          control={
-            <Switch
-              aria-label={i18n._({
-                id: "preferences.app-update.auto-check.label",
-                message: "Automatically check for app updates",
-              })}
-              checked={appUpdate.automaticChecksEnabled}
-              disabled={!appUpdateSupported}
-              onCheckedChange={(automaticChecksEnabled) => {
-                patchAppUpdate({ automaticChecksEnabled });
-              }}
-            />
-          }
-          description={
-            appUpdateUnsupportedReason === "not-packaged" ? (
-              <Trans id="preferences.app-update.auto-check.unavailable-development">
-                App updates are unavailable while Fluxnotes is running from a development build.
-              </Trans>
-            ) : appUpdateUnsupportedReason === "platform" ? (
-              <Trans id="preferences.app-update.auto-check.unavailable-platform">
-                App updates are unavailable on this platform.
-              </Trans>
-            ) : (
-              <Trans id="preferences.app-update.auto-check.description">
-                Fluxnotes checks in the background and shows an install option when an update is
-                ready.
-              </Trans>
-            )
-          }
-          icon={RefreshCwIcon}
-          label={
-            <Trans id="preferences.app-update.auto-check.label">
-              Automatically check for app updates
-            </Trans>
-          }
-        />
-        <SettingsRow
-          control={
-            <div className="flex items-center gap-2">
-              {appUpdateReadyStatus ? (
-                <AppUpdateInstallDialog
-                  status={appUpdateReadyStatus}
-                  trigger={
-                    <Button size="sm">
-                      <CircleFadingArrowUpIcon />
-                      {appUpdateTargetVersion ? (
-                        <Trans id="preferences.app-update.install-version">
-                          Update to {appUpdateTargetVersion}
-                        </Trans>
-                      ) : (
-                        <Trans id="preferences.app-update.install">Install update</Trans>
-                      )}
-                    </Button>
-                  }
-                />
-              ) : appUpdateStatus ? (
-                <span className="text-muted-foreground text-sm tabular-nums">
-                  {appUpdateStatus.currentVersion}
-                </span>
-              ) : null}
-              {appUpdateDownloading ? (
-                <Button disabled size="sm" variant="outline">
-                  <RefreshCwIcon className="animate-spin" />
-                  <Trans id="preferences.app-update.downloading">Downloading update</Trans>
-                </Button>
-              ) : (
-                <Button
-                  disabled={!appUpdateSupported || appUpdateChecking}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => appUpdateCheckMutation.mutate()}
-                >
-                  {appUpdateChecking ? (
-                    <RefreshCwIcon className="animate-spin" />
-                  ) : (
-                    <RefreshCwIcon />
-                  )}
-                  <Trans id="preferences.app-update.check">Check</Trans>
-                </Button>
-              )}
-            </div>
-          }
-          icon={BadgeInfoIcon}
-          label={<Trans id="preferences.app-update.label">Version information</Trans>}
         />
         <SettingsRow
           control={
