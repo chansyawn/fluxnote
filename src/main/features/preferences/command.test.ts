@@ -13,6 +13,7 @@ describe("preferences command", () => {
     resetSettings: vi.fn(),
   };
   const applyThemePreference = vi.fn();
+  const onAppUpdatePreferencesChanged = vi.fn();
   const onAutoArchivePreferencesChanged = vi.fn(async () => undefined);
   const onLocalePreferenceChanged = vi.fn();
   const onTelemetryPreferenceChanged = vi.fn();
@@ -21,6 +22,7 @@ describe("preferences command", () => {
     handlers.clear();
     ipc.command.mockClear();
     applyThemePreference.mockClear();
+    onAppUpdatePreferencesChanged.mockClear();
     onAutoArchivePreferencesChanged.mockClear();
     onLocalePreferenceChanged.mockClear();
     onTelemetryPreferenceChanged.mockClear();
@@ -43,6 +45,7 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
         onTelemetryPreferenceChanged,
@@ -66,6 +69,33 @@ describe("preferences command", () => {
     expect(onAutoArchivePreferencesChanged).toHaveBeenCalledTimes(1);
     expect(onLocalePreferenceChanged).toHaveBeenCalledTimes(2);
     expect(onTelemetryPreferenceChanged).toHaveBeenCalledTimes(1);
+    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("notifies app update changes after app update patch", async () => {
+    const settings = {
+      appUpdate: { automaticChecksEnabled: false },
+      appearance: { theme: "system" },
+      schemaVersion: 1,
+    };
+    preferencesService.patchSettings.mockReturnValue(settings);
+    registerPreferencesCommands(
+      ipc as never,
+      {
+        applyThemePreference,
+        onAppUpdatePreferencesChanged,
+        onAutoArchivePreferencesChanged,
+        onLocalePreferenceChanged,
+        onTelemetryPreferenceChanged,
+        preferencesService,
+      } as never,
+    );
+
+    await handlers.get("preferences.patch")?.({
+      appUpdate: { automaticChecksEnabled: false },
+    });
+
+    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledWith(settings);
   });
 
   it("notifies auto archive changes after auto archive patch", async () => {
@@ -77,6 +107,7 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
         onTelemetryPreferenceChanged,
@@ -98,6 +129,7 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
         onTelemetryPreferenceChanged,
@@ -122,6 +154,7 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
         onTelemetryPreferenceChanged,
@@ -143,6 +176,7 @@ describe("preferences command", () => {
       ipc as never,
       {
         applyThemePreference,
+        onAppUpdatePreferencesChanged,
         onAutoArchivePreferencesChanged,
         onLocalePreferenceChanged,
         onTelemetryPreferenceChanged,

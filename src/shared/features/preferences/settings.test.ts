@@ -72,6 +72,10 @@ describe("settings", () => {
         enabled: "bad",
         unknown: true,
       },
+      appUpdate: {
+        automaticChecksEnabled: "bad",
+        unknown: true,
+      },
       unknown: true,
     });
 
@@ -103,6 +107,7 @@ describe("settings", () => {
       },
     });
     expect(normalized.telemetry).toEqual({ enabled: true });
+    expect(normalized.appUpdate).toEqual({ automaticChecksEnabled: true });
     expect(normalized).not.toHaveProperty("unknown");
     expect(normalized.appearance).not.toHaveProperty("unknown");
     expect(normalized.markdown).not.toHaveProperty("unknown");
@@ -117,6 +122,7 @@ describe("settings", () => {
         shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
         telemetry: { enabled: false },
+        appUpdate: { automaticChecksEnabled: false },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
@@ -124,6 +130,7 @@ describe("settings", () => {
       shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       telemetry: { enabled: false },
+      appUpdate: { automaticChecksEnabled: false },
     });
   });
 
@@ -182,6 +189,12 @@ describe("settings", () => {
     expect(() =>
       normalizeSettingsPatch({
         telemetry: { unknown: true },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      normalizeSettingsPatch({
+        appUpdate: { unknown: true },
       }),
     ).toThrow();
   });

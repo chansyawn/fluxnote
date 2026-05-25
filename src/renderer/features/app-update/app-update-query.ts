@@ -12,6 +12,22 @@ import { toast } from "sonner";
 
 export const APP_UPDATE_QUERY_KEY = ["app-update", "status"] as const;
 
+function isSameLastCheck(left: AppUpdateStatus | undefined, right: AppUpdateStatus): boolean {
+  if (!("lastCheck" in right) || !right.lastCheck) {
+    return true;
+  }
+
+  if (!left || !("lastCheck" in left) || !left.lastCheck) {
+    return false;
+  }
+
+  return (
+    left.lastCheck.checkedAt === right.lastCheck.checkedAt &&
+    left.lastCheck.outcome === right.lastCheck.outcome &&
+    left.lastCheck.source === right.lastCheck.source
+  );
+}
+
 export function AppUpdateSync() {
   const { i18n } = useLingui();
   const queryClient = useQueryClient();
@@ -20,16 +36,24 @@ export function AppUpdateSync() {
     return onAppUpdateChanged((status) => {
       const previousStatus = queryClient.getQueryData<AppUpdateStatus>(APP_UPDATE_QUERY_KEY);
       queryClient.setQueryData<AppUpdateStatus>(APP_UPDATE_QUERY_KEY, status);
-      if (status.state === "error" && status.lastCheckSource === "manual") {
+      if (
+        isSameLastCheck(previousStatus, status) ||
+        !("lastCheck" in status) ||
+        !status.lastCheck
+      ) {
+        return;
+      }
+
+      if (status.lastCheck.outcome === "failed" && status.lastCheck.source === "manual") {
         toast.error(
-          status.errorMessage ??
+          status.lastCheck.errorMessage ??
             i18n._({
               id: "app-update.check.error",
               message: "Failed to check for updates.",
             }),
         );
       }
-      if (status.state === "unavailable" && status.lastCheckSource === "manual") {
+      if (status.lastCheck.outcome === "up-to-date" && status.lastCheck.source === "manual") {
         toast.info(
           i18n._({
             id: "app-update.check.up-to-date",
@@ -37,17 +61,19 @@ export function AppUpdateSync() {
           }),
         );
       }
-      if (
-        status.state === "ready" &&
-        status.lastCheckSource === "manual" &&
-        previousStatus?.state === "checking" &&
-        previousStatus.availableVersion &&
-        previousStatus.availableVersion === status.availableVersion
-      ) {
+      if (status.lastCheck.outcome === "ready-latest" && status.lastCheck.source === "manual") {
         toast.info(
           i18n._({
             id: "app-update.check.ready-latest",
             message: "The downloaded update is the latest available version.",
+          }),
+        );
+      }
+      if (status.lastCheck.outcome === "newer-update") {
+        toast.info(
+          i18n._({
+            id: "app-update.check.newer-update",
+            message: "A newer update was found and is downloading.",
           }),
         );
       }

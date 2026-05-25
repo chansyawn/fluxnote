@@ -91,6 +91,7 @@ describe("createBackendRuntime", () => {
 
   const services = {
     appUpdateService: {
+      setAutomaticChecksEnabled: vi.fn(),
       start: vi.fn(),
       stop: vi.fn(),
     },
@@ -153,7 +154,10 @@ describe("createBackendRuntime", () => {
     mocks.createIpcRouter.mockReturnValue(ipc);
     mocks.createEntrypointRuntime.mockReturnValue(entrypointRuntime);
     mocks.createMainServices.mockReturnValue(services);
-    services.preferencesService.readSettings.mockReturnValue({ appearance: { theme: "system" } });
+    services.preferencesService.readSettings.mockReturnValue({
+      appUpdate: { automaticChecksEnabled: true },
+      appearance: { theme: "system" },
+    });
     services.windowManager.getMainWindow.mockReturnValue({ isVisible: vi.fn(() => true) });
   });
 
@@ -195,6 +199,9 @@ describe("createBackendRuntime", () => {
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
     expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
+    expect(services.appUpdateService.start).toHaveBeenCalledWith({
+      automaticChecksEnabled: true,
+    });
     expect(services.telemetryService.captureEvent).toHaveBeenCalledWith("app_started");
     expect(services.db.init).toHaveBeenCalledBefore(entrypointRuntime.startCliServer);
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledBefore(
@@ -231,6 +238,21 @@ describe("createBackendRuntime", () => {
     deps.onTelemetryPreferenceChanged();
 
     expect(services.telemetryService.notifyPreferenceChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates automatic app update checks after preferences change", async () => {
+    const runtime = createBackendRuntime();
+    await runtime.start();
+    const registerCall = mocks.registerPreferencesCommands.mock.calls[0];
+    const deps = registerCall?.[1] as {
+      onAppUpdatePreferencesChanged: (settings: {
+        appUpdate: { automaticChecksEnabled: boolean };
+      }) => void;
+    };
+
+    deps.onAppUpdatePreferencesChanged({ appUpdate: { automaticChecksEnabled: false } });
+
+    expect(services.appUpdateService.setAutomaticChecksEnabled).toHaveBeenCalledWith(false);
   });
 
   it("handles startup deep link when available", async () => {

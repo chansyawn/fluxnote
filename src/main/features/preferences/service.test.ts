@@ -38,6 +38,10 @@ describe("preferences service", () => {
           enabled: "invalid",
           unknown: true,
         },
+        appUpdate: {
+          automaticChecksEnabled: "invalid",
+          unknown: true,
+        },
         unknown: true,
       },
     };
@@ -60,6 +64,9 @@ describe("preferences service", () => {
       },
       telemetry: {
         enabled: true,
+      },
+      appUpdate: {
+        automaticChecksEnabled: true,
       },
     });
     expect(storage.store).toEqual(settings);
@@ -111,6 +118,7 @@ describe("preferences service", () => {
     const result = service.patchSettings({
       appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
+      appUpdate: { automaticChecksEnabled: false },
       markdown: { codeBlock: { wordWrap: true } },
       telemetry: { enabled: false },
     });
@@ -119,6 +127,7 @@ describe("preferences service", () => {
     expect(result.appearance.theme).toBe("dark");
     expect(result.appearance.fontSize).toBe(20);
     expect(result.autoArchive.enabled).toBe(false);
+    expect(result.appUpdate.automaticChecksEnabled).toBe(false);
     expect(result.markdown.codeBlock).toEqual({
       showLineNumbers: false,
       wordWrap: true,

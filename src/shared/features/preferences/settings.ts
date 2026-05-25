@@ -88,6 +88,10 @@ export const telemetrySettingsSchema = z.object({
   enabled: z.boolean().catch(true),
 });
 
+export const appUpdateSettingsSchema = z.object({
+  automaticChecksEnabled: z.boolean().catch(true),
+});
+
 const appearanceSettingsPatchSchema = z
   .object({
     locale: localeSchema.optional(),
@@ -142,6 +146,12 @@ const telemetrySettingsPatchSchema = z
   })
   .strict();
 
+const appUpdateSettingsPatchSchema = z
+  .object({
+    automaticChecksEnabled: z.boolean().optional(),
+  })
+  .strict();
+
 const defaultSettingsValue = {
   schemaVersion: SETTINGS_SCHEMA_VERSION,
   appearance: {
@@ -171,6 +181,9 @@ const defaultSettingsValue = {
   telemetry: {
     enabled: true,
   },
+  appUpdate: {
+    automaticChecksEnabled: true,
+  },
 } as const;
 
 export const settingsSchema = z.object({
@@ -180,6 +193,7 @@ export const settingsSchema = z.object({
   shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
   markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
   telemetry: telemetrySettingsSchema.catch(defaultSettingsValue.telemetry),
+  appUpdate: appUpdateSettingsSchema.catch(defaultSettingsValue.appUpdate),
 });
 
 export const settingsPatchSchema = z
@@ -189,6 +203,7 @@ export const settingsPatchSchema = z
     shortcuts: shortcutPreferencesPatchSchema.optional(),
     markdown: markdownSettingsPatchSchema.optional(),
     telemetry: telemetrySettingsPatchSchema.optional(),
+    appUpdate: appUpdateSettingsPatchSchema.optional(),
   })
   .strict();
 
@@ -205,12 +220,14 @@ export type ShortcutPreferences = z.infer<typeof shortcutPreferencesSchema>;
 export type MarkdownSettings = z.infer<typeof markdownSettingsSchema>;
 export type MarkdownCodeBlockSettings = z.infer<typeof markdownCodeBlockSettingsSchema>;
 export type TelemetrySettings = z.infer<typeof telemetrySettingsSchema>;
+export type AppUpdateSettings = z.infer<typeof appUpdateSettingsSchema>;
 
 export const DEFAULT_SETTINGS: Settings = defaultSettingsValue;
 export const DEFAULT_AUTO_ARCHIVE_SETTINGS: AutoArchiveSettings = DEFAULT_SETTINGS.autoArchive;
 export const DEFAULT_MARKDOWN_CODE_BLOCK_SETTINGS: MarkdownCodeBlockSettings =
   DEFAULT_SETTINGS.markdown.codeBlock;
 export const DEFAULT_TELEMETRY_SETTINGS: TelemetrySettings = DEFAULT_SETTINGS.telemetry;
+export const DEFAULT_APP_UPDATE_SETTINGS: AppUpdateSettings = DEFAULT_SETTINGS.appUpdate;
 
 function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings> {
   return z.object({
@@ -257,6 +274,11 @@ function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings>
         enabled: z.boolean().catch(defaults.telemetry.enabled),
       })
       .catch(defaults.telemetry),
+    appUpdate: z
+      .object({
+        automaticChecksEnabled: z.boolean().catch(defaults.appUpdate.automaticChecksEnabled),
+      })
+      .catch(defaults.appUpdate),
   });
 }
 

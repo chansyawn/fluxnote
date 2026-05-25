@@ -51,6 +51,10 @@ function mergeSettings(current: Settings, patch: SettingsPatch, defaults: Settin
         ...current.telemetry,
         ...patch.telemetry,
       },
+      appUpdate: {
+        ...current.appUpdate,
+        ...patch.appUpdate,
+      },
     },
     defaults,
   );

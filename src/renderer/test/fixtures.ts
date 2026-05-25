@@ -61,6 +61,10 @@ export function createRendererSettings(patch: SettingsPatch = {}): Settings {
       ...DEFAULT_SETTINGS.telemetry,
       ...patch.telemetry,
     },
+    appUpdate: {
+      ...DEFAULT_SETTINGS.appUpdate,
+      ...patch.appUpdate,
+    },
   };
 }
 

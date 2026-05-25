@@ -9,6 +9,7 @@ import {
   useManualAppUpdateCheckMutation,
 } from "@renderer/features/app-update/app-update-query";
 import {
+  useAppUpdatePreference,
   useFontSizePreference,
   useTelemetryPreference,
   useThemePreference,
@@ -60,6 +61,7 @@ export function AppSettingsSection() {
   const { fontSize, setFontSize } = useFontSizePreference();
   const { theme, setTheme } = useThemePreference();
   const { telemetry, patchTelemetry } = useTelemetryPreference();
+  const { appUpdate, patchAppUpdate } = useAppUpdatePreference();
   const { data: appUpdateStatus } = useAppUpdateStatusQuery();
   const appUpdateCheckMutation = useManualAppUpdateCheckMutation();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
@@ -99,9 +101,12 @@ export function AppSettingsSection() {
   const appUpdateChecking =
     appUpdateStatus?.state === "checking" || appUpdateCheckMutation.isPending;
   const appUpdateDownloading = appUpdateStatus?.state === "downloading";
-  const appUpdateReady = appUpdateStatus?.state === "ready";
-  const appUpdateSupported = appUpdateStatus?.isSupported !== false;
-  const appUpdateTargetVersion = appUpdateStatus?.availableVersion ?? appUpdateStatus?.releaseName;
+  const appUpdateReadyStatus = appUpdateStatus?.state === "ready" ? appUpdateStatus : null;
+  const appUpdateSupported = appUpdateStatus?.isSupported === true;
+  const appUpdateUnsupportedReason =
+    appUpdateStatus?.state === "unsupported" ? appUpdateStatus.unsupportedReason : null;
+  const appUpdateTargetVersion =
+    appUpdateReadyStatus?.availableVersion ?? appUpdateReadyStatus?.releaseName;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -245,10 +250,47 @@ export function AppSettingsSection() {
         />
         <SettingsRow
           control={
+            <Switch
+              aria-label={i18n._({
+                id: "preferences.app-update.auto-check.label",
+                message: "Automatically check for app updates",
+              })}
+              checked={appUpdate.automaticChecksEnabled}
+              disabled={!appUpdateSupported}
+              onCheckedChange={(automaticChecksEnabled) => {
+                patchAppUpdate({ automaticChecksEnabled });
+              }}
+            />
+          }
+          description={
+            appUpdateUnsupportedReason === "not-packaged" ? (
+              <Trans id="preferences.app-update.auto-check.unavailable-development">
+                App updates are unavailable while Fluxnotes is running from a development build.
+              </Trans>
+            ) : appUpdateUnsupportedReason === "platform" ? (
+              <Trans id="preferences.app-update.auto-check.unavailable-platform">
+                App updates are unavailable on this platform.
+              </Trans>
+            ) : (
+              <Trans id="preferences.app-update.auto-check.description">
+                Fluxnotes checks in the background and shows an install option when an update is
+                ready.
+              </Trans>
+            )
+          }
+          icon={RefreshCwIcon}
+          label={
+            <Trans id="preferences.app-update.auto-check.label">
+              Automatically check for app updates
+            </Trans>
+          }
+        />
+        <SettingsRow
+          control={
             <div className="flex items-center gap-2">
-              {appUpdateReady && appUpdateStatus ? (
+              {appUpdateReadyStatus ? (
                 <AppUpdateInstallDialog
-                  status={appUpdateStatus}
+                  status={appUpdateReadyStatus}
                   trigger={
                     <Button size="sm">
                       <CircleFadingArrowUpIcon />

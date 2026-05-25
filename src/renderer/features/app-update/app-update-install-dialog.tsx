@@ -18,8 +18,10 @@ import {
 import type { ReactElement } from "react";
 import { toast } from "sonner";
 
+type ReadyAppUpdateStatus = Extract<AppUpdateStatus, { state: "ready" }>;
+
 interface AppUpdateInstallDialogProps {
-  status: AppUpdateStatus;
+  status: ReadyAppUpdateStatus;
   trigger: ReactElement;
 }
 

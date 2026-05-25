@@ -14,42 +14,47 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:26
+#: src/renderer/features/app-update/app-update-query.ts:50
 msgid "app-update.check.error"
 msgstr "检查更新失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:48
+#: src/renderer/features/app-update/app-update-query.ts:74
+msgid "app-update.check.newer-update"
+msgstr "发现更新版本，正在下载。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/app-update/app-update-query.ts:66
 msgid "app-update.check.ready-latest"
 msgstr "已下载的更新是当前可用的最新版本。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:34
+#: src/renderer/features/app-update/app-update-query.ts:58
 msgid "app-update.check.up-to-date"
 msgstr "Fluxnotes 已是最新版本。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-install-dialog.tsx:43
+#: src/renderer/features/app-update/app-update-install-dialog.tsx:45
 msgid "app-update.restart-dialog.description"
 msgstr "Fluxnotes 将重启并安装已下载的更新。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-install-dialog.tsx:39
+#: src/renderer/features/app-update/app-update-install-dialog.tsx:41
 msgid "app-update.restart-dialog.description-version"
 msgstr "Fluxnotes 将重启并安装版本 {versionLabel}。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-install-dialog.tsx:51
+#: src/renderer/features/app-update/app-update-install-dialog.tsx:53
 msgid "app-update.restart-dialog.later"
 msgstr "稍后"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-install-dialog.tsx:60
+#: src/renderer/features/app-update/app-update-install-dialog.tsx:62
 msgid "app-update.restart-dialog.restart"
 msgstr "重启"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-install-dialog.tsx:35
+#: src/renderer/features/app-update/app-update-install-dialog.tsx:37
 msgid "app-update.restart-dialog.title"
 msgstr "重启以更新？"
 
@@ -353,32 +358,53 @@ msgid "lab.title"
 msgstr "实验室"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:287
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:275
+msgid "preferences.app-update.auto-check.description"
+msgstr "Fluxnotes 会在后台检查，并在更新准备好时显示安装入口。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:254
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:283
+msgid "preferences.app-update.auto-check.label"
+msgstr "自动检查应用更新"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:267
+msgid "preferences.app-update.auto-check.unavailable-development"
+msgstr "Fluxnotes 以开发构建运行时无法使用应用更新。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:271
+msgid "preferences.app-update.auto-check.unavailable-platform"
+msgstr "当前平台无法使用应用更新。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:329
 msgid "preferences.app-update.check"
 msgstr "检查"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:273
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:315
 msgid "preferences.app-update.downloading"
 msgstr "正在下载更新"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:260
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:302
 msgid "preferences.app-update.install"
 msgstr "安装更新"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:256
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:298
 msgid "preferences.app-update.install-version"
 msgstr "更新至 {appUpdateTargetVersion} 版本"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:293
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:335
 msgid "preferences.app-update.label"
 msgstr "版本信息"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:131
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:136
 msgid "preferences.app.title"
 msgstr "应用"
 
@@ -479,32 +505,32 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:308
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:350
 msgid "preferences.cli.install"
 msgstr "安装"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:313
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:355
 msgid "preferences.cli.path.description"
 msgstr "安装 Flux CLI 以支持终端工作流。安装后可运行 `flux --help` 查看可用命令与用法。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:319
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:361
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:304
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:346
 msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:227
 msgid "preferences.font-size.label"
 msgstr "字号"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:189
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:194
 msgid "preferences.language.label"
 msgstr "语言"
 
@@ -627,33 +653,33 @@ msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:238
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:243
 msgid "preferences.telemetry.description"
 msgstr "分享匿名诊断和崩溃报告。区块内容、标签、文件路径和剪贴板数据绝不会被包含。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:227
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:244
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:232
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:249
 msgid "preferences.telemetry.label"
 msgstr "分享匿名诊断"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:91
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:93
 msgid "preferences.theme.dark"
 msgstr "深色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:161
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:166
 msgid "preferences.theme.label"
 msgstr "主题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:86
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:88
 msgid "preferences.theme.light"
 msgstr "浅色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:81
+#: src/renderer/routes/preferences/-features/app-settings-section.tsx:83
 msgid "preferences.theme.system"
 msgstr "跟随系统"
 
