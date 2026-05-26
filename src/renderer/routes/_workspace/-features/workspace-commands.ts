@@ -1,4 +1,5 @@
 import type { Block, Tag } from "@renderer/clients";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import { useMemo } from "react";
 
 import type { BlockReorderOperation } from "./use-block-mutations";
@@ -8,7 +9,7 @@ interface UseWorkspaceCommandsParams {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
   cancelExternalEdit: (editId: string) => Promise<void>;
-  createBlockWithFocus: () => Promise<void>;
+  createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;

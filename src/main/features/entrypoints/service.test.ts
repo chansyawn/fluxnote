@@ -38,6 +38,9 @@ vi.mock("../tags/service", () => ({
 
 function createService() {
   const db = {} as AppDatabase;
+  const telemetryService = {
+    captureEvent: vi.fn(),
+  };
   return {
     db,
     service: createEntrypointService({
@@ -49,7 +52,9 @@ function createService() {
       getDb: vi.fn(async () => db),
       requestOpenBlock: vi.fn(),
       showMainWindow: vi.fn(),
+      telemetryService,
     }),
+    telemetryService,
   };
 }
 
@@ -60,18 +65,28 @@ describe("entrypoint service", () => {
   });
 
   it("creates a block from text and requests open", async () => {
-    const { service } = createService();
+    const { service, telemetryService } = createService();
 
-    const result = await service.createBlockFromText({ content: "hello" });
+    const result = await service.createBlockFromText({
+      blockCreatedSource: "cli_add_text",
+      content: "hello",
+    });
 
     expect(result).toEqual({ blockId: "block-1" });
+    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
+      source: "cli_add_text",
+    });
     expect(mocks.createBlockRecord).toHaveBeenCalledWith(expect.any(Object), "hello");
   });
 
   it("applies tags before opening created block", async () => {
     const { db, service } = createService();
 
-    await service.createBlockFromText({ content: "hello", tagNames: ["work", "idea"] });
+    await service.createBlockFromText({
+      blockCreatedSource: "cli_add_file",
+      content: "hello",
+      tagNames: ["work", "idea"],
+    });
 
     expect(mocks.setBlockTagsByName).toHaveBeenCalledWith(db, "block-1", ["work", "idea"]);
   });
@@ -83,11 +98,15 @@ describe("entrypoint service", () => {
       status: "submitted" as const,
     }));
     const requestOpenBlock = vi.fn();
+    const telemetryService = {
+      captureEvent: vi.fn(),
+    };
     const service = createEntrypointService({
       createExternalEditSession,
       getDb: vi.fn(async () => ({}) as AppDatabase),
       requestOpenBlock,
       showMainWindow: vi.fn(),
+      telemetryService,
     });
     const abortController = new AbortController();
 
@@ -97,6 +116,9 @@ describe("entrypoint service", () => {
     );
 
     expect(result).toEqual({ blockId: "block-1", content: "updated", status: "submitted" });
+    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
+      source: "cli_external_edit",
+    });
     expect(createExternalEditSession).toHaveBeenCalledWith(
       "block-1",
       "hello",

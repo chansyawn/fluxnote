@@ -1,5 +1,6 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
+import type { TelemetryService } from "@main/features/telemetry";
 
 import { createBlockRecord } from "../blocks/service";
 import type { OpenBlockService } from "../open-block";
@@ -8,6 +9,7 @@ import type { WindowManager } from "./manager";
 interface WindowCommandDeps {
   db: AppDatabase;
   openBlockService: OpenBlockService;
+  telemetryService: Pick<TelemetryService, "captureEvent">;
   windowManager: WindowManager;
 }
 
@@ -34,6 +36,7 @@ export function registerWindowCommands(ipc: IpcRouter, deps: WindowCommandDeps):
 
   ipc.command("window.quick-create-block", async () => {
     const block = await createBlockRecord(deps.db);
+    deps.telemetryService.captureEvent("block_created", { source: "quick_create_shortcut" });
     deps.windowManager.showMainWindow();
     deps.openBlockService.requestOpen({ blockId: block.id });
     return { blockId: block.id };

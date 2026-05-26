@@ -5,6 +5,14 @@ import { renderWithProviders } from "@renderer/test/render";
 import { useLayoutEffect } from "react";
 import { describe, expect, it, vi } from "vite-plus/test";
 
+const mocks = vi.hoisted(() => ({
+  captureRendererEvent: vi.fn(),
+}));
+
+vi.mock("@renderer/features/telemetry", () => ({
+  captureRendererEvent: mocks.captureRendererEvent,
+}));
+
 import { getNextFocusIndexAfterMutation, useBlockFocusActions } from "./use-block-focus-actions";
 import type {
   UseBlockFocusActionsParams,
@@ -149,9 +157,12 @@ describe("useBlockFocusActions", () => {
     });
     const actions = renderBlockFocusActions(params);
 
-    await actions.createBlockWithFocus();
+    await actions.createBlockWithFocus("workspace_titlebar");
 
     expect(params.createBlock).toHaveBeenCalledOnce();
+    expect(mocks.captureRendererEvent).toHaveBeenCalledWith("block_created", {
+      source: "workspace_titlebar",
+    });
     expect(params.navigateToBlock).toHaveBeenCalledWith("new-block", undefined);
   });
 });

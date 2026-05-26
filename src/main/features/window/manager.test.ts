@@ -78,6 +78,7 @@ const mocks = vi.hoisted(() => {
     appRelaunch: vi.fn(),
     setActivationPolicy: vi.fn(),
     emitEvent: vi.fn(() => true),
+    captureAppShow: vi.fn(),
     onAutoArchiveTrigger: vi.fn(),
     onOpenBlockReady: vi.fn(),
     calculateWindowPosition: vi.fn(() => ({ x: 10, y: 20 })),
@@ -126,6 +127,7 @@ describe("window manager", () => {
     mocks.appRelaunch.mockReset();
     mocks.emitEvent.mockReset();
     mocks.emitEvent.mockReturnValue(true);
+    mocks.captureAppShow.mockReset();
     mocks.onAutoArchiveTrigger.mockReset();
     mocks.onOpenBlockReady.mockReset();
     mocks.calculateWindowPosition.mockReset();
@@ -135,6 +137,7 @@ describe("window manager", () => {
 
   it("creates main window and wires lifecycle events", () => {
     const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
       onOpenBlockReady: mocks.onOpenBlockReady,
@@ -152,6 +155,7 @@ describe("window manager", () => {
 
     expect(mocks.emitEvent).toHaveBeenCalledWith("window.focus-changed", true);
     expect(mocks.emitEvent).toHaveBeenCalledWith("window.focus-changed", false);
+    expect(mocks.captureAppShow).toHaveBeenCalledOnce();
     expect(mocks.onAutoArchiveTrigger).toHaveBeenCalledWith(false);
     expect(mocks.onAutoArchiveTrigger).toHaveBeenCalledWith(true);
     expect(mocks.onOpenBlockReady).toHaveBeenCalled();
@@ -162,6 +166,7 @@ describe("window manager", () => {
 
     try {
       const manager = createWindowManager({
+        captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
         onOpenBlockReady: mocks.onOpenBlockReady,
@@ -189,6 +194,7 @@ describe("window manager", () => {
 
     try {
       const manager = createWindowManager({
+        captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
         onOpenBlockReady: mocks.onOpenBlockReady,
@@ -211,6 +217,7 @@ describe("window manager", () => {
 
     try {
       const manager = createWindowManager({
+        captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
         onOpenBlockReady: mocks.onOpenBlockReady,
@@ -234,6 +241,7 @@ describe("window manager", () => {
 
   it("toggles and quits via manager", () => {
     const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
       onOpenBlockReady: mocks.onOpenBlockReady,
@@ -252,6 +260,7 @@ describe("window manager", () => {
 
   it("relaunches and quits when restarting the app", () => {
     const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
       onOpenBlockReady: mocks.onOpenBlockReady,
@@ -269,6 +278,7 @@ describe("window manager", () => {
 
   it("shows hidden/minimized window and handles close while quitting", () => {
     const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
       onOpenBlockReady: mocks.onOpenBlockReady,
@@ -283,6 +293,7 @@ describe("window manager", () => {
     expect(win.restore).toHaveBeenCalled();
     expect(win.setPosition).toHaveBeenCalledWith(10, 20);
     expect(win.show).toHaveBeenCalled();
+    expect(mocks.captureAppShow).toHaveBeenCalledOnce();
     expect(win.focus).toHaveBeenCalled();
 
     const event = { preventDefault: vi.fn() };
@@ -295,6 +306,7 @@ describe("window manager", () => {
   it("loads dev server url and opens devtools in dev mode", () => {
     vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "http://localhost:5173");
     const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
       onOpenBlockReady: mocks.onOpenBlockReady,

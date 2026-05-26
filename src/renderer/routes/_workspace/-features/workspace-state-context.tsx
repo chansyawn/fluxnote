@@ -1,4 +1,5 @@
 import type { Block, BlockVisibility, ExternalEditSession, Tag } from "@renderer/clients";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { BlockMutationOperation, BlockReorderOperation } from "./use-block-mutations";
@@ -9,7 +10,7 @@ export interface WorkspaceCommands {
   archiveBlock: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
   cancelExternalEdit: (editId: string) => Promise<void>;
-  createBlockWithFocus: () => Promise<void>;
+  createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
   deleteBlock: (blockId: string) => Promise<void>;
   deleteTag: (tagId: string) => Promise<void>;

@@ -44,7 +44,7 @@ export function BlockWorkspace() {
       isCreatingBlock={blockMutations.isCreatingBlock}
       selectedTagIds={selectedTagIds}
       isTagOpPending={tagData.isTagOpPending}
-      onCreateBlock={commands.createBlockWithFocus}
+      onCreateBlock={() => commands.createBlockWithFocus("workspace_titlebar")}
       onSetVisibility={viewState.setVisibility}
       onSetSelectedTagIds={viewState.setSelectedTagIds}
       onCreateTag={async (name) => {
@@ -64,7 +64,7 @@ export function BlockWorkspace() {
         {tagFilter}
         <WorkspaceEmptyState
           isCreatingBlock={blockMutations.isCreatingBlock}
-          onCreateBlock={commands.createBlockWithFocus}
+          onCreateBlock={() => commands.createBlockWithFocus("workspace_empty_state")}
         />
       </div>
     );

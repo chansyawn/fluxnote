@@ -1,4 +1,6 @@
 import type { Block, LocateBlockResult } from "@renderer/clients";
+import { captureRendererEvent } from "@renderer/features/telemetry";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import { useEffectEvent } from "react";
 
 import type { BlockReorderOperation } from "../use-block-mutations";
@@ -25,7 +27,7 @@ export interface UseBlockFocusActionsParams {
 
 export interface UseBlockFocusActionsResult {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
-  createBlockWithFocus: () => Promise<void>;
+  createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
   reorderBlockWithFocus: (blockId: string, operation: BlockReorderOperation) => Promise<Block>;
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
@@ -88,8 +90,9 @@ export function useBlockFocusActions({
     },
   );
 
-  const createBlockWithFocus = useEffectEvent(async () => {
+  const createBlockWithFocus = useEffectEvent(async (source: BlockCreatedSource) => {
     const newBlock = await createBlock();
+    captureRendererEvent("block_created", { source });
     await navigateToBlockUnlessCancelled(newBlock.id, navigateToBlock);
   });
 

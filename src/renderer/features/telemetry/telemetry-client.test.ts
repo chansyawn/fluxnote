@@ -2,6 +2,7 @@ import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import {
+  captureRendererEvent,
   captureRendererError,
   configureRendererTelemetry,
   setRendererPostHogClientForTest,
@@ -84,6 +85,20 @@ describe("renderer telemetry client", () => {
       platform: "darwin",
       process: "renderer",
       source: "test",
+    });
+  });
+
+  it("captures renderer events with base metadata", () => {
+    const client = createClient();
+    setRendererPostHogClientForTest(client);
+
+    configureRendererTelemetry(createBootstrap());
+    captureRendererEvent("block_created", { source: "workspace_shortcut" });
+
+    expect(client.capture).toHaveBeenCalledWith("block_created", {
+      platform: "darwin",
+      process: "renderer",
+      source: "workspace_shortcut",
     });
   });
 });

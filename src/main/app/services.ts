@@ -93,6 +93,7 @@ export function createMainServices(): MainServices {
   });
 
   windowManager = createWindowManager({
+    captureAppShow: () => telemetryService.captureEvent("app_show"),
     emitEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
     onOpenBlockReady: () => openBlockService.emitPending(),

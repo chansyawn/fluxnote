@@ -49,6 +49,9 @@ vi.mock("../features/cli/ipc-server", () => ({
 
 describe("createEntrypointRuntime", () => {
   const getDb = vi.fn(async () => ({}) as AppDatabase) as () => Promise<AppDatabase>;
+  const telemetryService = {
+    captureEvent: vi.fn(),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -61,6 +64,7 @@ describe("createEntrypointRuntime", () => {
       getDb,
       requestOpenBlock: vi.fn(),
       showMainWindow,
+      telemetryService,
     });
 
     const result = await runtime.dispatchCommand("app.open", null);
@@ -78,11 +82,18 @@ describe("createEntrypointRuntime", () => {
       getDb,
       requestOpenBlock,
       showMainWindow: vi.fn(),
+      telemetryService,
     });
 
-    const result = await runtime.dispatchCommand("block.create-from-text", { content: "hello" });
+    const result = await runtime.dispatchCommand("block.create-from-text", {
+      blockCreatedSource: "cli_add_text",
+      content: "hello",
+    });
 
     expect(result).toEqual({ data: { blockId: "block-1" }, ok: true });
+    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
+      source: "cli_add_text",
+    });
     expect(requestOpenBlock).toHaveBeenCalledWith("block-1");
   });
 
@@ -98,9 +109,11 @@ describe("createEntrypointRuntime", () => {
       getDb: getTaggedDb,
       requestOpenBlock,
       showMainWindow: vi.fn(),
+      telemetryService,
     });
 
     const result = await runtime.dispatchCommand("block.create-from-text", {
+      blockCreatedSource: "cli_add_file",
       content: "hello",
       tagNames: ["work", "idea"],
     });
@@ -126,6 +139,7 @@ describe("createEntrypointRuntime", () => {
       getDb: getTaggedDb,
       requestOpenBlock: vi.fn(),
       showMainWindow: vi.fn(),
+      telemetryService,
     });
 
     const result = await runtime.dispatchCommand("block.create-external-edit", {
@@ -139,6 +153,9 @@ describe("createEntrypointRuntime", () => {
       ok: true,
     });
     expect(mocks.setBlockTagsByName).toHaveBeenCalledWith(db, "block-1", ["work"]);
+    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
+      source: "cli_external_edit",
+    });
     expect(createExternalEditSession).toHaveBeenCalledWith(
       "block-1",
       "hello",
@@ -153,6 +170,7 @@ describe("createEntrypointRuntime", () => {
       getDb,
       requestOpenBlock: vi.fn(),
       showMainWindow: vi.fn(),
+      telemetryService,
     });
 
     const result = await runtime.dispatchCommand("block.open", {});
@@ -166,6 +184,7 @@ describe("createEntrypointRuntime", () => {
       getDb,
       requestOpenBlock: vi.fn(),
       showMainWindow: vi.fn(),
+      telemetryService,
     });
 
     await runtime.startCliServer();
