@@ -1,6 +1,6 @@
 # Fluxnotes
 
-![Fluxnotes](./src/assets/banner.png)
+![Fluxnotes](./assets/banner.png)
 
 <p align="center">
   <img alt="License" src="https://img.shields.io/github/license/chansyawn/fluxnotes" />
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="./README.md">English</a> | 简体中文
+  <a href="../../README.md">English</a> | 简体中文
 </p>
 
 Fluxnotes 是一个适合 AI 时代工作流的轻量[^lightweight]全局置顶 Markdown Block 编辑器。
@@ -47,16 +47,22 @@ flux --help
 
 ### 配合 Codex / Claude Code 使用
 
-推荐用 alias 只为 Codex / Claude Code 启用 Fluxnotes：
+<p align="center">
+  <img src="./assets/use-with-codex.gif" alt="配合 Codex 使用 Fluxnotes" />
+</p>
+
+用 alias 只为 Codex / Claude Code 启用 Fluxnotes：
 
 ```bash
 alias cdx='EDITOR="flux edit" codex'
 alias cld='EDITOR="flux edit" claude'
 ```
 
-之后使用 `cdx` 或 `cld` 启动工具。当它们进入外部编辑流程时，会在 Fluxnotes 中打开待编辑内容。你可以在 Fluxnotes 里打磨输入，再提交或取消这次编辑。
+之后用 `cdx` 或 `cld` 启动 CLI Agent。在 Codex / Claude Code 中按默认外部编辑器快捷键 `Ctrl+G`；alias 会通过 `EDITOR="flux edit"` 把草稿送入 Fluxnotes。
 
-不建议直接把 `EDITOR="flux edit"` 设置成全局默认编辑器。全局 `EDITOR` 会影响 Git、shell 和其他 CLI 工具的编辑行为。
+在 Fluxnotes 里打磨后，提交或取消即可回到 CLI Agent。
+
+不建议全局设置 `EDITOR="flux edit"`；它也会影响 Git、shell 和其他 CLI 工具。
 
 ### 从终端创建内容
 

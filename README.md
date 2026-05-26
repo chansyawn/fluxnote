@@ -1,6 +1,6 @@
 # Fluxnotes
 
-![Fluxnotes](./src/assets/banner.png)
+![Fluxnotes](./docs/readme/assets/banner.png)
 
 <p align="center">
   <img alt="License" src="https://img.shields.io/github/license/chansyawn/fluxnotes" />
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  English | <a href="./README.zh.md">中文</a>
+  English | <a href="./docs/readme/README.zh.md">中文</a>
 </p>
 
 Fluxnotes is a lightweight[^lightweight], always-on-top Markdown Block editor for AI-era workflows.
@@ -47,16 +47,22 @@ to view available commands and options.
 
 ### Use With Codex / Claude Code
 
-Use aliases to enable Fluxnotes only for Codex / Claude Code:
+<p align="center">
+  <img src="./docs/readme/assets/use-with-codex.gif" alt="Use Fluxnotes with Codex" />
+</p>
+
+Enable Fluxnotes only for Codex / Claude Code with aliases:
 
 ```bash
 alias cdx='EDITOR="flux edit" codex'
 alias cld='EDITOR="flux edit" claude'
 ```
 
-Then start the tools with `cdx` or `cld`. When they enter an external edit flow, the content opens in Fluxnotes. You can polish the input there, then submit or cancel the edit.
+Start the CLI agent with `cdx` or `cld`. In Codex / Claude Code, press the default external-editor shortcut `Ctrl+G`; the alias sends the draft to Fluxnotes through `EDITOR="flux edit"`.
 
-Avoid setting `EDITOR="flux edit"` as your global default editor. A global `EDITOR` affects Git, shell commands, and other CLI tools.
+Polish it in Fluxnotes, then submit or cancel to return to the CLI agent.
+
+Avoid setting `EDITOR="flux edit"` globally; it also affects Git, shell commands, and other CLI tools.
 
 ### Create Content From the Terminal
 
