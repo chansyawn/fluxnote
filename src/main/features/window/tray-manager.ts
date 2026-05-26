@@ -12,6 +12,9 @@ interface TrayManagerServices {
   requestQuit: () => void;
 }
 
+// UUID v5 derived from "app.fluxnotes.tray".
+const TRAY_GUID = "0b22f1d9-6bfc-52e0-8abd-739669015441";
+
 export interface TrayManager {
   createTray: () => void;
   destroyTray: () => void;
@@ -38,6 +41,10 @@ function createTrayIcon(): NativeImage {
   }
 
   return icon;
+}
+
+function getTrayGuid(): string | undefined {
+  return process.platform === "darwin" || process.platform === "win32" ? TRAY_GUID : undefined;
 }
 
 export function createTrayManager(services: TrayManagerServices): TrayManager {
@@ -77,7 +84,9 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
     }
 
     const icon = createTrayIcon();
-    tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
+    const trayIcon = icon.isEmpty() ? nativeImage.createEmpty() : icon;
+    const trayGuid = getTrayGuid();
+    tray = trayGuid ? new Tray(trayIcon, trayGuid) : new Tray(trayIcon);
     tray.setToolTip("Fluxnotes");
     refreshMenu();
   }

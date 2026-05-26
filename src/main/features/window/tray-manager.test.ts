@@ -20,10 +20,16 @@ const mocks = vi.hoisted(() => {
 
   class FakeTray {
     static instances = trayInstances;
+    argumentCount: number;
+    guid: string | undefined;
+    icon: unknown;
     setToolTip = vi.fn();
     setContextMenu = vi.fn();
     destroy = vi.fn();
-    constructor(_icon: unknown) {
+    constructor(...args: [icon: unknown, guid?: string]) {
+      this.argumentCount = args.length;
+      this.icon = args[0];
+      this.guid = args[1];
       trayInstances.push(this);
     }
   }
@@ -48,6 +54,23 @@ vi.mock("electron", () => ({
 }));
 
 import { createTrayManager } from "./tray-manager";
+
+const TRAY_GUID = "0b22f1d9-6bfc-52e0-8abd-739669015441";
+
+function setPlatform(platform: NodeJS.Platform): () => void {
+  const originalPlatform = process.platform;
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value: platform,
+  });
+
+  return () => {
+    Object.defineProperty(process, "platform", {
+      configurable: true,
+      value: originalPlatform,
+    });
+  };
+}
 
 describe("tray manager", () => {
   let locale: LocaleCode;
@@ -77,6 +100,63 @@ describe("tray manager", () => {
 
     manager.destroyTray();
     expect(mocks.Tray.instances[0].destroy).toHaveBeenCalled();
+  });
+
+  it("passes a stable tray guid on macOS", () => {
+    const restorePlatform = setPlatform("darwin");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+
+      expect(mocks.Tray.instances[0].argumentCount).toBe(2);
+      expect(mocks.Tray.instances[0].guid).toBe(TRAY_GUID);
+    } finally {
+      restorePlatform();
+    }
+  });
+
+  it("passes a stable tray guid on Windows", () => {
+    const restorePlatform = setPlatform("win32");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+
+      expect(mocks.Tray.instances[0].argumentCount).toBe(2);
+      expect(mocks.Tray.instances[0].guid).toBe(TRAY_GUID);
+    } finally {
+      restorePlatform();
+    }
+  });
+
+  it("does not pass a tray guid on Linux", () => {
+    const restorePlatform = setPlatform("linux");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+
+      expect(mocks.Tray.instances[0].argumentCount).toBe(1);
+      expect(mocks.Tray.instances[0].guid).toBeUndefined();
+    } finally {
+      restorePlatform();
+    }
   });
 
   it("uses English tray menu labels by default", () => {
