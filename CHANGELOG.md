@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.18](https://github.com/chansyawn/fluxnotes/compare/v0.0.17...v0.0.18) (2026-05-26)
+
+
+### Features
+
+* add app and block telemetry events ([#44](https://github.com/chansyawn/fluxnotes/issues/44)) ([b15db52](https://github.com/chansyawn/fluxnotes/commit/b15db5287c01f18ee74fba3834f356bce548d52a))
+
 ## [0.0.17](https://github.com/chansyawn/fluxnotes/compare/v0.0.16...v0.0.17) (2026-05-25)
 
 
