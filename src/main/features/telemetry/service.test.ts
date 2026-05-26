@@ -29,6 +29,7 @@ describe("telemetry service", () => {
 
     expect(service.getBootstrap()).toEqual({
       anonId: expect.any(String),
+      appVersion: "1.0.0",
       enabled: false,
       posthogHost: null,
       posthogKey: null,
@@ -97,9 +98,9 @@ describe("telemetry service", () => {
       distinctId: "anon-1",
       event: "app_started",
       properties: {
-        appVersion: "1.0.0",
-        platform: "darwin",
-        process: "main",
+        app_platform: "darwin",
+        app_process: "main",
+        app_version: "1.0.0",
       },
     });
   });
@@ -120,9 +121,9 @@ describe("telemetry service", () => {
     await Promise.resolve();
 
     expect(client.captureException).toHaveBeenCalledWith(error, "anon-1", {
-      appVersion: "1.0.0",
-      platform: process.platform,
-      process: "main",
+      app_platform: expect.any(String),
+      app_process: "main",
+      app_version: "1.0.0",
       source: "test",
     });
   });
@@ -143,6 +144,7 @@ describe("telemetry service", () => {
 
     expect(emitEvent).toHaveBeenCalledWith("telemetry.changed", {
       anonId: "anon-1",
+      appVersion: "1.0.0",
       enabled: false,
       posthogHost: "https://posthog.example",
       posthogKey: "key",

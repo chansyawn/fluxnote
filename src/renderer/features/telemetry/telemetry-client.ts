@@ -58,8 +58,9 @@ function isCaptureEnabled(): boolean {
 
 function getBaseProperties(): Properties {
   return {
-    platform: window.appEnvironment.platform,
-    process: "renderer",
+    app_platform: window.appEnvironment.platform,
+    app_process: "renderer",
+    app_version: currentBootstrap?.appVersion,
   };
 }
 

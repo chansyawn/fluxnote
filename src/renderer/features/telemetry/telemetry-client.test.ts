@@ -23,6 +23,7 @@ function createClient(): RendererPostHogClient {
 function createBootstrap(patch: Partial<TelemetryBootstrap> = {}): TelemetryBootstrap {
   return {
     anonId: "anon-1",
+    appVersion: "1.0.0",
     enabled: true,
     posthogHost: "https://posthog.example",
     posthogKey: "key",
@@ -81,9 +82,10 @@ describe("renderer telemetry client", () => {
     captureRendererError(error, { pathname: "/preferences", source: "test" });
 
     expect(client.captureException).toHaveBeenCalledWith(error, {
+      app_platform: "darwin",
+      app_process: "renderer",
+      app_version: "1.0.0",
       pathname: "/preferences",
-      platform: "darwin",
-      process: "renderer",
       source: "test",
     });
   });
@@ -96,8 +98,9 @@ describe("renderer telemetry client", () => {
     captureRendererEvent("block_created", { source: "workspace_shortcut" });
 
     expect(client.capture).toHaveBeenCalledWith("block_created", {
-      platform: "darwin",
-      process: "renderer",
+      app_platform: "darwin",
+      app_process: "renderer",
+      app_version: "1.0.0",
       source: "workspace_shortcut",
     });
   });

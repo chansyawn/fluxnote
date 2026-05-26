@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { blockCreatedPropertiesSchema, telemetryEventNameSchema } from "./contract";
+import {
+  blockCreatedPropertiesSchema,
+  telemetryBootstrapSchema,
+  telemetryEventNameSchema,
+} from "./contract";
 
 describe("telemetry contract", () => {
   it("accepts app and Block creation event names", () => {
@@ -25,5 +29,17 @@ describe("telemetry contract", () => {
         source: "cli_add_auto_file",
       }).success,
     ).toBe(false);
+  });
+
+  it("requires app version in bootstrap", () => {
+    expect(
+      telemetryBootstrapSchema.safeParse({
+        anonId: "anon-1",
+        appVersion: "1.0.0",
+        enabled: true,
+        posthogHost: "https://posthog.example",
+        posthogKey: "key",
+      }).success,
+    ).toBe(true);
   });
 });

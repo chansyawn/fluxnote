@@ -19,6 +19,7 @@ export const blockCreatedPropertiesSchema = z.object({
 
 export const telemetryBootstrapSchema = z.object({
   anonId: z.string().min(1),
+  appVersion: z.string().min(1),
   enabled: z.boolean(),
   posthogHost: z.string().min(1).nullable(),
   posthogKey: z.string().min(1).nullable(),

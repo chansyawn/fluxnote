@@ -34,6 +34,7 @@ import { TelemetryProvider } from "./telemetry-provider";
 function createBootstrap(patch: Partial<TelemetryBootstrap> = {}): TelemetryBootstrap {
   return {
     anonId: "anon-1",
+    appVersion: "1.0.0",
     enabled: true,
     posthogHost: "https://posthog.example",
     posthogKey: "key",
