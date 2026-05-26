@@ -4,6 +4,7 @@ import {
   externalEditResultSchema,
   externalEditTriggerSchema,
 } from "../external-edit/session-contracts";
+import { blockCreatedSourceSchema } from "../telemetry/contract";
 
 export const backendCommandKeys = [
   "app.open",
@@ -14,11 +15,17 @@ export const backendCommandKeys = [
 export type BackendCommandKey = (typeof backendCommandKeys)[number];
 
 const nullSchema = z.null();
-const blockCreationRequestSchema = z.object({
+const blockContentRequestSchema = z.object({
   content: z.string(),
   tagNames: z.array(z.string()).optional(),
 });
-const externalEditBlockCreationRequestSchema = blockCreationRequestSchema.extend({
+const blockCreationRequestSchema = blockContentRequestSchema.extend({
+  blockCreatedSource: z.enum([
+    blockCreatedSourceSchema.enum.cli_add_text,
+    blockCreatedSourceSchema.enum.cli_add_file,
+  ]),
+});
+const externalEditBlockCreationRequestSchema = blockContentRequestSchema.extend({
   trigger: externalEditTriggerSchema,
 });
 

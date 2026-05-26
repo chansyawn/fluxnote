@@ -13,6 +13,7 @@ import type { AppDatabase } from "../core/database";
 import { createCliIpcServer } from "../features/cli/ipc-server";
 import { createDeepLinkHandler } from "../features/deep-link/handler";
 import { createEntrypointService, type EntrypointService } from "../features/entrypoints/service";
+import type { TelemetryService } from "../features/telemetry";
 
 interface EntrypointRuntimeServices {
   createExternalEditSession: (
@@ -24,6 +25,7 @@ interface EntrypointRuntimeServices {
   getDb: () => Promise<AppDatabase>;
   requestOpenBlock: (blockId: string) => void;
   showMainWindow: () => void;
+  telemetryService: Pick<TelemetryService, "captureEvent">;
 }
 
 interface EntrypointDispatcherServices {
@@ -108,6 +110,7 @@ export function createEntrypointRuntime(services: EntrypointRuntimeServices) {
     getDb: services.getDb,
     requestOpenBlock: services.requestOpenBlock,
     showMainWindow: services.showMainWindow,
+    telemetryService: services.telemetryService,
   });
   const commandExecutor = createEntrypointCommandExecutor(entrypointService);
   const dispatcher = createEntrypointDispatcher({

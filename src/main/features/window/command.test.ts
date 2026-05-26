@@ -26,10 +26,12 @@ describe("window command", () => {
       showMainWindow: vi.fn(),
     };
     const openBlockService = { requestOpen: vi.fn() };
+    const telemetryService = { captureEvent: vi.fn() };
 
     registerWindowCommands(ipc as never, {
       db: {} as never,
       openBlockService: openBlockService as never,
+      telemetryService: telemetryService as never,
       windowManager: windowManager as never,
     });
 
@@ -59,6 +61,7 @@ describe("window command", () => {
       showMainWindow: vi.fn(),
     };
     const openBlockService = { requestOpen: vi.fn() };
+    const telemetryService = { captureEvent: vi.fn() };
 
     const block = {
       id: "block-1",
@@ -68,6 +71,7 @@ describe("window command", () => {
     registerWindowCommands(ipc as never, {
       db: db as never,
       openBlockService: openBlockService as never,
+      telemetryService: telemetryService as never,
       windowManager: windowManager as never,
     });
 
@@ -75,6 +79,9 @@ describe("window command", () => {
 
     expect(result).toEqual({ blockId: "block-1" });
     expect(windowManager.showMainWindow).toHaveBeenCalledOnce();
+    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
+      source: "quick_create_shortcut",
+    });
     expect(openBlockService.requestOpen).toHaveBeenCalledWith({ blockId: "block-1" });
     expect(mocks.createBlockRecord).toHaveBeenCalledWith(db);
   });

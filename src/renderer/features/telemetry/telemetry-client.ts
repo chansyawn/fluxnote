@@ -1,4 +1,8 @@
-import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
+import type {
+  BlockCreatedProperties,
+  TelemetryBootstrap,
+  TelemetryEventName,
+} from "@shared/features/telemetry/contract";
 import type { CaptureResult, PostHog, Properties } from "posthog-js";
 import posthog from "posthog-js";
 
@@ -54,8 +58,9 @@ function isCaptureEnabled(): boolean {
 
 function getBaseProperties(): Properties {
   return {
-    platform: window.appEnvironment.platform,
-    process: "renderer",
+    app_platform: window.appEnvironment.platform,
+    app_process: "renderer",
+    app_version: currentBootstrap?.appVersion,
   };
 }
 
@@ -68,6 +73,24 @@ export function captureRendererError(
   }
 
   return postHogClient.captureException(error, {
+    ...getBaseProperties(),
+    ...properties,
+  });
+}
+
+type RendererTelemetryProperties = {
+  block_created: BlockCreatedProperties;
+};
+
+export function captureRendererEvent<TEvent extends keyof RendererTelemetryProperties>(
+  event: TEvent & TelemetryEventName,
+  properties: RendererTelemetryProperties[TEvent],
+): CaptureResult | undefined {
+  if (!isCaptureEnabled()) {
+    return undefined;
+  }
+
+  return postHogClient.capture(event, {
     ...getBaseProperties(),
     ...properties,
   });

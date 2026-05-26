@@ -5,6 +5,7 @@ import type { WorkspaceBlockActions } from "@renderer/routes/_workspace/-feature
 import type { WorkspaceBlockState } from "@renderer/routes/_workspace/-features/workspace-state-context";
 import { createExternalEditSession } from "@renderer/test/fixtures";
 import { renderWithProviders } from "@renderer/test/render";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import type { UseHotkeyDefinition, UseHotkeyOptions } from "@tanstack/react-hotkeys";
 import { useRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
@@ -94,7 +95,7 @@ function createState(overrides?: {
 function WorkspaceCreateShortcutProbe({
   createBlockWithFocus,
 }: {
-  createBlockWithFocus: () => Promise<void>;
+  createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
 }) {
   useWorkspaceCreateBlockShortcut({ createBlockWithFocus });
   return null;
@@ -193,7 +194,7 @@ describe("workspace block shortcuts", () => {
 
     const { preventDefault, stopPropagation } = triggerShortcut("Mod+N");
 
-    expect(createBlockWithFocus).toHaveBeenCalledOnce();
+    expect(createBlockWithFocus).toHaveBeenCalledWith("workspace_shortcut");
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
     expect(getOptions().target).toBeUndefined();

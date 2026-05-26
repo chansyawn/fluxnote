@@ -1,3 +1,4 @@
+import { normalizeAppPlatform } from "@shared/app/platform";
 import {
   resolvePostHogProjectConfig,
   type PostHogProjectConfig,
@@ -90,9 +91,9 @@ export function createTelemetryService({
 
   function getBaseProperties(): Record<string, unknown> {
     return {
-      appVersion,
-      platform,
-      process: "main",
+      app_platform: normalizeAppPlatform(platform),
+      app_process: "main",
+      app_version: appVersion,
     };
   }
 
@@ -115,6 +116,7 @@ export function createTelemetryService({
   function getBootstrap(): TelemetryBootstrap {
     return {
       anonId,
+      appVersion,
       enabled: isEnabled(),
       posthogHost: projectConfig?.host ?? null,
       posthogKey: projectConfig?.key ?? null,

@@ -24,7 +24,7 @@ describe("telemetry transport", () => {
     const transport = createTelemetryTransport({
       anonId: "anon-1",
       createClient,
-      getBaseProperties: () => ({ process: "main" }),
+      getBaseProperties: () => ({ app_process: "main" }),
       isEnabled: () => false,
       projectConfig,
     });
@@ -41,7 +41,7 @@ describe("telemetry transport", () => {
     const transport = createTelemetryTransport({
       anonId: "anon-1",
       createClient,
-      getBaseProperties: () => ({ appVersion: "1.0.0", process: "main" }),
+      getBaseProperties: () => ({ app_process: "main", app_version: "1.0.0" }),
       isEnabled: () => true,
       projectConfig,
     });
@@ -60,8 +60,8 @@ describe("telemetry transport", () => {
       distinctId: "anon-1",
       event: "app_started",
       properties: {
-        appVersion: "1.0.0",
-        process: "main",
+        app_process: "main",
+        app_version: "1.0.0",
         source: "startup",
       },
     });
@@ -78,7 +78,7 @@ describe("telemetry transport", () => {
     const transport = createTelemetryTransport({
       anonId: "anon-1",
       createClient,
-      getBaseProperties: () => ({ process: "main" }),
+      getBaseProperties: () => ({ app_process: "main" }),
       isEnabled: () => true,
       projectConfig,
     });
@@ -92,7 +92,7 @@ describe("telemetry transport", () => {
     expect(createClient).toHaveBeenCalledTimes(1);
     expect(client.capture).toHaveBeenCalledTimes(1);
     expect(client.captureException).toHaveBeenCalledWith(error, "anon-1", {
-      process: "main",
+      app_process: "main",
       source: "test",
     });
   });
@@ -102,7 +102,7 @@ describe("telemetry transport", () => {
     const transport = createTelemetryTransport({
       anonId: "anon-1",
       createClient,
-      getBaseProperties: () => ({ process: "main" }),
+      getBaseProperties: () => ({ app_process: "main" }),
       isEnabled: () => true,
       projectConfig: null,
     });
@@ -119,7 +119,7 @@ describe("telemetry transport", () => {
     const transport = createTelemetryTransport({
       anonId: "anon-1",
       createClient,
-      getBaseProperties: () => ({ process: "main" }),
+      getBaseProperties: () => ({ app_process: "main" }),
       isEnabled: () => true,
       projectConfig,
     });

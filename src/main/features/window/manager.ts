@@ -16,6 +16,7 @@ const MAIN_WINDOW_WORKSPACE_OPTIONS = {
 } as const;
 
 interface WindowManagerServices {
+  captureAppShow: () => void;
   emitEvent: EventBus["emit"];
   onAutoArchiveTrigger: (force: boolean) => void;
   onOpenBlockReady: () => void;
@@ -96,6 +97,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       currentWindow.setPosition(x, y);
       keepWindowVisibleAcrossWorkspaces(currentWindow);
       currentWindow.show();
+      services.captureAppShow();
     }
     keepWindowVisibleAcrossWorkspaces(currentWindow);
     currentWindow.focus();
@@ -219,9 +221,12 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
 
     createdWindow.once("ready-to-show", () => {
       if (!createdWindow.isDestroyed() && mainWindow === createdWindow) {
-        const { x, y } = calculateWindowPosition(createdWindow);
-        createdWindow.setPosition(x, y);
-        createdWindow.show();
+        if (!createdWindow.isVisible()) {
+          const { x, y } = calculateWindowPosition(createdWindow);
+          createdWindow.setPosition(x, y);
+          createdWindow.show();
+          services.captureAppShow();
+        }
       }
       services.emitEvent("window.focus-changed", true);
       services.onOpenBlockReady();

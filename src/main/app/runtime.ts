@@ -100,6 +100,7 @@ function registerRuntimeCommands(
   registerWindowCommands(ipc, {
     db: deps.db,
     openBlockService: deps.openBlockService,
+    telemetryService: deps.telemetryService,
     windowManager: deps.windowManager,
   });
   ipc.register();
@@ -118,6 +119,7 @@ export function createBackendRuntime() {
         services.openBlockService.requestOpen({ blockId });
       },
       showMainWindow: () => services.windowManager.showMainWindow(),
+      telemetryService: services.telemetryService,
     });
   }
 

@@ -6,6 +6,7 @@ import type {
   BackendCommandKey,
   BackendCommandResponse,
 } from "@shared/features/entrypoints/commands";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 
 import type { FluxCliCommand } from "./args";
 import { dispatchCommand } from "./dispatch-command";
@@ -62,19 +63,28 @@ async function readTextFile(filePath: string, deps: CliExecutorDeps): Promise<st
 async function resolveAddContent(
   source: Extract<FluxCliCommand, { kind: "add" }>["source"],
   deps: CliExecutorDeps,
-): Promise<string> {
+): Promise<{
+  blockCreatedSource: Extract<BlockCreatedSource, "cli_add_text" | "cli_add_file">;
+  content: string;
+}> {
   switch (source.type) {
     case "text": {
-      return source.text;
+      return { blockCreatedSource: "cli_add_text", content: source.text };
     }
     case "file": {
-      return await readTextFile(source.filePath, deps);
+      return {
+        blockCreatedSource: "cli_add_file",
+        content: await readTextFile(source.filePath, deps),
+      };
     }
     case "auto": {
       if (await isRegularFile(source.input, deps)) {
-        return await readTextFile(source.input, deps);
+        return {
+          blockCreatedSource: "cli_add_file",
+          content: await readTextFile(source.input, deps),
+        };
       }
-      return source.input;
+      return { blockCreatedSource: "cli_add_text", content: source.input };
     }
   }
 }
@@ -89,7 +99,11 @@ export async function executeAddFromText(
   tagNames: string[] = [],
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  const result = await deps.dispatchCommand("block.create-from-text", { content: text, tagNames });
+  const result = await deps.dispatchCommand("block.create-from-text", {
+    blockCreatedSource: "cli_add_text",
+    content: text,
+    tagNames,
+  });
   console.log(`Created block: ${result.blockId}`);
 }
 
@@ -185,6 +199,11 @@ async function executeAdd(
   command: Extract<FluxCliCommand, { kind: "add" }>,
   deps: CliExecutorDeps = defaultDeps,
 ): Promise<void> {
-  const content = await resolveAddContent(command.source, deps);
-  await executeAddFromText(content, command.tagNames, deps);
+  const { blockCreatedSource, content } = await resolveAddContent(command.source, deps);
+  const result = await deps.dispatchCommand("block.create-from-text", {
+    blockCreatedSource,
+    content,
+    tagNames: command.tagNames,
+  });
+  console.log(`Created block: ${result.blockId}`);
 }

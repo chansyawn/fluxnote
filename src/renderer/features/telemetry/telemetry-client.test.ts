@@ -2,6 +2,7 @@ import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import {
+  captureRendererEvent,
   captureRendererError,
   configureRendererTelemetry,
   setRendererPostHogClientForTest,
@@ -22,6 +23,7 @@ function createClient(): RendererPostHogClient {
 function createBootstrap(patch: Partial<TelemetryBootstrap> = {}): TelemetryBootstrap {
   return {
     anonId: "anon-1",
+    appVersion: "1.0.0",
     enabled: true,
     posthogHost: "https://posthog.example",
     posthogKey: "key",
@@ -80,10 +82,26 @@ describe("renderer telemetry client", () => {
     captureRendererError(error, { pathname: "/preferences", source: "test" });
 
     expect(client.captureException).toHaveBeenCalledWith(error, {
+      app_platform: "darwin",
+      app_process: "renderer",
+      app_version: "1.0.0",
       pathname: "/preferences",
-      platform: "darwin",
-      process: "renderer",
       source: "test",
+    });
+  });
+
+  it("captures renderer events with base metadata", () => {
+    const client = createClient();
+    setRendererPostHogClientForTest(client);
+
+    configureRendererTelemetry(createBootstrap());
+    captureRendererEvent("block_created", { source: "workspace_shortcut" });
+
+    expect(client.capture).toHaveBeenCalledWith("block_created", {
+      app_platform: "darwin",
+      app_process: "renderer",
+      app_version: "1.0.0",
+      source: "workspace_shortcut",
     });
   });
 });

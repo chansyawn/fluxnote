@@ -3,6 +3,7 @@ import {
   keyboardEventMatchesShortcut,
   type ShortcutBinding,
 } from "@renderer/features/shortcut/shortcut-utils";
+import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import {
   useHotkeys,
   type UseHotkeyDefinition,
@@ -21,7 +22,7 @@ interface ShortcutDefinitionParams {
 }
 
 export interface UseWorkspaceCreateBlockShortcutParams {
-  createBlockWithFocus: () => Promise<void>;
+  createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
 }
 
 export interface UseWorkspaceBlockActionShortcutsParams {
@@ -78,17 +79,21 @@ export function useWorkspaceCreateBlockShortcut({
   createBlockWithFocus,
 }: UseWorkspaceCreateBlockShortcutParams): void {
   const { shortcuts } = useShortcutState();
+  const createFromShortcut = useCallback(
+    () => createBlockWithFocus("workspace_shortcut"),
+    [createBlockWithFocus],
+  );
 
   const hotkeyDefinitions = useMemo<UseHotkeyDefinition[]>(() => {
     const createDefinition = createShortcutDefinition({
       hotkey: shortcuts["createBlock"],
-      callback: createBlockWithFocus,
+      callback: createFromShortcut,
       canRun: () => true,
       name: "Create block",
     });
 
     return createDefinition ? [createDefinition] : [];
-  }, [createBlockWithFocus, shortcuts]);
+  }, [createFromShortcut, shortcuts]);
 
   useWorkspaceHotkeys(hotkeyDefinitions);
 }

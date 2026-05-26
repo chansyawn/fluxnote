@@ -151,6 +151,7 @@ describe("createMainServices", () => {
     const createTelemetryCall = mocks.createTelemetryService.mock.calls[0]![0];
     const bootstrap = {
       anonId: "anon-1",
+      appVersion: "1.0.0",
       enabled: false,
       posthogHost: null,
       posthogKey: null,

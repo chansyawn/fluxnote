@@ -49,6 +49,7 @@ describe("executor", () => {
     await executeAddFromText("hello", [], deps);
 
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_text",
       content: "hello",
       tagNames: [],
     });
@@ -62,6 +63,7 @@ describe("executor", () => {
     await executeAddFromText("hello", ["work", "idea"], deps);
 
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_text",
       content: "hello",
       tagNames: ["work", "idea"],
     });
@@ -79,6 +81,7 @@ describe("executor", () => {
     expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
     expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_file",
       content: "file-content",
       tagNames: ["draft"],
     });
@@ -106,6 +109,7 @@ describe("executor", () => {
     expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
     expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_file",
       content: "file-content",
       tagNames: ["file-tag"],
     });
@@ -122,6 +126,7 @@ describe("executor", () => {
 
     expect(deps.readFile).not.toHaveBeenCalled();
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_text",
       content: "hello",
       tagNames: ["text-tag"],
     });
@@ -138,6 +143,7 @@ describe("executor", () => {
 
     expect(deps.readFile).not.toHaveBeenCalled();
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
+      blockCreatedSource: "cli_add_text",
       content: "hello",
       tagNames: [],
     });
