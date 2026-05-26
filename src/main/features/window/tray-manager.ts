@@ -6,10 +6,10 @@ import { app, Menu, nativeImage, type NativeImage, Tray } from "electron";
 import { getTrayMenuLabel } from "./tray-i18n";
 
 interface TrayManagerServices {
+  activateMainWindow: () => void;
   getLocale: () => LocaleCode;
   openMainWindowDevTools: () => void;
   requestQuit: () => void;
-  showMainWindow: () => void;
 }
 
 export interface TrayManager {
@@ -51,7 +51,7 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
     const locale = services.getLocale();
     const menuTemplate = [
       {
-        click: services.showMainWindow,
+        click: services.activateMainWindow,
         label: getTrayMenuLabel(locale, "show"),
       },
       { type: "separator" as const },

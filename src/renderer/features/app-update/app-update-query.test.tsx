@@ -103,23 +103,6 @@ describe("AppUpdateSync", () => {
     );
   });
 
-  it("notifies when an install refresh downloads a newer update", () => {
-    const harness = renderSync();
-
-    harness.appUpdateChanged(
-      createStatus({
-        lastCheck: {
-          checkedAt: "2026-01-01T00:00:00.000Z",
-          outcome: "newer-update",
-          source: "manual",
-        },
-        state: "downloading",
-      }),
-    );
-
-    expect(toastMocks.info).toHaveBeenCalledWith("A newer update was found and is downloading.");
-  });
-
   it("notifies manual check failures without repeating old results", () => {
     const harness = renderSync();
     const lastCheck = {

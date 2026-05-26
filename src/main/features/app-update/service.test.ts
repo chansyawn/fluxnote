@@ -171,7 +171,7 @@ describe("app update service", () => {
     });
   });
 
-  it("checks for newer updates before installing a ready update", () => {
+  it("installs a ready update without checking again", () => {
     const prepareToQuitForInstall = vi.fn();
     const service = createService({ prepareToQuitForInstall });
 
@@ -180,47 +180,14 @@ describe("app update service", () => {
     service.checkForUpdates("manual");
     emitDownloadedUpdate("v1.0.1");
     service.restartAndInstall();
-    mocks.autoUpdater.emit("update-not-available");
 
     expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
     expect(prepareToQuitForInstall).toHaveBeenCalledBefore(mocks.autoUpdater.quitAndInstall);
+    expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
     expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
   });
 
-  it("downloads the newer update instead of installing immediately", () => {
-    const prepareToQuitForInstall = vi.fn();
-    const service = createService({ prepareToQuitForInstall });
-
-    service.checkForUpdates("manual");
-    emitDownloadedUpdate("v1.0.1");
-    service.restartAndInstall();
-    mocks.autoUpdater.emit("update-available");
-
-    expect(service.getStatus()).toMatchObject({
-      lastCheck: {
-        outcome: "newer-update",
-        source: "manual",
-      },
-      state: "downloading",
-    });
-    expect(prepareToQuitForInstall).not.toHaveBeenCalled();
-    expect(mocks.autoUpdater.quitAndInstall).not.toHaveBeenCalled();
-  });
-
-  it("installs the ready update when the install refresh fails", () => {
-    const prepareToQuitForInstall = vi.fn();
-    const service = createService({ prepareToQuitForInstall });
-
-    service.checkForUpdates("manual");
-    emitDownloadedUpdate("v1.0.1");
-    service.restartAndInstall();
-    mocks.autoUpdater.emit("error", new Error("Network unavailable"));
-
-    expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
-    expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
-  });
-
-  it("falls back to direct install when a downloaded update has no parseable version", () => {
+  it("installs a downloaded update when the release name has no parseable version", () => {
     const prepareToQuitForInstall = vi.fn();
     const service = createService({ prepareToQuitForInstall });
 
@@ -230,6 +197,7 @@ describe("app update service", () => {
 
     expect(prepareToQuitForInstall).toHaveBeenCalledOnce();
     expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
+    expect(mocks.autoUpdater.quitAndInstall).toHaveBeenCalledOnce();
   });
 
   it("returns unsupported when app is not packaged", () => {

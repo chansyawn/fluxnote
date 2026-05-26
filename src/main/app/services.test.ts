@@ -4,6 +4,15 @@ import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 type TelemetryEventEmitter = (name: "telemetry.changed", payload: TelemetryBootstrap) => boolean;
+type CreateWindowManagerOptions = {
+  onMainWindowCreated: (window: never) => void;
+};
+type CreateTrayManagerOptions = {
+  activateMainWindow: () => void;
+};
+type CreateOpenBlockServiceOptions = {
+  showWindow: () => void;
+};
 
 const mocks = vi.hoisted(() => ({
   appGetPath: vi.fn(() => "/mock/user-data"),
@@ -56,12 +65,17 @@ const mocks = vi.hoisted(() => ({
     refreshMenu: vi.fn(),
   })),
   createWindowManager: vi.fn(() => ({
+    activateMainWindow: vi.fn(),
     createMainWindow: vi.fn(),
     getMainWindow: vi.fn(() => null),
+    hideMainWindow: vi.fn(),
+    isQuitRequested: vi.fn(() => false),
     openMainWindowDevTools: vi.fn(),
     prepareToQuit: vi.fn(),
     requestQuit: vi.fn(),
+    restartApp: vi.fn(),
     showMainWindow: vi.fn(),
+    toggleMainWindow: vi.fn(),
   })),
   getConfigStore: vi.fn(() => ({ store: {} })),
   migrateDatabase: vi.fn(),
@@ -160,5 +174,41 @@ describe("createMainServices", () => {
     createTelemetryCall.emitEvent("telemetry.changed", bootstrap);
 
     expect(events.emit).toHaveBeenCalledWith("telemetry.changed", bootstrap);
+  });
+
+  it("registers newly created main windows with the app event bus", () => {
+    createMainServices();
+    const events = mocks.createEventBus.mock.results[0]?.value as {
+      registerWindow: ReturnType<typeof vi.fn>;
+    };
+    const createWindowCall = (
+      mocks.createWindowManager.mock.calls as unknown as [CreateWindowManagerOptions][]
+    )[0]?.[0];
+    const window = {};
+    if (!createWindowCall) {
+      throw new Error("Window manager was not created.");
+    }
+
+    createWindowCall.onMainWindowCreated(window as never);
+
+    expect(events.registerWindow).toHaveBeenCalledWith(window);
+  });
+
+  it("uses main window activation for tray and open-block window requests", () => {
+    const services = createMainServices();
+    const createTrayCall = (
+      mocks.createTrayManager.mock.calls as unknown as [CreateTrayManagerOptions][]
+    )[0]?.[0];
+    const createOpenBlockCall = (
+      mocks.createOpenBlockService.mock.calls as unknown as [CreateOpenBlockServiceOptions][]
+    )[0]?.[0];
+    if (!createTrayCall || !createOpenBlockCall) {
+      throw new Error("Window activation dependencies were not created.");
+    }
+
+    createTrayCall.activateMainWindow();
+    createOpenBlockCall.showWindow();
+
+    expect(services.windowManager.activateMainWindow).toHaveBeenCalledTimes(2);
   });
 });

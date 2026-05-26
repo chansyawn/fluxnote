@@ -19,13 +19,16 @@ interface WindowManagerServices {
   captureAppShow: () => void;
   emitEvent: EventBus["emit"];
   onAutoArchiveTrigger: (force: boolean) => void;
+  onMainWindowCreated: (window: BrowserWindow) => void;
   onOpenBlockReady: () => void;
 }
 
 export interface WindowManager {
+  activateMainWindow: () => void;
   createMainWindow: () => void;
   getMainWindow: () => BrowserWindow | null;
   hideMainWindow: () => void;
+  isQuitRequested: () => boolean;
   openMainWindowDevTools: () => void;
   prepareToQuit: () => void;
   requestQuit: () => void;
@@ -140,6 +143,10 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     isQuitting = true;
   }
 
+  function isQuitRequested(): boolean {
+    return isQuitting;
+  }
+
   function requestQuit(): void {
     prepareToQuit();
     getMainWindow()?.destroy();
@@ -185,8 +192,11 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     mainWindow = createdWindow;
 
     keepWindowVisibleAcrossWorkspaces(createdWindow);
+    services.onMainWindowCreated(createdWindow);
 
     createdWindow.on("close", (event) => {
+      // Regular closes keep the menu-bar app alive; explicit quit/update paths must
+      // be allowed to destroy the window so Electron can finish shutting down.
       if (isQuitting) {
         return;
       }
@@ -243,10 +253,18 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     );
   }
 
+  function activateMainWindow(): void {
+    // Tray, deep-link, and CLI entrypoints may run after the previous window was
+    // destroyed. createMainWindow handles both recreation and focusing an existing one.
+    createMainWindow();
+  }
+
   return {
+    activateMainWindow,
     createMainWindow,
     getMainWindow,
     hideMainWindow,
+    isQuitRequested,
     openMainWindowDevTools,
     prepareToQuit,
     requestQuit,

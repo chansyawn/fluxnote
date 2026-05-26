@@ -1,4 +1,5 @@
 import type { LocaleCode } from "@shared/features/preferences/settings";
+import type { MenuItemConstructorOptions } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
@@ -62,10 +63,10 @@ describe("tray manager", () => {
 
   it("creates tray once and can destroy it", () => {
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.createTray();
@@ -80,10 +81,10 @@ describe("tray manager", () => {
 
   it("uses English tray menu labels by default", () => {
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.createTray();
@@ -95,13 +96,32 @@ describe("tray manager", () => {
     ]);
   });
 
-  it("uses Simplified Chinese tray menu labels", () => {
-    locale = "zh-Hans";
+  it("activates the main window from the show menu item", () => {
+    const activateMainWindow = vi.fn();
     const manager = createTrayManager({
+      activateMainWindow,
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
+    });
+
+    manager.createTray();
+    const menuTemplate = mocks.MenuBuildFromTemplate.mock.calls[0]?.[0] as
+      | MenuItemConstructorOptions[]
+      | undefined;
+
+    menuTemplate?.[0]?.click?.({} as never, undefined, {} as never);
+
+    expect(activateMainWindow).toHaveBeenCalledOnce();
+  });
+
+  it("uses Simplified Chinese tray menu labels", () => {
+    locale = "zh-Hans";
+    const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
+      getLocale: () => locale,
+      openMainWindowDevTools: vi.fn(),
+      requestQuit: vi.fn(),
     });
 
     manager.createTray();
@@ -116,10 +136,10 @@ describe("tray manager", () => {
   it("falls back to English tray labels for pseudo locale", () => {
     locale = "pseudo";
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.createTray();
@@ -135,10 +155,10 @@ describe("tray manager", () => {
     locale = "zh-Hans";
     vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "http://localhost:5173");
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.createTray();
@@ -153,10 +173,10 @@ describe("tray manager", () => {
 
   it("refreshes menu labels after locale changes", () => {
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.createTray();
@@ -173,10 +193,10 @@ describe("tray manager", () => {
 
   it("ignores refresh before tray is created", () => {
     const manager = createTrayManager({
+      activateMainWindow: vi.fn(),
       getLocale: () => locale,
       openMainWindowDevTools: vi.fn(),
       requestQuit: vi.fn(),
-      showMainWindow: vi.fn(),
     });
 
     manager.refreshMenu();

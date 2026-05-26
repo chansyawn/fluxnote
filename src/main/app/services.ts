@@ -89,21 +89,22 @@ export function createMainServices(): MainServices {
   });
   const openBlockService = createOpenBlockService({
     emitEvent,
-    showWindow: () => windowManager.showMainWindow(),
+    showWindow: () => windowManager.activateMainWindow(),
   });
 
   windowManager = createWindowManager({
     captureAppShow: () => telemetryService.captureEvent("app_show"),
     emitEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
+    onMainWindowCreated: (window) => events.registerWindow(window),
     onOpenBlockReady: () => openBlockService.emitPending(),
   });
 
   const trayManager = createTrayManager({
+    activateMainWindow: () => windowManager.activateMainWindow(),
     getLocale: () => preferencesService.readSettings().appearance.locale,
     openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
     requestQuit: () => windowManager.requestQuit(),
-    showMainWindow: () => windowManager.showMainWindow(),
   });
 
   return {
