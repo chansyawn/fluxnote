@@ -69,14 +69,6 @@ export function AppUpdateSync() {
           }),
         );
       }
-      if (status.lastCheck.outcome === "newer-update") {
-        toast.info(
-          i18n._({
-            id: "app-update.check.newer-update",
-            message: "A newer update was found and is downloading.",
-          }),
-        );
-      }
     });
   }, [i18n, queryClient]);
 

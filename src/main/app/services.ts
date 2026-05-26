@@ -25,9 +25,12 @@ import {
 } from "@shared/features/preferences/settings";
 import { app, nativeTheme } from "electron";
 
+import { createAppLifecycle, type AppLifecycle } from "./lifecycle";
+
 type TrayManager = ReturnType<typeof createTrayManager>;
 
 export interface MainServices {
+  appLifecycle: AppLifecycle;
   appUpdateService: AppUpdateService;
   applyThemePreference: (theme: ThemePreference) => void;
   autoArchiveRuntime: AutoArchiveRuntime;
@@ -55,10 +58,14 @@ export function createMainServices(): MainServices {
   });
   const events = createEventBus();
   const emitEvent: EventBus["emit"] = (name, payload) => events.emit(name, payload);
+  const appLifecycle = createAppLifecycle();
   let windowManager: WindowManager;
   const appUpdateService = createAppUpdateService({
     emitEvent,
-    prepareToQuitForInstall: () => windowManager.prepareToQuit(),
+    prepareToQuitForInstall: () => {
+      appLifecycle.prepareToQuit("app-update-install");
+      windowManager.prepareToQuit();
+    },
   });
   const applyThemePreference = (theme: ThemePreference): void => {
     nativeTheme.themeSource = theme;
@@ -89,13 +96,14 @@ export function createMainServices(): MainServices {
   });
   const openBlockService = createOpenBlockService({
     emitEvent,
-    showWindow: () => windowManager.showMainWindow(),
+    showWindow: () => windowManager.createOrShowMainWindow(),
   });
 
   windowManager = createWindowManager({
     captureAppShow: () => telemetryService.captureEvent("app_show"),
     emitEvent,
     onAutoArchiveTrigger: (force) => void autoArchiveRuntime.trigger(force),
+    onMainWindowCreated: events.registerWindow,
     onOpenBlockReady: () => openBlockService.emitPending(),
   });
 
@@ -103,10 +111,11 @@ export function createMainServices(): MainServices {
     getLocale: () => preferencesService.readSettings().appearance.locale,
     openMainWindowDevTools: () => windowManager.openMainWindowDevTools(),
     requestQuit: () => windowManager.requestQuit(),
-    showMainWindow: () => windowManager.showMainWindow(),
+    showMainWindow: () => windowManager.createOrShowMainWindow(),
   });
 
   return {
+    appLifecycle,
     appUpdateService,
     applyThemePreference,
     autoArchiveRuntime,

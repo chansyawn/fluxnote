@@ -9,6 +9,10 @@ const mocks = vi.hoisted(() => ({
   appGetPath: vi.fn(() => "/mock/user-data"),
   appGetPreferredSystemLanguages: vi.fn(() => ["zh-CN", "en-US"]),
   appGetVersion: vi.fn(() => "1.0.0"),
+  createAppLifecycle: vi.fn(() => ({
+    prepareToQuit: vi.fn(),
+    shouldQuitWhenAllWindowsClosed: vi.fn(),
+  })),
   createAppDataPaths: vi.fn(() => ({
     assetPathForBlock: vi.fn(),
     assetsRootPath: "/mock/user-data/assets",
@@ -57,6 +61,7 @@ const mocks = vi.hoisted(() => ({
   })),
   createWindowManager: vi.fn(() => ({
     createMainWindow: vi.fn(),
+    createOrShowMainWindow: vi.fn(),
     getMainWindow: vi.fn(() => null),
     openMainWindowDevTools: vi.fn(),
     prepareToQuit: vi.fn(),
@@ -115,6 +120,9 @@ vi.mock("@main/features/window", () => ({
   createTrayManager: mocks.createTrayManager,
   createWindowManager: mocks.createWindowManager,
 }));
+vi.mock("./lifecycle", () => ({
+  createAppLifecycle: mocks.createAppLifecycle,
+}));
 
 import { createMainServices } from "./services";
 
@@ -160,5 +168,66 @@ describe("createMainServices", () => {
     createTelemetryCall.emitEvent("telemetry.changed", bootstrap);
 
     expect(events.emit).toHaveBeenCalledWith("telemetry.changed", bootstrap);
+  });
+
+  it("prepares lifecycle and windows before installing an app update", () => {
+    createMainServices();
+    const appLifecycle = mocks.createAppLifecycle.mock.results[0]?.value as {
+      prepareToQuit: ReturnType<typeof vi.fn>;
+    };
+    const windowManager = mocks.createWindowManager.mock.results[0]?.value as {
+      prepareToQuit: ReturnType<typeof vi.fn>;
+    };
+    const [createAppUpdateCall] = mocks.createAppUpdateService.mock.calls[0] as unknown as [
+      { prepareToQuitForInstall: () => void },
+    ];
+
+    createAppUpdateCall.prepareToQuitForInstall();
+
+    expect(appLifecycle.prepareToQuit).toHaveBeenCalledWith("app-update-install");
+    expect(windowManager.prepareToQuit).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses create-or-show when the tray opens the main window", () => {
+    createMainServices();
+    const windowManager = mocks.createWindowManager.mock.results[0]?.value as {
+      createOrShowMainWindow: ReturnType<typeof vi.fn>;
+    };
+    const [createTrayCall] = mocks.createTrayManager.mock.calls[0] as unknown as [
+      { showMainWindow: () => void },
+    ];
+
+    createTrayCall.showMainWindow();
+
+    expect(windowManager.createOrShowMainWindow).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses create-or-show when opening a block asks for the main window", () => {
+    createMainServices();
+    const windowManager = mocks.createWindowManager.mock.results[0]?.value as {
+      createOrShowMainWindow: ReturnType<typeof vi.fn>;
+    };
+    const [createOpenBlockCall] = mocks.createOpenBlockService.mock.calls[0] as unknown as [
+      { showWindow: () => void },
+    ];
+
+    createOpenBlockCall.showWindow();
+
+    expect(windowManager.createOrShowMainWindow).toHaveBeenCalledTimes(1);
+  });
+
+  it("registers each created main window to the event bus", () => {
+    createMainServices();
+    const events = mocks.createEventBus.mock.results[0]?.value as {
+      registerWindow: ReturnType<typeof vi.fn>;
+    };
+    const [createWindowCall] = mocks.createWindowManager.mock.calls[0] as unknown as [
+      { onMainWindowCreated: (window: unknown) => void },
+    ];
+    const window = {};
+
+    createWindowCall.onMainWindowCreated(window);
+
+    expect(events.registerWindow).toHaveBeenCalledWith(window);
   });
 });

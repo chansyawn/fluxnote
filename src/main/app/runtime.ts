@@ -118,16 +118,9 @@ export function createBackendRuntime() {
       requestOpenBlock: (blockId) => {
         services.openBlockService.requestOpen({ blockId });
       },
-      showMainWindow: () => services.windowManager.showMainWindow(),
+      showMainWindow: () => services.windowManager.createOrShowMainWindow(),
       telemetryService: services.telemetryService,
     });
-  }
-
-  function registerMainWindowToEventBus(): void {
-    const mainWindow = services.windowManager.getMainWindow();
-    if (mainWindow) {
-      services.events.registerWindow(mainWindow);
-    }
   }
 
   function registerIpcCommands(db: AppDatabase): void {
@@ -159,7 +152,6 @@ export function createBackendRuntime() {
   async function startWorkspaceServices(): Promise<void> {
     services.applyThemePreference(services.preferencesService.readSettings().appearance.theme);
     services.windowManager.createMainWindow();
-    registerMainWindowToEventBus();
     services.trayManager.createTray();
     await services.autoArchiveRuntime.start();
     services.appUpdateService.start({
@@ -201,7 +193,7 @@ export function createBackendRuntime() {
   }
 
   function handleSecondInstance(argv: readonly string[]): void {
-    services.windowManager.showMainWindow();
+    services.windowManager.createOrShowMainWindow();
     const deepLink = extractDeepLinkFromArgv(argv);
     if (deepLink && entrypointRuntime) {
       void entrypointRuntime.handleDeepLink(deepLink);
@@ -215,17 +207,11 @@ export function createBackendRuntime() {
   }
 
   function activate(): void {
-    if (services.windowManager.getMainWindow() === null) {
-      services.windowManager.createMainWindow();
-      registerMainWindowToEventBus();
-      return;
-    }
-
-    services.windowManager.showMainWindow();
+    services.windowManager.createOrShowMainWindow();
   }
 
   function quitWhenAllWindowsClosed(): void {
-    if (process.platform !== "darwin") {
+    if (services.appLifecycle.shouldQuitWhenAllWindowsClosed()) {
       app.quit();
     }
   }

@@ -136,16 +136,19 @@ describe("window manager", () => {
   });
 
   it("creates main window and wires lifecycle events", () => {
+    const onMainWindowCreated = vi.fn();
     const manager = createWindowManager({
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 
     manager.createMainWindow();
     const win = mocks.BrowserWindow.instances[0];
     expect(win).toBeDefined();
+    expect(onMainWindowCreated).toHaveBeenCalledWith(win);
 
     win.emit("focus");
     win.emit("blur");
@@ -256,6 +259,19 @@ describe("window manager", () => {
 
     manager.requestQuit();
     expect(mocks.appQuit).toHaveBeenCalled();
+  });
+
+  it("creates a main window when create-or-show has no live window", () => {
+    const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
+      emitEvent: mocks.emitEvent,
+      onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onOpenBlockReady: mocks.onOpenBlockReady,
+    });
+
+    manager.createOrShowMainWindow();
+
+    expect(mocks.BrowserWindow.instances).toHaveLength(1);
   });
 
   it("relaunches and quits when restarting the app", () => {

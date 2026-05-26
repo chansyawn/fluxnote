@@ -19,11 +19,6 @@ msgid "app-update.check.error"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:74
-msgid "app-update.check.newer-update"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/renderer/features/app-update/app-update-query.ts:66
 msgid "app-update.check.ready-latest"
 msgstr ""

@@ -19,11 +19,13 @@ interface WindowManagerServices {
   captureAppShow: () => void;
   emitEvent: EventBus["emit"];
   onAutoArchiveTrigger: (force: boolean) => void;
+  onMainWindowCreated?: (window: BrowserWindow) => void;
   onOpenBlockReady: () => void;
 }
 
 export interface WindowManager {
   createMainWindow: () => void;
+  createOrShowMainWindow: () => void;
   getMainWindow: () => BrowserWindow | null;
   hideMainWindow: () => void;
   openMainWindowDevTools: () => void;
@@ -183,6 +185,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       ...getMainWindowPlatformOptions(),
     });
     mainWindow = createdWindow;
+    services.onMainWindowCreated?.(createdWindow);
 
     keepWindowVisibleAcrossWorkspaces(createdWindow);
 
@@ -243,8 +246,13 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
     );
   }
 
+  function createOrShowMainWindow(): void {
+    createMainWindow();
+  }
+
   return {
     createMainWindow,
+    createOrShowMainWindow,
     getMainWindow,
     hideMainWindow,
     openMainWindowDevTools,

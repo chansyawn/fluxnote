@@ -90,6 +90,10 @@ describe("createBackendRuntime", () => {
   };
 
   const services = {
+    appLifecycle: {
+      prepareToQuit: vi.fn(),
+      shouldQuitWhenAllWindowsClosed: vi.fn(() => false),
+    },
     appUpdateService: {
       setAutomaticChecksEnabled: vi.fn(),
       start: vi.fn(),
@@ -140,6 +144,7 @@ describe("createBackendRuntime", () => {
     },
     windowManager: {
       createMainWindow: vi.fn(),
+      createOrShowMainWindow: vi.fn(),
       getMainWindow: vi.fn<() => { isVisible: () => boolean } | null>(() => ({
         isVisible: vi.fn(() => true),
       })),
@@ -154,6 +159,7 @@ describe("createBackendRuntime", () => {
     mocks.createIpcRouter.mockReturnValue(ipc);
     mocks.createEntrypointRuntime.mockReturnValue(entrypointRuntime);
     mocks.createMainServices.mockReturnValue(services);
+    services.appLifecycle.shouldQuitWhenAllWindowsClosed.mockReturnValue(false);
     services.preferencesService.readSettings.mockReturnValue({
       appUpdate: { automaticChecksEnabled: true },
       appearance: { theme: "system" },
@@ -195,7 +201,7 @@ describe("createBackendRuntime", () => {
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledTimes(1);
     expect(services.applyThemePreference).toHaveBeenCalledTimes(1);
     expect(services.windowManager.createMainWindow).toHaveBeenCalledTimes(1);
-    expect(services.events.registerWindow).toHaveBeenCalledTimes(1);
+    expect(services.events.registerWindow).not.toHaveBeenCalled();
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
     expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
@@ -289,30 +295,36 @@ describe("createBackendRuntime", () => {
     runtime.handleSecondInstance(["flux://open/def"]);
     runtime.handleOpenUrl("flux://open/xyz");
 
-    expect(services.windowManager.showMainWindow).toHaveBeenCalled();
+    expect(services.windowManager.createOrShowMainWindow).toHaveBeenCalled();
     expect(entrypointRuntime.handleDeepLink).toHaveBeenCalledWith("flux://open/def");
     expect(entrypointRuntime.handleDeepLink).toHaveBeenCalledWith("flux://open/xyz");
   });
 
-  it("activates by creating window when main window is absent", () => {
-    services.windowManager.getMainWindow.mockReturnValueOnce(null);
+  it("activates by creating or showing the main window", () => {
     const runtime = createBackendRuntime();
 
     runtime.activate();
 
-    expect(services.windowManager.createMainWindow).toHaveBeenCalledTimes(1);
+    expect(services.windowManager.createOrShowMainWindow).toHaveBeenCalledTimes(1);
+    expect(services.windowManager.createMainWindow).not.toHaveBeenCalled();
     expect(services.windowManager.showMainWindow).not.toHaveBeenCalled();
   });
 
-  it("quits app only when not on darwin", () => {
+  it("keeps app running when the lifecycle keeps all-window-close open", () => {
     const runtime = createBackendRuntime();
 
     runtime.quitWhenAllWindowsClosed();
 
-    if (process.platform === "darwin") {
-      expect(mocks.appQuit).not.toHaveBeenCalled();
-    } else {
-      expect(mocks.appQuit).toHaveBeenCalledTimes(1);
-    }
+    expect(services.appLifecycle.shouldQuitWhenAllWindowsClosed).toHaveBeenCalledTimes(1);
+    expect(mocks.appQuit).not.toHaveBeenCalled();
+  });
+
+  it("quits app when the lifecycle treats all-window-close as a quit", () => {
+    services.appLifecycle.shouldQuitWhenAllWindowsClosed.mockReturnValue(true);
+    const runtime = createBackendRuntime();
+
+    runtime.quitWhenAllWindowsClosed();
+
+    expect(mocks.appQuit).toHaveBeenCalledTimes(1);
   });
 });
