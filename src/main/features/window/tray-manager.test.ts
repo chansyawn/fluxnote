@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "");
 
+type FakeTrayEventHandler = (...args: unknown[]) => void;
+
 const mocks = vi.hoisted(() => {
   const trayInstances: FakeTray[] = [];
 
@@ -22,15 +24,28 @@ const mocks = vi.hoisted(() => {
     static instances = trayInstances;
     argumentCount: number;
     guid: string | undefined;
+    handlers = new Map<string, FakeTrayEventHandler[]>();
     icon: unknown;
     setToolTip = vi.fn();
     setContextMenu = vi.fn();
+    popUpContextMenu = vi.fn();
     destroy = vi.fn();
+    on = vi.fn((event: string, handler: FakeTrayEventHandler) => {
+      const handlers = this.handlers.get(event) ?? [];
+      handlers.push(handler);
+      this.handlers.set(event, handlers);
+      return this;
+    });
     constructor(...args: [icon: unknown, guid?: string]) {
       this.argumentCount = args.length;
       this.icon = args[0];
       this.guid = args[1];
       trayInstances.push(this);
+    }
+    emit(event: string, ...args: unknown[]) {
+      for (const handler of this.handlers.get(event) ?? []) {
+        handler(...args);
+      }
     }
   }
 
@@ -195,6 +210,23 @@ describe("tray manager", () => {
     expect(activateMainWindow).toHaveBeenCalledOnce();
   });
 
+  it("activates the main window from a tray left click", () => {
+    const activateMainWindow = vi.fn();
+    const manager = createTrayManager({
+      activateMainWindow,
+      getLocale: () => locale,
+      openMainWindowDevTools: vi.fn(),
+      requestQuit: vi.fn(),
+    });
+
+    manager.createTray();
+    const tray = mocks.Tray.instances[0];
+    tray.emit("click");
+
+    expect(activateMainWindow).toHaveBeenCalledOnce();
+    expect(tray.popUpContextMenu).not.toHaveBeenCalled();
+  });
+
   it("uses Simplified Chinese tray menu labels", () => {
     locale = "zh-Hans";
     const manager = createTrayManager({
@@ -231,6 +263,72 @@ describe("tray manager", () => {
     ]);
   });
 
+  it("opens the tray menu from right click on macOS without an explicit position", () => {
+    const restorePlatform = setPlatform("darwin");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+      const tray = mocks.Tray.instances[0];
+      const builtMenu = mocks.MenuBuildFromTemplate.mock.results[0]?.value;
+      tray.emit("right-click", {}, { height: 24, width: 24, x: 100, y: 200 });
+
+      expect(tray.popUpContextMenu).toHaveBeenCalledWith(builtMenu, undefined);
+      expect(tray.setContextMenu).not.toHaveBeenCalled();
+    } finally {
+      restorePlatform();
+    }
+  });
+
+  it("opens the tray menu from right click beside the tray icon on Windows", () => {
+    const restorePlatform = setPlatform("win32");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+      const tray = mocks.Tray.instances[0];
+      const builtMenu = mocks.MenuBuildFromTemplate.mock.results[0]?.value;
+      tray.emit("right-click", {}, { height: 24, width: 24, x: 100, y: 200 });
+
+      expect(tray.popUpContextMenu).toHaveBeenCalledWith(builtMenu, { x: 100, y: 200 });
+      expect(tray.setContextMenu).not.toHaveBeenCalled();
+    } finally {
+      restorePlatform();
+    }
+  });
+
+  it("uses the native context menu fallback on Linux", () => {
+    const restorePlatform = setPlatform("linux");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
+
+      manager.createTray();
+      const tray = mocks.Tray.instances[0];
+      const builtMenu = mocks.MenuBuildFromTemplate.mock.results[0]?.value;
+      tray.emit("right-click");
+
+      expect(tray.setContextMenu).toHaveBeenCalledWith(builtMenu);
+      expect(tray.popUpContextMenu).not.toHaveBeenCalled();
+    } finally {
+      restorePlatform();
+    }
+  });
+
   it("translates the DevTools menu item in development", () => {
     locale = "zh-Hans";
     vi.stubGlobal("MAIN_WINDOW_VITE_DEV_SERVER_URL", "http://localhost:5173");
@@ -251,24 +349,33 @@ describe("tray manager", () => {
     ]);
   });
 
-  it("refreshes menu labels after locale changes", () => {
-    const manager = createTrayManager({
-      activateMainWindow: vi.fn(),
-      getLocale: () => locale,
-      openMainWindowDevTools: vi.fn(),
-      requestQuit: vi.fn(),
-    });
+  it("opens the refreshed menu after locale changes", () => {
+    const restorePlatform = setPlatform("win32");
+    try {
+      const manager = createTrayManager({
+        activateMainWindow: vi.fn(),
+        getLocale: () => locale,
+        openMainWindowDevTools: vi.fn(),
+        requestQuit: vi.fn(),
+      });
 
-    manager.createTray();
-    locale = "zh-Hans";
-    manager.refreshMenu();
+      manager.createTray();
+      locale = "zh-Hans";
+      manager.refreshMenu();
+      const tray = mocks.Tray.instances[0];
+      const builtMenus = mocks.MenuBuildFromTemplate.mock.results;
+      const refreshedMenu = builtMenus[builtMenus.length - 1]?.value;
+      tray.emit("right-click", {}, { height: 24, width: 24, x: 100, y: 200 });
 
-    expect(mocks.Tray.instances[0].setContextMenu).toHaveBeenCalledTimes(2);
-    expect(mocks.MenuBuildFromTemplate).toHaveBeenLastCalledWith([
-      expect.objectContaining({ label: "打开 Fluxnotes" }),
-      { type: "separator" },
-      expect.objectContaining({ label: "退出" }),
-    ]);
+      expect(tray.popUpContextMenu).toHaveBeenCalledWith(refreshedMenu, { x: 100, y: 200 });
+      expect(mocks.MenuBuildFromTemplate).toHaveBeenLastCalledWith([
+        expect.objectContaining({ label: "打开 Fluxnotes" }),
+        { type: "separator" },
+        expect.objectContaining({ label: "退出" }),
+      ]);
+    } finally {
+      restorePlatform();
+    }
   });
 
   it("ignores refresh before tray is created", () => {
