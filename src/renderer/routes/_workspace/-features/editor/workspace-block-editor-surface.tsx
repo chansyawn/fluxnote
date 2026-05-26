@@ -5,6 +5,7 @@ import {
   type BlockEditorHandle,
   type BlockEditorRuntime,
 } from "@renderer/features/block-editor";
+import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import { cn } from "@renderer/ui/lib/utils";
 import {
@@ -136,7 +137,14 @@ export function WorkspaceBlockEditorSurface({
       focus: () => {
         editorRef.current?.focus();
       },
+      formatText: (format) => {
+        editorRef.current?.formatText(format);
+      },
       flush,
+      getToolbarState: () =>
+        editorRef.current?.getToolbarState() ?? DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      subscribeToolbarState: (listener) =>
+        editorRef.current?.subscribeToolbarState(listener) ?? (() => undefined),
     }),
     [flush],
   );

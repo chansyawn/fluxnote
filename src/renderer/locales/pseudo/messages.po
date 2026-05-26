@@ -85,7 +85,7 @@ msgid "block-editor.code.language.search"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:65
+#: src/renderer/features/block-editor/core/block-editor.tsx:118
 msgid "block-editor.content.label"
 msgstr ""
 
@@ -120,8 +120,8 @@ msgid "block-editor.link.url"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:64
-#: src/renderer/features/block-editor/core/block-editor.tsx:70
+#: src/renderer/features/block-editor/core/block-editor.tsx:117
+#: src/renderer/features/block-editor/core/block-editor.tsx:123
 msgid "block-editor.placeholder"
 msgstr ""
 
@@ -203,6 +203,31 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
 msgid "block-editor.table.row-menu"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:51
+msgid "block-editor.toolbar.bold"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:56
+msgid "block-editor.toolbar.inline-code"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+msgid "block-editor.toolbar.italic"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:79
+msgid "block-editor.toolbar.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+msgid "block-editor.toolbar.strikethrough"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -333,7 +358,7 @@ msgid "home-note.block.external-edit.submit.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
 msgstr ""
 
@@ -353,7 +378,7 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr ""
 
@@ -699,7 +724,7 @@ msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:18
+#: src/renderer/routes/preferences/index.tsx:19
 msgid "preferences.title"
 msgstr ""
 

@@ -1,6 +1,8 @@
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 import type { Ref } from "react";
 
+import type { BlockEditorToolbarController, BlockEditorToolbarState } from "../toolbar/types";
+
 export interface BlockEditorAssetInput {
   dataBase64: string;
   fileName?: string;
@@ -89,11 +91,13 @@ export interface BlockEditorConfigInput {
   markdown?: BlockEditorMarkdownConfigInput;
 }
 
-export interface BlockEditorHandle {
+export interface BlockEditorHandle extends BlockEditorToolbarController {
   copy: () => Promise<void>;
   focus: () => void;
   flush: () => Promise<string>;
 }
+
+export type { BlockEditorToolbarState };
 
 export interface BlockEditorProps {
   ref?: Ref<BlockEditorHandle>;

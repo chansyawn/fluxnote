@@ -2,6 +2,7 @@
 
 import { queryClient } from "@renderer/app/query";
 import type { Block, ListBlocksResult } from "@renderer/clients";
+import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -127,6 +128,9 @@ describe("useExternalEditActions", () => {
       copy: vi.fn(async () => undefined),
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),
+      formatText: vi.fn(),
+      getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      subscribeToolbarState: () => () => undefined,
     };
     const navigateToBlock = vi.fn(async () => undefined);
     const harness = createHarness({

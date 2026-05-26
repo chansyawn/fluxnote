@@ -65,6 +65,7 @@ function NavigationHarness({
   onSnapshot,
   registry,
 }: NavigationHarnessProps) {
+  const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<BlockVisibility>(initialVisibility);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(initialSelectedTagIds);
   const locateCurrentView = useCallback(
@@ -72,12 +73,14 @@ function NavigationHarness({
     [locateBlockInView, selectedTagIds, visibility],
   );
   const navigation = useBlockNavigation({
+    activeBlockId,
     blockCollection: {
       ensureBlockIndexLoaded,
       getBlockAtIndex,
       locateBlockInView: locateCurrentView,
     },
     registry,
+    setActiveBlockId,
     workspaceView: {
       isUnfiltered: (nextVisibility) =>
         visibility === nextVisibility && selectedTagIds.length === 0,
@@ -108,9 +111,12 @@ async function flushEffects(): Promise<void> {
 
 function createRegistry(): BlockEditorRegistry {
   return {
+    activeBlockId: null,
+    activeEditor: undefined,
     getEditor: vi.fn(),
     registerEditor: vi.fn(() => () => undefined),
     requestEditorFocus: vi.fn(),
+    setActiveBlockId: vi.fn(),
   };
 }
 
