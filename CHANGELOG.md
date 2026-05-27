@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.20](https://github.com/chansyawn/fluxnotes/compare/v0.0.19...v0.0.20) (2026-05-27)
+
+
+### Features
+
+* add block editor toolbar and shortcuts ([#49](https://github.com/chansyawn/fluxnotes/issues/49)) ([f806779](https://github.com/chansyawn/fluxnotes/commit/f806779d8633bdf3de43d32b32394bc016e357f6))
+
 ## [0.0.19](https://github.com/chansyawn/fluxnotes/compare/v0.0.18...v0.0.19) (2026-05-27)
 
 
