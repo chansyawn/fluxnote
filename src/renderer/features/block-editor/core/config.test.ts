@@ -17,6 +17,7 @@ describe("block editor config", () => {
         },
       }),
     ).toEqual({
+      ...DEFAULT_BLOCK_EDITOR_CONFIG,
       markdown: {
         codeBlock: {
           showLineNumbers: true,

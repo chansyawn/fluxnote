@@ -1,7 +1,11 @@
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 import type { Ref } from "react";
 
-import type { BlockEditorToolbarController, BlockEditorToolbarState } from "../toolbar/types";
+import type {
+  BlockEditorTextFormatShortcuts,
+  BlockEditorToolbarController,
+  BlockEditorToolbarState,
+} from "../toolbar/types";
 
 export interface BlockEditorAssetInput {
   dataBase64: string;
@@ -76,6 +80,7 @@ export interface BlockEditorMarkdownConfig {
 
 export interface BlockEditorConfig {
   markdown: BlockEditorMarkdownConfig;
+  shortcuts: BlockEditorShortcutConfig;
 }
 
 export interface BlockEditorCodeBlockConfigInput {
@@ -87,8 +92,17 @@ export interface BlockEditorMarkdownConfigInput {
   codeBlock?: BlockEditorCodeBlockConfigInput;
 }
 
+export interface BlockEditorShortcutConfig {
+  textFormats: BlockEditorTextFormatShortcuts;
+}
+
+export interface BlockEditorShortcutConfigInput {
+  textFormats?: BlockEditorTextFormatShortcuts;
+}
+
 export interface BlockEditorConfigInput {
   markdown?: BlockEditorMarkdownConfigInput;
+  shortcuts?: BlockEditorShortcutConfigInput;
 }
 
 export interface BlockEditorHandle extends BlockEditorToolbarController {

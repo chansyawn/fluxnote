@@ -38,6 +38,10 @@ export const shortcutActionSchema = z.enum([
   "quickCreateBlock",
   "submitExternalEdit",
   "cancelExternalEdit",
+  "formatBold",
+  "formatItalic",
+  "formatStrikethrough",
+  "formatInlineCode",
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
@@ -67,6 +71,10 @@ export const shortcutPreferencesSchema = z.object({
   quickCreateBlock: shortcutBindingSchema.catch("Ctrl+Alt+N"),
   submitExternalEdit: shortcutBindingSchema.catch("Mod+Enter"),
   cancelExternalEdit: shortcutBindingSchema.catch("Mod+\\"),
+  formatBold: shortcutBindingSchema.catch("Mod+B"),
+  formatItalic: shortcutBindingSchema.catch("Mod+I"),
+  formatStrikethrough: shortcutBindingSchema.catch("Mod+Shift+X"),
+  formatInlineCode: shortcutBindingSchema.catch("Mod+Shift+E"),
 });
 
 export const appearanceSettingsSchema = z.object({
@@ -124,6 +132,10 @@ const shortcutPreferencesPatchSchema = z
     quickCreateBlock: shortcutBindingSchema.optional(),
     submitExternalEdit: shortcutBindingSchema.optional(),
     cancelExternalEdit: shortcutBindingSchema.optional(),
+    formatBold: shortcutBindingSchema.optional(),
+    formatItalic: shortcutBindingSchema.optional(),
+    formatStrikethrough: shortcutBindingSchema.optional(),
+    formatInlineCode: shortcutBindingSchema.optional(),
   })
   .strict();
 
@@ -174,6 +186,10 @@ const defaultSettingsValue = {
     quickCreateBlock: "Ctrl+Alt+N",
     submitExternalEdit: "Mod+Enter",
     cancelExternalEdit: "Mod+\\",
+    formatBold: "Mod+B",
+    formatItalic: "Mod+I",
+    formatStrikethrough: "Mod+Shift+X",
+    formatInlineCode: "Mod+Shift+E",
   },
   markdown: {
     codeBlock: defaultMarkdownCodeBlockSettingsValue,
@@ -257,6 +273,10 @@ function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings>
         quickCreateBlock: shortcutBindingSchema.catch(defaults.shortcuts.quickCreateBlock),
         submitExternalEdit: shortcutBindingSchema.catch(defaults.shortcuts.submitExternalEdit),
         cancelExternalEdit: shortcutBindingSchema.catch(defaults.shortcuts.cancelExternalEdit),
+        formatBold: shortcutBindingSchema.catch(defaults.shortcuts.formatBold),
+        formatItalic: shortcutBindingSchema.catch(defaults.shortcuts.formatItalic),
+        formatStrikethrough: shortcutBindingSchema.catch(defaults.shortcuts.formatStrikethrough),
+        formatInlineCode: shortcutBindingSchema.catch(defaults.shortcuts.formatInlineCode),
       })
       .catch(defaults.shortcuts),
     markdown: z

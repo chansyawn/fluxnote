@@ -4,12 +4,13 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { act } from "react";
+import { act, createRef } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockEditorRuntime } from "../test-helper/editor-driver";
 import { BlockEditor } from "./block-editor";
+import type { BlockEditorHandle } from "./types";
 
 vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -53,6 +54,94 @@ describe("BlockEditor", () => {
     );
 
     expect(screen.getByRole("textbox", { name: /markdown block editor/i })).toBeInTheDocument();
+  });
+
+  it("applies configured Block Editor text format shortcuts", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          initialMarkdown=""
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+
+    const oldDefaultEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+    });
+    const configuredEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+      shiftKey: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(oldDefaultEvent);
+    });
+
+    expect(oldDefaultEvent.defaultPrevented).toBe(true);
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+
+    await act(async () => {
+      editor.dispatchEvent(configuredEvent);
+    });
+
+    expect(configuredEvent.defaultPrevented).toBe(true);
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+  });
+
+  it("blocks Lexical format shortcuts that are not configured by Fluxnotes", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          config={{ shortcuts: { textFormats: { bold: null } } }}
+          initialMarkdown="Plain text"
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+    const boldEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+    });
+    const underlineEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "u",
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(boldEvent);
+      editor.dispatchEvent(underlineEvent);
+    });
+
+    expect(boldEvent.defaultPrevented).toBe(true);
+    expect(underlineEvent.defaultPrevented).toBe(true);
+    expect(editor.textContent).toBe("Plain text");
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
   });
 
   it("lets users copy code from code block controls", async () => {

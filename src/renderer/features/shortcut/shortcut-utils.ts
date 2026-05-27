@@ -138,38 +138,15 @@ export function normalizeShortcutPreferences(
   shortcuts: StoredShortcutPreferences,
   platform?: ShortcutPlatform,
 ): ShortcutPreferences {
-  return {
-    toggleWindow: shortcuts["toggleWindow"]
-      ? normalizeShortcutBinding(shortcuts["toggleWindow"], platform)
-      : null,
-    createBlock: shortcuts["createBlock"]
-      ? normalizeShortcutBinding(shortcuts["createBlock"], platform)
-      : null,
-    copyBlock: shortcuts["copyBlock"]
-      ? normalizeShortcutBinding(shortcuts["copyBlock"], platform)
-      : null,
-    keepBlock: shortcuts["keepBlock"]
-      ? normalizeShortcutBinding(shortcuts["keepBlock"], platform)
-      : null,
-    togglePinBlock: shortcuts["togglePinBlock"]
-      ? normalizeShortcutBinding(shortcuts["togglePinBlock"], platform)
-      : null,
-    archiveBlock: shortcuts["archiveBlock"]
-      ? normalizeShortcutBinding(shortcuts["archiveBlock"], platform)
-      : null,
-    deleteBlock: shortcuts["deleteBlock"]
-      ? normalizeShortcutBinding(shortcuts["deleteBlock"], platform)
-      : null,
-    quickCreateBlock: shortcuts["quickCreateBlock"]
-      ? normalizeShortcutBinding(shortcuts["quickCreateBlock"], platform)
-      : null,
-    submitExternalEdit: shortcuts["submitExternalEdit"]
-      ? normalizeShortcutBinding(shortcuts["submitExternalEdit"], platform)
-      : null,
-    cancelExternalEdit: shortcuts["cancelExternalEdit"]
-      ? normalizeShortcutBinding(shortcuts["cancelExternalEdit"], platform)
-      : null,
-  };
+  const normalizedShortcuts = {} as ShortcutPreferences;
+
+  for (const action of SHORTCUT_ACTIONS) {
+    normalizedShortcuts[action] = shortcuts[action]
+      ? normalizeShortcutBinding(shortcuts[action], platform)
+      : null;
+  }
+
+  return normalizedShortcuts;
 }
 
 function normalizeHotkeyKeyToken(token: string): string {

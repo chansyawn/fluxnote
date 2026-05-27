@@ -36,6 +36,10 @@ _Avoid_: Note, document, item
 The editing surface for a single **Block**.
 _Avoid_: Editor controller, persisted editor, text box
 
+**Block Editor Shortcuts**:
+**User Preferences** choices that control keyboard shortcuts for actions inside the **Block Editor**.
+_Avoid_: Editor shortcuts, toolbar shortcuts
+
 **Active Block**:
 A **Block** that is visible in the normal working set.
 _Avoid_: Current block, live block
@@ -89,6 +93,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - A **Workspace** contains zero or more **Blocks**.
 - A **Block** is either an **Active Block** or an **Archived Block**.
 - A **Block** can have zero or more **Tags**.
+- **Block Editor Shortcuts** affect actions inside the **Block Editor**.
 - A **Block Order** arranges **Active Blocks** in the **Workspace**.
 - A **Pinned Block** appears before unpinned **Active Blocks** in the **Block Order**.
 - A **Pinned Block** is excluded from **Auto Archive** without becoming a **Kept Block**.
@@ -98,6 +103,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - An **External Edit Trigger** starts exactly one **External Edit Session**.
 - **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
 - **User Preferences** can affect **Workspace** presentation and app-level behavior.
+- **Block Editor Shortcuts** belong to **User Preferences**.
 - **Theme Preference** belongs to **User Preferences**.
 - **Telemetry Preference** belongs to **User Preferences**.
 - **App Update Check Preference** belongs to **User Preferences**.
@@ -120,6 +126,7 @@ _Avoid_: Scroll controller, focus controller, route navigation
 ## Flagged Ambiguities
 
 - "Editor" can mean the app-level editing feature or the **Block Editor**; resolved: use **Block Editor** for the user-facing editing surface of one **Block**.
+- "Editor Shortcuts" can mean shortcuts for multiple editing-related workflows; resolved: use **Block Editor Shortcuts** for shortcuts that act inside the **Block Editor**.
 - "Keep" can be confused with saving content; resolved: **Kept Block** only means protected from **Auto Archive**.
 - "Pinned" can be confused with **Kept Block**; resolved: **Pinned Block** only means fixed to the top area of the **Workspace**.
 - "Settings" and "config" can mean implementation details or user choices; resolved: use **User Preferences** for user-controlled app-level choices.

@@ -77,6 +77,9 @@ describe("BlockEditorToolbar", () => {
     expect(boldButton).toHaveAttribute("aria-pressed", "true");
     expect(boldButton).toHaveClass("text-foreground");
     expect(italicButton).toHaveClass("text-muted-foreground/60");
+    expect(
+      screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Bold", "Italic", "Strikethrough", "Inline code"]);
 
     act(() => {
       setState(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
@@ -89,5 +92,20 @@ describe("BlockEditorToolbar", () => {
 
     expect(controller.formatText).toHaveBeenCalledWith("italic");
     expect(controller.focus).toHaveBeenCalledOnce();
+  });
+
+  it("shows configured shortcuts in tooltips", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController();
+
+    renderWithProviders(
+      <BlockEditorToolbar controller={controller} shortcuts={{ bold: "Control+B", code: null }} />,
+    );
+
+    await user.hover(screen.getByRole("button", { name: "Bold" }));
+
+    expect(await screen.findByText("Bold")).toBeVisible();
+    expect(screen.getByText("Ctrl")).toBeVisible();
+    expect(screen.getByText("B")).toBeVisible();
   });
 });

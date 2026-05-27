@@ -6,11 +6,15 @@ import { ReactExtension } from "@lexical/react/ReactExtension";
 import { mergeRegister } from "@lexical/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import {
   $getSelection,
   $isRangeSelection,
+  BEFORE_INPUT_COMMAND,
+  COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
+  KEY_DOWN_COMMAND,
   SELECTION_CHANGE_COMMAND,
   configExtension,
   defineExtension,
@@ -23,8 +27,10 @@ import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
+  BLOCK_EDITOR_TEXT_FORMATS,
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
   type BlockEditorTextFormat,
+  type BlockEditorTextFormatShortcuts,
   type BlockEditorToolbarState,
   type BlockEditorToolbarStateListener,
 } from "../toolbar/types";
@@ -32,7 +38,11 @@ import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
 } from "./block-editor-core-extension";
-import { BlockEditorConfigProvider, resolveBlockEditorConfig } from "./config";
+import {
+  BlockEditorConfigProvider,
+  resolveBlockEditorConfig,
+  useBlockEditorConfig,
+} from "./config";
 import { BlockEditorOverlayContainerProvider } from "./editor-overlay-container";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
@@ -87,6 +97,44 @@ function toolbarStatesEqual(
   );
 }
 
+const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
+  bold: "Mod+B",
+  italic: "Mod+I",
+  underline: "Mod+U",
+} as const;
+
+const LEXICAL_FORMAT_INPUT_TYPES = new Set([
+  "formatBold",
+  "formatItalic",
+  "formatStrikeThrough",
+  "formatUnderline",
+]);
+
+function getConfiguredTextFormatShortcut(
+  event: KeyboardEvent,
+  shortcuts: BlockEditorTextFormatShortcuts,
+): BlockEditorTextFormat | null {
+  for (const format of BLOCK_EDITOR_TEXT_FORMATS) {
+    const shortcut = shortcuts[format] ?? null;
+
+    if (keyboardEventMatchesShortcut(event, shortcut)) {
+      return format;
+    }
+  }
+
+  return null;
+}
+
+function isLexicalDefaultTextFormatShortcut(event: KeyboardEvent): boolean {
+  return Object.values(LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS).some((shortcut) =>
+    keyboardEventMatchesShortcut(event, shortcut),
+  );
+}
+
+function isLexicalTextFormatInput(event: InputEvent): boolean {
+  return LEXICAL_FORMAT_INPUT_TYPES.has(event.inputType);
+}
+
 function createBlockEditorContentExtension(config: BlockEditorContentExtensionConfig) {
   return defineExtension({
     $initialEditorState: createInitialMarkdownEditorState(config.initialMarkdown),
@@ -112,6 +160,7 @@ interface BlockEditorContentProps {
 
 function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
   const { i18n } = useLingui();
+
   return (
     <ContentEditable
       aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
@@ -136,6 +185,7 @@ interface BlockEditorImperativeProps {
 
 function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImperativeProps) {
   const [editor] = useLexicalComposerContext();
+  const { shortcuts } = useBlockEditorConfig();
   const runtime = useBlockEditorRuntime();
   const toolbarStateRef = useRef<BlockEditorToolbarState>(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
   const toolbarStateListenersRef = useRef(new Set<BlockEditorToolbarStateListener>());
@@ -174,6 +224,49 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
       ),
     );
   }, [editor, publishToolbarState, syncToolbarState]);
+
+  useEffect(() => {
+    return mergeRegister(
+      editor.registerCommand(
+        KEY_DOWN_COMMAND,
+        (event) => {
+          if (event.repeat) {
+            return false;
+          }
+
+          const configuredFormat = getConfiguredTextFormatShortcut(event, shortcuts.textFormats);
+          if (configuredFormat) {
+            event.preventDefault();
+            event.stopPropagation();
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, configuredFormat);
+            return true;
+          }
+
+          if (isLexicalDefaultTextFormatShortcut(event)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return true;
+          }
+
+          return false;
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+      editor.registerCommand(
+        BEFORE_INPUT_COMMAND,
+        (event) => {
+          if (!isLexicalTextFormatInput(event)) {
+            return false;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          return true;
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
+    );
+  }, [editor, shortcuts.textFormats]);
 
   useImperativeHandle(
     ref,
