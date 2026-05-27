@@ -9,6 +9,14 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
       wordWrap: false,
     },
   },
+  shortcuts: {
+    textFormats: {
+      bold: null,
+      code: null,
+      italic: null,
+      strikethrough: null,
+    },
+  },
 };
 
 export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): BlockEditorConfig {
@@ -21,6 +29,12 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
         wordWrap:
           config?.markdown?.codeBlock?.wordWrap ??
           DEFAULT_BLOCK_EDITOR_CONFIG.markdown.codeBlock.wordWrap,
+      },
+    },
+    shortcuts: {
+      textFormats: {
+        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.textFormats,
+        ...config?.shortcuts?.textFormats,
       },
     },
   };

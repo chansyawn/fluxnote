@@ -85,7 +85,7 @@ msgid "block-editor.code.language.search"
 msgstr "搜索语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:118
+#: src/renderer/features/block-editor/core/block-editor.tsx:167
 msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
@@ -120,8 +120,8 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:117
-#: src/renderer/features/block-editor/core/block-editor.tsx:123
+#: src/renderer/features/block-editor/core/block-editor.tsx:166
+#: src/renderer/features/block-editor/core/block-editor.tsx:172
 msgid "block-editor.placeholder"
 msgstr "写一条笔记..."
 
@@ -206,27 +206,27 @@ msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:55
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:60
 msgid "block-editor.toolbar.bold"
 msgstr "加粗"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:60
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:75
 msgid "block-editor.toolbar.inline-code"
 msgstr "行内代码"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:70
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:65
 msgid "block-editor.toolbar.italic"
 msgstr "斜体"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:87
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:92
 msgid "block-editor.toolbar.label"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:65
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:70
 msgid "block-editor.toolbar.strikethrough"
 msgstr "删除线"
 
@@ -590,12 +590,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:67
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:81
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:87
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:104
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "取消外部编辑"
 
@@ -606,17 +606,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:61
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:42
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:56
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:62
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:76
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "删除区块"
 
@@ -642,17 +642,47 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:116
+msgid "preferences.shortcuts.formatBold.label"
+msgstr "加粗"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:131
+msgid "preferences.shortcuts.formatInlineCode.label"
+msgstr "行内代码"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:121
+msgid "preferences.shortcuts.formatItalic.label"
+msgstr "斜体"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:126
+msgid "preferences.shortcuts.formatStrikethrough.label"
+msgstr "删除线"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:111
+msgid "preferences.shortcuts.group.block-editor"
+msgstr "区块编辑器"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:46
+msgid "preferences.shortcuts.group.workspace-app"
+msgstr "工作区与应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:66
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:74
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:88
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:72
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:86
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "快速记录区块"
 
@@ -673,22 +703,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:82
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:97
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:107
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:153
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:71
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "固定/取消固定区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:37
+#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:51
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 
@@ -906,12 +936,12 @@ msgid "workspace.tags.search.empty"
 msgstr "没有匹配的标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/index.tsx:21
+#: src/renderer/routes/_workspace/-features/index.tsx:26
 msgid "workspace.toolbar.block-count.one"
 msgstr "1 个区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/index.tsx:28
+#: src/renderer/routes/_workspace/-features/index.tsx:33
 msgid "workspace.toolbar.block-count.other"
 msgstr "{count} 个区块"
 

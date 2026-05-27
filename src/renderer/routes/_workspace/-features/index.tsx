@@ -1,6 +1,11 @@
 import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
-import { BlockEditorToolbar } from "@renderer/features/block-editor";
+import {
+  BlockEditorToolbar,
+  type BlockEditorTextFormatShortcuts,
+} from "@renderer/features/block-editor";
+import { BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
+import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
 
@@ -35,6 +40,7 @@ function formatWorkspaceToolbarBlockCountLabel(i18n: I18n, count: number) {
 
 export function BlockWorkspace() {
   const { i18n } = useLingui();
+  const { shortcuts } = useShortcutState();
   const {
     blockList,
     blockMutations,
@@ -51,6 +57,15 @@ export function BlockWorkspace() {
       registerEditor: editorRegistry.registerEditor,
     }),
     [editorRegistry.getEditor, editorRegistry.registerEditor],
+  );
+  const toolbarShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+    () => ({
+      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
+      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
+      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
+      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+    }),
+    [shortcuts],
   );
 
   const { visibility, selectedTagIds } = viewState;
@@ -142,6 +157,7 @@ export function BlockWorkspace() {
         <BlockEditorToolbar
           className="pointer-events-auto relative z-10"
           controller={editorRegistry.activeEditor}
+          shortcuts={toolbarShortcuts}
           inactiveContent={
             blockList.isInitialLoading ? null : (
               <div className="text-muted-foreground pointer-events-auto relative z-10 mx-auto flex min-h-10 w-fit items-center justify-center px-4 text-xs font-medium">

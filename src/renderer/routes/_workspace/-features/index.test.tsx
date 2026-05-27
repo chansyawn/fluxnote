@@ -10,6 +10,22 @@ const mocks = vi.hoisted(() => ({
   activeEditorEnabled: true,
   focusBlock: vi.fn(),
   isInitialLoading: false,
+  shortcuts: {
+    archiveBlock: "Mod+E",
+    cancelExternalEdit: "Mod+\\",
+    copyBlock: "Mod+Shift+C",
+    createBlock: "Mod+N",
+    deleteBlock: "Mod+D",
+    formatBold: "Mod+B",
+    formatInlineCode: "Mod+Shift+E",
+    formatItalic: "Mod+I",
+    formatStrikethrough: "Mod+Shift+X",
+    keepBlock: "Mod+K",
+    quickCreateBlock: "Ctrl+Alt+N",
+    submitExternalEdit: "Mod+Enter",
+    togglePinBlock: "Mod+T",
+    toggleWindow: "Alt+N",
+  },
   totalBlockCount: 1,
 }));
 
@@ -26,6 +42,12 @@ vi.mock("@renderer/features/block-editor", () => ({
     ) : (
       <div tabIndex={0}>{inactiveContent}</div>
     ),
+}));
+
+vi.mock("@renderer/features/shortcut/shortcut-state", () => ({
+  useShortcutState: () => ({
+    shortcuts: mocks.shortcuts,
+  }),
 }));
 
 vi.mock("./view/workspace-titlebar-actions-portal", () => ({

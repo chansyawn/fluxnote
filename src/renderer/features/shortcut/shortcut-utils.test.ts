@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
@@ -33,23 +34,9 @@ describe("shortcut utils", () => {
   });
 
   it("normalizes archive block shortcut preferences", () => {
-    expect(
-      normalizeShortcutPreferences(
-        {
-          toggleWindow: "Alt+N",
-          createBlock: "Mod+N",
-          copyBlock: "Mod+Shift+C",
-          keepBlock: "Mod+K",
-          togglePinBlock: "Mod+T",
-          archiveBlock: "Mod+E",
-          deleteBlock: "Mod+D",
-          quickCreateBlock: "Ctrl+Alt+N",
-          submitExternalEdit: "Mod+Enter",
-          cancelExternalEdit: "Mod+\\",
-        },
-        "mac",
-      )["archiveBlock"],
-    ).toBe("Mod+E");
+    expect(normalizeShortcutPreferences(DEFAULT_SETTINGS.shortcuts, "mac")["archiveBlock"]).toBe(
+      "Mod+E",
+    );
   });
 
   it("formats modifier-only recorder previews", () => {

@@ -20,7 +20,9 @@ export type {
   BlockEditorToolbarState,
 } from "./core/types";
 export type {
+  BlockEditorShortcutBinding,
   BlockEditorTextFormat,
+  BlockEditorTextFormatShortcuts,
   BlockEditorTextFormatState,
   BlockEditorToolbarController,
   BlockEditorToolbarStateListener,
