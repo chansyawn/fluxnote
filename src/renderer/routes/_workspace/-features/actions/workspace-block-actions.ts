@@ -7,22 +7,22 @@ import type { BlockReorderOperation } from "../use-block-mutations";
 import type { WorkspaceBlockState, WorkspaceCommands } from "../workspace-state-context";
 
 export type WorkspaceBlockShortcutAction =
-  | "copyBlock"
-  | "keepBlock"
-  | "togglePinBlock"
-  | "archiveBlock"
-  | "deleteBlock"
-  | "submitExternalEdit"
-  | "cancelExternalEdit";
+  | "workspace.copyBlock"
+  | "workspace.keepBlock"
+  | "workspace.togglePinBlock"
+  | "workspace.archiveBlock"
+  | "workspace.deleteBlock"
+  | "workspace.submitExternalEdit"
+  | "workspace.cancelExternalEdit";
 
 export const WORKSPACE_BLOCK_SHORTCUT_ACTIONS = [
-  "copyBlock",
-  "keepBlock",
-  "togglePinBlock",
-  "archiveBlock",
-  "deleteBlock",
-  "submitExternalEdit",
-  "cancelExternalEdit",
+  "workspace.copyBlock",
+  "workspace.keepBlock",
+  "workspace.togglePinBlock",
+  "workspace.archiveBlock",
+  "workspace.deleteBlock",
+  "workspace.submitExternalEdit",
+  "workspace.cancelExternalEdit",
 ] as const satisfies readonly ShortcutAction[];
 
 export interface WorkspaceBlockActions {

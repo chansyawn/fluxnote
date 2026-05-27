@@ -42,46 +42,16 @@ interface ShortcutFieldGroupDefinition {
 
 const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
   {
-    id: "workspace-app",
-    title: <Trans id="preferences.shortcuts.group.workspace-app">Workspace and app</Trans>,
+    id: "global",
+    title: <Trans id="preferences.shortcuts.group.global">Global</Trans>,
     fields: [
       {
-        action: "toggleWindow",
+        action: "global.toggleWindow",
         icon: <KeyboardIcon />,
         title: <Trans id="preferences.shortcuts.toggleWindow.label">Toggle window</Trans>,
       },
       {
-        action: "createBlock",
-        icon: <PlusCircleIcon />,
-        title: <Trans id="preferences.shortcuts.createBlock.label">Create block</Trans>,
-      },
-      {
-        action: "copyBlock",
-        icon: <CopyIcon />,
-        title: <Trans id="preferences.shortcuts.copyBlock.label">Copy block</Trans>,
-      },
-      {
-        action: "keepBlock",
-        icon: <FlagIcon />,
-        title: <Trans id="preferences.shortcuts.keepBlock.label">Keep block</Trans>,
-      },
-      {
-        action: "togglePinBlock",
-        icon: <PinIcon />,
-        title: <Trans id="preferences.shortcuts.togglePinBlock.label">Pin/unpin block</Trans>,
-      },
-      {
-        action: "deleteBlock",
-        icon: <Trash2Icon />,
-        title: <Trans id="preferences.shortcuts.deleteBlock.label">Delete block</Trans>,
-      },
-      {
-        action: "archiveBlock",
-        icon: <ArchiveIcon />,
-        title: <Trans id="preferences.shortcuts.archiveBlock.label">Archive/restore block</Trans>,
-      },
-      {
-        action: "quickCreateBlock",
+        action: "global.quickCreateBlock",
         icon: <WandSparklesIcon />,
         title: <Trans id="preferences.shortcuts.quickCreateBlock.label">Quick create block</Trans>,
         description: (
@@ -90,15 +60,51 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
           </Trans>
         ),
       },
+    ],
+  },
+  {
+    id: "workspace",
+    title: <Trans id="preferences.shortcuts.group.workspace">Workspace</Trans>,
+    fields: [
       {
-        action: "submitExternalEdit",
+        action: "workspace.createBlock",
+        icon: <PlusCircleIcon />,
+        title: <Trans id="preferences.shortcuts.createBlock.label">Create block</Trans>,
+      },
+      {
+        action: "workspace.copyBlock",
+        icon: <CopyIcon />,
+        title: <Trans id="preferences.shortcuts.copyBlock.label">Copy block</Trans>,
+      },
+      {
+        action: "workspace.keepBlock",
+        icon: <FlagIcon />,
+        title: <Trans id="preferences.shortcuts.keepBlock.label">Keep block</Trans>,
+      },
+      {
+        action: "workspace.togglePinBlock",
+        icon: <PinIcon />,
+        title: <Trans id="preferences.shortcuts.togglePinBlock.label">Pin/unpin block</Trans>,
+      },
+      {
+        action: "workspace.deleteBlock",
+        icon: <Trash2Icon />,
+        title: <Trans id="preferences.shortcuts.deleteBlock.label">Delete block</Trans>,
+      },
+      {
+        action: "workspace.archiveBlock",
+        icon: <ArchiveIcon />,
+        title: <Trans id="preferences.shortcuts.archiveBlock.label">Archive/restore block</Trans>,
+      },
+      {
+        action: "workspace.submitExternalEdit",
         icon: <CheckIcon />,
         title: (
           <Trans id="preferences.shortcuts.submitExternalEdit.label">Submit external edit</Trans>
         ),
       },
       {
-        action: "cancelExternalEdit",
+        action: "workspace.cancelExternalEdit",
         icon: <XIcon />,
         title: (
           <Trans id="preferences.shortcuts.cancelExternalEdit.label">Cancel external edit</Trans>
@@ -107,26 +113,26 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
     ],
   },
   {
-    id: "block-editor",
-    title: <Trans id="preferences.shortcuts.group.block-editor">Block Editor</Trans>,
+    id: "editor",
+    title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
     fields: [
       {
-        action: "formatBold",
+        action: "editor.formatBold",
         icon: <BoldIcon />,
         title: <Trans id="preferences.shortcuts.formatBold.label">Bold</Trans>,
       },
       {
-        action: "formatItalic",
+        action: "editor.formatItalic",
         icon: <ItalicIcon />,
         title: <Trans id="preferences.shortcuts.formatItalic.label">Italic</Trans>,
       },
       {
-        action: "formatStrikethrough",
+        action: "editor.formatStrikethrough",
         icon: <StrikethroughIcon />,
         title: <Trans id="preferences.shortcuts.formatStrikethrough.label">Strikethrough</Trans>,
       },
       {
-        action: "formatInlineCode",
+        action: "editor.formatInlineCode",
         icon: <Code2Icon />,
         title: <Trans id="preferences.shortcuts.formatInlineCode.label">Inline code</Trans>,
       },
@@ -160,7 +166,8 @@ export function ShortcutSettingsSection() {
                 const isRecording = recordingAction === field.action;
                 const shortcut = shortcuts[field.action];
                 const fieldError =
-                  (field.action === "toggleWindow" || field.action === "quickCreateBlock") &&
+                  (field.action === "global.toggleWindow" ||
+                    field.action === "global.quickCreateBlock") &&
                   shortcut !== null &&
                   globalShortcutErrors[field.action] === shortcut
                     ? ("unavailable" as const)

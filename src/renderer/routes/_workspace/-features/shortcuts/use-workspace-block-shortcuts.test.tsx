@@ -12,20 +12,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test"
 
 const mocks = vi.hoisted(() => {
   const defaultShortcuts = {
-    archiveBlock: "Mod+E",
-    cancelExternalEdit: "Mod+\\",
-    copyBlock: "Mod+Shift+C",
-    createBlock: "Mod+N",
-    deleteBlock: "Mod+D",
-    formatBold: "Mod+B",
-    formatInlineCode: "Mod+Shift+E",
-    formatItalic: "Mod+I",
-    formatStrikethrough: "Mod+Shift+X",
-    keepBlock: "Mod+K",
-    quickCreateBlock: "Ctrl+Alt+N",
-    submitExternalEdit: "Mod+Enter",
-    togglePinBlock: "Mod+T",
-    toggleWindow: "Alt+N",
+    "workspace.archiveBlock": "Mod+E",
+    "workspace.cancelExternalEdit": "Mod+\\",
+    "workspace.copyBlock": "Mod+Shift+C",
+    "workspace.createBlock": "Mod+N",
+    "workspace.deleteBlock": "Mod+D",
+    "editor.formatBold": "Mod+B",
+    "editor.formatInlineCode": "Mod+Shift+E",
+    "editor.formatItalic": "Mod+I",
+    "editor.formatStrikethrough": "Mod+Shift+X",
+    "workspace.keepBlock": "Mod+K",
+    "global.quickCreateBlock": "Ctrl+Alt+N",
+    "workspace.submitExternalEdit": "Mod+Enter",
+    "workspace.togglePinBlock": "Mod+T",
+    "global.toggleWindow": "Alt+N",
   } as const;
 
   return {

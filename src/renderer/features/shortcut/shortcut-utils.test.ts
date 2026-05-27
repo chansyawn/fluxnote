@@ -34,9 +34,9 @@ describe("shortcut utils", () => {
   });
 
   it("normalizes archive block shortcut preferences", () => {
-    expect(normalizeShortcutPreferences(DEFAULT_SETTINGS.shortcuts, "mac")["archiveBlock"]).toBe(
-      "Mod+E",
-    );
+    expect(
+      normalizeShortcutPreferences(DEFAULT_SETTINGS.shortcuts, "mac")["workspace.archiveBlock"],
+    ).toBe("Mod+E");
   });
 
   it("formats modifier-only recorder previews", () => {

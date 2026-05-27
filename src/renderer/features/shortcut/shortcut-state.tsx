@@ -41,11 +41,11 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   });
 
   const toggleWindowShortcutError = useGlobalShortcutSync({
-    shortcut: shortcuts["toggleWindow"],
+    shortcut: shortcuts["global.toggleWindow"],
     onPressed: handleToggleWindow,
   });
   const quickCreateBlockShortcutError = useGlobalShortcutSync({
-    shortcut: shortcuts["quickCreateBlock"],
+    shortcut: shortcuts["global.quickCreateBlock"],
     onPressed: handleQuickCreateBlock,
   });
 
@@ -53,8 +53,8 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     () => ({
       shortcuts,
       globalShortcutErrors: {
-        toggleWindow: toggleWindowShortcutError,
-        quickCreateBlock: quickCreateBlockShortcutError,
+        "global.toggleWindow": toggleWindowShortcutError,
+        "global.quickCreateBlock": quickCreateBlockShortcutError,
       },
       clearShortcut: (action) => {
         clearShortcut(action);
