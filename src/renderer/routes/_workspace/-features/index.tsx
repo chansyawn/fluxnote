@@ -100,7 +100,7 @@ export function BlockWorkspace() {
 
   return (
     <section
-      className="z-10 mx-auto flex h-full min-h-0 w-full flex-1 flex-col"
+      className="z-10 mx-auto flex min-h-full w-full flex-col"
       onBlurCapture={(event) => {
         const nextTarget = event.relatedTarget;
         if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
@@ -108,10 +108,8 @@ export function BlockWorkspace() {
         }
       }}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <div className="mx-auto flex min-h-full w-full flex-col gap-4">{workspaceContent}</div>
-      </div>
-      <div className="shrink-0 pt-2">
+      <div className="mx-auto flex w-full flex-1 flex-col gap-4">{workspaceContent}</div>
+      <div className="sticky bottom-0 z-20 shrink-0">
         <BlockEditorToolbar controller={editorRegistry.activeEditor} />
       </div>
     </section>

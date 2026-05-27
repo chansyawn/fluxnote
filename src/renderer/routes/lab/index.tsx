@@ -8,23 +8,21 @@ export const Route = createFileRoute("/lab/")({
 
 function RouteComponent() {
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-      <section className="mx-auto flex w-full max-w-3xl flex-col gap-4 py-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-base font-semibold">
-            <Trans id="lab.title">Lab</Trans>
-          </h1>
-          <p className="text-muted-foreground text-xs">
-            <Trans id="lab.description">
-              Experiment area for infrastructure and integration demos.
-            </Trans>
-          </p>
-        </div>
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-4 py-3">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-base font-semibold">
+          <Trans id="lab.title">Lab</Trans>
+        </h1>
+        <p className="text-muted-foreground text-xs">
+          <Trans id="lab.description">
+            Experiment area for infrastructure and integration demos.
+          </Trans>
+        </p>
+      </div>
 
-        <div className="pt-2">
-          <BlockEditorPlaygroundPanel />
-        </div>
-      </section>
-    </div>
+      <div className="pt-2">
+        <BlockEditorPlaygroundPanel />
+      </div>
+    </section>
   );
 }

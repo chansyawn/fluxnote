@@ -22,7 +22,10 @@ function RootComponent() {
       <OpenBlockWorkspaceRouteSync />
       <WindowShell>
         <WindowTitleBar />
-        <main tabIndex={1} className="flex min-h-0 flex-1 flex-col px-3 pb-3 focus:outline-none">
+        <main
+          tabIndex={1}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 focus:outline-none"
+        >
           <Outlet />
         </main>
       </WindowShell>

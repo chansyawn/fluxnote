@@ -358,7 +358,7 @@ msgid "home-note.block.external-edit.submit.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:18
+#: src/renderer/routes/lab/index.tsx:17
 msgid "lab.description"
 msgstr ""
 
@@ -378,7 +378,7 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:15
+#: src/renderer/routes/lab/index.tsx:14
 msgid "lab.title"
 msgstr ""
 
@@ -724,7 +724,7 @@ msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:19
+#: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
 msgstr ""
 
