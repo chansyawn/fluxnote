@@ -72,10 +72,12 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
       return;
     }
 
-    tray.popUpContextMenu(
-      contextMenu,
-      process.platform === "win32" ? { x: bounds.x, y: bounds.y } : undefined,
-    );
+    if (process.platform === "win32") {
+      tray.popUpContextMenu(contextMenu, { x: bounds.x, y: bounds.y });
+      return;
+    }
+
+    tray.popUpContextMenu(contextMenu);
   }
 
   function refreshMenu(): void {
