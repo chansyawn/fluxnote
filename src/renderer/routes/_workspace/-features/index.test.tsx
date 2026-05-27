@@ -3,18 +3,29 @@
 import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
 import { renderWithProviders } from "@renderer/test/render";
 import { fireEvent, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vite-plus/test";
+import type { ReactNode } from "react";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
+  activeEditorEnabled: true,
   focusBlock: vi.fn(),
+  isInitialLoading: false,
+  totalBlockCount: 1,
 }));
 
 vi.mock("@renderer/features/block-editor", () => ({
-  BlockEditorToolbar: ({ controller }: { controller?: unknown }) => (
-    <button disabled={!controller} type="button">
-      Editor toolbar
-    </button>
-  ),
+  BlockEditorToolbar: ({
+    controller,
+    inactiveContent,
+  }: {
+    controller?: unknown;
+    inactiveContent?: ReactNode;
+  }) =>
+    controller ? (
+      <button type="button">Editor toolbar</button>
+    ) : (
+      <div tabIndex={0}>{inactiveContent}</div>
+    ),
 }));
 
 vi.mock("./view/workspace-titlebar-actions-portal", () => ({
@@ -37,8 +48,8 @@ vi.mock("./workspace-runtime", () => ({
     blockList: {
       ensureBlockRange: vi.fn(),
       getBlockAtIndex: vi.fn(),
-      isInitialLoading: false,
-      totalBlockCount: 1,
+      isInitialLoading: mocks.isInitialLoading,
+      totalBlockCount: mocks.totalBlockCount,
     },
     blockMutations: {
       isCreatingBlock: false,
@@ -60,14 +71,16 @@ vi.mock("./workspace-runtime", () => ({
       focusBlock: mocks.focusBlock,
     },
     editorRegistry: {
-      activeEditor: {
-        copy: vi.fn(async () => undefined),
-        flush: vi.fn(async () => ""),
-        focus: vi.fn(),
-        formatText: vi.fn(),
-        getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-        subscribeToolbarState: () => () => undefined,
-      },
+      activeEditor: mocks.activeEditorEnabled
+        ? {
+            copy: vi.fn(async () => undefined),
+            flush: vi.fn(async () => ""),
+            focus: vi.fn(),
+            formatText: vi.fn(),
+            getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+            subscribeToolbarState: () => () => undefined,
+          }
+        : undefined,
       getEditor: vi.fn(),
       registerEditor: vi.fn(),
     },
@@ -102,6 +115,13 @@ vi.mock("./workspace-runtime", () => ({
 import { BlockWorkspace } from ".";
 
 describe("BlockWorkspace", () => {
+  beforeEach(() => {
+    mocks.activeEditorEnabled = true;
+    mocks.focusBlock.mockClear();
+    mocks.isInitialLoading = false;
+    mocks.totalBlockCount = 1;
+  });
+
   it("keeps the active Block while focus moves from the editor into the toolbar", () => {
     renderWithProviders(<BlockWorkspace />);
     const blockEditor = screen.getByRole("button", { name: "Block editor" });
@@ -111,6 +131,15 @@ describe("BlockWorkspace", () => {
     fireEvent.blur(blockEditor, { relatedTarget: toolbar });
 
     expect(mocks.focusBlock).not.toHaveBeenCalledWith(null);
+  });
+
+  it("passes the current view block count as inactive toolbar content", () => {
+    mocks.activeEditorEnabled = false;
+    mocks.totalBlockCount = 2;
+
+    renderWithProviders(<BlockWorkspace />);
+
+    expect(screen.getByText("2 blocks")).toBeVisible();
   });
 
   it("clears the active Block when focus leaves the Workspace editing area", () => {

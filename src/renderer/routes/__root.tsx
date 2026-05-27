@@ -24,7 +24,7 @@ function RootComponent() {
         <WindowTitleBar />
         <main
           tabIndex={1}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-3 focus:outline-none"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 focus:outline-none"
         >
           <Outlet />
         </main>

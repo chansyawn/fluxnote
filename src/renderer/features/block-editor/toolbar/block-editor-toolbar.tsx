@@ -4,7 +4,7 @@ import { ButtonGroup } from "@renderer/ui/components/button-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { cn } from "@renderer/ui/lib/utils";
 import { BoldIcon, Code2Icon, ItalicIcon, StrikethroughIcon, type LucideIcon } from "lucide-react";
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { type ReactNode, useCallback, useMemo, useSyncExternalStore } from "react";
 
 import {
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
@@ -15,6 +15,7 @@ import {
 interface BlockEditorToolbarProps {
   className?: string;
   controller?: BlockEditorToolbarController | null;
+  inactiveContent?: ReactNode;
 }
 
 interface TextFormatControl {
@@ -39,10 +40,13 @@ function useBlockEditorToolbarState(controller: BlockEditorToolbarController | n
   return useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
 }
 
-export function BlockEditorToolbar({ className, controller }: BlockEditorToolbarProps) {
+export function BlockEditorToolbar({
+  className,
+  controller,
+  inactiveContent,
+}: BlockEditorToolbarProps) {
   const { i18n } = useLingui();
   const state = useBlockEditorToolbarState(controller);
-  const disabled = !controller;
   const textFormatControls = useMemo<TextFormatControl[]>(
     () => [
       {
@@ -69,10 +73,14 @@ export function BlockEditorToolbar({ className, controller }: BlockEditorToolbar
     [i18n],
   );
 
+  if (!controller) {
+    return inactiveContent ?? null;
+  }
+
   return (
     <div
       className={cn(
-        "bg-background/75 mx-auto flex w-fit items-center rounded-lg border p-1 shadow-sm backdrop-blur-md",
+        "mx-auto flex w-fit items-center rounded-xl border border-muted bg-popover shadow-xs p-1",
         className,
       )}
     >
@@ -88,19 +96,19 @@ export function BlockEditorToolbar({ className, controller }: BlockEditorToolbar
                   <Button
                     aria-label={control.label}
                     aria-pressed={pressed}
-                    disabled={disabled}
-                    size="icon"
+                    className={cn(pressed ? "text-foreground" : "text-muted-foreground/60")}
+                    size="icon-sm"
                     type="button"
-                    variant={pressed && !disabled ? "secondary" : "ghost"}
+                    variant="ghost"
                     onClick={() => {
-                      controller?.formatText(control.format);
-                      controller?.focus();
+                      controller.formatText(control.format);
+                      controller.focus();
                     }}
                     onMouseDown={(event) => {
                       event.preventDefault();
                     }}
                   >
-                    <Icon data-icon="inline-start" />
+                    <Icon data-icon="inline-start" className="size-4" />
                   </Button>
                 }
               />

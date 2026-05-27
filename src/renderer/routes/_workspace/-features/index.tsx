@@ -1,4 +1,7 @@
+import type { I18n } from "@lingui/core";
+import { useLingui } from "@lingui/react";
 import { BlockEditorToolbar } from "@renderer/features/block-editor";
+import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
 
 import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
@@ -13,7 +16,25 @@ import { WorkspaceTitlebarActionsPortal } from "./view/workspace-titlebar-action
 import { useWorkspaceRuntime } from "./workspace-runtime";
 import { WorkspaceStateProvider } from "./workspace-state-context";
 
+function formatWorkspaceToolbarBlockCountLabel(i18n: I18n, count: number) {
+  if (count === 1) {
+    return i18n._({
+      id: "workspace.toolbar.block-count.one",
+      message: "1 block",
+    });
+  }
+
+  const formattedCount = new Intl.NumberFormat(i18n.locale).format(count);
+  const label = i18n._({
+    id: "workspace.toolbar.block-count.other",
+    message: "{count} blocks",
+    values: { count: formattedCount },
+  });
+  return label.replace("{count}", formattedCount);
+}
+
 export function BlockWorkspace() {
+  const { i18n } = useLingui();
   const {
     blockList,
     blockMutations,
@@ -34,6 +55,7 @@ export function BlockWorkspace() {
 
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
+
   const tagFilter = (
     <WorkspaceTitlebarActionsPortal
       tags={tagData.tags}
@@ -109,8 +131,25 @@ export function BlockWorkspace() {
       }}
     >
       <div className="mx-auto flex w-full flex-1 flex-col gap-4">{workspaceContent}</div>
-      <div className="sticky bottom-0 z-20 shrink-0">
-        <BlockEditorToolbar controller={editorRegistry.activeEditor} />
+      <div className="pointer-events-none sticky bottom-0 z-20 -mt-14 flex h-24 shrink-0 items-end justify-center pb-2">
+        <div
+          aria-hidden="true"
+          className={cn(
+            "fixed inset-x-0 bottom-0 z-0 h-16",
+            "from-background/80 via-background/40 to-background/0 bg-linear-to-t",
+          )}
+        />
+        <BlockEditorToolbar
+          className="pointer-events-auto relative z-10"
+          controller={editorRegistry.activeEditor}
+          inactiveContent={
+            blockList.isInitialLoading ? null : (
+              <div className="text-muted-foreground pointer-events-auto relative z-10 mx-auto flex min-h-10 w-fit items-center justify-center px-4 text-xs font-medium">
+                {formatWorkspaceToolbarBlockCountLabel(i18n, totalBlockCount)}
+              </div>
+            )
+          }
+        />
       </div>
     </section>
   );
