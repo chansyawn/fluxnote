@@ -149,6 +149,7 @@ describe("window manager", () => {
     manager.createMainWindow();
     const win = mocks.BrowserWindow.instances[0];
     expect(win).toBeDefined();
+    expect((win.options as BrowserWindowConstructorOptions).skipTaskbar).toBe(true);
     expect(mocks.onMainWindowCreated).toHaveBeenCalledWith(win);
 
     win.emit("focus");

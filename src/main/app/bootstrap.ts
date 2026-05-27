@@ -1,19 +1,11 @@
 import { app } from "electron";
 
 import { reportProcessError } from "../features/telemetry";
+import { configureMacOSAppBehavior } from "./mac-os-app-behavior";
 import { registerPrivilegedSchemes } from "./protocols";
 import { createBackendRuntime } from "./runtime";
 
 type BackendRuntime = ReturnType<typeof createBackendRuntime>;
-
-function configureMacOSAppBehavior(): void {
-  if (process.platform !== "darwin") {
-    return;
-  }
-
-  app.setActivationPolicy("accessory");
-  app.dock?.hide();
-}
 
 export function startPrimaryInstance(): void {
   registerPrivilegedSchemes();

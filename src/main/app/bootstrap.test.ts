@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
+  configureMacOSAppBehavior: vi.fn(),
   createBackendRuntime: vi.fn(),
-  dockHide: vi.fn(),
-  setActivationPolicy: vi.fn(),
   on: vi.fn(),
   registerPrivilegedSchemes: vi.fn(),
   whenReady: vi.fn(() => Promise.resolve()),
@@ -11,13 +10,14 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("electron", () => ({
   app: {
-    dock: { hide: mocks.dockHide },
-    setActivationPolicy: mocks.setActivationPolicy,
     on: mocks.on,
     whenReady: mocks.whenReady,
   },
 }));
 
+vi.mock("./mac-os-app-behavior", () => ({
+  configureMacOSAppBehavior: mocks.configureMacOSAppBehavior,
+}));
 vi.mock("./protocols", () => ({ registerPrivilegedSchemes: mocks.registerPrivilegedSchemes }));
 vi.mock("./runtime", () => ({ createBackendRuntime: mocks.createBackendRuntime }));
 
@@ -75,8 +75,7 @@ describe("startPrimaryInstance", () => {
     await Promise.resolve();
 
     expect(mocks.createBackendRuntime).toHaveBeenCalledTimes(1);
-    expect(mocks.setActivationPolicy).not.toHaveBeenCalled();
-    expect(mocks.dockHide).not.toHaveBeenCalled();
+    expect(mocks.configureMacOSAppBehavior).toHaveBeenCalledTimes(1);
     expect(runtime.start).toHaveBeenCalledTimes(1);
     expect(mocks.on).toHaveBeenCalledWith("activate", expect.any(Function));
 
@@ -109,16 +108,13 @@ describe("startPrimaryInstance", () => {
     expect(runtime.quitWhenAllWindowsClosed).toHaveBeenCalledTimes(1);
   });
 
-  it("configures macOS accessory app behavior when ready", async () => {
-    setPlatform("darwin");
-
+  it("configures app behavior before starting runtime", async () => {
     startPrimaryInstance();
 
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(mocks.setActivationPolicy).toHaveBeenCalledWith("accessory");
-    expect(mocks.dockHide).toHaveBeenCalledTimes(1);
+    expect(mocks.configureMacOSAppBehavior).toHaveBeenCalledBefore(mocks.createBackendRuntime);
     expect(runtime.start).toHaveBeenCalledTimes(1);
   });
 });
