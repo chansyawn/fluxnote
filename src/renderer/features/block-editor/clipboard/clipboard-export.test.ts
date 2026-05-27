@@ -3,7 +3,6 @@ import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
-  $selectAll,
   $setSelection,
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
@@ -68,7 +67,7 @@ describe("clipboard export", () => {
     let snapshot: ReturnType<typeof exportClipboardSnapshotFromDocument> = null;
 
     editor.update(() => {
-      snapshot = exportClipboardSnapshotFromDocument(editor, $selectAll());
+      snapshot = exportClipboardSnapshotFromDocument();
     });
 
     expect(snapshot).toEqual(

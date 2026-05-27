@@ -108,12 +108,18 @@ importers:
       electron-store:
         specifier: ^11.0.2
         version: 11.0.2
+      hast-util-to-html:
+        specifier: ^9.0.5
+        version: 9.0.5
       lexical:
         specifier: ^0.44.0
         version: 0.44.0
       lucide-react:
         specifier: ^1.7.0
         version: 1.7.0(react@19.2.4)
+      mdast-util-to-hast:
+        specifier: ^13.2.1
+        version: 13.2.1
       posthog-js:
         specifier: ^1.376.0
         version: 1.376.0

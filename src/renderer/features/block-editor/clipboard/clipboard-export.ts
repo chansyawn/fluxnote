@@ -1,4 +1,4 @@
-import { $generateJSONFromSelectedNodes, $getHtmlContent } from "@lexical/clipboard";
+import { $generateJSONFromSelectedNodes } from "@lexical/clipboard";
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 import {
   $getRoot,
@@ -18,14 +18,6 @@ export interface ClipboardExportSnapshot {
   imageAssetUrl: string | null;
   markdown: string;
   nodes: ClipboardSerializedNode[];
-}
-
-function exportSelectionToHtml(editor: LexicalEditor, selection: BaseSelection): string {
-  try {
-    return $getHtmlContent(editor, selection);
-  } catch {
-    return "";
-  }
 }
 
 function findSingleSelectedImageNode(
@@ -63,8 +55,6 @@ function getImageAssetUrlForNativeClipboard(
 }
 
 function createClipboardExportSnapshot(
-  editor: LexicalEditor,
-  selection: BaseSelection,
   nodes: ClipboardSerializedNode[],
   imageAssetUrl: string | null,
 ): ClipboardExportSnapshot | null {
@@ -75,7 +65,7 @@ function createClipboardExportSnapshot(
 
   return {
     assetUrls: collectClipboardAssetUrls(filteredNodes),
-    html: exportClipboardNodesToHtml(filteredNodes) || exportSelectionToHtml(editor, selection),
+    html: exportClipboardNodesToHtml(filteredNodes),
     imageAssetUrl,
     markdown: exportClipboardNodesToMarkdown(filteredNodes),
     nodes: filteredNodes,
@@ -102,21 +92,11 @@ export function exportClipboardSnapshotFromSelection(
 
   const lexical = $generateJSONFromSelectedNodes<ClipboardSerializedNode>(editor, selection);
   return createClipboardExportSnapshot(
-    editor,
-    selection,
     lexical.nodes,
     getImageAssetUrlForNativeClipboard(lexical.nodes, options.includeImageFileUrl),
   );
 }
 
-export function exportClipboardSnapshotFromDocument(
-  editor: LexicalEditor,
-  selection: BaseSelection,
-): ClipboardExportSnapshot | null {
-  return createClipboardExportSnapshot(
-    editor,
-    selection,
-    $getRoot().getChildren().map(serializeClipboardNode),
-    null,
-  );
+export function exportClipboardSnapshotFromDocument(): ClipboardExportSnapshot | null {
+  return createClipboardExportSnapshot($getRoot().getChildren().map(serializeClipboardNode), null);
 }

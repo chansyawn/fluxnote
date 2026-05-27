@@ -1,9 +1,10 @@
-import { $getHtmlContent } from "@lexical/clipboard";
-import { withDOM } from "@lexical/headless/dom";
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
-import { $selectAll, $setSelection, type SerializedEditorState } from "lexical";
+import { toHtml } from "hast-util-to-html";
+import { type SerializedEditorState } from "lexical";
+import { toHast } from "mdast-util-to-hast";
 
 import { createHeadlessMarkdownEditor } from "../core/headless-markdown-editor";
+import { exportLexicalToMdast } from "../core/lexical-mdast";
 import { exportEditorStateToMarkdown } from "../core/markdown-editor-io";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
@@ -92,22 +93,10 @@ export function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[])
 }
 
 export function exportClipboardNodesToHtml(nodes: ClipboardSerializedNode[]): string {
-  return withDOM(() => {
-    const editor = createHeadlessMarkdownEditor();
-    const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
-    editor.setEditorState(editorState);
-
-    let html = "";
-    editor.update(
-      () => {
-        const selection = $selectAll();
-        html = $getHtmlContent(editor, selection);
-        $setSelection(null);
-      },
-      { discrete: true },
-    );
-    return html;
-  });
+  const editor = createHeadlessMarkdownEditor();
+  const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
+  const hast = toHast(exportLexicalToMdast(editorState), { allowDangerousHtml: false });
+  return hast ? toHtml(hast, { allowDangerousHtml: false }) : "";
 }
 
 export function rewriteClipboardHtmlAssetUrls(
