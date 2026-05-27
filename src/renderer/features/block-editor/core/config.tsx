@@ -6,7 +6,6 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
   markdown: {
     codeBlock: {
       showLineNumbers: false,
-      wordWrap: false,
     },
   },
   shortcuts: {
@@ -26,9 +25,6 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
         showLineNumbers:
           config?.markdown?.codeBlock?.showLineNumbers ??
           DEFAULT_BLOCK_EDITOR_CONFIG.markdown.codeBlock.showLineNumbers,
-        wordWrap:
-          config?.markdown?.codeBlock?.wordWrap ??
-          DEFAULT_BLOCK_EDITOR_CONFIG.markdown.codeBlock.wordWrap,
       },
     },
     shortcuts: {

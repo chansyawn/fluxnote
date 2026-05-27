@@ -47,7 +47,6 @@ export const shortcutBindingSchema = z.string().nullable();
 
 const defaultMarkdownCodeBlockSettingsValue = {
   showLineNumbers: false,
-  wordWrap: false,
 } as const;
 
 const autoArchiveIdleMinutesSchema = z.preprocess(
@@ -85,7 +84,6 @@ export const appearanceSettingsSchema = z.object({
 
 export const markdownCodeBlockSettingsSchema = z.object({
   showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.showLineNumbers),
-  wordWrap: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.wordWrap),
 });
 
 export const markdownSettingsSchema = z.object({
@@ -142,7 +140,6 @@ const shortcutPreferencesPatchSchema = z
 const markdownCodeBlockSettingsPatchSchema = z
   .object({
     showLineNumbers: z.boolean().optional(),
-    wordWrap: z.boolean().optional(),
   })
   .strict();
 
@@ -284,7 +281,6 @@ function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings>
         codeBlock: z
           .object({
             showLineNumbers: z.boolean().catch(defaults.markdown.codeBlock.showLineNumbers),
-            wordWrap: z.boolean().catch(defaults.markdown.codeBlock.wordWrap),
           })
           .catch(defaults.markdown.codeBlock),
       })

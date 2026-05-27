@@ -580,11 +580,6 @@ msgid "preferences.markdown.code-block.line-numbers.label"
 msgstr "显示行号"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:41
-msgid "preferences.markdown.code-block.word-wrap.label"
-msgstr "自动换行"
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:15
 msgid "preferences.markdown.title"
 msgstr "Markdown"

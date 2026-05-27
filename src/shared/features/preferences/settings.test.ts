@@ -63,7 +63,6 @@ describe("settings", () => {
       markdown: {
         codeBlock: {
           showLineNumbers: "bad",
-          wordWrap: true,
           unknown: true,
         },
         unknown: true,
@@ -107,7 +106,6 @@ describe("settings", () => {
     expect(normalized.markdown).toEqual({
       codeBlock: {
         showLineNumbers: false,
-        wordWrap: true,
       },
     });
     expect(normalized.telemetry).toEqual({ enabled: true });
@@ -128,7 +126,7 @@ describe("settings", () => {
           copyBlock: "Mod+Shift+C",
           formatInlineCode: "Mod+Shift+E",
         },
-        markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
+        markdown: { codeBlock: { showLineNumbers: true } },
         telemetry: { enabled: false },
         appUpdate: { automaticChecksEnabled: false },
       }),
@@ -140,7 +138,7 @@ describe("settings", () => {
         copyBlock: "Mod+Shift+C",
         formatInlineCode: "Mod+Shift+E",
       },
-      markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
+      markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },
     });

@@ -6,7 +6,7 @@ import {
   SettingsSection,
 } from "@renderer/routes/preferences/-features/settings-list";
 import { Switch } from "@renderer/ui/components/switch";
-import { ListOrderedIcon, WrapTextIcon } from "lucide-react";
+import { ListOrderedIcon } from "lucide-react";
 
 export function MarkdownSettingsSection() {
   const { codeBlock, patchCodeBlock } = useMarkdownCodeBlockPreference();
@@ -27,18 +27,6 @@ export function MarkdownSettingsSection() {
           label={
             <Trans id="preferences.markdown.code-block.line-numbers.label">Show line numbers</Trans>
           }
-        />
-        <SettingsRow
-          control={
-            <Switch
-              checked={codeBlock.wordWrap}
-              onCheckedChange={(checked) => {
-                patchCodeBlock({ wordWrap: checked });
-              }}
-            />
-          }
-          icon={<WrapTextIcon />}
-          label={<Trans id="preferences.markdown.code-block.word-wrap.label">Word wrap</Trans>}
         />
       </SettingsGroup>
     </SettingsSection>

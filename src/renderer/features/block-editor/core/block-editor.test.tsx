@@ -233,7 +233,7 @@ describe("BlockEditor", () => {
     render(
       <I18nProvider i18n={i18n}>
         <BlockEditor
-          config={{ markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } } }}
+          config={{ markdown: { codeBlock: { showLineNumbers: true } } }}
           initialMarkdown={["```ts", "const value = 1;", "```", ""].join("\n")}
           runtime={runtime}
           onMarkdownChange={() => undefined}
