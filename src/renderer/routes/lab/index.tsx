@@ -8,7 +8,7 @@ export const Route = createFileRoute("/lab/")({
 
 function RouteComponent() {
   return (
-    <section className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+    <section className="mx-auto flex w-full max-w-3xl flex-col gap-4 py-3">
       <div className="flex flex-col gap-1">
         <h1 className="text-base font-semibold">
           <Trans id="lab.title">Lab</Trans>

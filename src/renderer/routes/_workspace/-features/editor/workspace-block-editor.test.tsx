@@ -16,8 +16,18 @@ import type { WorkspaceBlockEditorHandle } from "./workspace-block-editor-surfac
 const mocks = vi.hoisted(() => ({
   editorHandle: {
     copy: vi.fn(async () => undefined),
+    formatText: vi.fn(),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
+    getToolbarState: vi.fn(() => ({
+      textFormats: {
+        bold: false,
+        code: false,
+        italic: false,
+        strikethrough: false,
+      },
+    })),
+    subscribeToolbarState: vi.fn(() => () => undefined),
   },
   shortcutActionsByBlock: new Map<string, WorkspaceBlockActions>(),
   shortcuts: {
@@ -26,6 +36,10 @@ const mocks = vi.hoisted(() => ({
     copyBlock: "Mod+Shift+C",
     createBlock: "Mod+N",
     deleteBlock: "Mod+D",
+    formatBold: "Mod+B",
+    formatInlineCode: "Mod+Shift+E",
+    formatItalic: "Mod+I",
+    formatStrikethrough: "Mod+Shift+X",
     keepBlock: "Mod+K",
     quickCreateBlock: "Ctrl+Alt+N",
     togglePinBlock: "Mod+T",

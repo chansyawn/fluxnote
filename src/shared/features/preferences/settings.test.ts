@@ -99,6 +99,10 @@ describe("settings", () => {
       quickCreateBlock: "Ctrl+Alt+N",
       submitExternalEdit: "Mod+Enter",
       cancelExternalEdit: "Mod+\\",
+      formatBold: "Mod+B",
+      formatItalic: "Mod+I",
+      formatStrikethrough: "Mod+Shift+X",
+      formatInlineCode: "Mod+Shift+E",
     });
     expect(normalized.markdown).toEqual({
       codeBlock: {
@@ -119,7 +123,11 @@ describe("settings", () => {
       normalizeSettingsPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
-        shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
+        shortcuts: {
+          archiveBlock: "Mod+E",
+          copyBlock: "Mod+Shift+C",
+          formatInlineCode: "Mod+Shift+E",
+        },
         markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
         telemetry: { enabled: false },
         appUpdate: { automaticChecksEnabled: false },
@@ -127,7 +135,11 @@ describe("settings", () => {
     ).toEqual({
       appearance: { locale: "zh-Hans" },
       autoArchive: { enabled: false, idleMinutes: 300 },
-      shortcuts: { archiveBlock: "Mod+E", copyBlock: "Mod+Shift+C" },
+      shortcuts: {
+        archiveBlock: "Mod+E",
+        copyBlock: "Mod+Shift+C",
+        formatInlineCode: "Mod+Shift+E",
+      },
       markdown: { codeBlock: { showLineNumbers: true, wordWrap: true } },
       telemetry: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },

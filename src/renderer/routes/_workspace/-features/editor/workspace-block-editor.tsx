@@ -131,6 +131,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
         }
         isExternalEditPending={Boolean(state.externalEditSession)}
         block={block}
+        shortcuts={shortcuts}
         onFocus={commands.focusBlock}
       />
     </div>

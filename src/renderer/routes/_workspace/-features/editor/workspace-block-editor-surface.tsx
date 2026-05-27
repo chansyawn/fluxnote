@@ -3,9 +3,15 @@ import {
   BlockEditor,
   type BlockEditorConfigInput,
   type BlockEditorHandle,
+  type BlockEditorTextFormatShortcuts,
   type BlockEditorRuntime,
 } from "@renderer/features/block-editor";
+import {
+  BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS,
+  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+} from "@renderer/features/block-editor/toolbar";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
+import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { cn } from "@renderer/ui/lib/utils";
 import {
   useCallback,
@@ -89,6 +95,7 @@ interface WorkspaceBlockEditorSurfaceProps {
   block: Block;
   adornments?: ReactNode;
   isExternalEditPending?: boolean;
+  shortcuts: ShortcutPreferences;
   onFocus: (blockId: string) => void;
   ref?: Ref<WorkspaceBlockEditorHandle>;
 }
@@ -97,19 +104,32 @@ export function WorkspaceBlockEditorSurface({
   block,
   adornments,
   isExternalEditPending = false,
+  shortcuts,
   onFocus,
   ref,
 }: WorkspaceBlockEditorSurfaceProps) {
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
+  const textFormatShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+    () => ({
+      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
+      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
+      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
+      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+    }),
+    [shortcuts],
+  );
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
       markdown: {
         codeBlock,
       },
+      shortcuts: {
+        textFormats: textFormatShortcuts,
+      },
     }),
-    [codeBlock],
+    [codeBlock, textFormatShortcuts],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockEditorPersistence(block);
@@ -136,7 +156,14 @@ export function WorkspaceBlockEditorSurface({
       focus: () => {
         editorRef.current?.focus();
       },
+      formatText: (format) => {
+        editorRef.current?.formatText(format);
+      },
       flush,
+      getToolbarState: () =>
+        editorRef.current?.getToolbarState() ?? DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      subscribeToolbarState: (listener) =>
+        editorRef.current?.subscribeToolbarState(listener) ?? (() => undefined),
     }),
     [flush],
   );
