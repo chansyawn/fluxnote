@@ -6,7 +6,6 @@ import { ReactExtension } from "@lexical/react/ReactExtension";
 import { mergeRegister } from "@lexical/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import {
   $getSelection,
   $isRangeSelection,
@@ -27,10 +26,8 @@ import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
-  BLOCK_EDITOR_TEXT_FORMATS,
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
   type BlockEditorTextFormat,
-  type BlockEditorTextFormatShortcuts,
   type BlockEditorToolbarState,
   type BlockEditorToolbarStateListener,
 } from "../toolbar/types";
@@ -48,6 +45,7 @@ import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
 import { importMarkdownToEditor } from "./markdown-editor-io";
 import { BlockEditorRuntimeExtension, useBlockEditorRuntime } from "./runtime-extension";
+import { resolveTextFormatShortcut } from "./text-format-shortcuts";
 import type { BlockEditorProps, BlockEditorRuntime } from "./types";
 
 interface BlockEditorContentExtensionConfig {
@@ -97,39 +95,12 @@ function toolbarStatesEqual(
   );
 }
 
-const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
-  bold: "Mod+B",
-  italic: "Mod+I",
-  underline: "Mod+U",
-} as const;
-
 const LEXICAL_FORMAT_INPUT_TYPES = new Set([
   "formatBold",
   "formatItalic",
   "formatStrikeThrough",
   "formatUnderline",
 ]);
-
-function getConfiguredTextFormatShortcut(
-  event: KeyboardEvent,
-  shortcuts: BlockEditorTextFormatShortcuts,
-): BlockEditorTextFormat | null {
-  for (const format of BLOCK_EDITOR_TEXT_FORMATS) {
-    const shortcut = shortcuts[format] ?? null;
-
-    if (keyboardEventMatchesShortcut(event, shortcut)) {
-      return format;
-    }
-  }
-
-  return null;
-}
-
-function isLexicalDefaultTextFormatShortcut(event: KeyboardEvent): boolean {
-  return Object.values(LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS).some((shortcut) =>
-    keyboardEventMatchesShortcut(event, shortcut),
-  );
-}
 
 function isLexicalTextFormatInput(event: InputEvent): boolean {
   return LEXICAL_FORMAT_INPUT_TYPES.has(event.inputType);
@@ -230,25 +201,25 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
       editor.registerCommand(
         KEY_DOWN_COMMAND,
         (event) => {
-          if (event.repeat) {
+          const shortcutResolution = resolveTextFormatShortcut(event, shortcuts.textFormats);
+
+          if (shortcutResolution.type === "none") {
             return false;
           }
 
-          const configuredFormat = getConfiguredTextFormatShortcut(event, shortcuts.textFormats);
-          if (configuredFormat) {
-            event.preventDefault();
-            event.stopPropagation();
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, configuredFormat);
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (event.repeat) {
             return true;
           }
 
-          if (isLexicalDefaultTextFormatShortcut(event)) {
-            event.preventDefault();
-            event.stopPropagation();
+          if (shortcutResolution.type === "blocked-default") {
             return true;
           }
 
-          return false;
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, shortcutResolution.format);
+          return true;
         },
         COMMAND_PRIORITY_HIGH,
       ),

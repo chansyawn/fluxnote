@@ -144,6 +144,88 @@ describe("BlockEditor", () => {
     expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
   });
 
+  it("consumes repeated Lexical default format shortcuts without applying them", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          initialMarkdown=""
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+
+    const repeatedOldDefaultEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+      repeat: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(repeatedOldDefaultEvent);
+    });
+
+    expect(repeatedOldDefaultEvent.defaultPrevented).toBe(true);
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+  });
+
+  it("consumes repeated configured format shortcuts without toggling the format again", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          initialMarkdown=""
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+
+    const configuredEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+      shiftKey: true,
+    });
+    const repeatedConfiguredEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "b",
+      repeat: true,
+      shiftKey: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(configuredEvent);
+    });
+
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+
+    await act(async () => {
+      editor.dispatchEvent(repeatedConfiguredEvent);
+    });
+
+    expect(repeatedConfiguredEvent.defaultPrevented).toBe(true);
+    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+  });
+
   it("lets users copy code from code block controls", async () => {
     const user = userEvent.setup();
     const runtime = createBlockEditorRuntime();

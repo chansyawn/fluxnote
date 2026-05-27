@@ -85,7 +85,7 @@ msgid "block-editor.code.language.search"
 msgstr "搜索语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:167
+#: src/renderer/features/block-editor/core/block-editor.tsx:138
 msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
@@ -120,8 +120,8 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:166
-#: src/renderer/features/block-editor/core/block-editor.tsx:172
+#: src/renderer/features/block-editor/core/block-editor.tsx:137
+#: src/renderer/features/block-editor/core/block-editor.tsx:143
 msgid "block-editor.placeholder"
 msgstr "写一条笔记..."
 
