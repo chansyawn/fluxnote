@@ -29,14 +29,16 @@ export function useWorkspaceRuntime() {
     [blockList.ensureBlockIndexLoaded, blockList.getBlockAtIndex, blockList.locateBlockInView],
   );
   const blockNavigation = useBlockNavigation({
+    activeBlockId: editorRegistry.activeBlockId,
     blockCollection: blockNavigationCollection,
     registry: editorRegistry,
+    setActiveBlockId: editorRegistry.setActiveBlockId,
     workspaceView: blockView.navigationView,
   });
 
   const activeBlockFocus = useActiveBlockFocus({
-    activeBlockId: blockNavigation.activeBlockId,
-    setActiveBlockId: blockNavigation.setActiveBlockId,
+    activeBlockId: editorRegistry.activeBlockId,
+    setActiveBlockId: editorRegistry.setActiveBlockId,
   });
 
   const { commands, externalEditActions, focusActions } = useWorkspaceCommandRuntime({

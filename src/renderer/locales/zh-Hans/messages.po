@@ -85,7 +85,7 @@ msgid "block-editor.code.language.search"
 msgstr "搜索语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:65
+#: src/renderer/features/block-editor/core/block-editor.tsx:118
 msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
@@ -120,8 +120,8 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:64
-#: src/renderer/features/block-editor/core/block-editor.tsx:70
+#: src/renderer/features/block-editor/core/block-editor.tsx:117
+#: src/renderer/features/block-editor/core/block-editor.tsx:123
 msgid "block-editor.placeholder"
 msgstr "写一条笔记..."
 
@@ -204,6 +204,31 @@ msgstr "上移"
 #: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
 msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:51
+msgid "block-editor.toolbar.bold"
+msgstr "加粗"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:56
+msgid "block-editor.toolbar.inline-code"
+msgstr "行内代码"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+msgid "block-editor.toolbar.italic"
+msgstr "斜体"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:79
+msgid "block-editor.toolbar.label"
+msgstr "编辑器"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+msgid "block-editor.toolbar.strikethrough"
+msgstr "删除线"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
@@ -333,7 +358,7 @@ msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "提交"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
 msgstr "用于基础设施与集成演示的实验区域。"
 
@@ -353,7 +378,7 @@ msgid "lab.playground.title"
 msgstr "笔记区块编辑器演练区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr "实验室"
 
@@ -699,7 +724,7 @@ msgid "preferences.theme.system"
 msgstr "跟随系统"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:18
+#: src/renderer/routes/preferences/index.tsx:19
 msgid "preferences.title"
 msgstr "偏好设置"
 

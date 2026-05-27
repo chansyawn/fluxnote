@@ -1,13 +1,5 @@
 import type { BlockVisibility } from "@renderer/clients";
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useReducer, useRef } from "react";
 
 import type { WorkspaceBlockCollection } from "../block-collection/workspace-block-collection";
 import type { BlockEditorRegistry } from "../editor-registry/use-block-editor-registry";
@@ -133,11 +125,13 @@ export function blockNavigationReducer(
 }
 
 interface UseBlockNavigationParams {
+  activeBlockId: string | null;
   blockCollection: Pick<
     WorkspaceBlockCollection,
     "ensureBlockIndexLoaded" | "getBlockAtIndex" | "locateBlockInView"
   >;
   registry: BlockEditorRegistry;
+  setActiveBlockId: (blockId: string | null) => void;
   workspaceView: {
     isUnfiltered: (visibility: BlockVisibility) => boolean;
     showUnfiltered: (visibility: BlockVisibility) => void;
@@ -158,11 +152,12 @@ function createBlockNavigationError(message: string): BlockNavigationError {
 }
 
 export function useBlockNavigation({
+  activeBlockId,
   blockCollection,
   registry,
+  setActiveBlockId,
   workspaceView,
 }: UseBlockNavigationParams): UseBlockNavigationResult {
-  const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const [state, dispatch] = useReducer(blockNavigationReducer, { phase: "idle" });
   const deferredByRequestIdRef = useRef(new Map<number, NavigationDeferred>());
   const nextRequestIdRef = useRef(0);

@@ -85,7 +85,7 @@ msgid "block-editor.code.language.search"
 msgstr "Search language"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:65
+#: src/renderer/features/block-editor/core/block-editor.tsx:118
 msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
@@ -120,8 +120,8 @@ msgid "block-editor.link.url"
 msgstr "Link URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:64
-#: src/renderer/features/block-editor/core/block-editor.tsx:70
+#: src/renderer/features/block-editor/core/block-editor.tsx:117
+#: src/renderer/features/block-editor/core/block-editor.tsx:123
 msgid "block-editor.placeholder"
 msgstr "Write a note..."
 
@@ -204,6 +204,31 @@ msgstr "Move up"
 #: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
 msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:51
+msgid "block-editor.toolbar.bold"
+msgstr "Bold"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:56
+msgid "block-editor.toolbar.inline-code"
+msgstr "Inline code"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+msgid "block-editor.toolbar.italic"
+msgstr "Italic"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:79
+msgid "block-editor.toolbar.label"
+msgstr "Editor"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+msgid "block-editor.toolbar.strikethrough"
+msgstr "Strikethrough"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
@@ -333,7 +358,7 @@ msgid "home-note.block.external-edit.submit.tooltip"
 msgstr "Submit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
@@ -353,7 +378,7 @@ msgid "lab.playground.title"
 msgstr "Note Block Editor Playground"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr "Lab"
 
@@ -699,7 +724,7 @@ msgid "preferences.theme.system"
 msgstr "System"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:18
+#: src/renderer/routes/preferences/index.tsx:19
 msgid "preferences.title"
 msgstr "Preferences"
 

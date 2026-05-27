@@ -3,14 +3,31 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalExtensionComposer } from "@lexical/react/LexicalExtensionComposer";
 import { ReactExtension } from "@lexical/react/ReactExtension";
+import { mergeRegister } from "@lexical/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { configExtension, defineExtension, type InitialEditorStateType } from "lexical";
-import { useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+  $getSelection,
+  $isRangeSelection,
+  COMMAND_PRIORITY_LOW,
+  FORMAT_TEXT_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  configExtension,
+  defineExtension,
+  type InitialEditorStateType,
+  type LexicalEditor,
+} from "lexical";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
+import {
+  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+  type BlockEditorTextFormat,
+  type BlockEditorToolbarState,
+  type BlockEditorToolbarStateListener,
+} from "../toolbar/types";
 import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
@@ -32,6 +49,42 @@ function createInitialMarkdownEditorState(markdown: string): InitialEditorStateT
   return (editor) => {
     importMarkdownToEditor(editor, markdown);
   };
+}
+
+function readToolbarStateFromSelection(): BlockEditorToolbarState {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) {
+    return DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE;
+  }
+
+  return {
+    textFormats: {
+      bold: selection.hasFormat("bold"),
+      code: selection.hasFormat("code"),
+      italic: selection.hasFormat("italic"),
+      strikethrough: selection.hasFormat("strikethrough"),
+    },
+  };
+}
+
+function readToolbarState(editor: LexicalEditor): BlockEditorToolbarState {
+  let state = DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE;
+  editor.getEditorState().read(() => {
+    state = readToolbarStateFromSelection();
+  });
+  return state;
+}
+
+function toolbarStatesEqual(
+  left: BlockEditorToolbarState,
+  right: BlockEditorToolbarState,
+): boolean {
+  return (
+    left.textFormats.bold === right.textFormats.bold &&
+    left.textFormats.code === right.textFormats.code &&
+    left.textFormats.italic === right.textFormats.italic &&
+    left.textFormats.strikethrough === right.textFormats.strikethrough
+  );
 }
 
 function createBlockEditorContentExtension(config: BlockEditorContentExtensionConfig) {
@@ -84,6 +137,43 @@ interface BlockEditorImperativeProps {
 function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImperativeProps) {
   const [editor] = useLexicalComposerContext();
   const runtime = useBlockEditorRuntime();
+  const toolbarStateRef = useRef<BlockEditorToolbarState>(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
+  const toolbarStateListenersRef = useRef(new Set<BlockEditorToolbarStateListener>());
+
+  const publishToolbarState = useCallback((nextState: BlockEditorToolbarState) => {
+    if (toolbarStatesEqual(toolbarStateRef.current, nextState)) {
+      return;
+    }
+
+    toolbarStateRef.current = nextState;
+    for (const listener of toolbarStateListenersRef.current) {
+      listener(nextState);
+    }
+  }, []);
+
+  const syncToolbarState = useCallback(() => {
+    publishToolbarState(readToolbarState(editor));
+  }, [editor, publishToolbarState]);
+
+  useEffect(() => {
+    syncToolbarState();
+
+    return mergeRegister(
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          publishToolbarState(readToolbarStateFromSelection());
+        });
+      }),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          syncToolbarState();
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+  }, [editor, publishToolbarState, syncToolbarState]);
 
   useImperativeHandle(
     ref,
@@ -93,8 +183,18 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
         if (data === null) return;
         await runtime.clipboard.write(data);
       },
+      formatText: (format: BlockEditorTextFormat) => {
+        editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+      },
       flush: flushMarkdown,
       focus: () => editor.focus(),
+      getToolbarState: () => toolbarStateRef.current,
+      subscribeToolbarState: (listener: BlockEditorToolbarStateListener) => {
+        toolbarStateListenersRef.current.add(listener);
+        return () => {
+          toolbarStateListenersRef.current.delete(listener);
+        };
+      },
     }),
     [editor, runtime, flushMarkdown],
   );

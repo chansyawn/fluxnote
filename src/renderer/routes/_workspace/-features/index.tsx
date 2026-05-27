@@ -1,3 +1,4 @@
+import { BlockEditorToolbar } from "@renderer/features/block-editor";
 import { useMemo } from "react";
 
 import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
@@ -31,10 +32,6 @@ export function BlockWorkspace() {
     [editorRegistry.getEditor, editorRegistry.registerEditor],
   );
 
-  if (blockList.isInitialLoading) {
-    return <LoadingState />;
-  }
-
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
   const tagFilter = (
@@ -58,40 +55,65 @@ export function BlockWorkspace() {
     />
   );
 
-  if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
+  const workspaceContent = (() => {
+    if (blockList.isInitialLoading) {
+      return <LoadingState />;
+    }
+
+    if (visibility === "active" && totalBlockCount === 0 && selectedTagIds.length === 0) {
+      return (
+        <>
+          {tagFilter}
+          <WorkspaceEmptyState
+            isCreatingBlock={blockMutations.isCreatingBlock}
+            onCreateBlock={() => commands.createBlockWithFocus("workspace_empty_state")}
+          />
+        </>
+      );
+    }
+
     return (
-      <div className="mx-auto flex h-full min-h-0 w-full flex-1 flex-col gap-4">
+      <>
         {tagFilter}
-        <WorkspaceEmptyState
-          isCreatingBlock={blockMutations.isCreatingBlock}
-          onCreateBlock={() => commands.createBlockWithFocus("workspace_empty_state")}
-        />
-      </div>
+        {totalBlockCount === 0 ? (
+          visibility === "archived" && selectedTagIds.length === 0 ? (
+            <WorkspaceArchivedEmptyState />
+          ) : (
+            <WorkspaceFilteredEmptyState visibility={visibility} />
+          )
+        ) : (
+          <WorkspaceStateProvider value={workspaceContextValue}>
+            <BlockEditorRegistryProvider value={registryContextValue}>
+              <VirtualBlockList
+                totalCount={totalBlockCount}
+                getBlockAtIndex={blockList.getBlockAtIndex}
+                ensureBlockRange={blockList.ensureBlockRange}
+                scrollTarget={blockNavigation.scrollTarget}
+                onScrollTargetRendered={blockNavigation.targetRendered}
+              />
+            </BlockEditorRegistryProvider>
+          </WorkspaceStateProvider>
+        )}
+      </>
     );
-  }
+  })();
 
   return (
-    <section className="z-10 mx-auto flex h-full min-h-0 w-full flex-1 flex-col gap-4">
-      {tagFilter}
-      {totalBlockCount === 0 ? (
-        visibility === "archived" && selectedTagIds.length === 0 ? (
-          <WorkspaceArchivedEmptyState />
-        ) : (
-          <WorkspaceFilteredEmptyState visibility={visibility} />
-        )
-      ) : (
-        <WorkspaceStateProvider value={workspaceContextValue}>
-          <BlockEditorRegistryProvider value={registryContextValue}>
-            <VirtualBlockList
-              totalCount={totalBlockCount}
-              getBlockAtIndex={blockList.getBlockAtIndex}
-              ensureBlockRange={blockList.ensureBlockRange}
-              scrollTarget={blockNavigation.scrollTarget}
-              onScrollTargetRendered={blockNavigation.targetRendered}
-            />
-          </BlockEditorRegistryProvider>
-        </WorkspaceStateProvider>
-      )}
+    <section
+      className="z-10 mx-auto flex h-full min-h-0 w-full flex-1 flex-col"
+      onBlurCapture={(event) => {
+        const nextTarget = event.relatedTarget;
+        if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+          commands.focusBlock(null);
+        }
+      }}
+    >
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+        <div className="mx-auto flex min-h-full w-full flex-col gap-4">{workspaceContent}</div>
+      </div>
+      <div className="shrink-0 pt-2">
+        <BlockEditorToolbar controller={editorRegistry.activeEditor} />
+      </div>
     </section>
   );
 }

@@ -7,6 +7,7 @@
 
 export { BlockEditor } from "./core/block-editor";
 export { normalizeExternalMarkdown } from "./markdown/external-markdown";
+export { BlockEditorToolbar } from "./toolbar";
 export type {
   BlockEditorCodeBlockConfig,
   BlockEditorConfig,
@@ -16,4 +17,11 @@ export type {
   BlockEditorMarkdownConfig,
   BlockEditorProps,
   BlockEditorRuntime,
+  BlockEditorToolbarState,
 } from "./core/types";
+export type {
+  BlockEditorTextFormat,
+  BlockEditorTextFormatState,
+  BlockEditorToolbarController,
+  BlockEditorToolbarStateListener,
+} from "./toolbar";
