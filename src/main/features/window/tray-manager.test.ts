@@ -28,7 +28,13 @@ const mocks = vi.hoisted(() => {
     icon: unknown;
     setToolTip = vi.fn();
     setContextMenu = vi.fn();
-    popUpContextMenu = vi.fn();
+    popUpContextMenu = vi.fn((...args: [menu?: unknown, position?: unknown]) => {
+      if (args.length > 1 && args[1] === undefined) {
+        throw new TypeError(
+          "Error processing argument at index 1, conversion failure from undefined",
+        );
+      }
+    });
     destroy = vi.fn();
     on = vi.fn((event: string, handler: FakeTrayEventHandler) => {
       const handlers = this.handlers.get(event) ?? [];
@@ -278,7 +284,7 @@ describe("tray manager", () => {
       const builtMenu = mocks.MenuBuildFromTemplate.mock.results[0]?.value;
       tray.emit("right-click", {}, { height: 24, width: 24, x: 100, y: 200 });
 
-      expect(tray.popUpContextMenu).toHaveBeenCalledWith(builtMenu, undefined);
+      expect(tray.popUpContextMenu).toHaveBeenCalledWith(builtMenu);
       expect(tray.setContextMenu).not.toHaveBeenCalled();
     } finally {
       restorePlatform();
