@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.21](https://github.com/chansyawn/fluxnotes/compare/v0.0.20...v0.0.21) (2026-05-27)
+
+
+### Bug Fixes
+
+* open tray context menu on macOS ([#51](https://github.com/chansyawn/fluxnotes/issues/51)) ([4b36e10](https://github.com/chansyawn/fluxnotes/commit/4b36e10b83f02b3048b766ce57d40d22022b64cc))
+
 ## [0.0.20](https://github.com/chansyawn/fluxnotes/compare/v0.0.19...v0.0.20) (2026-05-27)
 
 
