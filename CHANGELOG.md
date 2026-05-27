@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.19](https://github.com/chansyawn/fluxnotes/compare/v0.0.18...v0.0.19) (2026-05-27)
+
+
+### Features
+
+* refine tray interactions and update install flow ([#47](https://github.com/chansyawn/fluxnotes/issues/47)) ([b82e554](https://github.com/chansyawn/fluxnotes/commit/b82e554ff9d803dacf9fb7c3283099395fc85ecf))
+
 ## [0.0.18](https://github.com/chansyawn/fluxnotes/compare/v0.0.17...v0.0.18) (2026-05-26)
 
 
