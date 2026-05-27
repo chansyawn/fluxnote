@@ -37,7 +37,7 @@ export function registerWindowCommands(ipc: IpcRouter, deps: WindowCommandDeps):
   ipc.command("window.quick-create-block", async () => {
     const block = await createBlockRecord(deps.db);
     deps.telemetryService.captureEvent("block_created", { source: "quick_create_shortcut" });
-    deps.windowManager.showMainWindow();
+    deps.windowManager.activateMainWindow();
     deps.openBlockService.requestOpen({ blockId: block.id });
     return { blockId: block.id };
   });

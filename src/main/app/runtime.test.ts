@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   appQuit: vi.fn(),
@@ -79,6 +79,15 @@ vi.mock("./services", () => ({ createMainServices: mocks.createMainServices }));
 
 import { createBackendRuntime } from "./runtime";
 
+const originalPlatform = process.platform;
+
+function setPlatform(value: NodeJS.Platform): void {
+  Object.defineProperty(process, "platform", {
+    configurable: true,
+    value,
+  });
+}
+
 describe("createBackendRuntime", () => {
   const entrypointRuntime = {
     handleDeepLink: vi.fn(async () => undefined),
@@ -139,12 +148,19 @@ describe("createBackendRuntime", () => {
       refreshMenu: vi.fn(),
     },
     windowManager: {
+      activateMainWindow: vi.fn(),
       createMainWindow: vi.fn(),
       getMainWindow: vi.fn<() => { isVisible: () => boolean } | null>(() => ({
         isVisible: vi.fn(() => true),
       })),
+      hideMainWindow: vi.fn(),
+      isQuitRequested: vi.fn(() => false),
+      openMainWindowDevTools: vi.fn(),
       prepareToQuit: vi.fn(),
+      requestQuit: vi.fn(),
+      restartApp: vi.fn(),
       showMainWindow: vi.fn(),
+      toggleMainWindow: vi.fn(),
     },
   };
 
@@ -159,6 +175,11 @@ describe("createBackendRuntime", () => {
       appearance: { theme: "system" },
     });
     services.windowManager.getMainWindow.mockReturnValue({ isVisible: vi.fn(() => true) });
+    services.windowManager.isQuitRequested.mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    setPlatform(originalPlatform);
   });
 
   it("starts runtime and wires startup flow", async () => {
@@ -195,7 +216,6 @@ describe("createBackendRuntime", () => {
     expect(entrypointRuntime.startCliServer).toHaveBeenCalledTimes(1);
     expect(services.applyThemePreference).toHaveBeenCalledTimes(1);
     expect(services.windowManager.createMainWindow).toHaveBeenCalledTimes(1);
-    expect(services.events.registerWindow).toHaveBeenCalledTimes(1);
     expect(services.trayManager.createTray).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.start).toHaveBeenCalledTimes(1);
     expect(services.appUpdateService.start).toHaveBeenCalledTimes(1);
@@ -289,30 +309,45 @@ describe("createBackendRuntime", () => {
     runtime.handleSecondInstance(["flux://open/def"]);
     runtime.handleOpenUrl("flux://open/xyz");
 
-    expect(services.windowManager.showMainWindow).toHaveBeenCalled();
+    expect(services.windowManager.activateMainWindow).toHaveBeenCalled();
     expect(entrypointRuntime.handleDeepLink).toHaveBeenCalledWith("flux://open/def");
     expect(entrypointRuntime.handleDeepLink).toHaveBeenCalledWith("flux://open/xyz");
   });
 
-  it("activates by creating window when main window is absent", () => {
-    services.windowManager.getMainWindow.mockReturnValueOnce(null);
+  it("activates the main window through the window manager", () => {
     const runtime = createBackendRuntime();
 
     runtime.activate();
 
-    expect(services.windowManager.createMainWindow).toHaveBeenCalledTimes(1);
+    expect(services.windowManager.activateMainWindow).toHaveBeenCalledTimes(1);
     expect(services.windowManager.showMainWindow).not.toHaveBeenCalled();
   });
 
-  it("quits app only when not on darwin", () => {
+  it("keeps app running after all windows close on darwin without quit intent", () => {
+    setPlatform("darwin");
     const runtime = createBackendRuntime();
 
     runtime.quitWhenAllWindowsClosed();
 
-    if (process.platform === "darwin") {
-      expect(mocks.appQuit).not.toHaveBeenCalled();
-    } else {
-      expect(mocks.appQuit).toHaveBeenCalledTimes(1);
-    }
+    expect(mocks.appQuit).not.toHaveBeenCalled();
+  });
+
+  it("quits app after all windows close on darwin with quit intent", () => {
+    setPlatform("darwin");
+    services.windowManager.isQuitRequested.mockReturnValue(true);
+    const runtime = createBackendRuntime();
+
+    runtime.quitWhenAllWindowsClosed();
+
+    expect(mocks.appQuit).toHaveBeenCalledTimes(1);
+  });
+
+  it("quits app after all windows close outside darwin", () => {
+    setPlatform("win32");
+    const runtime = createBackendRuntime();
+
+    runtime.quitWhenAllWindowsClosed();
+
+    expect(mocks.appQuit).toHaveBeenCalledTimes(1);
   });
 });

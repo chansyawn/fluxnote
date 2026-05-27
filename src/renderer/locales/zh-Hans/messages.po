@@ -19,11 +19,6 @@ msgid "app-update.check.error"
 msgstr "检查更新失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:74
-msgid "app-update.check.newer-update"
-msgstr "发现更新版本，正在下载。"
-
-#. js-lingui-explicit-id
 #: src/renderer/features/app-update/app-update-query.ts:66
 msgid "app-update.check.ready-latest"
 msgstr "已下载的更新是当前可用的最新版本。"

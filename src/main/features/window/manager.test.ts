@@ -80,6 +80,7 @@ const mocks = vi.hoisted(() => {
     emitEvent: vi.fn(() => true),
     captureAppShow: vi.fn(),
     onAutoArchiveTrigger: vi.fn(),
+    onMainWindowCreated: vi.fn(),
     onOpenBlockReady: vi.fn(),
     calculateWindowPosition: vi.fn(() => ({ x: 10, y: 20 })),
     saveWindowPosition: vi.fn(),
@@ -129,6 +130,7 @@ describe("window manager", () => {
     mocks.emitEvent.mockReturnValue(true);
     mocks.captureAppShow.mockReset();
     mocks.onAutoArchiveTrigger.mockReset();
+    mocks.onMainWindowCreated.mockReset();
     mocks.onOpenBlockReady.mockReset();
     mocks.calculateWindowPosition.mockReset();
     mocks.calculateWindowPosition.mockReturnValue({ x: 10, y: 20 });
@@ -140,12 +142,14 @@ describe("window manager", () => {
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 
     manager.createMainWindow();
     const win = mocks.BrowserWindow.instances[0];
     expect(win).toBeDefined();
+    expect(mocks.onMainWindowCreated).toHaveBeenCalledWith(win);
 
     win.emit("focus");
     win.emit("blur");
@@ -169,6 +173,7 @@ describe("window manager", () => {
         captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onMainWindowCreated: mocks.onMainWindowCreated,
         onOpenBlockReady: mocks.onOpenBlockReady,
       });
 
@@ -197,6 +202,7 @@ describe("window manager", () => {
         captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onMainWindowCreated: mocks.onMainWindowCreated,
         onOpenBlockReady: mocks.onOpenBlockReady,
       });
 
@@ -220,6 +226,7 @@ describe("window manager", () => {
         captureAppShow: mocks.captureAppShow,
         emitEvent: mocks.emitEvent,
         onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+        onMainWindowCreated: mocks.onMainWindowCreated,
         onOpenBlockReady: mocks.onOpenBlockReady,
       });
 
@@ -244,6 +251,7 @@ describe("window manager", () => {
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 
@@ -258,11 +266,31 @@ describe("window manager", () => {
     expect(mocks.appQuit).toHaveBeenCalled();
   });
 
+  it("activates by recreating the main window when the previous window is gone", () => {
+    const manager = createWindowManager({
+      captureAppShow: mocks.captureAppShow,
+      emitEvent: mocks.emitEvent,
+      onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
+      onOpenBlockReady: mocks.onOpenBlockReady,
+    });
+
+    manager.createMainWindow();
+    const firstWindow = mocks.BrowserWindow.instances[0];
+    firstWindow.destroyed = true;
+
+    manager.activateMainWindow();
+
+    expect(mocks.BrowserWindow.instances).toHaveLength(2);
+    expect(mocks.onMainWindowCreated).toHaveBeenLastCalledWith(mocks.BrowserWindow.instances[1]);
+  });
+
   it("relaunches and quits when restarting the app", () => {
     const manager = createWindowManager({
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 
@@ -273,6 +301,7 @@ describe("window manager", () => {
 
     expect(mocks.appRelaunch).toHaveBeenCalledOnce();
     expect(win.destroyed).toBe(true);
+    expect(manager.isQuitRequested()).toBe(true);
     expect(mocks.appQuit).toHaveBeenCalledOnce();
   });
 
@@ -281,6 +310,7 @@ describe("window manager", () => {
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 
@@ -309,6 +339,7 @@ describe("window manager", () => {
       captureAppShow: mocks.captureAppShow,
       emitEvent: mocks.emitEvent,
       onAutoArchiveTrigger: mocks.onAutoArchiveTrigger,
+      onMainWindowCreated: mocks.onMainWindowCreated,
       onOpenBlockReady: mocks.onOpenBlockReady,
     });
 

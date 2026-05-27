@@ -19,6 +19,7 @@ describe("window command", () => {
       ),
     };
     const windowManager = {
+      activateMainWindow: vi.fn(),
       requestQuit: vi.fn(),
       hideMainWindow: vi.fn(),
       restartApp: vi.fn(),
@@ -54,6 +55,7 @@ describe("window command", () => {
     };
     const db = {};
     const windowManager = {
+      activateMainWindow: vi.fn(),
       requestQuit: vi.fn(),
       hideMainWindow: vi.fn(),
       restartApp: vi.fn(),
@@ -78,7 +80,7 @@ describe("window command", () => {
     const result = await handlers.get("window.quick-create-block")?.();
 
     expect(result).toEqual({ blockId: "block-1" });
-    expect(windowManager.showMainWindow).toHaveBeenCalledOnce();
+    expect(windowManager.activateMainWindow).toHaveBeenCalledOnce();
     expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
       source: "quick_create_shortcut",
     });

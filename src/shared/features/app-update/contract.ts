@@ -9,7 +9,6 @@ export const appUpdateLastCheckOutcomeSchema = z.enum([
   "update-ready",
   "up-to-date",
   "ready-latest",
-  "newer-update",
   "failed",
 ]);
 export type AppUpdateLastCheckOutcome = z.infer<typeof appUpdateLastCheckOutcomeSchema>;

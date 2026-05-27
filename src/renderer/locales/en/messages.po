@@ -19,11 +19,6 @@ msgid "app-update.check.error"
 msgstr "Failed to check for updates."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/app-update/app-update-query.ts:74
-msgid "app-update.check.newer-update"
-msgstr "A newer update was found and is downloading."
-
-#. js-lingui-explicit-id
 #: src/renderer/features/app-update/app-update-query.ts:66
 msgid "app-update.check.ready-latest"
 msgstr "The downloaded update is the latest available version."

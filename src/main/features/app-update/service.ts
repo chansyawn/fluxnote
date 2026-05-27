@@ -15,10 +15,9 @@ const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 type Timer = ReturnType<typeof setTimeout>;
 type Interval = ReturnType<typeof setInterval>;
-type UpdateCheckPurpose = "normal" | "ready-refresh" | "install-refresh";
+type UpdateCheckPurpose = "normal" | "ready-refresh";
 
 interface ActiveUpdateCheck {
-  baselineVersion: string;
   purpose: UpdateCheckPurpose;
   readyUpdate?: {
     availableVersion?: string;
@@ -162,7 +161,7 @@ export function createAppUpdateService({
             releaseName: status.releaseName,
           }
         : undefined;
-    activeCheck = { baselineVersion, purpose, readyUpdate, source };
+    activeCheck = { purpose, readyUpdate, source };
     setFeedUrl(baselineVersion);
     setStatus({
       ...supportedStatusBase(),
@@ -263,22 +262,12 @@ export function createAppUpdateService({
       throw businessError("BUSINESS.INVALID_INVOKE", "No app update is ready to install.");
     }
 
-    if (!isSupported || !status.availableVersion) {
-      installReadyUpdate();
-      return;
-    }
-
-    beginUpdateCheck("manual", "install-refresh");
-
-    try {
-      autoUpdater.checkForUpdates();
-    } catch {
-      activeCheck = null;
-      installReadyUpdate();
-    }
+    installReadyUpdate();
   }
 
   function installReadyUpdate(): void {
+    // Electron closes windows before `before-quit` when quitAndInstall starts, so the
+    // window manager must enter quit mode before handing control to the updater.
     prepareToQuitForInstall();
     autoUpdater.quitAndInstall();
   }
@@ -290,17 +279,6 @@ export function createAppUpdateService({
 
     const check = activeCheck;
     activeCheck = null;
-
-    if (check.purpose === "install-refresh") {
-      setStatus({
-        ...supportedStatusBase(),
-        ...check.readyUpdate,
-        lastCheck: createLastCheck(check, "ready-latest"),
-        state: "ready",
-      });
-      installReadyUpdate();
-      return;
-    }
 
     if (check.purpose === "ready-refresh") {
       setStatus({
@@ -321,7 +299,6 @@ export function createAppUpdateService({
 
   function completeDownloadedUpdate(releaseName: string): void {
     const check = activeCheck ?? {
-      baselineVersion: currentVersion,
       purpose: "normal",
       source: "automatic",
     };
@@ -343,11 +320,6 @@ export function createAppUpdateService({
     const check = activeCheck;
     const message = getErrorMessage(error);
     activeCheck = null;
-
-    if (check.purpose === "install-refresh") {
-      installReadyUpdate();
-      return;
-    }
 
     if (check.purpose === "ready-refresh") {
       setStatus({
@@ -383,13 +355,9 @@ export function createAppUpdateService({
       return;
     }
 
-    const nextLastCheck =
-      activeCheck.purpose === "install-refresh"
-        ? createLastCheck(activeCheck, "newer-update")
-        : getLastCheck();
     setStatus({
       ...supportedStatusBase(),
-      lastCheck: nextLastCheck,
+      lastCheck: getLastCheck(),
       state: "downloading",
     });
   });

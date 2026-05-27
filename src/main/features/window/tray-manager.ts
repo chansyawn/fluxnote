@@ -1,16 +1,27 @@
 import path from "node:path";
 
 import type { LocaleCode } from "@shared/features/preferences/settings";
-import { app, Menu, nativeImage, type NativeImage, Tray } from "electron";
+import {
+  app,
+  Menu,
+  nativeImage,
+  type KeyboardEvent,
+  type NativeImage,
+  type Rectangle,
+  Tray,
+} from "electron";
 
 import { getTrayMenuLabel } from "./tray-i18n";
 
 interface TrayManagerServices {
+  activateMainWindow: () => void;
   getLocale: () => LocaleCode;
   openMainWindowDevTools: () => void;
   requestQuit: () => void;
-  showMainWindow: () => void;
 }
+
+// UUID v5 derived from "app.fluxnotes.tray".
+const TRAY_GUID = "0b22f1d9-6bfc-52e0-8abd-739669015441";
 
 export interface TrayManager {
   createTray: () => void;
@@ -40,8 +51,32 @@ function createTrayIcon(): NativeImage {
   return icon;
 }
 
+function getTrayGuid(): string | undefined {
+  return process.platform === "darwin" || process.platform === "win32" ? TRAY_GUID : undefined;
+}
+
 export function createTrayManager(services: TrayManagerServices): TrayManager {
   let tray: Tray | null = null;
+  let contextMenu: Menu | null = null;
+
+  function supportsExplicitContextMenuPopup(): boolean {
+    return process.platform === "darwin" || process.platform === "win32";
+  }
+
+  function usesNativeContextMenuFallback(): boolean {
+    return process.platform === "linux";
+  }
+
+  function openContextMenu(_event: KeyboardEvent, bounds: Rectangle): void {
+    if (!tray || !contextMenu) {
+      return;
+    }
+
+    tray.popUpContextMenu(
+      contextMenu,
+      process.platform === "win32" ? { x: bounds.x, y: bounds.y } : undefined,
+    );
+  }
 
   function refreshMenu(): void {
     if (!tray) {
@@ -51,7 +86,7 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
     const locale = services.getLocale();
     const menuTemplate = [
       {
-        click: services.showMainWindow,
+        click: services.activateMainWindow,
         label: getTrayMenuLabel(locale, "show"),
       },
       { type: "separator" as const },
@@ -68,7 +103,11 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
       });
     }
 
-    tray.setContextMenu(Menu.buildFromTemplate(menuTemplate));
+    contextMenu = Menu.buildFromTemplate(menuTemplate);
+
+    if (usesNativeContextMenuFallback()) {
+      tray.setContextMenu(contextMenu);
+    }
   }
 
   function createTray(): void {
@@ -77,14 +116,21 @@ export function createTrayManager(services: TrayManagerServices): TrayManager {
     }
 
     const icon = createTrayIcon();
-    tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
+    const trayIcon = icon.isEmpty() ? nativeImage.createEmpty() : icon;
+    const trayGuid = getTrayGuid();
+    tray = trayGuid ? new Tray(trayIcon, trayGuid) : new Tray(trayIcon);
     tray.setToolTip("Fluxnotes");
+    tray.on("click", services.activateMainWindow);
+    if (supportsExplicitContextMenuPopup()) {
+      tray.on("right-click", openContextMenu);
+    }
     refreshMenu();
   }
 
   function destroyTray(): void {
     tray?.destroy();
     tray = null;
+    contextMenu = null;
   }
 
   return {
