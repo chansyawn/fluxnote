@@ -206,27 +206,27 @@ msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:51
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:55
 msgid "block-editor.toolbar.bold"
 msgstr "Bold"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:56
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:60
 msgid "block-editor.toolbar.inline-code"
 msgstr "Inline code"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:70
 msgid "block-editor.toolbar.italic"
 msgstr "Italic"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:79
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:87
 msgid "block-editor.toolbar.label"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:65
 msgid "block-editor.toolbar.strikethrough"
 msgstr "Strikethrough"
 
@@ -904,6 +904,16 @@ msgstr "Search or create tags"
 #: src/renderer/features/tag/tag-combobox-popover.tsx:157
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/index.tsx:21
+msgid "workspace.toolbar.block-count.one"
+msgstr "1 block"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/index.tsx:28
+msgid "workspace.toolbar.block-count.other"
+msgstr "{count} blocks"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-titlebar-actions-portal.tsx:83
