@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.23](https://github.com/chansyawn/fluxnotes/compare/v0.0.22...v0.0.23) (2026-05-28)
+
+
+### Bug Fixes
+
+* adjust window sizing and update cadence ([#57](https://github.com/chansyawn/fluxnotes/issues/57)) ([d8ce9c4](https://github.com/chansyawn/fluxnotes/commit/d8ce9c4e0ce66621ab9053c2697cef571921d4e2))
+
 ## [0.0.22](https://github.com/chansyawn/fluxnotes/compare/v0.0.21...v0.0.22) (2026-05-28)
 
 
