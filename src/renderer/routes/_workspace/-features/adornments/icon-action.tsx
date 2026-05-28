@@ -78,8 +78,8 @@ export function CopyAction({ copied = false, disabled, shortcut, onCopy }: CopyA
   return (
     <IconAction
       icon={copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
-      label={<Trans id="home-note.block.copy">Copy block</Trans>}
-      tooltipLabel={<Trans id="home-note.block.copy.tooltip">Copy</Trans>}
+      label={<Trans id="workspace.blocks.copy">Copy block</Trans>}
+      tooltipLabel={<Trans id="workspace.blocks.copy.tooltip">Copy</Trans>}
       shortcut={shortcut}
       disabled={disabled}
       onClick={async () => {

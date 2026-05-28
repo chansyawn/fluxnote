@@ -1,4 +1,4 @@
-import type { LocaleCode } from "@shared/features/preferences/settings";
+import type { LocaleCode } from "@shared/features/preferences/user-preferences";
 
 type TrayMenuLabelKey = "devTools" | "quit" | "show";
 

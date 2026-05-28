@@ -1,9 +1,9 @@
 import type { Block, ExternalEditSession, Tag } from "@renderer/clients";
 import {
-  DEFAULT_SETTINGS,
-  type Settings,
-  type SettingsPatch,
-} from "@shared/features/preferences/settings";
+  DEFAULT_USER_PREFERENCES,
+  type UserPreferences,
+  type UserPreferencesPatch,
+} from "@shared/features/preferences/user-preferences";
 
 const FIXTURE_TIMESTAMP = "2026-01-01T00:00:00.000Z";
 
@@ -19,7 +19,7 @@ export function createRendererBlock(overrides: Partial<Block> = {}): Block {
     orderIndex: 0,
     tags: [],
     updatedAt: FIXTURE_TIMESTAMP,
-    willArchive: false,
+    isPendingAutoArchive: false,
     ...overrides,
   };
 }
@@ -34,35 +34,35 @@ export function createRendererTag(overrides: Partial<Tag> = {}): Tag {
   };
 }
 
-export function createRendererSettings(patch: SettingsPatch = {}): Settings {
+export function createRendererUserPreferences(patch: UserPreferencesPatch = {}): UserPreferences {
   return {
-    ...DEFAULT_SETTINGS,
+    ...DEFAULT_USER_PREFERENCES,
     appearance: {
-      ...DEFAULT_SETTINGS.appearance,
+      ...DEFAULT_USER_PREFERENCES.appearance,
       ...patch.appearance,
     },
     autoArchive: {
-      ...DEFAULT_SETTINGS.autoArchive,
+      ...DEFAULT_USER_PREFERENCES.autoArchive,
       ...patch.autoArchive,
     },
     markdown: {
-      ...DEFAULT_SETTINGS.markdown,
+      ...DEFAULT_USER_PREFERENCES.markdown,
       ...patch.markdown,
       codeBlock: {
-        ...DEFAULT_SETTINGS.markdown.codeBlock,
+        ...DEFAULT_USER_PREFERENCES.markdown.codeBlock,
         ...patch.markdown?.codeBlock,
       },
     },
     shortcuts: {
-      ...DEFAULT_SETTINGS.shortcuts,
+      ...DEFAULT_USER_PREFERENCES.shortcuts,
       ...patch.shortcuts,
     },
     telemetry: {
-      ...DEFAULT_SETTINGS.telemetry,
+      ...DEFAULT_USER_PREFERENCES.telemetry,
       ...patch.telemetry,
     },
     appUpdate: {
-      ...DEFAULT_SETTINGS.appUpdate,
+      ...DEFAULT_USER_PREFERENCES.appUpdate,
       ...patch.appUpdate,
     },
   };

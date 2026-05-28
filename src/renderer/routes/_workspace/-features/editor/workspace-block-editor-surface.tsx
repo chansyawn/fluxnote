@@ -37,7 +37,7 @@ interface BlockEditorFrameProps {
   isKept: boolean;
   isPinned: boolean;
   runtime: BlockEditorRuntime;
-  willArchive: boolean;
+  isPendingAutoArchive: boolean;
   onMarkdownChange: (markdown: string) => void;
   onBlur: () => void;
   onFocus: () => void;
@@ -53,7 +53,7 @@ function BlockEditorFrame({
   isKept,
   isPinned,
   runtime,
-  willArchive,
+  isPendingAutoArchive,
   onMarkdownChange,
   onBlur,
   onFocus,
@@ -67,7 +67,7 @@ function BlockEditorFrame({
           "border-ring": isKept,
           "border-muted": isPinned,
           "border-dashed": isExternalEditPending,
-          "opacity-60": willArchive,
+          "opacity-60": isPendingAutoArchive,
         },
       )}
       data-block-id={blockId}
@@ -179,7 +179,7 @@ export function WorkspaceBlockEditorSurface({
       isExternalEditPending={isExternalEditPending}
       isKept={block.isKept}
       isPinned={block.isPinned}
-      willArchive={block.willArchive}
+      isPendingAutoArchive={block.isPendingAutoArchive}
       onBlur={() => {
         void flush();
       }}

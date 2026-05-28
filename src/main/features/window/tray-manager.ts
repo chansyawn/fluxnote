@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { LocaleCode } from "@shared/features/preferences/settings";
+import type { LocaleCode } from "@shared/features/preferences/user-preferences";
 import {
   app,
   Menu,

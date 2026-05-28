@@ -1,36 +1,24 @@
 # Fluxnotes
 
-Fluxnotes is a lightweight note-taking context centered on small Markdown blocks that can be captured, edited, organized, and reopened from inside or outside the app.
+Fluxnotes is a lightweight context buffer centered on Markdown **Blocks** that can be captured, edited, organized, and reopened from inside or outside the app.
 
 ## Language
 
 **Workspace**:
-The primary place where a user browses, filters, edits, and manages their note blocks.
+The primary place where a user browses, filters, edits, and manages **Blocks**.
 _Avoid_: Home, dashboard, note list
 
 **User Preferences**:
 User-controlled app-level choices that affect how Fluxnotes behaves and presents the **Workspace**.
 _Avoid_: Settings, config, runtime state
 
-**Theme Preference**:
-A **User Preferences** choice that controls whether Fluxnotes follows the system appearance or uses a light or dark appearance.
-_Avoid_: Theme config, color mode state
-
-**Telemetry Preference**:
-A **User Preferences** choice that controls whether Fluxnotes shares anonymous diagnostics.
-_Avoid_: Tracking config, analytics state
-
-**App Update**:
-A workflow that discovers, downloads, and installs a released version of the Fluxnotes application. Fluxnotes may try to confirm whether a newer release exists before installation, but a downloaded release can still be an **App Update** when that confirmation is unavailable.
-_Avoid_: Block update, content update, software update
-
-**App Update Check Preference**:
-A **User Preferences** choice that controls whether Fluxnotes automatically checks for **App Updates** in the background. It does not automatically install an **App Update**.
-_Avoid_: Automatic update, update notification setting
-
 **Block**:
-A standalone note unit with Markdown content, archive state, keep state, pin state, and tags.
+A standalone Markdown unit with content, archive state, keep state, pin state, tags, and optional **Block Assets**.
 _Avoid_: Note, document, item
+
+**Block Asset**:
+A local resource that belongs to exactly one **Block** and can be referenced from that **Block**'s Markdown content.
+_Avoid_: Attachment, global asset, media file
 
 **Block Editor**:
 The editing surface for a single **Block**.
@@ -49,7 +37,7 @@ A **Block** that has been removed from the normal working set without being dele
 _Avoid_: Hidden block, completed block
 
 **Kept Block**:
-An **Active Block** that the user has protected from automatic archiving.
+An **Active Block** that the user has protected from **Auto Archive**.
 _Avoid_: Pinned block, favorite block
 
 **Pinned Block**:
@@ -64,6 +52,10 @@ _Avoid_: Sort key, rank, position
 The policy that moves eligible inactive **Blocks** into the archive.
 _Avoid_: Cleanup, expiry, pruning
 
+**Pending Auto Archive**:
+The state of an eligible **Active Block** that will be archived by **Auto Archive** once archiving is allowed to run.
+_Avoid_: Will archive, stale block, pending archive
+
 **Tag**:
 A user-defined label used to group and filter **Blocks**.
 _Avoid_: Label, category
@@ -72,8 +64,12 @@ _Avoid_: Label, category
 A **Workspace** view constrained to **Blocks** assigned to selected **Tags**.
 _Avoid_: Search, category view
 
+**Input Handoff**:
+A workflow that passes content or focus between an external tool and Fluxnotes so the user can create, open, edit, submit, or cancel a **Block**.
+_Avoid_: Entrypoint, backend command, launch path
+
 **External Edit**:
-A workflow where a **Block** is edited through an external file and then submitted or cancelled.
+An **Input Handoff** workflow where a **Block** is edited through an external file and then submitted or cancelled.
 _Avoid_: Import, sync, handoff
 
 **External Edit Session**:
@@ -85,7 +81,7 @@ The source and file context that started an **External Edit**.
 _Avoid_: Origin metadata, launch data
 
 **Block Navigation**:
-The Workspace workflow that locates a **Block**, prepares the right **Workspace** view, scrolls the **Block** into view, and focuses its **Block Editor**.
+The **Workspace** workflow that locates a **Block**, prepares the right **Workspace** view, scrolls the **Block** into view, and focuses its **Block Editor**.
 _Avoid_: Scroll controller, focus controller, route navigation
 
 ## Relationships
@@ -93,24 +89,20 @@ _Avoid_: Scroll controller, focus controller, route navigation
 - A **Workspace** contains zero or more **Blocks**.
 - A **Block** is either an **Active Block** or an **Archived Block**.
 - A **Block** can have zero or more **Tags**.
-- **Block Editor Shortcuts** affect actions inside the **Block Editor**.
+- A **Block** can have zero or more **Block Assets**.
+- A **Block Asset** belongs to exactly one **Block**.
 - A **Block Order** arranges **Active Blocks** in the **Workspace**.
 - A **Pinned Block** appears before unpinned **Active Blocks** in the **Block Order**.
-- A **Pinned Block** is excluded from **Auto Archive** without becoming a **Kept Block**.
+- A **Pinned Block** is protected from **Auto Archive** without becoming a **Kept Block**.
+- A **Kept Block** is protected from **Auto Archive** without becoming a **Pinned Block**.
+- A **Pending Auto Archive** state only applies to **Active Blocks**.
 - A **Tag Filter** selects zero or more **Tags** and narrows the **Workspace** to matching **Blocks**.
-- A **Kept Block** is an **Active Block** excluded from **Auto Archive**.
-- An **External Edit Session** belongs to exactly one **Block**.
+- **Input Handoff** can create, open, or edit one **Block** at a time.
+- **External Edit** is a kind of **Input Handoff**.
+- An **External Edit Session** belongs to exactly one **Block** and temporarily protects that **Block** from archive, delete, and keep-state changes.
 - An **External Edit Trigger** starts exactly one **External Edit Session**.
 - **Block Navigation** operates inside the **Workspace** and targets one **Block** at a time.
-- **User Preferences** can affect **Workspace** presentation and app-level behavior.
 - **Block Editor Shortcuts** belong to **User Preferences**.
-- **Theme Preference** belongs to **User Preferences**.
-- **Telemetry Preference** belongs to **User Preferences**.
-- **App Update Check Preference** belongs to **User Preferences**.
-- **User Preferences** expose manual **App Update** checks.
-- **App Update Check Preference** does not disable manual **App Update** checks.
-- **App Update** does not modify **Blocks**.
-- **User Preferences** configure **Auto Archive**, but changing them does not itself move **Blocks** into the archive.
 
 ## Example Dialogue
 
@@ -120,17 +112,16 @@ _Avoid_: Scroll controller, focus controller, route navigation
 > **Dev:** "If an **External Edit Session** exists for a **Block**, can the user delete that **Block** directly?"
 > **Domain expert:** "No — the **External Edit** should be submitted or cancelled first so the **Block** has a clear final state."
 
-> **Dev:** "When an **App Update** is ready, should it update existing **Blocks**?"
-> **Domain expert:** "No — an **App Update** only changes the installed Fluxnotes application."
+> **Dev:** "If a **Pinned Block** is inactive long enough for **Auto Archive**, should it become a **Pending Auto Archive**?"
+> **Domain expert:** "No — a **Pinned Block** is protected from **Auto Archive** without becoming a **Kept Block**."
 
 ## Flagged Ambiguities
 
+- "Note" can be confused with **Block**; resolved: use **Block** for Fluxnotes content units.
 - "Editor" can mean the app-level editing feature or the **Block Editor**; resolved: use **Block Editor** for the user-facing editing surface of one **Block**.
 - "Editor Shortcuts" can mean shortcuts for multiple editing-related workflows; resolved: use **Block Editor Shortcuts** for shortcuts that act inside the **Block Editor**.
 - "Keep" can be confused with saving content; resolved: **Kept Block** only means protected from **Auto Archive**.
 - "Pinned" can be confused with **Kept Block**; resolved: **Pinned Block** only means fixed to the top area of the **Workspace**.
 - "Settings" and "config" can mean implementation details or user choices; resolved: use **User Preferences** for user-controlled app-level choices.
-- "Theme" can mean either the user's choice or the resolved light/dark appearance; resolved: use **Theme Preference** for the user-controlled choice.
-- "Telemetry" can mean implementation diagnostics or the user's sharing choice; resolved: use **Telemetry Preference** for the user-controlled choice.
-- "Update" can mean changing **Block** content or updating Fluxnotes itself; resolved: use **App Update** for installed application updates.
-- "Automatic update" can mean checking for an **App Update** or installing one; resolved: use **App Update Check Preference** for automatic checking, and do not imply automatic installation.
+- "Asset" can mean application packaging files or **Block Assets**; resolved: use **Block Asset** only for local resources belonging to a **Block**.
+- "Handoff" can describe many app launches; resolved: use **Input Handoff** for external-tool workflows that pass Block content or focus through Fluxnotes.

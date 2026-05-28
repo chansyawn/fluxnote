@@ -1,5 +1,5 @@
 import type { Block } from "@renderer/clients";
-import type { ShortcutAction } from "@shared/features/preferences/settings";
+import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 import { useCallback, useMemo } from "react";
 
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";

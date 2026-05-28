@@ -41,11 +41,11 @@ vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
-import { ShortcutSettingsSection } from "./shortcut-settings-section";
+import { ShortcutPreferencesSection } from "./shortcut-preferences-section";
 
-describe("ShortcutSettingsSection", () => {
+describe("ShortcutPreferencesSection", () => {
   it("shows shortcuts in scoped groups", () => {
-    renderWithProviders(<ShortcutSettingsSection />);
+    renderWithProviders(<ShortcutPreferencesSection />);
 
     expect(screen.getByText("Global")).toBeVisible();
     expect(screen.getByText("Workspace")).toBeVisible();

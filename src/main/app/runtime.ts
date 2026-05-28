@@ -1,6 +1,6 @@
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
-import type { ThemePreference } from "@shared/features/preferences/settings";
+import type { ThemePreference } from "@shared/features/preferences/user-preferences";
 import { app, globalShortcut } from "electron";
 
 import { createIpcRouter } from "../core/ipc";
@@ -66,7 +66,7 @@ function registerRuntimeCommands(
     getAssetPathForBlock: deps.paths.assetPathForBlock,
     listExternalEditSessions: deps.externalEditManager.listSessions,
     now: deps.now,
-    readSettings: deps.preferencesService.readSettings,
+    readUserPreferences: deps.preferencesService.readUserPreferences,
   });
   registerClipboardCommands(ipc);
   registerCliCommands(ipc);
@@ -81,8 +81,8 @@ function registerRuntimeCommands(
   });
   registerPreferencesCommands(ipc, {
     applyThemePreference: deps.applyThemePreference,
-    onAppUpdatePreferencesChanged: (settings) =>
-      deps.appUpdateService.setAutomaticChecksEnabled(settings.appUpdate.automaticChecksEnabled),
+    onAppUpdatePreferencesChanged: (preferences) =>
+      deps.appUpdateService.setAutomaticChecksEnabled(preferences.appUpdate.automaticChecksEnabled),
     onAutoArchivePreferencesChanged: () => deps.autoArchiveRuntime.refreshState(),
     onLocalePreferenceChanged: () => deps.trayManager.refreshMenu(),
     onTelemetryPreferenceChanged: () => deps.telemetryService.notifyPreferenceChanged(),
@@ -150,13 +150,15 @@ export function createBackendRuntime() {
   }
 
   async function startWorkspaceServices(): Promise<void> {
-    services.applyThemePreference(services.preferencesService.readSettings().appearance.theme);
+    services.applyThemePreference(
+      services.preferencesService.readUserPreferences().appearance.theme,
+    );
     services.windowManager.createMainWindow();
     services.trayManager.createTray();
     await services.autoArchiveRuntime.start();
     services.appUpdateService.start({
       automaticChecksEnabled:
-        services.preferencesService.readSettings().appUpdate.automaticChecksEnabled,
+        services.preferencesService.readUserPreferences().appUpdate.automaticChecksEnabled,
     });
     services.telemetryService.captureEvent("app_started");
   }

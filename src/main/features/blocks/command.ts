@@ -1,11 +1,11 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
-import type { Settings } from "@shared/features/preferences/settings";
+import type { UserPreferences } from "@shared/features/preferences/user-preferences";
 
 import {
   createAutoArchiveEvaluationContext,
-  resolveAutoArchiveSettings,
+  resolveAutoArchivePreferences,
   type AutoArchiveEvaluationContext,
 } from "./auto-archive-policy";
 import {
@@ -24,7 +24,7 @@ import {
 
 interface BlocksCommandDeps {
   db: AppDatabase;
-  readSettings: () => Settings | Promise<Settings>;
+  readUserPreferences: () => UserPreferences | Promise<UserPreferences>;
   listExternalEditSessions: () => ExternalEditSession[];
   getAssetPathForBlock: (blockId: string) => string;
   now: () => Date;
@@ -33,12 +33,12 @@ interface BlocksCommandDeps {
 async function getAutoArchiveEvaluationContext(
   deps: BlocksCommandDeps,
 ): Promise<AutoArchiveEvaluationContext> {
-  const settings = await resolveAutoArchiveSettings(deps.readSettings);
+  const preferences = await resolveAutoArchivePreferences(deps.readUserPreferences);
 
   return createAutoArchiveEvaluationContext({
     now: deps.now(),
     protectedBlockIds: new Set(deps.listExternalEditSessions().map((session) => session.blockId)),
-    settings,
+    preferences,
   });
 }
 

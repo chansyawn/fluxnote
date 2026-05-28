@@ -18,7 +18,7 @@ It is not another knowledge base, and it is not a full Markdown editor. It is a 
 
 - **Polish input**: organize and revise longer text before sending it to chat tools, CLI agents, or other input boxes.
 - **Organize context**: keep temporary working context while switching between tasks, windows, and tools.
-- **Capture temporary notes**: save ideas, snippets, and pending items before moving them into a more formal knowledge base or document.
+- **Capture temporary**: save ideas, snippets, and pending items before moving them into a more formal knowledge base or document.
 
 ## Getting Started
 
@@ -30,7 +30,7 @@ Download the latest version from [GitHub Releases](https://github.com/chansyawn/
 
 - **Always on top**: stays visible while you move between browsers, IDEs, terminals, documents, and AI tools, acting as a temporary context buffer for the current work.
 - **Auto archive**: automatically moves inactive Blocks out of the active Workspace to reduce buildup from long-running parallel tasks.
-- **WYSIWYG Markdown**: write Markdown in a close-to-what-you-see-is-what-you-get editing experience for structured prompts and notes.
+- **WYSIWYG Markdown**: write Markdown in a close-to-what-you-see-is-what-you-get editing experience for structured prompts.
 - **Input handoff**: use the `flux` CLI to open Fluxnotes, create Blocks, or connect it as an external editor for CLI agents such as Codex and Claude Code. More launch and handoff paths will be explored over time.
 
 ## Usage

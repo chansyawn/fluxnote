@@ -1,4 +1,4 @@
-import type { LocaleCode } from "@shared/features/preferences/settings";
+import type { LocaleCode } from "@shared/features/preferences/user-preferences";
 import type { MenuItemConstructorOptions } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 

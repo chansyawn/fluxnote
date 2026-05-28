@@ -1,18 +1,18 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import {
-  createDefaultSettings,
-  DEFAULT_SETTINGS,
+  createDefaultUserPreferences,
+  DEFAULT_USER_PREFERENCES,
   isFontSize,
   isLocaleCode,
   isThemePreference,
-  normalizeSettings,
-  normalizeSettingsPatch,
+  normalizeUserPreferences,
+  normalizeUserPreferencesPatch,
   resolvePreferredLocale,
   THEME_PREFERENCE_OPTIONS,
-} from "./settings";
+} from "./user-preferences";
 
-describe("settings", () => {
+describe("preferences", () => {
   it("should validate locale code", () => {
     expect(isLocaleCode("en")).toBe(true);
     expect(isLocaleCode("zh-Hans")).toBe(true);
@@ -24,21 +24,21 @@ describe("settings", () => {
     expect(isFontSize(15)).toBe(false);
   });
 
-  it("should fallback to default settings for invalid input", () => {
-    expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
-    expect(normalizeSettings({})).toEqual(DEFAULT_SETTINGS);
-    expect(normalizeSettings({ schemaVersion: 999 })).toEqual(DEFAULT_SETTINGS);
+  it("should fallback to default preferences for invalid input", () => {
+    expect(normalizeUserPreferences(null)).toEqual(DEFAULT_USER_PREFERENCES);
+    expect(normalizeUserPreferences({})).toEqual(DEFAULT_USER_PREFERENCES);
+    expect(normalizeUserPreferences({ schemaVersion: 999 })).toEqual(DEFAULT_USER_PREFERENCES);
   });
 
   it("should fallback to runtime defaults for invalid input", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+    const defaults = createDefaultUserPreferences("zh-Hans");
 
-    expect(normalizeSettings(null, defaults)).toEqual(defaults);
-    expect(normalizeSettings({ schemaVersion: 999 }, defaults)).toEqual(defaults);
+    expect(normalizeUserPreferences(null, defaults)).toEqual(defaults);
+    expect(normalizeUserPreferences({ schemaVersion: 999 }, defaults)).toEqual(defaults);
   });
 
   it("should normalize nested fields without dropping valid sibling fields", () => {
-    const normalized = normalizeSettings({
+    const normalized = normalizeUserPreferences({
       schemaVersion: 1,
       appearance: {
         locale: "invalid",
@@ -85,7 +85,7 @@ describe("settings", () => {
     });
     expect(normalized.autoArchive).toEqual({
       enabled: false,
-      idleMinutes: DEFAULT_SETTINGS.autoArchive.idleMinutes,
+      idleMinutes: DEFAULT_USER_PREFERENCES.autoArchive.idleMinutes,
     });
     expect(normalized.shortcuts).toEqual({
       "global.toggleWindow": "Alt+N",
@@ -116,9 +116,9 @@ describe("settings", () => {
     expect(normalized.markdown.codeBlock).not.toHaveProperty("unknown");
   });
 
-  it("should parse valid settings patch", () => {
+  it("should parse valid preferences patch", () => {
     expect(
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         appearance: { locale: "zh-Hans" },
         autoArchive: { enabled: false, idleMinutes: 300 },
         shortcuts: {
@@ -149,10 +149,10 @@ describe("settings", () => {
     expect(isThemePreference("system")).toBe(true);
     expect(isThemePreference("dark")).toBe(true);
     expect(isThemePreference("amoled")).toBe(false);
-    expect(normalizeSettingsPatch({ appearance: { theme: "dark" } })).toEqual({
+    expect(normalizeUserPreferencesPatch({ appearance: { theme: "dark" } })).toEqual({
       appearance: { theme: "dark" },
     });
-    expect(() => normalizeSettingsPatch({ appearance: { theme: "amoled" } })).toThrow();
+    expect(() => normalizeUserPreferencesPatch({ appearance: { theme: "amoled" } })).toThrow();
   });
 
   it("should resolve preferred locale from supported language families", () => {
@@ -167,43 +167,43 @@ describe("settings", () => {
     expect(resolvePreferredLocale(["", "fr-FR"])).toBe("en");
   });
 
-  it("should create default settings with runtime locale", () => {
-    expect(createDefaultSettings("zh-Hans")).toEqual({
-      ...DEFAULT_SETTINGS,
+  it("should create default preferences with runtime locale", () => {
+    expect(createDefaultUserPreferences("zh-Hans")).toEqual({
+      ...DEFAULT_USER_PREFERENCES,
       appearance: {
-        ...DEFAULT_SETTINGS.appearance,
+        ...DEFAULT_USER_PREFERENCES.appearance,
         locale: "zh-Hans",
       },
     });
   });
 
-  it("should reject settings patch with extra fields", () => {
+  it("should reject preferences patch with extra fields", () => {
     expect(() =>
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         appearance: { locale: "en", unknown: true },
       }),
     ).toThrow();
 
     expect(() =>
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         markdown: { codeBlock: { unknown: true } },
       }),
     ).toThrow();
 
     expect(() =>
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         unknown: true,
       }),
     ).toThrow();
 
     expect(() =>
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         telemetry: { unknown: true },
       }),
     ).toThrow();
 
     expect(() =>
-      normalizeSettingsPatch({
+      normalizeUserPreferencesPatch({
         appUpdate: { unknown: true },
       }),
     ).toThrow();

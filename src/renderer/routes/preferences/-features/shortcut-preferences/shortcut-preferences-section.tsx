@@ -1,11 +1,14 @@
 import { Trans } from "@lingui/react/macro";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
-  SettingsGroup,
-  SettingsRow,
-  SettingsSection,
-} from "@renderer/routes/preferences/-features/settings-list";
-import { DEFAULT_SETTINGS, type ShortcutAction } from "@shared/features/preferences/settings";
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
+import {
+  DEFAULT_USER_PREFERENCES,
+  type ShortcutAction,
+} from "@shared/features/preferences/user-preferences";
 import {
   CheckIcon,
   ArchiveIcon,
@@ -140,7 +143,7 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
   },
 ];
 
-export function ShortcutSettingsSection() {
+export function ShortcutPreferencesSection() {
   const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
     useShortcutState();
   const {
@@ -156,12 +159,12 @@ export function ShortcutSettingsSection() {
   });
 
   return (
-    <SettingsSection title={<Trans id="preferences.shortcuts.title">Shortcuts</Trans>}>
+    <PreferencesSection title={<Trans id="preferences.shortcuts.title">Shortcuts</Trans>}>
       <div className="flex flex-col gap-3">
         {SHORTCUT_FIELD_GROUPS.map((group) => (
           <div key={group.id} className="flex flex-col gap-1.5">
             <h3 className="text-muted-foreground px-1 text-xs font-medium">{group.title}</h3>
-            <SettingsGroup>
+            <PreferencesGroup>
               {group.fields.map((field) => {
                 const isRecording = recordingAction === field.action;
                 const shortcut = shortcuts[field.action];
@@ -172,10 +175,11 @@ export function ShortcutSettingsSection() {
                   globalShortcutErrors[field.action] === shortcut
                     ? ("unavailable" as const)
                     : (fieldErrors[field.action] ?? null);
-                const shouldShowReset = shortcut !== DEFAULT_SETTINGS.shortcuts[field.action];
+                const shouldShowReset =
+                  shortcut !== DEFAULT_USER_PREFERENCES.shortcuts[field.action];
 
                 return (
-                  <SettingsRow
+                  <PreferencesRow
                     key={field.action}
                     control={
                       <ShortcutInput
@@ -212,10 +216,10 @@ export function ShortcutSettingsSection() {
                   />
                 );
               })}
-            </SettingsGroup>
+            </PreferencesGroup>
           </div>
         ))}
       </div>
-    </SettingsSection>
+    </PreferencesSection>
   );
 }

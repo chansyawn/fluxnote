@@ -298,66 +298,6 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:81
-msgid "home-note.block.copy"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:82
-msgid "home-note.block.copy.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:194
-msgid "home-note.block.delete"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:195
-msgid "home-note.block.delete.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
-msgid "home-note.block.external-edit.cancel"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:40
-msgid "home-note.block.external-edit.cancel.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
-msgid "home-note.block.external-edit.metadata.cwd"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
-msgid "home-note.block.external-edit.metadata.file"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
-msgid "home-note.block.external-edit.metadata.source"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
-msgid "home-note.block.external-edit.metadata.source.cli"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31
-msgid "home-note.block.external-edit.submit"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:32
-msgid "home-note.block.external-edit.submit.tooltip"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/lab/index.tsx:17
 msgid "lab.description"
 msgstr ""
@@ -383,373 +323,373 @@ msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:58
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
 msgid "preferences.about.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:123
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:123
 msgid "preferences.app-update.auto-check.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:102
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:130
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:102
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:130
 msgid "preferences.app-update.auto-check.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:115
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:115
 msgid "preferences.app-update.auto-check.unavailable-development"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:119
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:119
 msgid "preferences.app-update.auto-check.unavailable-platform"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:91
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:91
 msgid "preferences.app-update.check"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:77
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:77
 msgid "preferences.app-update.downloading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:70
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:70
 msgid "preferences.app-update.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:97
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:97
 msgid "preferences.app-version.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:111
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:111
 msgid "preferences.app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:310
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:310
 msgid "preferences.archive.clear.action"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:346
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:346
 msgid "preferences.archive.clear.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:327
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:327
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:339
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:339
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:320
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:320
 msgid "preferences.archive.clear.dialog.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:317
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:317
 msgid "preferences.archive.clear.dialog.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:88
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:88
 msgid "preferences.archive.clear.error"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:351
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
 msgid "preferences.archive.clear.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:79
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:79
 msgid "preferences.archive.clear.success"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:223
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:223
 msgid "preferences.archive.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:239
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:239
 msgid "preferences.auto-archive.enable.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:119
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:119
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:246
 msgid "preferences.auto-archive.enable.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:111
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:111
 msgid "preferences.auto-archive.threshold.amount.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:298
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
 msgid "preferences.auto-archive.threshold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:293
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:293
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:115
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:115
 msgid "preferences.auto-archive.threshold.unit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:103
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:103
 msgid "preferences.auto-archive.unit.days"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:104
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:104
 msgid "preferences.auto-archive.unit.hours"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-settings-section.tsx:105
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:105
 msgid "preferences.auto-archive.unit.minutes"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:217
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:217
 msgid "preferences.cli.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:222
 msgid "preferences.cli.path.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:228
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:228
 msgid "preferences.cli.path.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:213
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:213
 msgid "preferences.cli.uninstall"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:202
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:202
 msgid "preferences.font-size.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:171
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:171
 msgid "preferences.github.issues.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:176
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:176
 msgid "preferences.github.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:163
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:163
 msgid "preferences.github.repository.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:169
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
 msgid "preferences.language.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:28
+#: src/renderer/routes/preferences/-features/markdown-preferences-section.tsx:28
 msgid "preferences.markdown.code-block.line-numbers.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/markdown-settings-section.tsx:15
+#: src/renderer/routes/preferences/-features/markdown-preferences-section.tsx:15
 msgid "preferences.markdown.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:97
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:100
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:110
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:113
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:52
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:127
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:127
 msgid "preferences.shortcuts.clear"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:77
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:80
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:72
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:75
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:92
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:95
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:44
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:95
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:44
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:95
 msgid "preferences.shortcuts.empty"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:14
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:14
 msgid "preferences.shortcuts.error.duplicate"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:22
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:22
 msgid "preferences.shortcuts.error.invalid-modifier"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:30
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:30
 msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:122
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:125
 msgid "preferences.shortcuts.formatBold.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:137
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:140
 msgid "preferences.shortcuts.formatInlineCode.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:127
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:130
 msgid "preferences.shortcuts.formatItalic.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:132
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:135
 msgid "preferences.shortcuts.formatStrikethrough.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:117
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:120
 msgid "preferences.shortcuts.group.editor"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:46
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:49
 msgid "preferences.shortcuts.group.global"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:67
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
 msgid "preferences.shortcuts.group.workspace"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:82
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:85
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:58
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:61
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "Quickly create a new block and bring the window forward for fast capture."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:56
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "Quick create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:69
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:69
 msgid "preferences.shortcuts.recording.success"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-recording-popover.tsx:36
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:36
 msgid "preferences.shortcuts.recording.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:48
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-input.tsx:112
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:103
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:106
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:159
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:162
 msgid "preferences.shortcuts.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:87
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:90
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-settings/shortcut-settings-section.tsx:51
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:54
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:146
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:146
 msgid "preferences.telemetry.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:135
-#: src/renderer/routes/preferences/-features/about-settings-section.tsx:152
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:135
+#: src/renderer/routes/preferences/-features/about-preferences-section.tsx:152
 msgid "preferences.telemetry.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:77
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:77
 msgid "preferences.theme.dark"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:141
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:141
 msgid "preferences.theme.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
 msgid "preferences.theme.light"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-settings-section.tsx:67
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
 msgid "preferences.theme.system"
 msgstr ""
 
@@ -790,83 +730,103 @@ msgid "workspace.archived.filtered.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:175
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:179
 msgid "workspace.blocks.archive"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:182
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:186
 msgid "workspace.blocks.archive.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:114
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
+msgid "workspace.blocks.auto-archive.protected-by-external-edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:109
+msgid "workspace.blocks.auto-archive.protected-by-pin"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:81
+msgid "workspace.blocks.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/icon-action.tsx:82
+msgid "workspace.blocks.copy.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:198
+msgid "workspace.blocks.delete"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:199
+msgid "workspace.blocks.delete.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:118
 msgid "workspace.blocks.keep"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:101
-msgid "workspace.blocks.keep.protected-by-external-edit"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:108
-msgid "workspace.blocks.keep.protected-by-pin"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:206
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:215
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:210
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:219
 msgid "workspace.blocks.more-actions"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:263
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:270
 msgid "workspace.blocks.move"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:281
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:288
 msgid "workspace.blocks.move-down"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:290
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:297
 msgid "workspace.blocks.move-to-top"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:272
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:279
 msgid "workspace.blocks.move-up"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:255
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:262
 msgid "workspace.blocks.pin"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:173
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:177
 msgid "workspace.blocks.restore"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:180
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:184
 msgid "workspace.blocks.restore.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:221
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:225
 msgid "workspace.blocks.status"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:112
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:116
 msgid "workspace.blocks.unkeep"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:253
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:260
 msgid "workspace.blocks.unpin"
 msgstr ""
 
@@ -886,6 +846,46 @@ msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+msgid "workspace.external-edit.cancel"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:40
+msgid "workspace.external-edit.cancel.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
+msgid "workspace.external-edit.metadata.cwd"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
+msgid "workspace.external-edit.metadata.file"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
+msgid "workspace.external-edit.metadata.source"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
+msgid "workspace.external-edit.metadata.source.cli"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31
+msgid "workspace.external-edit.submit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:32
+msgid "workspace.external-edit.submit.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/view/workspace-empty-state.tsx:88
 msgid "workspace.filtered.empty.description"
 msgstr ""
@@ -901,12 +901,12 @@ msgid "workspace.loading"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:156
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:160
 msgid "workspace.tags.assign.button"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:145
+#: src/renderer/routes/_workspace/-features/adornments/block-actions.tsx:149
 msgid "workspace.tags.assign.placeholder"
 msgstr ""
 

@@ -26,7 +26,7 @@ function ExternalEditSourceIcon({ source }: { source: ExternalEditTrigger["sourc
 function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["source"] }) {
   switch (source) {
     case "cli":
-      return <Trans id="home-note.block.external-edit.metadata.source.cli">Command line</Trans>;
+      return <Trans id="workspace.external-edit.metadata.source.cli">Command line</Trans>;
   }
 }
 
@@ -60,15 +60,15 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
       <HoverCardContent align="start" className="w-[min(24rem,calc(100vw-2rem))]" side="bottom">
         <dl className="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-3 gap-y-2">
           <ExternalEditMetadataItem
-            label={<Trans id="home-note.block.external-edit.metadata.source">Source</Trans>}
+            label={<Trans id="workspace.external-edit.metadata.source">Source</Trans>}
             value={<ExternalEditSourceLabel source={trigger.source} />}
           />
           <ExternalEditMetadataItem
-            label={<Trans id="home-note.block.external-edit.metadata.cwd">Working directory</Trans>}
+            label={<Trans id="workspace.external-edit.metadata.cwd">Working directory</Trans>}
             value={trigger.cwd}
           />
           <ExternalEditMetadataItem
-            label={<Trans id="home-note.block.external-edit.metadata.file">Target file</Trans>}
+            label={<Trans id="workspace.external-edit.metadata.file">Target file</Trans>}
             value={trigger.targetFilePath}
           />
         </dl>

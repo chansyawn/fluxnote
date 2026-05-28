@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
+import { DEFAULT_USER_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
   })),
   fingerprintAutoArchiveCandidateBlockIds: vi.fn((ids: string[]) => ids.join("|")),
   listAutoArchiveCandidateBlockIds: vi.fn(),
-  resolveAutoArchiveSettings: vi.fn(),
+  resolveAutoArchivePreferences: vi.fn(),
 }));
 
 vi.mock("./auto-archive-policy", () => mocks);
@@ -21,7 +21,7 @@ describe("auto-archive runtime", () => {
     mocks.createAutoArchiveEvaluationContext.mockClear();
     mocks.fingerprintAutoArchiveCandidateBlockIds.mockClear();
     mocks.listAutoArchiveCandidateBlockIds.mockReset();
-    mocks.resolveAutoArchiveSettings.mockReset();
+    mocks.resolveAutoArchivePreferences.mockReset();
   });
 
   afterEach(() => {
@@ -35,7 +35,7 @@ describe("auto-archive runtime", () => {
   });
 
   it("emits pending state when enabled and no force archive", async () => {
-    mocks.resolveAutoArchiveSettings.mockResolvedValue({ enabled: true, idleMinutes: 10 });
+    mocks.resolveAutoArchivePreferences.mockResolvedValue({ enabled: true, idleMinutes: 10 });
     mocks.listAutoArchiveCandidateBlockIds.mockResolvedValue(["b1", "b2"]);
 
     const emitEvent = vi.fn(() => true);
@@ -43,8 +43,8 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => true,
       getDb: () => ({ update: vi.fn() }) as never,
-      readSettings: async () => ({
-        ...DEFAULT_SETTINGS,
+      readUserPreferences: async () => ({
+        ...DEFAULT_USER_PREFERENCES,
         autoArchive: { enabled: true, idleMinutes: 10 },
       }),
     });
@@ -61,7 +61,7 @@ describe("auto-archive runtime", () => {
   });
 
   it("archives when hidden and force trigger is true", async () => {
-    mocks.resolveAutoArchiveSettings.mockResolvedValue({ enabled: true, idleMinutes: 10 });
+    mocks.resolveAutoArchivePreferences.mockResolvedValue({ enabled: true, idleMinutes: 10 });
     mocks.listAutoArchiveCandidateBlockIds
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce(["b1", "b2"])
@@ -76,8 +76,8 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => false,
       getDb: () => ({ update }) as never,
-      readSettings: async () => ({
-        ...DEFAULT_SETTINGS,
+      readUserPreferences: async () => ({
+        ...DEFAULT_USER_PREFERENCES,
         autoArchive: { enabled: true, idleMinutes: 10 },
       }),
     });
@@ -100,15 +100,15 @@ describe("auto-archive runtime", () => {
   });
 
   it("emits zero state when auto archive disabled", async () => {
-    mocks.resolveAutoArchiveSettings.mockResolvedValue({ enabled: false, idleMinutes: 10 });
+    mocks.resolveAutoArchivePreferences.mockResolvedValue({ enabled: false, idleMinutes: 10 });
 
     const emitEvent = vi.fn(() => true);
     const runtime = createAutoArchiveRuntime({
       emitEvent,
       getWindowVisible: () => false,
       getDb: () => ({ update: vi.fn() }) as never,
-      readSettings: async () => ({
-        ...DEFAULT_SETTINGS,
+      readUserPreferences: async () => ({
+        ...DEFAULT_USER_PREFERENCES,
         autoArchive: { enabled: false, idleMinutes: 10 },
       }),
     });
@@ -125,7 +125,7 @@ describe("auto-archive runtime", () => {
   });
 
   it("refreshes pending state without archiving", async () => {
-    mocks.resolveAutoArchiveSettings.mockResolvedValue({ enabled: true, idleMinutes: 10 });
+    mocks.resolveAutoArchivePreferences.mockResolvedValue({ enabled: true, idleMinutes: 10 });
     mocks.listAutoArchiveCandidateBlockIds.mockResolvedValue(["b1"]);
 
     const update = vi.fn();
@@ -134,8 +134,8 @@ describe("auto-archive runtime", () => {
       emitEvent,
       getWindowVisible: () => false,
       getDb: () => ({ update }) as never,
-      readSettings: async () => ({
-        ...DEFAULT_SETTINGS,
+      readUserPreferences: async () => ({
+        ...DEFAULT_USER_PREFERENCES,
         autoArchive: { enabled: true, idleMinutes: 10 },
       }),
     });

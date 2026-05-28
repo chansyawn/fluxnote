@@ -1,52 +1,54 @@
 // @vitest-environment jsdom
 
-import { createRendererSettings } from "@renderer/test/fixtures";
+import { createRendererUserPreferences } from "@renderer/test/fixtures";
 import { renderWithProviders } from "@renderer/test/render";
-import type { Settings } from "@shared/features/preferences/settings";
+import type { UserPreferences } from "@shared/features/preferences/user-preferences";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 const clientMocks = vi.hoisted(() => ({
   onPreferencesChanged: vi.fn(),
-  patchSettings: vi.fn(),
-  readSettings: vi.fn(),
-  resetSettings: vi.fn(),
+  patchUserPreferences: vi.fn(),
+  readUserPreferences: vi.fn(),
+  resetUserPreferences: vi.fn(),
 }));
 
 vi.mock("@renderer/clients", () => ({
   onPreferencesChanged: clientMocks.onPreferencesChanged,
-  patchSettings: clientMocks.patchSettings,
-  readSettings: clientMocks.readSettings,
-  resetSettings: clientMocks.resetSettings,
+  patchUserPreferences: clientMocks.patchUserPreferences,
+  readUserPreferences: clientMocks.readUserPreferences,
+  resetUserPreferences: clientMocks.resetUserPreferences,
   toAppInvokeError: (error: unknown) => ({
     message: error instanceof Error ? error.message : "Unknown error",
   }),
 }));
 
-import { PreferencesSync, SETTINGS_QUERY_KEY } from "./preferences-query";
+import { PreferencesSync, USER_PREFERENCES_QUERY_KEY } from "./preferences-query";
 
 describe("PreferencesSync", () => {
   afterEach(() => {
     clientMocks.onPreferencesChanged.mockReset();
-    clientMocks.patchSettings.mockReset();
-    clientMocks.readSettings.mockReset();
-    clientMocks.resetSettings.mockReset();
+    clientMocks.patchUserPreferences.mockReset();
+    clientMocks.readUserPreferences.mockReset();
+    clientMocks.resetUserPreferences.mockReset();
   });
 
   it("keeps the User Preferences query cache in sync with renderer events", () => {
-    let preferencesChanged: (settings: Settings) => void = (_settings) => {
+    let preferencesChanged: (preferences: UserPreferences) => void = (_settings) => {
       throw new Error("Preferences changed listener was not registered.");
     };
     const unlisten = vi.fn();
-    clientMocks.onPreferencesChanged.mockImplementation((handler: (settings: Settings) => void) => {
-      preferencesChanged = handler;
-      return unlisten;
-    });
-    const nextSettings = createRendererSettings({ appearance: { locale: "zh-Hans" } });
+    clientMocks.onPreferencesChanged.mockImplementation(
+      (handler: (preferences: UserPreferences) => void) => {
+        preferencesChanged = handler;
+        return unlisten;
+      },
+    );
+    const nextPreferences = createRendererUserPreferences({ appearance: { locale: "zh-Hans" } });
     const { queryClient, unmount } = renderWithProviders(<PreferencesSync />);
 
-    preferencesChanged(nextSettings);
+    preferencesChanged(nextPreferences);
 
-    expect(queryClient.getQueryData(SETTINGS_QUERY_KEY)).toEqual(nextSettings);
+    expect(queryClient.getQueryData(USER_PREFERENCES_QUERY_KEY)).toEqual(nextPreferences);
 
     unmount();
 

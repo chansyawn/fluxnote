@@ -11,10 +11,10 @@ import {
   useTelemetryPreference,
 } from "@renderer/features/preferences/preferences-query";
 import {
-  SettingsGroup,
-  SettingsRow,
-  SettingsSection,
-} from "@renderer/routes/preferences/-features/settings-list";
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
 import { BrandIcon } from "@renderer/ui/components/brand-icon";
 import { Button } from "@renderer/ui/components/button";
 import { Switch } from "@renderer/ui/components/switch";
@@ -33,7 +33,7 @@ import { toast } from "sonner";
 const GITHUB_REPOSITORY_URL = "https://github.com/chansyawn/fluxnotes";
 const GITHUB_ISSUES_URL = "https://github.com/chansyawn/fluxnotes/issues";
 
-export function AboutSettingsSection() {
+export function AboutPreferencesSection() {
   const { i18n } = useLingui();
   const { telemetry, patchTelemetry } = useTelemetryPreference();
   const { appUpdate, patchAppUpdate } = useAppUpdatePreference();
@@ -55,9 +55,9 @@ export function AboutSettingsSection() {
   }, []);
 
   return (
-    <SettingsSection title={<Trans id="preferences.about.title">About</Trans>}>
-      <SettingsGroup>
-        <SettingsRow
+    <PreferencesSection title={<Trans id="preferences.about.title">About</Trans>}>
+      <PreferencesGroup>
+        <PreferencesRow
           control={
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm tabular-nums">{currentVersion}</span>
@@ -96,12 +96,12 @@ export function AboutSettingsSection() {
           icon={<BadgeInfoIcon />}
           label={<Trans id="preferences.app-version.label">Version</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <Switch
               aria-label={i18n._({
                 id: "preferences.app-update.auto-check.label",
-                message: "Auto updates",
+                message: "App update checks",
               })}
               checked={appUpdate.automaticChecksEnabled}
               disabled={!appUpdateSupported}
@@ -127,9 +127,9 @@ export function AboutSettingsSection() {
             )
           }
           icon={<RefreshCwIcon />}
-          label={<Trans id="preferences.app-update.auto-check.label">Auto updates</Trans>}
+          label={<Trans id="preferences.app-update.auto-check.label">App update checks</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <Switch
               aria-label={i18n._({
@@ -144,14 +144,14 @@ export function AboutSettingsSection() {
           }
           description={
             <Trans id="preferences.telemetry.description">
-              Shares anonymous diagnostics and crash reports. Notes, tags, file paths, and clipboard
-              data are never included.
+              Shares anonymous diagnostics and crash reports. Blocks, tags, file paths, and
+              clipboard data are never included.
             </Trans>
           }
           icon={<SendIcon />}
           label={<Trans id="preferences.telemetry.label">Telemetry</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <div className="flex items-center gap-2">
               <Button
@@ -175,7 +175,7 @@ export function AboutSettingsSection() {
           icon={<BrandIcon icon={siGithub} />}
           label={<Trans id="preferences.github.label">GitHub</Trans>}
         />
-      </SettingsGroup>
-    </SettingsSection>
+      </PreferencesGroup>
+    </PreferencesSection>
   );
 }

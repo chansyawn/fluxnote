@@ -8,9 +8,9 @@ describe("preferences command", () => {
     command: vi.fn((name: string, handler: (input: any) => unknown) => handlers.set(name, handler)),
   };
   const preferencesService = {
-    patchSettings: vi.fn(),
-    readSettings: vi.fn(),
-    resetSettings: vi.fn(),
+    patchUserPreferences: vi.fn(),
+    readUserPreferences: vi.fn(),
+    resetUserPreferences: vi.fn(),
   };
   const applyThemePreference = vi.fn();
   const onAppUpdatePreferencesChanged = vi.fn();
@@ -30,14 +30,14 @@ describe("preferences command", () => {
   });
 
   it("dispatches patch/read/reset commands", async () => {
-    preferencesService.patchSettings.mockReturnValue({
+    preferencesService.patchUserPreferences.mockReturnValue({
       appearance: { locale: "en", theme: "dark", fontSize: 16 },
     });
-    preferencesService.readSettings.mockReturnValue({
+    preferencesService.readUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "light" },
     });
-    preferencesService.resetSettings.mockReturnValue({
+    preferencesService.resetUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "system" },
     });
@@ -59,7 +59,7 @@ describe("preferences command", () => {
     const readResult = handlers.get("preferences.read")?.({});
     const resetResult = await handlers.get("preferences.reset")?.({});
 
-    expect(preferencesService.patchSettings).toHaveBeenCalled();
+    expect(preferencesService.patchUserPreferences).toHaveBeenCalled();
     expect(readResult).toEqual({ schemaVersion: 1, appearance: { theme: "light" } });
     expect(resetResult).toEqual({ schemaVersion: 1, appearance: { theme: "system" } });
     expect(patchResult).toEqual({ appearance: { locale: "en", theme: "dark", fontSize: 16 } });
@@ -73,12 +73,12 @@ describe("preferences command", () => {
   });
 
   it("notifies app update changes after app update patch", async () => {
-    const settings = {
+    const preferences = {
       appUpdate: { automaticChecksEnabled: false },
       appearance: { theme: "system" },
       schemaVersion: 1,
     };
-    preferencesService.patchSettings.mockReturnValue(settings);
+    preferencesService.patchUserPreferences.mockReturnValue(preferences);
     registerPreferencesCommands(
       ipc as never,
       {
@@ -95,11 +95,11 @@ describe("preferences command", () => {
       appUpdate: { automaticChecksEnabled: false },
     });
 
-    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledWith(settings);
+    expect(onAppUpdatePreferencesChanged).toHaveBeenCalledWith(preferences);
   });
 
   it("notifies auto archive changes after auto archive patch", async () => {
-    preferencesService.patchSettings.mockReturnValue({
+    preferencesService.patchUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "system" },
     });
@@ -121,7 +121,7 @@ describe("preferences command", () => {
   });
 
   it("does not notify auto archive changes after theme patch", async () => {
-    preferencesService.patchSettings.mockReturnValue({
+    preferencesService.patchUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "dark" },
     });
@@ -146,7 +146,7 @@ describe("preferences command", () => {
   });
 
   it("notifies telemetry changes after telemetry patch", async () => {
-    preferencesService.patchSettings.mockReturnValue({
+    preferencesService.patchUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "system" },
     });
@@ -168,7 +168,7 @@ describe("preferences command", () => {
   });
 
   it("does not notify telemetry changes after non telemetry patch", async () => {
-    preferencesService.patchSettings.mockReturnValue({
+    preferencesService.patchUserPreferences.mockReturnValue({
       schemaVersion: 1,
       appearance: { theme: "dark" },
     });

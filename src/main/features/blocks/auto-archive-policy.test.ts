@@ -1,20 +1,20 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
+import { DEFAULT_USER_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
-  blockWillAutoArchive,
+  blockHasPendingAutoArchive,
   createAutoArchiveEvaluationContext,
   fingerprintAutoArchiveCandidateBlockIds,
-  resolveAutoArchiveSettings,
+  resolveAutoArchivePreferences,
 } from "./auto-archive-policy";
 
 describe("auto-archive policy", () => {
-  it("resolves settings and falls back on error", async () => {
-    const ok = await resolveAutoArchiveSettings(async () => ({
-      ...DEFAULT_SETTINGS,
+  it("resolves preferences and falls back on error", async () => {
+    const ok = await resolveAutoArchivePreferences(async () => ({
+      ...DEFAULT_USER_PREFERENCES,
       autoArchive: { enabled: false, idleMinutes: 5 },
     }));
-    const fallback = await resolveAutoArchiveSettings(async () => {
+    const fallback = await resolveAutoArchivePreferences(async () => {
       throw new Error("boom");
     });
 
@@ -27,12 +27,12 @@ describe("auto-archive policy", () => {
     const enabled = createAutoArchiveEvaluationContext({
       now,
       protectedBlockIds: new Set(["b1"]),
-      settings: { enabled: true, idleMinutes: 5 },
+      preferences: { enabled: true, idleMinutes: 5 },
     });
     const disabled = createAutoArchiveEvaluationContext({
       now,
       protectedBlockIds: new Set(["b1"]),
-      settings: { enabled: false, idleMinutes: 5 },
+      preferences: { enabled: false, idleMinutes: 5 },
     });
 
     expect(enabled.cutoffIso).toBe("2026-01-01T00:05:00.000Z");
@@ -46,7 +46,7 @@ describe("auto-archive policy", () => {
     };
 
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: null,
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
@@ -58,7 +58,7 @@ describe("auto-archive policy", () => {
       ),
     ).toBe(true);
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: "2026-01-01T00:09:00.000Z",
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
@@ -70,7 +70,7 @@ describe("auto-archive policy", () => {
       ),
     ).toBe(false);
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: null,
           contentUpdatedAt: "2026-01-01T00:06:00.000Z",
@@ -82,7 +82,7 @@ describe("auto-archive policy", () => {
       ),
     ).toBe(false);
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: null,
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
@@ -94,7 +94,7 @@ describe("auto-archive policy", () => {
       ),
     ).toBe(false);
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: null,
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",
@@ -106,7 +106,7 @@ describe("auto-archive policy", () => {
       ),
     ).toBe(false);
     expect(
-      blockWillAutoArchive(
+      blockHasPendingAutoArchive(
         {
           archivedAt: null,
           contentUpdatedAt: "2026-01-01T00:00:00.000Z",

@@ -8,7 +8,7 @@ import {
   LANGUAGE_OPTIONS,
   type LanguageOption,
   type LocaleCode,
-} from "@shared/features/preferences/settings";
+} from "@shared/features/preferences/user-preferences";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 
 const DEV_ONLY_LOCALE = "pseudo";

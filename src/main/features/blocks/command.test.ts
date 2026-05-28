@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
+import { DEFAULT_USER_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
@@ -31,8 +31,8 @@ describe("blocks command", () => {
     getAssetPathForBlock: (blockId: string) => `/tmp/${blockId}`,
     listExternalEditSessions: () => [],
     now: () => new Date("2026-01-01T00:00:00.000Z"),
-    readSettings: () => ({
-      ...DEFAULT_SETTINGS,
+    readUserPreferences: () => ({
+      ...DEFAULT_USER_PREFERENCES,
       autoArchive: { enabled: true, idleMinutes: 60 },
     }),
   };

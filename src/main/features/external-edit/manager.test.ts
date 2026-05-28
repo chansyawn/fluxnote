@@ -5,9 +5,9 @@ import { createExternalEditManager } from "./manager";
 describe("external-edit manager", () => {
   const trigger = {
     cwd: "/workspace",
-    requestedFilePath: "note.md",
+    requestedFilePath: "block.md",
     source: "cli" as const,
-    targetFilePath: "/workspace/note.md",
+    targetFilePath: "/workspace/block.md",
   };
 
   it("begins and claims a session", async () => {

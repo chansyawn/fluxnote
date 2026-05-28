@@ -19,13 +19,13 @@ const block = {
   orderIndex: 0,
   tags: [],
   updatedAt: "2026-01-01T00:00:00.000Z",
-  willArchive: false,
+  isPendingAutoArchive: false,
 };
 const externalEditTrigger = {
   cwd: "/workspace",
-  requestedFilePath: "note.md",
+  requestedFilePath: "block.md",
   source: "cli" as const,
-  targetFilePath: "/workspace/note.md",
+  targetFilePath: "/workspace/block.md",
 };
 
 vi.mock("../blocks/service", () => ({

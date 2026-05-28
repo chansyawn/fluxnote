@@ -1,26 +1,29 @@
-import { createDefaultSettings, DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
+import {
+  createDefaultUserPreferences,
+  DEFAULT_USER_PREFERENCES,
+} from "@shared/features/preferences/user-preferences";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createPreferencesService } from "./service";
 
 describe("preferences service", () => {
-  it("reads default settings from storage", () => {
-    const service = createPreferencesService({ storage: { store: DEFAULT_SETTINGS } });
+  it("reads default preferences from storage", () => {
+    const service = createPreferencesService({ storage: { store: DEFAULT_USER_PREFERENCES } });
 
-    expect(service.readSettings()).toEqual(DEFAULT_SETTINGS);
+    expect(service.readUserPreferences()).toEqual(DEFAULT_USER_PREFERENCES);
   });
 
-  it("reads runtime default settings from storage", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+  it("reads runtime default preferences from storage", () => {
+    const defaults = createDefaultUserPreferences("zh-Hans");
     const service = createPreferencesService({ defaults, storage: { store: defaults } });
 
-    expect(service.readSettings()).toEqual(defaults);
+    expect(service.readUserPreferences()).toEqual(defaults);
   });
 
-  it("repairs invalid stored settings when reading", () => {
+  it("repairs invalid stored preferences when reading", () => {
     const storage = {
       store: {
-        ...DEFAULT_SETTINGS,
+        ...DEFAULT_USER_PREFERENCES,
         appearance: {
           locale: "invalid",
           theme: "invalid",
@@ -46,10 +49,10 @@ describe("preferences service", () => {
     };
     const service = createPreferencesService({ storage });
 
-    const settings = service.readSettings();
+    const preferences = service.readUserPreferences();
 
-    expect(settings).toEqual({
-      ...DEFAULT_SETTINGS,
+    expect(preferences).toEqual({
+      ...DEFAULT_USER_PREFERENCES,
       appearance: {
         locale: "en",
         theme: "system",
@@ -67,14 +70,14 @@ describe("preferences service", () => {
         automaticChecksEnabled: true,
       },
     });
-    expect(storage.store).toEqual(settings);
+    expect(storage.store).toEqual(preferences);
   });
 
   it("repairs invalid stored locale to runtime default locale", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+    const defaults = createDefaultUserPreferences("zh-Hans");
     const storage = {
       store: {
-        ...DEFAULT_SETTINGS,
+        ...DEFAULT_USER_PREFERENCES,
         appearance: {
           locale: "invalid",
           theme: "light",
@@ -84,36 +87,36 @@ describe("preferences service", () => {
     };
     const service = createPreferencesService({ defaults, storage });
 
-    const settings = service.readSettings();
+    const preferences = service.readUserPreferences();
 
-    expect(settings.appearance).toEqual({
+    expect(preferences.appearance).toEqual({
       locale: "zh-Hans",
       theme: "light",
       fontSize: 20,
     });
-    expect(storage.store).toEqual(settings);
+    expect(storage.store).toEqual(preferences);
   });
 
-  it("keeps clean stored settings unchanged when reading", () => {
+  it("keeps clean stored preferences unchanged when reading", () => {
     const storage = {
       store: {
-        ...DEFAULT_SETTINGS,
-        appearance: { ...DEFAULT_SETTINGS.appearance, locale: "zh-Hans" },
+        ...DEFAULT_USER_PREFERENCES,
+        appearance: { ...DEFAULT_USER_PREFERENCES.appearance, locale: "zh-Hans" },
       },
     };
     const originalStore = storage.store;
     const service = createPreferencesService({ storage });
 
-    const settings = service.readSettings();
+    const preferences = service.readUserPreferences();
 
-    expect(settings).toEqual(originalStore);
+    expect(preferences).toEqual(originalStore);
     expect(storage.store).toBe(originalStore);
   });
 
-  it("patches nested settings with normalization", () => {
-    const service = createPreferencesService({ storage: { store: DEFAULT_SETTINGS } });
+  it("patches nested preferences with normalization", () => {
+    const service = createPreferencesService({ storage: { store: DEFAULT_USER_PREFERENCES } });
 
-    const result = service.patchSettings({
+    const result = service.patchUserPreferences({
       appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },
@@ -132,17 +135,17 @@ describe("preferences service", () => {
     expect(result.telemetry.enabled).toBe(false);
   });
 
-  it("repairs stored settings before applying patch", () => {
+  it("repairs stored preferences before applying patch", () => {
     const storage = {
       store: {
-        ...DEFAULT_SETTINGS,
+        ...DEFAULT_USER_PREFERENCES,
         appearance: { locale: "invalid", theme: "light", fontSize: 20 },
         markdown: { codeBlock: { showLineNumbers: true } },
       },
     };
     const service = createPreferencesService({ storage });
 
-    const result = service.patchSettings({
+    const result = service.patchUserPreferences({
       markdown: { codeBlock: { showLineNumbers: false } },
     });
 
@@ -157,18 +160,18 @@ describe("preferences service", () => {
     expect(storage.store).toEqual(result);
   });
 
-  it("repairs stored settings with runtime defaults before applying patch", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+  it("repairs stored preferences with runtime defaults before applying patch", () => {
+    const defaults = createDefaultUserPreferences("zh-Hans");
     const storage = {
       store: {
-        ...DEFAULT_SETTINGS,
+        ...DEFAULT_USER_PREFERENCES,
         appearance: { locale: "invalid", theme: "light", fontSize: 20 },
         markdown: { codeBlock: { showLineNumbers: true } },
       },
     };
     const service = createPreferencesService({ defaults, storage });
 
-    const result = service.patchSettings({
+    const result = service.patchUserPreferences({
       markdown: { codeBlock: { showLineNumbers: false } },
     });
 
@@ -183,59 +186,59 @@ describe("preferences service", () => {
     expect(storage.store).toEqual(result);
   });
 
-  it("rejects invalid patches without writing settings", () => {
-    const storage = { store: DEFAULT_SETTINGS };
+  it("rejects invalid patches without writing preferences", () => {
+    const storage = { store: DEFAULT_USER_PREFERENCES };
     const service = createPreferencesService({ storage });
 
     expect(() =>
-      service.patchSettings({
+      service.patchUserPreferences({
         appearance: { fontSize: 999 },
       } as never),
     ).toThrow();
-    expect(storage.store).toBe(DEFAULT_SETTINGS);
+    expect(storage.store).toBe(DEFAULT_USER_PREFERENCES);
   });
 
-  it("resets settings to defaults", () => {
+  it("resets preferences to defaults", () => {
     const service = createPreferencesService({
       storage: {
         store: {
-          ...DEFAULT_SETTINGS,
-          appearance: { ...DEFAULT_SETTINGS.appearance, locale: "zh-Hans" },
+          ...DEFAULT_USER_PREFERENCES,
+          appearance: { ...DEFAULT_USER_PREFERENCES.appearance, locale: "zh-Hans" },
         },
       },
     });
 
-    service.resetSettings();
+    service.resetUserPreferences();
 
-    expect(service.readSettings()).toEqual(DEFAULT_SETTINGS);
+    expect(service.readUserPreferences()).toEqual(DEFAULT_USER_PREFERENCES);
   });
 
-  it("resets settings to runtime defaults", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+  it("resets preferences to runtime defaults", () => {
+    const defaults = createDefaultUserPreferences("zh-Hans");
     const service = createPreferencesService({
       defaults,
       storage: {
         store: {
-          ...DEFAULT_SETTINGS,
-          appearance: { ...DEFAULT_SETTINGS.appearance, locale: "en" },
+          ...DEFAULT_USER_PREFERENCES,
+          appearance: { ...DEFAULT_USER_PREFERENCES.appearance, locale: "en" },
         },
       },
     });
 
-    service.resetSettings();
+    service.resetUserPreferences();
 
-    expect(service.readSettings()).toEqual(defaults);
+    expect(service.readUserPreferences()).toEqual(defaults);
   });
 
   it("emits changed event after patch and reset writes", () => {
     const emitEvent = vi.fn();
     const service = createPreferencesService({
       emitEvent,
-      storage: { store: DEFAULT_SETTINGS },
+      storage: { store: DEFAULT_USER_PREFERENCES },
     });
 
-    const patched = service.patchSettings({ appearance: { locale: "zh-Hans" } });
-    const reset = service.resetSettings();
+    const patched = service.patchUserPreferences({ appearance: { locale: "zh-Hans" } });
+    const reset = service.resetUserPreferences();
 
     expect(emitEvent).toHaveBeenNthCalledWith(1, "preferences.changed", patched);
     expect(emitEvent).toHaveBeenNthCalledWith(2, "preferences.changed", reset);

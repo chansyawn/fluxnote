@@ -28,7 +28,7 @@ This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code
 
 - [x] Shipped Lexical migration
 - [ ] Add richer GFM support
-- [ ] Revisit single-document editor later
+- [ ] Revisit single-block editor later
 
 ---
 
@@ -55,7 +55,7 @@ pnpm dev
 
 ## Table
 
-| Feature | Status | Notes |
+| Feature | Status | Details |
 | --- | --- | --- |
 | Paragraphs | Ready | Stable core support |
 | Task list | Ready | GFM syntax enabled |
@@ -105,11 +105,11 @@ export function BlockEditorPlaygroundPanel() {
       <div className="bg-card flex items-center justify-between gap-2 rounded-lg p-2">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">
-            <Trans id="lab.playground.title">Note Block Editor Playground</Trans>
+            <Trans id="lab.playground.title">Block Editor Playground</Trans>
           </h2>
           <p className="text-muted-foreground text-xs">
             <Trans id="lab.playground.description">
-              Frontend-only playground. Edit this preset markdown to verify note block behavior.
+              Frontend-only playground. Edit this preset markdown to verify Block behavior.
             </Trans>
           </p>
         </div>

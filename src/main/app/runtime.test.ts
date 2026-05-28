@@ -135,7 +135,7 @@ describe("createBackendRuntime", () => {
       userDataPath: "/tmp",
     },
     preferencesService: {
-      readSettings: vi.fn(),
+      readUserPreferences: vi.fn(),
     },
     telemetryService: {
       captureEvent: vi.fn(),
@@ -170,7 +170,7 @@ describe("createBackendRuntime", () => {
     mocks.createIpcRouter.mockReturnValue(ipc);
     mocks.createEntrypointRuntime.mockReturnValue(entrypointRuntime);
     mocks.createMainServices.mockReturnValue(services);
-    services.preferencesService.readSettings.mockReturnValue({
+    services.preferencesService.readUserPreferences.mockReturnValue({
       appUpdate: { automaticChecksEnabled: true },
       appearance: { theme: "system" },
     });
@@ -265,7 +265,7 @@ describe("createBackendRuntime", () => {
     await runtime.start();
     const registerCall = mocks.registerPreferencesCommands.mock.calls[0];
     const deps = registerCall?.[1] as {
-      onAppUpdatePreferencesChanged: (settings: {
+      onAppUpdatePreferencesChanged: (preferences: {
         appUpdate: { automaticChecksEnabled: boolean };
       }) => void;
     };

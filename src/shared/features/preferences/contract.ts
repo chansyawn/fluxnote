@@ -1,25 +1,25 @@
 import { z } from "zod";
 
-import { settingsPatchSchema, settingsSchema } from "./settings";
+import { userPreferencesPatchSchema, userPreferencesSchema } from "./user-preferences";
 
 const voidSchema = z.undefined();
 
 export const preferencesContract = {
   commands: {
     "preferences.patch": {
-      input: settingsPatchSchema,
-      output: settingsSchema,
+      input: userPreferencesPatchSchema,
+      output: userPreferencesSchema,
     },
     "preferences.read": {
       input: voidSchema,
-      output: settingsSchema,
+      output: userPreferencesSchema,
     },
     "preferences.reset": {
       input: voidSchema,
-      output: settingsSchema,
+      output: userPreferencesSchema,
     },
   },
   events: {
-    "preferences.changed": settingsSchema,
+    "preferences.changed": userPreferencesSchema,
   },
 } as const;

@@ -8,7 +8,7 @@ import {
   validateShortcutUpdate,
 } from "@renderer/features/shortcut/shortcut-utils";
 import { useGlobalShortcutSync } from "@renderer/features/shortcut/use-global-shortcut-sync";
-import { type ShortcutAction } from "@shared/features/preferences/settings";
+import { type ShortcutAction } from "@shared/features/preferences/user-preferences";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { createContext, useContext, useEffectEvent, useMemo, type ReactNode } from "react";
 

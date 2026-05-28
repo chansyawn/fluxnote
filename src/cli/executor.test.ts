@@ -75,11 +75,11 @@ describe("executor", () => {
     deps.dispatchCommand.mockResolvedValue({ blockId: "block-2" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    await executeAddFromFile("note.md", ["draft"], deps);
+    await executeAddFromFile("block.md", ["draft"], deps);
 
-    expect(deps.access).toHaveBeenCalledWith("/workspace/note.md");
-    expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
-    expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
+    expect(deps.access).toHaveBeenCalledWith("/workspace/block.md");
+    expect(deps.stat).toHaveBeenCalledWith("/workspace/block.md");
+    expect(deps.readFile).toHaveBeenCalledWith("/workspace/block.md", "utf8");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       blockCreatedSource: "cli_add_file",
       content: "file-content",
@@ -92,8 +92,8 @@ describe("executor", () => {
     const deps = createDeps();
     deps.stat.mockResolvedValue(createFileStat(false));
 
-    await expect(executeAddFromFile("notes", [], deps)).rejects.toThrow(
-      "Expected a file path: notes",
+    await expect(executeAddFromFile("blocks", [], deps)).rejects.toThrow(
+      "Expected a file path: blocks",
     );
     expect(deps.readFile).not.toHaveBeenCalled();
   });
@@ -104,10 +104,10 @@ describe("executor", () => {
     deps.dispatchCommand.mockResolvedValue({ blockId: "block-3" });
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-    await executeAddFromAuto("note.md", ["file-tag"], deps);
+    await executeAddFromAuto("block.md", ["file-tag"], deps);
 
-    expect(deps.stat).toHaveBeenCalledWith("/workspace/note.md");
-    expect(deps.readFile).toHaveBeenCalledWith("/workspace/note.md", "utf8");
+    expect(deps.stat).toHaveBeenCalledWith("/workspace/block.md");
+    expect(deps.readFile).toHaveBeenCalledWith("/workspace/block.md", "utf8");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-from-text", {
       blockCreatedSource: "cli_add_file",
       content: "file-content",
@@ -155,19 +155,19 @@ describe("executor", () => {
     deps.readFile.mockResolvedValue("original");
     deps.dispatchCommand.mockResolvedValue({ status: "submitted", content: "updated" });
 
-    await executeExternalEdit("note.md", ["work"], deps);
+    await executeExternalEdit("block.md", ["work"], deps);
 
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
       content: "original",
       tagNames: ["work"],
       trigger: {
         cwd: "/workspace",
-        requestedFilePath: "note.md",
+        requestedFilePath: "block.md",
         source: "cli",
-        targetFilePath: "/workspace/note.md",
+        targetFilePath: "/workspace/block.md",
       },
     });
-    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "updated", "utf8");
+    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/block.md", "updated", "utf8");
   });
 
   it("does not write file when external edit is canceled", async () => {
@@ -175,7 +175,7 @@ describe("executor", () => {
     deps.readFile.mockResolvedValue("original");
     deps.dispatchCommand.mockResolvedValue({ status: "cancelled" });
 
-    await executeExternalEdit("note.md", [], deps);
+    await executeExternalEdit("block.md", [], deps);
 
     expect(deps.writeFile).not.toHaveBeenCalled();
   });
@@ -186,7 +186,7 @@ describe("executor", () => {
     deps.dispatchCommand.mockRejectedValue(new Error("failed"));
     deps.writeFile.mockResolvedValue(undefined);
 
-    await expect(executeExternalEdit("note.md", [], deps)).rejects.toThrow("failed");
-    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/note.md", "original", "utf8");
+    await expect(executeExternalEdit("block.md", [], deps)).rejects.toThrow("failed");
+    expect(deps.writeFile).toHaveBeenCalledWith("/workspace/block.md", "original", "utf8");
   });
 });

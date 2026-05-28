@@ -41,7 +41,7 @@ import type { BlockReorderOperation } from "../use-block-mutations";
 import { AdornmentBar } from "./adornment-bar";
 import { CopyAction, IconAction } from "./icon-action";
 
-export type ProtectedKeepReason = "external-edit" | "pinned" | null;
+export type AutoArchiveProtectionReason = "external-edit" | "pinned" | null;
 
 export interface BlockActionPosition {
   canMoveDown: boolean;
@@ -57,7 +57,7 @@ interface BlockActionsProps extends Pick<ComponentProps<"div">, "className"> {
     shortcuts?: ShortcutPreferences;
     copied?: boolean;
     disabled?: boolean;
-    protectedKeepReason?: ProtectedKeepReason;
+    autoArchiveProtectionReason?: AutoArchiveProtectionReason;
     pending?: {
       archive?: boolean;
       delete?: boolean;
@@ -91,21 +91,25 @@ function BlockActionMenuShortcut({ shortcut }: { shortcut?: ShortcutBinding }) {
 
 function BlockKeepMenuLabel({
   block,
-  protectedKeepReason,
+  autoArchiveProtectionReason,
 }: {
   block: Block;
-  protectedKeepReason: ProtectedKeepReason;
+  autoArchiveProtectionReason: AutoArchiveProtectionReason;
 }) {
-  if (protectedKeepReason === "external-edit") {
+  if (autoArchiveProtectionReason === "external-edit") {
     return (
-      <Trans id="workspace.blocks.keep.protected-by-external-edit">
-        External edit keeps this block
+      <Trans id="workspace.blocks.auto-archive.protected-by-external-edit">
+        External edit protects this block from auto archive
       </Trans>
     );
   }
 
-  if (protectedKeepReason === "pinned") {
-    return <Trans id="workspace.blocks.keep.protected-by-pin">Pin keeps this block</Trans>;
+  if (autoArchiveProtectionReason === "pinned") {
+    return (
+      <Trans id="workspace.blocks.auto-archive.protected-by-pin">
+        Pinned blocks are protected from auto archive
+      </Trans>
+    );
   }
 
   return block.isKept ? (
@@ -122,12 +126,12 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
     shortcuts,
     copied = false,
     disabled,
-    protectedKeepReason = null,
+    autoArchiveProtectionReason = null,
     pending = {},
   } = state;
   const isArchived = block.archivedAt !== null;
-  const isExternalEditProtected = protectedKeepReason === "external-edit";
-  const keepDisabled = disabled || pending.keep || protectedKeepReason !== null;
+  const isExternalEditProtected = autoArchiveProtectionReason === "external-edit";
+  const keepDisabled = disabled || pending.keep || autoArchiveProtectionReason !== null;
   const reorderDisabled = disabled || pending.reorder;
 
   return (
@@ -191,8 +195,8 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
         />
         <IconAction
           icon={<Trash2Icon className="size-3" />}
-          label={<Trans id="home-note.block.delete">Delete block</Trans>}
-          tooltipLabel={<Trans id="home-note.block.delete.tooltip">Delete</Trans>}
+          label={<Trans id="workspace.blocks.delete">Delete block</Trans>}
+          tooltipLabel={<Trans id="workspace.blocks.delete.tooltip">Delete</Trans>}
           shortcut={shortcuts?.["workspace.deleteBlock"]}
           disabled={disabled}
           pending={pending.delete}
@@ -233,7 +237,10 @@ export function BlockActions({ block, className, position, state, handlers }: Bl
                   ) : (
                     <FlagIcon />
                   )}
-                  <BlockKeepMenuLabel block={block} protectedKeepReason={protectedKeepReason} />
+                  <BlockKeepMenuLabel
+                    block={block}
+                    autoArchiveProtectionReason={autoArchiveProtectionReason}
+                  />
                   <BlockActionMenuShortcut shortcut={shortcuts?.["workspace.keepBlock"]} />
                 </DropdownMenuItem>
                 <DropdownMenuItem

@@ -8,10 +8,10 @@ import {
   useThemePreference,
 } from "@renderer/features/preferences/preferences-query";
 import {
-  SettingsGroup,
-  SettingsRow,
-  SettingsSection,
-} from "@renderer/routes/preferences/-features/settings-list";
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
 import { Button } from "@renderer/ui/components/button";
 import {
   Select,
@@ -28,7 +28,7 @@ import {
   isLocaleCode,
   isThemePreference,
   type ThemePreference,
-} from "@shared/features/preferences/settings";
+} from "@shared/features/preferences/user-preferences";
 import { useQuery } from "@tanstack/react-query";
 import {
   LanguagesIcon,
@@ -43,7 +43,7 @@ import {
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-export function AppSettingsSection() {
+export function AppPreferencesSection() {
   const { i18n } = useLingui();
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
@@ -108,9 +108,9 @@ export function AppSettingsSection() {
   }, []);
 
   return (
-    <SettingsSection title={<Trans id="preferences.app.title">App</Trans>}>
-      <SettingsGroup>
-        <SettingsRow
+    <PreferencesSection title={<Trans id="preferences.app.title">App</Trans>}>
+      <PreferencesGroup>
+        <PreferencesRow
           control={
             <Tabs
               value={theme}
@@ -140,7 +140,7 @@ export function AppSettingsSection() {
           icon={<PaletteIcon />}
           label={<Trans id="preferences.theme.label">Theme</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <Select
               items={languageItems}
@@ -168,7 +168,7 @@ export function AppSettingsSection() {
           icon={<LanguagesIcon />}
           label={<Trans id="preferences.language.label">Language</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <Select
               items={fontSizeItems}
@@ -201,7 +201,7 @@ export function AppSettingsSection() {
           icon={<TypeIcon />}
           label={<Trans id="preferences.font-size.label">Font size</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             cliInstalled ? (
               <Button
@@ -227,7 +227,7 @@ export function AppSettingsSection() {
           icon={<TerminalIcon />}
           label={<Trans id="preferences.cli.path.label">Flux CLI</Trans>}
         />
-      </SettingsGroup>
-    </SettingsSection>
+      </PreferencesGroup>
+    </PreferencesSection>
   );
 }

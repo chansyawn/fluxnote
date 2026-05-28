@@ -7,7 +7,7 @@ import {
 } from "@renderer/features/shortcut/shortcut-utils";
 import { dispatchDocumentKeyboardEvent } from "@renderer/test/events";
 import { renderWithProviders } from "@renderer/test/render";
-import type { ShortcutAction } from "@shared/features/preferences/settings";
+import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { act, useLayoutEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";

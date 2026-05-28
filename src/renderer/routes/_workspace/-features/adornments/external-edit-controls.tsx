@@ -28,16 +28,16 @@ export function ExternalEditControls({
       <ButtonGroup>
         <IconAction
           icon={<CheckIcon className="size-3" />}
-          label={<Trans id="home-note.block.external-edit.submit">Submit external edit</Trans>}
-          tooltipLabel={<Trans id="home-note.block.external-edit.submit.tooltip">Submit</Trans>}
+          label={<Trans id="workspace.external-edit.submit">Submit external edit</Trans>}
+          tooltipLabel={<Trans id="workspace.external-edit.submit.tooltip">Submit</Trans>}
           shortcut={shortcuts?.["workspace.submitExternalEdit"]}
           pending={pending}
           onClick={onSubmit}
         />
         <IconAction
           icon={<XIcon className="size-3" />}
-          label={<Trans id="home-note.block.external-edit.cancel">Cancel external edit</Trans>}
-          tooltipLabel={<Trans id="home-note.block.external-edit.cancel.tooltip">Cancel</Trans>}
+          label={<Trans id="workspace.external-edit.cancel">Cancel external edit</Trans>}
+          tooltipLabel={<Trans id="workspace.external-edit.cancel.tooltip">Cancel</Trans>}
           shortcut={shortcuts?.["workspace.cancelExternalEdit"]}
           disabled={pending}
           onClick={onCancel}

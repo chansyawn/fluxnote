@@ -1,86 +1,86 @@
 import {
   onPreferencesChanged,
-  patchSettings,
-  readSettings,
-  resetSettings,
+  patchUserPreferences,
+  readUserPreferences,
+  resetUserPreferences,
   toAppInvokeError,
 } from "@renderer/clients";
 import {
-  DEFAULT_SETTINGS,
-  type AppUpdateSettings,
-  type AutoArchiveSettings,
+  DEFAULT_USER_PREFERENCES,
+  type AppUpdatePreferences,
+  type AutoArchivePreferences,
   type FontSize,
   type LocaleCode,
-  type MarkdownCodeBlockSettings,
-  type Settings,
-  type SettingsPatch,
+  type MarkdownCodeBlockPreferences,
+  type UserPreferences,
+  type UserPreferencesPatch,
   type ShortcutAction,
-  type TelemetrySettings,
+  type TelemetryPreferences,
   type ThemePreference,
-} from "@shared/features/preferences/settings";
+} from "@shared/features/preferences/user-preferences";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { toast } from "sonner";
 
 import { normalizeShortcutPreferences, type ShortcutBinding } from "../shortcut/shortcut-utils";
 
-export const SETTINGS_QUERY_KEY = ["preferences", "settings"] as const;
+export const USER_PREFERENCES_QUERY_KEY = ["preferences", "preferences"] as const;
 
 export function PreferencesSync() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    return onPreferencesChanged((settings) => {
-      queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+    return onPreferencesChanged((preferences) => {
+      queryClient.setQueryData<UserPreferences>(USER_PREFERENCES_QUERY_KEY, preferences);
     });
   }, [queryClient]);
 
   return null;
 }
 
-export function useSettingsQuery() {
+export function useUserPreferencesQuery() {
   return useQuery({
-    queryKey: SETTINGS_QUERY_KEY,
-    queryFn: readSettings,
-    placeholderData: DEFAULT_SETTINGS,
+    queryKey: USER_PREFERENCES_QUERY_KEY,
+    queryFn: readUserPreferences,
+    placeholderData: DEFAULT_USER_PREFERENCES,
   });
 }
 
-function showSettingsError(error: unknown): void {
+function showUserPreferencesError(error: unknown): void {
   toast.error(toAppInvokeError(error).message);
 }
 
-export function usePatchSettingsMutation() {
+export function usePatchUserPreferencesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: patchSettings,
-    onError: showSettingsError,
-    onSuccess: (settings) => {
-      queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+    mutationFn: patchUserPreferences,
+    onError: showUserPreferencesError,
+    onSuccess: (preferences) => {
+      queryClient.setQueryData<UserPreferences>(USER_PREFERENCES_QUERY_KEY, preferences);
     },
   });
 }
 
-export function useResetSettingsMutation() {
+export function useResetUserPreferencesMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: resetSettings,
-    onError: showSettingsError,
-    onSuccess: (settings) => {
-      queryClient.setQueryData<Settings>(SETTINGS_QUERY_KEY, settings);
+    mutationFn: resetUserPreferences,
+    onError: showUserPreferencesError,
+    onSuccess: (preferences) => {
+      queryClient.setQueryData<UserPreferences>(USER_PREFERENCES_QUERY_KEY, preferences);
     },
   });
 }
 
-function useSettingsValue(): Settings {
-  return useSettingsQuery().data ?? DEFAULT_SETTINGS;
+function useUserPreferencesValue(): UserPreferences {
+  return useUserPreferencesQuery().data ?? DEFAULT_USER_PREFERENCES;
 }
 
 export function useLocalePreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const setLocale = useCallback(
     (locale: LocaleCode) => {
       mutation.mutate({ appearance: { locale } });
@@ -89,34 +89,34 @@ export function useLocalePreference() {
   );
 
   return {
-    locale: settings.appearance.locale,
+    locale: preferences.appearance.locale,
     setLocale,
   };
 }
 
 export function useAutoArchivePreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const patchAutoArchive = useCallback(
-    (patch: Partial<AutoArchiveSettings>) => {
+    (patch: Partial<AutoArchivePreferences>) => {
       return mutation.mutateAsync({ autoArchive: patch });
     },
     [mutation.mutateAsync],
   );
 
   return {
-    autoArchive: settings.autoArchive,
+    autoArchive: preferences.autoArchive,
     patchAutoArchive,
   };
 }
 
 export function useShortcutPreferences() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
-  const shortcuts = normalizeShortcutPreferences(settings.shortcuts);
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
+  const shortcuts = normalizeShortcutPreferences(preferences.shortcuts);
 
   const patchShortcuts = useCallback(
-    (patch: NonNullable<SettingsPatch["shortcuts"]>) => {
+    (patch: NonNullable<UserPreferencesPatch["shortcuts"]>) => {
       mutation.mutate({ shortcuts: patch });
     },
     [mutation],
@@ -135,7 +135,7 @@ export function useShortcutPreferences() {
   );
   const resetShortcut = useCallback(
     (action: ShortcutAction) => {
-      patchShortcuts({ [action]: DEFAULT_SETTINGS.shortcuts[action] });
+      patchShortcuts({ [action]: DEFAULT_USER_PREFERENCES.shortcuts[action] });
     },
     [patchShortcuts],
   );
@@ -149,8 +149,8 @@ export function useShortcutPreferences() {
 }
 
 export function useFontSizePreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const setFontSize = useCallback(
     (fontSize: FontSize) => {
       mutation.mutate({ appearance: { fontSize } });
@@ -159,14 +159,14 @@ export function useFontSizePreference() {
   );
 
   return {
-    fontSize: settings.appearance.fontSize,
+    fontSize: preferences.appearance.fontSize,
     setFontSize,
   };
 }
 
 export function useThemePreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const setTheme = useCallback(
     (theme: ThemePreference) => {
       mutation.mutate({ appearance: { theme } });
@@ -175,32 +175,32 @@ export function useThemePreference() {
   );
 
   return {
-    theme: settings.appearance.theme,
+    theme: preferences.appearance.theme,
     setTheme,
   };
 }
 
 export function useMarkdownCodeBlockPreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const patchCodeBlock = useCallback(
-    (patch: Partial<MarkdownCodeBlockSettings>) => {
+    (patch: Partial<MarkdownCodeBlockPreferences>) => {
       mutation.mutate({ markdown: { codeBlock: patch } });
     },
     [mutation],
   );
 
   return {
-    codeBlock: settings.markdown.codeBlock,
+    codeBlock: preferences.markdown.codeBlock,
     patchCodeBlock,
   };
 }
 
 export function useTelemetryPreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const patchTelemetry = useCallback(
-    (patch: Partial<TelemetrySettings>) => {
+    (patch: Partial<TelemetryPreferences>) => {
       mutation.mutate({ telemetry: patch });
     },
     [mutation],
@@ -208,22 +208,22 @@ export function useTelemetryPreference() {
 
   return {
     patchTelemetry,
-    telemetry: settings.telemetry,
+    telemetry: preferences.telemetry,
   };
 }
 
 export function useAppUpdatePreference() {
-  const settings = useSettingsValue();
-  const mutation = usePatchSettingsMutation();
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
   const patchAppUpdate = useCallback(
-    (patch: Partial<AppUpdateSettings>) => {
+    (patch: Partial<AppUpdatePreferences>) => {
       mutation.mutate({ appUpdate: patch });
     },
     [mutation],
   );
 
   return {
-    appUpdate: settings.appUpdate,
+    appUpdate: preferences.appUpdate,
     patchAppUpdate,
   };
 }
