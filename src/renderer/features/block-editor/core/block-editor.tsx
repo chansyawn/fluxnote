@@ -134,13 +134,13 @@ function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
 
   return (
     <ContentEditable
-      aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a note..." })}
+      aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a block..." })}
       ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
       className="relative min-h-16 resize-none outline-none"
       onBlur={onBlur}
       placeholder={
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
-          <Trans id="block-editor.placeholder">Write a note...</Trans>
+          <Trans id="block-editor.placeholder">Write a block...</Trans>
         </div>
       }
       spellCheck

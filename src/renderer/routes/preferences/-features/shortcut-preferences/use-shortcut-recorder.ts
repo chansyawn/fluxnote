@@ -3,7 +3,7 @@ import {
   formatShortcutTokens,
   normalizeShortcutRecorderHotkey,
 } from "@renderer/features/shortcut/shortcut-utils";
-import type { ShortcutAction } from "@shared/features/preferences/settings";
+import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useCallback, useEffect, useRef, useState } from "react";
 

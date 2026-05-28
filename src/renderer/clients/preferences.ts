@@ -1,19 +1,22 @@
-import type { Settings, SettingsPatch } from "@shared/features/preferences/settings";
+import type {
+  UserPreferences,
+  UserPreferencesPatch,
+} from "@shared/features/preferences/user-preferences";
 
 import { invokeCommand, subscribeEvent } from "./ipc/invoke";
 
-export async function readSettings(): Promise<Settings> {
+export async function readUserPreferences(): Promise<UserPreferences> {
   return await invokeCommand("preferences.read", undefined);
 }
 
-export async function patchSettings(patch: SettingsPatch): Promise<Settings> {
+export async function patchUserPreferences(patch: UserPreferencesPatch): Promise<UserPreferences> {
   return await invokeCommand("preferences.patch", patch);
 }
 
-export async function resetSettings(): Promise<Settings> {
+export async function resetUserPreferences(): Promise<UserPreferences> {
   return await invokeCommand("preferences.reset", undefined);
 }
 
-export function onPreferencesChanged(handler: (settings: Settings) => void): () => void {
+export function onPreferencesChanged(handler: (preferences: UserPreferences) => void): () => void {
   return subscribeEvent("preferences.changed", handler);
 }

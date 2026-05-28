@@ -19,19 +19,19 @@ import {
   type SVGProps,
 } from "react";
 
-interface SettingsSectionProps {
+interface PreferencesSectionProps {
   title: ReactNode;
   children: ReactNode;
 }
 
-interface SettingsGroupProps {
+interface PreferencesGroupProps {
   children: ReactNode;
 }
 
-type SettingsRowIcon = ReactElement<SVGProps<SVGSVGElement>>;
+type PreferencesRowIcon = ReactElement<SVGProps<SVGSVGElement>>;
 
-interface SettingsRowProps {
-  icon: SettingsRowIcon;
+interface PreferencesRowProps {
+  icon: PreferencesRowIcon;
   label: ReactNode;
   control: ReactNode;
   description?: ReactNode;
@@ -39,7 +39,7 @@ interface SettingsRowProps {
   controlClassName?: string;
 }
 
-function SettingsSection({ title, children }: SettingsSectionProps) {
+function PreferencesSection({ title, children }: PreferencesSectionProps) {
   return (
     <section className="flex flex-col gap-2.5">
       <h2 className="ps-1 text-sm font-semibold">{title}</h2>
@@ -48,7 +48,7 @@ function SettingsSection({ title, children }: SettingsSectionProps) {
   );
 }
 
-function SettingsGroup({ children }: SettingsGroupProps) {
+function PreferencesGroup({ children }: PreferencesGroupProps) {
   const rows = Children.toArray(children);
 
   return (
@@ -67,14 +67,14 @@ function SettingsGroup({ children }: SettingsGroupProps) {
   );
 }
 
-function SettingsRow({
+function PreferencesRow({
   icon,
   label,
   control,
   description,
   className,
   controlClassName,
-}: SettingsRowProps) {
+}: PreferencesRowProps) {
   return (
     <Item className={cn("h-10 flex-nowrap rounded-none border-none", className)}>
       <ItemMedia className="text-foreground" variant="icon">
@@ -114,4 +114,4 @@ function SettingsRow({
   );
 }
 
-export { SettingsGroup, SettingsRow, SettingsSection };
+export { PreferencesGroup, PreferencesRow, PreferencesSection };

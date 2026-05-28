@@ -4,10 +4,10 @@ import { deleteArchivedBlocks } from "@renderer/clients";
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
 import {
-  SettingsGroup,
-  SettingsRow,
-  SettingsSection,
-} from "@renderer/routes/preferences/-features/settings-list";
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,7 +38,7 @@ import {
   toAutoArchiveIdleMinutes,
   type AutoArchiveDurationUnit,
 } from "@shared/features/preferences/auto-archive";
-import { DEFAULT_AUTO_ARCHIVE_SETTINGS } from "@shared/features/preferences/settings";
+import { DEFAULT_AUTO_ARCHIVE_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { useMutation } from "@tanstack/react-query";
 import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -67,7 +67,7 @@ function clampAmount(amount: number, unit: AutoArchiveDurationUnit): number {
   return Math.min(Math.max(amount, 1), MAX_DURATION_BY_UNIT[unit]);
 }
 
-export function AutoArchiveSettingsSection() {
+export function AutoArchivePreferencesSection() {
   const { i18n } = useLingui();
   const { autoArchive, patchAutoArchive } = useAutoArchivePreference();
   const deleteArchivedBlocksMutation = useMutation({
@@ -92,7 +92,7 @@ export function AutoArchiveSettingsSection() {
       );
     },
   });
-  const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_SETTINGS;
+  const preferences = autoArchive ?? DEFAULT_AUTO_ARCHIVE_PREFERENCES;
   const duration = toAutoArchiveDurationViewModel(preferences.idleMinutes);
   const [amountText, setAmountTextState] = useState(String(duration.amount));
   const [unit, setUnitState] = useState<AutoArchiveDurationUnit>(duration.unit);
@@ -220,9 +220,9 @@ export function AutoArchiveSettingsSection() {
   };
 
   return (
-    <SettingsSection title={<Trans id="preferences.archive.title">Archive</Trans>}>
-      <SettingsGroup>
-        <SettingsRow
+    <PreferencesSection title={<Trans id="preferences.archive.title">Archive</Trans>}>
+      <PreferencesGroup>
+        <PreferencesRow
           control={
             <Switch
               aria-label={enableAutoArchiveLabel}
@@ -245,7 +245,7 @@ export function AutoArchiveSettingsSection() {
           icon={<ArchiveIcon />}
           label={<Trans id="preferences.auto-archive.enable.label">Enable auto-archive</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <div className="flex items-center gap-2">
               <ButtonGroup>
@@ -297,7 +297,7 @@ export function AutoArchiveSettingsSection() {
           icon={<ClockIcon />}
           label={<Trans id="preferences.auto-archive.threshold.label">Auto archive after</Trans>}
         />
-        <SettingsRow
+        <PreferencesRow
           control={
             <AlertDialog>
               <AlertDialogTrigger
@@ -350,7 +350,7 @@ export function AutoArchiveSettingsSection() {
           icon={<DatabaseZapIcon />}
           label={<Trans id="preferences.archive.clear.label">Clear archived data</Trans>}
         />
-      </SettingsGroup>
-    </SettingsSection>
+      </PreferencesGroup>
+    </PreferencesSection>
   );
 }

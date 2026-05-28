@@ -6,7 +6,12 @@ export {
   restartAndInstallAppUpdate,
 } from "./app-update";
 export { getCliStatus, installCli, uninstallCli } from "./cli";
-export { onPreferencesChanged, patchSettings, readSettings, resetSettings } from "./preferences";
+export {
+  onPreferencesChanged,
+  patchUserPreferences,
+  readUserPreferences,
+  resetUserPreferences,
+} from "./preferences";
 export { onTelemetryChanged, readTelemetryBootstrap } from "./telemetry";
 export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
 export { writeBlockEditorClipboard } from "./clipboard";

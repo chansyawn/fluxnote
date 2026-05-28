@@ -7,7 +7,7 @@ import {
   normalizeAutoArchiveIdleMinutes,
 } from "./auto-archive";
 
-export const SETTINGS_SCHEMA_VERSION = 1;
+export const USER_PREFERENCES_SCHEMA_VERSION = 1;
 
 export const LANGUAGE_OPTIONS = [
   { key: "en", name: "English", rtl: false },
@@ -45,7 +45,7 @@ export const shortcutActionSchema = z.enum([
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
-const defaultMarkdownCodeBlockSettingsValue = {
+const defaultMarkdownCodeBlockPreferencesValue = {
   showLineNumbers: false,
 } as const;
 
@@ -54,7 +54,7 @@ const autoArchiveIdleMinutesSchema = z.preprocess(
   z.number().int(),
 );
 
-export const autoArchiveSettingsSchema = z.object({
+export const autoArchivePreferencesSchema = z.object({
   enabled: z.boolean().catch(true),
   idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
 });
@@ -76,29 +76,29 @@ export const shortcutPreferencesSchema = z.object({
   "editor.formatInlineCode": shortcutBindingSchema.catch("Mod+Shift+E"),
 });
 
-export const appearanceSettingsSchema = z.object({
+export const appearancePreferencesSchema = z.object({
   locale: localeSchema.catch("en"),
   theme: themePreferenceSchema.catch("system"),
   fontSize: fontSizeSchema.catch(16),
 });
 
-export const markdownCodeBlockSettingsSchema = z.object({
-  showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockSettingsValue.showLineNumbers),
+export const markdownCodeBlockPreferencesSchema = z.object({
+  showLineNumbers: z.boolean().catch(defaultMarkdownCodeBlockPreferencesValue.showLineNumbers),
 });
 
-export const markdownSettingsSchema = z.object({
-  codeBlock: markdownCodeBlockSettingsSchema.catch(defaultMarkdownCodeBlockSettingsValue),
+export const markdownPreferencesSchema = z.object({
+  codeBlock: markdownCodeBlockPreferencesSchema.catch(defaultMarkdownCodeBlockPreferencesValue),
 });
 
-export const telemetrySettingsSchema = z.object({
+export const telemetryPreferencesSchema = z.object({
   enabled: z.boolean().catch(true),
 });
 
-export const appUpdateSettingsSchema = z.object({
+export const appUpdatePreferencesSchema = z.object({
   automaticChecksEnabled: z.boolean().catch(true),
 });
 
-const appearanceSettingsPatchSchema = z
+const appearancePreferencesPatchSchema = z
   .object({
     locale: localeSchema.optional(),
     theme: themePreferenceSchema.optional(),
@@ -106,7 +106,7 @@ const appearanceSettingsPatchSchema = z
   })
   .strict();
 
-const autoArchiveSettingsPatchSchema = z
+const autoArchivePreferencesPatchSchema = z
   .object({
     enabled: z.boolean().optional(),
     idleMinutes: z
@@ -137,32 +137,32 @@ const shortcutPreferencesPatchSchema = z
   })
   .strict();
 
-const markdownCodeBlockSettingsPatchSchema = z
+const markdownCodeBlockPreferencesPatchSchema = z
   .object({
     showLineNumbers: z.boolean().optional(),
   })
   .strict();
 
-const markdownSettingsPatchSchema = z
+const markdownPreferencesPatchSchema = z
   .object({
-    codeBlock: markdownCodeBlockSettingsPatchSchema.optional(),
+    codeBlock: markdownCodeBlockPreferencesPatchSchema.optional(),
   })
   .strict();
 
-const telemetrySettingsPatchSchema = z
+const telemetryPreferencesPatchSchema = z
   .object({
     enabled: z.boolean().optional(),
   })
   .strict();
 
-const appUpdateSettingsPatchSchema = z
+const appUpdatePreferencesPatchSchema = z
   .object({
     automaticChecksEnabled: z.boolean().optional(),
   })
   .strict();
 
-const defaultSettingsValue = {
-  schemaVersion: SETTINGS_SCHEMA_VERSION,
+const defaultUserPreferencesValue = {
+  schemaVersion: USER_PREFERENCES_SCHEMA_VERSION,
   appearance: {
     locale: "en",
     theme: "system",
@@ -189,7 +189,7 @@ const defaultSettingsValue = {
     "editor.formatInlineCode": "Mod+Shift+E",
   },
   markdown: {
-    codeBlock: defaultMarkdownCodeBlockSettingsValue,
+    codeBlock: defaultMarkdownCodeBlockPreferencesValue,
   },
   telemetry: {
     enabled: true,
@@ -199,52 +199,57 @@ const defaultSettingsValue = {
   },
 } as const;
 
-export const settingsSchema = z.object({
-  schemaVersion: z.literal(SETTINGS_SCHEMA_VERSION),
-  appearance: appearanceSettingsSchema.catch(defaultSettingsValue.appearance),
-  autoArchive: autoArchiveSettingsSchema.catch(defaultSettingsValue.autoArchive),
-  shortcuts: shortcutPreferencesSchema.catch(defaultSettingsValue.shortcuts),
-  markdown: markdownSettingsSchema.catch(defaultSettingsValue.markdown),
-  telemetry: telemetrySettingsSchema.catch(defaultSettingsValue.telemetry),
-  appUpdate: appUpdateSettingsSchema.catch(defaultSettingsValue.appUpdate),
+export const userPreferencesSchema = z.object({
+  schemaVersion: z.literal(USER_PREFERENCES_SCHEMA_VERSION),
+  appearance: appearancePreferencesSchema.catch(defaultUserPreferencesValue.appearance),
+  autoArchive: autoArchivePreferencesSchema.catch(defaultUserPreferencesValue.autoArchive),
+  shortcuts: shortcutPreferencesSchema.catch(defaultUserPreferencesValue.shortcuts),
+  markdown: markdownPreferencesSchema.catch(defaultUserPreferencesValue.markdown),
+  telemetry: telemetryPreferencesSchema.catch(defaultUserPreferencesValue.telemetry),
+  appUpdate: appUpdatePreferencesSchema.catch(defaultUserPreferencesValue.appUpdate),
 });
 
-export const settingsPatchSchema = z
+export const userPreferencesPatchSchema = z
   .object({
-    appearance: appearanceSettingsPatchSchema.optional(),
-    autoArchive: autoArchiveSettingsPatchSchema.optional(),
+    appearance: appearancePreferencesPatchSchema.optional(),
+    autoArchive: autoArchivePreferencesPatchSchema.optional(),
     shortcuts: shortcutPreferencesPatchSchema.optional(),
-    markdown: markdownSettingsPatchSchema.optional(),
-    telemetry: telemetrySettingsPatchSchema.optional(),
-    appUpdate: appUpdateSettingsPatchSchema.optional(),
+    markdown: markdownPreferencesPatchSchema.optional(),
+    telemetry: telemetryPreferencesPatchSchema.optional(),
+    appUpdate: appUpdatePreferencesPatchSchema.optional(),
   })
   .strict();
 
-export type Settings = z.infer<typeof settingsSchema>;
-export type SettingsPatch = z.infer<typeof settingsPatchSchema>;
+export type UserPreferences = z.infer<typeof userPreferencesSchema>;
+export type UserPreferencesPatch = z.infer<typeof userPreferencesPatchSchema>;
 export type LocaleCode = z.infer<typeof localeSchema>;
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
 export type LanguageOption = (typeof LANGUAGE_OPTIONS)[number];
 export type FontSize = z.infer<typeof fontSizeSchema>;
-export type AutoArchiveSettings = z.infer<typeof autoArchiveSettingsSchema>;
+export type AutoArchivePreferences = z.infer<typeof autoArchivePreferencesSchema>;
 export type ShortcutAction = z.infer<typeof shortcutActionSchema>;
 export type ShortcutBinding = z.infer<typeof shortcutBindingSchema>;
 export type ShortcutPreferences = z.infer<typeof shortcutPreferencesSchema>;
-export type MarkdownSettings = z.infer<typeof markdownSettingsSchema>;
-export type MarkdownCodeBlockSettings = z.infer<typeof markdownCodeBlockSettingsSchema>;
-export type TelemetrySettings = z.infer<typeof telemetrySettingsSchema>;
-export type AppUpdateSettings = z.infer<typeof appUpdateSettingsSchema>;
+export type MarkdownPreferences = z.infer<typeof markdownPreferencesSchema>;
+export type MarkdownCodeBlockPreferences = z.infer<typeof markdownCodeBlockPreferencesSchema>;
+export type TelemetryPreferences = z.infer<typeof telemetryPreferencesSchema>;
+export type AppUpdatePreferences = z.infer<typeof appUpdatePreferencesSchema>;
 
-export const DEFAULT_SETTINGS: Settings = defaultSettingsValue;
-export const DEFAULT_AUTO_ARCHIVE_SETTINGS: AutoArchiveSettings = DEFAULT_SETTINGS.autoArchive;
-export const DEFAULT_MARKDOWN_CODE_BLOCK_SETTINGS: MarkdownCodeBlockSettings =
-  DEFAULT_SETTINGS.markdown.codeBlock;
-export const DEFAULT_TELEMETRY_SETTINGS: TelemetrySettings = DEFAULT_SETTINGS.telemetry;
-export const DEFAULT_APP_UPDATE_SETTINGS: AppUpdateSettings = DEFAULT_SETTINGS.appUpdate;
+export const DEFAULT_USER_PREFERENCES: UserPreferences = defaultUserPreferencesValue;
+export const DEFAULT_AUTO_ARCHIVE_PREFERENCES: AutoArchivePreferences =
+  DEFAULT_USER_PREFERENCES.autoArchive;
+export const DEFAULT_MARKDOWN_CODE_BLOCK_PREFERENCES: MarkdownCodeBlockPreferences =
+  DEFAULT_USER_PREFERENCES.markdown.codeBlock;
+export const DEFAULT_TELEMETRY_PREFERENCES: TelemetryPreferences =
+  DEFAULT_USER_PREFERENCES.telemetry;
+export const DEFAULT_APP_UPDATE_PREFERENCES: AppUpdatePreferences =
+  DEFAULT_USER_PREFERENCES.appUpdate;
 
-function createSettingsNormalizerSchema(defaults: Settings): z.ZodType<Settings> {
+function createUserPreferencesNormalizerSchema(
+  defaults: UserPreferences,
+): z.ZodType<UserPreferences> {
   return z.object({
-    schemaVersion: z.literal(SETTINGS_SCHEMA_VERSION),
+    schemaVersion: z.literal(USER_PREFERENCES_SCHEMA_VERSION),
     appearance: z
       .object({
         locale: localeSchema.catch(defaults.appearance.locale),
@@ -345,14 +350,14 @@ export function resolvePreferredLocale(preferredLanguages: readonly string[]): L
     }
   }
 
-  return DEFAULT_SETTINGS.appearance.locale;
+  return DEFAULT_USER_PREFERENCES.appearance.locale;
 }
 
-export function createDefaultSettings(locale: LocaleCode): Settings {
+export function createDefaultUserPreferences(locale: LocaleCode): UserPreferences {
   return {
-    ...DEFAULT_SETTINGS,
+    ...DEFAULT_USER_PREFERENCES,
     appearance: {
-      ...DEFAULT_SETTINGS.appearance,
+      ...DEFAULT_USER_PREFERENCES.appearance,
       locale,
     },
   };
@@ -370,8 +375,11 @@ export function isThemePreference(value: string): value is ThemePreference {
   return THEME_PREFERENCE_OPTIONS.some((theme) => theme === value);
 }
 
-export function normalizeSettings(input: unknown, defaults: Settings = DEFAULT_SETTINGS): Settings {
-  const result = createSettingsNormalizerSchema(defaults).safeParse(input);
+export function normalizeUserPreferences(
+  input: unknown,
+  defaults: UserPreferences = DEFAULT_USER_PREFERENCES,
+): UserPreferences {
+  const result = createUserPreferencesNormalizerSchema(defaults).safeParse(input);
 
   if (!result.success) {
     return defaults;
@@ -380,6 +388,6 @@ export function normalizeSettings(input: unknown, defaults: Settings = DEFAULT_S
   return result.data;
 }
 
-export function normalizeSettingsPatch(input: unknown): SettingsPatch {
-  return settingsPatchSchema.parse(input);
+export function normalizeUserPreferencesPatch(input: unknown): UserPreferencesPatch {
+  return userPreferencesPatchSchema.parse(input);
 }

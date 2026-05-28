@@ -3,14 +3,14 @@ import { blocks } from "@main/core/database";
 import { getSqliteChangedRows } from "@main/core/database";
 import type { EventBus } from "@main/core/ipc";
 import type { AutoArchiveStateChangedPayload } from "@shared/features/blocks/contract";
-import type { Settings } from "@shared/features/preferences/settings";
+import type { UserPreferences } from "@shared/features/preferences/user-preferences";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import {
   createAutoArchiveEvaluationContext,
   fingerprintAutoArchiveCandidateBlockIds,
   listAutoArchiveCandidateBlockIds,
-  resolveAutoArchiveSettings,
+  resolveAutoArchivePreferences,
 } from "./auto-archive-policy";
 
 interface AutoArchiveRuntimeOptions {
@@ -18,7 +18,7 @@ interface AutoArchiveRuntimeOptions {
   getProtectedBlockIds?: () => Set<string>;
   getWindowVisible: () => boolean;
   getDb: () => AppDatabase;
-  readSettings: () => Settings | Promise<Settings>;
+  readUserPreferences: () => UserPreferences | Promise<UserPreferences>;
 }
 
 export interface AutoArchiveRuntime {
@@ -65,7 +65,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
   }
 
   async function scan(forceArchiveWhenHidden: boolean): Promise<void> {
-    const config = await resolveAutoArchiveSettings(options.readSettings);
+    const config = await resolveAutoArchivePreferences(options.readUserPreferences);
     const windowVisible = options.getWindowVisible();
 
     if (!config.enabled) {
@@ -85,7 +85,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
     const evaluationContext = createAutoArchiveEvaluationContext({
       now,
       protectedBlockIds: getProtectedBlockIds(),
-      settings: config,
+      preferences: config,
     });
     const staleBlockIds = await listAutoArchiveCandidateBlockIds(db, evaluationContext);
     const shouldArchive = forceArchiveWhenHidden && !windowVisible && staleBlockIds.length > 0;
@@ -119,7 +119,7 @@ export function createAutoArchiveRuntime(options: AutoArchiveRuntimeOptions): Au
       return;
     }
 
-    const config = await resolveAutoArchiveSettings(options.readSettings);
+    const config = await resolveAutoArchivePreferences(options.readUserPreferences);
     timer = setTimeout(
       () => {
         void (async () => {

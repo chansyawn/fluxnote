@@ -1,5 +1,5 @@
 import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
-import type { ShortcutAction } from "@shared/features/preferences/settings";
+import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 
 export const BLOCK_EDITOR_TEXT_FORMATS = ["bold", "italic", "strikethrough", "code"] as const;
 

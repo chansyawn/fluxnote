@@ -102,7 +102,7 @@ vi.mock("@renderer/ui/components/dropdown-menu", async () => {
   };
 });
 
-import { BlockActions, type ProtectedKeepReason } from "./block-actions";
+import { BlockActions, type AutoArchiveProtectionReason } from "./block-actions";
 
 function createHandlers() {
   return {
@@ -118,18 +118,18 @@ function createHandlers() {
 }
 
 function renderBlockActions({
-  protectedKeepReason = null,
+  autoArchiveProtectionReason = null,
 }: {
-  protectedKeepReason?: ProtectedKeepReason;
+  autoArchiveProtectionReason?: AutoArchiveProtectionReason;
 } = {}) {
   const handlers = createHandlers();
   renderWithProviders(
     <BlockActions
-      block={createRendererBlock({ isPinned: protectedKeepReason === "pinned" })}
+      block={createRendererBlock({ isPinned: autoArchiveProtectionReason === "pinned" })}
       handlers={handlers}
       position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
       state={{
-        protectedKeepReason,
+        autoArchiveProtectionReason,
         tags: [] satisfies Tag[],
       }}
     />,
@@ -139,25 +139,33 @@ function renderBlockActions({
 
 describe("BlockActions", () => {
   it("prevents archived and kept state changes while a Block has an External Edit Session", async () => {
-    renderBlockActions({ protectedKeepReason: "external-edit" });
+    renderBlockActions({ autoArchiveProtectionReason: "external-edit" });
     const user = userEvent.setup();
 
     expect(
-      screen.getByRole("menuitem", { name: /External edit keeps this block/ }),
+      screen.getByRole("menuitem", {
+        name: /External edit protects this block from auto archive/,
+      }),
     ).toHaveAttribute("data-disabled");
     expect(screen.getByRole("button", { name: "Archive block" })).toBeDisabled();
 
-    await user.click(screen.getByRole("menuitem", { name: /External edit keeps this block/ }));
+    await user.click(
+      screen.getByRole("menuitem", {
+        name: /External edit protects this block from auto archive/,
+      }),
+    );
     await user.click(screen.getByRole("button", { name: "Archive block" }));
   });
 
   it("explains that a Pinned Block is already protected from Auto Archive", async () => {
-    const { handlers } = renderBlockActions({ protectedKeepReason: "pinned" });
+    const { handlers } = renderBlockActions({ autoArchiveProtectionReason: "pinned" });
     const user = userEvent.setup();
 
-    expect(screen.getByRole("menuitem", { name: /Pin keeps this block/ })).toHaveAttribute(
-      "data-disabled",
-    );
+    expect(
+      screen.getByRole("menuitem", {
+        name: /Pinned blocks are protected from auto archive/,
+      }),
+    ).toHaveAttribute("data-disabled");
     expect(screen.getByRole("button", { name: "Archive block" })).toBeEnabled();
 
     await user.click(screen.getByRole("menuitem", { name: "Unpin from top" }));

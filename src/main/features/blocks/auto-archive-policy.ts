@@ -1,10 +1,10 @@
 import type { AppDatabase } from "@main/core/database";
 import { blocks, type BlockRecord } from "@main/core/database";
 import {
-  DEFAULT_SETTINGS,
-  type AutoArchiveSettings,
-  type Settings,
-} from "@shared/features/preferences/settings";
+  DEFAULT_USER_PREFERENCES,
+  type AutoArchivePreferences,
+  type UserPreferences,
+} from "@shared/features/preferences/user-preferences";
 import { and, eq, isNull, lt } from "drizzle-orm";
 
 export interface AutoArchiveEvaluationContext {
@@ -15,27 +15,27 @@ export interface AutoArchiveEvaluationContext {
 export interface AutoArchiveEvaluationInput {
   now: Date;
   protectedBlockIds: ReadonlySet<string>;
-  settings: AutoArchiveSettings;
+  preferences: AutoArchivePreferences;
 }
 
-export async function resolveAutoArchiveSettings(
-  readSettings: () => Settings | Promise<Settings>,
-): Promise<AutoArchiveSettings> {
+export async function resolveAutoArchivePreferences(
+  readUserPreferences: () => UserPreferences | Promise<UserPreferences>,
+): Promise<AutoArchivePreferences> {
   try {
-    return (await readSettings()).autoArchive;
+    return (await readUserPreferences()).autoArchive;
   } catch {
-    return DEFAULT_SETTINGS.autoArchive;
+    return DEFAULT_USER_PREFERENCES.autoArchive;
   }
 }
 
 export function createAutoArchiveEvaluationContext({
   now,
   protectedBlockIds,
-  settings,
+  preferences,
 }: AutoArchiveEvaluationInput): AutoArchiveEvaluationContext {
   const normalizedProtectedBlockIds = new Set(protectedBlockIds);
 
-  if (!settings.enabled) {
+  if (!preferences.enabled) {
     return {
       cutoffIso: null,
       protectedBlockIds: normalizedProtectedBlockIds,
@@ -43,12 +43,12 @@ export function createAutoArchiveEvaluationContext({
   }
 
   return {
-    cutoffIso: new Date(now.getTime() - settings.idleMinutes * 60_000).toISOString(),
+    cutoffIso: new Date(now.getTime() - preferences.idleMinutes * 60_000).toISOString(),
     protectedBlockIds: normalizedProtectedBlockIds,
   };
 }
 
-export function blockWillAutoArchive(
+export function blockHasPendingAutoArchive(
   block: Pick<BlockRecord, "archivedAt" | "contentUpdatedAt" | "id" | "isKept" | "isPinned">,
   context: AutoArchiveEvaluationContext,
 ): boolean {

@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS } from "@shared/features/preferences/settings";
+import { DEFAULT_USER_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { describe, expect, it } from "vite-plus/test";
 
 import {
@@ -35,7 +35,9 @@ describe("shortcut utils", () => {
 
   it("normalizes archive block shortcut preferences", () => {
     expect(
-      normalizeShortcutPreferences(DEFAULT_SETTINGS.shortcuts, "mac")["workspace.archiveBlock"],
+      normalizeShortcutPreferences(DEFAULT_USER_PREFERENCES.shortcuts, "mac")[
+        "workspace.archiveBlock"
+      ],
     ).toBe("Mod+E");
   });
 

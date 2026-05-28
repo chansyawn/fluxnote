@@ -15,8 +15,8 @@ interface TelemetryStorage {
   store: Record<string, unknown>;
 }
 
-interface TelemetrySettingsReader {
-  readSettings: () => {
+interface TelemetryPreferencesReader {
+  readUserPreferences: () => {
     telemetry: {
       enabled: boolean;
     };
@@ -31,7 +31,7 @@ interface TelemetryServiceDeps {
   emitEvent?: TelemetryEventEmitter;
   env?: Record<string, string | undefined>;
   platform?: string;
-  readSettings: TelemetrySettingsReader["readSettings"];
+  readUserPreferences: TelemetryPreferencesReader["readUserPreferences"];
   storage: TelemetryStorage;
 }
 
@@ -79,14 +79,14 @@ export function createTelemetryService({
   emitEvent,
   env = process.env,
   platform = process.platform,
-  readSettings,
+  readUserPreferences,
   storage,
 }: TelemetryServiceDeps): TelemetryService {
   const projectConfig = resolveProjectConfig(env);
   const anonId = getOrCreateAnonId(storage);
 
   function isEnabled(): boolean {
-    return readSettings().telemetry.enabled && projectConfig !== null;
+    return readUserPreferences().telemetry.enabled && projectConfig !== null;
   }
 
   function getBaseProperties(): Record<string, unknown> {

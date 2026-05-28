@@ -17,7 +17,7 @@ export const blockSchema = z.object({
   orderIndex: z.number().int(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  willArchive: z.boolean(),
+  isPendingAutoArchive: z.boolean(),
   tags: z.array(blockTagSchema),
 });
 export type Block = z.infer<typeof blockSchema>;

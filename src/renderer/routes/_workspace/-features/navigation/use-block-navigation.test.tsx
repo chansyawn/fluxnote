@@ -24,7 +24,7 @@ function createBlock(id: string, overrides?: Partial<Block>): Block {
     orderIndex: 0,
     tags: [],
     updatedAt: "2026-01-01T00:00:00.000Z",
-    willArchive: false,
+    isPendingAutoArchive: false,
     ...overrides,
   };
 }

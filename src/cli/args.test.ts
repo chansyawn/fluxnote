@@ -45,11 +45,11 @@ describe("parseFluxArgs", () => {
   });
 
   it("parses add command from file option", () => {
-    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "--file", "note.md"]);
+    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "--file", "block.md"]);
     expect(command).toEqual({
       kind: "add",
       source: {
-        filePath: "note.md",
+        filePath: "block.md",
         type: "file",
       },
       tagNames: [],
@@ -57,11 +57,11 @@ describe("parseFluxArgs", () => {
   });
 
   it("parses add command from short file option", () => {
-    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "-f", "note.md"]);
+    const command = parseFluxArgs(["node", "flux-cli.mjs", "add", "-f", "block.md"]);
     expect(command).toEqual({
       kind: "add",
       source: {
-        filePath: "note.md",
+        filePath: "block.md",
         type: "file",
       },
       tagNames: [],
@@ -111,9 +111,9 @@ describe("parseFluxArgs", () => {
   });
 
   it("parses edit command from file path", () => {
-    const command = parseFluxArgs(["node", "flux-cli.mjs", "edit", "note.md"]);
+    const command = parseFluxArgs(["node", "flux-cli.mjs", "edit", "block.md"]);
     expect(command).toEqual({
-      filePath: "note.md",
+      filePath: "block.md",
       kind: "edit",
       tagNames: [],
     });
@@ -124,14 +124,14 @@ describe("parseFluxArgs", () => {
       "node",
       "flux-cli.mjs",
       "edit",
-      "note.md",
+      "block.md",
       "--tag",
       "work",
       "--tag",
       "draft",
     ]);
     expect(command).toEqual({
-      filePath: "note.md",
+      filePath: "block.md",
       kind: "edit",
       tagNames: ["work", "draft"],
     });
@@ -142,14 +142,14 @@ describe("parseFluxArgs", () => {
       "node",
       "flux-cli.mjs",
       "edit",
-      "note.md",
+      "block.md",
       "-t",
       "work",
       "-t",
       "draft",
     ]);
     expect(command).toEqual({
-      filePath: "note.md",
+      filePath: "block.md",
       kind: "edit",
       tagNames: ["work", "draft"],
     });
@@ -171,7 +171,7 @@ describe("parseFluxArgs", () => {
 
   it("throws usage error when add has multiple input sources", () => {
     expect(() =>
-      parseFluxArgs(["node", "flux-cli.mjs", "add", "--text", "hello", "note.md"]),
+      parseFluxArgs(["node", "flux-cli.mjs", "add", "--text", "hello", "block.md"]),
     ).toThrow("Use only one input source: --text, --file, or an input value.");
   });
 });

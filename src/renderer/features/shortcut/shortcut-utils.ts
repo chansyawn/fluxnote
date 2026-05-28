@@ -2,7 +2,7 @@ import {
   shortcutActionSchema,
   type ShortcutAction,
   type ShortcutPreferences as StoredShortcutPreferences,
-} from "@shared/features/preferences/settings";
+} from "@shared/features/preferences/user-preferences";
 import {
   formatForDisplay,
   isModifierKey,

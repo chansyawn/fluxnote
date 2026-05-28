@@ -1,34 +1,34 @@
 import type { IpcRouter } from "@main/core/ipc";
 import type {
-  Settings,
-  SettingsPatch,
+  UserPreferences,
+  UserPreferencesPatch,
   ThemePreference,
-} from "@shared/features/preferences/settings";
+} from "@shared/features/preferences/user-preferences";
 
 import type { PreferencesService } from "./service";
 
 interface PreferencesCommandDeps {
   applyThemePreference?: (theme: ThemePreference) => void;
   onLocalePreferenceChanged?: () => void;
-  onAppUpdatePreferencesChanged?: (settings: Settings) => void;
+  onAppUpdatePreferencesChanged?: (preferences: UserPreferences) => void;
   onAutoArchivePreferencesChanged?: () => Promise<void> | void;
   onTelemetryPreferenceChanged?: () => void;
   preferencesService: PreferencesService;
 }
 
-function includesAppUpdatePreferences(patch: SettingsPatch): boolean {
+function includesAppUpdatePreferences(patch: UserPreferencesPatch): boolean {
   return patch.appUpdate !== undefined;
 }
 
-function includesAutoArchivePreferences(patch: SettingsPatch): boolean {
+function includesAutoArchivePreferences(patch: UserPreferencesPatch): boolean {
   return patch.autoArchive !== undefined;
 }
 
-function includesLocalePreference(patch: SettingsPatch): boolean {
+function includesLocalePreference(patch: UserPreferencesPatch): boolean {
   return patch.appearance?.locale !== undefined;
 }
 
-function includesTelemetryPreference(patch: SettingsPatch): boolean {
+function includesTelemetryPreference(patch: UserPreferencesPatch): boolean {
   return patch.telemetry !== undefined;
 }
 
@@ -38,19 +38,19 @@ function notifyAutoArchivePreferencesChanged(deps: PreferencesCommandDeps): void
   });
 }
 
-function applyThemePreference(deps: PreferencesCommandDeps, settings: Settings): void {
-  deps.applyThemePreference?.(settings.appearance.theme);
+function applyThemePreference(deps: PreferencesCommandDeps, preferences: UserPreferences): void {
+  deps.applyThemePreference?.(preferences.appearance.theme);
 }
 
 export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCommandDeps): void {
   ipc.command("preferences.patch", (input) => {
-    const settings = deps.preferencesService.patchSettings(input);
-    applyThemePreference(deps, settings);
+    const preferences = deps.preferencesService.patchUserPreferences(input);
+    applyThemePreference(deps, preferences);
     if (includesLocalePreference(input)) {
       deps.onLocalePreferenceChanged?.();
     }
     if (includesAppUpdatePreferences(input)) {
-      deps.onAppUpdatePreferencesChanged?.(settings);
+      deps.onAppUpdatePreferencesChanged?.(preferences);
     }
     if (includesAutoArchivePreferences(input)) {
       notifyAutoArchivePreferencesChanged(deps);
@@ -58,22 +58,22 @@ export function registerPreferencesCommands(ipc: IpcRouter, deps: PreferencesCom
     if (includesTelemetryPreference(input)) {
       deps.onTelemetryPreferenceChanged?.();
     }
-    return settings;
+    return preferences;
   });
 
   ipc.command("preferences.read", () => {
-    const settings = deps.preferencesService.readSettings();
-    applyThemePreference(deps, settings);
-    return settings;
+    const preferences = deps.preferencesService.readUserPreferences();
+    applyThemePreference(deps, preferences);
+    return preferences;
   });
 
   ipc.command("preferences.reset", () => {
-    const settings = deps.preferencesService.resetSettings();
-    applyThemePreference(deps, settings);
+    const preferences = deps.preferencesService.resetUserPreferences();
+    applyThemePreference(deps, preferences);
     deps.onLocalePreferenceChanged?.();
-    deps.onAppUpdatePreferencesChanged?.(settings);
+    deps.onAppUpdatePreferencesChanged?.(preferences);
     notifyAutoArchivePreferencesChanged(deps);
     deps.onTelemetryPreferenceChanged?.();
-    return settings;
+    return preferences;
   });
 }

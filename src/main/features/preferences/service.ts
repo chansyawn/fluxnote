@@ -1,30 +1,34 @@
 import type { EventBus } from "@main/core/ipc";
 import {
-  DEFAULT_SETTINGS,
-  normalizeSettings,
-  normalizeSettingsPatch,
-  type Settings,
-  type SettingsPatch,
-} from "@shared/features/preferences/settings";
+  DEFAULT_USER_PREFERENCES,
+  normalizeUserPreferences,
+  normalizeUserPreferencesPatch,
+  type UserPreferences,
+  type UserPreferencesPatch,
+} from "@shared/features/preferences/user-preferences";
 
 interface PreferencesStorage {
   store: Record<string, unknown>;
 }
 
 export interface PreferencesService {
-  patchSettings: (patch: SettingsPatch) => Settings;
-  readSettings: () => Settings;
-  resetSettings: () => Settings;
+  patchUserPreferences: (patch: UserPreferencesPatch) => UserPreferences;
+  readUserPreferences: () => UserPreferences;
+  resetUserPreferences: () => UserPreferences;
 }
 
 interface PreferencesServiceOptions {
-  defaults?: Settings;
+  defaults?: UserPreferences;
   emitEvent?: EventBus["emit"];
   storage?: PreferencesStorage;
 }
 
-function mergeSettings(current: Settings, patch: SettingsPatch, defaults: Settings): Settings {
-  return normalizeSettings(
+function mergeUserPreferences(
+  current: UserPreferences,
+  patch: UserPreferencesPatch,
+  defaults: UserPreferences,
+): UserPreferences {
+  return normalizeUserPreferences(
     {
       ...current,
       appearance: {
@@ -96,43 +100,43 @@ export function createPreferencesService(
   options: PreferencesServiceOptions | PreferencesStorage = {},
 ): PreferencesService {
   const serviceOptions = "store" in options ? { storage: options } : options;
-  const defaults = serviceOptions.defaults ?? DEFAULT_SETTINGS;
+  const defaults = serviceOptions.defaults ?? DEFAULT_USER_PREFERENCES;
   const storage = serviceOptions.storage ?? { store: defaults };
   const emitEvent = serviceOptions.emitEvent;
 
-  function readSettings(): Settings {
-    const settings = normalizeSettings(storage.store, defaults);
-    if (!areJsonValuesEqual(storage.store, settings)) {
-      return writeSettings(settings);
+  function readUserPreferences(): UserPreferences {
+    const preferences = normalizeUserPreferences(storage.store, defaults);
+    if (!areJsonValuesEqual(storage.store, preferences)) {
+      return writeUserPreferences(preferences);
     }
 
-    return settings;
+    return preferences;
   }
 
-  function writeSettings(settings: Settings): Settings {
-    storage.store = settings;
-    return settings;
+  function writeUserPreferences(preferences: UserPreferences): UserPreferences {
+    storage.store = preferences;
+    return preferences;
   }
 
-  function writeAndNotify(settings: Settings): Settings {
-    const writtenSettings = writeSettings(settings);
-    emitEvent?.("preferences.changed", writtenSettings);
-    return writtenSettings;
+  function writeAndNotify(preferences: UserPreferences): UserPreferences {
+    const writtenPreferences = writeUserPreferences(preferences);
+    emitEvent?.("preferences.changed", writtenPreferences);
+    return writtenPreferences;
   }
 
-  function patchSettings(input: SettingsPatch): Settings {
-    const patch = normalizeSettingsPatch(input);
-    const nextSettings = mergeSettings(readSettings(), patch, defaults);
-    return writeAndNotify(nextSettings);
+  function patchUserPreferences(input: UserPreferencesPatch): UserPreferences {
+    const patch = normalizeUserPreferencesPatch(input);
+    const nextPreferences = mergeUserPreferences(readUserPreferences(), patch, defaults);
+    return writeAndNotify(nextPreferences);
   }
 
-  function resetSettings(): Settings {
+  function resetUserPreferences(): UserPreferences {
     return writeAndNotify(defaults);
   }
 
   return {
-    patchSettings,
-    readSettings,
-    resetSettings,
+    patchUserPreferences,
+    readUserPreferences,
+    resetUserPreferences,
   };
 }

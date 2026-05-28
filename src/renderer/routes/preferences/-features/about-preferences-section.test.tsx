@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 
 import { APP_UPDATE_QUERY_KEY } from "@renderer/features/app-update/app-update-query";
-import { SETTINGS_QUERY_KEY } from "@renderer/features/preferences/preferences-query";
-import { createRendererSettings } from "@renderer/test/fixtures";
+import { USER_PREFERENCES_QUERY_KEY } from "@renderer/features/preferences/preferences-query";
+import { createRendererUserPreferences } from "@renderer/test/fixtures";
 import { createTestQueryClient, renderWithProviders } from "@renderer/test/render";
 import type { AppUpdateStatus } from "@shared/features/app-update/contract";
-import type { Settings, SettingsPatch } from "@shared/features/preferences/settings";
+import type {
+  UserPreferences,
+  UserPreferencesPatch,
+} from "@shared/features/preferences/user-preferences";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
@@ -17,9 +20,9 @@ const clientMocks = vi.hoisted(() => ({
   onAppUpdateChanged: vi.fn(),
   onPreferencesChanged: vi.fn(),
   openExternalUrl: vi.fn(),
-  patchSettings: vi.fn(),
-  readSettings: vi.fn(),
-  resetSettings: vi.fn(),
+  patchUserPreferences: vi.fn(),
+  readUserPreferences: vi.fn(),
+  resetUserPreferences: vi.fn(),
   restartAndInstallAppUpdate: vi.fn(),
 }));
 
@@ -33,9 +36,9 @@ vi.mock("@renderer/clients", () => ({
   onAppUpdateChanged: clientMocks.onAppUpdateChanged,
   onPreferencesChanged: clientMocks.onPreferencesChanged,
   openExternalUrl: clientMocks.openExternalUrl,
-  patchSettings: clientMocks.patchSettings,
-  readSettings: clientMocks.readSettings,
-  resetSettings: clientMocks.resetSettings,
+  patchUserPreferences: clientMocks.patchUserPreferences,
+  readUserPreferences: clientMocks.readUserPreferences,
+  resetUserPreferences: clientMocks.resetUserPreferences,
   restartAndInstallAppUpdate: clientMocks.restartAndInstallAppUpdate,
   toAppInvokeError: (error: unknown) => ({
     message: error instanceof Error ? error.message : "Unknown error",
@@ -55,7 +58,7 @@ vi.mock("@lingui/react/macro", async () => {
   };
 });
 
-import { AboutSettingsSection } from "./about-settings-section";
+import { AboutPreferencesSection } from "./about-preferences-section";
 
 const supportedUpdateStatus: AppUpdateStatus = {
   currentVersion: "1.2.3",
@@ -64,57 +67,57 @@ const supportedUpdateStatus: AppUpdateStatus = {
   state: "idle",
 };
 
-function setupUserPreferences(initialSettings: Settings): Settings {
-  let settings = initialSettings;
-  clientMocks.readSettings.mockImplementation(async () => settings);
-  clientMocks.patchSettings.mockImplementation(async (patch: SettingsPatch) => {
-    settings = createRendererSettings({
-      ...settings,
+function setupUserPreferences(initialPreferences: UserPreferences): UserPreferences {
+  let preferences = initialPreferences;
+  clientMocks.readUserPreferences.mockImplementation(async () => preferences);
+  clientMocks.patchUserPreferences.mockImplementation(async (patch: UserPreferencesPatch) => {
+    preferences = createRendererUserPreferences({
+      ...preferences,
       ...patch,
-      appUpdate: { ...settings.appUpdate, ...patch.appUpdate },
-      appearance: { ...settings.appearance, ...patch.appearance },
-      autoArchive: { ...settings.autoArchive, ...patch.autoArchive },
+      appUpdate: { ...preferences.appUpdate, ...patch.appUpdate },
+      appearance: { ...preferences.appearance, ...patch.appearance },
+      autoArchive: { ...preferences.autoArchive, ...patch.autoArchive },
       markdown: {
-        ...settings.markdown,
+        ...preferences.markdown,
         ...patch.markdown,
         codeBlock: {
-          ...settings.markdown.codeBlock,
+          ...preferences.markdown.codeBlock,
           ...patch.markdown?.codeBlock,
         },
       },
-      shortcuts: { ...settings.shortcuts, ...patch.shortcuts },
-      telemetry: { ...settings.telemetry, ...patch.telemetry },
+      shortcuts: { ...preferences.shortcuts, ...patch.shortcuts },
+      telemetry: { ...preferences.telemetry, ...patch.telemetry },
     });
-    return settings;
+    return preferences;
   });
-  return settings;
+  return preferences;
 }
 
-function renderAboutSettings({
+function renderAboutPreferences({
   appUpdateStatus = supportedUpdateStatus,
-  settings = createRendererSettings(),
+  preferences = createRendererUserPreferences(),
 }: {
   appUpdateStatus?: AppUpdateStatus;
-  settings?: Settings;
+  preferences?: UserPreferences;
 } = {}) {
-  const currentSettings = setupUserPreferences(settings);
+  const currentPreferences = setupUserPreferences(preferences);
   clientMocks.getAppUpdateStatus.mockResolvedValue(appUpdateStatus);
   const queryClient = createTestQueryClient();
-  queryClient.setQueryData(SETTINGS_QUERY_KEY, currentSettings);
+  queryClient.setQueryData(USER_PREFERENCES_QUERY_KEY, currentPreferences);
   queryClient.setQueryData(APP_UPDATE_QUERY_KEY, appUpdateStatus);
 
-  return renderWithProviders(<AboutSettingsSection />, { queryClient });
+  return renderWithProviders(<AboutPreferencesSection />, { queryClient });
 }
 
-function lastSettingsPatch(): SettingsPatch {
-  const patch = clientMocks.patchSettings.mock.calls.at(-1)?.[0];
+function lastUserPreferencesPatch(): UserPreferencesPatch {
+  const patch = clientMocks.patchUserPreferences.mock.calls.at(-1)?.[0];
   if (!patch) {
     throw new Error("Expected User Preferences to be patched.");
   }
   return patch;
 }
 
-describe("AboutSettingsSection", () => {
+describe("AboutPreferencesSection", () => {
   beforeEach(() => {
     clientMocks.checkForAppUpdate.mockResolvedValue(supportedUpdateStatus);
     clientMocks.getAppUpdateStatus.mockResolvedValue(supportedUpdateStatus);
@@ -130,18 +133,18 @@ describe("AboutSettingsSection", () => {
     clientMocks.onAppUpdateChanged.mockReset();
     clientMocks.onPreferencesChanged.mockReset();
     clientMocks.openExternalUrl.mockReset();
-    clientMocks.patchSettings.mockReset();
-    clientMocks.readSettings.mockReset();
-    clientMocks.resetSettings.mockReset();
+    clientMocks.patchUserPreferences.mockReset();
+    clientMocks.readUserPreferences.mockReset();
+    clientMocks.resetUserPreferences.mockReset();
     clientMocks.restartAndInstallAppUpdate.mockReset();
     toastMocks.error.mockReset();
   });
 
   it("shows About information and actions in the expected order", () => {
-    renderAboutSettings();
+    renderAboutPreferences();
 
     const pageText = document.body.textContent ?? "";
-    const labels = ["Version", "Auto updates", "Telemetry", "GitHub"];
+    const labels = ["Version", "App update checks", "Telemetry", "GitHub"];
 
     expect(screen.getByRole("heading", { name: "About" })).toBeVisible();
     expect(screen.getByText("1.2.3")).toBeVisible();
@@ -153,7 +156,7 @@ describe("AboutSettingsSection", () => {
 
   it("opens the repository and issues links through the external URL client", async () => {
     const user = userEvent.setup();
-    renderAboutSettings();
+    renderAboutPreferences();
 
     await user.click(screen.getByRole("button", { name: "Repository" }));
     await user.click(screen.getByRole("button", { name: "Issues" }));
@@ -166,10 +169,10 @@ describe("AboutSettingsSection", () => {
     });
   });
 
-  it("persists telemetry and automatic update preferences", async () => {
+  it("persists telemetry and app update check preferences", async () => {
     const user = userEvent.setup();
-    renderAboutSettings({
-      settings: createRendererSettings({
+    renderAboutPreferences({
+      preferences: createRendererUserPreferences({
         appUpdate: { automaticChecksEnabled: true },
         telemetry: { enabled: true },
       }),
@@ -178,13 +181,13 @@ describe("AboutSettingsSection", () => {
     await user.click(screen.getByRole("switch", { name: "Telemetry" }));
 
     await waitFor(() => {
-      expect(lastSettingsPatch()).toEqual({ telemetry: { enabled: false } });
+      expect(lastUserPreferencesPatch()).toEqual({ telemetry: { enabled: false } });
     });
 
-    await user.click(screen.getByRole("switch", { name: "Auto updates" }));
+    await user.click(screen.getByRole("switch", { name: "App update checks" }));
 
     await waitFor(() => {
-      expect(lastSettingsPatch()).toEqual({ appUpdate: { automaticChecksEnabled: false } });
+      expect(lastUserPreferencesPatch()).toEqual({ appUpdate: { automaticChecksEnabled: false } });
     });
   });
 
@@ -197,7 +200,7 @@ describe("AboutSettingsSection", () => {
       state: "unsupported",
       unsupportedReason: "not-packaged",
     };
-    const { unmount } = renderAboutSettings();
+    const { unmount } = renderAboutPreferences();
 
     await user.click(screen.getByRole("button", { name: "Check" }));
 
@@ -206,9 +209,9 @@ describe("AboutSettingsSection", () => {
     });
 
     unmount();
-    renderAboutSettings({ appUpdateStatus: unsupportedStatus });
+    renderAboutPreferences({ appUpdateStatus: unsupportedStatus });
 
-    expect(screen.getByRole("switch", { name: "Auto updates" })).toHaveAttribute(
+    expect(screen.getByRole("switch", { name: "App update checks" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
@@ -230,14 +233,14 @@ describe("AboutSettingsSection", () => {
       platform: "darwin-arm64",
       state: "downloading",
     };
-    const { unmount } = renderAboutSettings({ appUpdateStatus: readyStatus });
+    const { unmount } = renderAboutPreferences({ appUpdateStatus: readyStatus });
 
     expect(screen.getByText("1.2.3")).toBeVisible();
     expect(screen.getByRole("button", { name: "Update" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Check" })).not.toBeInTheDocument();
 
     unmount();
-    renderAboutSettings({ appUpdateStatus: downloadingStatus });
+    renderAboutPreferences({ appUpdateStatus: downloadingStatus });
 
     expect(screen.getByText("1.2.3")).toBeVisible();
     expect(screen.getByRole("button", { name: "Downloading" })).toBeDisabled();

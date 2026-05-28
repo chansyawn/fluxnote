@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { AboutSettingsSection } from "@renderer/routes/preferences/-features/about-settings-section";
-import { AppSettingsSection } from "@renderer/routes/preferences/-features/app-settings-section";
-import { AutoArchiveSettingsSection } from "@renderer/routes/preferences/-features/auto-archive-settings-section";
-import { MarkdownSettingsSection } from "@renderer/routes/preferences/-features/markdown-settings-section";
-import { ShortcutSettingsSection } from "@renderer/routes/preferences/-features/shortcut-settings";
+import { AboutPreferencesSection } from "@renderer/routes/preferences/-features/about-preferences-section";
+import { AppPreferencesSection } from "@renderer/routes/preferences/-features/app-preferences-section";
+import { AutoArchivePreferencesSection } from "@renderer/routes/preferences/-features/auto-archive-preferences-section";
+import { MarkdownPreferencesSection } from "@renderer/routes/preferences/-features/markdown-preferences-section";
+import { ShortcutPreferencesSection } from "@renderer/routes/preferences/-features/shortcut-preferences";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/preferences/")({
@@ -20,11 +20,11 @@ function RouteComponent() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <AppSettingsSection />
-        <MarkdownSettingsSection />
-        <AutoArchiveSettingsSection />
-        <ShortcutSettingsSection />
-        <AboutSettingsSection />
+        <AppPreferencesSection />
+        <MarkdownPreferencesSection />
+        <AutoArchivePreferencesSection />
+        <ShortcutPreferencesSection />
+        <AboutPreferencesSection />
       </div>
     </section>
   );

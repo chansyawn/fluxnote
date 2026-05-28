@@ -1,5 +1,5 @@
 import { APP_SETTINGS_STORE_FILE } from "@shared/app/app-config";
-import { createDefaultSettings } from "@shared/features/preferences/settings";
+import { createDefaultUserPreferences } from "@shared/features/preferences/user-preferences";
 import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -51,7 +51,7 @@ const mocks = vi.hoisted(() => ({
     emitPending: vi.fn(),
     requestOpen: vi.fn(),
   })),
-  createPreferencesService: vi.fn(() => ({ readSettings: vi.fn() })),
+  createPreferencesService: vi.fn(() => ({ readUserPreferences: vi.fn() })),
   createTelemetryService: vi.fn((_options: { emitEvent: TelemetryEventEmitter }) => ({
     captureError: vi.fn(),
     captureEvent: vi.fn(),
@@ -139,7 +139,7 @@ describe("createMainServices", () => {
   });
 
   it("initializes preferences defaults from preferred system languages", () => {
-    const defaults = createDefaultSettings("zh-Hans");
+    const defaults = createDefaultUserPreferences("zh-Hans");
 
     createMainServices();
 

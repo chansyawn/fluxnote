@@ -9,7 +9,10 @@ import { businessError } from "@shared/ipc/result";
 import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 
-import { blockWillAutoArchive, type AutoArchiveEvaluationContext } from "./auto-archive-policy";
+import {
+  blockHasPendingAutoArchive,
+  type AutoArchiveEvaluationContext,
+} from "./auto-archive-policy";
 
 type AppDbTransaction = Parameters<Parameters<AppDatabase["transaction"]>[0]>[0];
 type BlocksDb = AppDatabase | AppDbTransaction;
@@ -47,7 +50,9 @@ function mapBlockRow(
     orderIndex: block.orderIndex,
     createdAt: block.createdAt,
     updatedAt: block.updatedAt,
-    willArchive: autoArchiveContext ? blockWillAutoArchive(block, autoArchiveContext) : false,
+    isPendingAutoArchive: autoArchiveContext
+      ? blockHasPendingAutoArchive(block, autoArchiveContext)
+      : false,
     tags,
   };
 }

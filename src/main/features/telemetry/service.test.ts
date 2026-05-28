@@ -23,7 +23,7 @@ describe("telemetry service", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
       env: {},
-      readSettings: () => ({ telemetry: { enabled: true } }),
+      readUserPreferences: () => ({ telemetry: { enabled: true } }),
       storage: { store: {} },
     });
 
@@ -41,7 +41,7 @@ describe("telemetry service", () => {
     const service = createTelemetryService({
       appVersion: "1.0.0",
       env: {},
-      readSettings: () => ({ telemetry: { enabled: true } }),
+      readUserPreferences: () => ({ telemetry: { enabled: true } }),
       storage,
     });
 
@@ -52,7 +52,7 @@ describe("telemetry service", () => {
       createTelemetryService({
         appVersion: "1.0.0",
         env: {},
-        readSettings: () => ({ telemetry: { enabled: true } }),
+        readUserPreferences: () => ({ telemetry: { enabled: true } }),
         storage,
       }).getBootstrap().anonId,
     ).toBe(bootstrap.anonId);
@@ -64,7 +64,7 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: postHogEnv,
-      readSettings: () => ({ telemetry: { enabled: false } }),
+      readUserPreferences: () => ({ telemetry: { enabled: false } }),
       storage: { store: { anonId: "anon-1" } },
     });
 
@@ -82,7 +82,7 @@ describe("telemetry service", () => {
       createClient,
       env: postHogEnv,
       platform: "darwin",
-      readSettings: () => ({ telemetry: { enabled: true } }),
+      readUserPreferences: () => ({ telemetry: { enabled: true } }),
       storage: { store: { anonId: "anon-1" } },
     });
 
@@ -112,7 +112,7 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: postHogEnv,
-      readSettings: () => ({ telemetry: { enabled: true } }),
+      readUserPreferences: () => ({ telemetry: { enabled: true } }),
       storage: { store: { anonId: "anon-1" } },
     });
 
@@ -135,7 +135,7 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       emitEvent,
       env: postHogEnv,
-      readSettings: () => ({ telemetry: { enabled: telemetryEnabled } }),
+      readUserPreferences: () => ({ telemetry: { enabled: telemetryEnabled } }),
       storage: { store: { anonId: "anon-1" } },
     });
 
@@ -158,7 +158,7 @@ describe("telemetry service", () => {
       appVersion: "1.0.0",
       createClient,
       env: postHogEnv,
-      readSettings: () => ({ telemetry: { enabled: telemetryEnabled } }),
+      readUserPreferences: () => ({ telemetry: { enabled: telemetryEnabled } }),
       storage: { store: { anonId: "anon-1" } },
     });
 

@@ -1,5 +1,5 @@
 import { useThemePreference } from "@renderer/features/preferences/preferences-query";
-import type { ThemePreference } from "@shared/features/preferences/settings";
+import type { ThemePreference } from "@shared/features/preferences/user-preferences";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type ThemeMode = ThemePreference;
