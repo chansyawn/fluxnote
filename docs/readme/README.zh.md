@@ -20,9 +20,9 @@ Fluxnotes 是一个适合 AI 时代工作流的轻量[^lightweight]全局置顶 
 - **整理上下文**：在多任务、多窗口切换时，保存临时工作内容。
 - **临时记录**：记录灵感、片段和待处理内容，之后再沉淀到更正式的知识库或文档。
 
-## 开始
+## 安装
 
-前往 [GitHub Releases](https://github.com/chansyawn/fluxnotes/releases) 下载最新版。
+前往 [GitHub Releases](https://github.com/chansyawn/fluxnotes/releases) 下载最新版。Fluxnotes 当前支持 macOS 和 Windows。
 
 > Fluxnotes 仍处于早期开发阶段，可能存在不稳定或体验不完整的地方。欢迎通过 [Issues](https://github.com/chansyawn/fluxnotes/issues) 反馈问题和建议[^feedback]。
 
@@ -35,17 +35,18 @@ Fluxnotes 是一个适合 AI 时代工作流的轻量[^lightweight]全局置顶 
 
 ## 用法
 
-### 安装 Flux CLI
+### 日常使用
 
-打开 Fluxnotes 的「偏好设置」，在「App」分区找到「Flux CLI」并点击安装。安装后可以在终端运行：
+强烈建议使用快捷键控制窗口、Block 操作和编辑动作。Fluxnotes 是一个全局置顶的临时工作区，快捷键可以减少在鼠标、输入框和不同应用之间来回切换。
 
-```bash
-flux --help
-```
+- `Alt/Option+N`：显示或隐藏 Fluxnotes 窗口。
+- 更多窗口、Block 和编辑快捷键可以在 Fluxnotes 的「偏好设置」中查看和修改。
 
-查看当前可用命令与参数。
+### 使用 Flux CLI
 
-### 配合 Codex / Claude Code 使用
+打开 Fluxnotes 的「偏好设置」，在「App」分区找到「Flux CLI」并点击安装。安装后可以在终端运行 `flux --help` 查看当前可用命令与参数。
+
+#### 配合 Codex / Claude Code 使用
 
 <p align="center">
   <img src="./assets/use-with-codex.gif" alt="配合 Codex 使用 Fluxnotes" />
@@ -64,17 +65,21 @@ alias cld='EDITOR="flux edit" claude'
 
 不建议全局设置 `EDITOR="flux edit"`；它也会影响 Git、shell 和其他 CLI 工具。
 
-### 从终端创建内容
+#### 从终端创建内容
 
 ```bash
 flux
 flux add "整理这次任务的上下文和下一步"
+flux add --text "整理这次任务的上下文和下一步"
 flux add --file prompt.md --tag codex
+flux edit prompt.md
 ```
 
 - `flux`：打开 Fluxnotes。
 - `flux add "..."`：从行内文本创建一个 Block。
+- `flux add --text "..."`：显式从行内文本创建一个 Block。
 - `flux add --file prompt.md --tag codex`：从 UTF-8 文本文件创建 Block，并添加 Tag。
+- `flux edit prompt.md`：把文件作为外部编辑草稿交给 Fluxnotes，提交或取消后回到调用方。
 
 ## 为什么创建 Fluxnotes
 
@@ -84,12 +89,18 @@ flux add --file prompt.md --tag codex
 
 Fluxnotes 试图解决的就是这个中间层问题：在正式提交给 AI 之前，先有一个轻量、始终可见、适合反复修改的输入工作区。
 
+## 隐私与本地数据
+
+Fluxnotes 会将用户数据存储在 `~/.flux`。如需彻底卸载 Fluxnotes，或在应用无法启动时重置本地状态，可以删除该文件夹。这会清除本地 Blocks、设置，以及应用管理的 Flux CLI 文件。
+
+Fluxnotes 包含可关闭的遥测设置，用于帮助理解功能使用情况和诊断问题。你可以在「偏好设置」中关闭遥测。
+
 ## 后续规划
 
 - 更完整的 Markdown 语法支持和更好的输入体验。
 - 更便捷的输入流转：探索 Accessibility API、浏览器插件等方式，从各种输入框中唤起 Fluxnotes，或将内容直接传递给不同 AI 应用。
 
-## 另一种选择
+## 替代选择
 
 如果你觉得 Fluxnotes 现阶段还不够成熟稳定，可以先试试 [Raycast Notes](https://www.raycast.com/core-features/notes)。它是 Fluxnotes 的灵感来源，更加成熟，也更加简洁克制。
 
