@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.22](https://github.com/chansyawn/fluxnotes/compare/v0.0.21...v0.0.22) (2026-05-28)
+
+
+### Features
+
+* improve editor shortcuts and macOS tray behavior ([#53](https://github.com/chansyawn/fluxnotes/issues/53)) ([6cd1be9](https://github.com/chansyawn/fluxnotes/commit/6cd1be92e5158ade5a99a318dcfd2d08371b79d8))
+* optmize scrollbar styles ([#55](https://github.com/chansyawn/fluxnotes/issues/55)) ([86390d4](https://github.com/chansyawn/fluxnotes/commit/86390d4636bf6440073ff4a90fea7750b1d49b36))
+
 ## [0.0.21](https://github.com/chansyawn/fluxnotes/compare/v0.0.20...v0.0.21) (2026-05-27)
 
 
