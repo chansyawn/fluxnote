@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.24](https://github.com/chansyawn/fluxnotes/compare/v0.0.23...v0.0.24) (2026-05-28)
+
+
+### Bug Fixes
+
+* refresh table selection and strong text styling ([#59](https://github.com/chansyawn/fluxnotes/issues/59)) ([3473ecf](https://github.com/chansyawn/fluxnotes/commit/3473ecff95de6ce7855d6e45d46e0e1af543f053))
+
 ## [0.0.23](https://github.com/chansyawn/fluxnotes/compare/v0.0.22...v0.0.23) (2026-05-28)
 
 
