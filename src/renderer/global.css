@@ -6,7 +6,6 @@
 @import "@fontsource-variable/noto-sans-sc/wght.css";
 @import "@fontsource-variable/cascadia-code/wght.css";
 @import "@fontsource-variable/cascadia-code/wght-italic.css";
-@import "./scrollbar.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,6 +127,8 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-color: var(--ring) transparent;
+    scrollbar-width: thin;
   }
 
   html {
@@ -143,5 +144,9 @@
   .lucide {
     width: 1em;
     height: 1em;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
   }
 }
