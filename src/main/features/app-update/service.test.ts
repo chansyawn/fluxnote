@@ -243,7 +243,7 @@ describe("app update service", () => {
     vi.advanceTimersByTime(30_000);
     emitDownloadedUpdate("v1.0.1");
     service.setAutomaticChecksEnabled(false);
-    vi.advanceTimersByTime(6 * 60 * 60 * 1000);
+    vi.advanceTimersByTime(10 * 60 * 60 * 1000);
 
     expect(mocks.autoUpdater.checkForUpdates).toHaveBeenCalledOnce();
     expect(service.getStatus()).toMatchObject({

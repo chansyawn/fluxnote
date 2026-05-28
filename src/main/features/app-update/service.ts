@@ -11,7 +11,7 @@ const UPDATE_REPO = "chansyawn/fluxnotes";
 const UPDATE_HOST = "https://update.electronjs.org";
 const STARTUP_CHECK_DELAY_MS = 30_000;
 const WINDOWS_FIRST_RUN_CHECK_DELAY_MS = 10_000;
-const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const UPDATE_CHECK_INTERVAL_MS = 10 * 60 * 60 * 1000;
 
 type Timer = ReturnType<typeof setTimeout>;
 type Interval = ReturnType<typeof setInterval>;

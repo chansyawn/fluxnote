@@ -6,6 +6,7 @@ import { app, BrowserWindow, type BrowserWindowConstructorOptions } from "electr
 import { calculateWindowPosition, saveWindowPosition } from "./position";
 
 const MAIN_WINDOW_MAX_WIDTH = 960;
+const MAIN_WINDOW_MIN_HEIGHT = 320;
 const MAIN_WINDOW_MIN_WIDTH = 320;
 const MAIN_WINDOW_HEIGHT = 720;
 const MAIN_WINDOW_WIDTH = 540;
@@ -174,6 +175,7 @@ export function createWindowManager(services: WindowManagerServices): WindowMana
       icon: process.platform === "win32" ? resolveIconPath("icon.ico") : undefined,
       maximizable: false,
       maxWidth: MAIN_WINDOW_MAX_WIDTH,
+      minHeight: MAIN_WINDOW_MIN_HEIGHT,
       minWidth: MAIN_WINDOW_MIN_WIDTH,
       resizable: true,
       show: false,
