@@ -4,6 +4,7 @@ import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
 import { TableControlsDecorator } from "./table-controls-decorator";
+import { refreshTableSelectionObserverRegistration } from "./table-selection-workaround";
 import { TABLE } from "./table-shortcut";
 
 export { tableFromLexical, tableToLexical } from "./lexical";
@@ -31,6 +32,10 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
     tableScrollableWrapper: "block-editor__table-scrollable-wrapper",
     tableSelected: "block-editor__table--selected",
     tableSelection: "block-editor__table-selection",
+  },
+  register(editor, _config, state) {
+    const { hasTabHandler } = state.getDependency(TableExtension).output;
+    return refreshTableSelectionObserverRegistration(editor, hasTabHandler);
   },
 });
 

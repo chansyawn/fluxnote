@@ -1,7 +1,7 @@
 @reference "#global.css";
 
 .block-editor__text--strong {
-  @apply font-bold;
+  @apply font-semibold;
 }
 
 .block-editor__text--emphasis {
