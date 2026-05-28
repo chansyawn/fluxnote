@@ -7,20 +7,20 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   shortcuts: {
-    archiveBlock: "Mod+E",
-    cancelExternalEdit: "Mod+\\",
-    copyBlock: "Mod+Shift+C",
-    createBlock: "Mod+N",
-    deleteBlock: "Mod+D",
-    formatBold: "Mod+B",
-    formatInlineCode: "Mod+Shift+E",
-    formatItalic: "Mod+I",
-    formatStrikethrough: "Mod+Shift+X",
-    keepBlock: "Mod+K",
-    quickCreateBlock: "Ctrl+Alt+N",
-    submitExternalEdit: "Mod+Enter",
-    togglePinBlock: "Mod+T",
-    toggleWindow: "Alt+N",
+    "workspace.archiveBlock": "Mod+E",
+    "workspace.cancelExternalEdit": "Mod+\\",
+    "workspace.copyBlock": "Mod+Shift+C",
+    "workspace.createBlock": "Mod+N",
+    "workspace.deleteBlock": "Mod+D",
+    "editor.formatBold": "Mod+B",
+    "editor.formatInlineCode": "Mod+Shift+E",
+    "editor.formatItalic": "Mod+I",
+    "editor.formatStrikethrough": "Mod+Shift+X",
+    "workspace.keepBlock": "Mod+K",
+    "global.quickCreateBlock": "Ctrl+Alt+N",
+    "workspace.submitExternalEdit": "Mod+Enter",
+    "workspace.togglePinBlock": "Mod+T",
+    "global.toggleWindow": "Alt+N",
   },
   clearShortcut: vi.fn(),
   resetShortcut: vi.fn(),
@@ -44,11 +44,12 @@ vi.mock("@lingui/react/macro", () => ({
 import { ShortcutSettingsSection } from "./shortcut-settings-section";
 
 describe("ShortcutSettingsSection", () => {
-  it("shows Block Editor shortcuts in their own group", () => {
+  it("shows shortcuts in scoped groups", () => {
     renderWithProviders(<ShortcutSettingsSection />);
 
-    expect(screen.getByText("Workspace and app")).toBeVisible();
-    expect(screen.getByText("Block Editor")).toBeVisible();
+    expect(screen.getByText("Global")).toBeVisible();
+    expect(screen.getByText("Workspace")).toBeVisible();
+    expect(screen.getByText("Editor")).toBeVisible();
     expect(screen.getByText("Bold")).toBeVisible();
     expect(screen.getByText("Italic")).toBeVisible();
     expect(screen.getByText("Strikethrough")).toBeVisible();

@@ -160,7 +160,7 @@ export function BlockWorkspace() {
           shortcuts={toolbarShortcuts}
           inactiveContent={
             blockList.isInitialLoading ? null : (
-              <div className="text-muted-foreground pointer-events-auto relative z-10 mx-auto flex min-h-10 w-fit items-center justify-center px-4 text-xs font-medium">
+              <div className="text-muted-foreground/70 pointer-events-none relative z-10 mx-auto mb-2 text-xs font-medium select-none">
                 {formatWorkspaceToolbarBlockCountLabel(i18n, totalBlockCount)}
               </div>
             )

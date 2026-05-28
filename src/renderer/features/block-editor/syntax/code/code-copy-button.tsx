@@ -9,10 +9,10 @@ import { useBlockEditorRuntime } from "../../core/runtime-extension";
 const COPY_FEEDBACK_DURATION_MS = 2000;
 
 interface CodeCopyButtonProps {
-  code: string;
+  getCode: () => string;
 }
 
-export function CodeCopyButton({ code }: CodeCopyButtonProps) {
+export function CodeCopyButton({ getCode }: CodeCopyButtonProps) {
   const { i18n } = useLingui();
   const runtime = useBlockEditorRuntime();
   const [copied, setCopied] = useState(false);
@@ -32,7 +32,7 @@ export function CodeCopyButton({ code }: CodeCopyButtonProps) {
   }, [copied]);
 
   const handleCopy = async () => {
-    await runtime.clipboard.writeText(code);
+    await runtime.clipboard.writeText(getCode());
     setCopied(true);
   };
 

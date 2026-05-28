@@ -98,7 +98,7 @@ describe("useShortcutRecorder", () => {
     const harness = createRecorderHarness({ updateShortcut });
 
     act(() => {
-      harness.getSnapshot().startRecording("createBlock");
+      harness.getSnapshot().startRecording("workspace.createBlock");
     });
 
     let controlDownEvent: KeyboardEvent;
@@ -133,7 +133,7 @@ describe("useShortcutRecorder", () => {
       phase: "error",
       tokens: formatShortcutTokens(duplicateHotkey),
     });
-    expect(harness.getSnapshot().fieldErrors.createBlock).toBe("duplicate");
+    expect(harness.getSnapshot().fieldErrors["workspace.createBlock"]).toBe("duplicate");
 
     act(() => {
       vi.advanceTimersByTime(1_800);
@@ -144,7 +144,7 @@ describe("useShortcutRecorder", () => {
       phase: "recording",
       tokens: [],
     });
-    expect(harness.getSnapshot().fieldErrors.createBlock).toBeUndefined();
+    expect(harness.getSnapshot().fieldErrors["workspace.createBlock"]).toBeUndefined();
 
     let resumedEvent: KeyboardEvent;
     act(() => {
@@ -169,7 +169,7 @@ describe("useShortcutRecorder", () => {
     const harness = createRecorderHarness({ updateShortcut });
 
     act(() => {
-      harness.getSnapshot().startRecording("createBlock");
+      harness.getSnapshot().startRecording("workspace.createBlock");
     });
 
     let recordedEvent: KeyboardEvent;
@@ -186,7 +186,7 @@ describe("useShortcutRecorder", () => {
       throw new Error("Expected the recorded shortcut to normalize.");
     }
 
-    expect(updateShortcut).toHaveBeenCalledWith("createBlock", recordedHotkey);
+    expect(updateShortcut).toHaveBeenCalledWith("workspace.createBlock", recordedHotkey);
     expect(harness.getSnapshot().feedback).toEqual({
       error: null,
       phase: "success",
@@ -207,18 +207,18 @@ describe("useShortcutRecorder", () => {
     const harness = createRecorderHarness({ clearShortcut });
 
     act(() => {
-      harness.getSnapshot().startRecording("createBlock");
+      harness.getSnapshot().startRecording("workspace.createBlock");
     });
     act(() => {
       dispatchDocumentKeyboardEvent("keydown", { key: "Backspace" });
     });
 
-    expect(clearShortcut).toHaveBeenCalledWith("createBlock");
+    expect(clearShortcut).toHaveBeenCalledWith("workspace.createBlock");
     expect(harness.getSnapshot().feedback?.phase).toBe("success");
 
     act(() => {
       vi.advanceTimersByTime(1_200);
-      harness.getSnapshot().startRecording("archiveBlock");
+      harness.getSnapshot().startRecording("workspace.archiveBlock");
     });
 
     act(() => {

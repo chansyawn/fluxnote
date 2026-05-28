@@ -183,7 +183,6 @@ export function createBackendRuntime() {
     services.appUpdateService.stop();
     services.autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
-    services.trayManager.destroyTray();
     services.externalEditManager.cancelAll();
     services.telemetryService.shutdown();
     if (entrypointRuntime) {

@@ -1,11 +1,5 @@
 import { withDOM } from "@lexical/headless/dom";
-import {
-  $getSelection,
-  $selectAll,
-  $setSelection,
-  type BaseSelection,
-  type LexicalEditor,
-} from "lexical";
+import { $getSelection, type LexicalEditor } from "lexical";
 
 import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../core/types";
 import { normalizeExternalMarkdown } from "../markdown/external-markdown";
@@ -82,25 +76,7 @@ export async function createClipboardDataFromDocument(
   editor: LexicalEditor,
   resolveAssets: ResolveAssets,
 ): Promise<BlockEditorClipboardWriteData | null> {
-  const snapshot = withDOM(() => {
-    let selection: BaseSelection | null = null;
-
-    editor.update(
-      () => {
-        const previousSelection = $getSelection()?.clone() ?? null;
-        selection = $selectAll();
-        $setSelection(previousSelection);
-      },
-      { discrete: true },
-    );
-
-    if (selection === null) {
-      return null;
-    }
-    const documentSelection = selection;
-
-    return editor.read(() => exportClipboardSnapshotFromDocument(editor, documentSelection));
-  });
+  const snapshot = editor.read(() => exportClipboardSnapshotFromDocument());
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssets) : null;
 }

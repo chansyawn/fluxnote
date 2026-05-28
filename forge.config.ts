@@ -28,6 +28,9 @@ const packagerConfig = {
   appCategoryType: "public.app-category.productivity",
   asar: true,
   executableName: "Fluxnotes",
+  extendInfo: {
+    LSUIElement: true,
+  },
   extraResource: ["src/main/core/database/drizzle", "src/assets"],
   icon: appIconPath,
   name: "Fluxnotes",

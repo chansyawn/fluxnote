@@ -30,7 +30,6 @@ describe("preferences service", () => {
         markdown: {
           codeBlock: {
             showLineNumbers: true,
-            wordWrap: "invalid",
             unknown: true,
           },
         },
@@ -59,7 +58,6 @@ describe("preferences service", () => {
       markdown: {
         codeBlock: {
           showLineNumbers: true,
-          wordWrap: false,
         },
       },
       telemetry: {
@@ -119,7 +117,7 @@ describe("preferences service", () => {
       appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },
-      markdown: { codeBlock: { wordWrap: true } },
+      markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
     });
 
@@ -129,8 +127,7 @@ describe("preferences service", () => {
     expect(result.autoArchive.enabled).toBe(false);
     expect(result.appUpdate.automaticChecksEnabled).toBe(false);
     expect(result.markdown.codeBlock).toEqual({
-      showLineNumbers: false,
-      wordWrap: true,
+      showLineNumbers: true,
     });
     expect(result.telemetry.enabled).toBe(false);
   });
@@ -140,13 +137,13 @@ describe("preferences service", () => {
       store: {
         ...DEFAULT_SETTINGS,
         appearance: { locale: "invalid", theme: "light", fontSize: 20 },
-        markdown: { codeBlock: { showLineNumbers: true, wordWrap: "invalid" } },
+        markdown: { codeBlock: { showLineNumbers: true } },
       },
     };
     const service = createPreferencesService({ storage });
 
     const result = service.patchSettings({
-      markdown: { codeBlock: { wordWrap: true } },
+      markdown: { codeBlock: { showLineNumbers: false } },
     });
 
     expect(result.appearance).toEqual({
@@ -155,8 +152,7 @@ describe("preferences service", () => {
       fontSize: 20,
     });
     expect(result.markdown.codeBlock).toEqual({
-      showLineNumbers: true,
-      wordWrap: true,
+      showLineNumbers: false,
     });
     expect(storage.store).toEqual(result);
   });
@@ -167,13 +163,13 @@ describe("preferences service", () => {
       store: {
         ...DEFAULT_SETTINGS,
         appearance: { locale: "invalid", theme: "light", fontSize: 20 },
-        markdown: { codeBlock: { showLineNumbers: true, wordWrap: "invalid" } },
+        markdown: { codeBlock: { showLineNumbers: true } },
       },
     };
     const service = createPreferencesService({ defaults, storage });
 
     const result = service.patchSettings({
-      markdown: { codeBlock: { wordWrap: true } },
+      markdown: { codeBlock: { showLineNumbers: false } },
     });
 
     expect(result.appearance).toEqual({
@@ -182,8 +178,7 @@ describe("preferences service", () => {
       fontSize: 20,
     });
     expect(result.markdown.codeBlock).toEqual({
-      showLineNumbers: true,
-      wordWrap: true,
+      showLineNumbers: false,
     });
     expect(storage.store).toEqual(result);
   });

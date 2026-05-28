@@ -21,7 +21,6 @@ describe("block editor config", () => {
       markdown: {
         codeBlock: {
           showLineNumbers: true,
-          wordWrap: false,
         },
       },
     });

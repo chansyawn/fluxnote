@@ -284,7 +284,7 @@ describe("createBackendRuntime", () => {
     expect(entrypointRuntime.handleDeepLink).toHaveBeenCalledWith("flux://open/abc");
   });
 
-  it("stops runtime and releases resources", async () => {
+  it("stops runtime without explicitly destroying the tray", async () => {
     const runtime = createBackendRuntime();
     await runtime.start();
 
@@ -294,7 +294,7 @@ describe("createBackendRuntime", () => {
     expect(services.appUpdateService.stop).toHaveBeenCalledTimes(1);
     expect(services.autoArchiveRuntime.stop).toHaveBeenCalledTimes(1);
     expect(mocks.unregisterAll).toHaveBeenCalledTimes(1);
-    expect(services.trayManager.destroyTray).toHaveBeenCalledTimes(1);
+    expect(services.trayManager.destroyTray).not.toHaveBeenCalled();
     expect(services.externalEditManager.cancelAll).toHaveBeenCalledTimes(1);
     expect(services.telemetryService.shutdown).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.stopCliServer).toHaveBeenCalledTimes(1);

@@ -7,6 +7,7 @@ import { app } from "electron";
 
 import { configureUserDataPath } from "./app/app-paths";
 import { startPrimaryInstance } from "./app/bootstrap";
+import { configureMacOSAppBehavior } from "./app/mac-os-app-behavior";
 import { handleSquirrelStartup } from "./app/squirrel-startup";
 
 function registerDefaultProtocolClient(): void {
@@ -23,6 +24,7 @@ function registerDefaultProtocolClient(): void {
 }
 
 function startApp(): void {
+  configureMacOSAppBehavior();
   configureUserDataPath();
   registerDefaultProtocolClient();
 

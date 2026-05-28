@@ -71,7 +71,6 @@ export interface BlockEditorRuntime {
 
 export interface BlockEditorCodeBlockConfig {
   showLineNumbers: boolean;
-  wordWrap: boolean;
 }
 
 export interface BlockEditorMarkdownConfig {
@@ -85,7 +84,6 @@ export interface BlockEditorConfig {
 
 export interface BlockEditorCodeBlockConfigInput {
   showLineNumbers?: boolean;
-  wordWrap?: boolean;
 }
 
 export interface BlockEditorMarkdownConfigInput {

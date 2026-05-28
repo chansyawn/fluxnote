@@ -10,10 +10,10 @@ export type BlockEditorTextFormatShortcuts = Partial<
 >;
 
 export const BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS = {
-  bold: "formatBold",
-  italic: "formatItalic",
-  strikethrough: "formatStrikethrough",
-  code: "formatInlineCode",
+  bold: "editor.formatBold",
+  italic: "editor.formatItalic",
+  strikethrough: "editor.formatStrikethrough",
+  code: "editor.formatInlineCode",
 } satisfies Record<BlockEditorTextFormat, ShortcutAction>;
 
 export type BlockEditorTextFormatState = Record<BlockEditorTextFormat, boolean>;
