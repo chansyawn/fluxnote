@@ -3,8 +3,10 @@ import {
   $getSelection,
   $isRangeSelection,
   $isTextNode,
+  $setSelection,
   COLLABORATION_TAG,
   HISTORIC_TAG,
+  type BaseSelection,
   type LexicalEditor,
   type NodeKey,
 } from "lexical";
@@ -47,6 +49,22 @@ function restoreShortcutSelection({ anchorKey, anchorOffset }: PendingShortcutSe
   return true;
 }
 
+function runContainerShortcutTransaction(
+  pending: PendingShortcutSelection,
+  applyShortcut: () => boolean,
+): boolean {
+  const selectionBeforeReplay: BaseSelection | null = $getSelection()?.clone() ?? null;
+  if (!restoreShortcutSelection(pending)) {
+    return false;
+  }
+
+  const handled = applyShortcut();
+  if (!handled) {
+    $setSelection(selectionBeforeReplay);
+  }
+  return handled;
+}
+
 export function registerContainerShortcutReplay(
   editor: LexicalEditor,
   applyShortcut: () => boolean,
@@ -63,9 +81,7 @@ export function registerContainerShortcutReplay(
 
     editor.update(
       () => {
-        if (restoreShortcutSelection(pending)) {
-          applyShortcut();
-        }
+        runContainerShortcutTransaction(pending, applyShortcut);
       },
       { discrete: true },
     );
