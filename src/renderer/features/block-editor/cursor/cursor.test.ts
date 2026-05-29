@@ -5,8 +5,10 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   CONTROLLED_TEXT_INSERTION_COMMAND,
+  KEY_BACKSPACE_COMMAND,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
+  KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   type LexicalCommand,
   type LexicalEditor,
@@ -96,6 +98,33 @@ function isSelectionInGap(editor: LexicalEditor): boolean {
   return result;
 }
 
+function isSelectionInText(editor: LexicalEditor, text: string, offset: number): boolean {
+  let result = false;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      return;
+    }
+
+    result =
+      selection.anchor.getNode().getTextContent() === text && selection.anchor.offset === offset;
+  });
+  return result;
+}
+
+function isSelectionInTopLevelType(editor: LexicalEditor, type: string): boolean {
+  let result = false;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      return;
+    }
+
+    result = selection.anchor.getNode().getTopLevelElement()?.getType() === type;
+  });
+  return result;
+}
+
 describe("gap cursor", () => {
   it("filters serialized gap cursor paragraphs from clipboard nodes", () => {
     const nodes = [
@@ -125,12 +154,35 @@ describe("gap cursor", () => {
     expect(readMarkdown(editor)).toBe(["```ts", "const x = 1;", "```", ""].join("\n"));
   });
 
+  it("adds hidden gaps between ordinary paragraphs and boundary blocks", () => {
+    const markdown = ["before", "", "```", "abc", "```", "", "after", ""].join("\n");
+    const editor = editorFromMarkdown(markdown);
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "gap", "code", "gap", "paragraph"]);
+    expect(readMarkdown(editor)).toBe(markdown);
+  });
+
+  it("does not add gaps between ordinary paragraphs", () => {
+    const editor = editorFromMarkdown(["before", "", "after", ""].join("\n"));
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "paragraph"]);
+  });
+
   it("keeps a single reachable gap between adjacent boundary blocks", () => {
     const editor = editorFromMarkdown(
       ["```", "a", "```", "", "> b", "", "| h |", "| - |", "| c |", ""].join("\n"),
     );
 
     expect(getRootSummary(editor)).toEqual(["gap", "code", "gap", "quote", "gap", "table", "gap"]);
+  });
+
+  it("keeps a gap between promoted empty paragraphs and boundary blocks", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    selectGap(editor, "first");
+
+    expect(dispatchCommand(editor, KEY_ENTER_COMMAND, keyboardPayload())).toBe(true);
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "gap", "code", "gap"]);
   });
 
   it("moves from block edges into before and after gaps", () => {
@@ -155,6 +207,44 @@ describe("gap cursor", () => {
     selectText(editor, "c", 1);
     expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
     expect(isSelectionInGap(editor)).toBe(true);
+  });
+
+  it("moves between paragraph edges and adjacent gaps", () => {
+    const editor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+
+    selectText(editor, "before", 6);
+    expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+
+    expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInText(editor, "before", 6)).toBe(true);
+
+    selectText(editor, "after", 0);
+    expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+
+    expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInText(editor, "after", 0)).toBe(true);
+  });
+
+  it("handles delete and backspace across paragraph and boundary gaps", () => {
+    const forwardEditor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+    selectText(forwardEditor, "before", 6);
+
+    expect(dispatchCommand(forwardEditor, KEY_DELETE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(forwardEditor, "code")).toBe(true);
+
+    const backwardEditor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+    selectText(backwardEditor, "after", 0);
+
+    expect(dispatchCommand(backwardEditor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(backwardEditor, "code")).toBe(true);
   });
 
   it("promotes a gap to a normal paragraph on enter", () => {

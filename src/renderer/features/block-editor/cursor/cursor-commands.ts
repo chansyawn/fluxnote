@@ -18,10 +18,7 @@ import {
   type PasteCommandType,
 } from "lexical";
 
-import {
-  $moveGapCursorSelection,
-  $selectAdjacentThematicBreakFromSelection,
-} from "./cursor-navigation";
+import { $selectAdjacentBoundaryFromSelection, $moveGapCursorSelection } from "./cursor-navigation";
 import { $promoteGapCursorParagraph } from "./cursor-state";
 
 function $promoteSelectionGapCursor(): boolean {
@@ -62,7 +59,7 @@ function handleGapDelete(event: KeyboardEvent, direction: "backward" | "forward"
     return false;
   }
 
-  const handled = $selectAdjacentThematicBreakFromSelection(direction);
+  const handled = $selectAdjacentBoundaryFromSelection(direction);
   if (handled) {
     event.preventDefault();
   }

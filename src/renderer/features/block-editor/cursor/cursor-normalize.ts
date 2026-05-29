@@ -2,14 +2,7 @@ import { $isCodeNode } from "@lexical/code";
 import { $isHorizontalRuleNode } from "@lexical/extension";
 import { $isQuoteNode } from "@lexical/rich-text";
 import { $isTableNode } from "@lexical/table";
-import {
-  $getRoot,
-  $isElementNode,
-  $isParagraphNode,
-  type LexicalNode,
-  type NodeKey,
-  type ParagraphNode,
-} from "lexical";
+import { $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
 
 import { $createGapCursorParagraph, $isGapCursorParagraph } from "./cursor-state";
 
@@ -17,10 +10,6 @@ export function $isGapBoundaryNode(node: LexicalNode | null | undefined): boolea
   return (
     $isCodeNode(node) || $isHorizontalRuleNode(node) || $isQuoteNode(node) || $isTableNode(node)
   );
-}
-
-function $isOrdinaryParagraph(node: LexicalNode | null | undefined): node is ParagraphNode {
-  return $isParagraphNode(node) && !$isGapCursorParagraph(node);
 }
 
 function $isRootChild(node: LexicalNode | null | undefined): boolean {
@@ -33,7 +22,7 @@ function $needsGapBefore(node: LexicalNode): boolean {
   }
 
   const previous = node.getPreviousSibling();
-  return !$isOrdinaryParagraph(previous) && !$isGapCursorParagraph(previous);
+  return !$isGapCursorParagraph(previous);
 }
 
 function $needsGapAfter(node: LexicalNode): boolean {
@@ -42,7 +31,7 @@ function $needsGapAfter(node: LexicalNode): boolean {
   }
 
   const next = node.getNextSibling();
-  return !$isOrdinaryParagraph(next) && !$isGapCursorParagraph(next);
+  return !$isGapCursorParagraph(next);
 }
 
 function $isEmptyGapCursor(node: LexicalNode): boolean {
@@ -57,23 +46,12 @@ function $hasGapBoundaryAfter(node: LexicalNode): boolean {
   return $isGapBoundaryNode(node.getNextSibling());
 }
 
-function $hasOrdinaryParagraphBefore(node: LexicalNode): boolean {
-  return $isOrdinaryParagraph(node.getPreviousSibling());
-}
-
-function $hasOrdinaryParagraphAfter(node: LexicalNode): boolean {
-  return $isOrdinaryParagraph(node.getNextSibling());
-}
-
 function $isRequiredGap(node: LexicalNode): boolean {
   if (!$isGapCursorParagraph(node) || node.getTextContentSize() > 0) {
     return false;
   }
 
-  return (
-    ($hasGapBoundaryBefore(node) && !$hasOrdinaryParagraphAfter(node)) ||
-    ($hasGapBoundaryAfter(node) && !$hasOrdinaryParagraphBefore(node))
-  );
+  return $hasGapBoundaryBefore(node) || $hasGapBoundaryAfter(node);
 }
 
 function $insertMissingRootGapCursors(): void {
