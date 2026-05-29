@@ -8,6 +8,7 @@ import {
 } from "lexical";
 
 import { registerCursorCommands } from "./cursor-commands";
+import { registerCursorMouseCommands } from "./cursor-mouse";
 import { $getSelectionGapCursorKey } from "./cursor-navigation";
 import { $getRootGapCursorKeys, $normalizeRootGapCursors } from "./cursor-normalize";
 
@@ -74,6 +75,7 @@ export const CursorExtension = defineExtension({
   register(editor) {
     return mergeRegister(
       registerCursorCommands(editor),
+      registerCursorMouseCommands(editor),
       registerCursorDomSync(editor),
       editor.registerNodeTransform(RootNode, () => {
         $normalizeRootGapCursors();

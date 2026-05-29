@@ -1,6 +1,7 @@
 import {
   $getRoot,
   $getSelection,
+  $getNodeByKey,
   $isParagraphNode,
   $isRangeSelection,
   CONTROLLED_TEXT_INSERTION_COMMAND,
@@ -14,7 +15,7 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { editorFromMarkdown, readMarkdown } from "../test-helper/editor-driver";
 import { filterGapCursorNodes } from "./cursor-normalize";
-import { $isGapCursorParagraph } from "./cursor-state";
+import { $isGapCursorParagraph, $promoteGapCursorParagraph } from "./cursor-state";
 
 function keyboardPayload(): KeyboardEvent {
   return {
@@ -176,5 +177,37 @@ describe("gap cursor", () => {
     dispatchCommand(editor, CONTROLLED_TEXT_INSERTION_COMMAND, "after");
 
     expect(readMarkdown(editor)).toBe(["```", "abc", "```", "", "after", ""].join("\n"));
+  });
+
+  it("promotes a clicked gap to a normal paragraph at the same position", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    let gapKey = "";
+
+    editor.update(
+      () => {
+        const gap = $getRoot().getFirstChild();
+        if (!$isGapCursorParagraph(gap)) {
+          throw new Error("Expected first root child to be a gap cursor.");
+        }
+
+        gapKey = gap.getKey();
+        expect($promoteGapCursorParagraph(gap)).toBe(true);
+        gap.selectStart();
+      },
+      { discrete: true },
+    );
+
+    editor.getEditorState().read(() => {
+      const promoted = $getNodeByKey(gapKey);
+      const selection = $getSelection();
+
+      expect($isParagraphNode(promoted)).toBe(true);
+      expect($isGapCursorParagraph(promoted)).toBe(false);
+      if (!$isRangeSelection(selection)) {
+        throw new Error("Expected range selection after promoting gap cursor.");
+      }
+      expect(selection.anchor.key).toBe(gapKey);
+      expect(selection.anchor.offset).toBe(0);
+    });
   });
 });
