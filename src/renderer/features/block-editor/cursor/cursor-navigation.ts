@@ -1,3 +1,4 @@
+import { $isHorizontalRuleNode } from "@lexical/extension";
 import {
   $getSelection,
   $isElementNode,
@@ -186,6 +187,41 @@ export function $selectAdjacentBoundaryFromSelection(direction: Direction): bool
   }
 
   return $selectBoundaryBlock($getAdjacentSiblingPastGap(topLevelNode, direction), direction);
+}
+
+export function $deleteEmptyParagraphAfterBoundaryGapFromSelection(): boolean {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+    return false;
+  }
+
+  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
+  if (!topLevelNode || !$isParagraphNode(topLevelNode)) {
+    return false;
+  }
+
+  const isGapParagraph: boolean = $isGapCursorParagraph(topLevelNode);
+  if (
+    isGapParagraph ||
+    topLevelNode.getTextContentSize() > 0 ||
+    !$isAtBoundaryEdge(selection, topLevelNode, "backward")
+  ) {
+    return false;
+  }
+
+  const gap = topLevelNode.getPreviousSibling();
+  const boundary = gap?.getPreviousSibling();
+  if (
+    !$isGapCursorParagraph(gap) ||
+    !$isGapBoundaryNode(boundary) ||
+    $isHorizontalRuleNode(boundary)
+  ) {
+    return false;
+  }
+
+  gap.selectStart();
+  topLevelNode.remove();
+  return true;
 }
 
 export function $isSelectionInsideGapCursor(): boolean {

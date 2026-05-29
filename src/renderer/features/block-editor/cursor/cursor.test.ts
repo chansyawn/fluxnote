@@ -247,6 +247,22 @@ describe("gap cursor", () => {
     expect(isSelectionInTopLevelType(backwardEditor, "code")).toBe(true);
   });
 
+  it("deletes an empty paragraph after a boundary block before selecting the boundary", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    selectGap(editor, "last");
+    expect(dispatchCommand(editor, KEY_ENTER_COMMAND, keyboardPayload())).toBe(true);
+
+    expect(getRootSummary(editor)).toEqual(["gap", "code", "gap", "paragraph"]);
+
+    expect(dispatchCommand(editor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(getRootSummary(editor)).toEqual(["gap", "code", "gap"]);
+    expect(isSelectionInGap(editor)).toBe(true);
+    expect(readMarkdown(editor)).toBe(["```", "abc", "```", ""].join("\n"));
+
+    expect(dispatchCommand(editor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(editor, "code")).toBe(true);
+  });
+
   it("promotes a gap to a normal paragraph on enter", () => {
     const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
     selectGap(editor, "first");

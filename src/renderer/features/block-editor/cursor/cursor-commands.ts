@@ -18,7 +18,11 @@ import {
   type PasteCommandType,
 } from "lexical";
 
-import { $selectAdjacentBoundaryFromSelection, $moveGapCursorSelection } from "./cursor-navigation";
+import {
+  $deleteEmptyParagraphAfterBoundaryGapFromSelection,
+  $selectAdjacentBoundaryFromSelection,
+  $moveGapCursorSelection,
+} from "./cursor-navigation";
 import { $promoteGapCursorParagraph } from "./cursor-state";
 
 function $promoteSelectionGapCursor(): boolean {
@@ -59,7 +63,10 @@ function handleGapDelete(event: KeyboardEvent, direction: "backward" | "forward"
     return false;
   }
 
-  const handled = $selectAdjacentBoundaryFromSelection(direction);
+  const handled =
+    direction === "backward" && $deleteEmptyParagraphAfterBoundaryGapFromSelection()
+      ? true
+      : $selectAdjacentBoundaryFromSelection(direction);
   if (handled) {
     event.preventDefault();
   }
