@@ -3,8 +3,10 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import {
+  claimGapCursorMouseEvent,
   findGapCursorHitTarget,
   isInteractiveEventTarget,
+  preventNativeSelectionForGapCursorMouseEvent,
   type GapCursorHitTarget,
 } from "./cursor-mouse";
 
@@ -18,6 +20,10 @@ function target(
   nextRect: DOMRect | null,
 ): GapCursorHitTarget {
   return { key, nextRect, previousRect };
+}
+
+function mouseEvent(type: string, button = 0): MouseEvent {
+  return new MouseEvent(type, { bubbles: true, button, cancelable: true });
 }
 
 describe("gap cursor mouse hit testing", () => {
@@ -135,5 +141,33 @@ describe("gap cursor mouse hit testing", () => {
     expect(isInteractiveEventTarget(root, paragraph)).toBe(false);
     expect(isInteractiveEventTarget(root, outsideButton)).toBe(false);
     expect(isInteractiveEventTarget(root, null)).toBe(false);
+  });
+
+  it("prevents native selection for primary mouse button events on gap targets", () => {
+    const event = mouseEvent("mousedown");
+
+    expect(preventNativeSelectionForGapCursorMouseEvent(event, "gap-between")).toBe(true);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("does not prevent native selection outside gap targets", () => {
+    const event = mouseEvent("mousedown");
+
+    expect(preventNativeSelectionForGapCursorMouseEvent(event, null)).toBe(false);
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("does not prevent native selection for non-primary mouse buttons", () => {
+    const event = mouseEvent("mousedown", 1);
+
+    expect(preventNativeSelectionForGapCursorMouseEvent(event, "gap-between")).toBe(false);
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("claims primary click events on gap targets before Lexical handles root clicks", () => {
+    const event = mouseEvent("click");
+
+    expect(claimGapCursorMouseEvent(event, "gap-between")).toBe(true);
+    expect(event.defaultPrevented).toBe(true);
   });
 });

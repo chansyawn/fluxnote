@@ -2,6 +2,7 @@ import {
   $getNodeByKey,
   $getRoot,
   isDOMNode,
+  stopLexicalPropagation,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
@@ -157,6 +158,27 @@ function getGapCursorHitKey(
   });
 }
 
+export function preventNativeSelectionForGapCursorMouseEvent(
+  event: MouseEvent,
+  key: NodeKey | null,
+): boolean {
+  if (!key || event.button !== 0) {
+    return false;
+  }
+
+  event.preventDefault();
+  return true;
+}
+
+export function claimGapCursorMouseEvent(event: MouseEvent, key: NodeKey | null): boolean {
+  if (!preventNativeSelectionForGapCursorMouseEvent(event, key)) {
+    return false;
+  }
+
+  stopLexicalPropagation(event);
+  return true;
+}
+
 function selectGapCursor(editor: LexicalEditor, key: NodeKey): void {
   editor.update(
     () => {
@@ -199,37 +221,44 @@ export function registerCursorMouseCommands(editor: LexicalEditor): () => void {
       setHoverState(false);
     };
 
+    const handleMouseDown = (event: MouseEvent) => {
+      preventNativeSelectionForGapCursorMouseEvent(
+        event,
+        getGapCursorHitKey(editor, rootElement, event),
+      );
+    };
+
     const handleClick = (event: MouseEvent) => {
       const key = getGapCursorHitKey(editor, rootElement, event);
-      if (!key) {
+      if (!key || !claimGapCursorMouseEvent(event, key)) {
         return;
       }
 
-      event.preventDefault();
       selectGapCursor(editor, key);
     };
 
     const handleDoubleClick = (event: MouseEvent) => {
       const key = getGapCursorHitKey(editor, rootElement, event);
-      if (!key) {
+      if (!key || !claimGapCursorMouseEvent(event, key)) {
         return;
       }
 
-      event.preventDefault();
       promoteGapCursor(editor, key);
     };
 
     rootElement.addEventListener("pointermove", handlePointerMove);
     rootElement.addEventListener("pointerleave", handlePointerLeave);
-    rootElement.addEventListener("click", handleClick);
-    rootElement.addEventListener("dblclick", handleDoubleClick);
+    rootElement.addEventListener("mousedown", handleMouseDown, true);
+    rootElement.addEventListener("click", handleClick, true);
+    rootElement.addEventListener("dblclick", handleDoubleClick, true);
 
     return () => {
       setHoverState(false);
       rootElement.removeEventListener("pointermove", handlePointerMove);
       rootElement.removeEventListener("pointerleave", handlePointerLeave);
-      rootElement.removeEventListener("click", handleClick);
-      rootElement.removeEventListener("dblclick", handleDoubleClick);
+      rootElement.removeEventListener("mousedown", handleMouseDown, true);
+      rootElement.removeEventListener("click", handleClick, true);
+      rootElement.removeEventListener("dblclick", handleDoubleClick, true);
     };
   });
 }
