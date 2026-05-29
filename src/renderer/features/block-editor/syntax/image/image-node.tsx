@@ -64,6 +64,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   static importDOM(): DOMConversionMap | null {
+    // Keep legacy importDOM until DOMImportExtension migration has Word, VS Code, and browser paste fixtures.
     return {
       img: () => ({
         conversion: convertImageElement,
