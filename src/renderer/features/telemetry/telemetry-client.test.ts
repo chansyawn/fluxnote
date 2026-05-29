@@ -1,10 +1,14 @@
+// @vitest-environment jsdom
+
 import type { TelemetryBootstrap } from "@shared/features/telemetry/contract";
+import type { CaptureResult } from "posthog-js";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import {
   captureRendererEvent,
   captureRendererError,
   configureRendererTelemetry,
+  createRendererPostHogInitOptions,
   setRendererPostHogClientForTest,
   type RendererPostHogClient,
 } from "./telemetry-client";
@@ -13,7 +17,6 @@ function createClient(): RendererPostHogClient {
   return {
     capture: vi.fn(),
     captureException: vi.fn(),
-    identify: vi.fn(),
     init: vi.fn(),
     opt_in_capturing: vi.fn(),
     opt_out_capturing: vi.fn(),
@@ -33,9 +36,7 @@ function createBootstrap(patch: Partial<TelemetryBootstrap> = {}): TelemetryBoot
 
 describe("renderer telemetry client", () => {
   beforeEach(() => {
-    vi.stubGlobal("window", {
-      appEnvironment: { platform: "darwin" },
-    });
+    vi.stubGlobal("appEnvironment", { platform: "darwin" });
   });
 
   it("initializes PostHog with automatic capture disabled", () => {
@@ -47,6 +48,10 @@ describe("renderer telemetry client", () => {
     expect(client.init).toHaveBeenCalledWith("key", {
       api_host: "https://posthog.example",
       autocapture: false,
+      bootstrap: {
+        distinctID: "anon-1",
+        isIdentifiedID: false,
+      },
       capture_dead_clicks: false,
       capture_exceptions: false,
       capture_pageleave: false,
@@ -58,8 +63,34 @@ describe("renderer telemetry client", () => {
       disable_web_experiments: true,
       person_profiles: "never",
     });
-    expect(client.identify).toHaveBeenCalledWith("anon-1");
     expect(client.opt_in_capturing).toHaveBeenCalledWith({ captureEventName: false });
+  });
+
+  it("configures real PostHog capture to use the shared anonymous id", async () => {
+    const { PostHog } = await import("posthog-js");
+    const client = new PostHog();
+    const capturedRequests: CaptureResult[] = [];
+    const bootstrap = createBootstrap({ anonId: "anon-main" });
+
+    client.init("key", {
+      ...createRendererPostHogInitOptions(bootstrap),
+      before_send: (captureResult) => {
+        if (captureResult) {
+          capturedRequests.push(captureResult);
+        }
+        return null;
+      },
+    });
+    client.capture("block_created", {
+      app_process: "renderer",
+      source: "workspace_shortcut",
+    });
+    client.opt_out_capturing();
+
+    expect(capturedRequests).toHaveLength(1);
+    expect(capturedRequests[0]?.properties.distinct_id).toBe("anon-main");
+    expect(capturedRequests[0]?.properties.$is_identified).toBe(false);
+    expect(capturedRequests[0]?.properties.$process_person_profile).toBe(false);
   });
 
   it("opts out and skips error capture when disabled", () => {

@@ -8,8 +8,9 @@ import posthog from "posthog-js";
 
 export type RendererPostHogClient = Pick<
   PostHog,
-  "capture" | "captureException" | "identify" | "init" | "opt_in_capturing" | "opt_out_capturing"
+  "capture" | "captureException" | "init" | "opt_in_capturing" | "opt_out_capturing"
 >;
+type RendererPostHogInitOptions = NonNullable<Parameters<PostHog["init"]>[1]>;
 
 let currentBootstrap: TelemetryBootstrap | null = null;
 let initialized = false;
@@ -19,25 +20,34 @@ export function getPostHogClient(): PostHog {
   return postHogClient;
 }
 
+export function createRendererPostHogInitOptions(
+  bootstrap: TelemetryBootstrap,
+): RendererPostHogInitOptions {
+  return {
+    api_host: bootstrap.posthogHost ?? undefined,
+    autocapture: false,
+    bootstrap: {
+      distinctID: bootstrap.anonId,
+      isIdentifiedID: false,
+    },
+    capture_dead_clicks: false,
+    capture_exceptions: false,
+    capture_pageleave: false,
+    capture_pageview: false,
+    disable_external_dependency_loading: true,
+    disable_session_recording: true,
+    disable_surveys: true,
+    disable_surveys_automatic_display: true,
+    disable_web_experiments: true,
+    person_profiles: "never",
+  };
+}
+
 export function configureRendererTelemetry(bootstrap: TelemetryBootstrap): RendererPostHogClient {
   currentBootstrap = bootstrap;
 
   if (bootstrap.posthogKey && bootstrap.posthogHost && !initialized) {
-    postHogClient.init(bootstrap.posthogKey, {
-      api_host: bootstrap.posthogHost,
-      autocapture: false,
-      capture_dead_clicks: false,
-      capture_exceptions: false,
-      capture_pageleave: false,
-      capture_pageview: false,
-      disable_external_dependency_loading: true,
-      disable_session_recording: true,
-      disable_surveys: true,
-      disable_surveys_automatic_display: true,
-      disable_web_experiments: true,
-      person_profiles: "never",
-    });
-    postHogClient.identify(bootstrap.anonId);
+    postHogClient.init(bootstrap.posthogKey, createRendererPostHogInitOptions(bootstrap));
     initialized = true;
   }
 
