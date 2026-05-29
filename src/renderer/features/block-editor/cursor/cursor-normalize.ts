@@ -45,24 +45,39 @@ function $needsGapAfter(node: LexicalNode): boolean {
   return !$isOrdinaryParagraph(next) && !$isGapCursorParagraph(next);
 }
 
+function $isEmptyGapCursor(node: LexicalNode): boolean {
+  return $isGapCursorParagraph(node) && node.getTextContentSize() === 0;
+}
+
+function $hasGapBoundaryBefore(node: LexicalNode): boolean {
+  return $isGapBoundaryNode(node.getPreviousSibling());
+}
+
+function $hasGapBoundaryAfter(node: LexicalNode): boolean {
+  return $isGapBoundaryNode(node.getNextSibling());
+}
+
+function $hasOrdinaryParagraphBefore(node: LexicalNode): boolean {
+  return $isOrdinaryParagraph(node.getPreviousSibling());
+}
+
+function $hasOrdinaryParagraphAfter(node: LexicalNode): boolean {
+  return $isOrdinaryParagraph(node.getNextSibling());
+}
+
 function $isRequiredGap(node: LexicalNode): boolean {
   if (!$isGapCursorParagraph(node) || node.getTextContentSize() > 0) {
     return false;
   }
 
-  const previous = node.getPreviousSibling();
-  const next = node.getNextSibling();
   return (
-    ($isGapBoundaryNode(previous) && !$isOrdinaryParagraph(next)) ||
-    ($isGapBoundaryNode(next) && !$isOrdinaryParagraph(previous))
+    ($hasGapBoundaryBefore(node) && !$hasOrdinaryParagraphAfter(node)) ||
+    ($hasGapBoundaryAfter(node) && !$hasOrdinaryParagraphBefore(node))
   );
 }
 
-export function $normalizeRootGapCursors(): Set<NodeKey> {
-  const root = $getRoot();
-  const children = root.getChildren();
-
-  for (const child of children) {
+function $insertMissingRootGapCursors(): void {
+  for (const child of $getRoot().getChildren()) {
     if ($needsGapBefore(child)) {
       child.insertBefore($createGapCursorParagraph());
     }
@@ -70,21 +85,28 @@ export function $normalizeRootGapCursors(): Set<NodeKey> {
       child.insertAfter($createGapCursorParagraph());
     }
   }
+}
 
+function $removeUnneededRootGapCursors(): Set<NodeKey> {
   const gapKeys = new Set<NodeKey>();
-  for (const child of root.getChildren()) {
+  for (const child of $getRoot().getChildren()) {
     if (!$isGapCursorParagraph(child)) {
       continue;
     }
 
     if ($isRequiredGap(child)) {
       gapKeys.add(child.getKey());
-    } else if ($isElementNode(child) && child.getTextContentSize() === 0) {
+    } else if ($isElementNode(child) && $isEmptyGapCursor(child)) {
       child.remove();
     }
   }
 
   return gapKeys;
+}
+
+export function $normalizeRootGapCursors(): Set<NodeKey> {
+  $insertMissingRootGapCursors();
+  return $removeUnneededRootGapCursors();
 }
 
 export function $getRootGapCursorKeys(): Set<NodeKey> {

@@ -1,6 +1,12 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it } from "vite-plus/test";
 
-import { findGapCursorHitTarget, type GapCursorHitTarget } from "./cursor-mouse";
+import {
+  findGapCursorHitTarget,
+  isInteractiveEventTarget,
+  type GapCursorHitTarget,
+} from "./cursor-mouse";
 
 function rect(top: number, bottom: number, left = 0, right = 200): DOMRect {
   return { bottom, left, right, top } as DOMRect;
@@ -35,6 +41,38 @@ describe("gap cursor mouse hit testing", () => {
         targets: [target("gap-between", rect(20, 80), rect(100, 160))],
       }),
     ).toBe("gap-between");
+  });
+
+  it("finds gaps at vertical bounds inclusively", () => {
+    const gap = target("gap-between", rect(20, 80), rect(100, 160));
+
+    expect(
+      findGapCursorHitTarget({
+        point: { x: 100, y: 80 },
+        rootRect,
+        targets: [gap],
+      }),
+    ).toBe("gap-between");
+    expect(
+      findGapCursorHitTarget({
+        point: { x: 100, y: 100 },
+        rootRect,
+        targets: [gap],
+      }),
+    ).toBe("gap-between");
+  });
+
+  it("finds the matching gap when multiple candidates exist", () => {
+    expect(
+      findGapCursorHitTarget({
+        point: { x: 100, y: 130 },
+        rootRect,
+        targets: [
+          target("first-gap", null, rect(20, 80)),
+          target("second-gap", rect(100, 120), rect(140, 180)),
+        ],
+      }),
+    ).toBe("second-gap");
   });
 
   it("finds gaps after the last boundary block", () => {
@@ -75,5 +113,27 @@ describe("gap cursor mouse hit testing", () => {
         targets: [target("gap-between", rect(20, 100), rect(80, 160))],
       }),
     ).toBeNull();
+  });
+
+  it("treats nested editor controls as interactive event targets", () => {
+    const root = document.createElement("section");
+    const button = document.createElement("button");
+    const tableControl = document.createElement("span");
+    tableControl.setAttribute("data-table-control", "true");
+    button.append(tableControl);
+    root.append(button);
+
+    expect(isInteractiveEventTarget(root, tableControl)).toBe(true);
+  });
+
+  it("ignores non-interactive event targets and targets outside the editor", () => {
+    const root = document.createElement("section");
+    const paragraph = document.createElement("p");
+    const outsideButton = document.createElement("button");
+    root.append(paragraph);
+
+    expect(isInteractiveEventTarget(root, paragraph)).toBe(false);
+    expect(isInteractiveEventTarget(root, outsideButton)).toBe(false);
+    expect(isInteractiveEventTarget(root, null)).toBe(false);
   });
 });

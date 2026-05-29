@@ -97,7 +97,10 @@ export function findGapCursorHitTarget(input: GapCursorHitTestInput): NodeKey | 
   return null;
 }
 
-function isInteractiveEventTarget(rootElement: HTMLElement, target: EventTarget | null): boolean {
+export function isInteractiveEventTarget(
+  rootElement: HTMLElement,
+  target: EventTarget | null,
+): boolean {
   if (!isDOMNode(target) || !(target instanceof Element) || !rootElement.contains(target)) {
     return false;
   }
