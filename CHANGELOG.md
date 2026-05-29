@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.26](https://github.com/chansyawn/fluxnotes/compare/v0.0.25...v0.0.26) (2026-05-29)
+
+
+### Features
+
+* support mouse gap cursor selection ([#65](https://github.com/chansyawn/fluxnotes/issues/65)) ([6dbf62b](https://github.com/chansyawn/fluxnotes/commit/6dbf62b39588bd2a83ab30a55c8b266edf6490f8))
+
+
+### Bug Fixes
+
+* align renderer telemetry anon id ([#63](https://github.com/chansyawn/fluxnotes/issues/63)) ([5c0f67e](https://github.com/chansyawn/fluxnotes/commit/5c0f67ee7c4f9b603b26dd7ca066f90212f15f29))
+
 ## [0.0.25](https://github.com/chansyawn/fluxnotes/compare/v0.0.24...v0.0.25) (2026-05-29)
 
 
