@@ -1,7 +1,7 @@
 @reference "#global.css";
 
 .block-editor__horizontal-rule {
-  @apply border-border my-2 h-0 border-2 border-t;
+  @apply border-ring my-2 h-0 border-2 border-t;
 }
 
 .block-editor__horizontal-rule--selected {
