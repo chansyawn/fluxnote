@@ -115,7 +115,7 @@ function createBlockEditorContentExtension(config: BlockEditorContentExtensionCo
       ...SYNTAX_REACT_EXTENSIONS,
       createBlockEditorCoreExtension(),
       ClipboardExtension,
-      HistoryExtension,
+      configExtension(HistoryExtension, { maxDepth: 100 }),
     ],
     name: "fluxnotes/block-editor/content",
     namespace: BLOCK_EDITOR_NAMESPACE,
