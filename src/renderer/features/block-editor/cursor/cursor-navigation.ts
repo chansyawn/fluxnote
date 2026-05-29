@@ -1,6 +1,8 @@
+import { $isHorizontalRuleNode } from "@lexical/extension";
 import {
   $getSelection,
   $isElementNode,
+  $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
   type ElementNode,
@@ -63,6 +65,10 @@ function $isAtBoundaryEdge(
   return edge === "backward" ? offset === 0 : offset === boundary.getTextContentSize();
 }
 
+function $isGapAdjacentBlock(node: LexicalNode | null | undefined): boolean {
+  return $isGapBoundaryNode(node) || ($isParagraphNode(node) && !$isGapCursorParagraph(node));
+}
+
 function $selectGapNearBlock(block: LexicalNode, direction: Direction): boolean {
   const gap = direction === "backward" ? block.getPreviousSibling() : block.getNextSibling();
   if (!$isGapCursorParagraph(gap)) {
@@ -75,7 +81,7 @@ function $selectGapNearBlock(block: LexicalNode, direction: Direction): boolean 
 
 function $selectAdjacentBlockFromGap(gap: ElementNode, direction: Direction): boolean {
   const block = direction === "backward" ? gap.getPreviousSibling() : gap.getNextSibling();
-  if (!$isGapBoundaryNode(block)) {
+  if (!$isGapAdjacentBlock(block)) {
     return false;
   }
 
@@ -91,6 +97,26 @@ function $selectAdjacentBlockFromGap(gap: ElementNode, direction: Direction): bo
   return true;
 }
 
+function $selectBoundaryBlock(
+  block: LexicalNode | null | undefined,
+  direction: Direction,
+): boolean {
+  if (!block || !$isGapBoundaryNode(block)) {
+    return false;
+  }
+
+  if ($selectThematicBreak(block)) {
+    return true;
+  }
+
+  if (direction === "backward") {
+    block.selectEnd();
+  } else {
+    block.selectStart();
+  }
+  return true;
+}
+
 function $selectAdjacentThematicBreak(
   selection: RangeSelection,
   block: LexicalNode,
@@ -102,6 +128,15 @@ function $selectAdjacentThematicBreak(
 
   const sibling = direction === "backward" ? block.getPreviousSibling() : block.getNextSibling();
   return $selectThematicBreak(sibling);
+}
+
+function $getAdjacentSiblingPastGap(node: LexicalNode, direction: Direction): LexicalNode | null {
+  const sibling = direction === "backward" ? node.getPreviousSibling() : node.getNextSibling();
+  if (!$isGapCursorParagraph(sibling)) {
+    return sibling;
+  }
+
+  return direction === "backward" ? sibling.getPreviousSibling() : sibling.getNextSibling();
 }
 
 export function $moveGapCursorSelection(direction: Direction): boolean {
@@ -123,14 +158,17 @@ export function $moveGapCursorSelection(direction: Direction): boolean {
     return true;
   }
 
-  if (!$isGapBoundaryNode(topLevelNode) || !$isAtBoundaryEdge(selection, topLevelNode, direction)) {
+  if (
+    !$isGapAdjacentBlock(topLevelNode) ||
+    !$isAtBoundaryEdge(selection, topLevelNode, direction)
+  ) {
     return false;
   }
 
   return $selectGapNearBlock(topLevelNode, direction);
 }
 
-export function $selectAdjacentThematicBreakFromSelection(direction: Direction): boolean {
+export function $selectAdjacentBoundaryFromSelection(direction: Direction): boolean {
   const selection = $getSelection();
   if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
     return false;
@@ -148,9 +186,42 @@ export function $selectAdjacentThematicBreakFromSelection(direction: Direction):
     return false;
   }
 
-  const sibling =
-    direction === "backward" ? topLevelNode.getPreviousSibling() : topLevelNode.getNextSibling();
-  return $selectThematicBreak(sibling);
+  return $selectBoundaryBlock($getAdjacentSiblingPastGap(topLevelNode, direction), direction);
+}
+
+export function $deleteEmptyParagraphAfterBoundaryGapFromSelection(): boolean {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+    return false;
+  }
+
+  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
+  if (!topLevelNode || !$isParagraphNode(topLevelNode)) {
+    return false;
+  }
+
+  const isGapParagraph: boolean = $isGapCursorParagraph(topLevelNode);
+  if (
+    isGapParagraph ||
+    topLevelNode.getTextContentSize() > 0 ||
+    !$isAtBoundaryEdge(selection, topLevelNode, "backward")
+  ) {
+    return false;
+  }
+
+  const gap = topLevelNode.getPreviousSibling();
+  const boundary = gap?.getPreviousSibling();
+  if (
+    !$isGapCursorParagraph(gap) ||
+    !$isGapBoundaryNode(boundary) ||
+    $isHorizontalRuleNode(boundary)
+  ) {
+    return false;
+  }
+
+  gap.selectStart();
+  topLevelNode.remove();
+  return true;
 }
 
 export function $isSelectionInsideGapCursor(): boolean {

@@ -19,8 +19,9 @@ import {
 } from "lexical";
 
 import {
+  $deleteEmptyParagraphAfterBoundaryGapFromSelection,
+  $selectAdjacentBoundaryFromSelection,
   $moveGapCursorSelection,
-  $selectAdjacentThematicBreakFromSelection,
 } from "./cursor-navigation";
 import { $promoteGapCursorParagraph } from "./cursor-state";
 
@@ -62,7 +63,10 @@ function handleGapDelete(event: KeyboardEvent, direction: "backward" | "forward"
     return false;
   }
 
-  const handled = $selectAdjacentThematicBreakFromSelection(direction);
+  const handled =
+    direction === "backward" && $deleteEmptyParagraphAfterBoundaryGapFromSelection()
+      ? true
+      : $selectAdjacentBoundaryFromSelection(direction);
   if (handled) {
     event.preventDefault();
   }

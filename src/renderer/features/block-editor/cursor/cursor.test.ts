@@ -1,11 +1,14 @@
 import {
   $getRoot,
   $getSelection,
+  $getNodeByKey,
   $isParagraphNode,
   $isRangeSelection,
   CONTROLLED_TEXT_INSERTION_COMMAND,
+  KEY_BACKSPACE_COMMAND,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
+  KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   type LexicalCommand,
   type LexicalEditor,
@@ -14,7 +17,7 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { editorFromMarkdown, readMarkdown } from "../test-helper/editor-driver";
 import { filterGapCursorNodes } from "./cursor-normalize";
-import { $isGapCursorParagraph } from "./cursor-state";
+import { $isGapCursorParagraph, $promoteGapCursorParagraph } from "./cursor-state";
 
 function keyboardPayload(): KeyboardEvent {
   return {
@@ -95,6 +98,33 @@ function isSelectionInGap(editor: LexicalEditor): boolean {
   return result;
 }
 
+function isSelectionInText(editor: LexicalEditor, text: string, offset: number): boolean {
+  let result = false;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      return;
+    }
+
+    result =
+      selection.anchor.getNode().getTextContent() === text && selection.anchor.offset === offset;
+  });
+  return result;
+}
+
+function isSelectionInTopLevelType(editor: LexicalEditor, type: string): boolean {
+  let result = false;
+  editor.getEditorState().read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      return;
+    }
+
+    result = selection.anchor.getNode().getTopLevelElement()?.getType() === type;
+  });
+  return result;
+}
+
 describe("gap cursor", () => {
   it("filters serialized gap cursor paragraphs from clipboard nodes", () => {
     const nodes = [
@@ -124,12 +154,35 @@ describe("gap cursor", () => {
     expect(readMarkdown(editor)).toBe(["```ts", "const x = 1;", "```", ""].join("\n"));
   });
 
+  it("adds hidden gaps between ordinary paragraphs and boundary blocks", () => {
+    const markdown = ["before", "", "```", "abc", "```", "", "after", ""].join("\n");
+    const editor = editorFromMarkdown(markdown);
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "gap", "code", "gap", "paragraph"]);
+    expect(readMarkdown(editor)).toBe(markdown);
+  });
+
+  it("does not add gaps between ordinary paragraphs", () => {
+    const editor = editorFromMarkdown(["before", "", "after", ""].join("\n"));
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "paragraph"]);
+  });
+
   it("keeps a single reachable gap between adjacent boundary blocks", () => {
     const editor = editorFromMarkdown(
       ["```", "a", "```", "", "> b", "", "| h |", "| - |", "| c |", ""].join("\n"),
     );
 
     expect(getRootSummary(editor)).toEqual(["gap", "code", "gap", "quote", "gap", "table", "gap"]);
+  });
+
+  it("keeps a gap between promoted empty paragraphs and boundary blocks", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    selectGap(editor, "first");
+
+    expect(dispatchCommand(editor, KEY_ENTER_COMMAND, keyboardPayload())).toBe(true);
+
+    expect(getRootSummary(editor)).toEqual(["paragraph", "gap", "code", "gap"]);
   });
 
   it("moves from block edges into before and after gaps", () => {
@@ -156,6 +209,60 @@ describe("gap cursor", () => {
     expect(isSelectionInGap(editor)).toBe(true);
   });
 
+  it("moves between paragraph edges and adjacent gaps", () => {
+    const editor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+
+    selectText(editor, "before", 6);
+    expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+
+    expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInText(editor, "before", 6)).toBe(true);
+
+    selectText(editor, "after", 0);
+    expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+
+    expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInText(editor, "after", 0)).toBe(true);
+  });
+
+  it("handles delete and backspace across paragraph and boundary gaps", () => {
+    const forwardEditor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+    selectText(forwardEditor, "before", 6);
+
+    expect(dispatchCommand(forwardEditor, KEY_DELETE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(forwardEditor, "code")).toBe(true);
+
+    const backwardEditor = editorFromMarkdown(
+      ["before", "", "```", "abc", "```", "", "after", ""].join("\n"),
+    );
+    selectText(backwardEditor, "after", 0);
+
+    expect(dispatchCommand(backwardEditor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(backwardEditor, "code")).toBe(true);
+  });
+
+  it("deletes an empty paragraph after a boundary block before selecting the boundary", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    selectGap(editor, "last");
+    expect(dispatchCommand(editor, KEY_ENTER_COMMAND, keyboardPayload())).toBe(true);
+
+    expect(getRootSummary(editor)).toEqual(["gap", "code", "gap", "paragraph"]);
+
+    expect(dispatchCommand(editor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(getRootSummary(editor)).toEqual(["gap", "code", "gap"]);
+    expect(isSelectionInGap(editor)).toBe(true);
+    expect(readMarkdown(editor)).toBe(["```", "abc", "```", ""].join("\n"));
+
+    expect(dispatchCommand(editor, KEY_BACKSPACE_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInTopLevelType(editor, "code")).toBe(true);
+  });
+
   it("promotes a gap to a normal paragraph on enter", () => {
     const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
     selectGap(editor, "first");
@@ -176,5 +283,37 @@ describe("gap cursor", () => {
     dispatchCommand(editor, CONTROLLED_TEXT_INSERTION_COMMAND, "after");
 
     expect(readMarkdown(editor)).toBe(["```", "abc", "```", "", "after", ""].join("\n"));
+  });
+
+  it("promotes a clicked gap to a normal paragraph at the same position", () => {
+    const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+    let gapKey = "";
+
+    editor.update(
+      () => {
+        const gap = $getRoot().getFirstChild();
+        if (!$isGapCursorParagraph(gap)) {
+          throw new Error("Expected first root child to be a gap cursor.");
+        }
+
+        gapKey = gap.getKey();
+        expect($promoteGapCursorParagraph(gap)).toBe(true);
+        gap.selectStart();
+      },
+      { discrete: true },
+    );
+
+    editor.getEditorState().read(() => {
+      const promoted = $getNodeByKey(gapKey);
+      const selection = $getSelection();
+
+      expect($isParagraphNode(promoted)).toBe(true);
+      expect($isGapCursorParagraph(promoted)).toBe(false);
+      if (!$isRangeSelection(selection)) {
+        throw new Error("Expected range selection after promoting gap cursor.");
+      }
+      expect(selection.anchor.key).toBe(gapKey);
+      expect(selection.anchor.offset).toBe(0);
+    });
   });
 });

@@ -2,14 +2,7 @@ import { $isCodeNode } from "@lexical/code";
 import { $isHorizontalRuleNode } from "@lexical/extension";
 import { $isQuoteNode } from "@lexical/rich-text";
 import { $isTableNode } from "@lexical/table";
-import {
-  $getRoot,
-  $isElementNode,
-  $isParagraphNode,
-  type LexicalNode,
-  type NodeKey,
-  type ParagraphNode,
-} from "lexical";
+import { $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
 
 import { $createGapCursorParagraph, $isGapCursorParagraph } from "./cursor-state";
 
@@ -17,10 +10,6 @@ export function $isGapBoundaryNode(node: LexicalNode | null | undefined): boolea
   return (
     $isCodeNode(node) || $isHorizontalRuleNode(node) || $isQuoteNode(node) || $isTableNode(node)
   );
-}
-
-function $isOrdinaryParagraph(node: LexicalNode | null | undefined): node is ParagraphNode {
-  return $isParagraphNode(node) && !$isGapCursorParagraph(node);
 }
 
 function $isRootChild(node: LexicalNode | null | undefined): boolean {
@@ -33,7 +22,7 @@ function $needsGapBefore(node: LexicalNode): boolean {
   }
 
   const previous = node.getPreviousSibling();
-  return !$isOrdinaryParagraph(previous) && !$isGapCursorParagraph(previous);
+  return !$isGapCursorParagraph(previous);
 }
 
 function $needsGapAfter(node: LexicalNode): boolean {
@@ -42,7 +31,19 @@ function $needsGapAfter(node: LexicalNode): boolean {
   }
 
   const next = node.getNextSibling();
-  return !$isOrdinaryParagraph(next) && !$isGapCursorParagraph(next);
+  return !$isGapCursorParagraph(next);
+}
+
+function $isEmptyGapCursor(node: LexicalNode): boolean {
+  return $isGapCursorParagraph(node) && node.getTextContentSize() === 0;
+}
+
+function $hasGapBoundaryBefore(node: LexicalNode): boolean {
+  return $isGapBoundaryNode(node.getPreviousSibling());
+}
+
+function $hasGapBoundaryAfter(node: LexicalNode): boolean {
+  return $isGapBoundaryNode(node.getNextSibling());
 }
 
 function $isRequiredGap(node: LexicalNode): boolean {
@@ -50,19 +51,11 @@ function $isRequiredGap(node: LexicalNode): boolean {
     return false;
   }
 
-  const previous = node.getPreviousSibling();
-  const next = node.getNextSibling();
-  return (
-    ($isGapBoundaryNode(previous) && !$isOrdinaryParagraph(next)) ||
-    ($isGapBoundaryNode(next) && !$isOrdinaryParagraph(previous))
-  );
+  return $hasGapBoundaryBefore(node) || $hasGapBoundaryAfter(node);
 }
 
-export function $normalizeRootGapCursors(): Set<NodeKey> {
-  const root = $getRoot();
-  const children = root.getChildren();
-
-  for (const child of children) {
+function $insertMissingRootGapCursors(): void {
+  for (const child of $getRoot().getChildren()) {
     if ($needsGapBefore(child)) {
       child.insertBefore($createGapCursorParagraph());
     }
@@ -70,21 +63,28 @@ export function $normalizeRootGapCursors(): Set<NodeKey> {
       child.insertAfter($createGapCursorParagraph());
     }
   }
+}
 
+function $removeUnneededRootGapCursors(): Set<NodeKey> {
   const gapKeys = new Set<NodeKey>();
-  for (const child of root.getChildren()) {
+  for (const child of $getRoot().getChildren()) {
     if (!$isGapCursorParagraph(child)) {
       continue;
     }
 
     if ($isRequiredGap(child)) {
       gapKeys.add(child.getKey());
-    } else if ($isElementNode(child) && child.getTextContentSize() === 0) {
+    } else if ($isElementNode(child) && $isEmptyGapCursor(child)) {
       child.remove();
     }
   }
 
   return gapKeys;
+}
+
+export function $normalizeRootGapCursors(): Set<NodeKey> {
+  $insertMissingRootGapCursors();
+  return $removeUnneededRootGapCursors();
 }
 
 export function $getRootGapCursorKeys(): Set<NodeKey> {
