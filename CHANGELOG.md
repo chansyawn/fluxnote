@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.25](https://github.com/chansyawn/fluxnotes/compare/v0.0.24...v0.0.25) (2026-05-29)
+
+
+### Features
+
+* escape inline formats at block editor boundaries ([#61](https://github.com/chansyawn/fluxnotes/issues/61)) ([f9879de](https://github.com/chansyawn/fluxnotes/commit/f9879ded670f0439f2c88a6338a626f929daade9))
+
 ## [0.0.24](https://github.com/chansyawn/fluxnotes/compare/v0.0.23...v0.0.24) (2026-05-28)
 
 
