@@ -131,21 +131,22 @@ export function WorkspaceBlockEditorSurface({
     }),
     [codeBlock, textFormatShortcuts],
   );
-  const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
-    useBlockEditorPersistence(block);
+  const { flushSave, getLatestContent, saveMarkdown } = useBlockEditorPersistence(block);
 
   useEffect(() => {
     return () => {
-      void editorRef.current?.flush();
-      snapshotLatestContent();
+      void (async () => {
+        await editorRef.current?.flush();
+        await flushSave();
+      })();
     };
-  }, [snapshotLatestContent]);
+  }, [flushSave]);
 
   const flush = useCallback(async () => {
     const markdown = (await editorRef.current?.flush()) ?? getLatestContent();
-    await waitForPendingSave();
+    await flushSave();
     return markdown;
-  }, [getLatestContent, waitForPendingSave]);
+  }, [flushSave, getLatestContent]);
 
   useImperativeHandle(
     ref,

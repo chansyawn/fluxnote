@@ -1,23 +1,24 @@
 import { type Block, updateBlockContent } from "@renderer/clients";
+import { useAsyncDebouncer } from "@tanstack/react-pacer";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 
 import { patchWorkspaceBlock } from "../block-collection/workspace-block-cache";
 
+const BLOCK_EDITOR_SAVE_DEBOUNCE_MS = 500;
+
 interface BlockPersistence {
   getLatestContent: () => string;
+  flushSave: () => Promise<void>;
   saveMarkdown: (markdown: string) => void;
-  snapshotLatestContent: () => void;
-  waitForPendingSave: () => Promise<void>;
 }
 
 export function useBlockEditorPersistence(block: Block): BlockPersistence {
   const latestContentRef = useRef(block.content);
   const persistedContentRef = useRef(block.content);
   const blockRef = useRef(block);
-  const latestRequestIdRef = useRef(0);
-  const appliedRequestIdRef = useRef(0);
-  const savePromiseRef = useRef<Promise<void> | null>(null);
+  const activeSavePromiseRef = useRef<Promise<void> | null>(null);
+  const pendingSaveContentRef = useRef<string | null>(null);
 
   useEffect(() => {
     blockRef.current = block;
@@ -26,63 +27,95 @@ export function useBlockEditorPersistence(block: Block): BlockPersistence {
   useEffect(() => {
     latestContentRef.current = block.content;
     persistedContentRef.current = block.content;
-    latestRequestIdRef.current = 0;
-    appliedRequestIdRef.current = 0;
-    savePromiseRef.current = null;
-  }, [block.id, block.content]);
+    activeSavePromiseRef.current = null;
+    pendingSaveContentRef.current = null;
+  }, [block.id]);
 
   const { mutateAsync: saveContent } = useMutation({
-    mutationFn: async ({ content, requestId }: { content: string; requestId: number }) => ({
-      requestId,
-      updatedBlock: await updateBlockContent({ blockId: block.id, content }),
-    }),
+    mutationFn: async ({ blockId, content }: { blockId: string; content: string }) =>
+      await updateBlockContent({ blockId, content }),
   });
 
-  const runSave = useCallback(
-    (content: string) => {
-      const requestId = latestRequestIdRef.current + 1;
-      latestRequestIdRef.current = requestId;
-
-      const savePromise = saveContent({ content, requestId })
-        .then(({ requestId: appliedId, updatedBlock }) => {
-          // Out-of-order responses keep the latest applied id; ties pass to honor "last write wins".
-          if (appliedId < appliedRequestIdRef.current) return;
-          appliedRequestIdRef.current = appliedId;
+  const startSave = useCallback(
+    (content: string): Promise<void> => {
+      const savePromise: Promise<void> = saveContent({
+        blockId: blockRef.current.id,
+        content,
+      })
+        .then((updatedBlock) => {
           persistedContentRef.current = updatedBlock.content;
           patchWorkspaceBlock(updatedBlock);
         })
         .catch(() => {
           // Save errors are intentionally silent in the simplified MVP UI.
+        })
+        .then(() => {
+          if (activeSavePromiseRef.current === savePromise) {
+            activeSavePromiseRef.current = null;
+          }
+
+          const pendingContent = pendingSaveContentRef.current;
+          pendingSaveContentRef.current = null;
+          if (pendingContent === null || pendingContent === persistedContentRef.current) {
+            return;
+          }
+
+          return startSave(pendingContent);
         });
-      savePromiseRef.current = savePromise;
-      void savePromise.finally(() => {
-        if (savePromiseRef.current === savePromise) {
-          savePromiseRef.current = null;
-        }
-      });
+      activeSavePromiseRef.current = savePromise;
+      return savePromise;
     },
     [saveContent],
   );
 
+  const saveLatest = useCallback(
+    (content: string) => {
+      if (activeSavePromiseRef.current) {
+        pendingSaveContentRef.current = content;
+        return activeSavePromiseRef.current;
+      }
+
+      if (content === persistedContentRef.current) {
+        return Promise.resolve();
+      }
+
+      return startSave(content);
+    },
+    [startSave],
+  );
+
+  const saveDebouncer = useAsyncDebouncer(
+    async () => {
+      await saveLatest(latestContentRef.current);
+      return true;
+    },
+    {
+      onError: () => undefined,
+      onUnmount: (debouncer) => {
+        void debouncer.flush();
+      },
+      throwOnError: false,
+      wait: BLOCK_EDITOR_SAVE_DEBOUNCE_MS,
+    },
+  );
+
   const getLatestContent = useCallback(() => latestContentRef.current, []);
 
-  const snapshotLatestContent = useCallback(() => {
-    if (latestContentRef.current === persistedContentRef.current) return;
-    patchWorkspaceBlock({ ...blockRef.current, content: latestContentRef.current });
-  }, []);
+  const flushSave = useCallback(async () => {
+    const didFlushPendingSave = await saveDebouncer.flush();
+    if (!didFlushPendingSave) {
+      await saveLatest(latestContentRef.current);
+    }
+  }, [saveDebouncer, saveLatest]);
 
   const saveMarkdown = useCallback(
     (markdown: string) => {
       latestContentRef.current = markdown;
-      if (markdown === persistedContentRef.current) return;
-      runSave(markdown);
+      if (!activeSavePromiseRef.current && markdown === persistedContentRef.current) return;
+      void saveDebouncer.maybeExecute();
     },
-    [runSave],
+    [saveDebouncer],
   );
 
-  const waitForPendingSave = useCallback(async () => {
-    await savePromiseRef.current;
-  }, []);
-
-  return { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave };
+  return { getLatestContent, flushSave, saveMarkdown };
 }

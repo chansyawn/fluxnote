@@ -193,14 +193,15 @@ function BlockEditorContent({
   onMarkdownChange,
 }: BlockEditorProps) {
   const { i18n } = useLingui();
+  const initialMarkdownRef = useRef(initialMarkdown);
   const editorRef = useRef<Editor | null>(null);
-  const latestMarkdownRef = useRef(initialMarkdown);
+  const latestMarkdownRef = useRef(initialMarkdownRef.current);
   const onMarkdownChangeRef = useRef(onMarkdownChange);
   const onBlurRef = useRef(onBlur);
   const configRef = useRef<BlockEditorConfig>(resolveBlockEditorConfig(config));
   const toolbarStateRef = useRef<BlockEditorToolbarState>(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
   const toolbarStateListenersRef = useRef(new Set<BlockEditorToolbarStateListener>());
-  const [isEmpty, setIsEmpty] = useState(initialMarkdown.trim().length === 0);
+  const [isEmpty, setIsEmpty] = useState(initialMarkdownRef.current.trim().length === 0);
 
   const resolvedConfig = useMemo(() => resolveBlockEditorConfig(config), [config]);
 
@@ -274,7 +275,7 @@ function BlockEditorContent({
       const editor = Editor.make()
         .config((ctx) => {
           ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, initialMarkdown);
+          ctx.set(defaultValueCtx, initialMarkdownRef.current);
           ctx.update(editorViewOptionsCtx, (options) => ({
             ...options,
             attributes: {
@@ -349,7 +350,7 @@ function BlockEditorContent({
 
       return editor;
     },
-    [flushMarkdown, i18n, initialMarkdown, publishToolbarState],
+    [flushMarkdown, i18n, publishToolbarState],
   );
 
   useEffect(() => {

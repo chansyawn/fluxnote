@@ -69,7 +69,7 @@ function renderEditor(
   const runtime = props.runtime ?? createBlockEditorRuntime();
   const onMarkdownChange = props.onMarkdownChange ?? (() => undefined);
 
-  render(
+  const rendered = render(
     <I18nProvider i18n={i18n}>
       <BlockEditor
         ref={ref}
@@ -82,7 +82,7 @@ function renderEditor(
     </I18nProvider>,
   );
 
-  return runtime;
+  return { runtime, ...rendered };
 }
 
 async function findEditor(): Promise<HTMLElement> {
@@ -202,5 +202,37 @@ describe("BlockEditor", () => {
     await waitFor(() => {
       expect(onMarkdownChange).toHaveBeenCalledWith(expect.stringContaining("Hello"));
     });
+  });
+
+  it("keeps the active editor mounted when the initial Markdown prop changes", async () => {
+    const onMarkdownChange = vi.fn();
+    const runtime = createBlockEditorRuntime();
+    const editorRef = createRef<BlockEditorHandle>();
+    const { rerender } = renderEditor(
+      {
+        initialMarkdown: "Local content",
+        onMarkdownChange,
+        runtime,
+      },
+      editorRef,
+    );
+    const editor = await findEditor();
+
+    editor.focus();
+
+    rerender(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          initialMarkdown="Persisted content"
+          runtime={runtime}
+          onMarkdownChange={onMarkdownChange}
+        />
+      </I18nProvider>,
+    );
+
+    expect(document.activeElement).toBe(editor);
+    expect(screen.getByText("Local content")).toBeVisible();
+    expect(screen.queryByText("Persisted content")).not.toBeInTheDocument();
   });
 });
