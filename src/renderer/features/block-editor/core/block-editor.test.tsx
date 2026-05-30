@@ -2,26 +2,16 @@
 
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { act, createRef } from "react";
-import type { ReactNode } from "react";
-import { describe, expect, it, vi } from "vite-plus/test";
+import { act, createRef, type ComponentProps, type ReactNode, type Ref } from "react";
+import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
 
-import { createBlockEditorRuntime } from "../test-helper/editor-driver";
 import { BlockEditor } from "./block-editor";
-import type { BlockEditorHandle } from "./types";
+import type { BlockEditorHandle, BlockEditorRuntime } from "./types";
 
 vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
-
-vi.mock("@renderer/app/theme", () => ({
-  useThemeState: () => ({
-    resolvedTheme: "light",
-    setThemeMode: () => undefined,
-    themeMode: "light",
-  }),
 }));
 
 (
@@ -31,55 +21,104 @@ vi.mock("@renderer/app/theme", () => ({
 i18n.load("en", {});
 i18n.activate("en");
 
-async function flushAnimationFrames(count: number): Promise<void> {
-  for (let index = 0; index < count; index += 1) {
-    await act(async () => {
-      await new Promise<void>((resolve) => {
-        window.requestAnimationFrame(() => resolve());
-      });
-    });
-  }
+beforeAll(() => {
+  document.elementFromPoint = () => document.activeElement;
+  HTMLElement.prototype.getClientRects = function getClientRects() {
+    return {
+      0: this.getBoundingClientRect(),
+      item: (index: number) => (index === 0 ? this.getBoundingClientRect() : null),
+      length: 1,
+      [Symbol.iterator]: function* iterateRects() {
+        yield this[0];
+      },
+    } as DOMRectList;
+  };
+  Range.prototype.getClientRects = () =>
+    ({
+      0: new DOMRect(0, 0, 0, 0),
+      item: (index: number) => (index === 0 ? new DOMRect(0, 0, 0, 0) : null),
+      length: 1,
+      [Symbol.iterator]: function* iterateRects() {
+        yield this[0];
+      },
+    }) as DOMRectList;
+  Range.prototype.getBoundingClientRect = () => new DOMRect(0, 0, 0, 0);
+});
+
+function createBlockEditorRuntime(): BlockEditorRuntime {
+  return {
+    assets: {
+      copy: vi.fn(async () => ({ assets: [] })),
+      create: vi.fn(async () => ({ assets: [] })),
+      resolve: vi.fn(async () => ({ assets: [] })),
+    },
+    clipboard: {
+      write: vi.fn(async () => undefined),
+      writeText: vi.fn(async () => undefined),
+    },
+    links: {
+      openExternal: vi.fn(async () => undefined),
+    },
+  };
+}
+
+function renderEditor(
+  props: Partial<ComponentProps<typeof BlockEditor>> = {},
+  ref?: Ref<BlockEditorHandle>,
+) {
+  const runtime = props.runtime ?? createBlockEditorRuntime();
+  const onMarkdownChange = props.onMarkdownChange ?? (() => undefined);
+
+  render(
+    <I18nProvider i18n={i18n}>
+      <BlockEditor
+        ref={ref}
+        initialMarkdown={props.initialMarkdown ?? ""}
+        runtime={runtime}
+        onMarkdownChange={onMarkdownChange}
+        config={props.config}
+        onBlur={props.onBlur}
+      />
+    </I18nProvider>,
+  );
+
+  return runtime;
+}
+
+async function findEditor(): Promise<HTMLElement> {
+  return await screen.findByRole("textbox", { name: /markdown block editor/i });
 }
 
 describe("BlockEditor", () => {
-  it("exposes a labeled editing surface for a Block", () => {
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          initialMarkdown="Hello"
-          runtime={createBlockEditorRuntime()}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
-    );
+  it("exposes a labeled editing surface for a Block", async () => {
+    renderEditor({ initialMarkdown: "Hello" });
 
-    expect(screen.getByRole("textbox", { name: /markdown block editor/i })).toBeInTheDocument();
+    expect(await findEditor()).toBeInTheDocument();
+    expect(screen.getByText("Hello")).toBeVisible();
+  });
+
+  it("flushes the latest Markdown through the public handle", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    renderEditor({ initialMarkdown: "**Hello**" }, editorRef);
+    await findEditor();
+
+    await expect(editorRef.current?.flush()).resolves.toContain("Hello");
   });
 
   it("applies configured Block Editor text format shortcuts", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
-          initialMarkdown=""
-          runtime={createBlockEditorRuntime()}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
+    renderEditor(
+      {
+        config: { shortcuts: { textFormats: { bold: "Control+Shift+B" } } },
+        initialMarkdown: "",
+      },
+      editorRef,
     );
 
-    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    const editor = await findEditor();
     editor.focus();
-
-    const oldDefaultEvent = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: "b",
-    });
     const configuredEvent = new KeyboardEvent("keydown", {
       bubbles: true,
       cancelable: true,
@@ -87,13 +126,6 @@ describe("BlockEditor", () => {
       key: "b",
       shiftKey: true,
     });
-
-    await act(async () => {
-      editor.dispatchEvent(oldDefaultEvent);
-    });
-
-    expect(oldDefaultEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
 
     await act(async () => {
       editor.dispatchEvent(configuredEvent);
@@ -103,22 +135,18 @@ describe("BlockEditor", () => {
     expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
   });
 
-  it("blocks Lexical format shortcuts that are not configured by Fluxnotes", async () => {
+  it("blocks browser format shortcuts that are not configured by Fluxnotes", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: null } } }}
-          initialMarkdown="Plain text"
-          runtime={createBlockEditorRuntime()}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
+    renderEditor(
+      {
+        config: { shortcuts: { textFormats: { bold: null } } },
+        initialMarkdown: "Plain text",
+      },
+      editorRef,
     );
 
-    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    const editor = await findEditor();
     editor.focus();
     const boldEvent = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -126,127 +154,53 @@ describe("BlockEditor", () => {
       ctrlKey: true,
       key: "b",
     });
-    const underlineEvent = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: "u",
-    });
 
     await act(async () => {
       editor.dispatchEvent(boldEvent);
-      editor.dispatchEvent(underlineEvent);
     });
 
     expect(boldEvent.defaultPrevented).toBe(true);
-    expect(underlineEvent.defaultPrevented).toBe(true);
-    expect(editor.textContent).toBe("Plain text");
     expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
   });
 
-  it("consumes repeated Lexical default format shortcuts without applying them", async () => {
+  it("copies Markdown content through the runtime clipboard", async () => {
     const editorRef = createRef<BlockEditorHandle>();
-
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
-          initialMarkdown=""
-          runtime={createBlockEditorRuntime()}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
-    );
-
-    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
-    editor.focus();
-
-    const repeatedOldDefaultEvent = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: "b",
-      repeat: true,
-    });
-
-    await act(async () => {
-      editor.dispatchEvent(repeatedOldDefaultEvent);
-    });
-
-    expect(repeatedOldDefaultEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
-  });
-
-  it("consumes repeated configured format shortcuts without toggling the format again", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
-          initialMarkdown=""
-          runtime={createBlockEditorRuntime()}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
-    );
-
-    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
-    editor.focus();
-
-    const configuredEvent = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: "b",
-      shiftKey: true,
-    });
-    const repeatedConfiguredEvent = new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ctrlKey: true,
-      key: "b",
-      repeat: true,
-      shiftKey: true,
-    });
-
-    await act(async () => {
-      editor.dispatchEvent(configuredEvent);
-    });
-
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
-
-    await act(async () => {
-      editor.dispatchEvent(repeatedConfiguredEvent);
-    });
-
-    expect(repeatedConfiguredEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
-  });
-
-  it("lets users copy code from code block controls", async () => {
-    const user = userEvent.setup();
     const runtime = createBlockEditorRuntime();
+    runtime.assets.resolve = vi.fn(async () => ({
+      assets: [{ assetUrl: "assets://block/photo.png", fileUrl: "file:///tmp/photo.png" }],
+    }));
 
-    render(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          config={{ markdown: { codeBlock: { showLineNumbers: true } } }}
-          initialMarkdown={["```ts", "const value = 1;", "```", ""].join("\n")}
-          runtime={runtime}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
+    renderEditor(
+      {
+        initialMarkdown: "![Alt](assets://block/photo.png)",
+        runtime,
+      },
+      editorRef,
     );
+    await findEditor();
 
-    await flushAnimationFrames(3);
-    window.dispatchEvent(new Event("resize"));
-    await flushAnimationFrames(1);
+    await editorRef.current?.copy();
 
-    await user.click(screen.getByRole("button", { name: /copy code/i }));
+    expect(runtime.clipboard.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageFileUrl: "file:///tmp/photo.png",
+        text: expect.stringContaining("assets://block/photo.png"),
+      }),
+    );
+  });
 
-    expect(runtime.clipboard.writeText).toHaveBeenCalledWith("const value = 1;");
+  it("notifies Markdown changes from user editing", async () => {
+    const user = userEvent.setup();
+    const onMarkdownChange = vi.fn();
+
+    renderEditor({ initialMarkdown: "", onMarkdownChange });
+    const editor = await findEditor();
+
+    await user.click(editor);
+    await user.keyboard("Hello");
+
+    await waitFor(() => {
+      expect(onMarkdownChange).toHaveBeenCalledWith(expect.stringContaining("Hello"));
+    });
   });
 });

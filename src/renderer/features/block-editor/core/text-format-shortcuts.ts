@@ -6,7 +6,7 @@ import {
   type BlockEditorTextFormatShortcuts,
 } from "../toolbar/types";
 
-const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
+const BROWSER_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
   bold: "Mod+B",
   italic: "Mod+I",
   underline: "Mod+U",
@@ -29,11 +29,11 @@ export function resolveTextFormatShortcut(
     }
   }
 
-  const isLexicalDefaultShortcut = Object.values(LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS).some(
+  const isBrowserDefaultShortcut = Object.values(BROWSER_DEFAULT_TEXT_FORMAT_SHORTCUTS).some(
     (shortcut) => keyboardEventMatchesShortcut(event, shortcut),
   );
 
-  if (isLexicalDefaultShortcut) {
+  if (isBrowserDefaultShortcut) {
     return { type: "blocked-default" };
   }
 

@@ -26,7 +26,7 @@ This paragraph includes **bold**, *italic*, ~~strikethrough~~, and \`inline code
 
 ## Task List
 
-- [x] Shipped Lexical migration
+- [x] Shipped Milkdown migration
 - [ ] Add richer GFM support
 - [ ] Revisit single-block editor later
 

@@ -1,5 +1,5 @@
 /**
- * Lexical-based Markdown block editor feature.
+ * Milkdown-based Markdown block editor feature.
  *
  * The editor is a WYSIWYG Markdown surface backed by semantic document data,
  * not a source-format-preserving Markdown editor.

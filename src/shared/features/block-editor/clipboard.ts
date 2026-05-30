@@ -1,4 +1,3 @@
-import type { SerializedLexicalNode } from "lexical";
 import { z } from "zod";
 
 const BLOCK_EDITOR_CLIPBOARD_HTML_MARKER = "fluxnotes-block-editor";
@@ -7,11 +6,12 @@ const BLOCK_EDITOR_CLIPBOARD_HTML_MARKER_PATTERN =
 const BLOCK_EDITOR_CLIPBOARD_HTML_MARKER_GLOBAL_PATTERN =
   /<!--fluxnotes-block-editor:[A-Za-z0-9_.!~*'()%~-]+-->/g;
 
-export type ClipboardSerializedNode = SerializedLexicalNode &
-  Record<string, unknown> & {
-    children?: ClipboardSerializedNode[];
-    src?: unknown;
-  };
+export type ClipboardSerializedNode = Record<string, unknown> & {
+  children?: ClipboardSerializedNode[];
+  src?: unknown;
+  type: string;
+  url?: unknown;
+};
 
 const clipboardSerializedNodeSchema: z.ZodType<ClipboardSerializedNode> = z.lazy(() =>
   z
@@ -19,7 +19,7 @@ const clipboardSerializedNodeSchema: z.ZodType<ClipboardSerializedNode> = z.lazy
       children: z.array(clipboardSerializedNodeSchema).optional(),
       src: z.unknown().optional(),
       type: z.string(),
-      version: z.number(),
+      url: z.unknown().optional(),
     })
     .catchall(z.unknown()),
 );

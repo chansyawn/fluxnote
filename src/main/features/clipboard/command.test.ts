@@ -24,7 +24,7 @@ import {
 import { registerClipboardCommands } from "./command";
 
 const payload = {
-  nodes: [{ text: "Text", type: "text", version: 1 }],
+  nodes: [{ text: "Text", type: "text" }],
   sourceBlockId: "block-1",
 };
 

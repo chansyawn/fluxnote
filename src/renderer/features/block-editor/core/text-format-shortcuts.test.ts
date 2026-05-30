@@ -31,7 +31,7 @@ describe("resolveTextFormatShortcut", () => {
     ).toEqual({ type: "configured", format: "bold" });
   });
 
-  it("blocks cleared Lexical default text format shortcuts", () => {
+  it("blocks cleared default text format shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "b" });
 
     expect(
@@ -41,7 +41,7 @@ describe("resolveTextFormatShortcut", () => {
     ).toEqual({ type: "blocked-default" });
   });
 
-  it("prefers configured shortcuts over Lexical default shortcuts", () => {
+  it("prefers configured shortcuts over default shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "i" });
 
     expect(
@@ -52,7 +52,7 @@ describe("resolveTextFormatShortcut", () => {
     ).toEqual({ type: "configured", format: "bold" });
   });
 
-  it("blocks Lexical underline shortcut that Fluxnote does not configure", () => {
+  it("blocks underline shortcut that Fluxnote does not configure", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "u" });
 
     expect(resolveTextFormatShortcut(event, {})).toEqual({ type: "blocked-default" });

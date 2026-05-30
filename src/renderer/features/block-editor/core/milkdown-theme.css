@@ -1,0 +1,156 @@
+.block-editor {
+  min-height: 4rem;
+}
+
+.block-editor .ProseMirror {
+  min-height: 4rem;
+  outline: none;
+  word-break: break-word;
+}
+
+.block-editor .ProseMirror > *:first-child {
+  margin-top: 0;
+}
+
+.block-editor .ProseMirror > *:last-child {
+  margin-bottom: 0;
+}
+
+.block-editor h1,
+.block-editor h2,
+.block-editor h3,
+.block-editor h4,
+.block-editor h5,
+.block-editor h6 {
+  font-weight: 650;
+  line-height: 1.25;
+  margin: 0.75rem 0 0.375rem;
+}
+
+.block-editor h1 {
+  font-size: 1.5rem;
+}
+
+.block-editor h2 {
+  font-size: 1.25rem;
+}
+
+.block-editor h3 {
+  font-size: 1.125rem;
+}
+
+.block-editor h4,
+.block-editor h5,
+.block-editor h6 {
+  font-size: 1rem;
+}
+
+.block-editor p {
+  margin: 0.375rem 0;
+}
+
+.block-editor blockquote {
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+  margin: 0.75rem 0;
+  padding-left: 0.75rem;
+}
+
+.block-editor a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.block-editor code {
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 0.1rem 0.25rem;
+}
+
+.block-editor pre {
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  padding: 0.75rem;
+}
+
+.block-editor pre code {
+  background: transparent;
+  border-radius: 0;
+  display: block;
+  padding: 0;
+}
+
+.block-editor[data-code-line-numbers="true"] pre code {
+  counter-reset: block-editor-code-line;
+}
+
+.block-editor[data-code-line-numbers="true"] pre code .line {
+  counter-increment: block-editor-code-line;
+}
+
+.block-editor ul,
+.block-editor ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.block-editor li {
+  margin: 0.125rem 0;
+}
+
+.block-editor li > p {
+  margin: 0;
+}
+
+.block-editor ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 1.25rem;
+}
+
+.block-editor li[data-type="taskItem"] {
+  position: relative;
+}
+
+.block-editor li[data-type="taskItem"] > label {
+  margin-right: 0.375rem;
+}
+
+.block-editor hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0.875rem 0;
+}
+
+.block-editor table {
+  border-collapse: collapse;
+  display: block;
+  margin: 0.75rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.block-editor th,
+.block-editor td {
+  border: 1px solid var(--border);
+  min-width: 4rem;
+  padding: 0.35rem 0.5rem;
+  vertical-align: top;
+}
+
+.block-editor th {
+  background: var(--muted);
+  font-weight: 600;
+}
+
+.block-editor img {
+  border-radius: var(--radius-md);
+  display: block;
+  height: auto;
+  margin: 0.75rem 0;
+  max-width: 100%;
+}

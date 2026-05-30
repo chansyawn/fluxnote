@@ -65,145 +65,14 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:23
-msgid "block-editor.code.copied"
-msgstr "Copied"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:19
-msgid "block-editor.code.copy"
-msgstr "Copy code"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:33
-msgid "block-editor.code.language.empty"
-msgstr "No matching languages"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:76
-msgid "block-editor.code.language.search"
-msgstr "Search language"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:138
+#: src/renderer/features/block-editor/core/block-editor.tsx:281
 msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:99
-msgid "block-editor.link.convert"
-msgstr "Convert to link"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:97
-msgid "block-editor.link.copied"
-msgstr "Copied"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:96
-msgid "block-editor.link.copy"
-msgstr "Copy"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:95
-msgid "block-editor.link.open"
-msgstr "Open"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:98
-msgid "block-editor.link.remove"
-msgstr "Remove link"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:100
-msgid "block-editor.link.url"
-msgstr "Link URL"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:137
-#: src/renderer/features/block-editor/core/block-editor.tsx:143
+#: src/renderer/features/block-editor/core/block-editor.tsx:381
 msgid "block-editor.placeholder"
 msgstr "Write a block..."
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:178
-msgid "block-editor.table.align-center"
-msgstr "Align center"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:174
-msgid "block-editor.table.align-default"
-msgstr "Default"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:176
-msgid "block-editor.table.align-left"
-msgstr "Align left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:180
-msgid "block-editor.table.align-right"
-msgstr "Align right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:128
-msgid "block-editor.table.column-menu"
-msgstr "Open column actions menu"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:157
-msgid "block-editor.table.delete-column"
-msgstr "Delete column"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:167
-msgid "block-editor.table.delete-row"
-msgstr "Delete row"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:143
-msgid "block-editor.table.insert-column-left"
-msgstr "Insert column left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:148
-msgid "block-editor.table.insert-column-right"
-msgstr "Insert column right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:159
-msgid "block-editor.table.insert-row-above"
-msgstr "Insert row above"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:161
-msgid "block-editor.table.insert-row-below"
-msgstr "Insert row below"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:153
-msgid "block-editor.table.move-column-left"
-msgstr "Move left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:155
-msgid "block-editor.table.move-column-right"
-msgstr "Move right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:165
-msgid "block-editor.table.move-row-down"
-msgstr "Move down"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:163
-msgid "block-editor.table.move-row-up"
-msgstr "Move up"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
-msgid "block-editor.table.row-menu"
-msgstr "Open row actions menu"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:60

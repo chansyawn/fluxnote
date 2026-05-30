@@ -22,7 +22,7 @@ import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 const clipboardData: BlockEditorClipboardWriteData = {
   html: "<p>Text</p>",
   imageFileUrl: "file:///tmp/photo.png",
-  nodes: [{ text: "Text", type: "text", version: 1 }],
+  nodes: [{ text: "Text", type: "text" }],
   text: "Text",
 };
 
