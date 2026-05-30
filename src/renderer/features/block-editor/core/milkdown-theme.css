@@ -99,25 +99,20 @@
   padding-left: 1.5rem;
 }
 
+.block-editor ul {
+  list-style-type: disc;
+}
+
+.block-editor ol {
+  list-style-type: decimal;
+}
+
 .block-editor li {
   margin: 0.125rem 0;
 }
 
 .block-editor li > p {
   margin: 0;
-}
-
-.block-editor ul[data-type="taskList"] {
-  list-style: none;
-  padding-left: 1.25rem;
-}
-
-.block-editor li[data-type="taskItem"] {
-  position: relative;
-}
-
-.block-editor li[data-type="taskItem"] > label {
-  margin-right: 0.375rem;
 }
 
 .block-editor hr {
