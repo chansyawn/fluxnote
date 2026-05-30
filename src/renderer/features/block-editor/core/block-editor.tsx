@@ -26,7 +26,8 @@ import {
 } from "react";
 
 import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
-import { syntaxPlugins } from "../syntax";
+import { createSyntaxPlugins } from "../syntax";
+import { LinkPopover, LinkPopoverStateStore } from "../syntax/link";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
@@ -77,6 +78,7 @@ function BlockEditorContent({
   onMarkdownChange,
 }: BlockEditorProps) {
   const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
+  const [linkPopoverStateStore] = useState(() => new LinkPopoverStateStore());
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
   const editorRef = useRef<Editor | null>(null);
   const latestMarkdownRef = useRef(initialMarkdownSnapshot);
@@ -206,7 +208,7 @@ function BlockEditorContent({
         })
         .use(commonmark)
         .use(gfm)
-        .use(syntaxPlugins)
+        .use(createSyntaxPlugins(linkPopoverStateStore))
         .use(history)
         .use(listener)
         .use(clipboard);
@@ -215,7 +217,7 @@ function BlockEditorContent({
 
       return editor;
     },
-    [initialMarkdownSnapshot],
+    [initialMarkdownSnapshot, linkPopoverStateStore],
   );
 
   useEffect(() => {
@@ -231,9 +233,10 @@ function BlockEditorContent({
 
   useEffect(
     () => () => {
+      linkPopoverStateStore.destroy();
       editorRef.current = null;
     },
-    [],
+    [linkPopoverStateStore],
   );
 
   return (
@@ -242,6 +245,7 @@ function BlockEditorContent({
       data-code-line-numbers={String(resolvedConfig.markdown.codeBlock.showLineNumbers)}
     >
       <Milkdown />
+      <LinkPopover runtime={runtime} store={linkPopoverStateStore} />
       {isEmpty ? (
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
           <Trans id="block-editor.placeholder">Write a block...</Trans>

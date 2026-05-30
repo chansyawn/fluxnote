@@ -65,7 +65,42 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:247
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:69
+msgid "block-editor.link.confirm"
+msgstr "Confirm"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:68
+msgid "block-editor.link.copied"
+msgstr "Copied"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:67
+msgid "block-editor.link.copy"
+msgstr "Copy"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:70
+msgid "block-editor.link.edit"
+msgstr "Edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:66
+msgid "block-editor.link.open"
+msgstr "Open"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:71
+msgid "block-editor.link.remove"
+msgstr "Remove"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:72
+msgid "block-editor.link.url"
+msgstr "Link URL"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/core/block-editor.tsx:251
 msgid "block-editor.placeholder"
 msgstr "Write a block..."
 

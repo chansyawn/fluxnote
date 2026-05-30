@@ -65,7 +65,42 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:247
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:69
+msgid "block-editor.link.confirm"
+msgstr "提交"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:68
+msgid "block-editor.link.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:67
+msgid "block-editor.link.copy"
+msgstr "复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:70
+msgid "block-editor.link.edit"
+msgstr "编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:66
+msgid "block-editor.link.open"
+msgstr "打开"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:71
+msgid "block-editor.link.remove"
+msgstr "移除"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:72
+msgid "block-editor.link.url"
+msgstr "链接 URL"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/core/block-editor.tsx:251
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 
