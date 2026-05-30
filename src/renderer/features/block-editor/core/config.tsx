@@ -1,5 +1,3 @@
-import { createContext, useContext, type ReactNode } from "react";
-
 import type { BlockEditorConfig, BlockEditorConfigInput } from "./types";
 
 export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
@@ -34,21 +32,4 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
       },
     },
   };
-}
-
-const BlockEditorConfigContext = createContext<BlockEditorConfig>(DEFAULT_BLOCK_EDITOR_CONFIG);
-
-interface BlockEditorConfigProviderProps {
-  children: ReactNode;
-  config: BlockEditorConfig;
-}
-
-export function BlockEditorConfigProvider({ children, config }: BlockEditorConfigProviderProps) {
-  return (
-    <BlockEditorConfigContext.Provider value={config}>{children}</BlockEditorConfigContext.Provider>
-  );
-}
-
-export function useBlockEditorConfig(): BlockEditorConfig {
-  return useContext(BlockEditorConfigContext);
 }
