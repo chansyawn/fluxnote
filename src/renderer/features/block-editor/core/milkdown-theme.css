@@ -93,28 +93,6 @@
   counter-increment: block-editor-code-line;
 }
 
-.block-editor ul,
-.block-editor ol {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
-}
-
-.block-editor ul {
-  list-style-type: disc;
-}
-
-.block-editor ol {
-  list-style-type: decimal;
-}
-
-.block-editor li {
-  margin: 0.125rem 0;
-}
-
-.block-editor li > p {
-  margin: 0;
-}
-
 .block-editor hr {
   border: 0;
   border-top: 1px solid var(--border);

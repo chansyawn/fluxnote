@@ -65,7 +65,7 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:238
+#: src/renderer/features/block-editor/core/block-editor.tsx:245
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 

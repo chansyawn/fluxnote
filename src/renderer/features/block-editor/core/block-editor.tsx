@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import {
   defaultValueCtx,
   Editor,
+  EditorStatus,
   editorViewCtx,
   editorViewOptionsCtx,
   rootCtx,
@@ -24,6 +25,7 @@ import {
 } from "react";
 
 import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
+import { syntaxPlugins } from "../syntax";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
@@ -104,7 +106,7 @@ function BlockEditorContent({
 
   const flushMarkdown = useCallback(async () => {
     const editor = editorRef.current;
-    if (!editor) return latestMarkdownRef.current;
+    if (!editor || editor.status !== EditorStatus.Created) return latestMarkdownRef.current;
 
     const markdown = serializeMarkdown(editor);
     publishMarkdown(markdown);
@@ -181,8 +183,8 @@ function BlockEditorContent({
               return true;
             },
           }));
-          ctx
-            .get(listenerCtx)
+          const listenerManager = ctx.get(listenerCtx);
+          listenerManager
             .markdownUpdated((_ctx, markdown) => {
               publishMarkdown(markdown);
             })
@@ -193,12 +195,17 @@ function BlockEditorContent({
               publishToolbarState(readToolbarState(editor));
             })
             .blur(() => {
-              void flushMarkdown();
+              void flushMarkdown().catch(() => undefined);
               handleBlur();
+            })
+            .destroy(() => {
+              // TODO: Replace Milkdown's markdownUpdated debounce with a local cancellable update flow.
+              listenerManager.listeners.markdownUpdated.length = 0;
             });
         })
         .use(commonmark)
         .use(gfm)
+        .use(syntaxPlugins)
         .use(listener)
         .use(clipboard);
 
