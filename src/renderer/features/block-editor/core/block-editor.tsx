@@ -8,6 +8,7 @@ import {
   rootCtx,
 } from "@milkdown/kit/core";
 import { clipboard } from "@milkdown/kit/plugin/clipboard";
+import { history } from "@milkdown/kit/plugin/history";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
@@ -206,6 +207,7 @@ function BlockEditorContent({
         .use(commonmark)
         .use(gfm)
         .use(syntaxPlugins)
+        .use(history)
         .use(listener)
         .use(clipboard);
 
