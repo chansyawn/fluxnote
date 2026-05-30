@@ -65,12 +65,7 @@ msgid "app.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:282
-msgid "block-editor.content.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:382
+#: src/renderer/features/block-editor/core/block-editor.tsx:238
 msgid "block-editor.placeholder"
 msgstr ""
 

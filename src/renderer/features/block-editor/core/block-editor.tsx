@@ -1,45 +1,38 @@
-import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import {
-  commandsCtx,
   defaultValueCtx,
   Editor,
   editorViewCtx,
   editorViewOptionsCtx,
   rootCtx,
-  serializerCtx,
 } from "@milkdown/kit/core";
 import { clipboard } from "@milkdown/kit/plugin/clipboard";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
-import {
-  commonmark,
-  emphasisSchema,
-  inlineCodeSchema,
-  strongSchema,
-  toggleEmphasisCommand,
-  toggleInlineCodeCommand,
-  toggleStrongCommand,
-} from "@milkdown/kit/preset/commonmark";
-import { gfm, strikethroughSchema, toggleStrikethroughCommand } from "@milkdown/kit/preset/gfm";
-import type { MarkType } from "@milkdown/kit/prose/model";
-import type { EditorView } from "@milkdown/kit/prose/view";
-import { getHTML } from "@milkdown/kit/utils";
+import { commonmark } from "@milkdown/kit/preset/commonmark";
+import { gfm } from "@milkdown/kit/preset/gfm";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
-import { collectImageAssetUrls } from "@shared/features/block-editor/asset-urls";
-import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-
-import { normalizeExternalMarkdown } from "../markdown/external-markdown";
 import {
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorTextFormat,
-  type BlockEditorToolbarState,
-  type BlockEditorToolbarStateListener,
-} from "../toolbar/types";
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
+import {
+  BlockEditorToolbarStateStore,
+  readToolbarState,
+  runFormatCommand,
+} from "../toolbar/editor-toolbar-state";
+import type { BlockEditorToolbarState } from "../toolbar/types";
 import { resolveBlockEditorConfig } from "./config";
 import { resolveTextFormatShortcut } from "./text-format-shortcuts";
-import type { BlockEditorConfig, BlockEditorProps, BlockEditorRuntime } from "./types";
+import type { BlockEditorProps } from "./types";
 
 import "./milkdown-theme.css";
 
@@ -49,118 +42,6 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatStrikeThrough",
   "formatUnderline",
 ]);
-
-const IMAGE_MARKDOWN_PATTERN = /!\[[^\]]*]\(\s*<?(assets:\/\/[^)\s>]+)>?\s*(?:"[^"]*")?\)/g;
-
-function collectMarkdownAssetUrls(markdown: string): string[] {
-  return collectImageAssetUrls(
-    [...markdown.matchAll(IMAGE_MARKDOWN_PATTERN)].map((match) => ({
-      type: "image",
-      url: match[1],
-    })),
-  );
-}
-
-function rewriteHtmlAssetUrls(html: string, assetUrlMap: Map<string, string>): string {
-  let nextHtml = html;
-
-  for (const [assetUrl, fileUrl] of assetUrlMap) {
-    nextHtml = nextHtml.replaceAll(assetUrl, fileUrl);
-  }
-
-  return nextHtml;
-}
-
-function getImageFileUrlForNativeClipboard(
-  markdown: string,
-  assetUrlMap: Map<string, string>,
-): string | undefined {
-  const assetUrls = collectMarkdownAssetUrls(markdown);
-  if (assetUrls.length !== 1) return undefined;
-  return assetUrlMap.get(assetUrls[0]);
-}
-
-function readMarkState(view: EditorView, markType: MarkType): boolean {
-  const { doc, selection, storedMarks } = view.state;
-  const { empty, from, to, $from } = selection;
-
-  if (empty) {
-    return (
-      Boolean(storedMarks?.some((mark) => mark.type === markType)) ||
-      markType.isInSet($from.marks()) !== undefined
-    );
-  }
-
-  return doc.rangeHasMark(from, to, markType);
-}
-
-function toolbarStatesEqual(
-  left: BlockEditorToolbarState,
-  right: BlockEditorToolbarState,
-): boolean {
-  return (
-    left.textFormats.bold === right.textFormats.bold &&
-    left.textFormats.code === right.textFormats.code &&
-    left.textFormats.italic === right.textFormats.italic &&
-    left.textFormats.strikethrough === right.textFormats.strikethrough
-  );
-}
-
-function readToolbarState(editor: Editor): BlockEditorToolbarState {
-  return editor.action((ctx) => {
-    const view = ctx.get(editorViewCtx);
-
-    return {
-      textFormats: {
-        bold: readMarkState(view, strongSchema.type(ctx)),
-        code: readMarkState(view, inlineCodeSchema.type(ctx)),
-        italic: readMarkState(view, emphasisSchema.type(ctx)),
-        strikethrough: readMarkState(view, strikethroughSchema.type(ctx)),
-      },
-    };
-  });
-}
-
-function runFormatCommand(editor: Editor, format: BlockEditorTextFormat): void {
-  editor.action((ctx) => {
-    const commands = ctx.get(commandsCtx);
-    const command = {
-      bold: toggleStrongCommand.key,
-      code: toggleInlineCodeCommand.key,
-      italic: toggleEmphasisCommand.key,
-      strikethrough: toggleStrikethroughCommand.key,
-    }[format];
-
-    commands.call(command);
-  });
-}
-
-function serializeMarkdown(editor: Editor): string {
-  return editor.action((ctx) => {
-    const view = ctx.get(editorViewCtx);
-    const serializer = ctx.get(serializerCtx);
-    return serializer(view.state.doc);
-  });
-}
-
-async function createClipboardData(editor: Editor, runtime: BlockEditorRuntime) {
-  const markdown = normalizeExternalMarkdown(serializeMarkdown(editor));
-  const html = editor.action(getHTML());
-  const assetUrls = collectMarkdownAssetUrls(markdown);
-  const resolvedAssets =
-    assetUrls.length > 0 ? await runtime.assets.resolve({ assetUrls }) : { assets: [] };
-  const assetUrlMap = new Map(
-    resolvedAssets.assets.map((asset) => [asset.assetUrl, asset.fileUrl] as const),
-  );
-  const imageFileUrl = getImageFileUrlForNativeClipboard(markdown, assetUrlMap);
-
-  return {
-    html: rewriteHtmlAssetUrls(html, assetUrlMap),
-    ...(imageFileUrl ? { imageFileUrl } : {}),
-    nodes: assetUrls.map((assetUrl) => ({ type: "image", url: assetUrl })),
-    text: markdown,
-  };
-}
 
 export function BlockEditor({
   ref,
@@ -192,52 +73,43 @@ function BlockEditorContent({
   onBlur,
   onMarkdownChange,
 }: BlockEditorProps) {
-  const { i18n } = useLingui();
-  const initialMarkdownRef = useRef(initialMarkdown);
+  const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
+  const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
   const editorRef = useRef<Editor | null>(null);
-  const latestMarkdownRef = useRef(initialMarkdownRef.current);
-  const onMarkdownChangeRef = useRef(onMarkdownChange);
-  const onBlurRef = useRef(onBlur);
-  const configRef = useRef<BlockEditorConfig>(resolveBlockEditorConfig(config));
-  const toolbarStateRef = useRef<BlockEditorToolbarState>(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
-  const toolbarStateListenersRef = useRef(new Set<BlockEditorToolbarStateListener>());
-  const [isEmpty, setIsEmpty] = useState(initialMarkdownRef.current.trim().length === 0);
+  const latestMarkdownRef = useRef(initialMarkdownSnapshot);
+  const [isEmpty, setIsEmpty] = useState(initialMarkdownSnapshot.trim().length === 0);
 
   const resolvedConfig = useMemo(() => resolveBlockEditorConfig(config), [config]);
 
-  useEffect(() => {
-    onMarkdownChangeRef.current = onMarkdownChange;
-  }, [onMarkdownChange]);
+  const publishMarkdown = useEffectEvent((markdown: string) => {
+    latestMarkdownRef.current = markdown;
+    setIsEmpty(markdown.trim().length === 0);
+    onMarkdownChange(markdown);
+  });
 
-  useEffect(() => {
-    onBlurRef.current = onBlur;
-  }, [onBlur]);
+  const handleBlur = useEffectEvent(() => {
+    onBlur?.();
+  });
 
-  useEffect(() => {
-    configRef.current = resolvedConfig;
-  }, [resolvedConfig]);
+  const resolveShortcut = useEffectEvent((event: KeyboardEvent) =>
+    resolveTextFormatShortcut(event, resolvedConfig.shortcuts.textFormats),
+  );
 
-  const publishToolbarState = useCallback((nextState: BlockEditorToolbarState) => {
-    if (toolbarStatesEqual(toolbarStateRef.current, nextState)) {
-      return;
-    }
-
-    toolbarStateRef.current = nextState;
-    for (const listener of toolbarStateListenersRef.current) {
-      listener(nextState);
-    }
-  }, []);
+  const publishToolbarState = useCallback(
+    (nextState: BlockEditorToolbarState) => {
+      toolbarStateStore.publish(nextState);
+    },
+    [toolbarStateStore],
+  );
 
   const flushMarkdown = useCallback(async () => {
     const editor = editorRef.current;
     if (!editor) return latestMarkdownRef.current;
 
     const markdown = serializeMarkdown(editor);
-    latestMarkdownRef.current = markdown;
-    setIsEmpty(markdown.trim().length === 0);
-    onMarkdownChangeRef.current(markdown);
+    publishMarkdown(markdown);
     return markdown;
-  }, []);
+  }, [publishMarkdown]);
 
   useImperativeHandle(
     ref,
@@ -245,7 +117,7 @@ function BlockEditorContent({
       copy: async () => {
         const editor = editorRef.current;
         if (!editor) return;
-        await runtime.clipboard.write(await createClipboardData(editor, runtime));
+        await runtime.clipboard.write(await createBlockEditorClipboardData(editor, runtime));
       },
       focus: () => {
         editorRef.current?.action((ctx) => {
@@ -259,15 +131,10 @@ function BlockEditorContent({
         publishToolbarState(readToolbarState(editor));
       },
       flush: flushMarkdown,
-      getToolbarState: () => toolbarStateRef.current,
-      subscribeToolbarState: (listener) => {
-        toolbarStateListenersRef.current.add(listener);
-        return () => {
-          toolbarStateListenersRef.current.delete(listener);
-        };
-      },
+      getToolbarState: toolbarStateStore.getSnapshot,
+      subscribeToolbarState: toolbarStateStore.subscribe,
     }),
-    [flushMarkdown, publishToolbarState, runtime],
+    [flushMarkdown, publishToolbarState, runtime, toolbarStateStore],
   );
 
   const milkdown = useEditor(
@@ -275,17 +142,11 @@ function BlockEditorContent({
       const editor = Editor.make()
         .config((ctx) => {
           ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, initialMarkdownRef.current);
+          ctx.set(defaultValueCtx, initialMarkdownSnapshot);
           ctx.update(editorViewOptionsCtx, (options) => ({
             ...options,
             attributes: {
-              "aria-label": i18n._({
-                id: "block-editor.content.label",
-                message: "Markdown block editor",
-              }),
-              "aria-multiline": "true",
               class: "block-editor__content",
-              role: "textbox",
               spellcheck: "true",
             },
             handleDOMEvents: {
@@ -300,10 +161,7 @@ function BlockEditorContent({
               },
             },
             handleKeyDown: (view, event) => {
-              const resolution = resolveTextFormatShortcut(
-                event,
-                configRef.current.shortcuts.textFormats,
-              );
+              const resolution = resolveShortcut(event);
               if (resolution.type === "none") {
                 return options.handleKeyDown?.(view, event) ?? false;
               }
@@ -326,9 +184,7 @@ function BlockEditorContent({
           ctx
             .get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {
-              latestMarkdownRef.current = markdown;
-              setIsEmpty(markdown.trim().length === 0);
-              onMarkdownChangeRef.current(markdown);
+              publishMarkdown(markdown);
             })
             .selectionUpdated(() => {
               publishToolbarState(readToolbarState(editor));
@@ -338,7 +194,7 @@ function BlockEditorContent({
             })
             .blur(() => {
               void flushMarkdown();
-              onBlurRef.current?.();
+              handleBlur();
             });
         })
         .use(commonmark)
@@ -350,7 +206,7 @@ function BlockEditorContent({
 
       return editor;
     },
-    [flushMarkdown, i18n, publishToolbarState],
+    [initialMarkdownSnapshot],
   );
 
   useEffect(() => {

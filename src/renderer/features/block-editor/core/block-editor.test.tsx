@@ -85,23 +85,27 @@ function renderEditor(
   return { runtime, ...rendered };
 }
 
-async function findEditor(): Promise<HTMLElement> {
-  return await screen.findByRole("textbox", { name: /markdown block editor/i });
+async function findEditor(container: HTMLElement): Promise<HTMLElement> {
+  await waitFor(() => {
+    expect(container.querySelector(".block-editor__content")).toBeInTheDocument();
+  });
+
+  return container.querySelector<HTMLElement>(".block-editor__content") as HTMLElement;
 }
 
 describe("BlockEditor", () => {
   it("exposes a labeled editing surface for a Block", async () => {
-    renderEditor({ initialMarkdown: "Hello" });
+    const { container } = renderEditor({ initialMarkdown: "Hello" });
 
-    expect(await findEditor()).toBeInTheDocument();
+    expect(await findEditor(container)).toBeInTheDocument();
     expect(screen.getByText("Hello")).toBeVisible();
   });
 
   it("flushes the latest Markdown through the public handle", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    renderEditor({ initialMarkdown: "**Hello**" }, editorRef);
-    await findEditor();
+    const { container } = renderEditor({ initialMarkdown: "**Hello**" }, editorRef);
+    await findEditor(container);
 
     await expect(editorRef.current?.flush()).resolves.toContain("Hello");
   });
@@ -109,15 +113,14 @@ describe("BlockEditor", () => {
   it("applies configured Block Editor text format shortcuts", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    renderEditor(
+    const { container } = renderEditor(
       {
         config: { shortcuts: { textFormats: { bold: "Control+Shift+B" } } },
         initialMarkdown: "",
       },
       editorRef,
     );
-
-    const editor = await findEditor();
+    const editor = await findEditor(container);
     editor.focus();
     const configuredEvent = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -138,15 +141,14 @@ describe("BlockEditor", () => {
   it("blocks browser format shortcuts that are not configured by Fluxnotes", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    renderEditor(
+    const { container } = renderEditor(
       {
         config: { shortcuts: { textFormats: { bold: null } } },
         initialMarkdown: "Plain text",
       },
       editorRef,
     );
-
-    const editor = await findEditor();
+    const editor = await findEditor(container);
     editor.focus();
     const boldEvent = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -170,14 +172,14 @@ describe("BlockEditor", () => {
       assets: [{ assetUrl: "assets://block/photo.png", fileUrl: "file:///tmp/photo.png" }],
     }));
 
-    renderEditor(
+    const { container } = renderEditor(
       {
         initialMarkdown: "![Alt](assets://block/photo.png)",
         runtime,
       },
       editorRef,
     );
-    await findEditor();
+    await findEditor(container);
 
     await editorRef.current?.copy();
 
@@ -193,8 +195,8 @@ describe("BlockEditor", () => {
     const user = userEvent.setup();
     const onMarkdownChange = vi.fn();
 
-    renderEditor({ initialMarkdown: "", onMarkdownChange });
-    const editor = await findEditor();
+    const { container } = renderEditor({ initialMarkdown: "", onMarkdownChange });
+    const editor = await findEditor(container);
 
     await user.click(editor);
     await user.keyboard("Hello");
@@ -208,7 +210,7 @@ describe("BlockEditor", () => {
     const onMarkdownChange = vi.fn();
     const runtime = createBlockEditorRuntime();
     const editorRef = createRef<BlockEditorHandle>();
-    const { rerender } = renderEditor(
+    const { container, rerender } = renderEditor(
       {
         initialMarkdown: "Local content",
         onMarkdownChange,
@@ -216,7 +218,7 @@ describe("BlockEditor", () => {
       },
       editorRef,
     );
-    const editor = await findEditor();
+    const editor = await findEditor(container);
 
     editor.focus();
 
