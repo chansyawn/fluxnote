@@ -219,6 +219,48 @@ describe("BlockEditor", () => {
     );
   });
 
+  it("copies code block text through the code block controls", async () => {
+    const runtime = createBlockEditorRuntime();
+    const { container } = renderEditor({
+      initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
+      runtime,
+    });
+    await findEditor(container);
+
+    await userEvent.click(await screen.findByRole("button", { name: "Copy code" }));
+
+    expect(runtime.clipboard.writeText).toHaveBeenCalledWith("const answer = 42;");
+    expect(await screen.findByRole("button", { name: "Copy code" })).toBeVisible();
+  });
+
+  it("updates a code block language through the code block controls", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderEditor(
+      {
+        initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
+      },
+      editorRef,
+    );
+    await findEditor(container);
+
+    await userEvent.click(await screen.findByRole("combobox", { name: "Code language" }));
+    await userEvent.click(await screen.findByRole("option", { name: "Python" }));
+
+    await expect(editorRef.current?.flush()).resolves.toContain("```python");
+  });
+
+  it("renders code block line numbers when the Markdown preference is enabled", async () => {
+    const { container } = renderEditor({
+      config: { markdown: { codeBlock: { showLineNumbers: true } } },
+      initialMarkdown: ["```ts", "const answer = 42;", "answer;", "```"].join("\n"),
+    });
+    await findEditor(container);
+
+    await waitFor(() => {
+      expect(container.querySelectorAll("pre .line-number")).toHaveLength(2);
+    });
+  });
+
   it("notifies Markdown changes from user editing", async () => {
     const user = userEvent.setup();
     const onMarkdownChange = vi.fn();

@@ -10,11 +10,14 @@ import {
 import { clipboard } from "@milkdown/kit/plugin/clipboard";
 import { history } from "@milkdown/kit/plugin/history";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
-
-import "@milkdown/kit/prose/view/style/prosemirror.css";
 import { commonmark } from "@milkdown/kit/preset/commonmark";
 import { gfm } from "@milkdown/kit/preset/gfm";
+
+import "@milkdown/kit/prose/view/style/prosemirror.css";
+import { highlight, highlightPluginConfig } from "@milkdown/plugin-highlight";
+import { createParser } from "@milkdown/plugin-highlight/shiki";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
+import { withLineNumbers } from "prosemirror-highlight";
 import {
   useCallback,
   useEffect,
@@ -24,9 +27,16 @@ import {
   useRef,
   useState,
 } from "react";
+import { createHighlighter } from "shiki";
 
 import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
 import { createSyntaxPlugins } from "../syntax";
+import {
+  CodeBlockControls,
+  CodeBlockControlsStateStore,
+  getShikiLanguage,
+  SHIKI_CODE_LANGUAGES,
+} from "../syntax/code";
 import { LinkPopover, LinkPopoverStateStore } from "../syntax/link";
 import {
   BlockEditorToolbarStateStore,
@@ -46,6 +56,23 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatStrikeThrough",
   "formatUnderline",
 ]);
+
+const SHIKI_THEMES = ["vitesse-light", "vitesse-dark"] as const;
+
+let shikiHighlighterPromise: ReturnType<typeof createHighlighter> | null = null;
+
+function getShikiHighlighter() {
+  shikiHighlighterPromise ??= createHighlighter({
+    langs: SHIKI_CODE_LANGUAGES,
+    themes: [...SHIKI_THEMES],
+  });
+
+  return shikiHighlighterPromise;
+}
+
+function resolveShikiTheme() {
+  return document.documentElement.classList.contains("dark") ? SHIKI_THEMES[1] : SHIKI_THEMES[0];
+}
 
 export function BlockEditor({
   ref,
@@ -79,7 +106,9 @@ function BlockEditorContent({
 }: BlockEditorProps) {
   const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
   const [linkPopoverStateStore] = useState(() => new LinkPopoverStateStore());
+  const [codeBlockControlsStateStore] = useState(() => new CodeBlockControlsStateStore());
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const latestMarkdownRef = useRef(initialMarkdownSnapshot);
   const [isEmpty, setIsEmpty] = useState(initialMarkdownSnapshot.trim().length === 0);
@@ -145,9 +174,14 @@ function BlockEditorContent({
   const milkdown = useEditor(
     (root) => {
       const editor = Editor.make()
-        .config((ctx) => {
+        .config(async (ctx) => {
           ctx.set(rootCtx, root);
           ctx.set(defaultValueCtx, initialMarkdownSnapshot);
+          const parser = createParser(await getShikiHighlighter(), { theme: resolveShikiTheme() });
+          ctx.set(highlightPluginConfig.key, {
+            languageExtractor: (node) => getShikiLanguage(node.attrs.language),
+            parser: withLineNumbers(parser),
+          });
           ctx.update(editorViewOptionsCtx, (options) => ({
             ...options,
             attributes: {
@@ -208,7 +242,8 @@ function BlockEditorContent({
         })
         .use(commonmark)
         .use(gfm)
-        .use(createSyntaxPlugins(linkPopoverStateStore))
+        .use(highlight)
+        .use(createSyntaxPlugins(linkPopoverStateStore, codeBlockControlsStateStore))
         .use(history)
         .use(listener)
         .use(clipboard);
@@ -217,7 +252,7 @@ function BlockEditorContent({
 
       return editor;
     },
-    [initialMarkdownSnapshot, linkPopoverStateStore],
+    [codeBlockControlsStateStore, initialMarkdownSnapshot, linkPopoverStateStore],
   );
 
   useEffect(() => {
@@ -234,18 +269,21 @@ function BlockEditorContent({
   useEffect(
     () => () => {
       linkPopoverStateStore.destroy();
+      codeBlockControlsStateStore.destroy();
       editorRef.current = null;
     },
-    [linkPopoverStateStore],
+    [codeBlockControlsStateStore, linkPopoverStateStore],
   );
 
   return (
     <div
+      ref={rootRef}
       className="block-editor relative text-sm"
       data-code-line-numbers={String(resolvedConfig.markdown.codeBlock.showLineNumbers)}
     >
       <Milkdown />
       <LinkPopover runtime={runtime} store={linkPopoverStateStore} />
+      <CodeBlockControls rootRef={rootRef} runtime={runtime} store={codeBlockControlsStateStore} />
       {isEmpty ? (
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
           <Trans id="block-editor.placeholder">Write a block...</Trans>

@@ -65,6 +65,31 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:167
+msgid "block-editor.code.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:166
+msgid "block-editor.code.copy"
+msgstr "复制代码"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:94
+msgid "block-editor.code.language.empty"
+msgstr "没有匹配的语言"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:98
+msgid "block-editor.code.language.label"
+msgstr "代码语言"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:135
+msgid "block-editor.code.language.search"
+msgstr "搜索语言"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/block-editor/syntax/link/link-popover.tsx:69
 msgid "block-editor.link.confirm"
 msgstr "提交"
@@ -100,7 +125,7 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:251
+#: src/renderer/features/block-editor/core/block-editor.tsx:289
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 

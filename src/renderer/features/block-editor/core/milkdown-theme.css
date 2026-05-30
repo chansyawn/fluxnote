@@ -70,29 +70,6 @@
   padding: 0.1rem 0.25rem;
 }
 
-.block-editor pre {
-  background: var(--muted);
-  border-radius: var(--radius-md);
-  margin: 0.75rem 0;
-  overflow-x: auto;
-  padding: 0.75rem;
-}
-
-.block-editor pre code {
-  background: transparent;
-  border-radius: 0;
-  display: block;
-  padding: 0;
-}
-
-.block-editor[data-code-line-numbers="true"] pre code {
-  counter-reset: block-editor-code-line;
-}
-
-.block-editor[data-code-line-numbers="true"] pre code .line {
-  counter-increment: block-editor-code-line;
-}
-
 .block-editor hr {
   border: 0;
   border-top: 1px solid var(--border);
