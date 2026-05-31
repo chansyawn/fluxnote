@@ -1,19 +1,15 @@
-.block-editor {
-  min-height: 4rem;
-}
+@reference "#global.css";
 
 .block-editor .ProseMirror {
-  min-height: 4rem;
-  outline: none;
-  word-break: break-word;
+  @apply min-h-16 wrap-break-word outline-none;
 }
 
 .block-editor .ProseMirror > *:first-child {
-  margin-top: 0;
+  @apply mt-0;
 }
 
 .block-editor .ProseMirror > *:last-child {
-  margin-bottom: 0;
+  @apply mb-0;
 }
 
 .block-editor h1,
@@ -22,65 +18,47 @@
 .block-editor h4,
 .block-editor h5,
 .block-editor h6 {
-  font-weight: 650;
-  line-height: 1.25;
-  margin: 0.75rem 0 0.375rem;
+  @apply mt-3 mb-1.5 leading-tight font-semibold;
 }
 
 .block-editor h1 {
-  font-size: 1.5rem;
+  @apply text-2xl;
 }
 
 .block-editor h2 {
-  font-size: 1.25rem;
+  @apply text-xl;
 }
 
 .block-editor h3 {
-  font-size: 1.125rem;
+  @apply text-lg;
 }
 
 .block-editor h4,
 .block-editor h5,
 .block-editor h6 {
-  font-size: 1rem;
+  @apply text-base;
 }
 
 .block-editor p {
-  margin: 0.375rem 0;
+  @apply my-1.5;
 }
 
 .block-editor blockquote {
-  border-left: 3px solid var(--border);
-  color: var(--muted-foreground);
-  margin: 0.75rem 0;
-  padding-left: 0.75rem;
+  @apply border-border text-muted-foreground my-3 border-l-2 pl-3;
 }
 
 .block-editor a {
-  color: var(--foreground);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
+  @apply text-foreground underline underline-offset-2;
 }
 
 .block-editor code {
-  background: var(--muted);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 0.92em;
-  padding: 0.1rem 0.25rem;
+  @apply bg-muted rounded-sm px-1 py-0.5 font-mono text-xs;
 }
 
 .block-editor hr {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 0.875rem 0;
+  @apply border-border my-3 border-0 border-t;
 }
 
 .block-editor img {
-  border-radius: var(--radius-md);
-  display: inline;
-  height: auto;
-  margin: 0 0.125rem;
-  max-width: 100%;
-  vertical-align: text-bottom;
+  @apply mx-0.5 inline h-auto max-w-full rounded-md align-text-bottom;
 }
