@@ -5,13 +5,28 @@ import { I18nProvider } from "@lingui/react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { act, createRef, type ComponentProps, type ReactNode, type Ref } from "react";
-import { beforeAll, describe, expect, it, vi } from "vite-plus/test";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { BlockEditor } from "./block-editor";
 import type { BlockEditorHandle, BlockEditorRuntime } from "./types";
 
+type MockThemeMode = "light" | "dark" | "system";
+type MockResolvedTheme = "light" | "dark";
+
 vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
+}));
+
+const themeMocks = vi.hoisted(() => ({
+  useThemeState: vi.fn(() => ({
+    resolvedTheme: "light" as MockResolvedTheme,
+    setThemeMode: vi.fn(),
+    themeMode: "light" as MockThemeMode,
+  })),
+}));
+
+vi.mock("@renderer/app/theme", () => ({
+  useThemeState: themeMocks.useThemeState,
 }));
 
 (
@@ -43,6 +58,14 @@ beforeAll(() => {
       },
     }) as DOMRectList;
   Range.prototype.getBoundingClientRect = () => new DOMRect(0, 0, 0, 0);
+});
+
+beforeEach(() => {
+  themeMocks.useThemeState.mockReturnValue({
+    resolvedTheme: "light",
+    setThemeMode: vi.fn(),
+    themeMode: "light",
+  });
 });
 
 async function findLink(container: HTMLElement, label: string): Promise<HTMLAnchorElement> {
@@ -259,6 +282,61 @@ describe("BlockEditor", () => {
     await waitFor(() => {
       expect(container.querySelectorAll("pre .line-number")).toHaveLength(2);
     });
+  });
+
+  it("configures code highlighting before the highlight plugin starts", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const { container } = renderEditor({
+        config: { markdown: { codeBlock: { showLineNumbers: true } } },
+        initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
+      });
+      await findEditor(container);
+
+      await waitFor(() => {
+        expect(container.querySelectorAll("pre .line-number")).toHaveLength(1);
+      });
+
+      const consoleOutput = consoleError.mock.calls.flat().map(String).join("\n");
+      expect(consoleOutput).not.toContain(
+        "Highlight plugin requires a parser to be set in the highlightPluginConfig.",
+      );
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
+  it("recreates the editor on theme changes while preserving code block behavior", async () => {
+    const runtime = createBlockEditorRuntime();
+    const initialMarkdown = ["```ts", "const answer = 42;", "```"].join("\n");
+    const { container, rerender } = renderEditor({
+      initialMarkdown,
+      runtime,
+    });
+    const initialEditor = await findEditor(container);
+
+    themeMocks.useThemeState.mockReturnValue({
+      resolvedTheme: "dark",
+      setThemeMode: vi.fn(),
+      themeMode: "dark",
+    });
+    rerender(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          initialMarkdown={initialMarkdown}
+          runtime={runtime}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector(".block-editor__content")).not.toBe(initialEditor);
+    });
+    await userEvent.click(await screen.findByRole("button", { name: "Copy code" }));
+
+    expect(runtime.clipboard.writeText).toHaveBeenCalledWith("const answer = 42;");
   });
 
   it("notifies Markdown changes from user editing", async () => {

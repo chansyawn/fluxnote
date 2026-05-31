@@ -65,27 +65,27 @@ msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:167
+#: src/renderer/features/block-editor/syntax/code/code-block-node-view.tsx:123
 msgid "block-editor.code.copied"
 msgstr "Copied"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:166
+#: src/renderer/features/block-editor/syntax/code/code-block-node-view.tsx:122
 msgid "block-editor.code.copy"
 msgstr "Copy code"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:94
+#: src/renderer/features/block-editor/syntax/code/code-block-node-view.tsx:50
 msgid "block-editor.code.language.empty"
 msgstr "No matching languages"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:98
+#: src/renderer/features/block-editor/syntax/code/code-block-node-view.tsx:54
 msgid "block-editor.code.language.label"
 msgstr "Code language"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-block-controls.tsx:135
+#: src/renderer/features/block-editor/syntax/code/code-block-node-view.tsx:91
 msgid "block-editor.code.language.search"
 msgstr "Search language"
 
@@ -125,7 +125,7 @@ msgid "block-editor.link.url"
 msgstr "Link URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:295
+#: src/renderer/features/block-editor/core/block-editor.tsx:274
 msgid "block-editor.placeholder"
 msgstr "Write a block..."
 

@@ -1,4 +1,11 @@
 import { useLingui } from "@lingui/react";
+import { codeBlockSchema } from "@milkdown/kit/preset/commonmark";
+import { $view } from "@milkdown/kit/utils";
+import {
+  useNodeViewContext,
+  type ReactNodeViewComponent,
+  type ReactNodeViewUserOptions,
+} from "@prosemirror-adapter/react";
 import { Button } from "@renderer/ui/components/button";
 import {
   Combobox,
@@ -11,21 +18,10 @@ import {
 } from "@renderer/ui/components/combobox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { CheckIcon, Code2Icon, CopyIcon } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  type RefObject,
-} from "react";
+import type { NodeViewConstructor } from "prosemirror-view";
+import { useEffect, useMemo, useState } from "react";
 
 import type { BlockEditorRuntime } from "../../core/types";
-import type {
-  CodeBlockControlTarget,
-  CodeBlockControlsStateStore,
-} from "./code-block-controls-plugin";
 import {
   CODE_LANGUAGE_OPTIONS,
   getCodeLanguageOption,
@@ -34,51 +30,11 @@ import {
 } from "./code-language-options";
 
 const COPY_FEEDBACK_DURATION_MS = 1600;
-
-interface MeasuredCodeBlockControl extends CodeBlockControlTarget {
-  height: number;
-  left: number;
-  top: number;
-  width: number;
-}
-
-interface CodeBlockControlsProps {
-  rootRef: RefObject<HTMLElement | null>;
-  runtime: BlockEditorRuntime;
-  store: CodeBlockControlsStateStore;
-}
+const CODE_BLOCK_CLASS_NAME = "block-editor__code-block";
+const CODE_BLOCK_TOOLBAR_SELECTOR = ".block-editor__code-toolbar";
 
 function normalizeSearchValue(value: string): string {
   return value.trim().toLocaleLowerCase();
-}
-
-function measureTargets(
-  root: HTMLElement | null,
-  targets: ReadonlyArray<CodeBlockControlTarget>,
-): MeasuredCodeBlockControl[] {
-  if (!root) return [];
-
-  const rootRect = root.getBoundingClientRect();
-  return targets.flatMap((target): MeasuredCodeBlockControl[] => {
-    if (!target.element.isConnected) return [];
-
-    const rect = target.element.getBoundingClientRect();
-    return [
-      {
-        ...target,
-        height: rect.height,
-        left: rect.left - rootRect.left + root.scrollLeft,
-        top: rect.top - rootRect.top + root.scrollTop,
-        width: rect.width,
-      },
-    ];
-  });
-}
-
-function updateCodeBlockLanguage(target: CodeBlockControlTarget, option: CodeLanguageOption): void {
-  const language = getCodeLanguageValue(option);
-  target.view.dispatch(target.view.state.tr.setNodeAttribute(target.pos, "language", language));
-  target.view.focus();
 }
 
 interface CodeLanguageComboboxProps {
@@ -156,11 +112,11 @@ function CodeLanguageCombobox({ language, onLanguageChange }: CodeLanguageCombob
 }
 
 interface CodeCopyButtonProps {
-  getCode: () => string;
+  code: string;
   runtime: BlockEditorRuntime;
 }
 
-function CodeCopyButton({ getCode, runtime }: CodeCopyButtonProps) {
+function CodeCopyButton({ code, runtime }: CodeCopyButtonProps) {
   const { i18n } = useLingui();
   const [copied, setCopied] = useState(false);
   const copyLabel = i18n._({ id: "block-editor.code.copy", message: "Copy code" });
@@ -182,7 +138,7 @@ function CodeCopyButton({ getCode, runtime }: CodeCopyButtonProps) {
             type="button"
             variant="ghost"
             onClick={() => {
-              void runtime.clipboard.writeText(getCode()).then(() => setCopied(true));
+              void runtime.clipboard.writeText(code).then(() => setCopied(true));
             }}
           />
         }
@@ -195,71 +151,55 @@ function CodeCopyButton({ getCode, runtime }: CodeCopyButtonProps) {
   );
 }
 
-export function CodeBlockControls({ rootRef, runtime, store }: CodeBlockControlsProps) {
-  const targets = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
-  const [measuredTargets, setMeasuredTargets] = useState<MeasuredCodeBlockControl[]>([]);
+function getNodeLanguage(language: unknown): string | null {
+  return typeof language === "string" ? language : null;
+}
 
-  const measure = useCallback(() => {
-    setMeasuredTargets(measureTargets(rootRef.current, targets));
-  }, [rootRef, targets]);
+function createCodeBlockNodeViewComponent(runtime: BlockEditorRuntime): ReactNodeViewComponent {
+  function CodeBlockNodeView() {
+    const { contentRef, node, setAttrs, view } = useNodeViewContext();
+    const language = getNodeLanguage(node.attrs.language);
 
-  useLayoutEffect(() => {
-    measure();
-  }, [measure]);
-
-  useEffect(() => {
-    measure();
-    window.addEventListener("resize", measure);
-    window.addEventListener("scroll", measure, true);
-
-    return () => {
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("scroll", measure, true);
-    };
-  }, [measure]);
-
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-
-    const resizeObserver = new ResizeObserver(measure);
-    if (rootRef.current) resizeObserver.observe(rootRef.current);
-
-    for (const target of targets) {
-      resizeObserver.observe(target.element);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [measure, rootRef, targets]);
-
-  if (measuredTargets.length === 0) return null;
-
-  return (
-    <>
-      {measuredTargets.map((target) => (
-        <div
-          key={target.id}
-          className="block-editor__code-toolbar"
-          contentEditable={false}
-          style={{
-            inlineSize: target.width,
-            insetBlockStart: target.top,
-            insetInlineStart: target.left,
-          }}
-        >
+    return (
+      <>
+        <div className="block-editor__code-toolbar" contentEditable={false}>
           <CodeLanguageCombobox
-            language={target.language}
-            onLanguageChange={(option) => updateCodeBlockLanguage(target, option)}
-          />
-          <CodeCopyButton
-            runtime={runtime}
-            getCode={() => {
-              return target.text;
+            language={language}
+            onLanguageChange={(option) => {
+              setAttrs({ language: getCodeLanguageValue(option) });
+              view.focus();
             }}
           />
+          <CodeCopyButton code={node.textContent} runtime={runtime} />
         </div>
-      ))}
-    </>
+        <pre ref={contentRef} />
+      </>
+    );
+  }
+
+  return CodeBlockNodeView;
+}
+
+export interface CodeBlockViewPluginInput {
+  nodeViewFactory: (options: ReactNodeViewUserOptions) => NodeViewConstructor;
+  runtime: BlockEditorRuntime;
+}
+
+export function createCodeBlockViewPlugin({ nodeViewFactory, runtime }: CodeBlockViewPluginInput) {
+  return $view(codeBlockSchema.node, (ctx) =>
+    nodeViewFactory({
+      as: () => {
+        const element = document.createElement("div");
+        element.className = CODE_BLOCK_CLASS_NAME;
+        return element;
+      },
+      component: createCodeBlockNodeViewComponent(runtime),
+      contentAs: "code",
+      update: (node) => node.type === codeBlockSchema.type(ctx),
+      stopEvent: (event) => {
+        const target = event.target;
+        return target instanceof Element && Boolean(target.closest(CODE_BLOCK_TOOLBAR_SELECTOR));
+      },
+    }),
   );
 }

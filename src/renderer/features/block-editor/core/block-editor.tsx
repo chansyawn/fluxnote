@@ -14,11 +14,13 @@ import { commonmark } from "@milkdown/kit/preset/commonmark";
 import { gfm } from "@milkdown/kit/preset/gfm";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
-import { highlight, highlightPluginConfig } from "@milkdown/plugin-highlight";
-import { createParser } from "@milkdown/plugin-highlight/shiki";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
-import { ProsemirrorAdapterProvider, usePluginViewFactory } from "@prosemirror-adapter/react";
-import { withLineNumbers } from "prosemirror-highlight";
+import {
+  ProsemirrorAdapterProvider,
+  useNodeViewFactory,
+  usePluginViewFactory,
+} from "@prosemirror-adapter/react";
+import { useThemeState } from "@renderer/app/theme";
 import {
   useCallback,
   useEffect,
@@ -28,16 +30,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { createHighlighter } from "shiki";
 
 import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
 import { createSyntaxPlugins } from "../syntax";
-import {
-  CodeBlockControls,
-  CodeBlockControlsStateStore,
-  getShikiLanguage,
-  SHIKI_CODE_LANGUAGES,
-} from "../syntax/code";
+import { configureCodeHighlight } from "../syntax/code";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
@@ -56,23 +52,6 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatStrikeThrough",
   "formatUnderline",
 ]);
-
-const SHIKI_THEMES = ["vitesse-light", "vitesse-dark"] as const;
-
-let shikiHighlighterPromise: ReturnType<typeof createHighlighter> | null = null;
-
-function getShikiHighlighter() {
-  shikiHighlighterPromise ??= createHighlighter({
-    langs: SHIKI_CODE_LANGUAGES,
-    themes: [...SHIKI_THEMES],
-  });
-
-  return shikiHighlighterPromise;
-}
-
-function resolveShikiTheme() {
-  return document.documentElement.classList.contains("dark") ? SHIKI_THEMES[1] : SHIKI_THEMES[0];
-}
 
 export function BlockEditor({
   ref,
@@ -107,9 +86,10 @@ function BlockEditorContent({
   onMarkdownChange,
 }: BlockEditorProps) {
   const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
-  const [codeBlockControlsStateStore] = useState(() => new CodeBlockControlsStateStore());
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
+  const codeBlockNodeViewFactory = useNodeViewFactory();
   const linkPluginViewFactory = usePluginViewFactory();
+  const { resolvedTheme } = useThemeState();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const latestMarkdownRef = useRef(initialMarkdownSnapshot);
@@ -179,11 +159,7 @@ function BlockEditorContent({
         .config(async (ctx) => {
           ctx.set(rootCtx, root);
           ctx.set(defaultValueCtx, initialMarkdownSnapshot);
-          const parser = createParser(await getShikiHighlighter(), { theme: resolveShikiTheme() });
-          ctx.set(highlightPluginConfig.key, {
-            languageExtractor: (node) => getShikiLanguage(node.attrs.language),
-            parser: withLineNumbers(parser),
-          });
+          await configureCodeHighlight(ctx, { theme: resolvedTheme });
           ctx.update(editorViewOptionsCtx, (options) => ({
             ...options,
             attributes: {
@@ -244,10 +220,9 @@ function BlockEditorContent({
         })
         .use(commonmark)
         .use(gfm)
-        .use(highlight)
         .use(
           createSyntaxPlugins({
-            codeBlockControlsStateStore,
+            codeBlockNodeViewFactory,
             linkPluginViewFactory,
             runtime,
           }),
@@ -260,7 +235,13 @@ function BlockEditorContent({
 
       return editor;
     },
-    [codeBlockControlsStateStore, initialMarkdownSnapshot, linkPluginViewFactory, runtime],
+    [
+      codeBlockNodeViewFactory,
+      initialMarkdownSnapshot,
+      linkPluginViewFactory,
+      resolvedTheme,
+      runtime,
+    ],
   );
 
   useEffect(() => {
@@ -276,10 +257,9 @@ function BlockEditorContent({
 
   useEffect(
     () => () => {
-      codeBlockControlsStateStore.destroy();
       editorRef.current = null;
     },
-    [codeBlockControlsStateStore],
+    [],
   );
 
   return (
@@ -289,7 +269,6 @@ function BlockEditorContent({
       data-code-line-numbers={String(resolvedConfig.markdown.codeBlock.showLineNumbers)}
     >
       <Milkdown />
-      <CodeBlockControls rootRef={rootRef} runtime={runtime} store={codeBlockControlsStateStore} />
       {isEmpty ? (
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
           <Trans id="block-editor.placeholder">Write a block...</Trans>

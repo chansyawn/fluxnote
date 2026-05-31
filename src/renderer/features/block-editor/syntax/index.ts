@@ -1,25 +1,30 @@
 import "./list/list.css";
 import type { BlockEditorRuntime } from "../core/types";
-import { createCodeBlockControlsPlugin, type CodeBlockControlsStateStore } from "./code";
+import {
+  codeHighlightPlugins,
+  createCodeBlockViewPlugin,
+  type CodeBlockViewPluginInput,
+} from "./code";
 import { createLinkPopoverPlugin, type LinkPopoverPluginInput } from "./link";
 import { listSyntaxPlugins } from "./list";
 
 export const syntaxPlugins = [...listSyntaxPlugins];
 
 interface BlockEditorSyntaxPluginInput {
-  codeBlockControlsStateStore: CodeBlockControlsStateStore;
+  codeBlockNodeViewFactory: CodeBlockViewPluginInput["nodeViewFactory"];
   linkPluginViewFactory: LinkPopoverPluginInput["pluginViewFactory"];
   runtime: BlockEditorRuntime;
 }
 
 export function createSyntaxPlugins({
-  codeBlockControlsStateStore,
+  codeBlockNodeViewFactory,
   linkPluginViewFactory,
   runtime,
 }: BlockEditorSyntaxPluginInput) {
   return [
     ...syntaxPlugins,
+    ...codeHighlightPlugins,
     createLinkPopoverPlugin({ pluginViewFactory: linkPluginViewFactory, runtime }),
-    createCodeBlockControlsPlugin(codeBlockControlsStateStore),
+    createCodeBlockViewPlugin({ nodeViewFactory: codeBlockNodeViewFactory, runtime }),
   ];
 }

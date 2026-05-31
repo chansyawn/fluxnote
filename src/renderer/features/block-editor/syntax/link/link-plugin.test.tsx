@@ -16,6 +16,18 @@ vi.mock("@lingui/react/macro", () => ({
   Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
+const themeMocks = vi.hoisted(() => ({
+  useThemeState: vi.fn(() => ({
+    resolvedTheme: "light" as const,
+    setThemeMode: vi.fn(),
+    themeMode: "light" as const,
+  })),
+}));
+
+vi.mock("@renderer/app/theme", () => ({
+  useThemeState: themeMocks.useThemeState,
+}));
+
 (
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
