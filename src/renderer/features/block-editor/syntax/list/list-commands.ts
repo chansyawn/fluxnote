@@ -2,6 +2,7 @@ import { commandsCtx } from "@milkdown/kit/core";
 import type { Ctx } from "@milkdown/kit/ctx";
 import {
   bulletListSchema,
+  liftListItemCommand,
   listItemSchema,
   orderedListSchema,
 } from "@milkdown/kit/preset/commonmark";
@@ -51,6 +52,46 @@ function createListSchemaTypes(ctx: Ctx): ListSchemaTypes {
 
 function getTargetListType(format: ListBlockFormat, types: ListSchemaTypes): NodeType {
   return format === "orderedList" ? types.orderedList : types.bulletList;
+}
+
+function isListItemInFormat(
+  state: EditorState,
+  item: ListItemRange,
+  format: ListBlockFormat,
+  types: ListSchemaTypes,
+): boolean {
+  const $position = state.doc.resolve(item.position);
+  const expectedListType = getTargetListType(format, types);
+  let isInsideExpectedList = false;
+
+  for (let depth = $position.depth; depth > 0; depth -= 1) {
+    const node = $position.node(depth);
+    if (node.type !== types.bulletList && node.type !== types.orderedList) continue;
+
+    isInsideExpectedList = node.type === expectedListType;
+    break;
+  }
+
+  if (!isInsideExpectedList) return false;
+
+  if (format === "taskList") {
+    return item.node.attrs.checked !== null;
+  }
+
+  return item.node.attrs.checked === null;
+}
+
+function selectedListItemsMatchFormat(
+  state: EditorState,
+  format: ListBlockFormat,
+  types: ListSchemaTypes,
+): boolean {
+  const selectedItems = findSelectionListItems(state, types);
+
+  return (
+    selectedItems.length > 0 &&
+    selectedItems.every((item) => isListItemInFormat(state, item, format, types))
+  );
 }
 
 function getListItemAttrs(format: ListBlockFormat, node: Node, index: number) {
@@ -168,6 +209,10 @@ export function createSetListBlockCommand(ctx: Ctx, format: ListBlockFormat): Co
   const types = createListSchemaTypes(ctx);
 
   return (state, dispatch) => {
+    if (selectedListItemsMatchFormat(state, format, types)) {
+      return ctx.get(commandsCtx).call(liftListItemCommand.key);
+    }
+
     const tr = state.tr;
     const changedListType = convertContainingListBlocks(state, tr, format, types);
     const changedListItems = setSelectedListItemAttrs(state, tr, format, types);

@@ -99,6 +99,61 @@ describe("BlockEditor", () => {
     await expect(editorRef.current?.flush()).resolves.toContain("## Title");
   });
 
+  it("toggles toolbar text block commands back to paragraph", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Title" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "heading2", type: "set-block" });
+      editorRef.current?.runToolbarCommand({ format: "heading2", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().blockFormat).toBe("paragraph");
+    await expect(editorRef.current?.flush()).resolves.toContain("Title");
+  });
+
+  it("toggles toolbar code block commands back to paragraph", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "const value = 1;" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "codeBlock", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().blockFormat).toBe("codeBlock");
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "codeBlock", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().blockFormat).toBe("paragraph");
+    await expect(editorRef.current?.flush()).resolves.toContain("const value = 1;");
+  });
+
+  it("toggles toolbar blockquote commands back to paragraph", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Quote" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "blockquote", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.blockquote).toBe(true);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "blockquote", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.blockquote).toBe(false);
+    await expect(editorRef.current?.flush()).resolves.toContain("Quote");
+  });
+
   it("runs toolbar list commands through the public handle", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
@@ -119,6 +174,59 @@ describe("BlockEditor", () => {
     expect(editorRef.current?.getToolbarState().activeBlocks.orderedList).toBe(true);
     expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(false);
     await expect(editorRef.current?.flush()).resolves.toContain("1. Task");
+  });
+
+  it("toggles toolbar list commands back to paragraph", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Task" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "taskList", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(true);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "taskList", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(false);
+    await expect(editorRef.current?.flush()).resolves.toContain("Task");
+  });
+
+  it("toggles configured Block Editor block shortcuts back to paragraph", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor(
+      {
+        config: { shortcuts: { editor: { "editor.heading2": "Control+Shift+2" } } },
+        initialMarkdown: "Title",
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+
+    for (const key of ["2", "2"]) {
+      const configuredEvent = new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        ctrlKey: true,
+        key,
+        shiftKey: true,
+      });
+
+      await act(async () => {
+        editor.dispatchEvent(configuredEvent);
+      });
+
+      expect(configuredEvent.defaultPrevented).toBe(true);
+    }
+
+    expect(editorRef.current?.getToolbarState().blockFormat).toBe("paragraph");
+    await expect(editorRef.current?.flush()).resolves.toContain("Title");
   });
 
   it("applies configured Block Editor task list shortcuts", async () => {

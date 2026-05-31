@@ -11,53 +11,37 @@ import {
   strongKeymap,
 } from "@milkdown/kit/preset/commonmark";
 import { strikethroughKeymap } from "@milkdown/kit/preset/gfm";
-import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
 
 import type { BlockEditorShortcuts } from "./types";
 
 const DISABLED_SHORTCUTS: string[] = [];
 
-function toProseMirrorKeyName(shortcut: string): string {
-  const parts = shortcut.split("+");
-  const key = parts.at(-1);
-
-  if (key && /^[A-Z]$/.test(key)) {
-    return [...parts.slice(0, -1), key.toLowerCase()].join("-");
-  }
-
-  return parts.join("-");
-}
-
-function toMilkdownShortcut(shortcut: ShortcutBinding): string | string[] {
-  return shortcut ? toProseMirrorKeyName(shortcut) : DISABLED_SHORTCUTS;
-}
-
-export function configureMilkdownKeymaps(ctx: Ctx, shortcuts: BlockEditorShortcuts): void {
+export function configureMilkdownKeymaps(ctx: Ctx, _shortcuts: BlockEditorShortcuts): void {
   ctx.update(headingKeymap.key, (keymap) => ({
     ...keymap,
     TurnIntoH1: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading1"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
     TurnIntoH2: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading2"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
     TurnIntoH3: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading3"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
     TurnIntoH4: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading4"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
     TurnIntoH5: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading5"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
     TurnIntoH6: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.heading6"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   }));
 
   ctx.set(blockquoteKeymap.key, {
     WrapInBlockquote: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.blockquote"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
@@ -75,37 +59,37 @@ export function configureMilkdownKeymaps(ctx: Ctx, shortcuts: BlockEditorShortcu
 
   ctx.set(codeBlockKeymap.key, {
     CreateCodeBlock: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.codeBlock"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(paragraphKeymap.key, {
     TurnIntoText: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.paragraph"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(strongKeymap.key, {
     ToggleBold: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.bold"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(emphasisKeymap.key, {
     ToggleEmphasis: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.italic"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(inlineCodeKeymap.key, {
     ToggleInlineCode: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.inlineCode"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(strikethroughKeymap.key, {
     ToggleStrikethrough: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.strikethrough"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 }
