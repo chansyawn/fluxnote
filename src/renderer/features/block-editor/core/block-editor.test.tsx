@@ -14,6 +14,84 @@ import {
 } from "../test/block-editor-test-utils";
 import type { BlockEditorHandle } from "./types";
 
+function getEditorTextNodes(editor: HTMLElement): Text[] {
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  const textNodes: Text[] = [];
+  let node = walker.nextNode();
+
+  while (node) {
+    if (node instanceof Text) {
+      textNodes.push(node);
+    }
+    node = walker.nextNode();
+  }
+
+  return textNodes;
+}
+
+function resolveEditorTextPosition(
+  editor: HTMLElement,
+  targetOffset: number,
+): { node: Text; offset: number } {
+  let consumed = 0;
+
+  for (const node of getEditorTextNodes(editor)) {
+    const nextConsumed = consumed + node.data.length;
+    if (targetOffset <= nextConsumed) {
+      return {
+        node,
+        offset: targetOffset - consumed,
+      };
+    }
+    consumed = nextConsumed;
+  }
+
+  throw new Error(`Expected editor text offset ${targetOffset} to exist.`);
+}
+
+async function selectEditorText(editor: HTMLElement, from: number, to: number): Promise<void> {
+  const selection = window.getSelection();
+  if (!selection) throw new Error("Expected a DOM selection.");
+
+  const start = resolveEditorTextPosition(editor, from);
+  const end = resolveEditorTextPosition(editor, to);
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  await act(async () => {
+    editor.dispatchEvent(new Event("selectionchange", { bubbles: true }));
+  });
+}
+
+async function placeEditorCursor(editor: HTMLElement, offset: number): Promise<void> {
+  await selectEditorText(editor, offset, offset);
+}
+
+function createImagePasteEvent(file: File): Event {
+  const pasteEvent = new Event("paste", {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  Object.defineProperty(pasteEvent, "clipboardData", {
+    value: {
+      getData: () => "",
+      items: [
+        {
+          getAsFile: () => file,
+          kind: "file",
+          type: file.type,
+        },
+      ],
+    },
+  });
+
+  return pasteEvent;
+}
+
 describe("BlockEditor", () => {
   it("exposes a labeled editing surface for a Block", async () => {
     const { container } = renderBlockEditor({ initialMarkdown: "Hello" });
@@ -414,6 +492,75 @@ describe("BlockEditor", () => {
       const markdown = await editorRef.current?.flush();
       expect(markdown).toContain("assets://block/photo.png");
       expect(markdown).not.toContain("data:image");
+    });
+  });
+
+  it("inserts pasted image files inline at the current cursor", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const runtime = createBlockEditorRuntime();
+    runtime.assets.create = vi.fn(async () => ({
+      assets: [{ altText: "photo.png", assetUrl: "assets://block/photo.png" }],
+    }));
+
+    const { container } = renderBlockEditor(
+      {
+        initialMarkdown: "Hello world",
+        runtime,
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    await placeEditorCursor(editor, 6);
+
+    await act(async () => {
+      editor.dispatchEvent(
+        createImagePasteEvent(new File(["photo"], "photo.png", { type: "image/png" })),
+      );
+    });
+
+    await waitFor(() => {
+      expect(runtime.assets.create).toHaveBeenCalledWith({
+        assets: [{ dataBase64: "cGhvdG8=", mimeType: "image/png" }],
+      });
+    });
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown?.trim()).toBe(
+        'Hello ![photo.png](assets://block/photo.png "photo.png")world',
+      );
+    });
+  });
+
+  it("replaces the selected text with pasted image files inline", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const runtime = createBlockEditorRuntime();
+    runtime.assets.create = vi.fn(async () => ({
+      assets: [{ altText: "photo.png", assetUrl: "assets://block/photo.png" }],
+    }));
+
+    const { container } = renderBlockEditor(
+      {
+        initialMarkdown: "Alpha selected Omega",
+        runtime,
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    await selectEditorText(editor, 6, 14);
+
+    await act(async () => {
+      editor.dispatchEvent(
+        createImagePasteEvent(new File(["photo"], "photo.png", { type: "image/png" })),
+      );
+    });
+
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown?.trim()).toBe(
+        'Alpha ![photo.png](assets://block/photo.png "photo.png") Omega',
+      );
     });
   });
 

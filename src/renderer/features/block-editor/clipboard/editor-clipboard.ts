@@ -249,7 +249,7 @@ function appendCreatedClipboardAssets(
     .join("\n");
 
   return {
-    html: formats.html ? `${formats.html}${htmlImages}` : "",
+    html: `${formats.html}${htmlImages}`,
     text: [formats.text, markdownImages].filter(Boolean).join("\n"),
   };
 }
