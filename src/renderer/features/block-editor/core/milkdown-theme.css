@@ -78,8 +78,9 @@
 
 .block-editor img {
   border-radius: var(--radius-md);
-  display: block;
+  display: inline;
   height: auto;
-  margin: 0.75rem 0;
+  margin: 0 0.125rem;
   max-width: 100%;
+  vertical-align: text-bottom;
 }
