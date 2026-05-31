@@ -202,7 +202,6 @@ export function updateLinkHref(
   markType: MarkType,
 ): ActiveMilkdownLink | null {
   const nextHref = sanitizeLinkUrlInput(href).trim();
-  if (!nextHref) return activeLink;
 
   const { view, from, to } = activeLink;
   const tr = view.state.tr

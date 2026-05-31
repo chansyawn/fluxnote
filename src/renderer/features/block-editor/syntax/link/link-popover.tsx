@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react";
 import { Button } from "@renderer/ui/components/button";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { Textarea } from "@renderer/ui/components/textarea";
-import { CheckIcon, CopyIcon, ExternalLinkIcon, PencilIcon, UnlinkIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, ExternalLinkIcon, UnlinkIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import type { BlockEditorRuntime } from "../../core/types";
@@ -41,7 +41,6 @@ export function LinkPopover({
   const { i18n } = useLingui();
   const [copied, setCopied] = useState(false);
   const [draftUrl, setDraftUrl] = useState("");
-  const [editing, setEditing] = useState(false);
   const previousActiveLinkRef = useRef<ActiveMilkdownLink | null>(null);
 
   useEffect(() => {
@@ -50,7 +49,6 @@ export function LinkPopover({
     previousActiveLinkRef.current = activeLink;
     setCopied(false);
     setDraftUrl(activeLink?.href ?? "");
-    setEditing(false);
   }, [activeLink]);
 
   useEffect(() => {
@@ -65,28 +63,25 @@ export function LinkPopover({
   const close = () => {
     setCopied(false);
     setDraftUrl("");
-    setEditing(false);
     onClose();
   };
 
-  const submitDraftUrl = () => {
-    const nextUrl = sanitizeLinkUrlInput(draftUrl).trim();
-    if (!nextUrl) return;
-
+  const updateDraftUrl = (url: string) => {
+    const nextUrl = sanitizeLinkUrlInput(url);
+    setDraftUrl(nextUrl);
     const updatedLink = updateLinkHref(
       activeLink,
       nextUrl,
       activeLink.view.state.schema.marks.link,
     );
     if (updatedLink) onPinActiveLink(updatedLink);
-    setEditing(false);
   };
 
+  const currentUrl = draftUrl.trim();
+  const hasUrl = currentUrl.length > 0;
   const openLabel = i18n._({ id: "block-editor.link.open", message: "Open" });
   const copyLabel = i18n._({ id: "block-editor.link.copy", message: "Copy" });
   const copiedLabel = i18n._({ id: "block-editor.link.copied", message: "Copied" });
-  const confirmLabel = i18n._({ id: "block-editor.link.confirm", message: "Confirm" });
-  const editLabel = i18n._({ id: "block-editor.link.edit", message: "Edit" });
   const removeLabel = i18n._({ id: "block-editor.link.remove", message: "Remove" });
   const urlLabel = i18n._({ id: "block-editor.link.url", message: "Link URL" });
 
@@ -115,41 +110,31 @@ export function LinkPopover({
         onPointerEnter={onHoldOpen}
         onPointerLeave={onScheduleClose}
       >
-        {editing ? (
-          <div className="flex flex-col gap-2">
-            <Textarea
-              aria-label={urlLabel}
-              className="max-h-28 min-h-7 resize-none overflow-auto py-1"
-              rows={1}
-              value={draftUrl}
-              onChange={(event) => setDraftUrl(sanitizeLinkUrlInput(event.currentTarget.value))}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  submitDraftUrl();
-                }
-                if (event.key === "Escape") {
-                  event.preventDefault();
-                  setDraftUrl(activeLink.href);
-                  setEditing(false);
-                }
-              }}
-            />
-            <div className="flex flex-wrap items-center gap-1">
-              <Button size="sm" type="button" variant="ghost" onClick={submitDraftUrl}>
-                <CheckIcon data-icon="inline-start" />
-                {confirmLabel}
-              </Button>
-            </div>
-          </div>
-        ) : (
+        <div className="flex w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col gap-2">
+          <Textarea
+            aria-label={urlLabel}
+            className="max-h-28 min-h-7 resize-none overflow-auto py-1"
+            rows={1}
+            value={draftUrl}
+            onChange={(event) => updateDraftUrl(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+              }
+              if (event.key === "Escape") {
+                event.preventDefault();
+                close();
+              }
+            }}
+          />
           <div className="flex flex-wrap items-center gap-1">
             <Button
+              disabled={!hasUrl}
               size="sm"
               type="button"
               variant="ghost"
               onClick={() => {
-                void runtime.links.openExternal(activeLink.href);
+                void runtime.links.openExternal(currentUrl);
                 close();
               }}
             >
@@ -157,11 +142,12 @@ export function LinkPopover({
               {openLabel}
             </Button>
             <Button
+              disabled={!hasUrl}
               size="sm"
               type="button"
               variant="ghost"
               onClick={() => {
-                void runtime.clipboard.writeText(activeLink.href);
+                void runtime.clipboard.writeText(currentUrl);
                 setCopied(true);
               }}
             >
@@ -177,19 +163,6 @@ export function LinkPopover({
               type="button"
               variant="ghost"
               onClick={() => {
-                setDraftUrl(activeLink.href);
-                setEditing(true);
-                onHoldOpen();
-              }}
-            >
-              <PencilIcon data-icon="inline-start" />
-              {editLabel}
-            </Button>
-            <Button
-              size="sm"
-              type="button"
-              variant="ghost"
-              onClick={() => {
                 removeLink(activeLink, activeLink.view.state.schema.marks.link);
                 close();
               }}
@@ -198,7 +171,7 @@ export function LinkPopover({
               {removeLabel}
             </Button>
           </div>
-        )}
+        </div>
       </PopoverContent>
     </Popover>
   );

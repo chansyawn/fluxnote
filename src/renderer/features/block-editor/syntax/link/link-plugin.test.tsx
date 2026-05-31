@@ -35,7 +35,7 @@ async function showLinkPopover(container: HTMLElement, label: string): Promise<H
     );
   });
 
-  await screen.findByRole("button", { name: "Open" });
+  await screen.findByRole("textbox", { name: "Link URL" });
   return link;
 }
 
@@ -48,6 +48,7 @@ describe("link plugin", () => {
 
     await showLinkPopover(container, "Fluxnotes");
 
+    expect(screen.getByRole("textbox", { name: "Link URL" })).toHaveValue("https://example.com");
     expect(screen.getByRole("button", { name: "Open" })).toBeVisible();
   });
 
@@ -129,11 +130,9 @@ describe("link plugin", () => {
     await findBlockEditor(container);
     await showLinkPopover(container, "Fluxnotes");
 
-    await userEvent.click(screen.getByRole("button", { name: "Edit" }));
     const input = screen.getByRole("textbox", { name: "Link URL" });
     await userEvent.clear(input);
     await userEvent.type(input, "https://fluxnotes.local");
-    await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
 
     await expect(editorRef.current?.flush()).resolves.toContain(
       "[Fluxnotes](https://fluxnotes.local)",
@@ -142,14 +141,14 @@ describe("link plugin", () => {
     expect(screen.getByRole("button", { name: "Copied" })).toBeVisible();
   });
 
-  it("keeps editing a pinned link when the pointer moves back to the anchor", async () => {
+  it("keeps the link input open when the pointer moves back to the anchor", async () => {
     const { container } = renderBlockEditor({
       initialMarkdown: "[Fluxnotes](https://example.com)",
     });
     const editor = await findBlockEditor(container);
     const link = await showLinkPopover(container, "Fluxnotes");
 
-    await userEvent.click(screen.getByRole("button", { name: "Edit" }));
+    await userEvent.click(screen.getByRole("textbox", { name: "Link URL" }));
     expect(screen.getByRole("textbox", { name: "Link URL" })).toBeVisible();
 
     vi.useFakeTimers();
@@ -183,6 +182,34 @@ describe("link plugin", () => {
     });
 
     expect(screen.getByRole("textbox", { name: "Link URL" })).toBeVisible();
+  });
+
+  it("allows a hovered link url to be empty", async () => {
+    const runtime = createBlockEditorRuntime();
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor(
+      {
+        initialMarkdown: "[Fluxnotes](https://example.com)",
+        runtime,
+      },
+      editorRef,
+    );
+    await findBlockEditor(container);
+    await showLinkPopover(container, "Fluxnotes");
+
+    const input = screen.getByRole("textbox", { name: "Link URL" });
+    await userEvent.clear(input);
+
+    await expect(editorRef.current?.flush()).resolves.toContain("[Fluxnotes]()");
+    expect(screen.getByRole("button", { name: "Open" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Remove" })).toBeEnabled();
+
+    await userEvent.click(screen.getByRole("button", { name: "Open" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    expect(runtime.links.openExternal).not.toHaveBeenCalled();
+    expect(runtime.clipboard.writeText).not.toHaveBeenCalled();
   });
 
   it("removes a hovered link while keeping its text", async () => {

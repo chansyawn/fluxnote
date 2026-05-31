@@ -90,37 +90,27 @@ msgid "block-editor.code.language.search"
 msgstr "搜索语言"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:88
-msgid "block-editor.link.confirm"
-msgstr "提交"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:87
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:84
 msgid "block-editor.link.copied"
 msgstr "已复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:86
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:83
 msgid "block-editor.link.copy"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:89
-msgid "block-editor.link.edit"
-msgstr "编辑"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:85
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:82
 msgid "block-editor.link.open"
 msgstr "打开"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:90
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:85
 msgid "block-editor.link.remove"
 msgstr "移除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:91
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:86
 msgid "block-editor.link.url"
 msgstr "链接 URL"
 
