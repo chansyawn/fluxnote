@@ -1,2 +1,2 @@
-export { createLinkPopoverPlugin, LinkPopoverStateStore } from "./link-plugin";
+export { createLinkPopoverPlugin, type LinkPopoverPluginInput } from "./link-plugin";
 export { LinkPopover } from "./link-popover";

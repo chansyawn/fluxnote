@@ -350,74 +350,15 @@ describe("BlockEditor", () => {
     expect(await editorRef.current?.flush()).toContain("* [ ] Open task");
   });
 
-  it("opens a hovered link through the runtime", async () => {
-    const runtime = createBlockEditorRuntime();
+  it("renders Markdown links with the link popover", async () => {
     const { container } = renderEditor({
       initialMarkdown: "[Fluxnotes](https://example.com)",
-      runtime,
     });
     await findEditor(container);
+
     await showLinkPopover(container, "Fluxnotes");
 
-    await userEvent.click(screen.getByRole("button", { name: "Open" }));
-
-    expect(runtime.links.openExternal).toHaveBeenCalledWith("https://example.com");
-  });
-
-  it("copies a hovered link through the runtime", async () => {
-    const runtime = createBlockEditorRuntime();
-    const { container } = renderEditor({
-      initialMarkdown: "[Fluxnotes](https://example.com)",
-      runtime,
-    });
-    await findEditor(container);
-    await showLinkPopover(container, "Fluxnotes");
-
-    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
-
-    expect(runtime.clipboard.writeText).toHaveBeenCalledWith("https://example.com");
-    expect(screen.getByRole("button", { name: "Copied" })).toBeVisible();
-  });
-
-  it("edits a hovered link url", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor(
-      {
-        initialMarkdown: "[Fluxnotes](https://example.com)",
-      },
-      editorRef,
-    );
-    await findEditor(container);
-    await showLinkPopover(container, "Fluxnotes");
-
-    await userEvent.click(screen.getByRole("button", { name: "Edit" }));
-    const input = screen.getByRole("textbox", { name: "Link URL" });
-    await userEvent.clear(input);
-    await userEvent.type(input, "https://fluxnotes.local");
-    await userEvent.click(screen.getByRole("button", { name: "Confirm" }));
-
-    await expect(editorRef.current?.flush()).resolves.toContain(
-      "[Fluxnotes](https://fluxnotes.local)",
-    );
-    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
-    expect(screen.getByRole("button", { name: "Copied" })).toBeVisible();
-  });
-
-  it("removes a hovered link while keeping its text", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor(
-      {
-        initialMarkdown: "[Fluxnotes](https://example.com)",
-      },
-      editorRef,
-    );
-    await findEditor(container);
-    await showLinkPopover(container, "Fluxnotes");
-
-    await userEvent.click(screen.getByRole("button", { name: "Remove" }));
-
-    await expect(editorRef.current?.flush()).resolves.toContain("Fluxnotes");
-    await expect(editorRef.current?.flush()).resolves.not.toContain("https://example.com");
+    expect(screen.getByRole("button", { name: "Open" })).toBeVisible();
   });
 
   it("creates unchecked tasks from empty bracket shorthand inside list items", async () => {

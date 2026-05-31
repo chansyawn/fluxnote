@@ -17,6 +17,7 @@ import "@milkdown/kit/prose/view/style/prosemirror.css";
 import { highlight, highlightPluginConfig } from "@milkdown/plugin-highlight";
 import { createParser } from "@milkdown/plugin-highlight/shiki";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
+import { ProsemirrorAdapterProvider, usePluginViewFactory } from "@prosemirror-adapter/react";
 import { withLineNumbers } from "prosemirror-highlight";
 import {
   useCallback,
@@ -37,7 +38,6 @@ import {
   getShikiLanguage,
   SHIKI_CODE_LANGUAGES,
 } from "../syntax/code";
-import { LinkPopover, LinkPopoverStateStore } from "../syntax/link";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
@@ -84,14 +84,16 @@ export function BlockEditor({
 }: BlockEditorProps) {
   return (
     <MilkdownProvider>
-      <BlockEditorContent
-        ref={ref}
-        runtime={runtime}
-        initialMarkdown={initialMarkdown}
-        config={config}
-        onBlur={onBlur}
-        onMarkdownChange={onMarkdownChange}
-      />
+      <ProsemirrorAdapterProvider>
+        <BlockEditorContent
+          ref={ref}
+          runtime={runtime}
+          initialMarkdown={initialMarkdown}
+          config={config}
+          onBlur={onBlur}
+          onMarkdownChange={onMarkdownChange}
+        />
+      </ProsemirrorAdapterProvider>
     </MilkdownProvider>
   );
 }
@@ -105,9 +107,9 @@ function BlockEditorContent({
   onMarkdownChange,
 }: BlockEditorProps) {
   const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
-  const [linkPopoverStateStore] = useState(() => new LinkPopoverStateStore());
   const [codeBlockControlsStateStore] = useState(() => new CodeBlockControlsStateStore());
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
+  const linkPluginViewFactory = usePluginViewFactory();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const latestMarkdownRef = useRef(initialMarkdownSnapshot);
@@ -243,7 +245,13 @@ function BlockEditorContent({
         .use(commonmark)
         .use(gfm)
         .use(highlight)
-        .use(createSyntaxPlugins(linkPopoverStateStore, codeBlockControlsStateStore))
+        .use(
+          createSyntaxPlugins({
+            codeBlockControlsStateStore,
+            linkPluginViewFactory,
+            runtime,
+          }),
+        )
         .use(history)
         .use(listener)
         .use(clipboard);
@@ -252,7 +260,7 @@ function BlockEditorContent({
 
       return editor;
     },
-    [codeBlockControlsStateStore, initialMarkdownSnapshot, linkPopoverStateStore],
+    [codeBlockControlsStateStore, initialMarkdownSnapshot, linkPluginViewFactory, runtime],
   );
 
   useEffect(() => {
@@ -268,11 +276,10 @@ function BlockEditorContent({
 
   useEffect(
     () => () => {
-      linkPopoverStateStore.destroy();
       codeBlockControlsStateStore.destroy();
       editorRef.current = null;
     },
-    [codeBlockControlsStateStore, linkPopoverStateStore],
+    [codeBlockControlsStateStore],
   );
 
   return (
@@ -282,7 +289,6 @@ function BlockEditorContent({
       data-code-line-numbers={String(resolvedConfig.markdown.codeBlock.showLineNumbers)}
     >
       <Milkdown />
-      <LinkPopover runtime={runtime} store={linkPopoverStateStore} />
       <CodeBlockControls rootRef={rootRef} runtime={runtime} store={codeBlockControlsStateStore} />
       {isEmpty ? (
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">

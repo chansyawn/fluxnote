@@ -3,32 +3,51 @@ import { Button } from "@renderer/ui/components/button";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { Textarea } from "@renderer/ui/components/textarea";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, PencilIcon, UnlinkIcon } from "lucide-react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { BlockEditorRuntime } from "../../core/types";
 import {
+  type ActiveMilkdownLink,
   getActiveLinkAnchor,
+  isSameActiveMilkdownLink,
   removeLink,
   sanitizeLinkUrlInput,
   updateLinkHref,
 } from "./link-model";
-import type { LinkPopoverStateStore } from "./link-plugin";
 
 const COPY_FEEDBACK_DURATION_MS = 1600;
 
 interface LinkPopoverProps {
+  activeLink: ActiveMilkdownLink | null;
   runtime: BlockEditorRuntime;
-  store: LinkPopoverStateStore;
+  onClose: () => void;
+  onHoldOpen: () => void;
+  onPinActiveLink: (link: ActiveMilkdownLink) => void;
+  onScheduleClose: () => void;
+  setPopoverElement: (element: HTMLElement | null) => void;
+  shouldIgnoreClose: (event: Event | undefined) => boolean;
 }
 
-export function LinkPopover({ runtime, store }: LinkPopoverProps) {
+export function LinkPopover({
+  activeLink,
+  runtime,
+  onClose,
+  onHoldOpen,
+  onPinActiveLink,
+  onScheduleClose,
+  setPopoverElement,
+  shouldIgnoreClose,
+}: LinkPopoverProps) {
   const { i18n } = useLingui();
-  const activeLink = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const [copied, setCopied] = useState(false);
   const [draftUrl, setDraftUrl] = useState("");
   const [editing, setEditing] = useState(false);
+  const previousActiveLinkRef = useRef<ActiveMilkdownLink | null>(null);
 
   useEffect(() => {
+    if (isSameActiveMilkdownLink(previousActiveLinkRef.current, activeLink)) return;
+
+    previousActiveLinkRef.current = activeLink;
     setCopied(false);
     setDraftUrl(activeLink?.href ?? "");
     setEditing(false);
@@ -47,7 +66,7 @@ export function LinkPopover({ runtime, store }: LinkPopoverProps) {
     setCopied(false);
     setDraftUrl("");
     setEditing(false);
-    store.clear();
+    onClose();
   };
 
   const submitDraftUrl = () => {
@@ -59,7 +78,7 @@ export function LinkPopover({ runtime, store }: LinkPopoverProps) {
       nextUrl,
       activeLink.view.state.schema.marks.link,
     );
-    if (updatedLink) store.pinActiveLink(updatedLink);
+    if (updatedLink) onPinActiveLink(updatedLink);
     setEditing(false);
   };
 
@@ -75,11 +94,11 @@ export function LinkPopover({ runtime, store }: LinkPopoverProps) {
     <Popover
       open
       onOpenChange={(nextOpen, eventDetails) => {
-        if (!nextOpen && !store.shouldIgnorePopoverClose(eventDetails.event)) close();
+        if (!nextOpen && !shouldIgnoreClose(eventDetails.event)) close();
       }}
     >
       <PopoverContent
-        ref={store.setPopoverElement}
+        ref={setPopoverElement}
         anchor={getActiveLinkAnchor(activeLink)}
         className="w-fit max-w-xs p-2"
         align="center"
@@ -90,11 +109,11 @@ export function LinkPopover({ runtime, store }: LinkPopoverProps) {
         onBlurCapture={(event) => {
           const nextTarget = event.relatedTarget;
           if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return;
-          store.schedulePinnedClose();
+          onScheduleClose();
         }}
-        onFocusCapture={store.holdActiveLinkOpen}
-        onPointerEnter={store.holdActiveLinkOpen}
-        onPointerLeave={store.schedulePinnedClose}
+        onFocusCapture={onHoldOpen}
+        onPointerEnter={onHoldOpen}
+        onPointerLeave={onScheduleClose}
       >
         {editing ? (
           <div className="flex flex-col gap-2">
@@ -160,7 +179,7 @@ export function LinkPopover({ runtime, store }: LinkPopoverProps) {
               onClick={() => {
                 setDraftUrl(activeLink.href);
                 setEditing(true);
-                store.holdActiveLinkOpen();
+                onHoldOpen();
               }}
             >
               <PencilIcon data-icon="inline-start" />

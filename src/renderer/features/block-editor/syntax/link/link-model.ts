@@ -103,20 +103,52 @@ function createRangeAnchor(view: EditorView, from: number, to: number): LinkPopo
   return {
     contextElement: view.dom,
     getBoundingClientRect: () => {
-      try {
-        const start = view.coordsAtPos(from);
-        const end = view.coordsAtPos(to);
-        const left = Math.min(start.left, end.left);
-        const right = Math.max(start.right, end.right);
-        const top = Math.min(start.top, end.top);
-        const bottom = Math.max(start.bottom, end.bottom);
-
-        return new DOMRect(left, top, right - left, bottom - top);
-      } catch {
-        return view.dom.getBoundingClientRect();
-      }
+      return getDomRangeRect(view, from, to) ?? getCoordsRangeRect(view, from, to);
     },
   };
+}
+
+function getDomRangeRect(view: EditorView, from: number, to: number): DOMRect | null {
+  try {
+    const range = view.dom.ownerDocument.createRange();
+    const start = view.domAtPos(from);
+    const end = view.domAtPos(to);
+
+    range.setStart(start.node, start.offset);
+    range.setEnd(end.node, end.offset);
+
+    return unionRects(
+      Array.from(range.getClientRects()).filter((rect) => rect.width > 0 || rect.height > 0),
+    );
+  } catch {
+    return null;
+  }
+}
+
+function getCoordsRangeRect(view: EditorView, from: number, to: number): DOMRect {
+  try {
+    const start = view.coordsAtPos(from);
+    const end = view.coordsAtPos(to);
+    const left = Math.min(start.left, end.left);
+    const right = Math.max(start.right, end.right);
+    const top = Math.min(start.top, end.top);
+    const bottom = Math.max(start.bottom, end.bottom);
+
+    return new DOMRect(left, top, right - left, bottom - top);
+  } catch {
+    return view.dom.getBoundingClientRect();
+  }
+}
+
+function unionRects(rects: DOMRectReadOnly[]): DOMRect | null {
+  if (rects.length === 0) return null;
+
+  const left = Math.min(...rects.map((rect) => rect.left));
+  const right = Math.max(...rects.map((rect) => rect.right));
+  const top = Math.min(...rects.map((rect) => rect.top));
+  const bottom = Math.max(...rects.map((rect) => rect.bottom));
+
+  return new DOMRect(left, top, right - left, bottom - top);
 }
 
 function createActiveLink(
