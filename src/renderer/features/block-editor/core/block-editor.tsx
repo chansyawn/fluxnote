@@ -89,6 +89,7 @@ function BlockEditorContent({
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
   const codeBlockNodeViewFactory = useNodeViewFactory();
   const linkPluginViewFactory = usePluginViewFactory();
+  const tablePluginViewFactory = usePluginViewFactory();
   const { resolvedTheme } = useThemeState();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -224,6 +225,7 @@ function BlockEditorContent({
           createSyntaxPlugins({
             codeBlockNodeViewFactory,
             linkPluginViewFactory,
+            tablePluginViewFactory,
             runtime,
           }),
         )
@@ -241,6 +243,7 @@ function BlockEditorContent({
       linkPluginViewFactory,
       resolvedTheme,
       runtime,
+      tablePluginViewFactory,
     ],
   );
 

@@ -1,0 +1,49 @@
+.block-editor table {
+  border: 1px solid var(--border);
+  border-collapse: separate;
+  border-radius: var(--radius-md);
+  border-spacing: 0;
+  display: block;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.block-editor tbody {
+  display: table;
+  min-width: max-content;
+  width: 100%;
+}
+
+.block-editor tr:last-child th,
+.block-editor tr:last-child td {
+  border-bottom: 0;
+}
+
+.block-editor th,
+.block-editor td {
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  min-width: 6rem;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  vertical-align: top;
+}
+
+.block-editor th:last-child,
+.block-editor td:last-child {
+  border-right: 0;
+}
+
+.block-editor th {
+  font-weight: 500;
+}
+
+.block-editor .selectedCell {
+  background: color-mix(in srgb, var(--primary) 5%, var(--muted));
+}

@@ -76,27 +76,6 @@
   margin: 0.875rem 0;
 }
 
-.block-editor table {
-  border-collapse: collapse;
-  display: block;
-  margin: 0.75rem 0;
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.block-editor th,
-.block-editor td {
-  border: 1px solid var(--border);
-  min-width: 4rem;
-  padding: 0.35rem 0.5rem;
-  vertical-align: top;
-}
-
-.block-editor th {
-  background: var(--muted);
-  font-weight: 600;
-}
-
 .block-editor img {
   border-radius: var(--radius-md);
   display: block;
