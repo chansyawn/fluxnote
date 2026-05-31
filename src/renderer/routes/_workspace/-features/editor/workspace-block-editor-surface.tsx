@@ -113,10 +113,10 @@ export function WorkspaceBlockEditorSurface({
       "editor.blockquote": shortcuts["editor.blockquote"],
       "editor.bulletList": shortcuts["editor.bulletList"],
       "editor.codeBlock": shortcuts["editor.codeBlock"],
-      "editor.formatBold": shortcuts["editor.formatBold"],
-      "editor.formatInlineCode": shortcuts["editor.formatInlineCode"],
-      "editor.formatItalic": shortcuts["editor.formatItalic"],
-      "editor.formatStrikethrough": shortcuts["editor.formatStrikethrough"],
+      "editor.bold": shortcuts["editor.bold"],
+      "editor.inlineCode": shortcuts["editor.inlineCode"],
+      "editor.italic": shortcuts["editor.italic"],
+      "editor.strikethrough": shortcuts["editor.strikethrough"],
       "editor.heading1": shortcuts["editor.heading1"],
       "editor.heading2": shortcuts["editor.heading2"],
       "editor.heading3": shortcuts["editor.heading3"],
@@ -165,12 +165,12 @@ export function WorkspaceBlockEditorSurface({
       focus: () => {
         editorRef.current?.focus();
       },
-      formatText: (format) => {
-        editorRef.current?.formatText(format);
-      },
       flush,
       getToolbarState: () =>
         editorRef.current?.getToolbarState() ?? DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      runToolbarCommand: (command) => {
+        editorRef.current?.runToolbarCommand(command);
+      },
       subscribeToolbarState: (listener) =>
         editorRef.current?.subscribeToolbarState(listener) ?? (() => undefined),
     }),

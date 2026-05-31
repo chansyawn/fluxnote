@@ -56,10 +56,21 @@ export function BlockWorkspace() {
   );
   const toolbarShortcuts = useMemo<Partial<BlockEditorShortcuts>>(
     () => ({
-      "editor.formatBold": shortcuts["editor.formatBold"],
-      "editor.formatInlineCode": shortcuts["editor.formatInlineCode"],
-      "editor.formatItalic": shortcuts["editor.formatItalic"],
-      "editor.formatStrikethrough": shortcuts["editor.formatStrikethrough"],
+      "editor.blockquote": shortcuts["editor.blockquote"],
+      "editor.bulletList": shortcuts["editor.bulletList"],
+      "editor.codeBlock": shortcuts["editor.codeBlock"],
+      "editor.bold": shortcuts["editor.bold"],
+      "editor.inlineCode": shortcuts["editor.inlineCode"],
+      "editor.italic": shortcuts["editor.italic"],
+      "editor.strikethrough": shortcuts["editor.strikethrough"],
+      "editor.heading1": shortcuts["editor.heading1"],
+      "editor.heading2": shortcuts["editor.heading2"],
+      "editor.heading3": shortcuts["editor.heading3"],
+      "editor.heading4": shortcuts["editor.heading4"],
+      "editor.heading5": shortcuts["editor.heading5"],
+      "editor.heading6": shortcuts["editor.heading6"],
+      "editor.orderedList": shortcuts["editor.orderedList"],
+      "editor.paragraph": shortcuts["editor.paragraph"],
     }),
     [shortcuts],
   );
@@ -136,7 +147,11 @@ export function BlockWorkspace() {
       className="z-10 mx-auto flex min-h-full w-full flex-col"
       onBlurCapture={(event) => {
         const nextTarget = event.relatedTarget;
-        if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+        if (
+          !(nextTarget instanceof Element) ||
+          (!event.currentTarget.contains(nextTarget) &&
+            !nextTarget.closest("[data-block-editor-toolbar]"))
+        ) {
           commands.focusBlock(null);
         }
       }}

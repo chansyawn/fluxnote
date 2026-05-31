@@ -160,8 +160,8 @@ describe("useWorkspaceBlockActions", () => {
         copy,
         flush: vi.fn(async () => ""),
         focus: vi.fn(),
-        formatText: vi.fn(),
         getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+        runToolbarCommand: vi.fn(),
         subscribeToolbarState: () => () => undefined,
       }),
     });

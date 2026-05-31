@@ -23,9 +23,13 @@ export type {
   BlockEditorToolbarState,
 } from "./core/types";
 export type {
+  BlockEditorBlockFormat,
+  BlockEditorBlockFormatState,
+  BlockEditorInlineFormat,
+  BlockEditorInlineFormatState,
   BlockEditorShortcutBinding,
-  BlockEditorTextFormat,
-  BlockEditorTextFormatState,
+  BlockEditorToolbarCommand,
   BlockEditorToolbarController,
+  BlockEditorToolbarFormat,
   BlockEditorToolbarStateListener,
 } from "./toolbar";

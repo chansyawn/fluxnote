@@ -4,12 +4,23 @@ import { BlockEditorToolbarStateStore, areToolbarStatesEqual } from "./editor-to
 import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE, type BlockEditorToolbarState } from "./types";
 
 const boldToolbarState: BlockEditorToolbarState = {
-  textFormats: {
+  ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+  inlineFormats: {
     bold: true,
-    code: false,
+    inlineCode: false,
     italic: false,
     strikethrough: false,
   },
+};
+
+const headingToolbarState: BlockEditorToolbarState = {
+  ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+  activeBlocks: {
+    ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE.activeBlocks,
+    heading2: true,
+    paragraph: false,
+  },
+  blockFormat: "heading2",
 };
 
 describe("BlockEditorToolbarStateStore", () => {
@@ -24,6 +35,9 @@ describe("BlockEditorToolbarStateStore", () => {
       areToolbarStatesEqual(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE, DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE),
     ).toBe(true);
     expect(areToolbarStatesEqual(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE, boldToolbarState)).toBe(false);
+    expect(areToolbarStatesEqual(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE, headingToolbarState)).toBe(
+      false,
+    );
   });
 
   it("notifies listeners only when the toolbar state changes", () => {

@@ -21,8 +21,8 @@ function createToolbarController(
   const listeners = new Set<BlockEditorToolbarStateListener>();
   const controller: BlockEditorToolbarController = {
     focus: vi.fn(),
-    formatText: vi.fn(),
     getToolbarState: () => state,
+    runToolbarCommand: vi.fn(),
     subscribeToolbarState: (listener) => {
       listeners.add(listener);
       return () => {
@@ -51,6 +51,7 @@ describe("BlockEditorToolbar", () => {
     expect(screen.queryByRole("button", { name: "Inline code" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Strikethrough" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Italic" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Text style" })).not.toBeInTheDocument();
   });
 
   it("renders nothing without a Block Editor controller or inactive content", () => {
@@ -59,12 +60,13 @@ describe("BlockEditorToolbar", () => {
     expect(screen.queryByRole("button", { name: "Bold" })).not.toBeInTheDocument();
   });
 
-  it("reflects toolbar state and dispatches text format commands", async () => {
+  it("reflects toolbar state and dispatches inline commands", async () => {
     const user = userEvent.setup();
     const { controller, setState } = createToolbarController({
-      textFormats: {
+      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      inlineFormats: {
         bold: true,
-        code: false,
+        inlineCode: false,
         italic: false,
         strikethrough: false,
       },
@@ -79,7 +81,17 @@ describe("BlockEditorToolbar", () => {
     expect(italicButton).toHaveClass("text-muted-foreground/60");
     expect(
       screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
-    ).toEqual(["Bold", "Italic", "Strikethrough", "Inline code"]);
+    ).toEqual([
+      "Text style",
+      "Quote",
+      "Bullet list",
+      "Numbered list",
+      "Code block",
+      "Bold",
+      "Italic",
+      "Strikethrough",
+      "Inline code",
+    ]);
 
     act(() => {
       setState(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
@@ -90,8 +102,59 @@ describe("BlockEditorToolbar", () => {
 
     await user.click(italicButton);
 
-    expect(controller.formatText).toHaveBeenCalledWith("italic");
+    expect(controller.runToolbarCommand).toHaveBeenCalledWith({
+      format: "italic",
+      type: "toggle-inline",
+    });
     expect(controller.focus).toHaveBeenCalledOnce();
+  });
+
+  it("reflects block state and dispatches block commands", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController({
+      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      activeBlocks: {
+        ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE.activeBlocks,
+        blockquote: true,
+        heading2: true,
+        paragraph: false,
+      },
+      blockFormat: "heading2",
+    });
+
+    renderWithProviders(<BlockEditorToolbar controller={controller} />);
+
+    expect(screen.getByRole("button", { name: "Text style" })).not.toHaveTextContent("H2");
+    expect(screen.getByRole("button", { name: "Quote" })).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(screen.getByRole("button", { name: "Code block" }));
+
+    expect(controller.runToolbarCommand).toHaveBeenCalledWith({
+      format: "codeBlock",
+      type: "set-block",
+    });
+  });
+
+  it("shows heading commands in a dropdown menu", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController();
+
+    renderWithProviders(
+      <BlockEditorToolbar
+        controller={controller}
+        shortcuts={{ "editor.heading2": "Control+Alt+2" }}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Text style" }));
+    await user.click(await screen.findByRole("menuitemradio", { name: /Heading 2/ }));
+
+    expect(controller.runToolbarCommand).toHaveBeenCalledWith({
+      format: "heading2",
+      type: "set-block",
+    });
+    expect(controller.focus).toHaveBeenCalledOnce();
+    expect(screen.getByText("Ctrl+Alt+2")).toBeVisible();
   });
 
   it("shows configured shortcuts in tooltips", async () => {
@@ -101,7 +164,7 @@ describe("BlockEditorToolbar", () => {
     renderWithProviders(
       <BlockEditorToolbar
         controller={controller}
-        shortcuts={{ "editor.formatBold": "Control+B", "editor.formatInlineCode": null }}
+        shortcuts={{ "editor.bold": "Control+B", "editor.inlineCode": null }}
       />,
     );
 

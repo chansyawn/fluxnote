@@ -31,7 +31,7 @@ describe("block editor config", () => {
       resolveBlockEditorConfig({
         shortcuts: {
           editor: {
-            "editor.formatBold": "Control+Shift+B",
+            "editor.bold": "Control+Shift+B",
           },
         },
       }),
@@ -41,7 +41,7 @@ describe("block editor config", () => {
         ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts,
         editor: {
           ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.editor,
-          "editor.formatBold": "Control+Shift+B",
+          "editor.bold": "Control+Shift+B",
         },
       },
     });

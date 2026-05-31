@@ -87,25 +87,25 @@ export function configureMilkdownKeymaps(ctx: Ctx, shortcuts: BlockEditorShortcu
 
   ctx.set(strongKeymap.key, {
     ToggleBold: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.formatBold"]),
+      shortcuts: toMilkdownShortcut(shortcuts["editor.bold"]),
     },
   });
 
   ctx.set(emphasisKeymap.key, {
     ToggleEmphasis: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.formatItalic"]),
+      shortcuts: toMilkdownShortcut(shortcuts["editor.italic"]),
     },
   });
 
   ctx.set(inlineCodeKeymap.key, {
     ToggleInlineCode: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.formatInlineCode"]),
+      shortcuts: toMilkdownShortcut(shortcuts["editor.inlineCode"]),
     },
   });
 
   ctx.set(strikethroughKeymap.key, {
     ToggleStrikethrough: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.formatStrikethrough"]),
+      shortcuts: toMilkdownShortcut(shortcuts["editor.strikethrough"]),
     },
   });
 }

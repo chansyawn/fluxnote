@@ -1,37 +1,95 @@
 import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
 import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 
-export const BLOCK_EDITOR_TEXT_FORMATS = ["bold", "italic", "strikethrough", "code"] as const;
+export const BLOCK_EDITOR_INLINE_FORMATS = [
+  "bold",
+  "italic",
+  "strikethrough",
+  "inlineCode",
+] as const;
+export const BLOCK_EDITOR_BLOCK_FORMATS = [
+  "paragraph",
+  "heading1",
+  "heading2",
+  "heading3",
+  "heading4",
+  "heading5",
+  "heading6",
+  "blockquote",
+  "bulletList",
+  "orderedList",
+  "codeBlock",
+] as const;
 
-export type BlockEditorTextFormat = (typeof BLOCK_EDITOR_TEXT_FORMATS)[number];
+export type BlockEditorInlineFormat = (typeof BLOCK_EDITOR_INLINE_FORMATS)[number];
+export type BlockEditorBlockFormat = (typeof BLOCK_EDITOR_BLOCK_FORMATS)[number];
+export type BlockEditorToolbarFormat = BlockEditorInlineFormat | BlockEditorBlockFormat;
 export type BlockEditorShortcutBinding = ShortcutBinding;
 
-export const BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS = {
-  bold: "editor.formatBold",
-  italic: "editor.formatItalic",
-  strikethrough: "editor.formatStrikethrough",
-  code: "editor.formatInlineCode",
-} satisfies Record<BlockEditorTextFormat, ShortcutAction>;
+export const BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS = {
+  paragraph: "editor.paragraph",
+  heading1: "editor.heading1",
+  heading2: "editor.heading2",
+  heading3: "editor.heading3",
+  heading4: "editor.heading4",
+  heading5: "editor.heading5",
+  heading6: "editor.heading6",
+  blockquote: "editor.blockquote",
+  bulletList: "editor.bulletList",
+  orderedList: "editor.orderedList",
+  codeBlock: "editor.codeBlock",
+  bold: "editor.bold",
+  italic: "editor.italic",
+  strikethrough: "editor.strikethrough",
+  inlineCode: "editor.inlineCode",
+} satisfies Record<BlockEditorToolbarFormat, ShortcutAction>;
 
-export type BlockEditorTextFormatState = Record<BlockEditorTextFormat, boolean>;
+export type BlockEditorInlineFormatState = Record<BlockEditorInlineFormat, boolean>;
+export type BlockEditorBlockFormatState = Record<BlockEditorBlockFormat, boolean>;
+
+export type BlockEditorToolbarCommand =
+  | {
+      type: "set-block";
+      format: BlockEditorBlockFormat;
+    }
+  | {
+      type: "toggle-inline";
+      format: BlockEditorInlineFormat;
+    };
 
 export interface BlockEditorToolbarState {
-  textFormats: BlockEditorTextFormatState;
+  activeBlocks: BlockEditorBlockFormatState;
+  blockFormat: BlockEditorBlockFormat;
+  inlineFormats: BlockEditorInlineFormatState;
 }
 
 export type BlockEditorToolbarStateListener = (state: BlockEditorToolbarState) => void;
 
 export interface BlockEditorToolbarController {
   focus: () => void;
-  formatText: (format: BlockEditorTextFormat) => void;
   getToolbarState: () => BlockEditorToolbarState;
+  runToolbarCommand: (command: BlockEditorToolbarCommand) => void;
   subscribeToolbarState: (listener: BlockEditorToolbarStateListener) => () => void;
 }
 
 export const DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE: BlockEditorToolbarState = {
-  textFormats: {
+  activeBlocks: {
+    blockquote: false,
+    bulletList: false,
+    codeBlock: false,
+    heading1: false,
+    heading2: false,
+    heading3: false,
+    heading4: false,
+    heading5: false,
+    heading6: false,
+    orderedList: false,
+    paragraph: true,
+  },
+  blockFormat: "paragraph",
+  inlineFormats: {
     bold: false,
-    code: false,
+    inlineCode: false,
     italic: false,
     strikethrough: false,
   },

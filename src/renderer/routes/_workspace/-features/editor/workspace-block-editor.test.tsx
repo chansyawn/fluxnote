@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import type { Block, Tag } from "@renderer/clients";
+import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -16,17 +17,10 @@ import type { WorkspaceBlockEditorHandle } from "./workspace-block-editor-surfac
 const mocks = vi.hoisted(() => ({
   editorHandle: {
     copy: vi.fn(async () => undefined),
-    formatText: vi.fn(),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
-    getToolbarState: vi.fn(() => ({
-      textFormats: {
-        bold: false,
-        code: false,
-        italic: false,
-        strikethrough: false,
-      },
-    })),
+    getToolbarState: vi.fn(() => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE),
+    runToolbarCommand: vi.fn(),
     subscribeToolbarState: vi.fn(() => () => undefined),
   },
   shortcutActionsByBlock: new Map<string, WorkspaceBlockActions>(),
@@ -36,10 +30,10 @@ const mocks = vi.hoisted(() => ({
     "workspace.copyBlock": "Mod+Shift+C",
     "workspace.createBlock": "Mod+N",
     "workspace.deleteBlock": "Mod+D",
-    "editor.formatBold": "Mod+B",
-    "editor.formatInlineCode": "Mod+Shift+E",
-    "editor.formatItalic": "Mod+I",
-    "editor.formatStrikethrough": "Mod+Shift+X",
+    "editor.bold": "Mod+B",
+    "editor.inlineCode": "Mod+Shift+E",
+    "editor.italic": "Mod+I",
+    "editor.strikethrough": "Mod+Shift+X",
     "workspace.keepBlock": "Mod+K",
     "global.quickCreateBlock": "Ctrl+Alt+N",
     "workspace.togglePinBlock": "Mod+T",

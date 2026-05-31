@@ -205,27 +205,122 @@ msgid "block-editor.table.row-menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:230
+msgid "block-editor.toolbar.blockquote"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:255
 msgid "block-editor.toolbar.bold"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:76
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:235
+msgid "block-editor.toolbar.bullet-list"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:245
+msgid "block-editor.toolbar.code-block"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:298
+msgid "block-editor.toolbar.heading-menu"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:190
+msgid "block-editor.toolbar.heading1"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:189
+msgid "block-editor.toolbar.heading1.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:196
+msgid "block-editor.toolbar.heading2"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:195
+msgid "block-editor.toolbar.heading2.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:202
+msgid "block-editor.toolbar.heading3"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:201
+msgid "block-editor.toolbar.heading3.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:208
+msgid "block-editor.toolbar.heading4"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:207
+msgid "block-editor.toolbar.heading4.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:214
+msgid "block-editor.toolbar.heading5"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:213
+msgid "block-editor.toolbar.heading5.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:220
+msgid "block-editor.toolbar.heading6"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:219
+msgid "block-editor.toolbar.heading6.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:270
 msgid "block-editor.toolbar.inline-code"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:260
 msgid "block-editor.toolbar.italic"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:93
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:292
 msgid "block-editor.toolbar.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:71
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:240
+msgid "block-editor.toolbar.ordered-list"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:184
+msgid "block-editor.toolbar.paragraph"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:183
+msgid "block-editor.toolbar.paragraph.short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:265
 msgid "block-editor.toolbar.strikethrough"
 msgstr ""
 
@@ -534,6 +629,11 @@ msgid "preferences.shortcuts.blockquote.label"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
+msgid "preferences.shortcuts.bold.label"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
 msgid "preferences.shortcuts.bulletList.label"
 msgstr ""
@@ -591,26 +691,6 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
-msgid "preferences.shortcuts.formatBold.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:205
-msgid "preferences.shortcuts.formatInlineCode.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:195
-msgid "preferences.shortcuts.formatItalic.label"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:200
-msgid "preferences.shortcuts.formatStrikethrough.label"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:130
 msgid "preferences.shortcuts.group.editor"
 msgstr ""
@@ -656,6 +736,16 @@ msgid "preferences.shortcuts.heading6.label"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:205
+msgid "preferences.shortcuts.inlineCode.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:195
+msgid "preferences.shortcuts.italic.label"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:95
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
@@ -694,6 +784,11 @@ msgstr ""
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:48
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:200
+msgid "preferences.shortcuts.strikethrough.label"
 msgstr ""
 
 #. js-lingui-explicit-id

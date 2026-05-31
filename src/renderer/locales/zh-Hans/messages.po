@@ -205,27 +205,122 @@ msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:61
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:230
+msgid "block-editor.toolbar.blockquote"
+msgstr "引用"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:255
 msgid "block-editor.toolbar.bold"
 msgstr "加粗"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:76
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:235
+msgid "block-editor.toolbar.bullet-list"
+msgstr "无序列表"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:245
+msgid "block-editor.toolbar.code-block"
+msgstr "代码块"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:298
+msgid "block-editor.toolbar.heading-menu"
+msgstr "文本样式"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:190
+msgid "block-editor.toolbar.heading1"
+msgstr "一级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:189
+msgid "block-editor.toolbar.heading1.short"
+msgstr "H1"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:196
+msgid "block-editor.toolbar.heading2"
+msgstr "二级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:195
+msgid "block-editor.toolbar.heading2.short"
+msgstr "H2"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:202
+msgid "block-editor.toolbar.heading3"
+msgstr "三级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:201
+msgid "block-editor.toolbar.heading3.short"
+msgstr "H3"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:208
+msgid "block-editor.toolbar.heading4"
+msgstr "四级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:207
+msgid "block-editor.toolbar.heading4.short"
+msgstr "H4"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:214
+msgid "block-editor.toolbar.heading5"
+msgstr "五级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:213
+msgid "block-editor.toolbar.heading5.short"
+msgstr "H5"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:220
+msgid "block-editor.toolbar.heading6"
+msgstr "六级标题"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:219
+msgid "block-editor.toolbar.heading6.short"
+msgstr "H6"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:270
 msgid "block-editor.toolbar.inline-code"
 msgstr "行内代码"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:66
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:260
 msgid "block-editor.toolbar.italic"
 msgstr "斜体"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:93
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:292
 msgid "block-editor.toolbar.label"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:71
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:240
+msgid "block-editor.toolbar.ordered-list"
+msgstr "有序列表"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:184
+msgid "block-editor.toolbar.paragraph"
+msgstr "普通文本"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:183
+msgid "block-editor.toolbar.paragraph.short"
+msgstr "文本"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:265
 msgid "block-editor.toolbar.strikethrough"
 msgstr "删除线"
 
@@ -534,6 +629,11 @@ msgid "preferences.shortcuts.blockquote.label"
 msgstr "引用块"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
+msgid "preferences.shortcuts.bold.label"
+msgstr "加粗"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
 msgid "preferences.shortcuts.bulletList.label"
 msgstr "无序列表"
@@ -591,26 +691,6 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
-msgid "preferences.shortcuts.formatBold.label"
-msgstr "加粗"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:205
-msgid "preferences.shortcuts.formatInlineCode.label"
-msgstr "行内代码"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:195
-msgid "preferences.shortcuts.formatItalic.label"
-msgstr "斜体"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:200
-msgid "preferences.shortcuts.formatStrikethrough.label"
-msgstr "删除线"
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:130
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
@@ -656,6 +736,16 @@ msgid "preferences.shortcuts.heading6.label"
 msgstr "六级标题"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:205
+msgid "preferences.shortcuts.inlineCode.label"
+msgstr "行内代码"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:195
+msgid "preferences.shortcuts.italic.label"
+msgstr "斜体"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:95
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
@@ -695,6 +785,11 @@ msgstr "正在录制..."
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-input.tsx:112
 msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:200
+msgid "preferences.shortcuts.strikethrough.label"
+msgstr "删除线"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:116

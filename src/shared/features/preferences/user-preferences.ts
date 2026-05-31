@@ -49,10 +49,10 @@ export const shortcutActionSchema = z.enum([
   "editor.orderedList",
   "editor.codeBlock",
   "editor.paragraph",
-  "editor.formatBold",
-  "editor.formatItalic",
-  "editor.formatStrikethrough",
-  "editor.formatInlineCode",
+  "editor.bold",
+  "editor.italic",
+  "editor.strikethrough",
+  "editor.inlineCode",
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
@@ -92,10 +92,10 @@ export const shortcutPreferencesSchema = z.object({
   "editor.orderedList": shortcutBindingSchema.catch("Mod+Alt+7"),
   "editor.codeBlock": shortcutBindingSchema.catch("Mod+Alt+C"),
   "editor.paragraph": shortcutBindingSchema.catch("Mod+Alt+0"),
-  "editor.formatBold": shortcutBindingSchema.catch("Mod+B"),
-  "editor.formatItalic": shortcutBindingSchema.catch("Mod+I"),
-  "editor.formatStrikethrough": shortcutBindingSchema.catch("Mod+Shift+X"),
-  "editor.formatInlineCode": shortcutBindingSchema.catch("Mod+Shift+E"),
+  "editor.bold": shortcutBindingSchema.catch("Mod+B"),
+  "editor.italic": shortcutBindingSchema.catch("Mod+I"),
+  "editor.strikethrough": shortcutBindingSchema.catch("Mod+Shift+X"),
+  "editor.inlineCode": shortcutBindingSchema.catch("Mod+Shift+E"),
 });
 
 export const appearancePreferencesSchema = z.object({
@@ -163,10 +163,10 @@ const shortcutPreferencesPatchSchema = z
     "editor.orderedList": shortcutBindingSchema.optional(),
     "editor.codeBlock": shortcutBindingSchema.optional(),
     "editor.paragraph": shortcutBindingSchema.optional(),
-    "editor.formatBold": shortcutBindingSchema.optional(),
-    "editor.formatItalic": shortcutBindingSchema.optional(),
-    "editor.formatStrikethrough": shortcutBindingSchema.optional(),
-    "editor.formatInlineCode": shortcutBindingSchema.optional(),
+    "editor.bold": shortcutBindingSchema.optional(),
+    "editor.italic": shortcutBindingSchema.optional(),
+    "editor.strikethrough": shortcutBindingSchema.optional(),
+    "editor.inlineCode": shortcutBindingSchema.optional(),
   })
   .strict();
 
@@ -227,10 +227,10 @@ const defaultUserPreferencesValue = {
     "editor.orderedList": "Mod+Alt+7",
     "editor.codeBlock": "Mod+Alt+C",
     "editor.paragraph": "Mod+Alt+0",
-    "editor.formatBold": "Mod+B",
-    "editor.formatItalic": "Mod+I",
-    "editor.formatStrikethrough": "Mod+Shift+X",
-    "editor.formatInlineCode": "Mod+Shift+E",
+    "editor.bold": "Mod+B",
+    "editor.italic": "Mod+I",
+    "editor.strikethrough": "Mod+Shift+X",
+    "editor.inlineCode": "Mod+Shift+E",
   },
   markdown: {
     codeBlock: defaultMarkdownCodeBlockPreferencesValue,
@@ -350,16 +350,12 @@ function createUserPreferencesNormalizerSchema(
         "editor.orderedList": shortcutBindingSchema.catch(defaults.shortcuts["editor.orderedList"]),
         "editor.codeBlock": shortcutBindingSchema.catch(defaults.shortcuts["editor.codeBlock"]),
         "editor.paragraph": shortcutBindingSchema.catch(defaults.shortcuts["editor.paragraph"]),
-        "editor.formatBold": shortcutBindingSchema.catch(defaults.shortcuts["editor.formatBold"]),
-        "editor.formatItalic": shortcutBindingSchema.catch(
-          defaults.shortcuts["editor.formatItalic"],
+        "editor.bold": shortcutBindingSchema.catch(defaults.shortcuts["editor.bold"]),
+        "editor.italic": shortcutBindingSchema.catch(defaults.shortcuts["editor.italic"]),
+        "editor.strikethrough": shortcutBindingSchema.catch(
+          defaults.shortcuts["editor.strikethrough"],
         ),
-        "editor.formatStrikethrough": shortcutBindingSchema.catch(
-          defaults.shortcuts["editor.formatStrikethrough"],
-        ),
-        "editor.formatInlineCode": shortcutBindingSchema.catch(
-          defaults.shortcuts["editor.formatInlineCode"],
-        ),
+        "editor.inlineCode": shortcutBindingSchema.catch(defaults.shortcuts["editor.inlineCode"]),
       })
       .catch(defaults.shortcuts),
     markdown: z

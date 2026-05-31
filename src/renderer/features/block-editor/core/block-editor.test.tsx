@@ -36,7 +36,7 @@ describe("BlockEditor", () => {
 
     const { container } = renderBlockEditor(
       {
-        config: { shortcuts: { editor: { "editor.formatBold": "Control+Shift+B" } } },
+        config: { shortcuts: { editor: { "editor.bold": "Control+Shift+B" } } },
         initialMarkdown: "",
       },
       editorRef,
@@ -56,7 +56,7 @@ describe("BlockEditor", () => {
     });
 
     expect(configuredEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(true);
   });
 
   it("blocks browser format shortcuts that are not configured by Fluxnotes", async () => {
@@ -64,7 +64,7 @@ describe("BlockEditor", () => {
 
     const { container } = renderBlockEditor(
       {
-        config: { shortcuts: { editor: { "editor.formatBold": null } } },
+        config: { shortcuts: { editor: { "editor.bold": null } } },
         initialMarkdown: "Plain text",
       },
       editorRef,
@@ -82,7 +82,35 @@ describe("BlockEditor", () => {
       editor.dispatchEvent(boldEvent);
     });
 
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(false);
+  });
+
+  it("runs toolbar block commands through the public handle", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Title" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "heading2", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().blockFormat).toBe("heading2");
+    await expect(editorRef.current?.flush()).resolves.toContain("## Title");
+  });
+
+  it("runs toolbar inline commands through the public handle", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Plain" }, editorRef);
+    const editor = await findBlockEditor(container);
+    editor.focus();
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "inlineCode", type: "toggle-inline" });
+    });
+
+    expect(editorRef.current?.getToolbarState().inlineFormats.inlineCode).toBe(true);
   });
 
   it("copies Markdown content through the runtime clipboard", async () => {

@@ -39,7 +39,7 @@ import { configureCodeHighlight } from "../syntax/code";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
-  runFormatCommand,
+  runToolbarCommand,
 } from "../toolbar/editor-toolbar-state";
 import type { BlockEditorToolbarState } from "../toolbar/types";
 import { resolveBlockEditorConfig } from "./config";
@@ -157,10 +157,10 @@ function BlockEditorContent({
           ctx.get(editorViewCtx).focus();
         });
       },
-      formatText: (format) => {
+      runToolbarCommand: (command) => {
         const editor = editorRef.current;
         if (!editor) return;
-        runFormatCommand(editor, format);
+        runToolbarCommand(editor, command);
         publishToolbarState(readToolbarState(editor));
       },
       flush: flushMarkdown,
