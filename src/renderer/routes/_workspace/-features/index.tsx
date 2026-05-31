@@ -72,6 +72,7 @@ export function BlockWorkspace() {
       "editor.heading6": shortcuts["editor.heading6"],
       "editor.orderedList": shortcuts["editor.orderedList"],
       "editor.paragraph": shortcuts["editor.paragraph"],
+      "editor.taskList": shortcuts["editor.taskList"],
     }),
     [shortcuts],
   );

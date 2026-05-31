@@ -107,6 +107,7 @@ describe("preferences", () => {
       "editor.blockquote": "Mod+Shift+B",
       "editor.bulletList": "Mod+Alt+8",
       "editor.orderedList": "Mod+Alt+7",
+      "editor.taskList": "Mod+Alt+9",
       "editor.codeBlock": "Mod+Alt+C",
       "editor.paragraph": "Mod+Alt+0",
       "editor.bold": "Mod+B",
@@ -136,6 +137,7 @@ describe("preferences", () => {
         shortcuts: {
           "workspace.archiveBlock": "Mod+E",
           "workspace.copyBlock": "Mod+Shift+C",
+          "editor.taskList": "Mod+Alt+9",
           "editor.inlineCode": "Mod+Shift+E",
           "editor.link": "Mod+Shift+L",
         },
@@ -149,6 +151,7 @@ describe("preferences", () => {
       shortcuts: {
         "workspace.archiveBlock": "Mod+E",
         "workspace.copyBlock": "Mod+Shift+C",
+        "editor.taskList": "Mod+Alt+9",
         "editor.inlineCode": "Mod+Shift+E",
         "editor.link": "Mod+Shift+L",
       },

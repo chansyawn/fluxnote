@@ -23,6 +23,7 @@ import { TextSelection } from "@milkdown/kit/prose/state";
 import type { EditorView } from "@milkdown/kit/prose/view";
 
 import { runLinkToolbarCommand, type LinkToolbarCommandResult } from "../syntax/link/link-model";
+import { runSetListBlockCommand } from "../syntax/list";
 import {
   BLOCK_EDITOR_BLOCK_FORMATS,
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
@@ -51,6 +52,19 @@ function isNodeActive(view: EditorView, nodeType: NodeType): boolean {
 
   for (let depth = $from.depth; depth > 0; depth -= 1) {
     if ($from.node(depth).type === nodeType) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function isTaskListItemActive(view: EditorView): boolean {
+  const { $from } = view.state.selection;
+
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const node = $from.node(depth);
+    if (node.type.name === "list_item" && node.attrs.checked !== null) {
       return true;
     }
   }
@@ -116,6 +130,7 @@ export function readToolbarState(editor: Editor): BlockEditorToolbarState {
       heading6: headingType,
       orderedList: orderedListSchema.type(ctx),
       paragraph: paragraphSchema.type(ctx),
+      taskList: bulletListSchema.type(ctx),
     } satisfies Record<BlockEditorBlockFormat, NodeType>;
     const blockFormat = readBlockFormat(view, nodeTypes);
     const activeBlocks = createEmptyActiveBlocks();
@@ -123,6 +138,8 @@ export function readToolbarState(editor: Editor): BlockEditorToolbarState {
     activeBlocks.blockquote = isNodeActive(view, nodeTypes.blockquote);
     activeBlocks.bulletList = isNodeActive(view, nodeTypes.bulletList);
     activeBlocks.orderedList = isNodeActive(view, nodeTypes.orderedList);
+    activeBlocks.taskList = activeBlocks.bulletList && isTaskListItemActive(view);
+    activeBlocks.bulletList = activeBlocks.bulletList && !activeBlocks.taskList;
 
     return {
       activeBlocks,
@@ -219,10 +236,13 @@ export function runToolbarCommand(
         commands.call(wrapInBlockTypeCommand.key, { nodeType: blockquoteSchema.type(ctx) });
         break;
       case "bulletList":
-        commands.call(wrapInBlockTypeCommand.key, { nodeType: bulletListSchema.type(ctx) });
+        runSetListBlockCommand(ctx, "bulletList");
         break;
       case "orderedList":
-        commands.call(wrapInBlockTypeCommand.key, { nodeType: orderedListSchema.type(ctx) });
+        runSetListBlockCommand(ctx, "orderedList");
+        break;
+      case "taskList":
+        runSetListBlockCommand(ctx, "taskList");
         break;
     }
   });

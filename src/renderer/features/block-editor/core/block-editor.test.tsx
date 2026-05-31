@@ -99,6 +99,85 @@ describe("BlockEditor", () => {
     await expect(editorRef.current?.flush()).resolves.toContain("## Title");
   });
 
+  it("runs toolbar list commands through the public handle", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "Task" }, editorRef);
+    await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "taskList", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(true);
+    await expect(editorRef.current?.flush()).resolves.toContain("* [ ] Task");
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "orderedList", type: "set-block" });
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.orderedList).toBe(true);
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(false);
+    await expect(editorRef.current?.flush()).resolves.toContain("1. Task");
+  });
+
+  it("applies configured Block Editor task list shortcuts", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor(
+      {
+        config: { shortcuts: { editor: { "editor.taskList": "Control+Shift+9" } } },
+        initialMarkdown: "Task",
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    const configuredEvent = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "9",
+      shiftKey: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(configuredEvent);
+    });
+
+    expect(configuredEvent.defaultPrevented).toBe(true);
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(true);
+    await expect(editorRef.current?.flush()).resolves.toContain("* [ ] Task");
+  });
+
+  it("disables Block Editor task list shortcuts when cleared", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor(
+      {
+        config: { shortcuts: { editor: { "editor.taskList": null } } },
+        initialMarkdown: "Task",
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    const taskListEvent = new KeyboardEvent("keydown", {
+      altKey: true,
+      bubbles: true,
+      cancelable: true,
+      key: "9",
+      metaKey: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(taskListEvent);
+    });
+
+    expect(editorRef.current?.getToolbarState().activeBlocks.taskList).toBe(false);
+    await expect(editorRef.current?.flush()).resolves.toContain("Task");
+  });
+
   it("runs toolbar inline commands through the public handle", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 

@@ -23,6 +23,7 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
       "editor.heading5": "Mod+Alt+5",
       "editor.heading6": "Mod+Alt+6",
       "editor.orderedList": "Mod+Alt+7",
+      "editor.taskList": "Mod+Alt+9",
       "editor.paragraph": "Mod+Alt+0",
     },
   },

@@ -11,7 +11,7 @@ import {
 import { clipboard } from "@milkdown/kit/plugin/clipboard";
 import { history } from "@milkdown/kit/plugin/history";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
-import { commonmark, linkSchema } from "@milkdown/kit/preset/commonmark";
+import { commonmark } from "@milkdown/kit/preset/commonmark";
 import { gfm } from "@milkdown/kit/preset/gfm";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
@@ -24,7 +24,6 @@ import {
   usePluginViewFactory,
 } from "@prosemirror-adapter/react";
 import { useThemeState } from "@renderer/app/theme";
-import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import {
   useCallback,
   useEffect,
@@ -40,16 +39,17 @@ import { serializeMarkdown } from "../clipboard/clipboard-data";
 import { copyWholeBlock, createEditorClipboardPlugin } from "../clipboard/editor-clipboard";
 import { createSyntaxPlugins } from "../syntax";
 import { configureCodeHighlight } from "../syntax/code";
-import { runLinkToolbarCommand, type LinkToolbarCommandResult } from "../syntax/link/link-model";
+import type { LinkToolbarCommandResult } from "../syntax/link/link-model";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
   runToolbarCommand,
 } from "../toolbar/editor-toolbar-state";
 import type { BlockEditorToolbarState } from "../toolbar/types";
+import { createBlockEditorShortcutPlugin } from "./block-editor-shortcuts";
 import { resolveBlockEditorConfig } from "./config";
 import { configureMilkdownKeymaps } from "./milkdown-keymaps";
-import type { BlockEditorProps, BlockEditorShortcuts } from "./types";
+import type { BlockEditorProps } from "./types";
 
 import "./milkdown-theme.css";
 
@@ -60,7 +60,6 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatUnderline",
 ]);
 const toolbarStatePluginKey = new PluginKey("FLUXNOTES_TOOLBAR_STATE");
-const linkShortcutPluginKey = new PluginKey("FLUXNOTES_LINK_SHORTCUT");
 
 function createToolbarStatePlugin(
   editor: Editor,
@@ -75,27 +74,6 @@ function createToolbarStatePlugin(
             publishToolbarState(readToolbarState(editor));
           },
         }),
-      }),
-  );
-}
-
-function createLinkShortcutPlugin(
-  shortcuts: BlockEditorShortcuts,
-  onLinkToolbarCommandResult: (result: LinkToolbarCommandResult) => void,
-) {
-  return $prose(
-    (ctx) =>
-      new Plugin({
-        key: linkShortcutPluginKey,
-        props: {
-          handleKeyDown: (view, event) => {
-            if (!keyboardEventMatchesShortcut(event, shortcuts["editor.link"])) return false;
-
-            event.preventDefault();
-            onLinkToolbarCommandResult(runLinkToolbarCommand(view, linkSchema.type(ctx)));
-            return true;
-          },
-        },
       }),
   );
 }
@@ -277,7 +255,10 @@ function BlockEditorContent({
         .use(createEditorClipboardPlugin(runtime))
         .use(createToolbarStatePlugin(editor, publishToolbarState))
         .use(
-          createLinkShortcutPlugin(resolvedConfig.shortcuts.editor, handleLinkToolbarCommandResult),
+          createBlockEditorShortcutPlugin({
+            onLinkToolbarCommandResult: handleLinkToolbarCommandResult,
+            shortcuts: resolvedConfig.shortcuts.editor,
+          }),
         )
         .use(history)
         .use(listener)

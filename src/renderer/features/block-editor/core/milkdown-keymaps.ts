@@ -63,13 +63,13 @@ export function configureMilkdownKeymaps(ctx: Ctx, shortcuts: BlockEditorShortcu
 
   ctx.set(bulletListKeymap.key, {
     WrapInBulletList: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.bulletList"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 
   ctx.set(orderedListKeymap.key, {
     WrapInOrderedList: {
-      shortcuts: toMilkdownShortcut(shortcuts["editor.orderedList"]),
+      shortcuts: DISABLED_SHORTCUTS,
     },
   });
 

@@ -110,7 +110,7 @@ msgid "block-editor.link.remove"
 msgstr "移除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:163
+#: src/renderer/features/block-editor/core/block-editor.tsx:141
 msgid "block-editor.link.select-text"
 msgstr "选择文本以添加链接"
 
@@ -120,7 +120,7 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:328
+#: src/renderer/features/block-editor/core/block-editor.tsx:309
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 
@@ -200,129 +200,140 @@ msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:231
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:238
 msgid "block-editor.toolbar.blockquote"
 msgstr "引用"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:256
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:273
 msgid "block-editor.toolbar.bold"
 msgstr "加粗"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:236
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:253
 msgid "block-editor.toolbar.bullet-list"
 msgstr "无序列表"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:246
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:243
 msgid "block-editor.toolbar.code-block"
 msgstr "代码块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:304
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:325
 msgid "block-editor.toolbar.heading-menu"
 msgstr "文本样式"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:191
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:198
 msgid "block-editor.toolbar.heading1"
 msgstr "一级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:190
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:197
 msgid "block-editor.toolbar.heading1.short"
 msgstr "H1"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:197
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:204
 msgid "block-editor.toolbar.heading2"
 msgstr "二级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:196
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:203
 msgid "block-editor.toolbar.heading2.short"
 msgstr "H2"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:203
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:210
 msgid "block-editor.toolbar.heading3"
 msgstr "三级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:202
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:209
 msgid "block-editor.toolbar.heading3.short"
 msgstr "H3"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:209
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:216
 msgid "block-editor.toolbar.heading4"
 msgstr "四级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:208
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:215
 msgid "block-editor.toolbar.heading4.short"
 msgstr "H4"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:215
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:222
 msgid "block-editor.toolbar.heading5"
 msgstr "五级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:214
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:221
 msgid "block-editor.toolbar.heading5.short"
 msgstr "H5"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:221
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:228
 msgid "block-editor.toolbar.heading6"
 msgstr "六级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:220
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:227
 msgid "block-editor.toolbar.heading6.short"
 msgstr "H6"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:271
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:288
 msgid "block-editor.toolbar.inline-code"
 msgstr "行内代码"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:261
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:278
 msgid "block-editor.toolbar.italic"
 msgstr "斜体"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:298
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:319
 msgid "block-editor.toolbar.label"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:276
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:293
 msgid "block-editor.toolbar.link"
 msgstr "链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:241
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:309
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:379
+msgid "block-editor.toolbar.list-menu"
+msgstr "列表"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:258
 msgid "block-editor.toolbar.ordered-list"
 msgstr "有序列表"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:185
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:192
 msgid "block-editor.toolbar.paragraph"
 msgstr "普通文本"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:184
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:191
 msgid "block-editor.toolbar.paragraph.short"
 msgstr "文本"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:266
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:283
 msgid "block-editor.toolbar.strikethrough"
 msgstr "删除线"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:263
+msgid "block-editor.toolbar.task-list"
+msgstr "任务列表"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/block-error-fallback.tsx:84
@@ -619,27 +630,27 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:112
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:166
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:167
 msgid "preferences.shortcuts.blockquote.label"
 msgstr "引用块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:191
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:197
 msgid "preferences.shortcuts.bold.label"
 msgstr "加粗"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:172
 msgid "preferences.shortcuts.bulletList.label"
 msgstr "无序列表"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:125
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "取消外部编辑"
 
@@ -650,22 +661,22 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:181
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:187
 msgid "preferences.shortcuts.codeBlock.label"
 msgstr "代码块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:92
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:87
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:106
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:107
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "删除区块"
 
@@ -691,87 +702,87 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:131
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:132
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:61
 msgid "preferences.shortcuts.group.global"
 msgstr "全局"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:82
 msgid "preferences.shortcuts.group.workspace"
 msgstr "工作区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:136
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:137
 msgid "preferences.shortcuts.heading1.label"
 msgstr "一级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:141
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:142
 msgid "preferences.shortcuts.heading2.label"
 msgstr "二级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:146
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:147
 msgid "preferences.shortcuts.heading3.label"
 msgstr "三级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:151
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:152
 msgid "preferences.shortcuts.heading4.label"
 msgstr "四级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:156
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
 msgid "preferences.shortcuts.heading5.label"
 msgstr "五级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:161
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:162
 msgid "preferences.shortcuts.heading6.label"
 msgstr "六级标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:206
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:212
 msgid "preferences.shortcuts.inlineCode.label"
 msgstr "行内代码"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:196
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:202
 msgid "preferences.shortcuts.italic.label"
 msgstr "斜体"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:97
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:211
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:217
 msgid "preferences.shortcuts.link.label"
 msgstr "链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:176
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:177
 msgid "preferences.shortcuts.orderedList.label"
 msgstr "有序列表"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:186
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:192
 msgid "preferences.shortcuts.paragraph.label"
 msgstr "段落"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:71
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "快速记录区块"
 
@@ -792,27 +803,32 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:201
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:207
 msgid "preferences.shortcuts.strikethrough.label"
 msgstr "删除线"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:117
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:118
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:233
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:182
+msgid "preferences.shortcuts.taskList.label"
+msgstr "任务列表"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:239
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:102
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "固定/取消固定区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:65
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:66
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 

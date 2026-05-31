@@ -28,6 +28,7 @@ import {
   Heading6Icon,
   ItalicIcon,
   LinkIcon,
+  ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
   QuoteIcon,
@@ -56,6 +57,12 @@ interface BlockEditorToolbarProps {
 
 interface ToolbarButtonControl<TFormat extends BlockEditorToolbarFormat> {
   format: TFormat;
+  icon: LucideIcon;
+  label: string;
+}
+
+interface ListControl {
+  format: Extract<BlockEditorBlockFormat, "bulletList" | "orderedList" | "taskList">;
   icon: LucideIcon;
   label: string;
 }
@@ -231,6 +238,16 @@ export function BlockEditorToolbar({
         label: i18n._({ id: "block-editor.toolbar.blockquote", message: "Quote" }),
       },
       {
+        format: "codeBlock",
+        icon: CodeIcon,
+        label: i18n._({ id: "block-editor.toolbar.code-block", message: "Code block" }),
+      },
+    ],
+    [i18n],
+  );
+  const listControls = useMemo<ListControl[]>(
+    () => [
+      {
         format: "bulletList",
         icon: ListIcon,
         label: i18n._({ id: "block-editor.toolbar.bullet-list", message: "Bullet list" }),
@@ -241,9 +258,9 @@ export function BlockEditorToolbar({
         label: i18n._({ id: "block-editor.toolbar.ordered-list", message: "Numbered list" }),
       },
       {
-        format: "codeBlock",
-        icon: CodeIcon,
-        label: i18n._({ id: "block-editor.toolbar.code-block", message: "Code block" }),
+        format: "taskList",
+        icon: ListChecksIcon,
+        label: i18n._({ id: "block-editor.toolbar.task-list", message: "Task list" }),
       },
     ],
     [i18n],
@@ -286,6 +303,10 @@ export function BlockEditorToolbar({
   const activeHeading =
     headingControls.find((control) => control.format === state.blockFormat) ?? headingControls[0];
   const ActiveHeadingIcon = activeHeading.icon;
+  const activeList = listControls.find((control) => state.activeBlocks[control.format]);
+  const ListButtonIcon = activeList?.icon ?? ListIcon;
+  const listTooltipLabel =
+    activeList?.label ?? i18n._({ id: "block-editor.toolbar.list-menu", message: "List" });
 
   return (
     <div
@@ -350,6 +371,58 @@ export function BlockEditorToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
         <ButtonGroupSeparator />
+        <DropdownMenu>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <DropdownMenuTrigger
+                  aria-label={i18n._({
+                    id: "block-editor.toolbar.list-menu",
+                    message: "List",
+                  })}
+                  aria-pressed={Boolean(activeList)}
+                  render={<Button size="sm" type="button" variant="ghost" />}
+                >
+                  <ListButtonIcon data-icon="inline-start" />
+                  <ChevronDownIcon data-icon="inline-end" />
+                </DropdownMenuTrigger>
+              }
+            />
+            <TooltipContent className="flex items-center gap-2">
+              <span>{listTooltipLabel}</span>
+            </TooltipContent>
+          </Tooltip>
+          <DropdownMenuContent className="w-auto min-w-44" data-block-editor-toolbar>
+            <DropdownMenuRadioGroup value={activeList?.format ?? ""}>
+              <DropdownMenuGroup>
+                {listControls.map((control) => {
+                  const Icon = control.icon;
+                  const shortcutLabel = getShortcutLabel(shortcuts, control.format);
+
+                  return (
+                    <DropdownMenuRadioItem
+                      key={control.format}
+                      value={control.format}
+                      onClick={() => {
+                        controller.runToolbarCommand({
+                          format: control.format,
+                          type: "set-block",
+                        });
+                        controller.focus();
+                      }}
+                    >
+                      <Icon />
+                      {control.label}
+                      {shortcutLabel ? (
+                        <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>
+                      ) : null}
+                    </DropdownMenuRadioItem>
+                  );
+                })}
+              </DropdownMenuGroup>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {blockControls.map((control) => (
           <ToolbarIconButton
             key={control.format}

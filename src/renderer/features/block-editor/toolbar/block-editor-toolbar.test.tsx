@@ -84,9 +84,8 @@ describe("BlockEditorToolbar", () => {
       screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
     ).toEqual([
       "Text style",
+      "List",
       "Quote",
-      "Bullet list",
-      "Numbered list",
       "Code block",
       "Bold",
       "Italic",
@@ -135,6 +134,41 @@ describe("BlockEditorToolbar", () => {
       format: "codeBlock",
       type: "set-block",
     });
+  });
+
+  it("shows list commands in a dropdown menu", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController({
+      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      activeBlocks: {
+        ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE.activeBlocks,
+        paragraph: false,
+        taskList: true,
+      },
+    });
+
+    renderWithProviders(
+      <BlockEditorToolbar
+        controller={controller}
+        shortcuts={{ "editor.taskList": "Control+Alt+9" }}
+      />,
+    );
+
+    const listButton = screen.getByRole("button", { name: "List" });
+    expect(listButton).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(listButton);
+    const taskListMenuItem = await screen.findByRole("menuitemradio", { name: /Task list/ });
+
+    expect(screen.getByText("Ctrl+Alt+9")).toBeVisible();
+
+    await user.click(taskListMenuItem);
+
+    expect(controller.runToolbarCommand).toHaveBeenCalledWith({
+      format: "taskList",
+      type: "set-block",
+    });
+    expect(controller.focus).toHaveBeenCalledOnce();
   });
 
   it("shows heading commands in a dropdown menu", async () => {

@@ -19,6 +19,7 @@ export const BLOCK_EDITOR_BLOCK_FORMATS = [
   "blockquote",
   "bulletList",
   "orderedList",
+  "taskList",
   "codeBlock",
 ] as const;
 
@@ -38,6 +39,7 @@ export const BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS = {
   blockquote: "editor.blockquote",
   bulletList: "editor.bulletList",
   orderedList: "editor.orderedList",
+  taskList: "editor.taskList",
   codeBlock: "editor.codeBlock",
   bold: "editor.bold",
   italic: "editor.italic",
@@ -87,6 +89,7 @@ export const DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE: BlockEditorToolbarState = {
     heading6: false,
     orderedList: false,
     paragraph: true,
+    taskList: false,
   },
   blockFormat: "paragraph",
   inlineFormats: {

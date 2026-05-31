@@ -24,6 +24,7 @@ import {
   KeyboardIcon,
   ItalicIcon,
   LinkIcon,
+  ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
   PinIcon,
@@ -174,6 +175,11 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
         action: "editor.orderedList",
         icon: <ListOrderedIcon />,
         title: <Trans id="preferences.shortcuts.orderedList.label">Ordered list</Trans>,
+      },
+      {
+        action: "editor.taskList",
+        icon: <ListChecksIcon />,
+        title: <Trans id="preferences.shortcuts.taskList.label">Task list</Trans>,
       },
       {
         action: "editor.codeBlock",
