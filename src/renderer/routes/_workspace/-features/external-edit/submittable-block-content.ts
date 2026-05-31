@@ -1,4 +1,3 @@
-import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markdown/external-markdown";
 import { useCallback, useMemo } from "react";
 
 import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-cache";
@@ -19,7 +18,7 @@ export function useSubmittableBlockContent({
     async (blockId: string) => {
       const editorContent = await getEditor(blockId)?.flush();
       const content = editorContent ?? getCachedWorkspaceBlock(blockId)?.content;
-      return content === undefined ? null : normalizeExternalMarkdown(content);
+      return content === undefined ? null : content;
     },
     [getEditor],
   );

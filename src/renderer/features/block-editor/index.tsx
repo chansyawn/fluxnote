@@ -6,7 +6,6 @@
  */
 
 export { BlockEditor } from "./core/block-editor";
-export { normalizeExternalMarkdown } from "./markdown/external-markdown";
 export { BlockEditorToolbar } from "./toolbar";
 export type {
   BlockEditorCodeBlockConfig,

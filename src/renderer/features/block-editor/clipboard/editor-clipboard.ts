@@ -7,7 +7,6 @@ import type { EditorView } from "@milkdown/kit/prose/view";
 import { $prose } from "@milkdown/kit/utils";
 
 import type { BlockEditorRuntime } from "../core/types";
-import { normalizeExternalMarkdown } from "../markdown/external-markdown";
 import {
   collectAssetUrlsFromClipboardFormats,
   collectFileUrlsFromClipboardFormats,
@@ -53,7 +52,7 @@ async function createClipboardData(
   const serialized = view.serializeForClipboard(slice);
   const formats = {
     html: serialized.dom.innerHTML,
-    text: normalizeExternalMarkdown(serialized.text),
+    text: serialized.text,
   };
   const assetUrlMap = await resolveClipboardAssets(runtime, formats);
   const rewritten = rewriteClipboardAssetUrlsToFiles(formats, assetUrlMap);
