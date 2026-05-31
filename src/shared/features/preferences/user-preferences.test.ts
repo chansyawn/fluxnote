@@ -104,7 +104,7 @@ describe("preferences", () => {
       "editor.heading4": "Mod+Alt+4",
       "editor.heading5": "Mod+Alt+5",
       "editor.heading6": "Mod+Alt+6",
-      "editor.blockquote": "Mod+Shift+B",
+      "editor.blockquote": "Mod+Alt+B",
       "editor.bulletList": "Mod+Alt+8",
       "editor.orderedList": "Mod+Alt+7",
       "editor.taskList": "Mod+Alt+9",

@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
     "workspace.createBlock": "Mod+N",
     "workspace.deleteBlock": "Mod+D",
     "editor.bold": "Mod+B",
-    "editor.blockquote": "Mod+Shift+B",
+    "editor.blockquote": "Mod+Alt+B",
     "editor.bulletList": "Mod+Alt+8",
     "editor.codeBlock": "Mod+Alt+C",
     "editor.heading1": "Mod+Alt+1",
