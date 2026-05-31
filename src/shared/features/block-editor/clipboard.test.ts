@@ -1,29 +1,25 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import {
-  decodeBlockEditorClipboardHtml,
-  encodeBlockEditorClipboardHtml,
-  stripBlockEditorClipboardHtmlMetadata,
-  type BlockEditorClipboardPayload,
-} from "./clipboard";
+import { blockEditorClipboardWriteRequestSchema } from "./clipboard";
 
-const payload: BlockEditorClipboardPayload = {
-  nodes: [{ text: "Text", type: "text", version: 1 }],
-  sourceBlockId: "block-1",
-};
+describe("block editor clipboard contract", () => {
+  it("accepts standard clipboard write data", () => {
+    const result = blockEditorClipboardWriteRequestSchema.safeParse({
+      html: "<p>Text</p>",
+      imageFileUrl: "file:///tmp/photo.png",
+      text: "Text",
+    });
 
-describe("block editor clipboard html metadata", () => {
-  it("encodes and decodes a payload without changing visible html", () => {
-    const html = encodeBlockEditorClipboardHtml("<p>Text</p>", payload);
-
-    expect(decodeBlockEditorClipboardHtml(html)).toEqual(payload);
-    expect(stripBlockEditorClipboardHtmlMetadata(html)).toBe("<p>Text</p>");
+    expect(result.success).toBe(true);
   });
 
-  it("returns null when metadata is missing or invalid", () => {
-    expect(decodeBlockEditorClipboardHtml("<p>Text</p>")).toBeNull();
-    expect(
-      decodeBlockEditorClipboardHtml("<!--fluxnotes-block-editor:bad--><p>Text</p>"),
-    ).toBeNull();
+  it("rejects private metadata payloads", () => {
+    const result = blockEditorClipboardWriteRequestSchema.strict().safeParse({
+      html: "<p>Text</p>",
+      payload: { sourceBlockId: "block-1" },
+      text: "Text",
+    });
+
+    expect(result.success).toBe(false);
   });
 });

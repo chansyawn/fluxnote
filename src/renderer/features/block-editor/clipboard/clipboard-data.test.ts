@@ -1,8 +1,14 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it } from "vite-plus/test";
 
 import {
+  ASSET_UNAVAILABLE_MARKDOWN,
   collectMarkdownAssetUrls,
+  collectFileUrlsFromClipboardFormats,
   getImageFileUrlForNativeClipboard,
+  rewriteClipboardAssetUrlsToFiles,
+  rewriteClipboardFileUrlsToAssets,
   rewriteHtmlAssetUrls,
 } from "./clipboard-data";
 
@@ -32,7 +38,49 @@ describe("clipboard data helpers", () => {
         '<img src="assets://block/photo.png"><a href="assets://block/diagram.svg">',
         assetUrlMap,
       ),
-    ).toBe('<img src="file:///tmp/photo.png"><a href="file:///tmp/diagram.svg">');
+    ).toBe('<img src="file:///tmp/photo.png"><a href="assets://block/diagram.svg"></a>');
+  });
+
+  it("rewrites clipboard asset image URLs to file URLs and placeholders", () => {
+    const result = rewriteClipboardAssetUrlsToFiles(
+      {
+        html: '<img src="assets://block/photo.png"><img src="assets://block/missing.png">',
+        text: "![Photo](assets://block/photo.png)\n![Missing](assets://block/missing.png)",
+      },
+      new Map([["assets://block/photo.png", "file:///tmp/photo.png"]]),
+    );
+
+    expect(result.html).toContain('src="file:///tmp/photo.png"');
+    expect(result.html).toContain('alt="Asset unavailable"');
+    expect(result.text).toContain("![Photo](file:///tmp/photo.png)");
+    expect(result.text).toContain(ASSET_UNAVAILABLE_MARKDOWN);
+  });
+
+  it("rewrites pasted file image URLs to asset URLs and placeholders", () => {
+    const result = rewriteClipboardFileUrlsToAssets(
+      {
+        html: '<img src="file:///tmp/photo.png"><img src="file:///tmp/missing.png">',
+        text: "![Photo](file:///tmp/photo.png)\n![Missing](file:///tmp/missing.png)",
+      },
+      new Map([
+        ["file:///tmp/photo.png", "assets://block/photo.png"],
+        ["file:///tmp/missing.png", null],
+      ]),
+    );
+
+    expect(result.html).toContain('src="assets://block/photo.png"');
+    expect(result.html).toContain('alt="Asset unavailable"');
+    expect(result.text).toContain("![Photo](assets://block/photo.png)");
+    expect(result.text).toContain(ASSET_UNAVAILABLE_MARKDOWN);
+  });
+
+  it("collects file image URLs from clipboard formats", () => {
+    expect(
+      collectFileUrlsFromClipboardFormats(
+        '<img src="file:///tmp/photo.png">',
+        "![Other](file:///tmp/other.png)",
+      ),
+    ).toEqual(["file:///tmp/photo.png", "file:///tmp/other.png"]);
   });
 
   it("returns a native image file URL only when exactly one Markdown image asset resolves", () => {

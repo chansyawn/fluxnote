@@ -50,6 +50,25 @@ export const assetsContract = {
         ),
       }),
     },
+    "assets.import": {
+      input: z.object({
+        blockId: z.string().min(1),
+        files: z.array(
+          z.object({
+            fileName: z.string().optional(),
+            fileUrl: z.string().min(1),
+          }),
+        ),
+      }),
+      output: z.object({
+        assets: z.array(
+          z.object({
+            assetUrl: z.string().nullable(),
+            fileUrl: z.string(),
+          }),
+        ),
+      }),
+    },
   },
   events: {},
 } as const;

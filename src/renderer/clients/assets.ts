@@ -17,6 +17,12 @@ export type ResolveAssetRequest = z.input<
 export type ResolveAssetResult = z.infer<
   (typeof assetsContract)["commands"]["assets.resolve"]["output"]
 >;
+export type ImportAssetRequest = z.input<
+  (typeof assetsContract)["commands"]["assets.import"]["input"]
+>;
+export type ImportAssetResult = z.infer<
+  (typeof assetsContract)["commands"]["assets.import"]["output"]
+>;
 
 export const createAsset = (req: CreateAssetRequest): Promise<CreateAssetResult> =>
   invokeCommand("assets.create", req);
@@ -26,6 +32,9 @@ export const copyAsset = (req: CopyAssetRequest): Promise<CopyAssetResult> =>
 
 export const resolveAsset = (req: ResolveAssetRequest): Promise<ResolveAssetResult> =>
   invokeCommand("assets.resolve", req);
+
+export const importAsset = (req: ImportAssetRequest): Promise<ImportAssetResult> =>
+  invokeCommand("assets.import", req);
 
 export function convertFileSrc(path: string): string {
   if (path.startsWith("file://")) {

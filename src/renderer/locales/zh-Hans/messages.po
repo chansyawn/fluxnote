@@ -125,7 +125,7 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:278
+#: src/renderer/features/block-editor/core/block-editor.tsx:280
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 
@@ -397,17 +397,17 @@ msgid "lab.description"
 msgstr "用于基础设施与集成演示的实验区域。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:111
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
 msgid "lab.playground.description"
 msgstr "纯前端演练区。编辑这段预设 Markdown 来验证区块行为。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:124
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:130
 msgid "lab.playground.reset"
 msgstr "重置预设"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:108
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:114
 msgid "lab.playground.title"
 msgstr "区块编辑器演练区"
 

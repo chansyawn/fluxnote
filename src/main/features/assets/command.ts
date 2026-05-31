@@ -2,7 +2,7 @@ import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 
-import { copyAsset, createAsset, resolveAsset } from "./service";
+import { copyAsset, createAsset, importAsset, resolveAsset } from "./service";
 
 interface AssetsCommandDeps {
   paths: AppDataPaths;
@@ -20,5 +20,9 @@ export function registerAssetsCommands(ipc: IpcRouter, deps: AssetsCommandDeps):
 
   ipc.command("assets.resolve", async (input) => {
     return await resolveAsset({ paths: deps.paths }, deps.db, input);
+  });
+
+  ipc.command("assets.import", async (input) => {
+    return await importAsset({ paths: deps.paths }, deps.db, input);
   });
 }

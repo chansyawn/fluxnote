@@ -78,6 +78,7 @@ export function createBlockEditorRuntime(): BlockEditorRuntime {
     assets: {
       copy: vi.fn(async () => ({ assets: [] })),
       create: vi.fn(async () => ({ assets: [] })),
+      import: vi.fn(async () => ({ assets: [] })),
       resolve: vi.fn(async () => ({ assets: [] })),
     },
     clipboard: {

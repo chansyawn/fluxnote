@@ -13,7 +13,7 @@ export {
   resetUserPreferences,
 } from "./preferences";
 export { onTelemetryChanged, readTelemetryBootstrap } from "./telemetry";
-export { convertFileSrc, copyAsset, createAsset, resolveAsset } from "./assets";
+export { convertFileSrc, copyAsset, createAsset, importAsset, resolveAsset } from "./assets";
 export { writeBlockEditorClipboard } from "./clipboard";
 export {
   cancelExternalEdit,
@@ -68,6 +68,8 @@ export type {
   CopyAssetResult,
   CreateAssetRequest,
   CreateAssetResult,
+  ImportAssetRequest,
+  ImportAssetResult,
   ResolveAssetRequest,
   ResolveAssetResult,
 } from "./assets";

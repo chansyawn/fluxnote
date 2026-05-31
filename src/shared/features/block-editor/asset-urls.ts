@@ -1,5 +1,3 @@
-import type { ClipboardSerializedNode } from "./clipboard";
-
 export interface ImageUrlNode {
   children?: ImageUrlNode[];
   src?: unknown;
@@ -30,23 +28,4 @@ export function collectImageAssetUrls(nodes: ReadonlyArray<ImageUrlNode>): strin
 
   nodes.forEach(visit);
   return Array.from(assetUrls);
-}
-
-export function rewriteClipboardImageAssetUrls(
-  nodes: ReadonlyArray<ClipboardSerializedNode>,
-  assetUrlMap: Map<string, string>,
-): ClipboardSerializedNode[] {
-  return nodes.map((node) => {
-    const nextNode: ClipboardSerializedNode = { ...node };
-    const assetUrl = getImageAssetUrl(node);
-    if (assetUrl) {
-      nextNode.src = assetUrlMap.get(assetUrl) ?? assetUrl;
-    }
-
-    if (node.children) {
-      nextNode.children = rewriteClipboardImageAssetUrls(node.children, assetUrlMap);
-    }
-
-    return nextNode;
-  });
 }

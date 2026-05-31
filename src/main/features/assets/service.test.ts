@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockRecord } from "../blocks/service";
 import { createTestDb } from "../test-db";
-import { copyAsset, createAsset, externalizeMarkdownAssetUrls, resolveAsset } from "./service";
+import {
+  copyAsset,
+  createAsset,
+  externalizeMarkdownAssetUrls,
+  importAsset,
+  resolveAsset,
+} from "./service";
 
 describe("assets service", () => {
   const paths = {
@@ -170,6 +176,46 @@ describe("assets service", () => {
           fileUrl: `file:///tmp/${block.id}/image.png`,
         },
       ]);
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("imports file urls into a block and reports per-file failures", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const copyFile = vi.fn(async (sourcePath: string) => {
+        if (sourcePath.includes("missing")) {
+          throw new Error("missing");
+        }
+      });
+
+      const result = await importAsset(
+        {
+          paths,
+          storage: { copyFile, writeFile: vi.fn() },
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          files: [
+            { fileUrl: "file:///tmp/source/photo.png" },
+            { fileUrl: "file:///tmp/source/missing.png" },
+          ],
+        },
+      );
+
+      expect(result.assets[0]).toEqual({
+        assetUrl: expect.stringContaining(`assets://${block.id}/`),
+        fileUrl: "file:///tmp/source/photo.png",
+      });
+      expect(result.assets[1]).toEqual({
+        assetUrl: null,
+        fileUrl: "file:///tmp/source/missing.png",
+      });
+      expect(copyFile).toHaveBeenCalledTimes(2);
     } finally {
       ctx.close();
       await ctx.cleanup();

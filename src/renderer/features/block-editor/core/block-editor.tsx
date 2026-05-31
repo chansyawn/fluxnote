@@ -33,7 +33,8 @@ import {
   useState,
 } from "react";
 
-import { createBlockEditorClipboardData, serializeMarkdown } from "../clipboard/clipboard-data";
+import { serializeMarkdown } from "../clipboard/clipboard-data";
+import { copyWholeBlock, createEditorClipboardPlugin } from "../clipboard/editor-clipboard";
 import { createSyntaxPlugins } from "../syntax";
 import { configureCodeHighlight } from "../syntax/code";
 import {
@@ -150,7 +151,7 @@ function BlockEditorContent({
       copy: async () => {
         const editor = editorRef.current;
         if (!editor) return;
-        await runtime.clipboard.write(await createBlockEditorClipboardData(editor, runtime));
+        await copyWholeBlock(editor, runtime);
       },
       focus: () => {
         editorRef.current?.action((ctx) => {
@@ -228,6 +229,7 @@ function BlockEditorContent({
             runtime,
           }),
         )
+        .use(createEditorClipboardPlugin(runtime))
         .use(createToolbarStatePlugin(editor, publishToolbarState))
         .use(history)
         .use(listener)

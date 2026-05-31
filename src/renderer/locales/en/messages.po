@@ -125,7 +125,7 @@ msgid "block-editor.link.url"
 msgstr "Link URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:278
+#: src/renderer/features/block-editor/core/block-editor.tsx:280
 msgid "block-editor.placeholder"
 msgstr "Write a block..."
 
@@ -397,17 +397,17 @@ msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:111
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
 msgid "lab.playground.description"
 msgstr "Frontend-only playground. Edit this preset markdown to verify Block behavior."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:124
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:130
 msgid "lab.playground.reset"
 msgstr "Reset preset"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:108
+#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:114
 msgid "lab.playground.title"
 msgstr "Block Editor Playground"
 

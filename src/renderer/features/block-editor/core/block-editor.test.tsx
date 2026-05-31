@@ -133,8 +133,9 @@ describe("BlockEditor", () => {
 
     expect(runtime.clipboard.write).toHaveBeenCalledWith(
       expect.objectContaining({
+        html: expect.stringContaining("file:///tmp/photo.png"),
         imageFileUrl: "file:///tmp/photo.png",
-        text: expect.stringContaining("assets://block/photo.png"),
+        text: expect.stringContaining("file:///tmp/photo.png"),
       }),
     );
   });

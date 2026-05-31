@@ -1,5 +1,5 @@
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
@@ -41,6 +41,14 @@ export interface CopyAssetInput {
 
 export interface ResolveAssetInput {
   assetUrls: string[];
+}
+
+export interface ImportAssetInput {
+  blockId: string;
+  files: Array<{
+    fileName?: string;
+    fileUrl: string;
+  }>;
 }
 
 interface MarkdownNode extends ImageUrlNode {
@@ -229,6 +237,38 @@ export async function resolveAsset(
       assetUrl,
       fileUrl: pathToFileURL(getAssetFilePath(deps.paths, assetUrl)).toString(),
     });
+  }
+
+  return { assets };
+}
+
+export async function importAsset(
+  deps: AssetServiceOptions,
+  db: AppDatabase,
+  input: ImportAssetInput,
+) {
+  const storage = deps.storage ?? nodeAssetStorage;
+  await assertBlockExists(db, input.blockId);
+
+  const assets = [];
+  for (const file of input.files) {
+    try {
+      const sourcePath = fileURLToPath(file.fileUrl);
+      const sourceFileName = file.fileName?.trim() || path.basename(sourcePath);
+      const targetFileName = createUniqueAssetFileName(sourceFileName, "image/png");
+      const targetPath = path.join(deps.paths.assetPathForBlock(input.blockId), targetFileName);
+
+      await storage.copyFile(sourcePath, targetPath);
+      assets.push({
+        assetUrl: `${assetUrlScheme}${input.blockId}/${targetFileName}`,
+        fileUrl: file.fileUrl,
+      });
+    } catch {
+      assets.push({
+        assetUrl: null,
+        fileUrl: file.fileUrl,
+      });
+    }
   }
 
   return { assets };
