@@ -140,6 +140,53 @@ describe("BlockEditor", () => {
     );
   });
 
+  it("stores pasted data image URLs as block assets", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const runtime = createBlockEditorRuntime();
+    const dataUrl = "data:image/png;base64,AQID";
+    runtime.assets.create = vi.fn(async () => ({
+      assets: [{ altText: "photo.png", assetUrl: "assets://block/photo.png" }],
+    }));
+
+    const { container } = renderBlockEditor(
+      {
+        initialMarkdown: "",
+        runtime,
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    const pasteEvent = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperty(pasteEvent, "clipboardData", {
+      value: {
+        getData: (type: string) => {
+          if (type === "text/html") return `<p>Before</p><img alt="Alt" src="${dataUrl}">`;
+          if (type === "text/plain") return "";
+          return "";
+        },
+        items: [],
+      },
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(pasteEvent);
+    });
+
+    await waitFor(() => {
+      expect(runtime.assets.create).toHaveBeenCalledWith({
+        assets: [{ dataBase64: "AQID", mimeType: "image/png" }],
+      });
+    });
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown).toContain("assets://block/photo.png");
+      expect(markdown).not.toContain("data:image");
+    });
+  });
+
   it("recreates the editor on theme changes while preserving code block behavior", async () => {
     const runtime = createBlockEditorRuntime();
     const initialMarkdown = ["```ts", "const answer = 42;", "```"].join("\n");

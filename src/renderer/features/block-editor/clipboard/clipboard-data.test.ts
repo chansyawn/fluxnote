@@ -4,10 +4,13 @@ import { describe, expect, it } from "vite-plus/test";
 
 import {
   ASSET_UNAVAILABLE_MARKDOWN,
+  collectDataImageUrlsFromClipboardFormats,
   collectMarkdownAssetUrls,
   collectFileUrlsFromClipboardFormats,
   getImageFileUrlForNativeClipboard,
+  parseDataImageUrl,
   rewriteClipboardAssetUrlsToFiles,
+  rewriteClipboardDataImageUrlsToAssets,
   rewriteClipboardFileUrlsToAssets,
   rewriteHtmlAssetUrls,
 } from "./clipboard-data";
@@ -81,6 +84,48 @@ describe("clipboard data helpers", () => {
         "![Other](file:///tmp/other.png)",
       ),
     ).toEqual(["file:///tmp/photo.png", "file:///tmp/other.png"]);
+  });
+
+  it("collects supported data image URLs from clipboard formats", () => {
+    const pngDataUrl = "data:image/png;base64,AQID";
+    const gifDataUrl = "data:image/gif;base64,BAUG";
+
+    expect(
+      collectDataImageUrlsFromClipboardFormats(
+        `<img src="${pngDataUrl}"><img src="data:image/svg+xml;base64,PHN2Zz4=">`,
+        `![Gif](${gifDataUrl})`,
+      ),
+    ).toEqual([pngDataUrl, gifDataUrl]);
+  });
+
+  it("parses supported data image URLs and rejects unsupported image types", () => {
+    expect(parseDataImageUrl("data:image/webp;base64,AQID")).toEqual({
+      dataBase64: "AQID",
+      mimeType: "image/webp",
+    });
+    expect(parseDataImageUrl("data:image/svg+xml;base64,PHN2Zz4=")).toBeNull();
+  });
+
+  it("rewrites pasted data image URLs to asset URLs and placeholders", () => {
+    const dataUrl = "data:image/png;base64,AQID";
+    const missingDataUrl = "data:image/jpeg;base64,BAUG";
+    const unsupportedDataUrl = "data:image/svg+xml;base64,PHN2Zz4=";
+    const result = rewriteClipboardDataImageUrlsToAssets(
+      {
+        html: `<img src="${dataUrl}"><img src="${missingDataUrl}"><img src="${unsupportedDataUrl}">`,
+        text: `![Photo](${dataUrl})\n![Missing](${missingDataUrl})\n![Svg](${unsupportedDataUrl})`,
+      },
+      new Map([
+        [dataUrl, "assets://block/photo.png"],
+        [missingDataUrl, null],
+      ]),
+    );
+
+    expect(result.html).toContain('src="assets://block/photo.png"');
+    expect(result.html).toContain('alt="Asset unavailable"');
+    expect(result.text).toContain("![Photo](assets://block/photo.png)");
+    expect(result.text).toContain(ASSET_UNAVAILABLE_MARKDOWN);
+    expect(result.text).not.toContain(unsupportedDataUrl);
   });
 
   it("returns a native image file URL only when exactly one Markdown image asset resolves", () => {

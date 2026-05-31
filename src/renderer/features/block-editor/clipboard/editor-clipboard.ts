@@ -8,15 +8,27 @@ import { $prose } from "@milkdown/kit/utils";
 
 import type { BlockEditorRuntime } from "../core/types";
 import {
+  ASSET_UNAVAILABLE_HTML,
+  ASSET_UNAVAILABLE_MARKDOWN,
+  collectAnyDataImageUrlsFromClipboardFormats,
   collectAssetUrlsFromClipboardFormats,
+  collectDataImageUrlsFromClipboardFormats,
   collectFileUrlsFromClipboardFormats,
+  isSupportedImageMimeType,
+  parseDataImageUrl,
   rewriteClipboardAssetUrlsToFiles,
+  rewriteClipboardDataImageUrlsToAssets,
   rewriteClipboardFileUrlsToAssets,
 } from "./clipboard-data";
 
 interface ClipboardFormats {
   html: string;
   text: string;
+}
+
+interface CreatedClipboardAsset {
+  altText: string;
+  assetUrl: string | null;
 }
 
 function getFileNameFromUrl(fileUrl: string): string | undefined {
@@ -27,6 +39,61 @@ function getFileNameFromUrl(fileUrl: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  const chunkSize = 0x8000;
+
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, offset + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return btoa(binary);
+}
+
+function hasClipboardImageFiles(event: ClipboardEvent): boolean {
+  const items = event.clipboardData?.items;
+  if (!items) return false;
+
+  return Array.from(items).some(
+    (item) => item.kind === "file" && isSupportedImageMimeType(item.type),
+  );
+}
+
+function collectClipboardImageFiles(event: ClipboardEvent): File[] {
+  const items = event.clipboardData?.items;
+  if (!items) return [];
+
+  return Array.from(items).flatMap((item) => {
+    if (item.kind !== "file" || !isSupportedImageMimeType(item.type)) return [];
+
+    const file = item.getAsFile();
+    return file ? [file] : [];
+  });
+}
+
+async function readClipboardImageFile(file: File): Promise<{
+  dataBase64: string;
+  mimeType: "image/png" | "image/jpeg" | "image/webp" | "image/gif";
+}> {
+  if (!isSupportedImageMimeType(file.type)) {
+    throw new Error("Unsupported clipboard image type.");
+  }
+
+  return {
+    dataBase64: bytesToBase64(new Uint8Array(await file.arrayBuffer())),
+    mimeType: file.type,
+  };
 }
 
 async function resolveClipboardAssets(
@@ -41,6 +108,51 @@ async function resolveClipboardAssets(
     return new Map(resolved.assets.map((asset) => [asset.assetUrl, asset.fileUrl]));
   } catch {
     return new Map();
+  }
+}
+
+async function createClipboardDataImageAssets(
+  runtime: BlockEditorRuntime,
+  dataImageUrls: string[],
+): Promise<Map<string, string | null>> {
+  const inputs = dataImageUrls.flatMap((dataImageUrl) => {
+    const parsed = parseDataImageUrl(dataImageUrl);
+    return parsed ? [{ dataImageUrl, parsed }] : [];
+  });
+  if (inputs.length === 0) return new Map();
+
+  try {
+    const result = await runtime.assets.create({
+      assets: inputs.map(({ parsed }) => parsed),
+    });
+
+    return new Map(
+      inputs.map(({ dataImageUrl }, index) => [
+        dataImageUrl,
+        result.assets[index]?.assetUrl ?? null,
+      ]),
+    );
+  } catch {
+    return new Map(inputs.map(({ dataImageUrl }) => [dataImageUrl, null]));
+  }
+}
+
+async function createClipboardFileAssets(
+  runtime: BlockEditorRuntime,
+  files: File[],
+): Promise<CreatedClipboardAsset[]> {
+  try {
+    const assets = await Promise.all(files.map(readClipboardImageFile));
+    const result = await runtime.assets.create({ assets });
+    return files.map((file, index) => ({
+      altText: result.assets[index]?.altText ?? file.name,
+      assetUrl: result.assets[index]?.assetUrl ?? null,
+    }));
+  } catch {
+    return files.map((file) => ({
+      altText: file.name,
+      assetUrl: null,
+    }));
   }
 }
 
@@ -114,7 +226,35 @@ function parseClipboardFormats(ctx: Ctx, view: EditorView, formats: ClipboardFor
   return new Slice(doc.content, 0, 0);
 }
 
-async function pasteClipboardFiles(
+function appendCreatedClipboardAssets(
+  formats: ClipboardFormats,
+  assets: CreatedClipboardAsset[],
+): ClipboardFormats {
+  if (assets.length === 0) return formats;
+
+  const htmlImages = assets
+    .map((asset) => {
+      if (!asset.assetUrl) return ASSET_UNAVAILABLE_HTML;
+
+      const altText = escapeHtmlAttribute(asset.altText);
+      return `<img src="${escapeHtmlAttribute(asset.assetUrl)}" alt="${altText}">`;
+    })
+    .join("");
+  const markdownImages = assets
+    .map((asset) =>
+      asset.assetUrl
+        ? `![${asset.altText.replace(/]/g, "\\]")}](${asset.assetUrl})`
+        : ASSET_UNAVAILABLE_MARKDOWN,
+    )
+    .join("\n");
+
+  return {
+    html: formats.html ? `${formats.html}${htmlImages}` : "",
+    text: [formats.text, markdownImages].filter(Boolean).join("\n"),
+  };
+}
+
+async function pasteClipboardImages(
   ctx: Ctx,
   view: EditorView,
   runtime: BlockEditorRuntime,
@@ -125,12 +265,25 @@ async function pasteClipboardFiles(
     text: event.clipboardData?.getData("text/plain") ?? "",
   };
   const fileUrls = collectFileUrlsFromClipboardFormats(formats.html, formats.text);
-  if (fileUrls.length === 0) return false;
+  const anyDataImageUrls = collectAnyDataImageUrlsFromClipboardFormats(formats.html, formats.text);
+  const dataImageUrls = collectDataImageUrlsFromClipboardFormats(formats.html, formats.text);
+  const imageFiles =
+    fileUrls.length === 0 && anyDataImageUrls.length === 0 ? collectClipboardImageFiles(event) : [];
+  if (fileUrls.length === 0 && anyDataImageUrls.length === 0 && imageFiles.length === 0) {
+    return false;
+  }
 
   event.preventDefault();
 
   const fileUrlMap = await importClipboardFiles(runtime, formats);
-  const rewritten = rewriteClipboardFileUrlsToAssets(formats, fileUrlMap);
+  const dataImageUrlMap = await createClipboardDataImageAssets(runtime, dataImageUrls);
+  const createdFileAssets = await createClipboardFileAssets(runtime, imageFiles);
+  const rewrittenFileUrls = rewriteClipboardFileUrlsToAssets(formats, fileUrlMap);
+  const rewrittenDataUrls = rewriteClipboardDataImageUrlsToAssets(
+    rewrittenFileUrls,
+    dataImageUrlMap,
+  );
+  const rewritten = appendCreatedClipboardAssets(rewrittenDataUrls, createdFileAssets);
   const slice = parseClipboardFormats(ctx, view, rewritten);
   view.dispatch(view.state.tr.replaceSelection(slice).scrollIntoView().setMeta("paste", true));
   return true;
@@ -171,15 +324,16 @@ export function createEditorClipboardPlugin(runtime: BlockEditorRuntime) {
             copy: (view, event) => handleCopyEvent(view, runtime, event),
             cut: (view, event) => handleCutEvent(view, runtime, event),
             paste: (view, event) => {
+              const html = event.clipboardData?.getData("text/html") ?? "";
+              const text = event.clipboardData?.getData("text/plain") ?? "";
               const hasFileImages =
-                collectFileUrlsFromClipboardFormats(
-                  event.clipboardData?.getData("text/html") ?? "",
-                  event.clipboardData?.getData("text/plain") ?? "",
-                ).length > 0;
+                collectFileUrlsFromClipboardFormats(html, text).length > 0 ||
+                collectAnyDataImageUrlsFromClipboardFormats(html, text).length > 0 ||
+                hasClipboardImageFiles(event);
               if (!hasFileImages) return false;
 
               event.preventDefault();
-              void pasteClipboardFiles(ctx, view, runtime, event);
+              void pasteClipboardImages(ctx, view, runtime, event);
               return true;
             },
           },
