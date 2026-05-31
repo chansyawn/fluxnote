@@ -5,11 +5,12 @@ import {
   createCodeBlockViewPlugin,
   type CodeBlockViewPluginInput,
 } from "./code";
+import { tabFocusTrapKeymap, tabIndentPlugin } from "./indentation";
 import { createLinkPopoverPlugin, type LinkPopoverPluginInput } from "./link";
 import { listSyntaxPlugins } from "./list";
 import { createTableControlPlugin, type TableControlPluginInput } from "./table";
 
-export const syntaxPlugins = [...listSyntaxPlugins];
+export const syntaxPlugins = [...listSyntaxPlugins, tabIndentPlugin, ...tabFocusTrapKeymap];
 
 interface BlockEditorSyntaxPluginInput {
   codeBlockNodeViewFactory: CodeBlockViewPluginInput["nodeViewFactory"];
