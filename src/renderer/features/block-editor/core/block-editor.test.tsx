@@ -1,162 +1,32 @@
 // @vitest-environment jsdom
 
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { act, createRef, type ComponentProps, type ReactNode, type Ref } from "react";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { act, createRef } from "react";
+import { describe, expect, it, vi } from "vite-plus/test";
 
-import { BlockEditor } from "./block-editor";
-import type { BlockEditorHandle, BlockEditorRuntime } from "./types";
-
-type MockThemeMode = "light" | "dark" | "system";
-type MockResolvedTheme = "light" | "dark";
-
-vi.mock("@lingui/react/macro", () => ({
-  Trans: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
-
-const themeMocks = vi.hoisted(() => ({
-  useThemeState: vi.fn(() => ({
-    resolvedTheme: "light" as MockResolvedTheme,
-    setThemeMode: vi.fn(),
-    themeMode: "light" as MockThemeMode,
-  })),
-}));
-
-vi.mock("@renderer/app/theme", () => ({
-  useThemeState: themeMocks.useThemeState,
-}));
-
-(
-  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
-).IS_REACT_ACT_ENVIRONMENT = true;
-
-i18n.load("en", {});
-i18n.activate("en");
-
-beforeAll(() => {
-  document.elementFromPoint = () => document.activeElement;
-  HTMLElement.prototype.getClientRects = function getClientRects() {
-    return {
-      0: this.getBoundingClientRect(),
-      item: (index: number) => (index === 0 ? this.getBoundingClientRect() : null),
-      length: 1,
-      [Symbol.iterator]: function* iterateRects() {
-        yield this[0];
-      },
-    } as DOMRectList;
-  };
-  Range.prototype.getClientRects = () =>
-    ({
-      0: new DOMRect(0, 0, 0, 0),
-      item: (index: number) => (index === 0 ? new DOMRect(0, 0, 0, 0) : null),
-      length: 1,
-      [Symbol.iterator]: function* iterateRects() {
-        yield this[0];
-      },
-    }) as DOMRectList;
-  Range.prototype.getBoundingClientRect = () => new DOMRect(0, 0, 0, 0);
-});
-
-beforeEach(() => {
-  themeMocks.useThemeState.mockReturnValue({
-    resolvedTheme: "light",
-    setThemeMode: vi.fn(),
-    themeMode: "light",
-  });
-});
-
-async function findLink(container: HTMLElement, label: string): Promise<HTMLAnchorElement> {
-  await waitFor(() => {
-    expect(container.querySelector("a")).toBeInTheDocument();
-  });
-
-  const link = screen.getByRole("link", { name: label });
-  return link as HTMLAnchorElement;
-}
-
-async function showLinkPopover(container: HTMLElement, label: string): Promise<HTMLAnchorElement> {
-  const link = await findLink(container, label);
-  vi.spyOn(link, "getBoundingClientRect").mockReturnValue(new DOMRect(20, 20, 80, 20));
-
-  await act(async () => {
-    link.dispatchEvent(
-      new MouseEvent("mousemove", {
-        bubbles: true,
-        cancelable: true,
-        clientX: 24,
-        clientY: 24,
-      }),
-    );
-  });
-
-  await screen.findByRole("button", { name: "Open" });
-  return link;
-}
-
-function createBlockEditorRuntime(): BlockEditorRuntime {
-  return {
-    assets: {
-      copy: vi.fn(async () => ({ assets: [] })),
-      create: vi.fn(async () => ({ assets: [] })),
-      resolve: vi.fn(async () => ({ assets: [] })),
-    },
-    clipboard: {
-      write: vi.fn(async () => undefined),
-      writeText: vi.fn(async () => undefined),
-    },
-    links: {
-      openExternal: vi.fn(async () => undefined),
-    },
-  };
-}
-
-function renderEditor(
-  props: Partial<ComponentProps<typeof BlockEditor>> = {},
-  ref?: Ref<BlockEditorHandle>,
-) {
-  const runtime = props.runtime ?? createBlockEditorRuntime();
-  const onMarkdownChange = props.onMarkdownChange ?? (() => undefined);
-
-  const rendered = render(
-    <I18nProvider i18n={i18n}>
-      <BlockEditor
-        ref={ref}
-        initialMarkdown={props.initialMarkdown ?? ""}
-        runtime={runtime}
-        onMarkdownChange={onMarkdownChange}
-        config={props.config}
-        onBlur={props.onBlur}
-      />
-    </I18nProvider>,
-  );
-
-  return { runtime, ...rendered };
-}
-
-async function findEditor(container: HTMLElement): Promise<HTMLElement> {
-  await waitFor(() => {
-    expect(container.querySelector(".block-editor__content")).toBeInTheDocument();
-  });
-
-  return container.querySelector<HTMLElement>(".block-editor__content") as HTMLElement;
-}
+import {
+  createBlockEditorRuntime,
+  createBlockEditorElement,
+  findBlockEditor,
+  renderBlockEditor,
+  setMockResolvedTheme,
+} from "../test/block-editor-test-utils";
+import type { BlockEditorHandle } from "./types";
 
 describe("BlockEditor", () => {
   it("exposes a labeled editing surface for a Block", async () => {
-    const { container } = renderEditor({ initialMarkdown: "Hello" });
+    const { container } = renderBlockEditor({ initialMarkdown: "Hello" });
 
-    expect(await findEditor(container)).toBeInTheDocument();
+    expect(await findBlockEditor(container)).toBeInTheDocument();
     expect(screen.getByText("Hello")).toBeVisible();
   });
 
   it("flushes the latest Markdown through the public handle", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    const { container } = renderEditor({ initialMarkdown: "**Hello**" }, editorRef);
-    await findEditor(container);
+    const { container } = renderBlockEditor({ initialMarkdown: "**Hello**" }, editorRef);
+    await findBlockEditor(container);
 
     await expect(editorRef.current?.flush()).resolves.toContain("Hello");
   });
@@ -164,14 +34,14 @@ describe("BlockEditor", () => {
   it("applies configured Block Editor text format shortcuts", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    const { container } = renderEditor(
+    const { container } = renderBlockEditor(
       {
         config: { shortcuts: { textFormats: { bold: "Control+Shift+B" } } },
         initialMarkdown: "",
       },
       editorRef,
     );
-    const editor = await findEditor(container);
+    const editor = await findBlockEditor(container);
     editor.focus();
     const configuredEvent = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -192,14 +62,14 @@ describe("BlockEditor", () => {
   it("blocks browser format shortcuts that are not configured by Fluxnotes", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 
-    const { container } = renderEditor(
+    const { container } = renderBlockEditor(
       {
         config: { shortcuts: { textFormats: { bold: null } } },
         initialMarkdown: "Plain text",
       },
       editorRef,
     );
-    const editor = await findEditor(container);
+    const editor = await findBlockEditor(container);
     editor.focus();
     const boldEvent = new KeyboardEvent("keydown", {
       bubbles: true,
@@ -223,14 +93,14 @@ describe("BlockEditor", () => {
       assets: [{ assetUrl: "assets://block/photo.png", fileUrl: "file:///tmp/photo.png" }],
     }));
 
-    const { container } = renderEditor(
+    const { container } = renderBlockEditor(
       {
         initialMarkdown: "![Alt](assets://block/photo.png)",
         runtime,
       },
       editorRef,
     );
-    await findEditor(container);
+    await findBlockEditor(container);
 
     await editorRef.current?.copy();
 
@@ -242,93 +112,22 @@ describe("BlockEditor", () => {
     );
   });
 
-  it("copies code block text through the code block controls", async () => {
-    const runtime = createBlockEditorRuntime();
-    const { container } = renderEditor({
-      initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
-      runtime,
-    });
-    await findEditor(container);
-
-    await userEvent.click(await screen.findByRole("button", { name: "Copy code" }));
-
-    expect(runtime.clipboard.writeText).toHaveBeenCalledWith("const answer = 42;");
-    expect(await screen.findByRole("button", { name: "Copy code" })).toBeVisible();
-  });
-
-  it("updates a code block language through the code block controls", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor(
-      {
-        initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
-      },
-      editorRef,
-    );
-    await findEditor(container);
-
-    await userEvent.click(await screen.findByRole("combobox", { name: "Code language" }));
-    await userEvent.click(await screen.findByRole("option", { name: "Python" }));
-
-    await expect(editorRef.current?.flush()).resolves.toContain("```python");
-  });
-
-  it("renders code block line numbers when the Markdown preference is enabled", async () => {
-    const { container } = renderEditor({
-      config: { markdown: { codeBlock: { showLineNumbers: true } } },
-      initialMarkdown: ["```ts", "const answer = 42;", "answer;", "```"].join("\n"),
-    });
-    await findEditor(container);
-
-    await waitFor(() => {
-      expect(container.querySelectorAll("pre .line-number")).toHaveLength(2);
-    });
-  });
-
-  it("configures code highlighting before the highlight plugin starts", async () => {
-    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-    try {
-      const { container } = renderEditor({
-        config: { markdown: { codeBlock: { showLineNumbers: true } } },
-        initialMarkdown: ["```ts", "const answer = 42;", "```"].join("\n"),
-      });
-      await findEditor(container);
-
-      await waitFor(() => {
-        expect(container.querySelectorAll("pre .line-number")).toHaveLength(1);
-      });
-
-      const consoleOutput = consoleError.mock.calls.flat().map(String).join("\n");
-      expect(consoleOutput).not.toContain(
-        "Highlight plugin requires a parser to be set in the highlightPluginConfig.",
-      );
-    } finally {
-      consoleError.mockRestore();
-    }
-  });
-
   it("recreates the editor on theme changes while preserving code block behavior", async () => {
     const runtime = createBlockEditorRuntime();
     const initialMarkdown = ["```ts", "const answer = 42;", "```"].join("\n");
-    const { container, rerender } = renderEditor({
+    const { container, rerender } = renderBlockEditor({
       initialMarkdown,
       runtime,
     });
-    const initialEditor = await findEditor(container);
+    const initialEditor = await findBlockEditor(container);
 
-    themeMocks.useThemeState.mockReturnValue({
-      resolvedTheme: "dark",
-      setThemeMode: vi.fn(),
-      themeMode: "dark",
-    });
+    setMockResolvedTheme("dark");
     rerender(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          initialMarkdown={initialMarkdown}
-          runtime={runtime}
-          onMarkdownChange={() => undefined}
-        />
-      </I18nProvider>,
+      createBlockEditorElement({
+        initialMarkdown,
+        runtime,
+        onMarkdownChange: () => undefined,
+      }),
     );
 
     await waitFor(() => {
@@ -343,8 +142,8 @@ describe("BlockEditor", () => {
     const user = userEvent.setup();
     const onMarkdownChange = vi.fn();
 
-    const { container } = renderEditor({ initialMarkdown: "", onMarkdownChange });
-    const editor = await findEditor(container);
+    const { container } = renderBlockEditor({ initialMarkdown: "", onMarkdownChange });
+    const editor = await findBlockEditor(container);
 
     await user.click(editor);
     await user.keyboard("Hello");
@@ -354,154 +153,11 @@ describe("BlockEditor", () => {
     });
   });
 
-  it("renders task list items from Markdown", async () => {
-    const { container } = renderEditor({
-      initialMarkdown: "- [ ] Open task\n- [x] Closed task",
-    });
-    await findEditor(container);
-
-    expect(
-      container.querySelector('li[data-item-type="task"][data-checked="false"]'),
-    ).toHaveTextContent("Open task");
-    expect(
-      container.querySelector('li[data-item-type="task"][data-checked="true"]'),
-    ).toHaveTextContent("Closed task");
-  });
-
-  it("toggles a task list item when the checkbox marker is clicked", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor({ initialMarkdown: "- [ ] Open task" }, editorRef);
-    await findEditor(container);
-    const taskItem = container.querySelector<HTMLElement>('li[data-item-type="task"]');
-    expect(taskItem).not.toBeNull();
-
-    const originalGetComputedStyle = window.getComputedStyle;
-    window.getComputedStyle = ((element: Element, pseudoElement?: string | null) => {
-      const declaration = originalGetComputedStyle(element, pseudoElement);
-      if (element === taskItem) {
-        Object.defineProperty(declaration, "fontSize", { configurable: true, value: "16px" });
-        Object.defineProperty(declaration, "lineHeight", { configurable: true, value: "24px" });
-      }
-      return declaration;
-    }) as typeof window.getComputedStyle;
-    vi.spyOn(taskItem as HTMLElement, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(24, 0, 200, 24),
-    );
-
-    await act(async () => {
-      taskItem?.dispatchEvent(
-        new MouseEvent("mousedown", {
-          bubbles: true,
-          cancelable: true,
-          clientX: 6,
-          clientY: 12,
-        }),
-      );
-    });
-    window.getComputedStyle = originalGetComputedStyle;
-
-    expect(await editorRef.current?.flush()).toContain("* [x] Open task");
-  });
-
-  it("does not toggle a task list item when its text is clicked", async () => {
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor({ initialMarkdown: "- [ ] Open task" }, editorRef);
-    await findEditor(container);
-    const taskItem = container.querySelector<HTMLElement>('li[data-item-type="task"]');
-    expect(taskItem).not.toBeNull();
-
-    vi.spyOn(taskItem as HTMLElement, "getBoundingClientRect").mockReturnValue(
-      new DOMRect(24, 0, 200, 24),
-    );
-
-    await act(async () => {
-      taskItem?.dispatchEvent(
-        new MouseEvent("mousedown", {
-          bubbles: true,
-          cancelable: true,
-          clientX: 80,
-          clientY: 12,
-        }),
-      );
-    });
-
-    expect(await editorRef.current?.flush()).toContain("* [ ] Open task");
-  });
-
-  it("renders Markdown links with the link popover", async () => {
-    const { container } = renderEditor({
-      initialMarkdown: "[Fluxnotes](https://example.com)",
-    });
-    await findEditor(container);
-
-    await showLinkPopover(container, "Fluxnotes");
-
-    expect(screen.getByRole("button", { name: "Open" })).toBeVisible();
-  });
-
-  it("creates unchecked tasks from empty bracket shorthand inside list items", async () => {
-    const user = userEvent.setup();
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor({ initialMarkdown: "" }, editorRef);
-    const editor = await findEditor(container);
-
-    await user.click(editor);
-    await user.keyboard("- [[");
-    await user.keyboard("]");
-    await user.keyboard(" Task");
-
-    await waitFor(() => {
-      expect(container.querySelector('li[data-item-type="task"]')).toHaveTextContent("Task");
-    });
-    expect(await editorRef.current?.flush()).toContain("* [ ] Task");
-  });
-
-  it.each([
-    ["empty brackets", ["[[", "]", " Task"], "* [ ] Task"],
-    ["spaced empty brackets", ["[[", " ]", " Task"], "* [ ] Task"],
-    ["checked brackets", ["[[", "x]", " Task"], "* [x] Task"],
-  ])(
-    "creates task list items from %s at the start of a paragraph",
-    async (_name, keys, markdown) => {
-      const user = userEvent.setup();
-      const editorRef = createRef<BlockEditorHandle>();
-      const { container } = renderEditor({ initialMarkdown: "" }, editorRef);
-      const editor = await findEditor(container);
-
-      await user.click(editor);
-      for (const keyText of keys) {
-        await user.keyboard(keyText);
-      }
-
-      await waitFor(() => {
-        expect(container.querySelector('li[data-item-type="task"]')).toHaveTextContent("Task");
-      });
-      expect(await editorRef.current?.flush()).toContain(markdown);
-    },
-  );
-
-  it("keeps task shorthand as text when typed in the middle of a paragraph", async () => {
-    const user = userEvent.setup();
-    const editorRef = createRef<BlockEditorHandle>();
-    const { container } = renderEditor({ initialMarkdown: "" }, editorRef);
-    const editor = await findEditor(container);
-
-    await user.click(editor);
-    await user.keyboard("Before [[");
-    await user.keyboard("]");
-    await user.keyboard(" after");
-
-    await waitFor(() => {
-      expect(editor).toHaveTextContent("Before [] after");
-    });
-    expect(await editorRef.current?.flush()).toContain("Before \\[] after");
-  });
-
   it("keeps the active editor mounted when the initial Markdown prop changes", async () => {
     const onMarkdownChange = vi.fn();
     const runtime = createBlockEditorRuntime();
     const editorRef = createRef<BlockEditorHandle>();
-    const { container, rerender } = renderEditor(
+    const { container, rerender } = renderBlockEditor(
       {
         initialMarkdown: "Local content",
         onMarkdownChange,
@@ -509,19 +165,19 @@ describe("BlockEditor", () => {
       },
       editorRef,
     );
-    const editor = await findEditor(container);
+    const editor = await findBlockEditor(container);
 
     editor.focus();
 
     rerender(
-      <I18nProvider i18n={i18n}>
-        <BlockEditor
-          ref={editorRef}
-          initialMarkdown="Persisted content"
-          runtime={runtime}
-          onMarkdownChange={onMarkdownChange}
-        />
-      </I18nProvider>,
+      createBlockEditorElement(
+        {
+          initialMarkdown: "Persisted content",
+          runtime,
+          onMarkdownChange,
+        },
+        editorRef,
+      ),
     );
 
     expect(document.activeElement).toBe(editor);
