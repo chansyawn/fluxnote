@@ -1,6 +1,7 @@
 import type { Editor } from "@milkdown/kit/core";
-import { editorViewCtx, parserCtx } from "@milkdown/kit/core";
+import { editorViewCtx, parserCtx, serializerCtx } from "@milkdown/kit/core";
 import type { Ctx } from "@milkdown/kit/ctx";
+import { isTextOnlySlice } from "@milkdown/kit/prose";
 import { DOMParser, Slice } from "@milkdown/kit/prose/model";
 import { AllSelection, Plugin } from "@milkdown/kit/prose/state";
 import type { EditorView } from "@milkdown/kit/prose/view";
@@ -212,18 +213,56 @@ async function importClipboardFiles(
   }
 }
 
+function parseHtmlClipboardSlice(view: EditorView, html: string): Slice {
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  return DOMParser.fromSchema(view.state.schema).parseSlice(container, {
+    context: view.state.selection.$from,
+    preserveWhitespace: false,
+  });
+}
+
+function parseTextClipboardSlice(ctx: Ctx, text: string): Slice | null {
+  if (!text) return null;
+
+  const doc = ctx.get(parserCtx)(text);
+  if (!doc || typeof doc === "string") return null;
+
+  return new Slice(doc.content, 0, 0);
+}
+
 function parseClipboardFormats(ctx: Ctx, view: EditorView, formats: ClipboardFormats): Slice {
   if (formats.html) {
-    const container = document.createElement("div");
-    container.innerHTML = formats.html;
-    return DOMParser.fromSchema(view.state.schema).parseSlice(container, {
-      context: view.state.selection.$from,
-      preserveWhitespace: false,
-    });
+    try {
+      return parseHtmlClipboardSlice(view, formats.html);
+    } catch {
+      const textSlice = parseTextClipboardSlice(ctx, formats.text);
+      if (textSlice) return textSlice;
+      throw new Error("Clipboard HTML could not be parsed.");
+    }
   }
 
-  const doc = ctx.get(parserCtx)(formats.text);
-  return new Slice(doc.content, 0, 0);
+  const textSlice = parseTextClipboardSlice(ctx, formats.text);
+  if (textSlice) return textSlice;
+
+  return Slice.empty;
+}
+
+function dispatchPasteSlice(view: EditorView, slice: Slice): boolean {
+  const textNode = isTextOnlySlice(slice);
+  if (textNode) {
+    view.dispatch(
+      view.state.tr.replaceSelectionWith(textNode, true).scrollIntoView().setMeta("paste", true),
+    );
+    return true;
+  }
+
+  try {
+    view.dispatch(view.state.tr.replaceSelection(slice).scrollIntoView().setMeta("paste", true));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function appendCreatedClipboardAssets(
@@ -258,23 +297,10 @@ async function pasteClipboardImages(
   ctx: Ctx,
   view: EditorView,
   runtime: BlockEditorRuntime,
-  event: ClipboardEvent,
+  formats: ClipboardFormats,
+  imageFiles: File[],
 ): Promise<boolean> {
-  const formats = {
-    html: event.clipboardData?.getData("text/html") ?? "",
-    text: event.clipboardData?.getData("text/plain") ?? "",
-  };
-  const fileUrls = collectFileUrlsFromClipboardFormats(formats.html, formats.text);
-  const anyDataImageUrls = collectAnyDataImageUrlsFromClipboardFormats(formats.html, formats.text);
   const dataImageUrls = collectDataImageUrlsFromClipboardFormats(formats.html, formats.text);
-  const imageFiles =
-    fileUrls.length === 0 && anyDataImageUrls.length === 0 ? collectClipboardImageFiles(event) : [];
-  if (fileUrls.length === 0 && anyDataImageUrls.length === 0 && imageFiles.length === 0) {
-    return false;
-  }
-
-  event.preventDefault();
-
   const fileUrlMap = await importClipboardFiles(runtime, formats);
   const dataImageUrlMap = await createClipboardDataImageAssets(runtime, dataImageUrls);
   const createdFileAssets = await createClipboardFileAssets(runtime, imageFiles);
@@ -285,7 +311,39 @@ async function pasteClipboardImages(
   );
   const rewritten = appendCreatedClipboardAssets(rewrittenDataUrls, createdFileAssets);
   const slice = parseClipboardFormats(ctx, view, rewritten);
-  view.dispatch(view.state.tr.replaceSelection(slice).scrollIntoView().setMeta("paste", true));
+  return dispatchPasteSlice(view, slice);
+}
+
+async function pasteClipboardContent(
+  ctx: Ctx,
+  view: EditorView,
+  runtime: BlockEditorRuntime,
+  event: ClipboardEvent,
+): Promise<boolean> {
+  const formats = {
+    html: event.clipboardData?.getData("text/html") ?? "",
+    text: event.clipboardData?.getData("text/plain") ?? "",
+  };
+  const fileUrls = collectFileUrlsFromClipboardFormats(formats.html, formats.text);
+  const anyDataImageUrls = collectAnyDataImageUrlsFromClipboardFormats(formats.html, formats.text);
+  const imageFiles =
+    fileUrls.length === 0 && anyDataImageUrls.length === 0 ? collectClipboardImageFiles(event) : [];
+
+  if (fileUrls.length > 0 || anyDataImageUrls.length > 0 || imageFiles.length > 0) {
+    return pasteClipboardImages(ctx, view, runtime, formats, imageFiles);
+  }
+
+  const slice = parseClipboardFormats(ctx, view, formats);
+  return dispatchPasteSlice(view, slice);
+}
+
+function pastePlainTextIntoCodeBlock(view: EditorView, event: ClipboardEvent): boolean {
+  const text = event.clipboardData?.getData("text/plain") ?? "";
+  if (!text) return false;
+
+  view.dispatch(
+    view.state.tr.insertText(text.replace(/\r\n?/g, "\n")).scrollIntoView().setMeta("paste", true),
+  );
   return true;
 }
 
@@ -315,6 +373,40 @@ function handleCutEvent(
   return true;
 }
 
+function handlePasteEvent(
+  ctx: Ctx,
+  view: EditorView,
+  runtime: BlockEditorRuntime,
+  event: ClipboardEvent,
+): boolean {
+  const editable = view.props.editable?.(view.state) ?? true;
+  if (!editable || !event.clipboardData) return false;
+
+  const html = event.clipboardData.getData("text/html");
+  const text = event.clipboardData.getData("text/plain");
+  const hasFiles = hasClipboardImageFiles(event);
+  if (!html && !text && !hasFiles) return false;
+
+  event.preventDefault();
+
+  if (view.state.selection.$from.parent.type.spec.code) {
+    pastePlainTextIntoCodeBlock(view, event);
+    return true;
+  }
+
+  void pasteClipboardContent(ctx, view, runtime, event);
+  return true;
+}
+
+function serializeClipboardText(ctx: Ctx, slice: Slice): string {
+  const doc = ctx
+    .get(editorViewCtx)
+    .state.schema.topNodeType.createAndFill(undefined, slice.content);
+  if (!doc) return slice.content.textBetween(0, slice.content.size, "\n\n");
+
+  return ctx.get(serializerCtx)(doc);
+}
+
 export function createEditorClipboardPlugin(runtime: BlockEditorRuntime) {
   return $prose(
     (ctx) =>
@@ -323,20 +415,9 @@ export function createEditorClipboardPlugin(runtime: BlockEditorRuntime) {
           handleDOMEvents: {
             copy: (view, event) => handleCopyEvent(view, runtime, event),
             cut: (view, event) => handleCutEvent(view, runtime, event),
-            paste: (view, event) => {
-              const html = event.clipboardData?.getData("text/html") ?? "";
-              const text = event.clipboardData?.getData("text/plain") ?? "";
-              const hasFileImages =
-                collectFileUrlsFromClipboardFormats(html, text).length > 0 ||
-                collectAnyDataImageUrlsFromClipboardFormats(html, text).length > 0 ||
-                hasClipboardImageFiles(event);
-              if (!hasFileImages) return false;
-
-              event.preventDefault();
-              void pasteClipboardImages(ctx, view, runtime, event);
-              return true;
-            },
+            paste: (view, event) => handlePasteEvent(ctx, view, runtime, event),
           },
+          clipboardTextSerializer: (slice) => serializeClipboardText(ctx, slice),
         },
       }),
   );

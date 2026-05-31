@@ -7,7 +7,6 @@ import {
   editorViewOptionsCtx,
   rootCtx,
 } from "@milkdown/kit/core";
-import { clipboard } from "@milkdown/kit/plugin/clipboard";
 import { history } from "@milkdown/kit/plugin/history";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
 import { commonmark } from "@milkdown/kit/preset/commonmark";
@@ -264,8 +263,7 @@ function BlockEditorContent({
           }),
         )
         .use(history)
-        .use(listener)
-        .use(clipboard);
+        .use(listener);
 
       editorRef.current = editor;
 

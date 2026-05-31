@@ -110,7 +110,7 @@ msgid "block-editor.link.remove"
 msgstr "移除"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:143
+#: src/renderer/features/block-editor/core/block-editor.tsx:142
 msgid "block-editor.link.select-text"
 msgstr "选择文本以添加链接"
 
@@ -120,7 +120,7 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:125
+#: src/renderer/features/block-editor/core/block-editor.tsx:124
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 

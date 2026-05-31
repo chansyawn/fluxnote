@@ -92,6 +92,31 @@ function createImagePasteEvent(file: File): Event {
   return pasteEvent;
 }
 
+function createClipboardPasteEvent(input: {
+  html?: string;
+  text?: string;
+  vscodeData?: string;
+}): Event {
+  const pasteEvent = new Event("paste", {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  Object.defineProperty(pasteEvent, "clipboardData", {
+    value: {
+      getData: (type: string) => {
+        if (type === "text/html") return input.html ?? "";
+        if (type === "text/plain") return input.text ?? "";
+        if (type === "vscode-editor-data") return input.vscodeData ?? "";
+        return "";
+      },
+      items: [],
+    },
+  });
+
+  return pasteEvent;
+}
+
 describe("BlockEditor", () => {
   it("exposes a labeled editing surface for a Block", async () => {
     const { container } = renderBlockEditor({ initialMarkdown: "Hello" });
@@ -446,6 +471,95 @@ describe("BlockEditor", () => {
         text: expect.stringContaining("file:///tmp/photo.png"),
       }),
     );
+  });
+
+  it("pastes VS Code HTML without creating an automatic code block", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "" }, editorRef);
+    const editor = await findBlockEditor(container);
+    editor.focus();
+
+    await act(async () => {
+      editor.dispatchEvent(
+        createClipboardPasteEvent({
+          html: "<div><span>const answer = 42;</span></div>",
+          text: "const answer = 42;",
+          vscodeData: JSON.stringify({ mode: "typescript" }),
+        }),
+      );
+    });
+
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown?.trim()).toBe("const answer = 42;");
+      expect(markdown).not.toContain("```");
+    });
+  });
+
+  it("prefers pasted HTML over plain text", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "" }, editorRef);
+    const editor = await findBlockEditor(container);
+    editor.focus();
+
+    await act(async () => {
+      editor.dispatchEvent(
+        createClipboardPasteEvent({
+          html: "<h1>HTML Title</h1>",
+          text: "Plain Title",
+        }),
+      );
+    });
+
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown).toContain("# HTML Title");
+      expect(markdown).not.toContain("Plain Title");
+    });
+  });
+
+  it("parses plain text clipboard content as Markdown", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "" }, editorRef);
+    const editor = await findBlockEditor(container);
+    editor.focus();
+
+    await act(async () => {
+      editor.dispatchEvent(createClipboardPasteEvent({ text: "# Plain Markdown" }));
+    });
+
+    await waitFor(async () => {
+      await expect(editorRef.current?.flush()).resolves.toContain("# Plain Markdown");
+    });
+  });
+
+  it("pastes raw plain text inside code blocks", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const initialMarkdown = ["```ts", "const before = 1;", "```"].join("\n");
+
+    const { container } = renderBlockEditor({ initialMarkdown }, editorRef);
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    await placeEditorCursor(editor, "const before = 1;".length);
+
+    await act(async () => {
+      editor.dispatchEvent(
+        createClipboardPasteEvent({
+          html: "<h1>HTML Title</h1>",
+          text: "\n# not a heading",
+        }),
+      );
+    });
+
+    await waitFor(async () => {
+      const markdown = await editorRef.current?.flush();
+      expect(markdown).toContain("```ts");
+      expect(markdown).toContain("# not a heading");
+      expect(markdown).not.toContain("# HTML Title");
+    });
   });
 
   it("stores pasted data image URLs as block assets", async () => {
