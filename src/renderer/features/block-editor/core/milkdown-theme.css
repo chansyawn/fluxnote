@@ -1,5 +1,9 @@
 @reference "#global.css";
 
+.block-editor {
+  @apply min-h-16;
+}
+
 .block-editor .ProseMirror {
   @apply min-h-16 wrap-break-word outline-none;
 }
@@ -41,6 +45,15 @@
 
 .block-editor p {
   @apply my-1.5;
+}
+
+.block-editor__placeholder {
+  @apply relative;
+}
+
+.block-editor__placeholder::before {
+  @apply text-muted-foreground pointer-events-none absolute top-0 left-0;
+  content: attr(data-placeholder);
 }
 
 .block-editor blockquote {

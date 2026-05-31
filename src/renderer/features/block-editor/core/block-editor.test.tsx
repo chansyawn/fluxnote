@@ -31,6 +31,49 @@ describe("BlockEditor", () => {
     await expect(editorRef.current?.flush()).resolves.toContain("Hello");
   });
 
+  it("shows placeholder in an empty Block Editor", async () => {
+    const { container } = renderBlockEditor({ initialMarkdown: "" });
+    const editor = await findBlockEditor(container);
+
+    expect(editor.querySelector("[data-placeholder='Write a block...']")).toBeInTheDocument();
+  });
+
+  it("does not show placeholder when initial Markdown has content", async () => {
+    const { container } = renderBlockEditor({ initialMarkdown: "Hello" });
+    const editor = await findBlockEditor(container);
+
+    expect(editor.querySelector("[data-placeholder]")).not.toBeInTheDocument();
+  });
+
+  it("hides and restores placeholder with ProseMirror document updates", async () => {
+    const user = userEvent.setup();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "" });
+    const editor = await findBlockEditor(container);
+
+    await user.click(editor);
+    await user.keyboard("H");
+
+    expect(editor.querySelector("[data-placeholder]")).not.toBeInTheDocument();
+
+    await user.keyboard("{Control>}a{/Control}{Backspace}");
+
+    expect(editor.querySelector("[data-placeholder='Write a block...']")).toBeInTheDocument();
+  });
+
+  it("does not show placeholder for empty structured blocks", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    const { container } = renderBlockEditor({ initialMarkdown: "" }, editorRef);
+    const editor = await findBlockEditor(container);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "heading2", type: "set-block" });
+    });
+
+    expect(editor.querySelector("[data-placeholder]")).not.toBeInTheDocument();
+  });
+
   it("applies configured Block Editor text format shortcuts", async () => {
     const editorRef = createRef<BlockEditorHandle>();
 

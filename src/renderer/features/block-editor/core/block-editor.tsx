@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
 import {
   defaultValueCtx,
   Editor,
@@ -46,6 +45,7 @@ import {
   runToolbarCommand,
 } from "../toolbar/editor-toolbar-state";
 import type { BlockEditorToolbarState } from "../toolbar/types";
+import { createBlockEditorPlaceholderPlugin } from "./block-editor-placeholder";
 import { createBlockEditorShortcutPlugin } from "./block-editor-shortcuts";
 import { resolveBlockEditorConfig } from "./config";
 import { configureMilkdownKeymaps } from "./milkdown-keymaps";
@@ -120,13 +120,15 @@ function BlockEditorContent({
   const rootRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const latestMarkdownRef = useRef(initialMarkdownSnapshot);
-  const [isEmpty, setIsEmpty] = useState(initialMarkdownSnapshot.trim().length === 0);
 
   const resolvedConfig = useMemo(() => resolveBlockEditorConfig(config), [config]);
+  const placeholderText = i18n._({
+    id: "block-editor.placeholder",
+    message: "Write a block...",
+  });
 
   const publishMarkdown = useEffectEvent((markdown: string) => {
     latestMarkdownRef.current = markdown;
-    setIsEmpty(markdown.trim().length === 0);
     onMarkdownChange(markdown);
   });
 
@@ -253,6 +255,7 @@ function BlockEditorContent({
           }),
         )
         .use(createEditorClipboardPlugin(runtime))
+        .use(createBlockEditorPlaceholderPlugin(placeholderText))
         .use(createToolbarStatePlugin(editor, publishToolbarState))
         .use(
           createBlockEditorShortcutPlugin({
@@ -272,6 +275,7 @@ function BlockEditorContent({
       codeBlockNodeViewFactory,
       initialMarkdownSnapshot,
       linkPluginViewFactory,
+      placeholderText,
       resolvedConfig.shortcuts.editor,
       resolvedTheme,
       runtime,
@@ -287,7 +291,6 @@ function BlockEditorContent({
 
     publishToolbarState(readToolbarState(editor));
     latestMarkdownRef.current = serializeMarkdown(editor);
-    setIsEmpty(latestMarkdownRef.current.trim().length === 0);
   }, [milkdown, publishToolbarState]);
 
   useEffect(
@@ -304,11 +307,6 @@ function BlockEditorContent({
       data-code-line-numbers={String(resolvedConfig.markdown.codeBlock.showLineNumbers)}
     >
       <Milkdown />
-      {isEmpty ? (
-        <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
-          <Trans id="block-editor.placeholder">Write a block...</Trans>
-        </div>
-      ) : null}
     </div>
   );
 }
