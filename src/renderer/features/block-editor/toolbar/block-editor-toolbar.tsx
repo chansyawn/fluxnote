@@ -100,13 +100,6 @@ function getShortcutTokens(
   return formatShortcutTokens(shortcuts?.[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS[format]] ?? null);
 }
 
-function getShortcutLabel(
-  shortcuts: Partial<BlockEditorShortcuts> | undefined,
-  format: BlockEditorToolbarFormat,
-) {
-  return getShortcutTokens(shortcuts, format).join("+");
-}
-
 function ShortcutTooltipContent({
   format,
   label,
@@ -344,7 +337,7 @@ export function BlockEditorToolbar({
               <DropdownMenuGroup>
                 {headingControls.map((control) => {
                   const Icon = control.icon;
-                  const shortcutLabel = getShortcutLabel(shortcuts, control.format);
+                  const shortcutTokens = getShortcutTokens(shortcuts, control.format);
 
                   return (
                     <DropdownMenuRadioItem
@@ -360,8 +353,8 @@ export function BlockEditorToolbar({
                     >
                       <Icon />
                       {control.menuLabel}
-                      {shortcutLabel ? (
-                        <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>
+                      {shortcutTokens.length > 0 ? (
+                        <DropdownMenuShortcut tokens={shortcutTokens} />
                       ) : null}
                     </DropdownMenuRadioItem>
                   );
@@ -381,6 +374,7 @@ export function BlockEditorToolbar({
                     message: "List",
                   })}
                   aria-pressed={Boolean(activeList)}
+                  className={cn(activeList ? "text-foreground" : "text-muted-foreground/60")}
                   render={<Button size="sm" type="button" variant="ghost" />}
                 >
                   <ListButtonIcon data-icon="inline-start" />
@@ -397,7 +391,7 @@ export function BlockEditorToolbar({
               <DropdownMenuGroup>
                 {listControls.map((control) => {
                   const Icon = control.icon;
-                  const shortcutLabel = getShortcutLabel(shortcuts, control.format);
+                  const shortcutTokens = getShortcutTokens(shortcuts, control.format);
 
                   return (
                     <DropdownMenuRadioItem
@@ -413,8 +407,8 @@ export function BlockEditorToolbar({
                     >
                       <Icon />
                       {control.label}
-                      {shortcutLabel ? (
-                        <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut>
+                      {shortcutTokens.length > 0 ? (
+                        <DropdownMenuShortcut tokens={shortcutTokens} />
                       ) : null}
                     </DropdownMenuRadioItem>
                   );

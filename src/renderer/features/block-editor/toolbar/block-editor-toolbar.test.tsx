@@ -80,6 +80,7 @@ describe("BlockEditorToolbar", () => {
     expect(boldButton).toHaveAttribute("aria-pressed", "true");
     expect(boldButton).toHaveClass("text-foreground");
     expect(italicButton).toHaveClass("text-muted-foreground/60");
+    expect(screen.getByRole("button", { name: "List" })).toHaveClass("text-muted-foreground/60");
     expect(
       screen.getAllByRole("button").map((button) => button.getAttribute("aria-label")),
     ).toEqual([
@@ -156,11 +157,15 @@ describe("BlockEditorToolbar", () => {
 
     const listButton = screen.getByRole("button", { name: "List" });
     expect(listButton).toHaveAttribute("aria-pressed", "true");
+    expect(listButton).toHaveClass("text-foreground");
 
     await user.click(listButton);
     const taskListMenuItem = await screen.findByRole("menuitemradio", { name: /Task list/ });
 
-    expect(screen.getByText("Ctrl+Alt+9")).toBeVisible();
+    expect(screen.getByText("Ctrl").closest("kbd")).toBeVisible();
+    expect(screen.getByText("Alt").closest("kbd")).toBeVisible();
+    expect(screen.getByText("9").closest("kbd")).toBeVisible();
+    expect(screen.queryByText("Ctrl+Alt+9")).not.toBeInTheDocument();
 
     await user.click(taskListMenuItem);
 
@@ -190,7 +195,10 @@ describe("BlockEditorToolbar", () => {
       type: "set-block",
     });
     expect(controller.focus).toHaveBeenCalledOnce();
-    expect(screen.getByText("Ctrl+Alt+2")).toBeVisible();
+    expect(screen.getByText("Ctrl").closest("kbd")).toBeVisible();
+    expect(screen.getByText("Alt").closest("kbd")).toBeVisible();
+    expect(screen.getByText("2").closest("kbd")).toBeVisible();
+    expect(screen.queryByText("Ctrl+Alt+2")).not.toBeInTheDocument();
   });
 
   it("shows configured shortcuts in tooltips", async () => {

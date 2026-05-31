@@ -200,138 +200,138 @@ msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:238
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:231
 msgid "block-editor.toolbar.blockquote"
 msgstr "Quote"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:273
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:266
 msgid "block-editor.toolbar.bold"
 msgstr "Bold"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:253
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:246
 msgid "block-editor.toolbar.bullet-list"
 msgstr "Bullet list"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:243
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:236
 msgid "block-editor.toolbar.code-block"
 msgstr "Code block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:325
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:318
 msgid "block-editor.toolbar.heading-menu"
 msgstr "Text style"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:198
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:191
 msgid "block-editor.toolbar.heading1"
 msgstr "Heading 1"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:197
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:190
 msgid "block-editor.toolbar.heading1.short"
 msgstr "H1"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:204
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:197
 msgid "block-editor.toolbar.heading2"
 msgstr "Heading 2"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:203
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:196
 msgid "block-editor.toolbar.heading2.short"
 msgstr "H2"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:210
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:203
 msgid "block-editor.toolbar.heading3"
 msgstr "Heading 3"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:209
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:202
 msgid "block-editor.toolbar.heading3.short"
 msgstr "H3"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:216
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:209
 msgid "block-editor.toolbar.heading4"
 msgstr "Heading 4"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:215
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:208
 msgid "block-editor.toolbar.heading4.short"
 msgstr "H4"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:222
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:215
 msgid "block-editor.toolbar.heading5"
 msgstr "Heading 5"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:221
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:214
 msgid "block-editor.toolbar.heading5.short"
 msgstr "H5"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:228
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:221
 msgid "block-editor.toolbar.heading6"
 msgstr "Heading 6"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:227
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:220
 msgid "block-editor.toolbar.heading6.short"
 msgstr "H6"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:288
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:281
 msgid "block-editor.toolbar.inline-code"
 msgstr "Inline code"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:278
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:271
 msgid "block-editor.toolbar.italic"
 msgstr "Italic"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:319
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:312
 msgid "block-editor.toolbar.label"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:293
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:286
 msgid "block-editor.toolbar.link"
 msgstr "Link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:309
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:379
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:302
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:372
 msgid "block-editor.toolbar.list-menu"
 msgstr "List"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:258
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:251
 msgid "block-editor.toolbar.ordered-list"
 msgstr "Numbered list"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:192
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:185
 msgid "block-editor.toolbar.paragraph"
 msgstr "Normal text"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:191
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:184
 msgid "block-editor.toolbar.paragraph.short"
 msgstr "Text"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:283
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:276
 msgid "block-editor.toolbar.strikethrough"
 msgstr "Strikethrough"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:263
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:256
 msgid "block-editor.toolbar.task-list"
 msgstr "Task list"
 

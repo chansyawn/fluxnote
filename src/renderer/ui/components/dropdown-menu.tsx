@@ -1,4 +1,5 @@
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
+import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { cn } from "@renderer/ui/lib/utils";
 import { ChevronRightIcon, CheckIcon } from "lucide-react";
 import * as React from "react";
@@ -220,16 +221,34 @@ function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.
   );
 }
 
-function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
+function DropdownMenuShortcut({
+  className,
+  children,
+  tokens,
+  ...props
+}: React.ComponentProps<"span"> & {
+  tokens?: readonly string[];
+}) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
       className={cn(
-        "ms-auto text-[0.625rem] tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground",
+        "ms-auto inline-flex items-center text-[0.625rem] text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground",
+        tokens && tokens.length > 0 ? "tracking-normal" : "tracking-widest",
         className,
       )}
       {...props}
-    />
+    >
+      {tokens && tokens.length > 0 ? (
+        <KbdGroup>
+          {tokens.map((token, index) => (
+            <Kbd key={`${token}-${index}`}>{token}</Kbd>
+          ))}
+        </KbdGroup>
+      ) : (
+        children
+      )}
+    </span>
   );
 }
 
