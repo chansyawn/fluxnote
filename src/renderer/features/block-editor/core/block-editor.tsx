@@ -14,6 +14,8 @@ import { commonmark } from "@milkdown/kit/preset/commonmark";
 import { gfm } from "@milkdown/kit/preset/gfm";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
+import { Plugin, PluginKey } from "@milkdown/kit/prose/state";
+import { $prose } from "@milkdown/kit/utils";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
 import {
   ProsemirrorAdapterProvider,
@@ -41,7 +43,7 @@ import {
 } from "../toolbar/editor-toolbar-state";
 import type { BlockEditorToolbarState } from "../toolbar/types";
 import { resolveBlockEditorConfig } from "./config";
-import { resolveTextFormatShortcut } from "./text-format-shortcuts";
+import { configureMilkdownKeymaps } from "./milkdown-keymaps";
 import type { BlockEditorProps } from "./types";
 
 import "./milkdown-theme.css";
@@ -52,6 +54,24 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatStrikeThrough",
   "formatUnderline",
 ]);
+const toolbarStatePluginKey = new PluginKey("FLUXNOTES_TOOLBAR_STATE");
+
+function createToolbarStatePlugin(
+  editor: Editor,
+  publishToolbarState: (nextState: BlockEditorToolbarState) => void,
+) {
+  return $prose(
+    () =>
+      new Plugin({
+        key: toolbarStatePluginKey,
+        view: () => ({
+          update: () => {
+            publishToolbarState(readToolbarState(editor));
+          },
+        }),
+      }),
+  );
+}
 
 export function BlockEditor({
   ref,
@@ -108,10 +128,6 @@ function BlockEditorContent({
     onBlur?.();
   });
 
-  const resolveShortcut = useEffectEvent((event: KeyboardEvent) =>
-    resolveTextFormatShortcut(event, resolvedConfig.shortcuts.textFormats),
-  );
-
   const publishToolbarState = useCallback(
     (nextState: BlockEditorToolbarState) => {
       toolbarStateStore.publish(nextState);
@@ -156,11 +172,14 @@ function BlockEditorContent({
 
   const milkdown = useEditor(
     (root) => {
-      const editor = Editor.make()
+      const editor = Editor.make();
+
+      editor
         .config(async (ctx) => {
           ctx.set(rootCtx, root);
           ctx.set(defaultValueCtx, initialMarkdownSnapshot);
           await configureCodeHighlight(ctx, { theme: resolvedTheme });
+          configureMilkdownKeymaps(ctx, resolvedConfig.shortcuts.editor);
           ctx.update(editorViewOptionsCtx, (options) => ({
             ...options,
             attributes: {
@@ -177,26 +196,6 @@ function BlockEditorContent({
                 event.stopPropagation();
                 return true;
               },
-            },
-            handleKeyDown: (view, event) => {
-              const resolution = resolveShortcut(event);
-              if (resolution.type === "none") {
-                return options.handleKeyDown?.(view, event) ?? false;
-              }
-
-              event.preventDefault();
-              event.stopPropagation();
-
-              if (event.repeat) {
-                return true;
-              }
-
-              if (resolution.type === "configured") {
-                runFormatCommand(editor, resolution.format);
-                publishToolbarState(readToolbarState(editor));
-              }
-
-              return true;
             },
           }));
           const listenerManager = ctx.get(listenerCtx);
@@ -229,6 +228,7 @@ function BlockEditorContent({
             runtime,
           }),
         )
+        .use(createToolbarStatePlugin(editor, publishToolbarState))
         .use(history)
         .use(listener)
         .use(clipboard);
@@ -241,6 +241,7 @@ function BlockEditorContent({
       codeBlockNodeViewFactory,
       initialMarkdownSnapshot,
       linkPluginViewFactory,
+      resolvedConfig.shortcuts.editor,
       resolvedTheme,
       runtime,
       tablePluginViewFactory,

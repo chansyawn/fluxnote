@@ -1,10 +1,6 @@
 import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
-import {
-  BlockEditorToolbar,
-  type BlockEditorTextFormatShortcuts,
-} from "@renderer/features/block-editor";
-import { BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
+import { BlockEditorToolbar, type BlockEditorShortcuts } from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
@@ -58,12 +54,12 @@ export function BlockWorkspace() {
     }),
     [editorRegistry.getEditor, editorRegistry.registerEditor],
   );
-  const toolbarShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+  const toolbarShortcuts = useMemo<Partial<BlockEditorShortcuts>>(
     () => ({
-      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
-      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
-      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+      "editor.formatBold": shortcuts["editor.formatBold"],
+      "editor.formatInlineCode": shortcuts["editor.formatInlineCode"],
+      "editor.formatItalic": shortcuts["editor.formatItalic"],
+      "editor.formatStrikethrough": shortcuts["editor.formatStrikethrough"],
     }),
     [shortcuts],
   );

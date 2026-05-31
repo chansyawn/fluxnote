@@ -98,6 +98,17 @@ describe("preferences", () => {
       "workspace.deleteBlock": "Mod+Delete",
       "workspace.submitExternalEdit": "Mod+Enter",
       "workspace.cancelExternalEdit": "Mod+\\",
+      "editor.heading1": "Mod+Alt+1",
+      "editor.heading2": "Mod+Alt+2",
+      "editor.heading3": "Mod+Alt+3",
+      "editor.heading4": "Mod+Alt+4",
+      "editor.heading5": "Mod+Alt+5",
+      "editor.heading6": "Mod+Alt+6",
+      "editor.blockquote": "Mod+Shift+B",
+      "editor.bulletList": "Mod+Alt+8",
+      "editor.orderedList": "Mod+Alt+7",
+      "editor.codeBlock": "Mod+Alt+C",
+      "editor.paragraph": "Mod+Alt+0",
       "editor.formatBold": "Mod+B",
       "editor.formatItalic": "Mod+I",
       "editor.formatStrikethrough": "Mod+Shift+X",
@@ -205,6 +216,12 @@ describe("preferences", () => {
     expect(() =>
       normalizeUserPreferencesPatch({
         appUpdate: { unknown: true },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      normalizeUserPreferencesPatch({
+        shortcuts: { "editor.tableExit": null },
       }),
     ).toThrow();
   });

@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react";
+import type { BlockEditorShortcuts } from "@renderer/features/block-editor/core/types";
 import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
 import { Button } from "@renderer/ui/components/button";
 import { ButtonGroup } from "@renderer/ui/components/button-group";
@@ -11,15 +12,15 @@ import { type ReactNode, useCallback, useMemo, useSyncExternalStore } from "reac
 import {
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
   type BlockEditorTextFormat,
-  type BlockEditorTextFormatShortcuts,
   type BlockEditorToolbarController,
+  BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS,
 } from "./types";
 
 interface BlockEditorToolbarProps {
   className?: string;
   controller?: BlockEditorToolbarController | null;
   inactiveContent?: ReactNode;
-  shortcuts?: BlockEditorTextFormatShortcuts;
+  shortcuts?: Partial<BlockEditorShortcuts>;
 }
 
 interface TextFormatControl {
@@ -93,7 +94,8 @@ export function BlockEditorToolbar({
         {textFormatControls.map((control) => {
           const Icon = control.icon;
           const pressed = state.textFormats[control.format];
-          const shortcutTokens = formatShortcutTokens(shortcuts?.[control.format] ?? null);
+          const shortcutAction = BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS[control.format];
+          const shortcutTokens = formatShortcutTokens(shortcuts?.[shortcutAction] ?? null);
 
           return (
             <Tooltip key={control.format}>

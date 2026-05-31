@@ -5,7 +5,6 @@ export {
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
   type BlockEditorShortcutBinding,
   type BlockEditorTextFormat,
-  type BlockEditorTextFormatShortcuts,
   type BlockEditorTextFormatState,
   type BlockEditorToolbarController,
   type BlockEditorToolbarState,

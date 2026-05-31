@@ -5,9 +5,6 @@ export const BLOCK_EDITOR_TEXT_FORMATS = ["bold", "italic", "strikethrough", "co
 
 export type BlockEditorTextFormat = (typeof BLOCK_EDITOR_TEXT_FORMATS)[number];
 export type BlockEditorShortcutBinding = ShortcutBinding;
-export type BlockEditorTextFormatShortcuts = Partial<
-  Record<BlockEditorTextFormat, BlockEditorShortcutBinding>
->;
 
 export const BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS = {
   bold: "editor.formatBold",

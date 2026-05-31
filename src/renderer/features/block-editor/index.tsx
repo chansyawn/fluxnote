@@ -17,12 +17,14 @@ export type {
   BlockEditorMarkdownConfig,
   BlockEditorProps,
   BlockEditorRuntime,
+  BlockEditorShortcutAction,
+  BlockEditorShortcuts,
+  BlockEditorShortcutsInput,
   BlockEditorToolbarState,
 } from "./core/types";
 export type {
   BlockEditorShortcutBinding,
   BlockEditorTextFormat,
-  BlockEditorTextFormatShortcuts,
   BlockEditorTextFormatState,
   BlockEditorToolbarController,
   BlockEditorToolbarStateListener,

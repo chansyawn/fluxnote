@@ -1,8 +1,9 @@
 import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
+import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 import type { Ref } from "react";
 
 import type {
-  BlockEditorTextFormatShortcuts,
+  BlockEditorShortcutBinding,
   BlockEditorToolbarController,
   BlockEditorToolbarState,
 } from "../toolbar/types";
@@ -77,6 +78,10 @@ export interface BlockEditorMarkdownConfig {
   codeBlock: BlockEditorCodeBlockConfig;
 }
 
+export type BlockEditorShortcutAction = Extract<ShortcutAction, `editor.${string}`>;
+export type BlockEditorShortcuts = Record<BlockEditorShortcutAction, BlockEditorShortcutBinding>;
+export type BlockEditorShortcutsInput = Partial<BlockEditorShortcuts>;
+
 export interface BlockEditorConfig {
   markdown: BlockEditorMarkdownConfig;
   shortcuts: BlockEditorShortcutConfig;
@@ -91,11 +96,11 @@ export interface BlockEditorMarkdownConfigInput {
 }
 
 export interface BlockEditorShortcutConfig {
-  textFormats: BlockEditorTextFormatShortcuts;
+  editor: BlockEditorShortcuts;
 }
 
 export interface BlockEditorShortcutConfigInput {
-  textFormats?: BlockEditorTextFormatShortcuts;
+  editor?: BlockEditorShortcutsInput;
 }
 
 export interface BlockEditorConfigInput {

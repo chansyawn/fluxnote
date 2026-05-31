@@ -99,7 +99,10 @@ describe("BlockEditorToolbar", () => {
     const { controller } = createToolbarController();
 
     renderWithProviders(
-      <BlockEditorToolbar controller={controller} shortcuts={{ bold: "Control+B", code: null }} />,
+      <BlockEditorToolbar
+        controller={controller}
+        shortcuts={{ "editor.formatBold": "Control+B", "editor.formatInlineCode": null }}
+      />,
     );
 
     await user.hover(screen.getByRole("button", { name: "Bold" }));

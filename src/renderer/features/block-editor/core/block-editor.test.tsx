@@ -36,7 +36,7 @@ describe("BlockEditor", () => {
 
     const { container } = renderBlockEditor(
       {
-        config: { shortcuts: { textFormats: { bold: "Control+Shift+B" } } },
+        config: { shortcuts: { editor: { "editor.formatBold": "Control+Shift+B" } } },
         initialMarkdown: "",
       },
       editorRef,
@@ -64,7 +64,7 @@ describe("BlockEditor", () => {
 
     const { container } = renderBlockEditor(
       {
-        config: { shortcuts: { textFormats: { bold: null } } },
+        config: { shortcuts: { editor: { "editor.formatBold": null } } },
         initialMarkdown: "Plain text",
       },
       editorRef,
@@ -82,7 +82,6 @@ describe("BlockEditor", () => {
       editor.dispatchEvent(boldEvent);
     });
 
-    expect(boldEvent.defaultPrevented).toBe(true);
     expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
   });
 

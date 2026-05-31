@@ -3,13 +3,10 @@ import {
   BlockEditor,
   type BlockEditorConfigInput,
   type BlockEditorHandle,
-  type BlockEditorTextFormatShortcuts,
+  type BlockEditorShortcuts,
   type BlockEditorRuntime,
 } from "@renderer/features/block-editor";
-import {
-  BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS,
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-} from "@renderer/features/block-editor/toolbar";
+import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { cn } from "@renderer/ui/lib/utils";
@@ -111,12 +108,23 @@ export function WorkspaceBlockEditorSurface({
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
-  const textFormatShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+  const editorShortcuts = useMemo<BlockEditorShortcuts>(
     () => ({
-      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
-      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
-      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+      "editor.blockquote": shortcuts["editor.blockquote"],
+      "editor.bulletList": shortcuts["editor.bulletList"],
+      "editor.codeBlock": shortcuts["editor.codeBlock"],
+      "editor.formatBold": shortcuts["editor.formatBold"],
+      "editor.formatInlineCode": shortcuts["editor.formatInlineCode"],
+      "editor.formatItalic": shortcuts["editor.formatItalic"],
+      "editor.formatStrikethrough": shortcuts["editor.formatStrikethrough"],
+      "editor.heading1": shortcuts["editor.heading1"],
+      "editor.heading2": shortcuts["editor.heading2"],
+      "editor.heading3": shortcuts["editor.heading3"],
+      "editor.heading4": shortcuts["editor.heading4"],
+      "editor.heading5": shortcuts["editor.heading5"],
+      "editor.heading6": shortcuts["editor.heading6"],
+      "editor.orderedList": shortcuts["editor.orderedList"],
+      "editor.paragraph": shortcuts["editor.paragraph"],
     }),
     [shortcuts],
   );
@@ -126,10 +134,10 @@ export function WorkspaceBlockEditorSurface({
         codeBlock,
       },
       shortcuts: {
-        textFormats: textFormatShortcuts,
+        editor: editorShortcuts,
       },
     }),
-    [codeBlock, textFormatShortcuts],
+    [codeBlock, editorShortcuts],
   );
   const { flushSave, getLatestContent, saveMarkdown } = useBlockEditorPersistence(block);
 

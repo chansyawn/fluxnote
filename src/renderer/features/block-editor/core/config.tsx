@@ -7,11 +7,22 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
     },
   },
   shortcuts: {
-    textFormats: {
-      bold: null,
-      code: null,
-      italic: null,
-      strikethrough: null,
+    editor: {
+      "editor.blockquote": "Mod+Shift+B",
+      "editor.bulletList": "Mod+Alt+8",
+      "editor.codeBlock": "Mod+Alt+C",
+      "editor.formatBold": "Mod+B",
+      "editor.formatInlineCode": "Mod+Shift+E",
+      "editor.formatItalic": "Mod+I",
+      "editor.formatStrikethrough": "Mod+Shift+X",
+      "editor.heading1": "Mod+Alt+1",
+      "editor.heading2": "Mod+Alt+2",
+      "editor.heading3": "Mod+Alt+3",
+      "editor.heading4": "Mod+Alt+4",
+      "editor.heading5": "Mod+Alt+5",
+      "editor.heading6": "Mod+Alt+6",
+      "editor.orderedList": "Mod+Alt+7",
+      "editor.paragraph": "Mod+Alt+0",
     },
   },
 };
@@ -26,9 +37,9 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
       },
     },
     shortcuts: {
-      textFormats: {
-        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.textFormats,
-        ...config?.shortcuts?.textFormats,
+      editor: {
+        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.editor,
+        ...config?.shortcuts?.editor,
       },
     },
   };
