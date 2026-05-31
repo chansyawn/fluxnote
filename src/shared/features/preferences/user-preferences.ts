@@ -53,6 +53,7 @@ export const shortcutActionSchema = z.enum([
   "editor.italic",
   "editor.strikethrough",
   "editor.inlineCode",
+  "editor.link",
 ]);
 export const shortcutBindingSchema = z.string().nullable();
 
@@ -96,6 +97,7 @@ export const shortcutPreferencesSchema = z.object({
   "editor.italic": shortcutBindingSchema.catch("Mod+I"),
   "editor.strikethrough": shortcutBindingSchema.catch("Mod+Shift+X"),
   "editor.inlineCode": shortcutBindingSchema.catch("Mod+Shift+E"),
+  "editor.link": shortcutBindingSchema.catch("Mod+Shift+L"),
 });
 
 export const appearancePreferencesSchema = z.object({
@@ -167,6 +169,7 @@ const shortcutPreferencesPatchSchema = z
     "editor.italic": shortcutBindingSchema.optional(),
     "editor.strikethrough": shortcutBindingSchema.optional(),
     "editor.inlineCode": shortcutBindingSchema.optional(),
+    "editor.link": shortcutBindingSchema.optional(),
   })
   .strict();
 
@@ -231,6 +234,7 @@ const defaultUserPreferencesValue = {
     "editor.italic": "Mod+I",
     "editor.strikethrough": "Mod+Shift+X",
     "editor.inlineCode": "Mod+Shift+E",
+    "editor.link": "Mod+Shift+L",
   },
   markdown: {
     codeBlock: defaultMarkdownCodeBlockPreferencesValue,
@@ -356,6 +360,7 @@ function createUserPreferencesNormalizerSchema(
           defaults.shortcuts["editor.strikethrough"],
         ),
         "editor.inlineCode": shortcutBindingSchema.catch(defaults.shortcuts["editor.inlineCode"]),
+        "editor.link": shortcutBindingSchema.catch(defaults.shortcuts["editor.link"]),
       })
       .catch(defaults.shortcuts),
     markdown: z

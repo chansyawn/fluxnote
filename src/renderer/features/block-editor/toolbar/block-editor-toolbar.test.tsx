@@ -68,6 +68,7 @@ describe("BlockEditorToolbar", () => {
         bold: true,
         inlineCode: false,
         italic: false,
+        link: false,
         strikethrough: false,
       },
     });
@@ -91,6 +92,7 @@ describe("BlockEditorToolbar", () => {
       "Italic",
       "Strikethrough",
       "Inline code",
+      "Link",
     ]);
 
     act(() => {
@@ -164,7 +166,7 @@ describe("BlockEditorToolbar", () => {
     renderWithProviders(
       <BlockEditorToolbar
         controller={controller}
-        shortcuts={{ "editor.bold": "Control+B", "editor.inlineCode": null }}
+        shortcuts={{ "editor.bold": "Control+B", "editor.inlineCode": null, "editor.link": null }}
       />,
     );
 

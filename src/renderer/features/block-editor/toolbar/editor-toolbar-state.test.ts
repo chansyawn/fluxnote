@@ -9,6 +9,7 @@ const boldToolbarState: BlockEditorToolbarState = {
     bold: true,
     inlineCode: false,
     italic: false,
+    link: false,
     strikethrough: false,
   },
 };

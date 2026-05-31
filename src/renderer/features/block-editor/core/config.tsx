@@ -16,6 +16,7 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
       "editor.italic": "Mod+I",
       "editor.strikethrough": "Mod+Shift+X",
       "editor.heading1": "Mod+Alt+1",
+      "editor.link": "Mod+Shift+L",
       "editor.heading2": "Mod+Alt+2",
       "editor.heading3": "Mod+Alt+3",
       "editor.heading4": "Mod+Alt+4",

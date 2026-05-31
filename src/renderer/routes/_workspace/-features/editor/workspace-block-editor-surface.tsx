@@ -116,6 +116,7 @@ export function WorkspaceBlockEditorSurface({
       "editor.bold": shortcuts["editor.bold"],
       "editor.inlineCode": shortcuts["editor.inlineCode"],
       "editor.italic": shortcuts["editor.italic"],
+      "editor.link": shortcuts["editor.link"],
       "editor.strikethrough": shortcuts["editor.strikethrough"],
       "editor.heading1": shortcuts["editor.heading1"],
       "editor.heading2": shortcuts["editor.heading2"],

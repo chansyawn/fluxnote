@@ -11,6 +11,16 @@ import userEvent from "@testing-library/user-event";
 import { act, createRef } from "react";
 import { describe, expect, it, vi } from "vite-plus/test";
 
+const mocks = vi.hoisted(() => ({
+  toast: {
+    info: vi.fn(),
+  },
+}));
+
+vi.mock("sonner", () => ({
+  toast: mocks.toast,
+}));
+
 async function findLink(container: HTMLElement, label: string): Promise<HTMLAnchorElement> {
   await waitFor(() => {
     expect(container.querySelector("a")).toBeInTheDocument();
@@ -37,6 +47,72 @@ async function showLinkPopover(container: HTMLElement, label: string): Promise<H
 
   await screen.findByRole("textbox", { name: "Link URL" });
   return link;
+}
+
+function getEditorTextNodes(editor: HTMLElement): Text[] {
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  const textNodes: Text[] = [];
+  let node = walker.nextNode();
+
+  while (node) {
+    if (node instanceof Text) {
+      textNodes.push(node);
+    }
+    node = walker.nextNode();
+  }
+
+  return textNodes;
+}
+
+function resolveEditorTextPosition(
+  editor: HTMLElement,
+  targetOffset: number,
+): { node: Text; offset: number } {
+  let consumed = 0;
+
+  for (const node of getEditorTextNodes(editor)) {
+    const nextConsumed = consumed + node.data.length;
+    if (targetOffset <= nextConsumed) {
+      return {
+        node,
+        offset: targetOffset - consumed,
+      };
+    }
+    consumed = nextConsumed;
+  }
+
+  throw new Error(`Expected editor text offset ${targetOffset} to exist.`);
+}
+
+async function selectEditorText(editor: HTMLElement, from: number, to: number): Promise<void> {
+  const selection = window.getSelection();
+  if (!selection) throw new Error("Expected a DOM selection.");
+
+  const start = resolveEditorTextPosition(editor, from);
+  const end = resolveEditorTextPosition(editor, to);
+  const range = document.createRange();
+  range.setStart(start.node, start.offset);
+  range.setEnd(end.node, end.offset);
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  await act(async () => {
+    editor.dispatchEvent(new Event("selectionchange", { bubbles: true }));
+  });
+}
+
+async function placeEditorCursor(editor: HTMLElement, offset: number): Promise<void> {
+  await selectEditorText(editor, offset, offset);
+}
+
+async function waitForFocusedLinkInput() {
+  const input = await screen.findByRole("textbox", { name: "Link URL" });
+
+  await waitFor(() => {
+    expect(input).toHaveFocus();
+  });
+
+  return input;
 }
 
 describe("link plugin", () => {
@@ -227,5 +303,141 @@ describe("link plugin", () => {
 
     await expect(editorRef.current?.flush()).resolves.toContain("Fluxnotes");
     await expect(editorRef.current?.flush()).resolves.not.toContain("https://example.com");
+  });
+
+  it("creates a link from selected text through the toolbar command", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor({ initialMarkdown: "Add Fluxnotes link" }, editorRef);
+    const editor = await findBlockEditor(container);
+
+    editor.focus();
+    await selectEditorText(editor, 4, 13);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "link", type: "toggle-inline" });
+    });
+
+    expect(await waitForFocusedLinkInput()).toHaveValue("");
+
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Link URL" }),
+      "https://fluxnotes.local",
+    );
+
+    await expect(editorRef.current?.flush()).resolves.toContain(
+      "[Fluxnotes](https://fluxnotes.local)",
+    );
+  });
+
+  it("creates a link from the current word when the selection is empty", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor({ initialMarkdown: "Alpha Beta" }, editorRef);
+    const editor = await findBlockEditor(container);
+
+    editor.focus();
+    await placeEditorCursor(editor, 8);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "link", type: "toggle-inline" });
+    });
+
+    expect(await waitForFocusedLinkInput()).toBeVisible();
+
+    await expect(editorRef.current?.flush()).resolves.toContain("[Beta]()");
+  });
+
+  it("shows feedback without mutating content when no text can be selected", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor({ initialMarkdown: "Alpha Beta" }, editorRef);
+    const editor = await findBlockEditor(container);
+
+    editor.focus();
+    await placeEditorCursor(editor, 5);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "link", type: "toggle-inline" });
+    });
+
+    expect(mocks.toast.info).toHaveBeenCalledWith("Select text to add a link");
+    expect(screen.queryByRole("textbox", { name: "Link URL" })).not.toBeInTheDocument();
+    await expect(editorRef.current?.flush()).resolves.not.toContain("[](");
+  });
+
+  it("highlights and removes the current link through the toolbar command", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor(
+      { initialMarkdown: "[Fluxnotes](https://example.com)" },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+
+    editor.focus();
+    await placeEditorCursor(editor, 4);
+
+    await waitFor(() => {
+      expect(editorRef.current?.getToolbarState().inlineFormats.link).toBe(true);
+    });
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "link", type: "toggle-inline" });
+    });
+
+    await expect(editorRef.current?.flush()).resolves.toContain("Fluxnotes");
+    expect(editorRef.current?.getToolbarState().inlineFormats.link).toBe(false);
+  });
+
+  it("replaces existing links inside a partial selected range", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor(
+      { initialMarkdown: "[Alpha](https://alpha.example) and Beta" },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+
+    editor.focus();
+    await selectEditorText(editor, 2, 13);
+
+    await act(async () => {
+      editorRef.current?.runToolbarCommand({ format: "link", type: "toggle-inline" });
+    });
+
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Link URL" }),
+      "https://selected.example",
+    );
+
+    await expect(editorRef.current?.flush()).resolves.toContain(
+      "Al[pha and Bet](https://selected.example)a",
+    );
+    await expect(editorRef.current?.flush()).resolves.not.toContain("https://alpha.example");
+  });
+
+  it("runs the configured link shortcut", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+    const { container } = renderBlockEditor(
+      {
+        config: { shortcuts: { editor: { "editor.link": "Control+Shift+L" } } },
+        initialMarkdown: "Shortcut Link",
+      },
+      editorRef,
+    );
+    const editor = await findBlockEditor(container);
+    editor.focus();
+    await selectEditorText(editor, 9, 13);
+    const event = new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: "l",
+      shiftKey: true,
+    });
+
+    await act(async () => {
+      editor.dispatchEvent(event);
+    });
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(await waitForFocusedLinkInput()).toBeVisible();
+    await expect(editorRef.current?.flush()).resolves.toContain("[Link]()");
   });
 });

@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
     "editor.bold": "Mod+B",
     "editor.inlineCode": "Mod+Shift+E",
     "editor.italic": "Mod+I",
+    "editor.link": "Mod+Shift+L",
     "editor.strikethrough": "Mod+Shift+X",
     "workspace.keepBlock": "Mod+K",
     "global.quickCreateBlock": "Ctrl+Alt+N",
@@ -54,5 +55,6 @@ describe("ShortcutPreferencesSection", () => {
     expect(screen.getByText("Italic")).toBeVisible();
     expect(screen.getByText("Strikethrough")).toBeVisible();
     expect(screen.getByText("Inline code")).toBeVisible();
+    expect(screen.getByText("Link")).toBeVisible();
   });
 });

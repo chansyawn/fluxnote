@@ -7,6 +7,7 @@ import {
   emphasisSchema,
   headingSchema,
   inlineCodeSchema,
+  linkSchema,
   orderedListSchema,
   paragraphSchema,
   setBlockTypeCommand,
@@ -21,6 +22,7 @@ import type { MarkType, NodeType } from "@milkdown/kit/prose/model";
 import { TextSelection } from "@milkdown/kit/prose/state";
 import type { EditorView } from "@milkdown/kit/prose/view";
 
+import { runLinkToolbarCommand, type LinkToolbarCommandResult } from "../syntax/link/link-model";
 import {
   BLOCK_EDITOR_BLOCK_FORMATS,
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
@@ -90,6 +92,7 @@ export function areToolbarStatesEqual(
     left.inlineFormats.bold === right.inlineFormats.bold &&
     left.inlineFormats.inlineCode === right.inlineFormats.inlineCode &&
     left.inlineFormats.italic === right.inlineFormats.italic &&
+    left.inlineFormats.link === right.inlineFormats.link &&
     left.inlineFormats.strikethrough === right.inlineFormats.strikethrough &&
     BLOCK_EDITOR_BLOCK_FORMATS.every(
       (format) => left.activeBlocks[format] === right.activeBlocks[format],
@@ -128,6 +131,7 @@ export function readToolbarState(editor: Editor): BlockEditorToolbarState {
         bold: readMarkState(view, strongSchema.type(ctx)),
         inlineCode: readMarkState(view, inlineCodeSchema.type(ctx)),
         italic: readMarkState(view, emphasisSchema.type(ctx)),
+        link: readMarkState(view, linkSchema.type(ctx)),
         strikethrough: readMarkState(view, strikethroughSchema.type(ctx)),
       },
     };
@@ -153,10 +157,20 @@ function toggleInlineCode(editor: Editor): void {
   });
 }
 
-export function runToolbarCommand(editor: Editor, command: BlockEditorToolbarCommand): void {
+export function runToolbarCommand(
+  editor: Editor,
+  command: BlockEditorToolbarCommand,
+): LinkToolbarCommandResult | null {
   if (command.type === "toggle-inline" && command.format === "inlineCode") {
     toggleInlineCode(editor);
-    return;
+    return null;
+  }
+
+  if (command.type === "toggle-inline" && command.format === "link") {
+    return editor.action((ctx) => {
+      const view = ctx.get(editorViewCtx);
+      return runLinkToolbarCommand(view, linkSchema.type(ctx));
+    });
   }
 
   editor.action((ctx) => {
@@ -174,6 +188,8 @@ export function runToolbarCommand(editor: Editor, command: BlockEditorToolbarCom
           break;
         case "inlineCode":
           commands.call(toggleInlineCodeCommand.key);
+          break;
+        case "link":
           break;
       }
       return;
@@ -210,6 +226,7 @@ export function runToolbarCommand(editor: Editor, command: BlockEditorToolbarCom
         break;
     }
   });
+  return null;
 }
 
 export class BlockEditorToolbarStateStore {

@@ -1,6 +1,6 @@
 import type { Ctx } from "@milkdown/kit/ctx";
 import { linkSchema } from "@milkdown/kit/preset/commonmark";
-import { Plugin, PluginKey } from "@milkdown/kit/prose/state";
+import { Plugin } from "@milkdown/kit/prose/state";
 import { $prose } from "@milkdown/kit/utils";
 import { type CreateReactPluginView, usePluginViewContext } from "@prosemirror-adapter/react";
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -13,9 +13,13 @@ import {
   isSameActiveMilkdownLink,
 } from "./link-model";
 import { LinkPopover } from "./link-popover";
+import {
+  linkPopoverPluginKey,
+  type LinkPopoverRequest,
+  type LinkPopoverPluginState,
+} from "./link-popover-state";
 
 const CLOSE_DELAY_MS = 120;
-const linkPopoverPluginKey = new PluginKey("FLUXNOTES_LINK_POPOVER");
 
 interface LinkSources {
   hover: ActiveMilkdownLink | null;
@@ -66,6 +70,7 @@ interface LinkPopoverPluginViewProps {
 function LinkPopoverPluginView({ ctx, runtime }: LinkPopoverPluginViewProps) {
   const { prevState, view } = usePluginViewContext();
   const [sources, setSources] = useState<LinkSources>(EMPTY_LINK_SOURCES);
+  const [focusRequest, setFocusRequest] = useState<LinkPopoverRequest | null>(null);
   const activeLink = useMemo(() => resolveActiveLink(sources), [sources]);
   const activeLinkRef = useRef<ActiveMilkdownLink | null>(activeLink);
   const closeTimersRef = useRef<Record<DelayedCloseSource, number | null>>({
@@ -177,6 +182,17 @@ function LinkPopoverPluginView({ ctx, runtime }: LinkPopoverPluginViewProps) {
   }, [ctx, prevState, setSource, view]);
 
   useEffect(() => {
+    const request = linkPopoverPluginKey.getState(view.state)?.request ?? null;
+    if (!request || focusRequest?.id === request.id) return;
+
+    const nextLink = findLinkFromSelection(view, linkSchema.type(ctx));
+    if (!nextLink) return;
+
+    pinActiveLink(nextLink);
+    setFocusRequest(request);
+  }, [ctx, focusRequest, pinActiveLink, prevState, view]);
+
+  useEffect(() => {
     const updateSelectionSource = () => {
       const nextLink = view.hasFocus() ? findLinkFromSelection(view, linkSchema.type(ctx)) : null;
       setSource("selection", nextLink);
@@ -228,6 +244,7 @@ function LinkPopoverPluginView({ ctx, runtime }: LinkPopoverPluginViewProps) {
     onHoldOpen: holdActiveLinkOpen,
     onPinActiveLink: pinActiveLink,
     onScheduleClose: schedulePinnedClose,
+    focusRequestId: focusRequest?.id ?? null,
     setPopoverElement: (element) => {
       popoverElementRef.current = element;
     },
@@ -240,6 +257,16 @@ export function createLinkPopoverPlugin({ pluginViewFactory, runtime }: LinkPopo
     (ctx) =>
       new Plugin({
         key: linkPopoverPluginKey,
+        state: {
+          init: (): LinkPopoverPluginState => ({ request: null }),
+          apply: (transaction, pluginState): LinkPopoverPluginState => {
+            const request = transaction.getMeta(linkPopoverPluginKey) as
+              | LinkPopoverRequest
+              | undefined;
+
+            return request ? { request } : pluginState;
+          },
+        },
         view: pluginViewFactory({
           component: function LinkPopoverPluginViewComponent() {
             return createElement(LinkPopoverPluginView, { ctx, runtime });

@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
     "editor.bold": "Mod+B",
     "editor.inlineCode": "Mod+Shift+E",
     "editor.italic": "Mod+I",
+    "editor.link": "Mod+Shift+L",
     "editor.strikethrough": "Mod+Shift+X",
     "editor.heading1": "Mod+Alt+1",
     "editor.heading2": "Mod+Alt+2",

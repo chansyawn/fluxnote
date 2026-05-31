@@ -19,6 +19,7 @@ const COPY_FEEDBACK_DURATION_MS = 1600;
 
 interface LinkPopoverProps {
   activeLink: ActiveMilkdownLink | null;
+  focusRequestId: number | null;
   runtime: BlockEditorRuntime;
   onClose: () => void;
   onHoldOpen: () => void;
@@ -30,6 +31,7 @@ interface LinkPopoverProps {
 
 export function LinkPopover({
   activeLink,
+  focusRequestId,
   runtime,
   onClose,
   onHoldOpen,
@@ -42,6 +44,8 @@ export function LinkPopover({
   const [copied, setCopied] = useState(false);
   const [draftUrl, setDraftUrl] = useState("");
   const previousActiveLinkRef = useRef<ActiveMilkdownLink | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const focusedRequestIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isSameActiveMilkdownLink(previousActiveLinkRef.current, activeLink)) return;
@@ -57,6 +61,16 @@ export function LinkPopover({
     const timer = window.setTimeout(() => setCopied(false), COPY_FEEDBACK_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [copied]);
+
+  useEffect(() => {
+    if (focusRequestId === null || focusedRequestIdRef.current === focusRequestId) return;
+
+    focusedRequestIdRef.current = focusRequestId;
+    window.requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.select();
+    });
+  }, [focusRequestId]);
 
   if (!activeLink) return null;
 
@@ -112,6 +126,7 @@ export function LinkPopover({
       >
         <div className="flex w-72 max-w-[min(18rem,calc(100vw-2rem))] flex-col gap-2">
           <Textarea
+            ref={textareaRef}
             aria-label={urlLabel}
             className="max-h-28 min-h-7 resize-none overflow-auto py-1"
             rows={1}

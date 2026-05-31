@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import {
   defaultValueCtx,
@@ -10,7 +11,7 @@ import {
 import { clipboard } from "@milkdown/kit/plugin/clipboard";
 import { history } from "@milkdown/kit/plugin/history";
 import { listener, listenerCtx } from "@milkdown/kit/plugin/listener";
-import { commonmark } from "@milkdown/kit/preset/commonmark";
+import { commonmark, linkSchema } from "@milkdown/kit/preset/commonmark";
 import { gfm } from "@milkdown/kit/preset/gfm";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
@@ -23,6 +24,7 @@ import {
   usePluginViewFactory,
 } from "@prosemirror-adapter/react";
 import { useThemeState } from "@renderer/app/theme";
+import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 import {
   useCallback,
   useEffect,
@@ -32,11 +34,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 import { serializeMarkdown } from "../clipboard/clipboard-data";
 import { copyWholeBlock, createEditorClipboardPlugin } from "../clipboard/editor-clipboard";
 import { createSyntaxPlugins } from "../syntax";
 import { configureCodeHighlight } from "../syntax/code";
+import { runLinkToolbarCommand, type LinkToolbarCommandResult } from "../syntax/link/link-model";
 import {
   BlockEditorToolbarStateStore,
   readToolbarState,
@@ -45,7 +49,7 @@ import {
 import type { BlockEditorToolbarState } from "../toolbar/types";
 import { resolveBlockEditorConfig } from "./config";
 import { configureMilkdownKeymaps } from "./milkdown-keymaps";
-import type { BlockEditorProps } from "./types";
+import type { BlockEditorProps, BlockEditorShortcuts } from "./types";
 
 import "./milkdown-theme.css";
 
@@ -56,6 +60,7 @@ const FORMAT_INPUT_TYPES = new Set([
   "formatUnderline",
 ]);
 const toolbarStatePluginKey = new PluginKey("FLUXNOTES_TOOLBAR_STATE");
+const linkShortcutPluginKey = new PluginKey("FLUXNOTES_LINK_SHORTCUT");
 
 function createToolbarStatePlugin(
   editor: Editor,
@@ -70,6 +75,27 @@ function createToolbarStatePlugin(
             publishToolbarState(readToolbarState(editor));
           },
         }),
+      }),
+  );
+}
+
+function createLinkShortcutPlugin(
+  shortcuts: BlockEditorShortcuts,
+  onLinkToolbarCommandResult: (result: LinkToolbarCommandResult) => void,
+) {
+  return $prose(
+    (ctx) =>
+      new Plugin({
+        key: linkShortcutPluginKey,
+        props: {
+          handleKeyDown: (view, event) => {
+            if (!keyboardEventMatchesShortcut(event, shortcuts["editor.link"])) return false;
+
+            event.preventDefault();
+            onLinkToolbarCommandResult(runLinkToolbarCommand(view, linkSchema.type(ctx)));
+            return true;
+          },
+        },
       }),
   );
 }
@@ -106,6 +132,7 @@ function BlockEditorContent({
   onBlur,
   onMarkdownChange,
 }: BlockEditorProps) {
+  const { i18n } = useLingui();
   const [initialMarkdownSnapshot] = useState(() => initialMarkdown);
   const [toolbarStateStore] = useState(() => new BlockEditorToolbarStateStore());
   const codeBlockNodeViewFactory = useNodeViewFactory();
@@ -127,6 +154,17 @@ function BlockEditorContent({
 
   const handleBlur = useEffectEvent(() => {
     onBlur?.();
+  });
+
+  const handleLinkToolbarCommandResult = useEffectEvent((result: LinkToolbarCommandResult) => {
+    if (result.type !== "empty") return;
+
+    toast.info(
+      i18n._({
+        id: "block-editor.link.select-text",
+        message: "Select text to add a link",
+      }),
+    );
   });
 
   const publishToolbarState = useCallback(
@@ -161,14 +199,21 @@ function BlockEditorContent({
       runToolbarCommand: (command) => {
         const editor = editorRef.current;
         if (!editor) return;
-        runToolbarCommand(editor, command);
+        const result = runToolbarCommand(editor, command);
+        if (result) handleLinkToolbarCommandResult(result);
         publishToolbarState(readToolbarState(editor));
       },
       flush: flushMarkdown,
       getToolbarState: toolbarStateStore.getSnapshot,
       subscribeToolbarState: toolbarStateStore.subscribe,
     }),
-    [flushMarkdown, publishToolbarState, runtime, toolbarStateStore],
+    [
+      flushMarkdown,
+      handleLinkToolbarCommandResult,
+      publishToolbarState,
+      runtime,
+      toolbarStateStore,
+    ],
   );
 
   const milkdown = useEditor(
@@ -231,6 +276,9 @@ function BlockEditorContent({
         )
         .use(createEditorClipboardPlugin(runtime))
         .use(createToolbarStatePlugin(editor, publishToolbarState))
+        .use(
+          createLinkShortcutPlugin(resolvedConfig.shortcuts.editor, handleLinkToolbarCommandResult),
+        )
         .use(history)
         .use(listener)
         .use(clipboard);

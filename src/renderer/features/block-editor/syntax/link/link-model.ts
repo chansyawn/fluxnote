@@ -2,6 +2,10 @@ import type { Mark, MarkType, Node as ProseMirrorNode } from "@milkdown/kit/pros
 import { TextSelection } from "@milkdown/kit/prose/state";
 import type { EditorView } from "@milkdown/kit/prose/view";
 
+import { createLinkPopoverRequest, linkPopoverPluginKey } from "./link-popover-state";
+
+const WORD_CHARACTER_PATTERN = /^[\p{L}\p{N}_]$/u;
+
 export interface LinkPopoverAnchor {
   contextElement?: Element;
   getBoundingClientRect: () => DOMRect;
@@ -21,6 +25,18 @@ interface LinkMarkRange {
   text: string;
   to: number;
 }
+
+export type LinkToolbarCommandResult =
+  | {
+      activeLink: ActiveMilkdownLink;
+      type: "created";
+    }
+  | {
+      type: "empty";
+    }
+  | {
+      type: "removed";
+    };
 
 export function sanitizeLinkUrlInput(url: string): string {
   return url.replace(/[\r\n]+/g, "");
@@ -168,6 +184,138 @@ function createActiveLink(
   };
 }
 
+function isTextPositionInsideRange(from: number, to: number, range: LinkMarkRange): boolean {
+  return from === range.from && to === range.to;
+}
+
+function findSelectedExactLinkRange(view: EditorView, markType: MarkType): LinkMarkRange | null {
+  const { selection } = view.state;
+  if (!(selection instanceof TextSelection) || selection.empty) return null;
+
+  const range = getMarkRangeAtPosition(view, markType, selection.from);
+  if (!range || !isTextPositionInsideRange(selection.from, selection.to, range)) return null;
+
+  return range;
+}
+
+function isWordCharacter(character: string): boolean {
+  return WORD_CHARACTER_PATTERN.test(character);
+}
+
+function findWordRangeAtSelection(view: EditorView): { from: number; to: number } | null {
+  const { selection } = view.state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return null;
+
+  const { $from } = selection;
+  const nodeBefore = $from.nodeBefore;
+  const nodeAfter = $from.nodeAfter;
+  const parent = $from.parent;
+  const parentStart = $from.start();
+  const textOffset = $from.parentOffset;
+  const parentText = parent.textBetween(0, parent.content.size);
+
+  if (nodeAfter?.isText === true && isWordCharacter(nodeAfter.text?.[0] ?? "")) {
+    // Continue below with parent-level text expansion.
+  } else if (
+    !nodeAfter &&
+    nodeBefore?.isText === true &&
+    isWordCharacter(nodeBefore.text?.at(-1) ?? "")
+  ) {
+    // Continue below with parent-level text expansion.
+  } else {
+    return null;
+  }
+
+  let start = textOffset;
+  let end = textOffset;
+
+  while (start > 0 && isWordCharacter(parentText[start - 1] ?? "")) {
+    start -= 1;
+  }
+
+  while (end < parentText.length && isWordCharacter(parentText[end] ?? "")) {
+    end += 1;
+  }
+
+  if (start === end) return null;
+
+  return {
+    from: parentStart + start,
+    to: parentStart + end,
+  };
+}
+
+function findLinkRangeAtEmptySelection(view: EditorView, markType: MarkType): LinkMarkRange | null {
+  const { selection } = view.state;
+  if (!(selection instanceof TextSelection) || !selection.empty) return null;
+
+  return getMarkRangeAtPosition(view, markType, selection.from);
+}
+
+function getLinkTargetRange(
+  view: EditorView,
+  markType: MarkType,
+): { from: number; to: number } | null {
+  const { selection } = view.state;
+  if (!(selection instanceof TextSelection)) return null;
+
+  if (!selection.empty) {
+    return {
+      from: selection.from,
+      to: selection.to,
+    };
+  }
+
+  const linkRange = getMarkRangeAtPosition(view, markType, selection.from);
+  if (linkRange) {
+    return {
+      from: linkRange.from,
+      to: linkRange.to,
+    };
+  }
+
+  return findWordRangeAtSelection(view);
+}
+
+export function runLinkToolbarCommand(
+  view: EditorView,
+  markType: MarkType,
+): LinkToolbarCommandResult {
+  const exactSelectedLink = findSelectedExactLinkRange(view, markType);
+  if (exactSelectedLink) {
+    view.dispatch(view.state.tr.removeMark(exactSelectedLink.from, exactSelectedLink.to, markType));
+    return { type: "removed" };
+  }
+
+  const currentLink = findLinkRangeAtEmptySelection(view, markType);
+  if (currentLink) {
+    view.dispatch(view.state.tr.removeMark(currentLink.from, currentLink.to, markType));
+    return { type: "removed" };
+  }
+
+  const targetRange = getLinkTargetRange(view, markType);
+  if (!targetRange || targetRange.from === targetRange.to) {
+    return { type: "empty" };
+  }
+
+  let tr = view.state.tr.removeMark(targetRange.from, targetRange.to, markType);
+  view.state.doc.nodesBetween(targetRange.from, targetRange.to, (node, position) => {
+    if (!node.isText || !getLinkMark(node, markType)) return;
+
+    tr = tr.removeMark(position, position + node.nodeSize, markType);
+  });
+  tr = tr.addMark(targetRange.from, targetRange.to, markType.create({ href: "" }));
+
+  tr.setSelection(TextSelection.create(tr.doc, targetRange.from, targetRange.to)).setMeta(
+    linkPopoverPluginKey,
+    createLinkPopoverRequest(targetRange.from, targetRange.to),
+  );
+  view.dispatch(tr);
+
+  const activeLink = createActiveLink(view, markType, targetRange.from);
+  return activeLink ? { activeLink, type: "created" } : { type: "empty" };
+}
+
 export function findLinkFromDomTarget(
   view: EditorView,
   markType: MarkType,
@@ -191,7 +339,7 @@ export function findLinkFromSelection(
   markType: MarkType,
 ): ActiveMilkdownLink | null {
   const { selection } = view.state;
-  if (!(selection instanceof TextSelection) || !selection.empty) return null;
+  if (!(selection instanceof TextSelection)) return null;
 
   return createActiveLink(view, markType, selection.from);
 }

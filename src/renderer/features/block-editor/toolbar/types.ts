@@ -6,6 +6,7 @@ export const BLOCK_EDITOR_INLINE_FORMATS = [
   "italic",
   "strikethrough",
   "inlineCode",
+  "link",
 ] as const;
 export const BLOCK_EDITOR_BLOCK_FORMATS = [
   "paragraph",
@@ -42,6 +43,7 @@ export const BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS = {
   italic: "editor.italic",
   strikethrough: "editor.strikethrough",
   inlineCode: "editor.inlineCode",
+  link: "editor.link",
 } satisfies Record<BlockEditorToolbarFormat, ShortcutAction>;
 
 export type BlockEditorInlineFormatState = Record<BlockEditorInlineFormat, boolean>;
@@ -91,6 +93,7 @@ export const DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE: BlockEditorToolbarState = {
     bold: false,
     inlineCode: false,
     italic: false,
+    link: false,
     strikethrough: false,
   },
 };

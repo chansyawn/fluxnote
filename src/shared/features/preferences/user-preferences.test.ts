@@ -113,6 +113,7 @@ describe("preferences", () => {
       "editor.italic": "Mod+I",
       "editor.strikethrough": "Mod+Shift+X",
       "editor.inlineCode": "Mod+Shift+E",
+      "editor.link": "Mod+Shift+L",
     });
     expect(normalized.markdown).toEqual({
       codeBlock: {
@@ -136,6 +137,7 @@ describe("preferences", () => {
           "workspace.archiveBlock": "Mod+E",
           "workspace.copyBlock": "Mod+Shift+C",
           "editor.inlineCode": "Mod+Shift+E",
+          "editor.link": "Mod+Shift+L",
         },
         markdown: { codeBlock: { showLineNumbers: true } },
         telemetry: { enabled: false },
@@ -148,6 +150,7 @@ describe("preferences", () => {
         "workspace.archiveBlock": "Mod+E",
         "workspace.copyBlock": "Mod+Shift+C",
         "editor.inlineCode": "Mod+Shift+E",
+        "editor.link": "Mod+Shift+L",
       },
       markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
