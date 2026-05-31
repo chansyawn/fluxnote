@@ -1,5 +1,3 @@
-import type { Editor } from "@milkdown/kit/core";
-import { editorViewCtx, serializerCtx } from "@milkdown/kit/core";
 import { collectImageAssetUrls } from "@shared/features/block-editor/asset-urls";
 
 const IMAGE_MARKDOWN_PATTERN = /!\[[^\]]*]\(\s*<?(assets:\/\/[^)\s>]+)>?\s*(?:"[^"]*")?\)/g;
@@ -141,14 +139,6 @@ export function isSupportedImageMimeType(mimeType: string): mimeType is DataImag
     mimeType === "image/webp" ||
     mimeType === "image/gif"
   );
-}
-
-export function serializeMarkdown(editor: Editor): string {
-  return editor.action((ctx) => {
-    const view = ctx.get(editorViewCtx);
-    const serializer = ctx.get(serializerCtx);
-    return serializer(view.state.doc);
-  });
 }
 
 function collectUrls(text: string, pattern: RegExp): string[] {

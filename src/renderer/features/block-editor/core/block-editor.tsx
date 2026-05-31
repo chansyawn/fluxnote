@@ -14,7 +14,7 @@ import { gfm } from "@milkdown/kit/preset/gfm";
 
 import "@milkdown/kit/prose/view/style/prosemirror.css";
 import { Plugin, PluginKey } from "@milkdown/kit/prose/state";
-import { $prose } from "@milkdown/kit/utils";
+import { $prose, getMarkdown } from "@milkdown/kit/utils";
 import { Milkdown, MilkdownProvider, useEditor } from "@milkdown/react";
 import {
   ProsemirrorAdapterProvider,
@@ -33,7 +33,6 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { serializeMarkdown } from "../clipboard/clipboard-data";
 import { copyWholeBlock, createEditorClipboardPlugin } from "../clipboard/editor-clipboard";
 import { createSyntaxPlugins } from "../syntax";
 import { configureCodeHighlight } from "../syntax/code";
@@ -157,7 +156,7 @@ function BlockEditorContent({
     const editor = editorRef.current;
     if (!editor || editor.status !== EditorStatus.Created) return latestMarkdownRef.current;
 
-    const markdown = serializeMarkdown(editor);
+    const markdown = editor.action(getMarkdown());
     publishMarkdown(markdown);
     return markdown;
   }, [publishMarkdown]);
@@ -288,7 +287,7 @@ function BlockEditorContent({
     if (!editor) return;
 
     publishToolbarState(readToolbarState(editor));
-    latestMarkdownRef.current = serializeMarkdown(editor);
+    latestMarkdownRef.current = editor.action(getMarkdown());
   }, [milkdown, publishToolbarState]);
 
   useEffect(
