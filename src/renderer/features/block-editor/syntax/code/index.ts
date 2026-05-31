@@ -1,5 +1,6 @@
 import "./code.css";
 
+export { codeBlockBackspacePlugin } from "./code-block-backspace-plugin";
 export {
   codeHighlightPlugins,
   configureCodeHighlight,
