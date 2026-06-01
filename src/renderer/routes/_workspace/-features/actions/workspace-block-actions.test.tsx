@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor/actions";
 import type { WorkspaceBlockEditorHandle } from "@renderer/routes/_workspace/-features/editor/workspace-block-editor-surface";
 import type { WorkspaceCommands } from "@renderer/routes/_workspace/-features/workspace-state-context";
 import {
@@ -158,12 +158,11 @@ describe("useWorkspaceBlockActions", () => {
       block: createRendererBlock({ tags: [createRendererTag({ id: "tag-1" })] }),
       getEditor: () => ({
         copy,
+        executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
         flush: vi.fn(async () => ""),
         focus: vi.fn(),
-        formatBlock: vi.fn(),
-        formatInline: vi.fn(),
-        getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-        subscribeToolbarState: () => () => undefined,
+        getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+        subscribeActionState: () => () => undefined,
       }),
     });
 

@@ -6,25 +6,24 @@ import userEvent from "@testing-library/user-event";
 import { act } from "react";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { BlockEditorToolbar } from "./block-editor-toolbar";
 import {
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorToolbarController,
-  type BlockEditorToolbarState,
-  type BlockEditorToolbarStateListener,
-} from "./types";
+  DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  type BlockEditorActionController,
+  type BlockEditorActionState,
+  type BlockEditorActionStateListener,
+} from "../actions";
+import { BlockEditorToolbar } from "./block-editor-toolbar";
 
 function createToolbarController(
-  initialState: BlockEditorToolbarState = DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+  initialState: BlockEditorActionState = DEFAULT_BLOCK_EDITOR_ACTION_STATE,
 ) {
   let state = initialState;
-  const listeners = new Set<BlockEditorToolbarStateListener>();
-  const controller: BlockEditorToolbarController = {
+  const listeners = new Set<BlockEditorActionStateListener>();
+  const controller: BlockEditorActionController = {
+    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
     focus: vi.fn(),
-    formatBlock: vi.fn(),
-    formatInline: vi.fn(),
-    getToolbarState: () => state,
-    subscribeToolbarState: (listener) => {
+    getActionState: () => state,
+    subscribeActionState: (listener) => {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
@@ -34,7 +33,7 @@ function createToolbarController(
 
   return {
     controller,
-    setState: (nextState: BlockEditorToolbarState) => {
+    setState: (nextState: BlockEditorActionState) => {
       state = nextState;
       for (const listener of listeners) {
         listener(nextState);
@@ -60,8 +59,8 @@ describe("BlockEditorToolbar", () => {
   it("reflects toolbar state and dispatches block and inline format commands", async () => {
     const user = userEvent.setup();
     const { controller, setState } = createToolbarController({
+      ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
       blockFormat: "bulletList",
-      blockFormattingDisabled: false,
       inlineFormats: {
         bold: true,
         inlineCode: false,
@@ -84,14 +83,14 @@ describe("BlockEditorToolbar", () => {
     expect(quoteButton).toHaveClass("text-muted-foreground/60");
 
     await user.click(quoteButton);
-    expect(controller.formatBlock).toHaveBeenCalledWith("blockquote");
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.blockquote");
 
     await user.click(italicButton);
-    expect(controller.formatInline).toHaveBeenCalledWith("italic");
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.italic");
     expect(controller.focus).toHaveBeenCalledTimes(2);
 
     act(() => {
-      setState(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
+      setState(DEFAULT_BLOCK_EDITOR_ACTION_STATE);
     });
 
     expect(boldButton).toHaveAttribute("aria-pressed", "false");
@@ -102,12 +101,15 @@ describe("BlockEditorToolbar", () => {
   it("shows text style menu items with shortcuts and dispatches the selected format", async () => {
     const user = userEvent.setup();
     const { controller } = createToolbarController({
-      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
       blockFormat: "heading2",
     });
 
     renderWithProviders(
-      <BlockEditorToolbar controller={controller} shortcuts={{ heading1: "Control+Alt+1" }} />,
+      <BlockEditorToolbar
+        controller={controller}
+        shortcuts={{ "editor.heading1": "Control+Alt+1" }}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Heading 2" }));
@@ -120,7 +122,7 @@ describe("BlockEditorToolbar", () => {
     expect(within(menu).getByText("1")).toBeVisible();
 
     await user.click(within(menu).getByText("Heading 1"));
-    expect(controller.formatBlock).toHaveBeenCalledWith("heading1");
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.heading1");
     expect(controller.focus).toHaveBeenCalledOnce();
   });
 
@@ -152,7 +154,7 @@ describe("BlockEditorToolbar", () => {
     expect(within(menu).getByText("Task list")).toBeVisible();
 
     await user.click(within(menu).getByText("Task list"));
-    expect(controller.formatBlock).toHaveBeenCalledWith("taskList");
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.taskList");
   });
 
   it("shows configured shortcuts in tooltips", async () => {
@@ -160,7 +162,7 @@ describe("BlockEditorToolbar", () => {
     const { controller } = createToolbarController();
 
     renderWithProviders(
-      <BlockEditorToolbar controller={controller} shortcuts={{ bold: "Control+B" }} />,
+      <BlockEditorToolbar controller={controller} shortcuts={{ "editor.bold": "Control+B" }} />,
     );
 
     await user.hover(screen.getByRole("button", { name: "Bold" }));
@@ -172,8 +174,22 @@ describe("BlockEditorToolbar", () => {
 
   it("disables block controls while preserving inline controls", () => {
     const { controller } = createToolbarController({
-      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-      blockFormattingDisabled: true,
+      ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      disabledActions: {
+        ...DEFAULT_BLOCK_EDITOR_ACTION_STATE.disabledActions,
+        "editor.blockquote": true,
+        "editor.bulletList": true,
+        "editor.codeBlock": true,
+        "editor.heading1": true,
+        "editor.heading2": true,
+        "editor.heading3": true,
+        "editor.heading4": true,
+        "editor.heading5": true,
+        "editor.heading6": true,
+        "editor.orderedList": true,
+        "editor.paragraph": true,
+        "editor.taskList": true,
+      },
     });
 
     renderWithProviders(<BlockEditorToolbar controller={controller} />);
@@ -186,8 +202,22 @@ describe("BlockEditorToolbar", () => {
 
   it("prevents disabled toolbar clicks from focusing the editor underneath", () => {
     const { controller } = createToolbarController({
-      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-      blockFormattingDisabled: true,
+      ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      disabledActions: {
+        ...DEFAULT_BLOCK_EDITOR_ACTION_STATE.disabledActions,
+        "editor.blockquote": true,
+        "editor.bulletList": true,
+        "editor.codeBlock": true,
+        "editor.heading1": true,
+        "editor.heading2": true,
+        "editor.heading3": true,
+        "editor.heading4": true,
+        "editor.heading5": true,
+        "editor.heading6": true,
+        "editor.orderedList": true,
+        "editor.paragraph": true,
+        "editor.taskList": true,
+      },
     });
 
     renderWithProviders(<BlockEditorToolbar controller={controller} />);
@@ -200,7 +230,7 @@ describe("BlockEditorToolbar", () => {
 
     expect(wasNotCanceled).toBe(false);
     expect(event.defaultPrevented).toBe(true);
-    expect(controller.formatBlock).not.toHaveBeenCalled();
+    expect(controller.executeAction).not.toHaveBeenCalled();
     expect(controller.focus).not.toHaveBeenCalled();
   });
 });

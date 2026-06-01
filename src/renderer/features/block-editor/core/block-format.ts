@@ -17,7 +17,7 @@ import {
   type LexicalNode,
 } from "lexical";
 
-import type { BlockEditorBlockFormat, BlockEditorToolbarState } from "../toolbar/types";
+import type { BlockEditorBlockFormat } from "../toolbar/types";
 
 const HEADING_FORMAT_TO_TAG = {
   heading1: "h1",
@@ -111,20 +111,6 @@ export function readBlockFormatFromSelection(): BlockEditorBlockFormat {
 export function isBlockFormattingDisabledAtSelection(): boolean {
   const anchorNode = getAnchorNode();
   return anchorNode !== null && $findMatchingParent(anchorNode, $isTableCellNode) !== null;
-}
-
-export function toolbarStatesEqual(
-  left: BlockEditorToolbarState,
-  right: BlockEditorToolbarState,
-): boolean {
-  return (
-    left.blockFormat === right.blockFormat &&
-    left.blockFormattingDisabled === right.blockFormattingDisabled &&
-    left.inlineFormats.bold === right.inlineFormats.bold &&
-    left.inlineFormats.inlineCode === right.inlineFormats.inlineCode &&
-    left.inlineFormats.italic === right.inlineFormats.italic &&
-    left.inlineFormats.strikethrough === right.inlineFormats.strikethrough
-  );
 }
 
 export function applyBlockFormat(format: BlockEditorBlockFormat): void {

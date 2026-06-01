@@ -1,14 +1,15 @@
-import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+} from "@renderer/features/shortcut/shortcut-utils";
 import { DropdownMenuItem, DropdownMenuRadioItem } from "@renderer/ui/components/dropdown-menu";
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { cn } from "@renderer/ui/lib/utils";
 
-import type { BlockEditorShortcutBinding } from "./types";
-
 interface ToolbarMenuItemContentProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
-  shortcut?: BlockEditorShortcutBinding;
+  shortcut?: ShortcutBinding;
 }
 
 function ToolbarMenuItemContent({ icon: Icon, label, shortcut }: ToolbarMenuItemContentProps) {

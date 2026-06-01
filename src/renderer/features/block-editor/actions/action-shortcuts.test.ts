@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vite-plus/test";
 
-import { resolveTextFormatShortcut } from "./text-format-shortcuts";
+import { resolveBlockEditorShortcut } from "./action-shortcuts";
 
 function createKeyboardEvent(shortcut: {
   altKey?: boolean;
@@ -20,33 +20,33 @@ function createKeyboardEvent(shortcut: {
   } as KeyboardEvent;
 }
 
-describe("resolveTextFormatShortcut", () => {
+describe("resolveBlockEditorShortcut", () => {
   it("resolves configured inline format shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "b", shiftKey: true });
 
     expect(
-      resolveTextFormatShortcut(event, {
-        bold: "Control+Shift+B",
+      resolveBlockEditorShortcut(event, {
+        "editor.bold": "Control+Shift+B",
       }),
-    ).toEqual({ type: "configured-inline", format: "bold" });
+    ).toEqual({ action: "editor.bold", type: "configured-action" });
   });
 
   it("resolves configured block format shortcuts", () => {
     const event = createKeyboardEvent({ altKey: true, ctrlKey: true, key: "1" });
 
     expect(
-      resolveTextFormatShortcut(event, {
-        heading1: "Control+Alt+1",
+      resolveBlockEditorShortcut(event, {
+        "editor.heading1": "Control+Alt+1",
       }),
-    ).toEqual({ type: "configured-block", format: "heading1" });
+    ).toEqual({ action: "editor.heading1", type: "configured-action" });
   });
 
   it("blocks cleared Lexical default text format shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "b" });
 
     expect(
-      resolveTextFormatShortcut(event, {
-        bold: null,
+      resolveBlockEditorShortcut(event, {
+        "editor.bold": null,
       }),
     ).toEqual({ type: "blocked-default" });
   });
@@ -55,22 +55,22 @@ describe("resolveTextFormatShortcut", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "i" });
 
     expect(
-      resolveTextFormatShortcut(event, {
-        bold: "Control+I",
-        italic: null,
+      resolveBlockEditorShortcut(event, {
+        "editor.bold": "Control+I",
+        "editor.italic": null,
       }),
-    ).toEqual({ type: "configured-inline", format: "bold" });
+    ).toEqual({ action: "editor.bold", type: "configured-action" });
   });
 
   it("blocks Lexical underline shortcut that Fluxnote does not configure", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "u" });
 
-    expect(resolveTextFormatShortcut(event, {})).toEqual({ type: "blocked-default" });
+    expect(resolveBlockEditorShortcut(event, {})).toEqual({ type: "blocked-default" });
   });
 
   it("ignores non-text-format shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "k" });
 
-    expect(resolveTextFormatShortcut(event, {})).toEqual({ type: "none" });
+    expect(resolveBlockEditorShortcut(event, {})).toEqual({ type: "none" });
   });
 });

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor";
 import { renderWithProviders } from "@renderer/test/render";
 import { fireEvent, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -30,6 +30,12 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@renderer/features/block-editor", () => ({
+  BLOCK_EDITOR_ACTION_DEFINITIONS: [
+    { id: "editor.bold" },
+    { id: "editor.inlineCode" },
+    { id: "editor.italic" },
+    { id: "editor.strikethrough" },
+  ],
   BlockEditorToolbar: ({
     controller,
     inactiveContent,
@@ -99,12 +105,11 @@ vi.mock("./workspace-runtime", () => ({
       activeEditor: mocks.activeEditorEnabled
         ? {
             copy: vi.fn(async () => undefined),
+            executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
             flush: vi.fn(async () => ""),
             focus: vi.fn(),
-            formatBlock: vi.fn(),
-            formatInline: vi.fn(),
-            getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-            subscribeToolbarState: () => () => undefined,
+            getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+            subscribeActionState: () => () => undefined,
           }
         : undefined,
       getEditor: vi.fn(),

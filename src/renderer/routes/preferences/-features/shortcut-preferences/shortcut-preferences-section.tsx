@@ -1,4 +1,6 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { BLOCK_EDITOR_ACTION_DEFINITIONS } from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   PreferencesGroup,
@@ -12,26 +14,10 @@ import {
 import {
   CheckIcon,
   ArchiveIcon,
-  BoldIcon,
-  BracesIcon,
-  Code2Icon,
   CopyIcon,
-  CheckSquareIcon,
   KeyboardIcon,
-  Heading1Icon,
-  Heading2Icon,
-  Heading3Icon,
-  Heading4Icon,
-  Heading5Icon,
-  Heading6Icon,
-  ItalicIcon,
-  ListIcon,
-  ListOrderedIcon,
-  PilcrowIcon,
   PinIcon,
   PlusCircleIcon,
-  QuoteIcon,
-  StrikethroughIcon,
   Trash2Icon,
   WandSparklesIcon,
   XIcon,
@@ -45,7 +31,7 @@ import { useShortcutRecorder } from "./use-shortcut-recorder";
 interface ShortcutFieldDefinition {
   action: ShortcutAction;
   icon: ReactElement<SVGProps<SVGSVGElement>>;
-  title: ReactElement;
+  title: ReactElement | string;
   description?: ReactElement;
 }
 
@@ -127,95 +113,10 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
       },
     ],
   },
-  {
-    id: "editor",
-    title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
-    fields: [
-      {
-        action: "editor.paragraph",
-        icon: <PilcrowIcon />,
-        title: <Trans id="preferences.shortcuts.paragraph.label">Paragraph</Trans>,
-      },
-      {
-        action: "editor.heading1",
-        icon: <Heading1Icon />,
-        title: <Trans id="preferences.shortcuts.heading1.label">Heading 1</Trans>,
-      },
-      {
-        action: "editor.heading2",
-        icon: <Heading2Icon />,
-        title: <Trans id="preferences.shortcuts.heading2.label">Heading 2</Trans>,
-      },
-      {
-        action: "editor.heading3",
-        icon: <Heading3Icon />,
-        title: <Trans id="preferences.shortcuts.heading3.label">Heading 3</Trans>,
-      },
-      {
-        action: "editor.heading4",
-        icon: <Heading4Icon />,
-        title: <Trans id="preferences.shortcuts.heading4.label">Heading 4</Trans>,
-      },
-      {
-        action: "editor.heading5",
-        icon: <Heading5Icon />,
-        title: <Trans id="preferences.shortcuts.heading5.label">Heading 5</Trans>,
-      },
-      {
-        action: "editor.heading6",
-        icon: <Heading6Icon />,
-        title: <Trans id="preferences.shortcuts.heading6.label">Heading 6</Trans>,
-      },
-      {
-        action: "editor.blockquote",
-        icon: <QuoteIcon />,
-        title: <Trans id="preferences.shortcuts.blockquote.label">Quote</Trans>,
-      },
-      {
-        action: "editor.bulletList",
-        icon: <ListIcon />,
-        title: <Trans id="preferences.shortcuts.bulletList.label">Bullet list</Trans>,
-      },
-      {
-        action: "editor.orderedList",
-        icon: <ListOrderedIcon />,
-        title: <Trans id="preferences.shortcuts.orderedList.label">Numbered list</Trans>,
-      },
-      {
-        action: "editor.taskList",
-        icon: <CheckSquareIcon />,
-        title: <Trans id="preferences.shortcuts.taskList.label">Task list</Trans>,
-      },
-      {
-        action: "editor.codeBlock",
-        icon: <BracesIcon />,
-        title: <Trans id="preferences.shortcuts.codeBlock.label">Code block</Trans>,
-      },
-      {
-        action: "editor.bold",
-        icon: <BoldIcon />,
-        title: <Trans id="preferences.shortcuts.bold.label">Bold</Trans>,
-      },
-      {
-        action: "editor.italic",
-        icon: <ItalicIcon />,
-        title: <Trans id="preferences.shortcuts.italic.label">Italic</Trans>,
-      },
-      {
-        action: "editor.strikethrough",
-        icon: <StrikethroughIcon />,
-        title: <Trans id="preferences.shortcuts.strikethrough.label">Strikethrough</Trans>,
-      },
-      {
-        action: "editor.inlineCode",
-        icon: <Code2Icon />,
-        title: <Trans id="preferences.shortcuts.inlineCode.label">Inline code</Trans>,
-      },
-    ],
-  },
 ];
 
 export function ShortcutPreferencesSection() {
+  const { i18n } = useLingui();
   const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
     useShortcutState();
   const {
@@ -229,11 +130,26 @@ export function ShortcutPreferencesSection() {
     clearShortcut,
     updateShortcut,
   });
+  const shortcutFieldGroups: ShortcutFieldGroupDefinition[] = [
+    ...SHORTCUT_FIELD_GROUPS,
+    {
+      id: "editor",
+      title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
+      fields: BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => {
+        const Icon = action.icon;
+        return {
+          action: action.id,
+          icon: <Icon />,
+          title: i18n._(action.label),
+        };
+      }),
+    },
+  ];
 
   return (
     <PreferencesSection title={<Trans id="preferences.shortcuts.title">Shortcuts</Trans>}>
       <div className="flex flex-col gap-3">
-        {SHORTCUT_FIELD_GROUPS.map((group) => (
+        {shortcutFieldGroups.map((group) => (
           <div key={group.id} className="flex flex-col gap-1.5">
             <h3 className="text-muted-foreground px-1 text-xs font-medium">{group.title}</h3>
             <PreferencesGroup>

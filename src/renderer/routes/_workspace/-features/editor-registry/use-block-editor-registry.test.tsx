@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor/actions";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -12,12 +12,11 @@ import { useBlockEditorRegistry } from "./use-block-editor-registry";
 function createEditorHandle(): WorkspaceBlockEditorHandle {
   return {
     copy: vi.fn(async () => undefined),
+    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
-    formatBlock: vi.fn(),
-    formatInline: vi.fn(),
-    getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-    subscribeToolbarState: () => () => undefined,
+    getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+    subscribeActionState: () => () => undefined,
   };
 }
 

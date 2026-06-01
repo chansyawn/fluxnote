@@ -16,13 +16,29 @@ import type { WorkspaceBlockEditorHandle } from "./workspace-block-editor-surfac
 const mocks = vi.hoisted(() => ({
   editorHandle: {
     copy: vi.fn(async () => undefined),
-    formatBlock: vi.fn(),
-    formatInline: vi.fn(),
+    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
-    getToolbarState: vi.fn(() => ({
+    getActionState: vi.fn(() => ({
       blockFormat: "paragraph",
-      blockFormattingDisabled: false,
+      disabledActions: {
+        "editor.blockquote": false,
+        "editor.bold": false,
+        "editor.bulletList": false,
+        "editor.codeBlock": false,
+        "editor.heading1": false,
+        "editor.heading2": false,
+        "editor.heading3": false,
+        "editor.heading4": false,
+        "editor.heading5": false,
+        "editor.heading6": false,
+        "editor.inlineCode": false,
+        "editor.italic": false,
+        "editor.orderedList": false,
+        "editor.paragraph": false,
+        "editor.strikethrough": false,
+        "editor.taskList": false,
+      },
       inlineFormats: {
         bold: false,
         inlineCode: false,
@@ -30,7 +46,7 @@ const mocks = vi.hoisted(() => ({
         strikethrough: false,
       },
     })),
-    subscribeToolbarState: vi.fn(() => () => undefined),
+    subscribeActionState: vi.fn(() => () => undefined),
   },
   shortcutActionsByBlock: new Map<string, WorkspaceBlockActions>(),
   shortcuts: {

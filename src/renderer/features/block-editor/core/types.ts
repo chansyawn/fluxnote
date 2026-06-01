@@ -1,10 +1,10 @@
 import type { Ref } from "react";
 
 import type {
-  BlockEditorToolbarShortcuts,
-  BlockEditorToolbarController,
-  BlockEditorToolbarState,
-} from "../toolbar/types";
+  BlockEditorActionController,
+  BlockEditorActionState,
+  BlockEditorShortcutConfig as BlockEditorActionShortcutConfig,
+} from "../actions/types";
 
 export interface BlockEditorAssetInput {
   dataBase64: string;
@@ -95,7 +95,7 @@ export interface BlockEditorMarkdownConfig {
 
 export interface BlockEditorConfig {
   markdown: BlockEditorMarkdownConfig;
-  shortcuts: BlockEditorShortcutConfig;
+  shortcuts: BlockEditorShortcutsConfig;
 }
 
 export interface BlockEditorCodeBlockConfigInput {
@@ -106,26 +106,25 @@ export interface BlockEditorMarkdownConfigInput {
   codeBlock?: BlockEditorCodeBlockConfigInput;
 }
 
-export interface BlockEditorShortcutConfig {
-  formats: BlockEditorToolbarShortcuts;
+export interface BlockEditorShortcutsConfig {
+  actions: BlockEditorActionShortcutConfig;
 }
 
-export interface BlockEditorShortcutConfigInput {
-  formats?: BlockEditorToolbarShortcuts;
+export interface BlockEditorShortcutsConfigInput {
+  actions?: BlockEditorActionShortcutConfig;
 }
 
 export interface BlockEditorConfigInput {
   markdown?: BlockEditorMarkdownConfigInput;
-  shortcuts?: BlockEditorShortcutConfigInput;
+  shortcuts?: BlockEditorShortcutsConfigInput;
 }
 
-export interface BlockEditorHandle extends BlockEditorToolbarController {
+export interface BlockEditorHandle extends BlockEditorActionController {
   copy: () => Promise<void>;
-  focus: () => void;
   flush: () => Promise<string>;
 }
 
-export type { BlockEditorToolbarState };
+export type { BlockEditorActionState };
 
 export interface BlockEditorProps {
   ref?: Ref<BlockEditorHandle>;

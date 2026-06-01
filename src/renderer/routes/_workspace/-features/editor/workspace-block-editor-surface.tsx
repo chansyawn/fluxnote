@@ -4,12 +4,10 @@ import {
   type BlockEditorConfigInput,
   type BlockEditorHandle,
   type BlockEditorRuntime,
-  type BlockEditorToolbarShortcuts,
+  BLOCK_EDITOR_ACTION_DEFINITIONS,
+  DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  type BlockEditorShortcutConfig,
 } from "@renderer/features/block-editor";
-import {
-  BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS,
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-} from "@renderer/features/block-editor/toolbar";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
 import { cn } from "@renderer/ui/lib/utils";
@@ -27,6 +25,14 @@ import { useBlockEditorPersistence } from "./block-editor-persistence";
 import { createWorkspaceBlockEditorRuntime } from "./block-editor-runtime";
 
 export type WorkspaceBlockEditorHandle = BlockEditorHandle;
+
+export function pickBlockEditorShortcuts(
+  shortcuts: ShortcutPreferences,
+): BlockEditorShortcutConfig {
+  return Object.fromEntries(
+    BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => [action.id, shortcuts[action.id]]),
+  ) as BlockEditorShortcutConfig;
+}
 
 interface BlockEditorFrameProps {
   blockId: string;
@@ -111,37 +117,17 @@ export function WorkspaceBlockEditorSurface({
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
-  const toolbarShortcuts = useMemo<BlockEditorToolbarShortcuts>(
-    () => ({
-      blockquote: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.blockquote],
-      bold: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bold],
-      bulletList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bulletList],
-      codeBlock: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.codeBlock],
-      heading1: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading1],
-      heading2: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading2],
-      heading3: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading3],
-      heading4: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading4],
-      heading5: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading5],
-      heading6: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading6],
-      inlineCode: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.inlineCode],
-      italic: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.italic],
-      orderedList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.orderedList],
-      paragraph: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.paragraph],
-      strikethrough: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      taskList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.taskList],
-    }),
-    [shortcuts],
-  );
+  const editorShortcuts = useMemo(() => pickBlockEditorShortcuts(shortcuts), [shortcuts]);
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
       markdown: {
         codeBlock,
       },
       shortcuts: {
-        formats: toolbarShortcuts,
+        actions: editorShortcuts,
       },
     }),
-    [codeBlock, toolbarShortcuts],
+    [codeBlock, editorShortcuts],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockEditorPersistence(block);
@@ -168,17 +154,19 @@ export function WorkspaceBlockEditorSurface({
       focus: () => {
         editorRef.current?.focus();
       },
-      formatBlock: (format) => {
-        editorRef.current?.formatBlock(format);
-      },
-      formatInline: (format) => {
-        editorRef.current?.formatInline(format);
+      executeAction: (action) => {
+        return (
+          editorRef.current?.executeAction(action) ?? {
+            action,
+            status: "unknown",
+          }
+        );
       },
       flush,
-      getToolbarState: () =>
-        editorRef.current?.getToolbarState() ?? DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-      subscribeToolbarState: (listener) =>
-        editorRef.current?.subscribeToolbarState(listener) ?? (() => undefined),
+      getActionState: () =>
+        editorRef.current?.getActionState() ?? DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      subscribeActionState: (listener) =>
+        editorRef.current?.subscribeActionState(listener) ?? (() => undefined),
     }),
     [flush],
   );

@@ -11,63 +11,59 @@ import {
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { cn } from "@renderer/ui/lib/utils";
-import {
-  type MouseEvent,
-  type ReactNode,
-  useCallback,
-  useMemo,
-  useRef,
-  useSyncExternalStore,
-} from "react";
+import { ChevronDownIcon } from "lucide-react";
+import { type MouseEvent, type ReactNode, useCallback, useRef, useSyncExternalStore } from "react";
 
 import {
-  BLOCK_BUTTON_FORMATS,
-  ChevronDownIcon,
-  createToolbarFormatDefinitions,
-  INLINE_FORMATS,
-  LIST_FORMATS,
-  TEXT_STYLE_FORMATS,
-  TOOLBAR_FORMAT_ICONS,
-} from "./toolbar-format-config";
+  BLOCK_EDITOR_ACTION_DEFINITIONS,
+  DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  type BlockEditorActionController,
+  type BlockEditorActionDefinition,
+  type BlockEditorActionId,
+  type BlockEditorActionState,
+  type BlockEditorShortcutConfig,
+} from "../actions";
 import { ToolbarMenuItem, ToolbarRadioMenuItem } from "./toolbar-menu-item";
-import {
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorBlockFormat,
-  type BlockEditorInlineFormat,
-  type BlockEditorToolbarController,
-  type BlockEditorToolbarShortcuts,
-} from "./types";
+import type { BlockEditorBlockFormat } from "./types";
 
-type TextStyleFormat = (typeof TEXT_STYLE_FORMATS)[number];
-type ListFormat = (typeof LIST_FORMATS)[number];
+const TEXT_STYLE_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
+  (action) => action.group === "text-style",
+);
+const LIST_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter((action) => action.group === "list");
+const BLOCK_BUTTON_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
+  (action) => action.group === "block-button",
+);
+const INLINE_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
+  (action) => action.group === "inline",
+);
 
 interface BlockEditorToolbarProps {
   className?: string;
-  controller?: BlockEditorToolbarController | null;
+  controller?: BlockEditorActionController | null;
   inactiveContent?: ReactNode;
-  shortcuts?: BlockEditorToolbarShortcuts;
+  shortcuts?: BlockEditorShortcutConfig;
 }
 
-function useBlockEditorToolbarState(controller: BlockEditorToolbarController | null | undefined) {
+function useBlockEditorActionState(controller: BlockEditorActionController | null | undefined) {
   const subscribe = useCallback(
     (onStoreChange: () => void) => {
-      return controller?.subscribeToolbarState(onStoreChange) ?? (() => undefined);
+      return controller?.subscribeActionState(onStoreChange) ?? (() => undefined);
     },
     [controller],
   );
 
   const getSnapshot = useCallback(
-    () => controller?.getToolbarState() ?? DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+    () => controller?.getActionState() ?? DEFAULT_BLOCK_EDITOR_ACTION_STATE,
     [controller],
   );
 
-  return useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
+  return useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_BLOCK_EDITOR_ACTION_STATE);
 }
 
 function ToolbarShortcut({
   shortcut,
 }: {
-  shortcut?: BlockEditorToolbarShortcuts[keyof BlockEditorToolbarShortcuts];
+  shortcut?: BlockEditorShortcutConfig[BlockEditorActionId];
 }) {
   const shortcutTokens = formatShortcutTokens(shortcut ?? null);
 
@@ -88,20 +84,24 @@ function preventToolbarMouseDown(event: MouseEvent) {
   event.preventDefault();
 }
 
-function isTextStyleFormat(format: BlockEditorBlockFormat): format is TextStyleFormat {
+function isBlockAction(
+  action: BlockEditorActionDefinition,
+): action is BlockEditorActionDefinition<BlockEditorBlockFormat> {
+  return action.kind === "block-format";
+}
+
+function findActiveTextStyleAction(state: BlockEditorActionState) {
   return (
-    format === "paragraph" ||
-    format === "heading1" ||
-    format === "heading2" ||
-    format === "heading3" ||
-    format === "heading4" ||
-    format === "heading5" ||
-    format === "heading6"
+    TEXT_STYLE_ACTIONS.find(
+      (action) => isBlockAction(action) && action.format === state.blockFormat,
+    ) ?? TEXT_STYLE_ACTIONS[0]
   );
 }
 
-function isListFormat(format: BlockEditorBlockFormat): format is ListFormat {
-  return format === "bulletList" || format === "orderedList" || format === "taskList";
+function findActiveListAction(state: BlockEditorActionState) {
+  return LIST_ACTIONS.find(
+    (action) => isBlockAction(action) && action.format === state.blockFormat,
+  );
 }
 
 export function BlockEditorToolbar({
@@ -112,25 +112,15 @@ export function BlockEditorToolbar({
 }: BlockEditorToolbarProps) {
   const { i18n } = useLingui();
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const state = useBlockEditorToolbarState(controller);
-  const definitions = useMemo(() => createToolbarFormatDefinitions(i18n), [i18n]);
-  const textStyleFormat = isTextStyleFormat(state.blockFormat) ? state.blockFormat : "paragraph";
-  const listFormat = isListFormat(state.blockFormat) ? state.blockFormat : null;
-  const TextStyleIcon = TOOLBAR_FORMAT_ICONS[textStyleFormat];
-  const ListIcon =
-    listFormat === null ? TOOLBAR_FORMAT_ICONS.bulletList : TOOLBAR_FORMAT_ICONS[listFormat];
+  const state = useBlockEditorActionState(controller);
+  const textStyleAction = findActiveTextStyleAction(state);
+  const listAction = findActiveListAction(state);
+  const TextStyleIcon = textStyleAction.icon;
+  const ListIcon = (listAction ?? LIST_ACTIONS[0]).icon;
 
-  const formatBlock = useCallback(
-    (format: BlockEditorBlockFormat) => {
-      controller?.formatBlock(format);
-      controller?.focus();
-    },
-    [controller],
-  );
-
-  const formatInline = useCallback(
-    (format: BlockEditorInlineFormat) => {
-      controller?.formatInline(format);
+  const executeAction = useCallback(
+    (action: BlockEditorActionId) => {
+      controller?.executeAction(action);
       controller?.focus();
     },
     [controller],
@@ -154,9 +144,9 @@ export function BlockEditorToolbar({
           <DropdownMenuTrigger
             render={
               <Button
-                aria-label={definitions[textStyleFormat].label}
+                aria-label={i18n._(textStyleAction.label)}
                 className="min-w-12"
-                disabled={state.blockFormattingDisabled}
+                disabled={state.disabledActions[textStyleAction.id]}
                 size="sm"
                 type="button"
                 variant="ghost"
@@ -173,23 +163,20 @@ export function BlockEditorToolbar({
             side="top"
           >
             <DropdownMenuRadioGroup
-              value={textStyleFormat}
+              value={textStyleAction.id}
               onValueChange={(value) => {
-                formatBlock(value as BlockEditorBlockFormat);
+                executeAction(value as BlockEditorActionId);
               }}
             >
-              {TEXT_STYLE_FORMATS.map((format) => {
-                const definition = definitions[format];
-                return (
-                  <ToolbarRadioMenuItem
-                    key={format}
-                    icon={definition.icon}
-                    label={definition.label}
-                    shortcut={shortcuts?.[format]}
-                    value={format}
-                  />
-                );
-              })}
+              {TEXT_STYLE_ACTIONS.map((action) => (
+                <ToolbarRadioMenuItem
+                  key={action.id}
+                  icon={action.icon}
+                  label={i18n._(action.label)}
+                  shortcut={shortcuts?.[action.id]}
+                  value={action.id}
+                />
+              ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -201,9 +188,11 @@ export function BlockEditorToolbar({
             render={
               <Button
                 aria-label={i18n._({ id: "block-editor.toolbar.list", message: "List" })}
-                aria-pressed={listFormat !== null}
-                className={cn(listFormat !== null ? "text-foreground" : "text-muted-foreground/60")}
-                disabled={state.blockFormattingDisabled}
+                aria-pressed={listAction !== undefined}
+                className={cn(
+                  listAction !== undefined ? "text-foreground" : "text-muted-foreground/60",
+                )}
+                disabled={LIST_ACTIONS.every((action) => state.disabledActions[action.id])}
                 size="sm"
                 type="button"
                 variant="ghost"
@@ -219,45 +208,42 @@ export function BlockEditorToolbar({
             container={toolbarRef}
             side="top"
           >
-            {LIST_FORMATS.map((format) => {
-              const definition = definitions[format];
-              return (
-                <ToolbarMenuItem
-                  key={format}
-                  active={listFormat === format}
-                  icon={definition.icon}
-                  label={definition.label}
-                  shortcut={shortcuts?.[format]}
-                  onSelect={() => {
-                    formatBlock(format);
-                  }}
-                />
-              );
-            })}
+            {LIST_ACTIONS.map((action) => (
+              <ToolbarMenuItem
+                key={action.id}
+                active={listAction?.id === action.id}
+                icon={action.icon}
+                label={i18n._(action.label)}
+                shortcut={shortcuts?.[action.id]}
+                onSelect={() => {
+                  executeAction(action.id);
+                }}
+              />
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
         <ButtonGroupSeparator />
 
-        {BLOCK_BUTTON_FORMATS.map((format) => {
-          const definition = definitions[format];
-          const Icon = definition.icon;
-          const pressed = state.blockFormat === format;
+        {BLOCK_BUTTON_ACTIONS.map((action) => {
+          const Icon = action.icon;
+          const pressed = isBlockAction(action) && state.blockFormat === action.format;
+          const label = i18n._(action.label);
 
           return (
-            <Tooltip key={format}>
+            <Tooltip key={action.id}>
               <TooltipTrigger
                 render={
                   <Button
-                    aria-label={definition.label}
+                    aria-label={label}
                     aria-pressed={pressed}
                     className={cn(pressed ? "text-foreground" : "text-muted-foreground/60")}
-                    disabled={state.blockFormattingDisabled}
+                    disabled={state.disabledActions[action.id]}
                     size="icon-sm"
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      formatBlock(format);
+                      executeAction(action.id);
                     }}
                   >
                     <Icon data-icon="inline-start" />
@@ -265,8 +251,8 @@ export function BlockEditorToolbar({
                 }
               />
               <TooltipContent className="flex items-center gap-2">
-                <span>{definition.label}</span>
-                <ToolbarShortcut shortcut={shortcuts?.[format]} />
+                <span>{label}</span>
+                <ToolbarShortcut shortcut={shortcuts?.[action.id]} />
               </TooltipContent>
             </Tooltip>
           );
@@ -274,24 +260,25 @@ export function BlockEditorToolbar({
 
         <ButtonGroupSeparator />
 
-        {INLINE_FORMATS.map((format) => {
-          const definition = definitions[format];
-          const Icon = definition.icon;
-          const pressed = state.inlineFormats[format];
+        {INLINE_ACTIONS.map((action) => {
+          const Icon = action.icon;
+          const pressed = action.kind === "inline-format" && state.inlineFormats[action.format];
+          const label = i18n._(action.label);
 
           return (
-            <Tooltip key={format}>
+            <Tooltip key={action.id}>
               <TooltipTrigger
                 render={
                   <Button
-                    aria-label={definition.label}
+                    aria-label={label}
                     aria-pressed={pressed}
                     className={cn(pressed ? "text-foreground" : "text-muted-foreground/60")}
+                    disabled={state.disabledActions[action.id]}
                     size="icon-sm"
                     type="button"
                     variant="ghost"
                     onClick={() => {
-                      formatInline(format);
+                      executeAction(action.id);
                     }}
                   >
                     <Icon data-icon="inline-start" />
@@ -299,8 +286,8 @@ export function BlockEditorToolbar({
                 }
               />
               <TooltipContent className="flex items-center gap-2">
-                <span>{definition.label}</span>
-                <ToolbarShortcut shortcut={shortcuts?.[format]} />
+                <span>{label}</span>
+                <ToolbarShortcut shortcut={shortcuts?.[action.id]} />
               </TooltipContent>
             </Tooltip>
           );

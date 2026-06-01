@@ -27,35 +27,43 @@ export const fontSizeSchema = z.union([
   z.literal(FONT_SIZE_OPTIONS[3]),
   z.literal(FONT_SIZE_OPTIONS[4]),
 ]);
-export const shortcutActionSchema = z.enum([
-  "global.toggleWindow",
-  "global.quickCreateBlock",
-  "workspace.createBlock",
-  "workspace.copyBlock",
-  "workspace.keepBlock",
-  "workspace.togglePinBlock",
-  "workspace.archiveBlock",
-  "workspace.deleteBlock",
-  "workspace.submitExternalEdit",
-  "workspace.cancelExternalEdit",
-  "editor.paragraph",
-  "editor.heading1",
-  "editor.heading2",
-  "editor.heading3",
-  "editor.heading4",
-  "editor.heading5",
-  "editor.heading6",
-  "editor.blockquote",
-  "editor.bulletList",
-  "editor.orderedList",
-  "editor.taskList",
-  "editor.codeBlock",
-  "editor.bold",
-  "editor.italic",
-  "editor.strikethrough",
-  "editor.inlineCode",
-]);
 export const shortcutBindingSchema = z.string().nullable();
+
+export const DEFAULT_SHORTCUTS = {
+  "global.toggleWindow": "Alt+N",
+  "global.quickCreateBlock": "Ctrl+Alt+N",
+  "workspace.createBlock": "Mod+N",
+  "workspace.copyBlock": "Mod+Shift+C",
+  "workspace.keepBlock": "Mod+K",
+  "workspace.togglePinBlock": "Mod+T",
+  "workspace.archiveBlock": "Mod+E",
+  "workspace.deleteBlock": "Mod+D",
+  "workspace.submitExternalEdit": "Mod+Enter",
+  "workspace.cancelExternalEdit": "Mod+\\",
+  "editor.paragraph": "Mod+Alt+0",
+  "editor.heading1": "Mod+Alt+1",
+  "editor.heading2": "Mod+Alt+2",
+  "editor.heading3": "Mod+Alt+3",
+  "editor.heading4": "Mod+Alt+4",
+  "editor.heading5": "Mod+Alt+5",
+  "editor.heading6": "Mod+Alt+6",
+  "editor.blockquote": "Mod+Alt+B",
+  "editor.bulletList": "Mod+Alt+8",
+  "editor.orderedList": "Mod+Alt+7",
+  "editor.taskList": "Mod+Alt+9",
+  "editor.codeBlock": "Mod+Alt+C",
+  "editor.bold": "Mod+B",
+  "editor.italic": "Mod+I",
+  "editor.strikethrough": "Mod+Shift+X",
+  "editor.inlineCode": "Mod+Shift+E",
+} as const;
+
+const shortcutActions = Object.keys(DEFAULT_SHORTCUTS) as [
+  keyof typeof DEFAULT_SHORTCUTS,
+  ...(keyof typeof DEFAULT_SHORTCUTS)[],
+];
+
+export const shortcutActionSchema = z.enum(shortcutActions);
 
 const defaultMarkdownCodeBlockPreferencesValue = {
   showLineNumbers: false,
@@ -71,34 +79,15 @@ export const autoArchivePreferencesSchema = z.object({
   idleMinutes: autoArchiveIdleMinutesSchema.catch(AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES),
 });
 
-export const shortcutPreferencesSchema = z.object({
-  "global.toggleWindow": shortcutBindingSchema.catch("Alt+N"),
-  "global.quickCreateBlock": shortcutBindingSchema.catch("Ctrl+Alt+N"),
-  "workspace.createBlock": shortcutBindingSchema.catch("Mod+N"),
-  "workspace.copyBlock": shortcutBindingSchema.catch("Mod+Shift+C"),
-  "workspace.keepBlock": shortcutBindingSchema.catch("Mod+K"),
-  "workspace.togglePinBlock": shortcutBindingSchema.catch("Mod+T"),
-  "workspace.archiveBlock": shortcutBindingSchema.catch("Mod+E"),
-  "workspace.deleteBlock": shortcutBindingSchema.catch("Mod+D"),
-  "workspace.submitExternalEdit": shortcutBindingSchema.catch("Mod+Enter"),
-  "workspace.cancelExternalEdit": shortcutBindingSchema.catch("Mod+\\"),
-  "editor.paragraph": shortcutBindingSchema.catch("Mod+Alt+0"),
-  "editor.heading1": shortcutBindingSchema.catch("Mod+Alt+1"),
-  "editor.heading2": shortcutBindingSchema.catch("Mod+Alt+2"),
-  "editor.heading3": shortcutBindingSchema.catch("Mod+Alt+3"),
-  "editor.heading4": shortcutBindingSchema.catch("Mod+Alt+4"),
-  "editor.heading5": shortcutBindingSchema.catch("Mod+Alt+5"),
-  "editor.heading6": shortcutBindingSchema.catch("Mod+Alt+6"),
-  "editor.blockquote": shortcutBindingSchema.catch("Mod+Alt+B"),
-  "editor.bulletList": shortcutBindingSchema.catch("Mod+Alt+8"),
-  "editor.orderedList": shortcutBindingSchema.catch("Mod+Alt+7"),
-  "editor.taskList": shortcutBindingSchema.catch("Mod+Alt+9"),
-  "editor.codeBlock": shortcutBindingSchema.catch("Mod+Alt+C"),
-  "editor.bold": shortcutBindingSchema.catch("Mod+B"),
-  "editor.italic": shortcutBindingSchema.catch("Mod+I"),
-  "editor.strikethrough": shortcutBindingSchema.catch("Mod+Shift+X"),
-  "editor.inlineCode": shortcutBindingSchema.catch("Mod+Shift+E"),
-});
+function createShortcutPreferencesSchema(defaults: Record<ShortcutAction, ShortcutBinding>) {
+  return z.object(
+    Object.fromEntries(
+      shortcutActions.map((action) => [action, shortcutBindingSchema.catch(defaults[action])]),
+    ) as Record<ShortcutAction, z.ZodCatch<typeof shortcutBindingSchema>>,
+  );
+}
+
+export const shortcutPreferencesSchema = createShortcutPreferencesSchema(DEFAULT_SHORTCUTS);
 
 export const appearancePreferencesSchema = z.object({
   locale: localeSchema.catch("en"),
@@ -143,34 +132,11 @@ const autoArchivePreferencesPatchSchema = z
   .strict();
 
 const shortcutPreferencesPatchSchema = z
-  .object({
-    "global.toggleWindow": shortcutBindingSchema.optional(),
-    "global.quickCreateBlock": shortcutBindingSchema.optional(),
-    "workspace.createBlock": shortcutBindingSchema.optional(),
-    "workspace.copyBlock": shortcutBindingSchema.optional(),
-    "workspace.keepBlock": shortcutBindingSchema.optional(),
-    "workspace.togglePinBlock": shortcutBindingSchema.optional(),
-    "workspace.archiveBlock": shortcutBindingSchema.optional(),
-    "workspace.deleteBlock": shortcutBindingSchema.optional(),
-    "workspace.submitExternalEdit": shortcutBindingSchema.optional(),
-    "workspace.cancelExternalEdit": shortcutBindingSchema.optional(),
-    "editor.paragraph": shortcutBindingSchema.optional(),
-    "editor.heading1": shortcutBindingSchema.optional(),
-    "editor.heading2": shortcutBindingSchema.optional(),
-    "editor.heading3": shortcutBindingSchema.optional(),
-    "editor.heading4": shortcutBindingSchema.optional(),
-    "editor.heading5": shortcutBindingSchema.optional(),
-    "editor.heading6": shortcutBindingSchema.optional(),
-    "editor.blockquote": shortcutBindingSchema.optional(),
-    "editor.bulletList": shortcutBindingSchema.optional(),
-    "editor.orderedList": shortcutBindingSchema.optional(),
-    "editor.taskList": shortcutBindingSchema.optional(),
-    "editor.codeBlock": shortcutBindingSchema.optional(),
-    "editor.bold": shortcutBindingSchema.optional(),
-    "editor.italic": shortcutBindingSchema.optional(),
-    "editor.strikethrough": shortcutBindingSchema.optional(),
-    "editor.inlineCode": shortcutBindingSchema.optional(),
-  })
+  .object(
+    Object.fromEntries(
+      shortcutActions.map((action) => [action, shortcutBindingSchema.optional()]),
+    ) as Record<ShortcutAction, z.ZodOptional<typeof shortcutBindingSchema>>,
+  )
   .strict();
 
 const markdownCodeBlockPreferencesPatchSchema = z
@@ -208,34 +174,7 @@ const defaultUserPreferencesValue = {
     enabled: true,
     idleMinutes: AUTO_ARCHIVE_DEFAULT_IDLE_MINUTES,
   },
-  shortcuts: {
-    "global.toggleWindow": "Alt+N",
-    "global.quickCreateBlock": "Ctrl+Alt+N",
-    "workspace.createBlock": "Mod+N",
-    "workspace.copyBlock": "Mod+Shift+C",
-    "workspace.keepBlock": "Mod+K",
-    "workspace.togglePinBlock": "Mod+T",
-    "workspace.archiveBlock": "Mod+E",
-    "workspace.deleteBlock": "Mod+D",
-    "workspace.submitExternalEdit": "Mod+Enter",
-    "workspace.cancelExternalEdit": "Mod+\\",
-    "editor.paragraph": "Mod+Alt+0",
-    "editor.heading1": "Mod+Alt+1",
-    "editor.heading2": "Mod+Alt+2",
-    "editor.heading3": "Mod+Alt+3",
-    "editor.heading4": "Mod+Alt+4",
-    "editor.heading5": "Mod+Alt+5",
-    "editor.heading6": "Mod+Alt+6",
-    "editor.blockquote": "Mod+Alt+B",
-    "editor.bulletList": "Mod+Alt+8",
-    "editor.orderedList": "Mod+Alt+7",
-    "editor.taskList": "Mod+Alt+9",
-    "editor.codeBlock": "Mod+Alt+C",
-    "editor.bold": "Mod+B",
-    "editor.italic": "Mod+I",
-    "editor.strikethrough": "Mod+Shift+X",
-    "editor.inlineCode": "Mod+Shift+E",
-  },
+  shortcuts: DEFAULT_SHORTCUTS,
   markdown: {
     codeBlock: defaultMarkdownCodeBlockPreferencesValue,
   },
@@ -311,58 +250,7 @@ function createUserPreferencesNormalizerSchema(
         idleMinutes: autoArchiveIdleMinutesSchema.catch(defaults.autoArchive.idleMinutes),
       })
       .catch(defaults.autoArchive),
-    shortcuts: z
-      .object({
-        "global.toggleWindow": shortcutBindingSchema.catch(
-          defaults.shortcuts["global.toggleWindow"],
-        ),
-        "global.quickCreateBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["global.quickCreateBlock"],
-        ),
-        "workspace.createBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.createBlock"],
-        ),
-        "workspace.copyBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.copyBlock"],
-        ),
-        "workspace.keepBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.keepBlock"],
-        ),
-        "workspace.togglePinBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.togglePinBlock"],
-        ),
-        "workspace.archiveBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.archiveBlock"],
-        ),
-        "workspace.deleteBlock": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.deleteBlock"],
-        ),
-        "workspace.submitExternalEdit": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.submitExternalEdit"],
-        ),
-        "workspace.cancelExternalEdit": shortcutBindingSchema.catch(
-          defaults.shortcuts["workspace.cancelExternalEdit"],
-        ),
-        "editor.paragraph": shortcutBindingSchema.catch(defaults.shortcuts["editor.paragraph"]),
-        "editor.heading1": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading1"]),
-        "editor.heading2": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading2"]),
-        "editor.heading3": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading3"]),
-        "editor.heading4": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading4"]),
-        "editor.heading5": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading5"]),
-        "editor.heading6": shortcutBindingSchema.catch(defaults.shortcuts["editor.heading6"]),
-        "editor.blockquote": shortcutBindingSchema.catch(defaults.shortcuts["editor.blockquote"]),
-        "editor.bulletList": shortcutBindingSchema.catch(defaults.shortcuts["editor.bulletList"]),
-        "editor.orderedList": shortcutBindingSchema.catch(defaults.shortcuts["editor.orderedList"]),
-        "editor.taskList": shortcutBindingSchema.catch(defaults.shortcuts["editor.taskList"]),
-        "editor.codeBlock": shortcutBindingSchema.catch(defaults.shortcuts["editor.codeBlock"]),
-        "editor.bold": shortcutBindingSchema.catch(defaults.shortcuts["editor.bold"]),
-        "editor.italic": shortcutBindingSchema.catch(defaults.shortcuts["editor.italic"]),
-        "editor.strikethrough": shortcutBindingSchema.catch(
-          defaults.shortcuts["editor.strikethrough"],
-        ),
-        "editor.inlineCode": shortcutBindingSchema.catch(defaults.shortcuts["editor.inlineCode"]),
-      })
-      .catch(defaults.shortcuts),
+    shortcuts: createShortcutPreferencesSchema(defaults.shortcuts).catch(defaults.shortcuts),
     markdown: z
       .object({
         codeBlock: z

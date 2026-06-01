@@ -1,15 +1,12 @@
 import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
-import {
-  BlockEditorToolbar,
-  type BlockEditorToolbarShortcuts,
-} from "@renderer/features/block-editor";
-import { BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
+import { BlockEditorToolbar } from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
 
 import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
+import { pickBlockEditorShortcuts } from "./editor/workspace-block-editor-surface";
 import { VirtualBlockList } from "./list/virtual-block-list";
 import {
   LoadingState,
@@ -58,27 +55,7 @@ export function BlockWorkspace() {
     }),
     [editorRegistry.getEditor, editorRegistry.registerEditor],
   );
-  const toolbarShortcuts = useMemo<BlockEditorToolbarShortcuts>(
-    () => ({
-      blockquote: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.blockquote],
-      bold: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bold],
-      bulletList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bulletList],
-      codeBlock: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.codeBlock],
-      heading1: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading1],
-      heading2: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading2],
-      heading3: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading3],
-      heading4: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading4],
-      heading5: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading5],
-      heading6: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading6],
-      inlineCode: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.inlineCode],
-      italic: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.italic],
-      orderedList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.orderedList],
-      paragraph: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.paragraph],
-      strikethrough: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      taskList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.taskList],
-    }),
-    [shortcuts],
-  );
+  const toolbarShortcuts = useMemo(() => pickBlockEditorShortcuts(shortcuts), [shortcuts]);
 
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
