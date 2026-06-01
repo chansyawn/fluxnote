@@ -144,7 +144,7 @@ export function BlockEditorToolbar({
     <div
       ref={toolbarRef}
       className={cn(
-        "mx-auto flex w-fit items-center rounded-md border border-muted bg-popover shadow-xs",
+        "mx-auto flex w-fit items-center rounded-lg border border-muted bg-popover p-1 shadow-xs",
         className,
       )}
     >
@@ -166,7 +166,12 @@ export function BlockEditorToolbar({
               </Button>
             }
           />
-          <DropdownMenuContent align="start" container={toolbarRef} side="top">
+          <DropdownMenuContent
+            align="start"
+            className="w-auto min-w-44"
+            container={toolbarRef}
+            side="top"
+          >
             <DropdownMenuRadioGroup
               value={textStyleFormat}
               onValueChange={(value) => {
@@ -209,7 +214,12 @@ export function BlockEditorToolbar({
               </Button>
             }
           />
-          <DropdownMenuContent align="start" container={toolbarRef} side="top">
+          <DropdownMenuContent
+            align="start"
+            className="w-auto min-w-44"
+            container={toolbarRef}
+            side="top"
+          >
             {LIST_FORMATS.map((format) => {
               const definition = definitions[format];
               return (

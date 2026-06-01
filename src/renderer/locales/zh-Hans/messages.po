@@ -271,7 +271,7 @@ msgid "block-editor.toolbar.label"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:198
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:203
 msgid "block-editor.toolbar.list"
 msgstr "列表"
 
