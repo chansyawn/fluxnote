@@ -124,6 +124,20 @@ describe("BlockEditorToolbar", () => {
     expect(controller.focus).toHaveBeenCalledOnce();
   });
 
+  it("keeps dropdown content inside the toolbar focus boundary", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController();
+
+    renderWithProviders(<BlockEditorToolbar controller={controller} />);
+
+    await user.click(screen.getByRole("button", { name: "Normal text" }));
+
+    const toolbar = screen.getByRole("group", { name: "Editor" }).parentElement;
+    const menu = await screen.findByRole("menu");
+
+    expect(toolbar).toContainElement(menu);
+  });
+
   it("shows list menu items and dispatches list formats", async () => {
     const user = userEvent.setup();
     const { controller } = createToolbarController();

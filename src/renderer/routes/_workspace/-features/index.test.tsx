@@ -38,7 +38,10 @@ vi.mock("@renderer/features/block-editor", () => ({
     inactiveContent?: ReactNode;
   }) =>
     controller ? (
-      <button type="button">Editor toolbar</button>
+      <div>
+        <button type="button">Editor toolbar</button>
+        <button type="button">Editor toolbar menu</button>
+      </div>
     ) : (
       <div tabIndex={0}>{inactiveContent}</div>
     ),
@@ -152,6 +155,17 @@ describe("BlockWorkspace", () => {
 
     blockEditor.focus();
     fireEvent.blur(blockEditor, { relatedTarget: toolbar });
+
+    expect(mocks.focusBlock).not.toHaveBeenCalledWith(null);
+  });
+
+  it("keeps the active Block while focus moves into a toolbar dropdown", () => {
+    renderWithProviders(<BlockWorkspace />);
+    const toolbar = screen.getByRole("button", { name: "Editor toolbar" });
+    const toolbarMenu = screen.getByRole("button", { name: "Editor toolbar menu" });
+
+    toolbar.focus();
+    fireEvent.blur(toolbar, { relatedTarget: toolbarMenu });
 
     expect(mocks.focusBlock).not.toHaveBeenCalledWith(null);
   });

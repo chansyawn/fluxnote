@@ -11,7 +11,14 @@ import {
 import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { cn } from "@renderer/ui/lib/utils";
-import { type MouseEvent, type ReactNode, useCallback, useMemo, useSyncExternalStore } from "react";
+import {
+  type MouseEvent,
+  type ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 
 import {
   BLOCK_BUTTON_FORMATS,
@@ -104,6 +111,7 @@ export function BlockEditorToolbar({
   shortcuts,
 }: BlockEditorToolbarProps) {
   const { i18n } = useLingui();
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const state = useBlockEditorToolbarState(controller);
   const definitions = useMemo(() => createToolbarFormatDefinitions(i18n), [i18n]);
   const textStyleFormat = isTextStyleFormat(state.blockFormat) ? state.blockFormat : "paragraph";
@@ -134,6 +142,7 @@ export function BlockEditorToolbar({
 
   return (
     <div
+      ref={toolbarRef}
       className={cn(
         "mx-auto flex w-fit items-center rounded-md border border-muted bg-popover shadow-xs",
         className,
@@ -157,7 +166,7 @@ export function BlockEditorToolbar({
               </Button>
             }
           />
-          <DropdownMenuContent align="start" side="top">
+          <DropdownMenuContent align="start" container={toolbarRef} side="top">
             <DropdownMenuRadioGroup
               value={textStyleFormat}
               onValueChange={(value) => {
@@ -200,7 +209,7 @@ export function BlockEditorToolbar({
               </Button>
             }
           />
-          <DropdownMenuContent align="start" side="top">
+          <DropdownMenuContent align="start" container={toolbarRef} side="top">
             {LIST_FORMATS.map((format) => {
               const definition = definitions[format];
               return (

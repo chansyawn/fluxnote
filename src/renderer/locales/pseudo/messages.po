@@ -266,12 +266,12 @@ msgid "block-editor.toolbar.italic"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:142
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:151
 msgid "block-editor.toolbar.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:189
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:198
 msgid "block-editor.toolbar.list"
 msgstr ""
 
