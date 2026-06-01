@@ -1,11 +1,18 @@
+import { $createCodeNode } from "@lexical/code";
+import { $createHeadingNode } from "@lexical/rich-text";
 import { $isTableCellNode, TableCellHeaderStates } from "@lexical/table";
 import {
+  CONTROLLED_TEXT_INSERTION_COMMAND,
   $createParagraphNode,
   $createTextNode,
+  $getNodeByKey,
   $getRoot,
+  $getSelection,
   $isElementNode,
   $isParagraphNode,
+  $isRangeSelection,
   type ElementFormatType,
+  type LexicalCommand,
   type LexicalEditor,
   type NodeKey,
 } from "lexical";
@@ -18,7 +25,7 @@ import {
   editorFromMarkdown,
   readMdast,
 } from "../../test-helper/editor-driver";
-import { pressEnter } from "../../test-helper/interaction-driver";
+import { pressEnter, selectText } from "../../test-helper/interaction-driver";
 import {
   performTableStructureOperation,
   type TableColumnAlign,
@@ -137,6 +144,41 @@ function performAlignOperation(
   });
 }
 
+function dispatchCommand<TPayload>(
+  editor: LexicalEditor,
+  command: LexicalCommand<TPayload>,
+  payload: TPayload,
+): boolean {
+  let handled = false;
+  editor.update(
+    () => {
+      handled = editor.dispatchCommand(command, payload);
+    },
+    { discrete: true },
+  );
+  return handled;
+}
+
+function typeText(editor: LexicalEditor, text: string): void {
+  for (const character of text) {
+    dispatchCommand(editor, CONTROLLED_TEXT_INSERTION_COMMAND, character);
+  }
+}
+
+function readSelection(editor: LexicalEditor): { nodeText: string; offset: number } {
+  return editor.read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      throw new Error("Expected range selection.");
+    }
+
+    return {
+      nodeText: selection.anchor.getNode().getTextContent(),
+      offset: selection.anchor.offset,
+    };
+  });
+}
+
 describe("table", () => {
   it("round-trips a simple table", () => {
     const markdown = ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n");
@@ -165,6 +207,55 @@ describe("table", () => {
       { children: [], type: "tableCell" },
       { children: [], type: "tableCell" },
     ]);
+  });
+
+  it("normalizes block children inside cells to markdown-compatible text", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+    const cellKey = getCellKey(editor, 1, 0);
+
+    editor.update(
+      () => {
+        const cell = $getNodeByKey(cellKey);
+        if (!$isTableCellNode(cell)) {
+          throw new Error("Unable to find table cell.");
+        }
+
+        cell.append(
+          $createHeadingNode("h2").append($createTextNode("Heading")),
+          $createCodeNode().append($createTextNode("const x = 1;")),
+        );
+      },
+      { discrete: true },
+    );
+
+    expect(getTable(editor).children[1].children[0].children).toEqual([
+      { type: "text", value: "a ## Heading ```\nconst x = 1;\n```" },
+    ]);
+  });
+
+  it("keeps heading markdown shortcuts literal inside cells without moving the caret", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+    selectText(editor, "a", 0);
+
+    typeText(editor, "# ");
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "h1" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+        {
+          children: [{ children: [{ type: "text", value: "# a" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+      ],
+      type: "table",
+    });
+    expect(readSelection(editor)).toEqual({
+      nodeText: "# a",
+      offset: 2,
+    });
   });
 
   it("typed delimiter shortcut creates a table", () => {

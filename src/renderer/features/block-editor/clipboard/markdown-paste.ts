@@ -5,6 +5,7 @@ import {
   $isNodeSelection,
   $isRangeSelection,
   $setSelection,
+  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
   type BaseSelection,
   type LexicalEditor,
 } from "lexical";
@@ -56,6 +57,15 @@ export function insertMarkdownAtSelection(
       }
 
       if ($isRangeSelection(currentSelection) || $isNodeSelection(currentSelection)) {
+        if (
+          editor.dispatchCommand(SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, {
+            nodes,
+            selection: currentSelection,
+          })
+        ) {
+          return;
+        }
+
         currentSelection.insertNodes(nodes);
         return;
       }

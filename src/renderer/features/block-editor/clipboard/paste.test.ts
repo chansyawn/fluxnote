@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import {
   createBlockEditorRuntime,
   editorFromMarkdown,
+  readMdast,
   readMarkdown,
 } from "../test-helper/editor-driver";
-import { pasteIntoEditor, TestDataTransfer } from "../test-helper/interaction-driver";
+import { pasteIntoEditor, selectText, TestDataTransfer } from "../test-helper/interaction-driver";
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./paste";
 
 describe("clipboard paste", () => {
@@ -63,6 +64,43 @@ describe("clipboard paste", () => {
 
     await vi.waitFor(() => {
       expect(readMarkdown(editor).trim()).toBe("# HTML");
+    });
+  });
+
+  it("pastes html blocks into a table cell as literal markdown text", async () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+    selectText(editor, "a");
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([
+          ["text/html", "<h1>Heading</h1><ul><li>one</li><li>two</li></ul>"],
+          ["text/plain", "# Heading\n\n- one\n- two"],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        children: [
+          {
+            children: [{ children: [{ type: "text", value: "h1" }], type: "tableCell" }],
+            type: "tableRow",
+          },
+          {
+            children: [
+              {
+                children: [{ type: "text", value: "a # Heading - one\n- two" }],
+                type: "tableCell",
+              },
+            ],
+            type: "tableRow",
+          },
+        ],
+        type: "table",
+      });
     });
   });
 

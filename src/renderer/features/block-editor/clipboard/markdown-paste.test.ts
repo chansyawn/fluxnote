@@ -1,7 +1,7 @@
 import { $getRoot, $getSelection } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
-import { editorFromMarkdown, readMarkdown } from "../test-helper/editor-driver";
+import { editorFromMarkdown, readMarkdown, readMdast } from "../test-helper/editor-driver";
 import { selectText } from "../test-helper/interaction-driver";
 import { insertMarkdownAtSelection } from "./markdown-paste";
 
@@ -108,6 +108,58 @@ describe("insertMarkdownAtSelection", () => {
     const markdown = readMarkdown(editor);
     expect(markdown).toContain("**Bold**");
     expect(markdown).toContain("[link](https://example.com)");
+  });
+
+  it("pastes block markdown into a table cell as literal markdown text", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+    selectText(editor, "a");
+
+    insertMarkdownAtSelection(editor, "# Heading\n\n- one\n- two", selectionFrom(editor));
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "h1" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+        {
+          children: [
+            {
+              children: [{ type: "text", value: "a # Heading - one\n- two" }],
+              type: "tableCell",
+            },
+          ],
+          type: "tableRow",
+        },
+      ],
+      type: "table",
+    });
+  });
+
+  it("inserts pasted markdown at the caret inside a table cell", () => {
+    const editor = editorFromMarkdown(["| h1    |", "| ----- |", "| abcde |", ""].join("\n"));
+    selectText(editor, "abcde", 2);
+
+    insertMarkdownAtSelection(editor, "# Heading", selectionFrom(editor));
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "h1" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+        {
+          children: [
+            {
+              children: [{ type: "text", value: "ab # Heading cde" }],
+              type: "tableCell",
+            },
+          ],
+          type: "tableRow",
+        },
+      ],
+      type: "table",
+    });
   });
 
   it("preserves selection-anchored insertion point across paragraphs", () => {

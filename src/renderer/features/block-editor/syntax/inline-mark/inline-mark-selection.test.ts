@@ -14,7 +14,7 @@ import {
   readMarkdown,
   readMdast,
 } from "../../test-helper/editor-driver";
-import { selectEmptyParagraph } from "../../test-helper/interaction-driver";
+import { selectEmptyParagraph, selectText } from "../../test-helper/interaction-driver";
 
 function dispatchCommand<TPayload>(
   editor: LexicalEditor,
@@ -101,5 +101,18 @@ describe("inline markdown selection", () => {
 
     expect(JSON.stringify(readMdast(editor))).toContain('"type":"list"');
     expect(JSON.stringify(readMdast(editor))).toContain('"value":"item"');
+  });
+
+  it("still applies inline markdown shortcuts inside table cells", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+
+    selectText(editor, "a", 0);
+    typeText(editor, "**bold**");
+    typeText(editor, " `code`");
+
+    expect(readMarkdown(editor)).toContain("**bold**");
+    expect(readMarkdown(editor)).toContain("`code`");
+    expect(JSON.stringify(readMdast(editor))).toContain('"type":"strong"');
+    expect(JSON.stringify(readMdast(editor))).toContain('"type":"inlineCode"');
   });
 });
