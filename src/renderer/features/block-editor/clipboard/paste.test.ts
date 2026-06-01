@@ -6,7 +6,7 @@ import {
   readMarkdown,
 } from "../test-helper/editor-driver";
 import { pasteIntoEditor, TestDataTransfer } from "../test-helper/interaction-driver";
-import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./clipboard-paste";
+import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./paste";
 
 describe("clipboard paste", () => {
   it("captures html and plain text clipboard formats", () => {

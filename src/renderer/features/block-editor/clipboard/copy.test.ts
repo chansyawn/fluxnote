@@ -1,4 +1,10 @@
-import { $createNodeSelection, $createParagraphNode, $getRoot, $setSelection } from "lexical";
+import {
+  $createNodeSelection,
+  $createParagraphNode,
+  $getRoot,
+  $getSelection,
+  $setSelection,
+} from "lexical";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import { $createImageNode } from "../syntax/image";
@@ -11,9 +17,76 @@ import { doc, p, t } from "../test-helper/mdast-builders";
 import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
-} from "./clipboard-data";
+  createClipboardSnapshotFromDocument,
+  createClipboardSnapshotFromSelection,
+} from "./copy";
 
-describe("clipboard data", () => {
+describe("clipboard copy", () => {
+  it("returns null for collapsed selections", () => {
+    const editor = editorFromMarkdown("Hello");
+
+    const snapshot = editor.read(() => {
+      const selection = $getSelection();
+      return selection
+        ? createClipboardSnapshotFromSelection(editor, selection, { includeImageFileUrl: true })
+        : null;
+    });
+
+    expect(snapshot).toBeNull();
+  });
+
+  it("exports selected image metadata for native image clipboard writes", () => {
+    const editor = editorFromMarkdown("");
+    let snapshot: ReturnType<typeof createClipboardSnapshotFromSelection> = null;
+
+    editor.update(
+      () => {
+        const imageNode = $createImageNode({
+          alt: "Photo",
+          src: "assets://block/photo.png",
+          title: null,
+        });
+        $getRoot().clear().append($createParagraphNode().append(imageNode));
+
+        const selection = $createNodeSelection();
+        selection.add(imageNode.getKey());
+        $setSelection(selection);
+
+        snapshot = createClipboardSnapshotFromSelection(editor, selection, {
+          includeImageFileUrl: true,
+        });
+      },
+      { discrete: true },
+    );
+
+    expect(snapshot).toEqual(
+      expect.objectContaining({
+        assetUrls: ["assets://block/photo.png"],
+        imageAssetUrl: "assets://block/photo.png",
+        markdown: expect.stringContaining("assets://block/photo.png"),
+        nodes: [expect.objectContaining({ src: "assets://block/photo.png", type: "image" })],
+      }),
+    );
+  });
+
+  it("exports full document nodes without native image metadata", () => {
+    const editor = editorFromMarkdown("Hello");
+    let snapshot: ReturnType<typeof createClipboardSnapshotFromDocument> = null;
+
+    editor.update(() => {
+      snapshot = createClipboardSnapshotFromDocument();
+    });
+
+    expect(snapshot).toEqual(
+      expect.objectContaining({
+        assetUrls: [],
+        imageAssetUrl: null,
+        markdown: expect.stringContaining("Hello"),
+        nodes: [expect.objectContaining({ type: "paragraph" })],
+      }),
+    );
+  });
+
   it("creates document clipboard data without resolving assets when none exist", async () => {
     const editor = editorFromMarkdown("Hello");
     const runtime = createBlockEditorRuntime();

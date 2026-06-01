@@ -23,7 +23,7 @@ import {
   ul,
   li,
 } from "../test-helper/mdast-builders";
-import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./clipboard-formats";
+import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./formats";
 
 function textNode(text: string): ClipboardSerializedNode {
   return {

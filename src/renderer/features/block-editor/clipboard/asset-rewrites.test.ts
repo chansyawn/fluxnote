@@ -5,7 +5,7 @@ import {
   rewriteClipboardAssetsForExternalFormats,
   rewriteHtmlFileImageSources,
   rewriteMarkdownFileImageSources,
-} from "./clipboard-assets";
+} from "./asset-rewrites";
 
 describe("clipboard assets", () => {
   it("rewrites copied image assets for external formats", () => {

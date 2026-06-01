@@ -3,9 +3,9 @@ import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 import { getSupportedImageFiles } from "../assets/image-files";
 import { insertImageFilesAtSelection } from "../assets/image-insert";
 import type { BlockEditorRuntime } from "../core/types";
-import { rewriteHtmlFileImageSources, rewriteMarkdownFileImageSources } from "./clipboard-assets";
-import { insertRichTextDataAtSelection } from "./clipboard-insert";
+import { rewriteHtmlFileImageSources, rewriteMarkdownFileImageSources } from "./asset-rewrites";
 import { insertMarkdownAtSelection } from "./markdown-paste";
+import { insertRichTextDataAtSelection } from "./rich-text-paste";
 
 interface ClipboardDataSnapshot {
   files: File[];

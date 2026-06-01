@@ -13,7 +13,7 @@ import {
   type PasteCommandType,
 } from "lexical";
 
-import { handleBlockEditorPaste } from "../clipboard/clipboard-paste";
+import { handleBlockEditorPaste } from "../clipboard/paste";
 import type { BlockEditorRuntime } from "../core/types";
 import { $isGapCursorParagraph } from "../cursor";
 

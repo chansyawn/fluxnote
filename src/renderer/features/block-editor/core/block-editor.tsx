@@ -22,8 +22,8 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
-import { createClipboardDataFromDocument } from "../clipboard/clipboard-data";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
+import { createClipboardDataFromDocument } from "../clipboard/copy";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
