@@ -17,4 +17,5 @@ export const BLOCK_EDITOR_SHORTCUT_ACTION_ORDER = [
   "editor.italic",
   "editor.strikethrough",
   "editor.inlineCode",
+  "editor.link",
 ] as const satisfies readonly BlockEditorActionId[];

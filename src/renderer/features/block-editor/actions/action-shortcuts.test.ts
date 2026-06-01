@@ -73,4 +73,14 @@ describe("resolveBlockEditorShortcut", () => {
 
     expect(resolveBlockEditorShortcut(event, {})).toEqual({ type: "none" });
   });
+
+  it("resolves the configured link shortcut", () => {
+    const event = createKeyboardEvent({ ctrlKey: true, key: "l", shiftKey: true });
+
+    expect(
+      resolveBlockEditorShortcut(event, {
+        "editor.link": "Control+Shift+L",
+      }),
+    ).toEqual({ action: "editor.link", type: "configured-action" });
+  });
 });

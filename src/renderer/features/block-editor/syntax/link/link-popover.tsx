@@ -4,7 +4,7 @@ import { Button } from "@renderer/ui/components/button";
 import { Popover, PopoverContent } from "@renderer/ui/components/popover";
 import { Textarea } from "@renderer/ui/components/textarea";
 import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";
 import {
@@ -29,9 +29,12 @@ export function LinkHoverControls() {
     scheduleActiveLinkClose,
     setPopoverElement,
     shouldIgnorePopoverClose,
+    urlInputFocusRequest,
   } = useActiveLinkTarget(editor);
   const [draftUrl, setDraftUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const urlInputRef = useRef<HTMLTextAreaElement>(null);
+  const activeMarkdownLinkKey = activeLink?.link.kind === "markdown" ? activeLink.link.key : null;
 
   const close = useCallback(() => {
     closeActiveLink();
@@ -49,6 +52,15 @@ export function LinkHoverControls() {
     setDraftUrl(activeLink?.link.kind === "markdown" ? activeLink.link.url : "");
     setCopied(false);
   }, [activeLink]);
+
+  useLayoutEffect(() => {
+    if (!urlInputFocusRequest || urlInputFocusRequest.key !== activeMarkdownLinkKey) return;
+    const timer = window.setTimeout(() => {
+      urlInputRef.current?.focus();
+      urlInputRef.current?.select();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [activeMarkdownLinkKey, urlInputFocusRequest]);
 
   const handleOpen = async () => {
     if (!activeLink) return;
@@ -91,6 +103,8 @@ export function LinkHoverControls() {
   if (!activeLink) return null;
 
   const isMarkdownLink = activeLink.link.kind === "markdown";
+  const actionUrl = isMarkdownLink ? draftUrl : activeLink.link.url;
+  const hasActionUrl = actionUrl.length > 0;
 
   const openLabel = i18n._({ id: "block-editor.link.open", message: "Open" });
   const copyLabel = i18n._({ id: "block-editor.link.copy", message: "Copy" });
@@ -101,11 +115,23 @@ export function LinkHoverControls() {
 
   const sharedActions = (
     <>
-      <Button size="sm" type="button" variant="ghost" onClick={() => void handleOpen()}>
+      <Button
+        disabled={!hasActionUrl}
+        size="sm"
+        type="button"
+        variant="ghost"
+        onClick={() => void handleOpen()}
+      >
         <ExternalLinkIcon data-icon="inline-start" />
         {openLabel}
       </Button>
-      <Button size="sm" type="button" variant="ghost" onClick={() => void handleCopy()}>
+      <Button
+        disabled={!hasActionUrl}
+        size="sm"
+        type="button"
+        variant="ghost"
+        onClick={() => void handleCopy()}
+      >
         {copied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}
         {copied ? copiedLabel : copyLabel}
       </Button>
@@ -140,6 +166,7 @@ export function LinkHoverControls() {
         {isMarkdownLink ? (
           <div className="flex flex-col gap-2">
             <Textarea
+              ref={urlInputRef}
               aria-label={urlLabel}
               className="max-h-28 min-h-7 resize-none overflow-auto py-1"
               rows={1}

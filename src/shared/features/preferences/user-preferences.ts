@@ -56,6 +56,7 @@ export const DEFAULT_SHORTCUTS = {
   "editor.italic": "Mod+I",
   "editor.strikethrough": "Mod+Shift+X",
   "editor.inlineCode": "Mod+Shift+E",
+  "editor.link": "Mod+Shift+L",
 } as const;
 
 const shortcutActions = Object.keys(DEFAULT_SHORTCUTS) as [

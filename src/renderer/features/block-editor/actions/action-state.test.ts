@@ -5,7 +5,7 @@ import {
   editorFromMdast,
   expectEditorMarkdown,
 } from "../test-helper/editor-driver";
-import { selectText } from "../test-helper/interaction-driver";
+import { selectText, selectTextRange } from "../test-helper/interaction-driver";
 import { doc, li, p, quote, t, ul } from "../test-helper/mdast-builders";
 import { executeBlockEditorAction } from "./action-definitions";
 import { readBlockEditorActionState } from "./action-state";
@@ -42,5 +42,31 @@ describe("Block Editor action state", () => {
     executeBlockEditorAction("editor.blockquote", { editor });
 
     expectEditorMarkdown(editor, "- Item");
+  });
+
+  it("tracks link action active and disabled state", () => {
+    const linkEditor = editorFromMarkdown("[Text](https://example.com)");
+    selectText(linkEditor, "Text", 2);
+
+    const activeState = readBlockEditorActionState(linkEditor);
+
+    expect(activeState.activeActions["editor.link"]).toBe(true);
+    expect(activeState.disabledActions["editor.link"]).toBe(false);
+
+    const emptyEditor = editorFromMarkdown("Text gap");
+    selectText(emptyEditor, "Text gap", 5);
+
+    const disabledState = readBlockEditorActionState(emptyEditor);
+
+    expect(disabledState.activeActions["editor.link"]).toBe(false);
+    expect(disabledState.disabledActions["editor.link"]).toBe(true);
+
+    const selectedEditor = editorFromMarkdown("Text");
+    selectTextRange(selectedEditor, "Text", 0, 4);
+
+    const selectedState = readBlockEditorActionState(selectedEditor);
+
+    expect(selectedState.activeActions["editor.link"]).toBe(false);
+    expect(selectedState.disabledActions["editor.link"]).toBe(false);
   });
 });

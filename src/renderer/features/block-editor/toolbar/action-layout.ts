@@ -2,7 +2,13 @@ import type { BlockEditorActionId } from "../actions";
 
 export const BLOCK_EDITOR_TOOLBAR_LAYOUT = {
   blockButtons: ["editor.blockquote", "editor.codeBlock"],
-  inlineButtons: ["editor.bold", "editor.italic", "editor.strikethrough", "editor.inlineCode"],
+  inlineButtons: [
+    "editor.bold",
+    "editor.italic",
+    "editor.strikethrough",
+    "editor.inlineCode",
+    "editor.link",
+  ],
   listMenu: ["editor.bulletList", "editor.orderedList", "editor.taskList"],
   textStyleMenu: [
     "editor.paragraph",

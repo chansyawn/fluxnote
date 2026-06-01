@@ -16,6 +16,7 @@ import {
   Heading5Icon,
   Heading6Icon,
   ItalicIcon,
+  LinkIcon,
   ListIcon,
   ListOrderedIcon,
   PilcrowIcon,
@@ -34,6 +35,11 @@ import {
   type BlockEditorListFormat,
   type BlockEditorTextStyleFormat,
 } from "../core/block-format";
+import {
+  executeLinkActionAtSelection,
+  isLinkActionDisabledAtSelection,
+  isMarkdownLinkActiveAtSelection,
+} from "../syntax/link/link-action";
 import type { BlockEditorInlineFormat } from "../toolbar/types";
 import type {
   BlockEditorActionContext,
@@ -161,6 +167,16 @@ const INLINE_ACTIONS = [
   lexicalFormat: TextFormatType;
 }[];
 
+const LINK_ACTION = {
+  icon: LinkIcon,
+  id: "editor.link",
+  label: { id: "block-editor.toolbar.link", message: "Link" },
+} as const satisfies {
+  icon: BlockEditorActionDefinition["icon"];
+  id: BlockEditorActionId;
+  label: BlockEditorActionDefinition["label"];
+};
+
 const QUOTE_ACTION = {
   icon: QuoteIcon,
   id: "editor.blockquote",
@@ -266,11 +282,30 @@ function createInlineActionDefinition(
   };
 }
 
+function createLinkActionDefinition(): BlockEditorActionDefinition {
+  return {
+    icon: LINK_ACTION.icon,
+    id: LINK_ACTION.id,
+    isActive: () => isMarkdownLinkActiveAtSelection(),
+    isDisabled: () => isLinkActionDisabledAtSelection(),
+    label: LINK_ACTION.label,
+    execute: ({ editor }) => {
+      const result = executeLinkActionAtSelection(editor);
+      if (result.kind === "disabled") {
+        return disabledActionResult(LINK_ACTION.id);
+      }
+
+      return executedActionResult(LINK_ACTION.id);
+    },
+  };
+}
+
 export const BLOCK_EDITOR_ACTION_DEFINITIONS = [
   ...TEXT_STYLE_ACTIONS.map(createTextStyleActionDefinition),
   ...LIST_ACTIONS.map(createListActionDefinition),
   createQuoteActionDefinition(),
   ...INLINE_ACTIONS.map(createInlineActionDefinition),
+  createLinkActionDefinition(),
 ] as const;
 
 export const BLOCK_EDITOR_ACTION_IDS = BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => action.id);

@@ -83,6 +83,32 @@ export function selectText(editor: LexicalEditor, text: string, offset = text.le
   );
 }
 
+export function selectTextRange(
+  editor: LexicalEditor,
+  text: string,
+  start: number,
+  end: number,
+): void {
+  editor.update(
+    () => {
+      const textNode = $getRoot()
+        .getAllTextNodes()
+        .find((node) => node.getTextContent() === text);
+
+      if (!textNode) {
+        throw new Error(`Unable to find text node "${text}".`);
+      }
+
+      if (start < 0 || end > textNode.getTextContentSize() || start > end) {
+        throw new Error(`Selection range ${start}:${end} is outside "${text}".`);
+      }
+
+      textNode.select(start, end);
+    },
+    { discrete: true },
+  );
+}
+
 export function selectEmptyParagraph(
   editor: LexicalEditor,
   position: "first" | "last" = "last",

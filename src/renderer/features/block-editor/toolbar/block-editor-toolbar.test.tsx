@@ -65,6 +65,7 @@ describe("BlockEditorToolbar", () => {
         "editor.bold": true,
         "editor.bulletList": true,
         "editor.codeBlock": true,
+        "editor.link": true,
       },
     });
 
@@ -72,6 +73,7 @@ describe("BlockEditorToolbar", () => {
 
     const boldButton = screen.getByRole("button", { name: "Bold" });
     const italicButton = screen.getByRole("button", { name: "Italic" });
+    const linkButton = screen.getByRole("button", { name: "Link" });
     const listButton = screen.getByRole("button", { name: "List" });
     const quoteButton = screen.getByRole("button", { name: "Quote" });
     const codeBlockButton = screen.getByRole("button", { name: "Code block" });
@@ -82,6 +84,7 @@ describe("BlockEditorToolbar", () => {
     expect(listButton).toHaveAttribute("aria-pressed", "true");
     expect(quoteButton).toHaveClass("text-muted-foreground/60");
     expect(codeBlockButton).toHaveAttribute("aria-pressed", "true");
+    expect(linkButton).toHaveAttribute("aria-pressed", "true");
 
     await user.click(quoteButton);
     expect(controller.executeAction).toHaveBeenCalledWith("editor.blockquote");
@@ -91,7 +94,10 @@ describe("BlockEditorToolbar", () => {
 
     await user.click(italicButton);
     expect(controller.executeAction).toHaveBeenCalledWith("editor.italic");
-    expect(controller.focus).toHaveBeenCalledTimes(3);
+
+    await user.click(linkButton);
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.link");
+    expect(controller.focus).toHaveBeenCalledTimes(4);
 
     act(() => {
       setState(DEFAULT_BLOCK_EDITOR_ACTION_STATE);
@@ -169,7 +175,10 @@ describe("BlockEditorToolbar", () => {
     const { controller } = createToolbarController();
 
     renderWithProviders(
-      <BlockEditorToolbar controller={controller} shortcuts={{ "editor.bold": "Control+B" }} />,
+      <BlockEditorToolbar
+        controller={controller}
+        shortcuts={{ "editor.bold": "Control+B", "editor.link": "Control+Shift+L" }}
+      />,
     );
 
     await user.hover(screen.getByRole("button", { name: "Bold" }));
@@ -177,6 +186,13 @@ describe("BlockEditorToolbar", () => {
     expect(await screen.findByText("Bold")).toBeVisible();
     expect(screen.getByText("Ctrl")).toBeVisible();
     expect(screen.getByText("B")).toBeVisible();
+
+    await user.hover(screen.getByRole("button", { name: "Link" }));
+
+    expect(await screen.findByText("Link")).toBeVisible();
+    expect(screen.getByText("Ctrl")).toBeVisible();
+    expect(screen.getByText("Shift")).toBeVisible();
+    expect(screen.getByText("L")).toBeVisible();
   });
 
   it("disables block controls while preserving inline controls", () => {
@@ -193,6 +209,7 @@ describe("BlockEditorToolbar", () => {
         "editor.heading4": true,
         "editor.heading5": true,
         "editor.heading6": true,
+        "editor.link": true,
         "editor.orderedList": true,
         "editor.paragraph": true,
         "editor.taskList": true,
@@ -206,6 +223,7 @@ describe("BlockEditorToolbar", () => {
     expect(screen.getByRole("button", { name: "Quote" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Code block" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Bold" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Link" })).toBeDisabled();
   });
 
   it("prevents disabled toolbar clicks from focusing the editor underneath", () => {

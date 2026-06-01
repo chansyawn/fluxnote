@@ -90,32 +90,32 @@ msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:99
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
 msgid "block-editor.link.convert"
 msgstr "转换为链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:97
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
 msgid "block-editor.link.copied"
 msgstr "已复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:96
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:110
 msgid "block-editor.link.copy"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:95
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:109
 msgid "block-editor.link.open"
 msgstr "打开"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:98
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
 msgid "block-editor.link.remove"
 msgstr "移除链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:100
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
 msgid "block-editor.link.url"
 msgstr "链接 URL"
 
