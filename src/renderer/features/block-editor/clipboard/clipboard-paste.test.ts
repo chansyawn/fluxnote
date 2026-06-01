@@ -1,7 +1,3 @@
-import {
-  encodeBlockEditorClipboardHtml,
-  type BlockEditorClipboardPayload,
-} from "@shared/features/block-editor/clipboard";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
@@ -12,28 +8,11 @@ import {
 import { pasteIntoEditor, TestDataTransfer } from "../test-helper/interaction-driver";
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./clipboard-paste";
 
-function textNode(text: string) {
-  return {
-    detail: 0,
-    format: 0,
-    mode: "normal",
-    style: "",
-    text,
-    type: "text",
-    version: 1,
-  };
-}
-
-const payload: BlockEditorClipboardPayload = {
-  nodes: [textNode("Text")],
-  sourceBlockId: "source-block",
-};
-
 describe("clipboard paste", () => {
-  it("strips internal clipboard metadata from html exposed to fallback rich text insertion", () => {
+  it("captures html and plain text clipboard formats", () => {
     const dataTransfer = new TestDataTransfer(
       new Map([
-        ["text/html", encodeBlockEditorClipboardHtml("<p>Text</p>", payload)],
+        ["text/html", "<p>Text</p>"],
         ["text/plain", "Text"],
       ]),
     ) as unknown as DataTransfer;
@@ -41,7 +20,6 @@ describe("clipboard paste", () => {
     const snapshot = createClipboardDataSnapshot(dataTransfer);
 
     expect(snapshot.html).toBe("<p>Text</p>");
-    expect(snapshot.rawHtml).toBe(encodeBlockEditorClipboardHtml("<p>Text</p>", payload));
     expect(snapshot.plainText).toBe("Text");
     expect(snapshot.getData("text/html")).toBe("<p>Text</p>");
     expect(snapshot.files).toEqual([]);
@@ -68,7 +46,7 @@ describe("clipboard paste", () => {
     expect(stopPropagation).not.toHaveBeenCalled();
   });
 
-  it("restores internal Block Editor payloads before markdown fallback", async () => {
+  it("prefers pasted html over plain markdown", async () => {
     const editor = editorFromMarkdown("");
     const runtime = createBlockEditorRuntime();
 
@@ -77,18 +55,18 @@ describe("clipboard paste", () => {
         editor,
         runtime,
         new Map([
-          ["text/html", encodeBlockEditorClipboardHtml("<p>fallback</p>", payload)],
-          ["text/plain", "# fallback"],
+          ["text/html", "<h1>HTML</h1>"],
+          ["text/plain", "# Plain"],
         ]),
       ),
     ).toBe(true);
 
     await vi.waitFor(() => {
-      expect(readMarkdown(editor).trim()).toBe("Text");
+      expect(readMarkdown(editor).trim()).toBe("# HTML");
     });
   });
 
-  it("parses pasted plain text as markdown", () => {
+  it("parses pasted plain text as markdown", async () => {
     const editor = editorFromMarkdown("");
 
     expect(
@@ -99,8 +77,129 @@ describe("clipboard paste", () => {
       ),
     ).toBe(true);
 
-    expect(readMarkdown(editor)).toContain("# Heading");
-    expect(readMarkdown(editor)).toContain("- item");
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor)).toContain("# Heading");
+      expect(readMarkdown(editor)).toContain("- item");
+    });
+  });
+
+  it("imports file image sources from pasted html", async () => {
+    const editor = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime({
+      assets: {
+        importFiles: vi.fn(async () => ({
+          assets: [
+            {
+              altText: "photo.png",
+              assetUrl: "assets://created/photo.png",
+              fileUrl: "file:///tmp/photo.png",
+            },
+            {
+              error: "IMPORT_FAILED",
+              fileUrl: "file:///tmp/missing.png",
+            },
+          ],
+        })),
+      },
+    });
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        runtime,
+        new Map([
+          [
+            "text/html",
+            [
+              '<p><img src="file:///tmp/photo.png" alt="Photo"></p>',
+              '<p><img src="file:///tmp/missing.png" alt="Missing"></p>',
+              '<p><a href="file:///tmp/document.pdf">Local</a></p>',
+            ].join(""),
+          ],
+          ["text/plain", "plain fallback"],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor)).toContain("![Photo](assets://created/photo.png)");
+      expect(readMarkdown(editor)).toContain("![](Unavailable)");
+      expect(readMarkdown(editor)).toContain("[Local](file:///tmp/document.pdf)");
+    });
+    expect(runtime.assets.importFiles).toHaveBeenCalledWith({
+      files: [{ fileUrl: "file:///tmp/photo.png" }, { fileUrl: "file:///tmp/missing.png" }],
+    });
+  });
+
+  it("imports pasted image files before falling back to html image content", async () => {
+    const editor = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime({
+      assets: {
+        create: vi.fn(async () => ({
+          assets: [{ altText: "Pasted", assetUrl: "assets://created/pasted.png" }],
+        })),
+        importFiles: vi.fn(async () => ({
+          assets: [{ assetUrl: "assets://html/remote.png", fileUrl: "file:///tmp/html.png" }],
+        })),
+      },
+    });
+    const image = new File(["image"], "pasted.png", { type: "image/png" });
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        runtime,
+        new Map([
+          ["text/html", '<p><img src="https://example.com/remote.png" alt="Remote"></p>'],
+          ["text/plain", "plain fallback"],
+        ]),
+        [image],
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor)).toContain("![Pasted](assets://created/pasted.png)");
+    });
+    expect(readMarkdown(editor)).not.toContain("https://example.com/remote.png");
+    expect(runtime.assets.create).toHaveBeenCalledWith({
+      assets: [
+        {
+          dataBase64: "aW1hZ2U=",
+          fileName: "pasted.png",
+          mimeType: "image/png",
+        },
+      ],
+    });
+    expect(runtime.assets.importFiles).not.toHaveBeenCalled();
+  });
+
+  it("imports file image destinations from pasted plain markdown", async () => {
+    const editor = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime({
+      assets: {
+        importFiles: vi.fn(async () => ({
+          assets: [
+            {
+              altText: "photo.png",
+              assetUrl: "assets://created/photo.png",
+              fileUrl: "file:///tmp/photo.png",
+            },
+          ],
+        })),
+      },
+    });
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        runtime,
+        new Map([["text/plain", "![Photo](file:///tmp/photo.png)"]]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMarkdown(editor)).toContain("![Photo](assets://created/photo.png)");
+    });
   });
 
   it("inserts pasted image files through the runtime asset boundary", async () => {

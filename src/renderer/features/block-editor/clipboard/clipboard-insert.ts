@@ -1,22 +1,12 @@
 import { $insertDataTransferForRichText } from "@lexical/clipboard";
+import { withDOM } from "@lexical/headless/dom";
 import {
-  type BlockEditorClipboardPayload,
-  type ClipboardSerializedNode,
-} from "@shared/features/block-editor/clipboard";
-import {
-  $createParagraphNode,
   $getRoot,
   $getSelection,
-  $isNodeSelection,
-  $isRangeSelection,
-  $parseSerializedNode,
   $setSelection,
   type BaseSelection,
   type LexicalEditor,
 } from "lexical";
-
-import type { BlockEditorRuntime } from "../core/types";
-import { createNodesForTargetBlock } from "./clipboard-assets";
 
 interface RichTextClipboardData {
   getData(type: string): string;
@@ -32,61 +22,28 @@ function restoreSelection(selection: BaseSelection | null): void {
   }
 }
 
-export function insertSerializedNodesAtSelection(
-  nodes: ReadonlyArray<ClipboardSerializedNode>,
-): void {
-  const lexicalNodes = nodes.map((node) => $parseSerializedNode(node));
-  const selection = $getSelection();
-
-  if ($isRangeSelection(selection)) {
-    selection.insertNodes(lexicalNodes);
-    return;
-  }
-
-  if ($isNodeSelection(selection)) {
-    selection.insertNodes(lexicalNodes);
-    return;
-  }
-
-  const paragraph = $createParagraphNode();
-  paragraph.append(...lexicalNodes);
-  $getRoot().append(paragraph);
-  paragraph.selectEnd();
-}
-
 export function insertRichTextDataAtSelection(
   editor: LexicalEditor,
   dataTransfer: RichTextClipboardData,
   selection: BaseSelection | null,
 ): void {
-  editor.update(
-    () => {
-      restoreSelection(selection);
+  withDOM(() => {
+    editor.update(
+      () => {
+        restoreSelection(selection);
 
-      const currentSelection = $getSelection();
-      if (currentSelection) {
-        // Lexical's rich text insertion path only reads getData(), so paste snapshots can survive async boundaries.
-        $insertDataTransferForRichText(dataTransfer as DataTransfer, currentSelection, editor);
-      }
-    },
-    { discrete: true },
-  );
-}
+        let currentSelection = $getSelection();
+        if (!currentSelection) {
+          $getRoot().selectEnd();
+          currentSelection = $getSelection();
+        }
 
-export async function insertClipboardPayloadAtSelection(
-  editor: LexicalEditor,
-  runtime: BlockEditorRuntime,
-  payload: BlockEditorClipboardPayload,
-  selection: BaseSelection | null,
-): Promise<void> {
-  const nodes = await createNodesForTargetBlock(payload, runtime.assets.copy);
-
-  editor.update(
-    () => {
-      restoreSelection(selection);
-
-      insertSerializedNodesAtSelection(nodes);
-    },
-    { discrete: true },
-  );
+        if (currentSelection) {
+          // Lexical's rich text insertion path only reads getData(), so paste snapshots can survive async boundaries.
+          $insertDataTransferForRichText(dataTransfer as DataTransfer, currentSelection, editor);
+        }
+      },
+      { discrete: true },
+    );
+  });
 }

@@ -3,13 +3,13 @@ import { $getSelection, type LexicalEditor } from "lexical";
 
 import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../core/types";
 import { normalizeExternalMarkdown } from "../markdown/external-markdown";
-import { rewriteClipboardAssetUrls } from "./clipboard-assets";
+import { rewriteClipboardAssetsForExternalFormats } from "./clipboard-assets";
 import {
   exportClipboardSnapshotFromDocument,
   exportClipboardSnapshotFromSelection,
   type ClipboardExportSnapshot,
 } from "./clipboard-export";
-import { exportClipboardNodesToMarkdown, rewriteClipboardHtmlAssetUrls } from "./clipboard-formats";
+import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./clipboard-formats";
 
 type ResolveAssets = BlockEditorRuntime["assets"]["resolve"];
 type ResolveAssetResult = Awaited<ReturnType<ResolveAssets>>;
@@ -23,7 +23,9 @@ async function resolveClipboardAssetUrls(
   resolveAssets: ResolveAssets,
 ): Promise<Map<string, string>> {
   const resolvedAssets: ResolveAssetResult =
-    assetUrls.length > 0 ? await resolveAssets({ assetUrls }) : { assets: [] };
+    assetUrls.length > 0
+      ? await resolveAssets({ assetUrls }).catch(() => ({ assets: [] }))
+      : { assets: [] };
   return createAssetUrlMap(resolvedAssets);
 }
 
@@ -33,21 +35,18 @@ async function createClipboardDataFromSnapshot(
 ): Promise<BlockEditorClipboardWriteData> {
   const assetUrlMap = await resolveClipboardAssetUrls(snapshot.assetUrls, resolveAssets);
   const imageFileUrl = snapshot.imageAssetUrl ? assetUrlMap.get(snapshot.imageAssetUrl) : undefined;
-  const externalNodes = rewriteClipboardAssetUrls(snapshot.nodes, assetUrlMap);
-  // Keep file:// URLs out of the DOM export path. Chromium attempts to load local
-  // resources when an img element receives a file URL, even if the element only
-  // exists for clipboard serialization, so rewrite the final HTML string instead.
-  const html =
-    assetUrlMap.size > 0
-      ? rewriteClipboardHtmlAssetUrls(snapshot.html, assetUrlMap)
-      : snapshot.html;
+  const externalNodes =
+    snapshot.assetUrls.length > 0
+      ? rewriteClipboardAssetsForExternalFormats(snapshot.nodes, assetUrlMap)
+      : snapshot.nodes;
 
   return {
-    html,
+    html: snapshot.assetUrls.length > 0 ? exportClipboardNodesToHtml(externalNodes) : snapshot.html,
     ...(imageFileUrl ? { imageFileUrl } : {}),
-    nodes: snapshot.nodes,
     text: normalizeExternalMarkdown(
-      assetUrlMap.size > 0 ? exportClipboardNodesToMarkdown(externalNodes) : snapshot.markdown,
+      snapshot.assetUrls.length > 0
+        ? exportClipboardNodesToMarkdown(externalNodes)
+        : snapshot.markdown,
     ),
   };
 }

@@ -82,10 +82,6 @@ function createEditorStateFromClipboardNodes(
   };
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 export function exportClipboardNodesToMarkdown(nodes: ClipboardSerializedNode[]): string {
   const editor = createHeadlessMarkdownEditor();
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
@@ -97,21 +93,4 @@ export function exportClipboardNodesToHtml(nodes: ClipboardSerializedNode[]): st
   const editorState = editor.parseEditorState(createEditorStateFromClipboardNodes(nodes));
   const hast = toHast(exportLexicalToMdast(editorState), { allowDangerousHtml: false });
   return hast ? toHtml(hast, { allowDangerousHtml: false }) : "";
-}
-
-export function rewriteClipboardHtmlAssetUrls(
-  html: string,
-  assetUrlMap: Map<string, string>,
-): string {
-  let nextHtml = html;
-
-  for (const [assetUrl, fileUrl] of assetUrlMap) {
-    const assetUrlPattern = escapeRegExp(assetUrl);
-    nextHtml = nextHtml.replaceAll(
-      new RegExp(`(<img\\b[^>]*\\bsrc=)(["'])${assetUrlPattern}\\2`, "gi"),
-      (_match, prefix: string, quote: string) => `${prefix}${quote}${fileUrl}${quote}`,
-    );
-  }
-
-  return nextHtml;
 }

@@ -1,36 +1,161 @@
-import {
-  collectImageAssetUrls,
-  rewriteClipboardImageAssetUrls,
-} from "@shared/features/block-editor/asset-urls";
-import type {
-  BlockEditorClipboardPayload,
-  ClipboardSerializedNode,
-} from "@shared/features/block-editor/clipboard";
+import { withDOM } from "@lexical/headless/dom";
+import { collectImageAssetUrls, getImageAssetUrl } from "@shared/features/block-editor/asset-urls";
+import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
+import type { Image, Root } from "mdast";
 
 import type { BlockEditorRuntime } from "../core/types";
+import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
 
-type CopyAssets = BlockEditorRuntime["assets"]["copy"];
-type CopyAssetResult = Awaited<ReturnType<CopyAssets>>;
+export const UNAVAILABLE_IMAGE_URL = "Unavailable";
 
-function createAssetUrlMap(result: CopyAssetResult): Map<string, string> {
-  return new Map(result.assets.map((asset) => [asset.sourceAssetUrl, asset.assetUrl]));
-}
+type ImportFileAssets = BlockEditorRuntime["assets"]["importFiles"];
 
 export const collectClipboardAssetUrls = collectImageAssetUrls;
-export const rewriteClipboardAssetUrls = rewriteClipboardImageAssetUrls;
 
-export async function createNodesForTargetBlock(
-  payload: BlockEditorClipboardPayload,
-  copyAssets: CopyAssets,
-): Promise<ClipboardSerializedNode[]> {
-  const sourceAssetUrls = collectClipboardAssetUrls(payload.nodes);
-  if (sourceAssetUrls.length === 0) {
-    return [...payload.nodes];
+function isFileUrl(value: string): boolean {
+  return value.startsWith("file://");
+}
+
+function toUniqueValues(values: ReadonlyArray<string>): string[] {
+  return Array.from(new Set(values));
+}
+
+function unavailableImageNode(node: ClipboardSerializedNode): ClipboardSerializedNode {
+  return {
+    ...node,
+    alt: "",
+    src: UNAVAILABLE_IMAGE_URL,
+    title: null,
+  };
+}
+
+export function rewriteClipboardAssetsForExternalFormats(
+  nodes: ReadonlyArray<ClipboardSerializedNode>,
+  assetUrlMap: Map<string, string>,
+): ClipboardSerializedNode[] {
+  return nodes.map((node) => {
+    const assetUrl = getImageAssetUrl(node);
+    const nextNode =
+      assetUrl && !assetUrlMap.has(assetUrl)
+        ? unavailableImageNode(node)
+        : {
+            ...node,
+            ...(assetUrl ? { src: assetUrlMap.get(assetUrl) } : {}),
+          };
+
+    if (node.children) {
+      nextNode.children = rewriteClipboardAssetsForExternalFormats(node.children, assetUrlMap);
+    }
+
+    return nextNode;
+  });
+}
+
+async function importFileImageUrls(
+  fileUrls: ReadonlyArray<string>,
+  importFiles: ImportFileAssets,
+): Promise<Map<string, string>> {
+  const uniqueFileUrls = toUniqueValues(fileUrls.filter(isFileUrl));
+  if (uniqueFileUrls.length === 0) {
+    return new Map();
   }
 
-  const copiedAssets = await copyAssets({
-    assetUrls: sourceAssetUrls,
-    sourceBlockId: payload.sourceBlockId,
+  const result = await importFiles({
+    files: uniqueFileUrls.map((fileUrl) => ({ fileUrl })),
+  }).catch(() => ({ assets: [] }));
+  return new Map(
+    result.assets.flatMap((asset) =>
+      asset.assetUrl ? [[asset.fileUrl, asset.assetUrl] as const] : [],
+    ),
+  );
+}
+
+function getHtmlImageFileUrls(html: string): string[] {
+  return withDOM(() => {
+    const document = globalThis.document.implementation.createHTMLDocument("");
+    document.body.innerHTML = html;
+    return Array.from(document.body.querySelectorAll("img"))
+      .map((image) => image.getAttribute("src") ?? "")
+      .filter(isFileUrl);
   });
-  return rewriteClipboardAssetUrls(payload.nodes, createAssetUrlMap(copiedAssets));
+}
+
+export async function rewriteHtmlFileImageSources(
+  html: string,
+  importFiles: ImportFileAssets,
+): Promise<string> {
+  const fileUrls = getHtmlImageFileUrls(html);
+  if (fileUrls.length === 0) {
+    return html;
+  }
+
+  const assetUrlMap = await importFileImageUrls(fileUrls, importFiles);
+  return withDOM(() => {
+    const document = globalThis.document.implementation.createHTMLDocument("");
+    document.body.innerHTML = html;
+
+    for (const image of Array.from(document.body.querySelectorAll("img"))) {
+      const src = image.getAttribute("src") ?? "";
+      if (!isFileUrl(src)) {
+        continue;
+      }
+
+      const assetUrl = assetUrlMap.get(src);
+      image.setAttribute("src", assetUrl ?? UNAVAILABLE_IMAGE_URL);
+      if (!assetUrl) {
+        image.setAttribute("alt", "");
+        image.removeAttribute("title");
+      }
+    }
+
+    return document.body.innerHTML;
+  });
+}
+
+function visitMarkdownImages(node: Root | Image, visitor: (image: Image) => void): void {
+  if (node.type === "image") {
+    visitor(node);
+    return;
+  }
+
+  if ("children" in node) {
+    node.children.forEach((child) => {
+      if (child.type === "image" || "children" in child) {
+        visitMarkdownImages(child as Root | Image, visitor);
+      }
+    });
+  }
+}
+
+export async function rewriteMarkdownFileImageSources(
+  markdown: string,
+  importFiles: ImportFileAssets,
+): Promise<string> {
+  const mdast = parseMarkdownToMdast(markdown);
+  const fileUrls: string[] = [];
+  visitMarkdownImages(mdast, (image) => {
+    if (isFileUrl(image.url)) {
+      fileUrls.push(image.url);
+    }
+  });
+
+  if (fileUrls.length === 0) {
+    return markdown;
+  }
+
+  const assetUrlMap = await importFileImageUrls(fileUrls, importFiles);
+  visitMarkdownImages(mdast, (image) => {
+    if (!isFileUrl(image.url)) {
+      return;
+    }
+
+    const assetUrl = assetUrlMap.get(image.url);
+    image.url = assetUrl ?? UNAVAILABLE_IMAGE_URL;
+    if (!assetUrl) {
+      image.alt = "";
+      image.title = null;
+    }
+  });
+
+  return stringifyMdastToMarkdown(mdast);
 }

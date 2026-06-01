@@ -80,6 +80,12 @@ export function BlockEditorPlaygroundPanel() {
             assetUrl: `data:${asset.mimeType};base64,${asset.dataBase64}`,
           })),
         }),
+        importFiles: async ({ files }) => ({
+          assets: files.map((file) => ({
+            assetUrl: file.fileUrl,
+            fileUrl: file.fileUrl,
+          })),
+        }),
         resolve: async ({ assetUrls }) => ({
           assets: assetUrls.map((assetUrl) => ({
             assetUrl,

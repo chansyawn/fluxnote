@@ -22,7 +22,6 @@ describe("clipboard data", () => {
 
     expect(data).toEqual(
       expect.objectContaining({
-        nodes: expect.any(Array),
         text: expect.stringContaining("Hello"),
       }),
     );
@@ -142,17 +141,9 @@ describe("clipboard data", () => {
 
     expect(data?.text).toBe("Alpha \n");
     expect(data?.text).not.toContain("&#x20;");
-    expect(data?.nodes).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          children: expect.arrayContaining([expect.objectContaining({ text: "Alpha " })]),
-          type: "paragraph",
-        }),
-      ]),
-    );
   });
 
-  it("rewrites image assets for external clipboard formats while preserving payload nodes", async () => {
+  it("rewrites image assets for external clipboard formats", async () => {
     const editor = editorFromMarkdown("");
 
     editor.update(
@@ -184,11 +175,21 @@ describe("clipboard data", () => {
     const data = await createClipboardDataFromCurrentSelection(editor, resolveAssets);
 
     expect(data?.imageFileUrl).toBe("file:///tmp/photo.png");
-    expect(data?.nodes[0]?.src).toBe("assets://block/photo.png");
     expect(data?.text).toContain("file:///tmp/photo.png");
     expect(data?.html).toContain("file:///tmp/photo.png");
     expect(resolveAssets).toHaveBeenCalledWith({
       assetUrls: ["assets://block/photo.png"],
     });
+  });
+
+  it("downgrades copied image assets when they cannot be resolved", async () => {
+    const editor = editorFromMarkdown('![Photo](assets://block/missing.png "Caption")');
+    const resolveAssets = vi.fn(async () => ({ assets: [] }));
+
+    const data = await createClipboardDataFromDocument(editor, resolveAssets);
+
+    expect(data?.imageFileUrl).toBeUndefined();
+    expect(data?.text).toContain("![](Unavailable)");
+    expect(data?.html).toContain('<img src="Unavailable" alt="">');
   });
 });

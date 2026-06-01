@@ -23,11 +23,7 @@ import {
   ul,
   li,
 } from "../test-helper/mdast-builders";
-import {
-  exportClipboardNodesToHtml,
-  exportClipboardNodesToMarkdown,
-  rewriteClipboardHtmlAssetUrls,
-} from "./clipboard-formats";
+import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./clipboard-formats";
 
 function textNode(text: string): ClipboardSerializedNode {
   return {
@@ -119,22 +115,5 @@ describe("clipboard formats", () => {
     expect(html).toContain('<th align="left">Name</th>');
     expect(html).toContain('<th align="center">Value</th>');
     expect(html).toContain("<hr>");
-  });
-
-  it("rewrites image src attributes without touching other html", () => {
-    const html = [
-      '<p><img src="assets://block/photo.png" alt="Photo"></p>',
-      "<img src='assets://block/other.png'>",
-      '<a href="assets://block/photo.png">asset link</a>',
-    ].join("");
-
-    const rewrittenHtml = rewriteClipboardHtmlAssetUrls(
-      html,
-      new Map([["assets://block/photo.png", "file:///tmp/photo.png"]]),
-    );
-
-    expect(rewrittenHtml).toContain('<img src="file:///tmp/photo.png" alt="Photo">');
-    expect(rewrittenHtml).toContain("<img src='assets://block/other.png'>");
-    expect(rewrittenHtml).toContain('<a href="assets://block/photo.png">asset link</a>');
   });
 });

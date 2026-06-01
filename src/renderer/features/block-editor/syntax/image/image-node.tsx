@@ -37,13 +37,13 @@ function ImageView({ alt, src, title }: ImageViewProps): JSX.Element {
 }
 
 function convertImageElement(element: HTMLElement): DOMConversionOutput | null {
-  if (!(element instanceof HTMLImageElement)) {
+  if (element.tagName.toLowerCase() !== "img") {
     return null;
   }
 
   return {
     node: $createImageNode({
-      alt: element.alt,
+      alt: element.getAttribute("alt") ?? "",
       src: element.getAttribute("src") ?? "",
       title: element.getAttribute("title"),
     }),

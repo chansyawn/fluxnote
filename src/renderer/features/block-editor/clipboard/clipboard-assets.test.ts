@@ -1,63 +1,113 @@
-import type { BlockEditorClipboardPayload } from "@shared/features/block-editor/clipboard";
+import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { createNodesForTargetBlock } from "./clipboard-assets";
+import {
+  rewriteClipboardAssetsForExternalFormats,
+  rewriteHtmlFileImageSources,
+  rewriteMarkdownFileImageSources,
+} from "./clipboard-assets";
 
 describe("clipboard assets", () => {
-  it("returns copied nodes without invoking asset copy when there are no asset urls", async () => {
-    const payload: BlockEditorClipboardPayload = {
-      nodes: [{ text: "Text", type: "text", version: 1 }],
-      sourceBlockId: "source-block",
-    };
-    const copyAssets = vi.fn(async () => ({ assets: [] }));
+  it("rewrites copied image assets for external formats", () => {
+    const nodes: ClipboardSerializedNode[] = [
+      {
+        children: [
+          {
+            alt: "Photo",
+            src: "assets://source/photo.png",
+            title: null,
+            type: "image",
+            version: 1,
+          },
+        ],
+        type: "paragraph",
+        version: 1,
+      },
+    ];
 
-    const nodes = await createNodesForTargetBlock(payload, copyAssets);
+    const rewritten = rewriteClipboardAssetsForExternalFormats(
+      nodes,
+      new Map([["assets://source/photo.png", "file:///tmp/photo.png"]]),
+    );
 
-    expect(nodes).toEqual(payload.nodes);
-    expect(nodes).not.toBe(payload.nodes);
-    expect(copyAssets).not.toHaveBeenCalled();
+    expect(rewritten[0]?.children?.[0]?.src).toBe("file:///tmp/photo.png");
+    expect(nodes[0]?.children?.[0]?.src).toBe("assets://source/photo.png");
   });
 
-  it("copies image assets into the target block and rewrites node urls", async () => {
-    const payload: BlockEditorClipboardPayload = {
-      nodes: [
-        {
-          children: [
-            {
-              alt: "Photo",
-              src: "assets://source/photo.png",
-              title: null,
-              type: "image",
-              version: 1,
-            },
-          ],
-          direction: null,
-          format: "",
-          indent: 0,
-          textFormat: 0,
-          textStyle: "",
-          type: "paragraph",
-          version: 1,
-        },
-      ],
-      sourceBlockId: "source-block",
-    };
-    const copyAssets = vi.fn(async () => ({
+  it("replaces unresolved copied image assets with unavailable placeholders", () => {
+    const nodes: ClipboardSerializedNode[] = [
+      {
+        alt: "Photo",
+        src: "assets://source/missing.png",
+        title: "Caption",
+        type: "image",
+        version: 1,
+      },
+    ];
+
+    const rewritten = rewriteClipboardAssetsForExternalFormats(nodes, new Map());
+
+    expect(rewritten[0]).toEqual(
+      expect.objectContaining({
+        alt: "",
+        src: "Unavailable",
+        title: null,
+      }),
+    );
+  });
+
+  it("imports html file image sources without changing ordinary file links", async () => {
+    const importFiles = vi.fn(async () => ({
       assets: [
         {
-          assetUrl: "assets://target/photo.png",
-          sourceAssetUrl: "assets://source/photo.png",
+          altText: "photo.png",
+          assetUrl: "assets://imported/photo.png",
+          fileUrl: "file:///tmp/photo.png",
         },
       ],
     }));
 
-    const nodes = await createNodesForTargetBlock(payload, copyAssets);
+    const html = [
+      '<p><img src="file:///tmp/photo.png" alt="Photo"></p>',
+      '<p><img src="file:///tmp/missing.png" alt="Missing" title="Old"></p>',
+      '<a href="file:///tmp/document.pdf">Local</a>',
+    ].join("");
 
-    expect(copyAssets).toHaveBeenCalledWith({
-      assetUrls: ["assets://source/photo.png"],
-      sourceBlockId: "source-block",
+    const rewritten = await rewriteHtmlFileImageSources(html, importFiles);
+
+    expect(importFiles).toHaveBeenCalledWith({
+      files: [{ fileUrl: "file:///tmp/photo.png" }, { fileUrl: "file:///tmp/missing.png" }],
     });
-    expect(nodes[0]?.children?.[0]?.src).toBe("assets://target/photo.png");
-    expect(payload.nodes[0]?.children?.[0]?.src).toBe("assets://source/photo.png");
+    expect(rewritten).toContain('<img src="assets://imported/photo.png" alt="Photo">');
+    expect(rewritten).toContain('<img src="Unavailable" alt="">');
+    expect(rewritten).toContain('<a href="file:///tmp/document.pdf">Local</a>');
+  });
+
+  it("imports markdown file image destinations and downgrades failures", async () => {
+    const importFiles = vi.fn(async () => ({
+      assets: [
+        {
+          altText: "photo.png",
+          assetUrl: "assets://imported/photo.png",
+          fileUrl: "file:///tmp/photo.png",
+        },
+        {
+          error: "IMPORT_FAILED",
+          fileUrl: "file:///tmp/missing.png",
+        },
+      ],
+    }));
+
+    const markdown = [
+      "![Photo](file:///tmp/photo.png)",
+      '![Missing](file:///tmp/missing.png "Old")',
+      "[Local](file:///tmp/document.pdf)",
+    ].join("\n\n");
+
+    const rewritten = await rewriteMarkdownFileImageSources(markdown, importFiles);
+
+    expect(rewritten).toContain("![Photo](assets://imported/photo.png)");
+    expect(rewritten).toContain("![](Unavailable)");
+    expect(rewritten).toContain("[Local](file:///tmp/document.pdf)");
   });
 });
