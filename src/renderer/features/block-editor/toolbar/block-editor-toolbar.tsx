@@ -147,6 +147,7 @@ export function BlockEditorToolbar({
         "mx-auto flex w-fit items-center rounded-lg border border-muted bg-popover p-1 shadow-xs",
         className,
       )}
+      onMouseDown={preventToolbarMouseDown}
     >
       <ButtonGroup aria-label={i18n._({ id: "block-editor.toolbar.label", message: "Editor" })}>
         <DropdownMenu>
@@ -159,7 +160,6 @@ export function BlockEditorToolbar({
                 size="sm"
                 type="button"
                 variant="ghost"
-                onMouseDown={preventToolbarMouseDown}
               >
                 <TextStyleIcon data-icon="inline-start" />
                 <ChevronDownIcon data-icon="inline-end" />
@@ -207,7 +207,6 @@ export function BlockEditorToolbar({
                 size="sm"
                 type="button"
                 variant="ghost"
-                onMouseDown={preventToolbarMouseDown}
               >
                 <ListIcon data-icon="inline-start" />
                 <ChevronDownIcon data-icon="inline-end" />
@@ -260,7 +259,6 @@ export function BlockEditorToolbar({
                     onClick={() => {
                       formatBlock(format);
                     }}
-                    onMouseDown={preventToolbarMouseDown}
                   >
                     <Icon data-icon="inline-start" />
                   </Button>
@@ -295,7 +293,6 @@ export function BlockEditorToolbar({
                     onClick={() => {
                       formatInline(format);
                     }}
-                    onMouseDown={preventToolbarMouseDown}
                   >
                     <Icon data-icon="inline-start" />
                   </Button>

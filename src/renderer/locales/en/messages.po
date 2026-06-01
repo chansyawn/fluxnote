@@ -266,7 +266,7 @@ msgid "block-editor.toolbar.italic"
 msgstr "Italic"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:151
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:152
 msgid "block-editor.toolbar.label"
 msgstr "Editor"
 

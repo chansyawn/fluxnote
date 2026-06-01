@@ -183,4 +183,24 @@ describe("BlockEditorToolbar", () => {
     expect(screen.getByRole("button", { name: "Quote" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Bold" })).toBeEnabled();
   });
+
+  it("prevents disabled toolbar clicks from focusing the editor underneath", () => {
+    const { controller } = createToolbarController({
+      ...DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
+      blockFormattingDisabled: true,
+    });
+
+    renderWithProviders(<BlockEditorToolbar controller={controller} />);
+
+    const toolbar = screen.getByRole("group", { name: "Editor" }).parentElement;
+    expect(toolbar).not.toBeNull();
+
+    const event = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
+    const wasNotCanceled = toolbar?.dispatchEvent(event);
+
+    expect(wasNotCanceled).toBe(false);
+    expect(event.defaultPrevented).toBe(true);
+    expect(controller.formatBlock).not.toHaveBeenCalled();
+    expect(controller.focus).not.toHaveBeenCalled();
+  });
 });
