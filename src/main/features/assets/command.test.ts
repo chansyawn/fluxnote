@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 const mocks = vi.hoisted(() => ({
   copyAsset: vi.fn(),
   createAsset: vi.fn(),
+  importFileAssets: vi.fn(),
   resolveAsset: vi.fn(),
 }));
 
@@ -31,6 +32,9 @@ describe("assets command", () => {
     mocks.copyAsset.mockResolvedValue({
       assets: [{ assetUrl: "assets://c/d.png", sourceAssetUrl: "assets://b1/a.png" }],
     });
+    mocks.importFileAssets.mockResolvedValue({
+      assets: [{ assetUrl: "assets://b1/local.png", fileUrl: "file:///tmp/local.png" }],
+    });
     mocks.resolveAsset.mockResolvedValue({
       assets: [{ assetUrl: "assets://b1/a.png", fileUrl: "file:///tmp/b1/a.png" }],
     });
@@ -45,9 +49,14 @@ describe("assets command", () => {
     const resolveResult = await handlers.get("assets.resolve")?.({
       assetUrls: ["assets://b1/a.png"],
     });
+    const importResult = await handlers.get("assets.importFiles")?.({
+      blockId: "b1",
+      files: [{ fileUrl: "file:///tmp/local.png" }],
+    });
 
     expect(mocks.createAsset).toHaveBeenCalled();
     expect(mocks.copyAsset).toHaveBeenCalled();
+    expect(mocks.importFileAssets).toHaveBeenCalled();
     expect(mocks.resolveAsset).toHaveBeenCalled();
     expect(createResult).toEqual({ assets: [{ assetUrl: "assets://a/b.png" }] });
     expect(copyResult).toEqual({
@@ -55,6 +64,9 @@ describe("assets command", () => {
     });
     expect(resolveResult).toEqual({
       assets: [{ assetUrl: "assets://b1/a.png", fileUrl: "file:///tmp/b1/a.png" }],
+    });
+    expect(importResult).toEqual({
+      assets: [{ assetUrl: "assets://b1/local.png", fileUrl: "file:///tmp/local.png" }],
     });
   });
 });

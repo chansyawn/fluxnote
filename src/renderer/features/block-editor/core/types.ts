@@ -1,4 +1,3 @@
-import type { ClipboardSerializedNode } from "@shared/features/block-editor/clipboard";
 import type { Ref } from "react";
 
 import type {
@@ -36,6 +35,21 @@ export interface BlockEditorCopyAssetResult {
   }>;
 }
 
+export interface BlockEditorImportFileAssetsRequest {
+  files: Array<{
+    fileUrl: string;
+  }>;
+}
+
+export interface BlockEditorImportFileAssetsResult {
+  assets: Array<{
+    altText?: string;
+    assetUrl?: string;
+    error?: string;
+    fileUrl: string;
+  }>;
+}
+
 export interface BlockEditorResolveAssetRequest {
   assetUrls: string[];
 }
@@ -50,7 +64,6 @@ export interface BlockEditorResolveAssetResult {
 export interface BlockEditorClipboardWriteData {
   html: string;
   imageFileUrl?: string;
-  nodes: ClipboardSerializedNode[];
   text: string;
 }
 
@@ -58,6 +71,9 @@ export interface BlockEditorRuntime {
   assets: {
     copy: (request: BlockEditorCopyAssetRequest) => Promise<BlockEditorCopyAssetResult>;
     create: (request: BlockEditorCreateAssetRequest) => Promise<BlockEditorCreateAssetResult>;
+    importFiles: (
+      request: BlockEditorImportFileAssetsRequest,
+    ) => Promise<BlockEditorImportFileAssetsResult>;
     resolve: (request: BlockEditorResolveAssetRequest) => Promise<BlockEditorResolveAssetResult>;
   };
   clipboard: {

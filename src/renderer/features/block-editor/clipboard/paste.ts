@@ -1,23 +1,16 @@
-import {
-  decodeBlockEditorClipboardHtml,
-  stripBlockEditorClipboardHtmlMetadata,
-} from "@shared/features/block-editor/clipboard";
 import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
 import { insertImageFilesAtSelection } from "../assets/image-insert";
 import type { BlockEditorRuntime } from "../core/types";
-import {
-  insertClipboardPayloadAtSelection,
-  insertRichTextDataAtSelection,
-} from "./clipboard-insert";
+import { rewriteHtmlFileImageSources, rewriteMarkdownFileImageSources } from "./asset-rewrites";
 import { insertMarkdownAtSelection } from "./markdown-paste";
+import { insertRichTextDataAtSelection } from "./rich-text-paste";
 
 interface ClipboardDataSnapshot {
   files: File[];
   html: string;
   plainText: string;
-  rawHtml: string;
   getData(type: string): string;
 }
 
@@ -29,21 +22,16 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
   const dataByType = new Map<string, string>();
   for (const type of Array.from(dataTransfer.types)) {
     const value = dataTransfer.getData(type);
-    dataByType.set(
-      type,
-      type === "text/html" ? stripBlockEditorClipboardHtmlMetadata(value) : value,
-    );
+    dataByType.set(type, value);
   }
 
   const html = dataByType.get("text/html") ?? "";
   const plainText = dataByType.get("text/plain") ?? "";
-  const rawHtml = dataTransfer.getData("text/html");
 
   return {
     files: getSupportedImageFiles(dataTransfer),
     html,
     plainText,
-    rawHtml,
     getData: (type: string) => dataByType.get(type) ?? "",
   };
 }
@@ -51,6 +39,39 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
 function claimPaste(event: PasteCommandType): void {
   event.preventDefault();
   event.stopPropagation();
+}
+
+async function insertHtmlClipboardDataAtSelection(
+  editor: LexicalEditor,
+  runtime: BlockEditorRuntime,
+  clipboardData: ClipboardDataSnapshot,
+  selection: BaseSelection | null,
+): Promise<void> {
+  const html = await rewriteHtmlFileImageSources(clipboardData.html, runtime.assets.importFiles);
+
+  insertRichTextDataAtSelection(
+    editor,
+    {
+      getData: (type: string) => {
+        if (type === "text/html") {
+          return html;
+        }
+
+        return clipboardData.getData(type);
+      },
+    },
+    selection,
+  );
+}
+
+async function insertPlainTextClipboardDataAtSelection(
+  editor: LexicalEditor,
+  runtime: BlockEditorRuntime,
+  plainText: string,
+  selection: BaseSelection | null,
+): Promise<void> {
+  const markdown = await rewriteMarkdownFileImageSources(plainText, runtime.assets.importFiles);
+  insertMarkdownAtSelection(editor, markdown, selection);
 }
 
 export function handleBlockEditorPaste(
@@ -71,16 +92,20 @@ export function handleBlockEditorPaste(
     return true;
   }
 
-  const eventPayload = decodeBlockEditorClipboardHtml(clipboardDataSnapshot.rawHtml);
-  if (eventPayload) {
+  if (clipboardDataSnapshot.html) {
     claimPaste(event);
-    void insertClipboardPayloadAtSelection(editor, runtime, eventPayload, selection);
+    void insertHtmlClipboardDataAtSelection(editor, runtime, clipboardDataSnapshot, selection);
     return true;
   }
 
   claimPaste(event);
   if (clipboardDataSnapshot.plainText) {
-    insertMarkdownAtSelection(editor, clipboardDataSnapshot.plainText, selection);
+    void insertPlainTextClipboardDataAtSelection(
+      editor,
+      runtime,
+      clipboardDataSnapshot.plainText,
+      selection,
+    );
     return true;
   }
 

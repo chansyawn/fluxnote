@@ -3,7 +3,7 @@ import { COMMAND_PRIORITY_HIGH, DRAGOVER_COMMAND, DROP_COMMAND, type LexicalEdit
 
 import { getSupportedImageFiles, hasSupportedImageData } from "../../assets/image-files";
 import { insertImageFilesAtSelection } from "../../assets/image-insert";
-import { cloneCurrentSelection } from "../../clipboard/clipboard-insert";
+import { cloneCurrentSelection } from "../../clipboard/rich-text-paste";
 import type { BlockEditorRuntime } from "../../core/types";
 
 export function registerImageInsertCommands(

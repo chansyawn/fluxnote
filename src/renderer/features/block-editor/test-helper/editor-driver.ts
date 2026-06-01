@@ -10,6 +10,7 @@ import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/mar
 import type {
   BlockEditorCreateAssetRequest,
   BlockEditorCopyAssetRequest,
+  BlockEditorImportFileAssetsRequest,
   BlockEditorResolveAssetRequest,
   BlockEditorRuntime,
 } from "../core/types";
@@ -64,6 +65,13 @@ export function createBlockEditorRuntime(
         assets: assets.map((asset, index) => ({
           altText: asset.fileName ?? `image-${index + 1}`,
           assetUrl: `assets://created/${asset.fileName ?? `image-${index + 1}`}`,
+        })),
+      })),
+      importFiles: vi.fn(async ({ files }: BlockEditorImportFileAssetsRequest) => ({
+        assets: files.map((file, index) => ({
+          altText: file.fileUrl.split("/").at(-1) ?? `image-${index + 1}`,
+          assetUrl: `assets://imported/${file.fileUrl.split("/").at(-1) ?? `image-${index + 1}`}`,
+          fileUrl: file.fileUrl,
         })),
       })),
       resolve: vi.fn(async ({ assetUrls }: BlockEditorResolveAssetRequest) => ({

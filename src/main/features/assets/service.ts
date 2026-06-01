@@ -1,5 +1,5 @@
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
@@ -39,6 +39,13 @@ export interface CopyAssetInput {
   targetBlockId: string;
 }
 
+export interface ImportFileAssetsInput {
+  blockId: string;
+  files: Array<{
+    fileUrl: string;
+  }>;
+}
+
 export interface ResolveAssetInput {
   assetUrls: string[];
 }
@@ -56,6 +63,22 @@ interface MarkdownImageReplacement {
 
 const MARKDOWN_PARSER = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
 const MARKDOWN_IMAGE_DESTINATION_PREFIX_PATTERN = /]\(\s*<?$/;
+
+function getSupportedImageMimeTypeFromPath(filePath: string): string | null {
+  switch (path.extname(filePath).toLowerCase()) {
+    case ".gif":
+      return "image/gif";
+    case ".jpeg":
+    case ".jpg":
+      return "image/jpeg";
+    case ".png":
+      return "image/png";
+    case ".webp":
+      return "image/webp";
+    default:
+      return null;
+  }
+}
 
 function createUniqueAssetFileName(fileNameCandidate: string | null, mimeType: string): string {
   const uniquePrefix = `${Date.now()}-${crypto.randomUUID()}`;
@@ -178,6 +201,46 @@ export async function createAsset(
   return {
     assets,
   };
+}
+
+export async function importFileAssets(
+  deps: AssetServiceOptions,
+  db: AppDatabase,
+  input: ImportFileAssetsInput,
+) {
+  const storage = deps.storage ?? nodeAssetStorage;
+  await assertBlockExists(db, input.blockId);
+
+  const assets = [];
+  for (const file of input.files) {
+    try {
+      const sourcePath = fileURLToPath(file.fileUrl);
+      const mimeType = getSupportedImageMimeTypeFromPath(sourcePath);
+      if (!mimeType) {
+        assets.push({
+          error: "UNSUPPORTED_IMAGE_TYPE",
+          fileUrl: file.fileUrl,
+        });
+        continue;
+      }
+
+      const fileName = createUniqueAssetFileName(path.basename(sourcePath), mimeType);
+      const targetPath = path.join(deps.paths.assetPathForBlock(input.blockId), fileName);
+      await storage.copyFile(sourcePath, targetPath);
+      assets.push({
+        altText: path.basename(sourcePath),
+        assetUrl: `${assetUrlScheme}${input.blockId}/${fileName}`,
+        fileUrl: file.fileUrl,
+      });
+    } catch {
+      assets.push({
+        error: "IMPORT_FAILED",
+        fileUrl: file.fileUrl,
+      });
+    }
+  }
+
+  return { assets };
 }
 
 export async function copyAsset(deps: AssetServiceOptions, db: AppDatabase, input: CopyAssetInput) {

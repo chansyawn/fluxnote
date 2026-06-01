@@ -37,6 +37,26 @@ export const assetsContract = {
         ),
       }),
     },
+    "assets.importFiles": {
+      input: z.object({
+        blockId: z.string().min(1),
+        files: z.array(
+          z.object({
+            fileUrl: z.string().min(1),
+          }),
+        ),
+      }),
+      output: z.object({
+        assets: z.array(
+          z.object({
+            fileUrl: z.string(),
+            assetUrl: z.string().optional(),
+            altText: z.string().optional(),
+            error: z.string().optional(),
+          }),
+        ),
+      }),
+    },
     "assets.resolve": {
       input: z.object({
         assetUrls: z.array(z.string().min(1)),

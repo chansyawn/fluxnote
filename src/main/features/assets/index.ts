@@ -1,2 +1,2 @@
 export { registerAssetsCommands } from "./command";
-export { copyAsset, createAsset } from "./service";
+export { copyAsset, createAsset, importFileAssets } from "./service";

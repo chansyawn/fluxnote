@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockRecord } from "../blocks/service";
 import { createTestDb } from "../test-db";
-import { copyAsset, createAsset, externalizeMarkdownAssetUrls, resolveAsset } from "./service";
+import {
+  copyAsset,
+  createAsset,
+  externalizeMarkdownAssetUrls,
+  importFileAssets,
+  resolveAsset,
+} from "./service";
 
 describe("assets service", () => {
   const paths = {
@@ -149,6 +155,112 @@ describe("assets service", () => {
           },
         ),
       ).rejects.toMatchObject({ code: "BUSINESS.INVALID_OPERATION" });
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("imports supported file image urls into the target block assets", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const copyFile = vi.fn(async () => undefined);
+
+      const result = await importFileAssets(
+        {
+          paths,
+          storage: { copyFile, writeFile: vi.fn() },
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          files: [{ fileUrl: "file:///Users/me/Pictures/Photo.PNG" }],
+        },
+      );
+
+      expect(result.assets).toEqual([
+        expect.objectContaining({
+          altText: "Photo.PNG",
+          assetUrl: expect.stringContaining(`assets://${block.id}/`),
+          fileUrl: "file:///Users/me/Pictures/Photo.PNG",
+        }),
+      ]);
+      expect(result.assets[0]?.assetUrl).toContain("Photo.PNG");
+      expect(copyFile).toHaveBeenCalledWith(
+        "/Users/me/Pictures/Photo.PNG",
+        expect.stringContaining(`/tmp/${block.id}/`),
+      );
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("returns per-file errors for unsupported file image imports", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const copyFile = vi.fn(async () => undefined);
+
+      const result = await importFileAssets(
+        {
+          paths,
+          storage: { copyFile, writeFile: vi.fn() },
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          files: [{ fileUrl: "file:///tmp/document.pdf" }],
+        },
+      );
+
+      expect(result.assets).toEqual([
+        {
+          error: "UNSUPPORTED_IMAGE_TYPE",
+          fileUrl: "file:///tmp/document.pdf",
+        },
+      ]);
+      expect(copyFile).not.toHaveBeenCalled();
+    } finally {
+      ctx.close();
+      await ctx.cleanup();
+    }
+  });
+
+  it("keeps importing later file images when one copy fails", async () => {
+    const ctx = await createTestDb();
+    try {
+      const block = await createBlockRecord(ctx.db, "content");
+      const copyFile = vi
+        .fn()
+        .mockRejectedValueOnce(new Error("missing"))
+        .mockResolvedValueOnce(undefined);
+
+      const result = await importFileAssets(
+        {
+          paths,
+          storage: { copyFile, writeFile: vi.fn() },
+        },
+        ctx.db,
+        {
+          blockId: block.id,
+          files: [{ fileUrl: "file:///tmp/missing.png" }, { fileUrl: "file:///tmp/ok.webp" }],
+        },
+      );
+
+      expect(result.assets).toEqual([
+        {
+          error: "IMPORT_FAILED",
+          fileUrl: "file:///tmp/missing.png",
+        },
+        expect.objectContaining({
+          altText: "ok.webp",
+          assetUrl: expect.stringContaining(`assets://${block.id}/`),
+          fileUrl: "file:///tmp/ok.webp",
+        }),
+      ]);
+      expect(copyFile).toHaveBeenCalledTimes(2);
     } finally {
       ctx.close();
       await ctx.cleanup();

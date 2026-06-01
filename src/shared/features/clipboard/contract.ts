@@ -1,7 +1,12 @@
-import { blockEditorClipboardWriteRequestSchema } from "@shared/features/block-editor/clipboard";
 import { z } from "zod";
 
 const voidSchema = z.undefined();
+
+export const blockEditorClipboardWriteRequestSchema = z.object({
+  html: z.string(),
+  imageFileUrl: z.string().optional(),
+  text: z.string(),
+});
 
 export const clipboardContract = {
   commands: {

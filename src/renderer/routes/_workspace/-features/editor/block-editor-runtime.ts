@@ -1,6 +1,7 @@
 import {
   copyAsset,
   createAsset,
+  importFileAssets,
   openExternalUrl,
   resolveAsset,
   writeBlockEditorClipboard,
@@ -13,15 +14,10 @@ import type {
 
 function createClipboardWriteRequest(
   data: BlockEditorClipboardWriteData,
-  blockId: string,
 ): BlockEditorClipboardWriteRequest {
   return {
     html: data.html,
     ...(data.imageFileUrl ? { imageFileUrl: data.imageFileUrl } : {}),
-    payload: {
-      nodes: data.nodes,
-      sourceBlockId: blockId,
-    },
     text: data.text,
   };
 }
@@ -35,12 +31,9 @@ async function writeClipboardText(text: string): Promise<void> {
   throw new Error("Clipboard API is unavailable.");
 }
 
-async function writeClipboardWithFallback(
-  data: BlockEditorClipboardWriteData,
-  blockId: string,
-): Promise<void> {
+async function writeClipboardWithFallback(data: BlockEditorClipboardWriteData): Promise<void> {
   try {
-    await writeBlockEditorClipboard(createClipboardWriteRequest(data, blockId));
+    await writeBlockEditorClipboard(createClipboardWriteRequest(data));
   } catch {
     await writeClipboardText(data.text);
   }
@@ -52,10 +45,11 @@ export function createWorkspaceBlockEditorRuntime(blockId: string): BlockEditorR
       copy: ({ assetUrls, sourceBlockId }) =>
         copyAsset({ assetUrls, sourceBlockId, targetBlockId: blockId }),
       create: ({ assets }) => createAsset({ assets, blockId }),
+      importFiles: ({ files }) => importFileAssets({ blockId, files }),
       resolve: resolveAsset,
     },
     clipboard: {
-      write: (data) => writeClipboardWithFallback(data, blockId),
+      write: writeClipboardWithFallback,
       writeText: writeClipboardText,
     },
     links: {

@@ -2,11 +2,11 @@ import { defineExtension } from "lexical";
 import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 
 import { BlockEditorRuntimeExtension } from "../core/runtime-extension";
-import { createClipboardDataFromCurrentSelection } from "./clipboard-data";
-import { cloneCurrentSelection } from "./clipboard-insert";
-import { handleBlockEditorPaste } from "./clipboard-paste";
+import { createClipboardDataFromCurrentSelection } from "./copy";
+import { handleBlockEditorPaste } from "./paste";
+import { cloneCurrentSelection } from "./rich-text-paste";
 
-export { createClipboardDataSnapshot } from "./clipboard-paste";
+export { createClipboardDataSnapshot } from "./paste";
 
 export const ClipboardExtension = defineExtension({
   name: "fluxnotes/block-editor/clipboard",
