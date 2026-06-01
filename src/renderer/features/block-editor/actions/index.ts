@@ -6,6 +6,7 @@ export {
   getBlockEditorActionDefinition,
   isBlockEditorActionId,
 } from "./action-definitions";
+export { BLOCK_EDITOR_SHORTCUT_ACTION_ORDER } from "./action-order";
 export {
   blockEditorActionStatesEqual,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,
@@ -15,7 +16,6 @@ export { resolveBlockEditorShortcut, type BlockEditorShortcutResolution } from "
 export type {
   BlockEditorActionController,
   BlockEditorActionDefinition,
-  BlockEditorActionGroup,
   BlockEditorActionId,
   BlockEditorActionResult,
   BlockEditorActionState,

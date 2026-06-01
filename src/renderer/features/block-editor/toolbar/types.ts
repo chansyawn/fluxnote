@@ -23,5 +23,3 @@ export const BLOCK_EDITOR_INLINE_FORMATS = [
 export type BlockEditorBlockFormat = (typeof BLOCK_EDITOR_BLOCK_FORMATS)[number];
 export type BlockEditorInlineFormat = (typeof BLOCK_EDITOR_INLINE_FORMATS)[number];
 export type BlockEditorFormat = BlockEditorBlockFormat | BlockEditorInlineFormat;
-
-export type BlockEditorInlineFormatState = Record<BlockEditorInlineFormat, boolean>;

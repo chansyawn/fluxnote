@@ -1,6 +1,9 @@
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { BLOCK_EDITOR_ACTION_DEFINITIONS } from "@renderer/features/block-editor";
+import {
+  getBlockEditorActionDefinition,
+  type BlockEditorActionId,
+} from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   PreferencesGroup,
@@ -115,6 +118,25 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
   },
 ];
 
+const EDITOR_SHORTCUT_ACTION_ORDER = [
+  "editor.paragraph",
+  "editor.heading1",
+  "editor.heading2",
+  "editor.heading3",
+  "editor.heading4",
+  "editor.heading5",
+  "editor.heading6",
+  "editor.blockquote",
+  "editor.bulletList",
+  "editor.orderedList",
+  "editor.taskList",
+  "editor.codeBlock",
+  "editor.bold",
+  "editor.italic",
+  "editor.strikethrough",
+  "editor.inlineCode",
+] as const satisfies readonly BlockEditorActionId[];
+
 export function ShortcutPreferencesSection() {
   const { i18n } = useLingui();
   const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
@@ -135,7 +157,8 @@ export function ShortcutPreferencesSection() {
     {
       id: "editor",
       title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
-      fields: BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => {
+      fields: EDITOR_SHORTCUT_ACTION_ORDER.map((actionId) => {
+        const action = getBlockEditorActionDefinition(actionId);
         const Icon = action.icon;
         return {
           action: action.id,

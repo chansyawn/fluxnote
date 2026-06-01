@@ -18,7 +18,7 @@ function ToolbarMenuItemContent({ icon: Icon, label, shortcut }: ToolbarMenuItem
   return (
     <>
       <Icon />
-      <span className="min-w-0 flex-1">{label}</span>
+      <span className="min-w-0 flex-1 whitespace-nowrap">{label}</span>
       {shortcutTokens.length > 0 ? (
         <KbdGroup className="ms-auto ps-3">
           {shortcutTokens.map((token, index) => (

@@ -1,4 +1,9 @@
-import { FORMAT_TEXT_COMMAND, type TextFormatType } from "lexical";
+import {
+  $getSelection,
+  $isRangeSelection,
+  FORMAT_TEXT_COMMAND,
+  type TextFormatType,
+} from "lexical";
 import {
   BoldIcon,
   BracesIcon,
@@ -18,104 +23,102 @@ import {
   StrikethroughIcon,
 } from "lucide-react";
 
-import { applyBlockFormat, isBlockFormattingDisabledAtSelection } from "../core/block-format";
-import type { BlockEditorBlockFormat, BlockEditorInlineFormat } from "../toolbar/types";
+import {
+  isBlockFormattingDisabledAtSelection,
+  isListFormatActiveAtSelection,
+  isQuoteActiveAtSelection,
+  isTextStyleActiveAtSelection,
+  toggleListFormatAtSelection,
+  toggleQuoteAtSelection,
+  toggleTextStyleAtSelection,
+  type BlockEditorListFormat,
+  type BlockEditorTextStyleFormat,
+} from "../core/block-format";
+import type { BlockEditorInlineFormat } from "../toolbar/types";
 import type {
   BlockEditorActionContext,
   BlockEditorActionDefinition,
-  BlockEditorActionGroup,
   BlockEditorActionId,
   BlockEditorActionResult,
 } from "./types";
 
-const BLOCK_ACTIONS = [
+const TEXT_STYLE_ACTIONS = [
   {
     format: "paragraph",
-    group: "text-style",
     icon: PilcrowIcon,
     id: "editor.paragraph",
     label: { id: "block-editor.toolbar.normal-text", message: "Normal text" },
   },
   {
     format: "heading1",
-    group: "text-style",
     icon: Heading1Icon,
     id: "editor.heading1",
     label: { id: "block-editor.toolbar.heading-1", message: "Heading 1" },
   },
   {
     format: "heading2",
-    group: "text-style",
     icon: Heading2Icon,
     id: "editor.heading2",
     label: { id: "block-editor.toolbar.heading-2", message: "Heading 2" },
   },
   {
     format: "heading3",
-    group: "text-style",
     icon: Heading3Icon,
     id: "editor.heading3",
     label: { id: "block-editor.toolbar.heading-3", message: "Heading 3" },
   },
   {
     format: "heading4",
-    group: "text-style",
     icon: Heading4Icon,
     id: "editor.heading4",
     label: { id: "block-editor.toolbar.heading-4", message: "Heading 4" },
   },
   {
     format: "heading5",
-    group: "text-style",
     icon: Heading5Icon,
     id: "editor.heading5",
     label: { id: "block-editor.toolbar.heading-5", message: "Heading 5" },
   },
   {
     format: "heading6",
-    group: "text-style",
     icon: Heading6Icon,
     id: "editor.heading6",
     label: { id: "block-editor.toolbar.heading-6", message: "Heading 6" },
   },
   {
+    format: "codeBlock",
+    icon: BracesIcon,
+    id: "editor.codeBlock",
+    label: { id: "block-editor.toolbar.code-block", message: "Code block" },
+  },
+] as const satisfies readonly {
+  format: BlockEditorTextStyleFormat;
+  icon: BlockEditorActionDefinition["icon"];
+  id: BlockEditorActionId;
+  label: BlockEditorActionDefinition["label"];
+}[];
+
+const LIST_ACTIONS = [
+  {
     format: "bulletList",
-    group: "list",
     icon: ListIcon,
     id: "editor.bulletList",
     label: { id: "block-editor.toolbar.bullet-list", message: "Bullet list" },
   },
   {
     format: "orderedList",
-    group: "list",
     icon: ListOrderedIcon,
     id: "editor.orderedList",
     label: { id: "block-editor.toolbar.numbered-list", message: "Numbered list" },
   },
   {
     format: "taskList",
-    group: "list",
     icon: CheckSquareIcon,
     id: "editor.taskList",
     label: { id: "block-editor.toolbar.task-list", message: "Task list" },
   },
-  {
-    format: "blockquote",
-    group: "block-button",
-    icon: QuoteIcon,
-    id: "editor.blockquote",
-    label: { id: "block-editor.toolbar.blockquote", message: "Quote" },
-  },
-  {
-    format: "codeBlock",
-    group: "block-button",
-    icon: BracesIcon,
-    id: "editor.codeBlock",
-    label: { id: "block-editor.toolbar.code-block", message: "Code block" },
-  },
 ] as const satisfies readonly {
-  format: BlockEditorBlockFormat;
-  group: BlockEditorActionGroup;
+  format: BlockEditorListFormat;
   icon: BlockEditorActionDefinition["icon"];
   id: BlockEditorActionId;
   label: BlockEditorActionDefinition["label"];
@@ -158,6 +161,16 @@ const INLINE_ACTIONS = [
   lexicalFormat: TextFormatType;
 }[];
 
+const QUOTE_ACTION = {
+  icon: QuoteIcon,
+  id: "editor.blockquote",
+  label: { id: "block-editor.toolbar.blockquote", message: "Quote" },
+} as const satisfies {
+  icon: BlockEditorActionDefinition["icon"];
+  id: BlockEditorActionId;
+  label: BlockEditorActionDefinition["label"];
+};
+
 function disabledActionResult(action: BlockEditorActionId): BlockEditorActionResult {
   return { action, status: "disabled" };
 }
@@ -167,46 +180,96 @@ function executedActionResult(action: BlockEditorActionId): BlockEditorActionRes
 }
 
 function createBlockActionDefinition(
-  action: (typeof BLOCK_ACTIONS)[number],
-): BlockEditorActionDefinition<BlockEditorBlockFormat> {
+  action: Omit<BlockEditorActionDefinition, "execute" | "isDisabled">,
+  execute: () => void,
+): BlockEditorActionDefinition {
   return {
     ...action,
     isDisabled: () => isBlockFormattingDisabledAtSelection(),
-    kind: "block-format",
     execute: ({ editor }) => {
       const disabled = editor.getEditorState().read(() => isBlockFormattingDisabledAtSelection());
       if (disabled) {
         return disabledActionResult(action.id);
       }
 
-      editor.update(() => {
-        applyBlockFormat(action.format);
-      });
+      editor.update(execute, { discrete: true });
       return executedActionResult(action.id);
     },
   };
 }
 
+function createTextStyleActionDefinition(
+  action: (typeof TEXT_STYLE_ACTIONS)[number],
+): BlockEditorActionDefinition {
+  return createBlockActionDefinition(
+    {
+      icon: action.icon,
+      id: action.id,
+      isActive: () => isTextStyleActiveAtSelection(action.format),
+      label: action.label,
+    },
+    () => {
+      toggleTextStyleAtSelection(action.format);
+    },
+  );
+}
+
+function createListActionDefinition(
+  action: (typeof LIST_ACTIONS)[number],
+): BlockEditorActionDefinition {
+  return createBlockActionDefinition(
+    {
+      icon: action.icon,
+      id: action.id,
+      isActive: () => isListFormatActiveAtSelection(action.format),
+      label: action.label,
+    },
+    () => {
+      toggleListFormatAtSelection(action.format);
+    },
+  );
+}
+
+function createQuoteActionDefinition(): BlockEditorActionDefinition {
+  return createBlockActionDefinition(
+    {
+      icon: QUOTE_ACTION.icon,
+      id: QUOTE_ACTION.id,
+      isActive: () => isQuoteActiveAtSelection(),
+      label: QUOTE_ACTION.label,
+    },
+    toggleQuoteAtSelection,
+  );
+}
+
 function createInlineActionDefinition(
   action: (typeof INLINE_ACTIONS)[number],
-): BlockEditorActionDefinition<BlockEditorInlineFormat> {
+): BlockEditorActionDefinition {
   return {
-    format: action.format,
-    group: "inline",
     icon: action.icon,
     id: action.id,
+    isActive: () => {
+      const selection = $getSelection();
+      return $isRangeSelection(selection) && selection.hasFormat(action.lexicalFormat);
+    },
     isDisabled: () => false,
-    kind: "inline-format",
     label: action.label,
     execute: ({ editor }) => {
-      editor.dispatchCommand(FORMAT_TEXT_COMMAND, action.lexicalFormat);
+      editor.update(
+        () => {
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, action.lexicalFormat);
+        },
+        { discrete: true },
+      );
       return executedActionResult(action.id);
     },
   };
 }
 
 export const BLOCK_EDITOR_ACTION_DEFINITIONS = [
-  ...BLOCK_ACTIONS.map(createBlockActionDefinition),
+  ...TEXT_STYLE_ACTIONS.map(createTextStyleActionDefinition),
+  ...LIST_ACTIONS.map(createListActionDefinition),
+  createQuoteActionDefinition(),
   ...INLINE_ACTIONS.map(createInlineActionDefinition),
 ] as const;
 

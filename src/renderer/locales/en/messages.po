@@ -206,12 +206,12 @@ msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:142
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:131
 msgid "block-editor.toolbar.label"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:190
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:179
 msgid "block-editor.toolbar.list"
 msgstr "List"
 
@@ -510,12 +510,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:114
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "Cancel external edit"
 
@@ -526,17 +526,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:76
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "Delete block"
 
@@ -562,32 +562,32 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:137
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:159
 msgid "preferences.shortcuts.group.editor"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:50
 msgid "preferences.shortcuts.group.global"
 msgstr "Global"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:71
 msgid "preferences.shortcuts.group.workspace"
 msgstr "Workspace"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:62
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "Quickly create a new block and bring the window forward for fast capture."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "Quick create block"
 
@@ -608,22 +608,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:107
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:150
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:173
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "Pin/unpin block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:55
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "Toggle window"
 

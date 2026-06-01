@@ -15,26 +15,25 @@ import { ChevronDownIcon } from "lucide-react";
 import { type MouseEvent, type ReactNode, useCallback, useRef, useSyncExternalStore } from "react";
 
 import {
-  BLOCK_EDITOR_ACTION_DEFINITIONS,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  getBlockEditorActionDefinition,
   type BlockEditorActionController,
-  type BlockEditorActionDefinition,
   type BlockEditorActionId,
   type BlockEditorActionState,
   type BlockEditorShortcutConfig,
 } from "../actions";
+import { BLOCK_EDITOR_TOOLBAR_LAYOUT } from "./action-layout";
 import { ToolbarMenuItem, ToolbarRadioMenuItem } from "./toolbar-menu-item";
-import type { BlockEditorBlockFormat } from "./types";
 
-const TEXT_STYLE_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
-  (action) => action.group === "text-style",
+const TEXT_STYLE_ACTIONS = BLOCK_EDITOR_TOOLBAR_LAYOUT.textStyleMenu.map(
+  getBlockEditorActionDefinition,
 );
-const LIST_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter((action) => action.group === "list");
-const BLOCK_BUTTON_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
-  (action) => action.group === "block-button",
+const LIST_ACTIONS = BLOCK_EDITOR_TOOLBAR_LAYOUT.listMenu.map(getBlockEditorActionDefinition);
+const BLOCK_BUTTON_ACTIONS = BLOCK_EDITOR_TOOLBAR_LAYOUT.blockButtons.map(
+  getBlockEditorActionDefinition,
 );
-const INLINE_ACTIONS = BLOCK_EDITOR_ACTION_DEFINITIONS.filter(
-  (action) => action.group === "inline",
+const INLINE_ACTIONS = BLOCK_EDITOR_TOOLBAR_LAYOUT.inlineButtons.map(
+  getBlockEditorActionDefinition,
 );
 
 interface BlockEditorToolbarProps {
@@ -84,24 +83,14 @@ function preventToolbarMouseDown(event: MouseEvent) {
   event.preventDefault();
 }
 
-function isBlockAction(
-  action: BlockEditorActionDefinition,
-): action is BlockEditorActionDefinition<BlockEditorBlockFormat> {
-  return action.kind === "block-format";
-}
-
 function findActiveTextStyleAction(state: BlockEditorActionState) {
   return (
-    TEXT_STYLE_ACTIONS.find(
-      (action) => isBlockAction(action) && action.format === state.blockFormat,
-    ) ?? TEXT_STYLE_ACTIONS[0]
+    TEXT_STYLE_ACTIONS.find((action) => state.activeActions[action.id]) ?? TEXT_STYLE_ACTIONS[0]
   );
 }
 
 function findActiveListAction(state: BlockEditorActionState) {
-  return LIST_ACTIONS.find(
-    (action) => isBlockAction(action) && action.format === state.blockFormat,
-  );
+  return LIST_ACTIONS.find((action) => state.activeActions[action.id]);
 }
 
 export function BlockEditorToolbar({
@@ -223,11 +212,9 @@ export function BlockEditorToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <ButtonGroupSeparator />
-
         {BLOCK_BUTTON_ACTIONS.map((action) => {
           const Icon = action.icon;
-          const pressed = isBlockAction(action) && state.blockFormat === action.format;
+          const pressed = state.activeActions[action.id];
           const label = i18n._(action.label);
 
           return (
@@ -262,7 +249,7 @@ export function BlockEditorToolbar({
 
         {INLINE_ACTIONS.map((action) => {
           const Icon = action.icon;
-          const pressed = action.kind === "inline-format" && state.inlineFormats[action.format];
+          const pressed = state.activeActions[action.id];
           const label = i18n._(action.label);
 
           return (

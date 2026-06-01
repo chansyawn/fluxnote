@@ -60,12 +60,11 @@ describe("BlockEditorToolbar", () => {
     const user = userEvent.setup();
     const { controller, setState } = createToolbarController({
       ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
-      blockFormat: "bulletList",
-      inlineFormats: {
-        bold: true,
-        inlineCode: false,
-        italic: false,
-        strikethrough: false,
+      activeActions: {
+        ...DEFAULT_BLOCK_EDITOR_ACTION_STATE.activeActions,
+        "editor.bold": true,
+        "editor.bulletList": true,
+        "editor.codeBlock": true,
       },
     });
 
@@ -75,19 +74,24 @@ describe("BlockEditorToolbar", () => {
     const italicButton = screen.getByRole("button", { name: "Italic" });
     const listButton = screen.getByRole("button", { name: "List" });
     const quoteButton = screen.getByRole("button", { name: "Quote" });
+    const codeBlockButton = screen.getByRole("button", { name: "Code block" });
 
     expect(boldButton).toHaveAttribute("aria-pressed", "true");
     expect(boldButton).toHaveClass("text-foreground");
     expect(italicButton).toHaveClass("text-muted-foreground/60");
     expect(listButton).toHaveAttribute("aria-pressed", "true");
     expect(quoteButton).toHaveClass("text-muted-foreground/60");
+    expect(codeBlockButton).toHaveAttribute("aria-pressed", "true");
 
     await user.click(quoteButton);
     expect(controller.executeAction).toHaveBeenCalledWith("editor.blockquote");
 
+    await user.click(codeBlockButton);
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.codeBlock");
+
     await user.click(italicButton);
     expect(controller.executeAction).toHaveBeenCalledWith("editor.italic");
-    expect(controller.focus).toHaveBeenCalledTimes(2);
+    expect(controller.focus).toHaveBeenCalledTimes(3);
 
     act(() => {
       setState(DEFAULT_BLOCK_EDITOR_ACTION_STATE);
@@ -102,7 +106,10 @@ describe("BlockEditorToolbar", () => {
     const user = userEvent.setup();
     const { controller } = createToolbarController({
       ...DEFAULT_BLOCK_EDITOR_ACTION_STATE,
-      blockFormat: "heading2",
+      activeActions: {
+        ...DEFAULT_BLOCK_EDITOR_ACTION_STATE.activeActions,
+        "editor.heading2": true,
+      },
     });
 
     renderWithProviders(
@@ -197,6 +204,7 @@ describe("BlockEditorToolbar", () => {
     expect(screen.getByRole("button", { name: "Normal text" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "List" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Quote" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Code block" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Bold" })).toBeEnabled();
   });
 

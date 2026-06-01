@@ -4,16 +4,8 @@ import type { ShortcutAction } from "@shared/features/preferences/user-preferenc
 import type { LexicalEditor } from "lexical";
 import type { LucideIcon } from "lucide-react";
 
-import type {
-  BlockEditorBlockFormat,
-  BlockEditorFormat,
-  BlockEditorInlineFormat,
-} from "../toolbar/types";
-
 export type BlockEditorActionId = Extract<ShortcutAction, `editor.${string}`>;
 export type BlockEditorShortcutConfig = Partial<Record<BlockEditorActionId, ShortcutBinding>>;
-
-export type BlockEditorActionGroup = "text-style" | "list" | "block-button" | "inline";
 
 export interface BlockEditorActionContext {
   editor: LexicalEditor;
@@ -24,23 +16,18 @@ export type BlockEditorActionResult =
   | { action: BlockEditorActionId; status: "executed" }
   | { action: string; status: "unknown" };
 
-export interface BlockEditorActionDefinition<
-  TFormat extends BlockEditorFormat = BlockEditorFormat,
-> {
-  format: TFormat;
-  group: BlockEditorActionGroup;
+export interface BlockEditorActionDefinition {
   icon: LucideIcon;
   id: BlockEditorActionId;
+  isActive: (context: BlockEditorActionContext) => boolean;
   isDisabled: (context: BlockEditorActionContext) => boolean;
-  kind: TFormat extends BlockEditorBlockFormat ? "block-format" : "inline-format";
   label: MessageDescriptor;
   execute: (context: BlockEditorActionContext) => BlockEditorActionResult;
 }
 
 export interface BlockEditorActionState {
-  blockFormat: BlockEditorBlockFormat;
+  activeActions: Record<BlockEditorActionId, boolean>;
   disabledActions: Record<BlockEditorActionId, boolean>;
-  inlineFormats: Record<BlockEditorInlineFormat, boolean>;
 }
 
 export type BlockEditorActionStateListener = (state: BlockEditorActionState) => void;

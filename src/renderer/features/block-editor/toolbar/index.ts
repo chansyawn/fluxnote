@@ -5,5 +5,4 @@ export {
   type BlockEditorBlockFormat,
   type BlockEditorFormat,
   type BlockEditorInlineFormat,
-  type BlockEditorInlineFormatState,
 } from "./types";

@@ -12,6 +12,7 @@ export {
   BLOCK_EDITOR_ACTION_DEFINITIONS,
   BLOCK_EDITOR_ACTION_IDS,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  getBlockEditorActionDefinition,
   isBlockEditorActionId,
   type BlockEditorActionController,
   type BlockEditorActionDefinition,
@@ -32,9 +33,4 @@ export type {
   BlockEditorRuntime,
   BlockEditorActionState as BlockEditorSelectionActionState,
 } from "./core/types";
-export type {
-  BlockEditorBlockFormat,
-  BlockEditorFormat,
-  BlockEditorInlineFormat,
-  BlockEditorInlineFormatState,
-} from "./toolbar";
+export type { BlockEditorBlockFormat, BlockEditorFormat, BlockEditorInlineFormat } from "./toolbar";

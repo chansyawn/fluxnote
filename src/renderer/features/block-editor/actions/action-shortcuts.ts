@@ -1,6 +1,6 @@
 import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 
-import { BLOCK_EDITOR_ACTION_DEFINITIONS } from "./action-definitions";
+import { BLOCK_EDITOR_SHORTCUT_ACTION_ORDER } from "./action-order";
 import type { BlockEditorActionId, BlockEditorShortcutConfig } from "./types";
 
 const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
@@ -18,11 +18,11 @@ export function resolveBlockEditorShortcut(
   event: KeyboardEvent,
   shortcuts: BlockEditorShortcutConfig,
 ): BlockEditorShortcutResolution {
-  for (const action of BLOCK_EDITOR_ACTION_DEFINITIONS) {
-    const shortcut = shortcuts[action.id] ?? null;
+  for (const action of BLOCK_EDITOR_SHORTCUT_ACTION_ORDER) {
+    const shortcut = shortcuts[action] ?? null;
 
     if (keyboardEventMatchesShortcut(event, shortcut)) {
-      return { action: action.id, type: "configured-action" };
+      return { action, type: "configured-action" };
     }
   }
 
