@@ -3,11 +3,11 @@ import {
   BlockEditor,
   type BlockEditorConfigInput,
   type BlockEditorHandle,
-  type BlockEditorTextFormatShortcuts,
   type BlockEditorRuntime,
+  type BlockEditorToolbarShortcuts,
 } from "@renderer/features/block-editor";
 import {
-  BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS,
+  BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS,
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
 } from "@renderer/features/block-editor/toolbar";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
@@ -111,12 +111,24 @@ export function WorkspaceBlockEditorSurface({
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
-  const textFormatShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+  const toolbarShortcuts = useMemo<BlockEditorToolbarShortcuts>(
     () => ({
-      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
-      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
-      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+      blockquote: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.blockquote],
+      bold: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bold],
+      bulletList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bulletList],
+      codeBlock: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.codeBlock],
+      heading1: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading1],
+      heading2: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading2],
+      heading3: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading3],
+      heading4: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading4],
+      heading5: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading5],
+      heading6: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading6],
+      inlineCode: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.inlineCode],
+      italic: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.italic],
+      orderedList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.orderedList],
+      paragraph: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.paragraph],
+      strikethrough: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.strikethrough],
+      taskList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.taskList],
     }),
     [shortcuts],
   );
@@ -126,10 +138,10 @@ export function WorkspaceBlockEditorSurface({
         codeBlock,
       },
       shortcuts: {
-        textFormats: textFormatShortcuts,
+        formats: toolbarShortcuts,
       },
     }),
-    [codeBlock, textFormatShortcuts],
+    [codeBlock, toolbarShortcuts],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockEditorPersistence(block);
@@ -156,8 +168,11 @@ export function WorkspaceBlockEditorSurface({
       focus: () => {
         editorRef.current?.focus();
       },
-      formatText: (format) => {
-        editorRef.current?.formatText(format);
+      formatBlock: (format) => {
+        editorRef.current?.formatBlock(format);
+      },
+      formatInline: (format) => {
+        editorRef.current?.formatInline(format);
       },
       flush,
       getToolbarState: () =>

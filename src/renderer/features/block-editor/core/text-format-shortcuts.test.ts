@@ -21,14 +21,24 @@ function createKeyboardEvent(shortcut: {
 }
 
 describe("resolveTextFormatShortcut", () => {
-  it("resolves configured text format shortcuts", () => {
+  it("resolves configured inline format shortcuts", () => {
     const event = createKeyboardEvent({ ctrlKey: true, key: "b", shiftKey: true });
 
     expect(
       resolveTextFormatShortcut(event, {
         bold: "Control+Shift+B",
       }),
-    ).toEqual({ type: "configured", format: "bold" });
+    ).toEqual({ type: "configured-inline", format: "bold" });
+  });
+
+  it("resolves configured block format shortcuts", () => {
+    const event = createKeyboardEvent({ altKey: true, ctrlKey: true, key: "1" });
+
+    expect(
+      resolveTextFormatShortcut(event, {
+        heading1: "Control+Alt+1",
+      }),
+    ).toEqual({ type: "configured-block", format: "heading1" });
   });
 
   it("blocks cleared Lexical default text format shortcuts", () => {
@@ -49,7 +59,7 @@ describe("resolveTextFormatShortcut", () => {
         bold: "Control+I",
         italic: null,
       }),
-    ).toEqual({ type: "configured", format: "bold" });
+    ).toEqual({ type: "configured-inline", format: "bold" });
   });
 
   it("blocks Lexical underline shortcut that Fluxnote does not configure", () => {

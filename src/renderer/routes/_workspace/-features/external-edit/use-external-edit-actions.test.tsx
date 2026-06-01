@@ -128,7 +128,8 @@ describe("useExternalEditActions", () => {
       copy: vi.fn(async () => undefined),
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),
-      formatText: vi.fn(),
+      formatBlock: vi.fn(),
+      formatInline: vi.fn(),
       getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
       subscribeToolbarState: () => () => undefined,
     };

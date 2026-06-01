@@ -1,9 +1,11 @@
 import { keyboardEventMatchesShortcut } from "@renderer/features/shortcut/shortcut-utils";
 
 import {
-  BLOCK_EDITOR_TEXT_FORMATS,
-  type BlockEditorTextFormat,
-  type BlockEditorTextFormatShortcuts,
+  BLOCK_EDITOR_BLOCK_FORMATS,
+  BLOCK_EDITOR_INLINE_FORMATS,
+  type BlockEditorBlockFormat,
+  type BlockEditorInlineFormat,
+  type BlockEditorToolbarShortcuts,
 } from "../toolbar/types";
 
 const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
@@ -13,19 +15,28 @@ const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {
 } as const;
 
 export type TextFormatShortcutResolution =
-  | { type: "configured"; format: BlockEditorTextFormat }
+  | { type: "configured-block"; format: BlockEditorBlockFormat }
+  | { type: "configured-inline"; format: BlockEditorInlineFormat }
   | { type: "blocked-default" }
   | { type: "none" };
 
 export function resolveTextFormatShortcut(
   event: KeyboardEvent,
-  shortcuts: BlockEditorTextFormatShortcuts,
+  shortcuts: BlockEditorToolbarShortcuts,
 ): TextFormatShortcutResolution {
-  for (const format of BLOCK_EDITOR_TEXT_FORMATS) {
+  for (const format of BLOCK_EDITOR_BLOCK_FORMATS) {
     const shortcut = shortcuts[format] ?? null;
 
     if (keyboardEventMatchesShortcut(event, shortcut)) {
-      return { type: "configured", format };
+      return { type: "configured-block", format };
+    }
+  }
+
+  for (const format of BLOCK_EDITOR_INLINE_FORMATS) {
+    const shortcut = shortcuts[format] ?? null;
+
+    if (keyboardEventMatchesShortcut(event, shortcut)) {
+      return { type: "configured-inline", format };
     }
   }
 

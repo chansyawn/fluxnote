@@ -9,11 +9,23 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
     },
   },
   shortcuts: {
-    textFormats: {
+    formats: {
+      blockquote: null,
       bold: null,
-      code: null,
+      bulletList: null,
+      codeBlock: null,
+      heading1: null,
+      heading2: null,
+      heading3: null,
+      heading4: null,
+      heading5: null,
+      heading6: null,
+      inlineCode: null,
       italic: null,
+      orderedList: null,
+      paragraph: null,
       strikethrough: null,
+      taskList: null,
     },
   },
 };
@@ -28,9 +40,9 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
       },
     },
     shortcuts: {
-      textFormats: {
-        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.textFormats,
-        ...config?.shortcuts?.textFormats,
+      formats: {
+        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.formats,
+        ...config?.shortcuts?.formats,
       },
     },
   };

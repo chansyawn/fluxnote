@@ -1,7 +1,7 @@
 import type { Ref } from "react";
 
 import type {
-  BlockEditorTextFormatShortcuts,
+  BlockEditorToolbarShortcuts,
   BlockEditorToolbarController,
   BlockEditorToolbarState,
 } from "../toolbar/types";
@@ -107,11 +107,11 @@ export interface BlockEditorMarkdownConfigInput {
 }
 
 export interface BlockEditorShortcutConfig {
-  textFormats: BlockEditorTextFormatShortcuts;
+  formats: BlockEditorToolbarShortcuts;
 }
 
 export interface BlockEditorShortcutConfigInput {
-  textFormats?: BlockEditorTextFormatShortcuts;
+  formats?: BlockEditorToolbarShortcuts;
 }
 
 export interface BlockEditorConfigInput {

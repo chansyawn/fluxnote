@@ -63,7 +63,7 @@ describe("BlockEditor", () => {
       <I18nProvider i18n={i18n}>
         <BlockEditor
           ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          config={{ shortcuts: { formats: { bold: "Control+Shift+B" } } }}
           initialMarkdown=""
           runtime={createBlockEditorRuntime()}
           onMarkdownChange={() => undefined}
@@ -93,14 +93,14 @@ describe("BlockEditor", () => {
     });
 
     expect(oldDefaultEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(false);
 
     await act(async () => {
       editor.dispatchEvent(configuredEvent);
     });
 
     expect(configuredEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(true);
   });
 
   it("blocks Lexical format shortcuts that are not configured by Fluxnotes", async () => {
@@ -110,7 +110,7 @@ describe("BlockEditor", () => {
       <I18nProvider i18n={i18n}>
         <BlockEditor
           ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: null } } }}
+          config={{ shortcuts: { formats: { bold: null } } }}
           initialMarkdown="Plain text"
           runtime={createBlockEditorRuntime()}
           onMarkdownChange={() => undefined}
@@ -141,7 +141,7 @@ describe("BlockEditor", () => {
     expect(boldEvent.defaultPrevented).toBe(true);
     expect(underlineEvent.defaultPrevented).toBe(true);
     expect(editor.textContent).toBe("Plain text");
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(false);
   });
 
   it("consumes repeated Lexical default format shortcuts without applying them", async () => {
@@ -151,7 +151,7 @@ describe("BlockEditor", () => {
       <I18nProvider i18n={i18n}>
         <BlockEditor
           ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          config={{ shortcuts: { formats: { bold: "Control+Shift+B" } } }}
           initialMarkdown=""
           runtime={createBlockEditorRuntime()}
           onMarkdownChange={() => undefined}
@@ -175,7 +175,7 @@ describe("BlockEditor", () => {
     });
 
     expect(repeatedOldDefaultEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(false);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(false);
   });
 
   it("consumes repeated configured format shortcuts without toggling the format again", async () => {
@@ -185,7 +185,7 @@ describe("BlockEditor", () => {
       <I18nProvider i18n={i18n}>
         <BlockEditor
           ref={editorRef}
-          config={{ shortcuts: { textFormats: { bold: "Control+Shift+B" } } }}
+          config={{ shortcuts: { formats: { bold: "Control+Shift+B" } } }}
           initialMarkdown=""
           runtime={createBlockEditorRuntime()}
           onMarkdownChange={() => undefined}
@@ -216,14 +216,14 @@ describe("BlockEditor", () => {
       editor.dispatchEvent(configuredEvent);
     });
 
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(true);
 
     await act(async () => {
       editor.dispatchEvent(repeatedConfiguredEvent);
     });
 
     expect(repeatedConfiguredEvent.defaultPrevented).toBe(true);
-    expect(editorRef.current?.getToolbarState().textFormats.bold).toBe(true);
+    expect(editorRef.current?.getToolbarState().inlineFormats.bold).toBe(true);
   });
 
   it("lets users copy code from code block controls", async () => {

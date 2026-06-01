@@ -19,6 +19,7 @@ import {
   defineExtension,
   type InitialEditorStateType,
   type LexicalEditor,
+  type TextFormatType,
 } from "lexical";
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
@@ -27,7 +28,7 @@ import { createClipboardDataFromDocument } from "../clipboard/copy";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
   DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorTextFormat,
+  type BlockEditorInlineFormat,
   type BlockEditorToolbarState,
   type BlockEditorToolbarStateListener,
 } from "../toolbar/types";
@@ -35,6 +36,12 @@ import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
 } from "./block-editor-core-extension";
+import {
+  applyBlockFormat,
+  isBlockFormattingDisabledAtSelection,
+  readBlockFormatFromSelection,
+  toolbarStatesEqual,
+} from "./block-format";
 import {
   BlockEditorConfigProvider,
   resolveBlockEditorConfig,
@@ -66,9 +73,11 @@ function readToolbarStateFromSelection(): BlockEditorToolbarState {
   }
 
   return {
-    textFormats: {
+    blockFormat: readBlockFormatFromSelection(),
+    blockFormattingDisabled: isBlockFormattingDisabledAtSelection(),
+    inlineFormats: {
       bold: selection.hasFormat("bold"),
-      code: selection.hasFormat("code"),
+      inlineCode: selection.hasFormat("code"),
       italic: selection.hasFormat("italic"),
       strikethrough: selection.hasFormat("strikethrough"),
     },
@@ -83,18 +92,6 @@ function readToolbarState(editor: LexicalEditor): BlockEditorToolbarState {
   return state;
 }
 
-function toolbarStatesEqual(
-  left: BlockEditorToolbarState,
-  right: BlockEditorToolbarState,
-): boolean {
-  return (
-    left.textFormats.bold === right.textFormats.bold &&
-    left.textFormats.code === right.textFormats.code &&
-    left.textFormats.italic === right.textFormats.italic &&
-    left.textFormats.strikethrough === right.textFormats.strikethrough
-  );
-}
-
 const LEXICAL_FORMAT_INPUT_TYPES = new Set([
   "formatBold",
   "formatItalic",
@@ -104,6 +101,10 @@ const LEXICAL_FORMAT_INPUT_TYPES = new Set([
 
 function isLexicalTextFormatInput(event: InputEvent): boolean {
   return LEXICAL_FORMAT_INPUT_TYPES.has(event.inputType);
+}
+
+function mapInlineFormatToLexical(format: BlockEditorInlineFormat): TextFormatType {
+  return format === "inlineCode" ? "code" : format;
 }
 
 function createBlockEditorContentExtension(config: BlockEditorContentExtensionConfig) {
@@ -201,7 +202,7 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
       editor.registerCommand(
         KEY_DOWN_COMMAND,
         (event) => {
-          const shortcutResolution = resolveTextFormatShortcut(event, shortcuts.textFormats);
+          const shortcutResolution = resolveTextFormatShortcut(event, shortcuts.formats);
 
           if (shortcutResolution.type === "none") {
             return false;
@@ -218,7 +219,17 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
             return true;
           }
 
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, shortcutResolution.format);
+          if (shortcutResolution.type === "configured-block") {
+            editor.update(() => {
+              applyBlockFormat(shortcutResolution.format);
+            });
+            return true;
+          }
+
+          editor.dispatchCommand(
+            FORMAT_TEXT_COMMAND,
+            mapInlineFormatToLexical(shortcutResolution.format),
+          );
           return true;
         },
         COMMAND_PRIORITY_HIGH,
@@ -237,7 +248,7 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
         COMMAND_PRIORITY_HIGH,
       ),
     );
-  }, [editor, shortcuts.textFormats]);
+  }, [editor, shortcuts.formats]);
 
   useImperativeHandle(
     ref,
@@ -247,8 +258,13 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
         if (data === null) return;
         await runtime.clipboard.write(data);
       },
-      formatText: (format: BlockEditorTextFormat) => {
-        editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+      formatBlock: (format) => {
+        editor.update(() => {
+          applyBlockFormat(format);
+        });
+      },
+      formatInline: (format: BlockEditorInlineFormat) => {
+        editor.dispatchCommand(FORMAT_TEXT_COMMAND, mapInlineFormatToLexical(format));
       },
       flush: flushMarkdown,
       focus: () => editor.focus(),

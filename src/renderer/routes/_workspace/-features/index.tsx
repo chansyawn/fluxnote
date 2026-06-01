@@ -2,9 +2,9 @@ import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
 import {
   BlockEditorToolbar,
-  type BlockEditorTextFormatShortcuts,
+  type BlockEditorToolbarShortcuts,
 } from "@renderer/features/block-editor";
-import { BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
+import { BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
@@ -58,12 +58,24 @@ export function BlockWorkspace() {
     }),
     [editorRegistry.getEditor, editorRegistry.registerEditor],
   );
-  const toolbarShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
+  const toolbarShortcuts = useMemo<BlockEditorToolbarShortcuts>(
     () => ({
-      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
-      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
-      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
+      blockquote: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.blockquote],
+      bold: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bold],
+      bulletList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.bulletList],
+      codeBlock: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.codeBlock],
+      heading1: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading1],
+      heading2: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading2],
+      heading3: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading3],
+      heading4: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading4],
+      heading5: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading5],
+      heading6: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.heading6],
+      inlineCode: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.inlineCode],
+      italic: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.italic],
+      orderedList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.orderedList],
+      paragraph: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.paragraph],
+      strikethrough: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.strikethrough],
+      taskList: shortcuts[BLOCK_EDITOR_FORMAT_SHORTCUT_ACTIONS.taskList],
     }),
     [shortcuts],
   );

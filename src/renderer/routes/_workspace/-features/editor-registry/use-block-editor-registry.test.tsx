@@ -14,7 +14,8 @@ function createEditorHandle(): WorkspaceBlockEditorHandle {
     copy: vi.fn(async () => undefined),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
-    formatText: vi.fn(),
+    formatBlock: vi.fn(),
+    formatInline: vi.fn(),
     getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
     subscribeToolbarState: () => () => undefined,
   };

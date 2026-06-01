@@ -88,20 +88,9 @@ describe("preferences", () => {
       idleMinutes: DEFAULT_USER_PREFERENCES.autoArchive.idleMinutes,
     });
     expect(normalized.shortcuts).toEqual({
-      "global.toggleWindow": "Alt+N",
-      "global.quickCreateBlock": "Ctrl+Alt+N",
+      ...DEFAULT_USER_PREFERENCES.shortcuts,
       "workspace.createBlock": null,
-      "workspace.copyBlock": "Mod+Shift+C",
-      "workspace.keepBlock": "Mod+K",
-      "workspace.togglePinBlock": "Mod+T",
-      "workspace.archiveBlock": "Mod+E",
       "workspace.deleteBlock": "Mod+Delete",
-      "workspace.submitExternalEdit": "Mod+Enter",
-      "workspace.cancelExternalEdit": "Mod+\\",
-      "editor.formatBold": "Mod+B",
-      "editor.formatItalic": "Mod+I",
-      "editor.formatStrikethrough": "Mod+Shift+X",
-      "editor.formatInlineCode": "Mod+Shift+E",
     });
     expect(normalized.markdown).toEqual({
       codeBlock: {
@@ -124,7 +113,7 @@ describe("preferences", () => {
         shortcuts: {
           "workspace.archiveBlock": "Mod+E",
           "workspace.copyBlock": "Mod+Shift+C",
-          "editor.formatInlineCode": "Mod+Shift+E",
+          "editor.inlineCode": "Mod+Shift+E",
         },
         markdown: { codeBlock: { showLineNumbers: true } },
         telemetry: { enabled: false },
@@ -136,7 +125,7 @@ describe("preferences", () => {
       shortcuts: {
         "workspace.archiveBlock": "Mod+E",
         "workspace.copyBlock": "Mod+Shift+C",
-        "editor.formatInlineCode": "Mod+Shift+E",
+        "editor.inlineCode": "Mod+Shift+E",
       },
       markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
