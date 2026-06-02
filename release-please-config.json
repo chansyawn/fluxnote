@@ -5,6 +5,7 @@
   "packages": {
     "apps/desktop": {
       "draft": true,
+      "force-tag-creation": true,
       "include-component-in-tag": false,
       "release-type": "node",
       "versioning": "always-bump-patch"
