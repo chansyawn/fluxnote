@@ -90,32 +90,32 @@ msgid "block-editor.content.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
 msgid "block-editor.link.convert"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
 msgid "block-editor.link.copied"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:110
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
 msgid "block-editor.link.copy"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:109
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
 msgid "block-editor.link.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
 msgid "block-editor.link.remove"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
 msgid "block-editor.link.url"
 msgstr ""
 
@@ -206,12 +206,12 @@ msgid "block-editor.table.row-menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:131
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:133
 msgid "block-editor.toolbar.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:179
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:181
 msgid "block-editor.toolbar.list"
 msgstr ""
 

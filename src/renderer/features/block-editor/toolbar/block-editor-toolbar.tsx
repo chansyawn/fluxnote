@@ -109,8 +109,10 @@ export function BlockEditorToolbar({
 
   const executeAction = useCallback(
     (action: BlockEditorActionId) => {
-      controller?.executeAction(action);
-      controller?.focus();
+      const result = controller?.executeAction(action);
+      if (result?.status === "executed" && result.focus === "editor") {
+        controller?.focus();
+      }
     },
     [controller],
   );

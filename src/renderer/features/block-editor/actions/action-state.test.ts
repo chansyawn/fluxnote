@@ -69,4 +69,28 @@ describe("Block Editor action state", () => {
     expect(selectedState.activeActions["editor.link"]).toBe(false);
     expect(selectedState.disabledActions["editor.link"]).toBe(false);
   });
+
+  it("reports managed focus when the link action creates a link editor", () => {
+    const editor = editorFromMarkdown("Text");
+    selectTextRange(editor, "Text", 0, 4);
+
+    expect(executeBlockEditorAction("editor.link", { editor })).toEqual({
+      action: "editor.link",
+      focus: "managed",
+      status: "executed",
+    });
+    expectEditorMarkdown(editor, "[Text]()");
+  });
+
+  it("reports editor focus when the link action removes an existing link", () => {
+    const editor = editorFromMarkdown("[Text](https://example.com)");
+    selectText(editor, "Text", 2);
+
+    expect(executeBlockEditorAction("editor.link", { editor })).toEqual({
+      action: "editor.link",
+      focus: "editor",
+      status: "executed",
+    });
+    expectEditorMarkdown(editor, "Text");
+  });
 });

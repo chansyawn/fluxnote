@@ -5,6 +5,7 @@ import type { LexicalEditor } from "lexical";
 import type { LucideIcon } from "lucide-react";
 
 export type BlockEditorActionId = Extract<ShortcutAction, `editor.${string}`>;
+export type BlockEditorActionFocus = "editor" | "managed";
 export type BlockEditorShortcutConfig = Partial<Record<BlockEditorActionId, ShortcutBinding>>;
 
 export interface BlockEditorActionContext {
@@ -13,7 +14,11 @@ export interface BlockEditorActionContext {
 
 export type BlockEditorActionResult =
   | { action: BlockEditorActionId; status: "disabled" }
-  | { action: BlockEditorActionId; status: "executed" }
+  | {
+      action: BlockEditorActionId;
+      focus: BlockEditorActionFocus;
+      status: "executed";
+    }
   | { action: string; status: "unknown" };
 
 export interface BlockEditorActionDefinition {

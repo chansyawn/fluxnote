@@ -16,7 +16,11 @@ import type { WorkspaceBlockEditorHandle } from "./workspace-block-editor-surfac
 const mocks = vi.hoisted(() => ({
   editorHandle: {
     copy: vi.fn(async () => undefined),
-    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
+    executeAction: vi.fn((action) => ({
+      action,
+      focus: "editor" as const,
+      status: "executed" as const,
+    })),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
     getActionState: vi.fn(() => ({

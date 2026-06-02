@@ -12,7 +12,11 @@ import { useBlockEditorRegistry } from "./use-block-editor-registry";
 function createEditorHandle(): WorkspaceBlockEditorHandle {
   return {
     copy: vi.fn(async () => undefined),
-    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
+    executeAction: vi.fn((action) => ({
+      action,
+      focus: "editor" as const,
+      status: "executed" as const,
+    })),
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
     getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,

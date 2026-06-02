@@ -35,6 +35,8 @@ export function LinkHoverControls() {
   const [copied, setCopied] = useState(false);
   const urlInputRef = useRef<HTMLTextAreaElement>(null);
   const activeMarkdownLinkKey = activeLink?.link.kind === "markdown" ? activeLink.link.key : null;
+  const shouldFocusUrlInput =
+    urlInputFocusRequest !== null && urlInputFocusRequest.key === activeMarkdownLinkKey;
 
   const close = useCallback(() => {
     closeActiveLink();
@@ -54,13 +56,13 @@ export function LinkHoverControls() {
   }, [activeLink]);
 
   useLayoutEffect(() => {
-    if (!urlInputFocusRequest || urlInputFocusRequest.key !== activeMarkdownLinkKey) return;
+    if (!shouldFocusUrlInput) return;
     const timer = window.setTimeout(() => {
       urlInputRef.current?.focus();
       urlInputRef.current?.select();
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [activeMarkdownLinkKey, urlInputFocusRequest]);
+  }, [shouldFocusUrlInput, urlInputFocusRequest]);
 
   const handleOpen = async () => {
     if (!activeLink) return;
@@ -151,7 +153,7 @@ export function LinkHoverControls() {
         className="w-fit max-w-xs p-2"
         align="center"
         finalFocus={false}
-        initialFocus={false}
+        initialFocus={shouldFocusUrlInput ? () => urlInputRef.current : false}
         side="top"
         sideOffset={2}
         onBlurCapture={(event) => {

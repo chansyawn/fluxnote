@@ -90,32 +90,32 @@ msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
 msgid "block-editor.link.convert"
 msgstr "Convert to link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
 msgid "block-editor.link.copied"
 msgstr "Copied"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:110
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
 msgid "block-editor.link.copy"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:109
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
 msgid "block-editor.link.open"
 msgstr "Open"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
 msgid "block-editor.link.remove"
 msgstr "Remove link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
 msgid "block-editor.link.url"
 msgstr "Link URL"
 
@@ -206,12 +206,12 @@ msgid "block-editor.table.row-menu"
 msgstr "Open row actions menu"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:131
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:133
 msgid "block-editor.toolbar.label"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:179
+#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:181
 msgid "block-editor.toolbar.list"
 msgstr "List"
 

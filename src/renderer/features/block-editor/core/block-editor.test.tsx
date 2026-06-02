@@ -2,7 +2,7 @@
 
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { act, createRef } from "react";
 import type { ReactNode } from "react";
@@ -39,6 +39,27 @@ async function flushAnimationFrames(count: number): Promise<void> {
       });
     });
   }
+}
+
+function selectEditorText(textbox: HTMLElement, text: string): void {
+  const walker = document.createTreeWalker(textbox, NodeFilter.SHOW_TEXT);
+  let textNode: Node | null = null;
+
+  while (!textNode) {
+    const node = walker.nextNode();
+    if (!node) break;
+    if (node.textContent === text) textNode = node;
+  }
+
+  if (!textNode) throw new Error(`Unable to find text node "${text}".`);
+
+  const range = document.createRange();
+  range.setStart(textNode, 0);
+  range.setEnd(textNode, text.length);
+
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
 }
 
 describe("BlockEditor", () => {
@@ -224,6 +245,35 @@ describe("BlockEditor", () => {
 
     expect(repeatedConfiguredEvent.defaultPrevented).toBe(true);
     expect(editorRef.current?.getActionState().activeActions["editor.bold"]).toBe(true);
+  });
+
+  it("opens the link editor and focuses the URL input after creating a link", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          initialMarkdown="Alpha"
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+    selectEditorText(editor, "Alpha");
+
+    await act(async () => {
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+    await act(async () => {
+      editorRef.current?.executeAction("editor.link");
+    });
+
+    const urlInput = await screen.findByRole("textbox", { name: "Link URL" });
+    await waitFor(() => expect(urlInput).toHaveFocus());
   });
 
   it("lets users copy code from code block controls", async () => {

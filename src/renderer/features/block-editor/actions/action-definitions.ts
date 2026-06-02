@@ -46,6 +46,7 @@ import type {
   BlockEditorActionDefinition,
   BlockEditorActionId,
   BlockEditorActionResult,
+  BlockEditorActionFocus,
 } from "./types";
 
 const TEXT_STYLE_ACTIONS = [
@@ -191,8 +192,11 @@ function disabledActionResult(action: BlockEditorActionId): BlockEditorActionRes
   return { action, status: "disabled" };
 }
 
-function executedActionResult(action: BlockEditorActionId): BlockEditorActionResult {
-  return { action, status: "executed" };
+function executedActionResult(
+  action: BlockEditorActionId,
+  focus: BlockEditorActionFocus = "editor",
+): BlockEditorActionResult {
+  return { action, focus, status: "executed" };
 }
 
 function createBlockActionDefinition(
@@ -293,6 +297,10 @@ function createLinkActionDefinition(): BlockEditorActionDefinition {
       const result = executeLinkActionAtSelection(editor);
       if (result.kind === "disabled") {
         return disabledActionResult(LINK_ACTION.id);
+      }
+
+      if (result.kind === "created") {
+        return executedActionResult(LINK_ACTION.id, "managed");
       }
 
       return executedActionResult(LINK_ACTION.id);

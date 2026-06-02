@@ -20,7 +20,11 @@ function createToolbarController(
   let state = initialState;
   const listeners = new Set<BlockEditorActionStateListener>();
   const controller: BlockEditorActionController = {
-    executeAction: vi.fn((action) => ({ action, status: "executed" as const })),
+    executeAction: vi.fn((action) => ({
+      action,
+      focus: "editor" as const,
+      status: "executed" as const,
+    })),
     focus: vi.fn(),
     getActionState: () => state,
     subscribeActionState: (listener) => {
@@ -106,6 +110,23 @@ describe("BlockEditorToolbar", () => {
     expect(boldButton).toHaveAttribute("aria-pressed", "false");
     expect(boldButton).toHaveClass("text-muted-foreground/60");
     expect(listButton).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("does not focus the editor after actions whose focus is managed elsewhere", async () => {
+    const user = userEvent.setup();
+    const { controller } = createToolbarController();
+    vi.mocked(controller.executeAction).mockReturnValue({
+      action: "editor.link",
+      focus: "managed",
+      status: "executed",
+    });
+
+    renderWithProviders(<BlockEditorToolbar controller={controller} />);
+
+    await user.click(screen.getByRole("button", { name: "Link" }));
+
+    expect(controller.executeAction).toHaveBeenCalledWith("editor.link");
+    expect(controller.focus).not.toHaveBeenCalled();
   });
 
   it("shows text style menu items with shortcuts and dispatches the selected format", async () => {
