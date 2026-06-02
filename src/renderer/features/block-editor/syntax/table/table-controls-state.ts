@@ -40,11 +40,19 @@ export interface TableControlTarget {
   handles: Record<TableControlKind, TableHandlePosition>;
 }
 
-interface TableControlDocumentTarget extends Omit<TableControlTarget, "cellKey" | "handles"> {
+type TableControlDocumentTarget = Omit<TableControlTarget, "cellKey" | "handles"> & {
   cellKey: NodeKey;
   columnStartKey: NodeKey;
   rowStartKey: NodeKey;
+};
+
+interface TableHandleLayoutInput {
+  columnStartRect: DOMRect;
+  rowStartRect: DOMRect;
+  tableWrapperRect: DOMRect;
 }
+
+const TABLE_SCROLLABLE_WRAPPER_SELECTOR = ".block-editor__table-scrollable-wrapper";
 
 function toShellRect(shellRect: DOMRect, cellRect: DOMRect, shell: HTMLElement): DOMRect {
   return DOMRect.fromRect({
@@ -53,6 +61,23 @@ function toShellRect(shellRect: DOMRect, cellRect: DOMRect, shell: HTMLElement):
     x: cellRect.left - shellRect.left + shell.scrollLeft,
     y: cellRect.top - shellRect.top + shell.scrollTop,
   });
+}
+
+export function calculateTableHandlePositions({
+  columnStartRect,
+  rowStartRect,
+  tableWrapperRect,
+}: TableHandleLayoutInput): Record<TableControlKind, TableHandlePosition> {
+  return {
+    column: {
+      blockStart: columnStartRect.top,
+      inlineStart: columnStartRect.left + columnStartRect.width / 2,
+    },
+    row: {
+      blockStart: rowStartRect.top + rowStartRect.height / 2,
+      inlineStart: tableWrapperRect.left,
+    },
+  };
 }
 
 function arePositionsEqual(a: TableHandlePosition, b: TableHandlePosition): boolean {
@@ -158,27 +183,24 @@ function readControlTarget(
 
   const columnStartElement = editor.getElementByKey(documentTarget.columnStartKey);
   const rowStartElement = editor.getElementByKey(documentTarget.rowStartKey);
-  if (!columnStartElement || !rowStartElement) return null;
+  const tableWrapperElement = cellElement.closest<HTMLElement>(TABLE_SCROLLABLE_WRAPPER_SELECTOR);
+  if (!columnStartElement || !rowStartElement || !tableWrapperElement) return null;
 
   const shellRect = shell.getBoundingClientRect();
   const columnStartRect = toShellRect(shellRect, columnStartElement.getBoundingClientRect(), shell);
   const rowStartRect = toShellRect(shellRect, rowStartElement.getBoundingClientRect(), shell);
+  const tableWrapperRect = toShellRect(
+    shellRect,
+    tableWrapperElement.getBoundingClientRect(),
+    shell,
+  );
 
   return {
     cellKey: documentTarget.cellKey,
     columnAlign: documentTarget.columnAlign,
     columnCount: documentTarget.columnCount,
     columnIndex: documentTarget.columnIndex,
-    handles: {
-      column: {
-        blockStart: columnStartRect.top,
-        inlineStart: columnStartRect.left + columnStartRect.width / 2,
-      },
-      row: {
-        blockStart: rowStartRect.top + rowStartRect.height / 2,
-        inlineStart: rowStartRect.left,
-      },
-    },
+    handles: calculateTableHandlePositions({ columnStartRect, rowStartRect, tableWrapperRect }),
     rowCount: documentTarget.rowCount,
     rowIndex: documentTarget.rowIndex,
     tableKey: documentTarget.tableKey,

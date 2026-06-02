@@ -1,11 +1,11 @@
 @reference "#global.css";
 
 .block-editor__table-scrollable-wrapper {
-  @apply my-2 overflow-x-auto overflow-y-visible;
+  @apply border-border bg-muted my-2 max-w-full overflow-x-auto overflow-y-hidden rounded-md border;
 }
 
 .block-editor__table {
-  @apply w-full min-w-max border-separate border-spacing-0 overflow-hidden rounded-md border text-sm;
+  @apply w-full min-w-max border-separate border-spacing-0 text-sm;
 }
 
 .block-editor__table-cell {

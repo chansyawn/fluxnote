@@ -79,6 +79,19 @@ export function GlobalErrorContent({ error }: GlobalErrorContentProps) {
           <XIcon className="size-3" />
           <Trans id="error.global.exit-app">Exit app</Trans>
         </Button>
+        {import.meta.env.DEV ? (
+          <Button
+            className="gap-1"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              window.location.reload();
+            }}
+          >
+            <RefreshCwIcon className="size-3" />
+            <Trans id="error.global.reload-window">Reload window</Trans>
+          </Button>
+        ) : null}
       </ItemActions>
     </Item>
   );

@@ -11,6 +11,7 @@ import {
 import {
   $createParagraphNode,
   $createTextNode,
+  $isElementNode,
   $isParagraphNode,
   type ElementFormatType,
   type ElementNode,
@@ -20,8 +21,15 @@ import type { AlignType } from "mdast";
 type TableAlign = AlignType | null;
 
 const TABLE_ROW_REG_EXP = /^\|(.+)\|\s*$/;
-const TABLE_DELIMITER_REG_EXP = /^\|(?:\s*:?-{3,}:?\s*\|)+\s*$/;
+const TABLE_DIMENSION_REG_EXP = /^\|\s*(\d+)\s*[xX]\s*(\d+)\s*\|\s*$/;
+const TABLE_SHORTCUT_REG_EXP = /^\|(?:(?:\s*:?-{3,}:?\s*\|)+|\s*\d+\s*[xX]\s*\d+\s*\|\s*)$/;
 const CELL_SEPARATOR_REG_EXP = /(?<!\\)\|/;
+const MAX_TABLE_DIMENSION = 20;
+
+interface TableDimensions {
+  columns: number;
+  rows: number;
+}
 
 function splitTableRow(line: string): string[] | null {
   const match = TABLE_ROW_REG_EXP.exec(line);
@@ -60,6 +68,28 @@ function parseDelimiterAlign(line: string): TableAlign[] | null {
 
 function tableAlignToElementFormat(align: TableAlign): ElementFormatType {
   return align ?? "";
+}
+
+function parseTableDimensions(line: string): TableDimensions | null {
+  const match = TABLE_DIMENSION_REG_EXP.exec(line);
+  if (!match) {
+    return null;
+  }
+
+  const columns = Number.parseInt(match[1], 10);
+  const rows = Number.parseInt(match[2], 10);
+  if (
+    !Number.isInteger(columns) ||
+    !Number.isInteger(rows) ||
+    columns < 1 ||
+    rows < 1 ||
+    columns > MAX_TABLE_DIMENSION ||
+    rows > MAX_TABLE_DIMENSION
+  ) {
+    return null;
+  }
+
+  return { columns, rows };
 }
 
 function createTableCell(value: string, isHeader: boolean, align: TableAlign): TableCellNode {
@@ -105,6 +135,28 @@ function createTable(
   return table;
 }
 
+function createEmptyTable({ columns, rows }: TableDimensions): TableNode {
+  const table = $createTableNode();
+  const cells = Array.from({ length: columns }, () => "");
+  const align: TableAlign[] = Array.from({ length: columns }, () => null);
+  table.append(
+    ...Array.from({ length: rows }, (_, index) => createTableRow(cells, index === 0, align)),
+  );
+  return table;
+}
+
+function selectFirstCell(table: TableNode): void {
+  const firstRow = table.getFirstChild();
+  const firstCell = $isElementNode(firstRow) ? firstRow.getFirstChild() : null;
+  const firstParagraph = $isElementNode(firstCell) ? firstCell.getFirstChild() : null;
+
+  if ($isParagraphNode(firstParagraph)) {
+    firstParagraph.selectStart();
+  } else {
+    table.selectStart();
+  }
+}
+
 function replaceTypedTableShortcut(parentNode: ElementNode, startMatch: RegExpMatchArray): boolean {
   const delimiterLine = startMatch[0].trimEnd();
   const align = parseDelimiterAlign(delimiterLine);
@@ -126,13 +178,32 @@ function replaceTypedTableShortcut(parentNode: ElementNode, startMatch: RegExpMa
   return true;
 }
 
+function replaceTypedTableDimensionShortcut(
+  parentNode: ElementNode,
+  startMatch: RegExpMatchArray,
+): boolean {
+  const dimensions = parseTableDimensions(startMatch[0]);
+  if (!dimensions) {
+    return false;
+  }
+
+  const table = createEmptyTable(dimensions);
+  parentNode.replace(table);
+  selectFirstCell(table);
+  return true;
+}
+
 export const TABLE: MultilineElementTransformer = {
   dependencies: [TableNode, TableRowNode, TableCellNode],
   regExpEnd: { optional: true, regExp: /^$/ },
-  regExpStart: TABLE_DELIMITER_REG_EXP,
+  regExpStart: TABLE_SHORTCUT_REG_EXP,
   replace: (rootNode, _children, startMatch, _endMatch, _linesInBetween, isImport) => {
     if (isImport) {
       return false;
+    }
+
+    if (replaceTypedTableDimensionShortcut(rootNode, startMatch as RegExpMatchArray)) {
+      return true;
     }
 
     return replaceTypedTableShortcut(rootNode, startMatch as RegExpMatchArray);

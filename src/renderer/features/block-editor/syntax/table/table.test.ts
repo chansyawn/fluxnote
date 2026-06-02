@@ -119,6 +119,22 @@ function createEditorWithTypedTableShortcut(delimiter = "| --- | --- |"): Lexica
   return editor;
 }
 
+function createEditorWithTypedTableDimensionShortcut(shortcut = "|3x2|"): LexicalEditor {
+  const editor = createHeadlessEditor();
+
+  editor.update(
+    () => {
+      const root = $getRoot();
+      root.clear();
+      root.append($createParagraphNode().append($createTextNode(shortcut)));
+      root.getLastChild()?.selectEnd();
+    },
+    { discrete: true },
+  );
+
+  return editor;
+}
+
 function performOperation(
   editor: LexicalEditor,
   rowIndex: number,
@@ -175,6 +191,36 @@ function readSelection(editor: LexicalEditor): { nodeText: string; offset: numbe
     return {
       nodeText: selection.anchor.getNode().getTextContent(),
       offset: selection.anchor.offset,
+    };
+  });
+}
+
+function readAnchorCellPosition(editor: LexicalEditor): {
+  columnIndex: number;
+  nodeText: string;
+  offset: number;
+  rowIndex: number;
+} {
+  return editor.read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) {
+      throw new Error("Expected range selection.");
+    }
+
+    const anchorNode = selection.anchor.getNode();
+    const paragraph = $isParagraphNode(anchorNode) ? anchorNode : anchorNode.getParent();
+    const cell = paragraph?.getParent();
+    const row = cell?.getParent();
+    const table = row?.getParent();
+    if (!$isElementNode(paragraph) || !$isElementNode(cell) || !$isElementNode(row) || !table) {
+      throw new Error("Expected selection inside a table cell paragraph.");
+    }
+
+    return {
+      columnIndex: cell.getIndexWithinParent(),
+      nodeText: selection.anchor.getNode().getTextContent(),
+      offset: selection.anchor.offset,
+      rowIndex: row.getIndexWithinParent(),
     };
   });
 }
@@ -295,6 +341,99 @@ describe("table", () => {
     expect(getCellFormat(editor, 1, 0)).toBe("left");
     expect(getCellFormat(editor, 0, 1)).toBe("right");
     expect(getCellFormat(editor, 1, 1)).toBe("right");
+  });
+
+  it("typed dimension shortcut creates an empty table on Enter", () => {
+    const editor = createEditorWithTypedTableDimensionShortcut();
+
+    expect(pressEnter(editor)).toBe(true);
+
+    const table = getTable(editor);
+    expect(table.align).toEqual([null, null, null]);
+    expect(table.children).toHaveLength(2);
+    expect(table.children[0].children).toHaveLength(3);
+    expect(table.children[1].children).toHaveLength(3);
+    expect(cellHasRowHeader(editor, 0, 0)).toBe(true);
+    expect(cellHasRowHeader(editor, 1, 0)).toBe(false);
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 0,
+      nodeText: "",
+      offset: 0,
+      rowIndex: 0,
+    });
+  });
+
+  it("typed dimension shortcut creates an empty table on trailing Space", () => {
+    const editor = createEditorWithTypedTableDimensionShortcut();
+
+    typeText(editor, " ");
+
+    const table = getTable(editor);
+    expect(table.children).toHaveLength(2);
+    expect(table.children[0].children).toHaveLength(3);
+  });
+
+  it("typed dimension shortcut accepts spaces and uppercase separators", () => {
+    const editor = createEditorWithTypedTableDimensionShortcut("| 3 X 2 |");
+
+    expect(pressEnter(editor)).toBe(true);
+
+    const table = getTable(editor);
+    expect(table.children).toHaveLength(2);
+    expect(table.children[0].children).toHaveLength(3);
+  });
+
+  it("typed dimension shortcut creates a one-cell minimum table", () => {
+    const editor = createEditorWithTypedTableDimensionShortcut("|1x1|");
+
+    expect(pressEnter(editor)).toBe(true);
+
+    const table = getTable(editor);
+    expect(table.children).toHaveLength(1);
+    expect(table.children[0].children).toHaveLength(1);
+    expect(cellHasRowHeader(editor, 0, 0)).toBe(true);
+  });
+
+  it("keeps invalid typed dimension shortcuts as text", () => {
+    for (const shortcut of ["|0x2|", "|21x2|", "|3x21|", "|abc|"]) {
+      const editor = createEditorWithTypedTableDimensionShortcut(shortcut);
+
+      pressEnter(editor);
+      expect(readMdast(editor).children[0]).toMatchObject({
+        children: [{ type: "text", value: shortcut }],
+        type: "paragraph",
+      });
+    }
+  });
+
+  it("imports dimension shortcut text as a paragraph", () => {
+    const editor = editorFromMarkdown("|3x2|");
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      children: [{ type: "text", value: "|3x2|" }],
+      type: "paragraph",
+    });
+  });
+
+  it("keeps dimension shortcuts literal inside cells", () => {
+    const editor = editorFromMarkdown(["| h1 |", "| -- |", "| a  |", ""].join("\n"));
+    selectText(editor, "a", 0);
+
+    typeText(editor, "|3x2| ");
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "h1" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+        {
+          children: [{ children: [{ type: "text", value: "|3x2| a" }], type: "tableCell" }],
+          type: "tableRow",
+        },
+      ],
+      type: "table",
+    });
   });
 
   it("performs row and column structure operations", () => {

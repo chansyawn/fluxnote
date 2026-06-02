@@ -126,82 +126,82 @@ msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:178
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:179
 msgid "block-editor.table.align-center"
 msgstr "居中对齐"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:174
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:175
 msgid "block-editor.table.align-default"
 msgstr "默认"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:176
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:177
 msgid "block-editor.table.align-left"
 msgstr "左对齐"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:180
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:181
 msgid "block-editor.table.align-right"
 msgstr "右对齐"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:128
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:129
 msgid "block-editor.table.column-menu"
 msgstr "打开列操作菜单"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:157
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:158
 msgid "block-editor.table.delete-column"
 msgstr "删除列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:167
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:168
 msgid "block-editor.table.delete-row"
 msgstr "删除行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:143
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:144
 msgid "block-editor.table.insert-column-left"
 msgstr "左侧插入列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:148
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:149
 msgid "block-editor.table.insert-column-right"
 msgstr "右侧插入列"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:159
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:160
 msgid "block-editor.table.insert-row-above"
 msgstr "上方插入行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:161
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:162
 msgid "block-editor.table.insert-row-below"
 msgstr "下方插入行"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:153
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:154
 msgid "block-editor.table.move-column-left"
 msgstr "左移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:155
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:156
 msgid "block-editor.table.move-column-right"
 msgstr "右移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:165
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:166
 msgid "block-editor.table.move-row-down"
 msgstr "下移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:163
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:164
 msgid "block-editor.table.move-row-up"
 msgstr "上移"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:135
 msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 
@@ -331,6 +331,11 @@ msgstr "Fluxnotes 遇到了意外错误。你可以反馈问题或重启应用�
 #: src/renderer/features/error-boundary/global-error-content.tsx:80
 msgid "error.global.exit-app"
 msgstr "退出应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:92
+msgid "error.global.reload-window"
+msgstr "重新加载窗口"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:72

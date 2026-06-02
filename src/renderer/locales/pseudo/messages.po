@@ -126,82 +126,82 @@ msgid "block-editor.placeholder"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:178
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:179
 msgid "block-editor.table.align-center"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:174
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:175
 msgid "block-editor.table.align-default"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:176
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:177
 msgid "block-editor.table.align-left"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:180
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:181
 msgid "block-editor.table.align-right"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:128
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:129
 msgid "block-editor.table.column-menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:157
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:158
 msgid "block-editor.table.delete-column"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:167
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:168
 msgid "block-editor.table.delete-row"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:143
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:144
 msgid "block-editor.table.insert-column-left"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:148
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:149
 msgid "block-editor.table.insert-column-right"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:159
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:160
 msgid "block-editor.table.insert-row-above"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:161
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:162
 msgid "block-editor.table.insert-row-below"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:153
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:154
 msgid "block-editor.table.move-column-left"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:155
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:156
 msgid "block-editor.table.move-column-right"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:165
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:166
 msgid "block-editor.table.move-row-down"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:163
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:164
 msgid "block-editor.table.move-row-up"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:134
+#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:135
 msgid "block-editor.table.row-menu"
 msgstr ""
 
@@ -330,6 +330,11 @@ msgstr ""
 #: src/renderer/features/error-boundary/error-title-bar.tsx:26
 #: src/renderer/features/error-boundary/global-error-content.tsx:80
 msgid "error.global.exit-app"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:92
+msgid "error.global.reload-window"
 msgstr ""
 
 #. js-lingui-explicit-id
