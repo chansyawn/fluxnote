@@ -1,5 +1,5 @@
-name: Release Publish
-run-name: Release Publish
+name: Release
+run-name: Release
 
 on:
   push:
@@ -10,43 +10,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-publish-${{ github.workflow }}
+  group: release-${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
-  detect:
-    name: Detect Release Merge
-    runs-on: ubuntu-latest
-    outputs:
-      is_release_merge: ${{ steps.detect.outputs.is_release_merge }}
-      release_version: ${{ steps.detect.outputs.release_version }}
-
-    steps:
-      - name: Detect release merge commit
-        id: detect
-        env:
-          AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
-          AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-        shell: bash
-        run: |
-          subject="${COMMIT_MESSAGE%%$'\n'*}"
-
-          if [[ "$subject" =~ ^chore\(master\):\ release(\ ([0-9]+\.[0-9]+\.[0-9]+(\-[0-9A-Za-z.-]+)?))?\ \(#[0-9]+\)$ ]] \
-            && [[ "$AUTHOR_NAME" == "fluxnotes-release-bot[bot]" ]] \
-            && [[ "$AUTHOR_EMAIL" == "285336738+fluxnotes-release-bot[bot]@users.noreply.github.com" ]]; then
-            echo "is_release_merge=true" >> "$GITHUB_OUTPUT"
-            echo "release_version=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_release_merge=false" >> "$GITHUB_OUTPUT"
-            echo "release_version=" >> "$GITHUB_OUTPUT"
-          fi
-
   release:
-    name: Create Release
+    name: Release Please
     runs-on: ubuntu-latest
-    needs: detect
-    if: needs.detect.outputs.is_release_merge == 'true'
     permissions:
       contents: write
       issues: write
@@ -71,24 +41,6 @@ jobs:
           token: ${{ steps.release-app.outputs.token }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
-          skip-github-pull-request: true
-
-      - name: Verify release output
-        env:
-          EXPECTED_VERSION: ${{ needs.detect.outputs.release_version }}
-          RELEASE_CREATED: ${{ steps.release.outputs['apps/desktop--release_created'] }}
-          VERSION: ${{ steps.release.outputs['apps/desktop--version'] }}
-        shell: bash
-        run: |
-          if [ "$RELEASE_CREATED" != "true" ]; then
-            echo "Expected release-please to create a release for $EXPECTED_VERSION."
-            exit 1
-          fi
-
-          if [ -n "$EXPECTED_VERSION" ] && [ "$VERSION" != "$EXPECTED_VERSION" ]; then
-            echo "Expected release version $EXPECTED_VERSION, got $VERSION."
-            exit 1
-          fi
 
   verify:
     name: Verify
