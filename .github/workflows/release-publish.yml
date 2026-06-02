@@ -52,9 +52,9 @@ jobs:
       issues: write
       pull-requests: write
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      version: ${{ steps.release.outputs.version }}
+      release_created: ${{ steps.release.outputs['apps/desktop--release_created'] }}
+      tag_name: ${{ steps.release.outputs['apps/desktop--tag_name'] }}
+      version: ${{ steps.release.outputs['apps/desktop--version'] }}
 
     steps:
       - name: Create release app token
@@ -76,8 +76,8 @@ jobs:
       - name: Verify release output
         env:
           EXPECTED_VERSION: ${{ needs.detect.outputs.release_version }}
-          RELEASE_CREATED: ${{ steps.release.outputs.release_created }}
-          VERSION: ${{ steps.release.outputs.version }}
+          RELEASE_CREATED: ${{ steps.release.outputs['apps/desktop--release_created'] }}
+          VERSION: ${{ steps.release.outputs['apps/desktop--version'] }}
         shell: bash
         run: |
           if [ "$RELEASE_CREATED" != "true" ]; then
