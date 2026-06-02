@@ -28,5 +28,6 @@ export default defineConfig({
   ],
   resolve: {
     alias: viteAliases,
+    preserveSymlinks: false,
   },
 });
