@@ -95,6 +95,12 @@ describe("GlobalErrorContent", () => {
     expect(clientMocks.destroyWindow).toHaveBeenCalledOnce();
     expect(clientMocks.hideWindow).toHaveBeenCalledOnce();
   });
+
+  it("shows the window reload action in development", () => {
+    render(<GlobalErrorContent error={new Error("boom")} />);
+
+    expect(screen.getByRole("button", { name: "Reload window" })).toBeVisible();
+  });
 });
 
 describe("BlockErrorFallback", () => {

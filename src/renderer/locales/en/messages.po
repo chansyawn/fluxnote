@@ -333,6 +333,11 @@ msgid "error.global.exit-app"
 msgstr "Exit app"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/error-boundary/global-error-content.tsx:92
+msgid "error.global.reload-window"
+msgstr "Reload window"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/global-error-content.tsx:72
 msgid "error.global.report-issue"
 msgstr "Report issue"
