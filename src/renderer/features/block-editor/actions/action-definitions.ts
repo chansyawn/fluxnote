@@ -1,3 +1,4 @@
+import { msg } from "@lingui/core/macro";
 import {
   $getSelection,
   $isRangeSelection,
@@ -54,49 +55,49 @@ const TEXT_STYLE_ACTIONS = [
     format: "paragraph",
     icon: PilcrowIcon,
     id: "editor.paragraph",
-    label: { id: "block-editor.toolbar.normal-text", message: "Normal text" },
+    label: msg({ id: "block-editor.toolbar.normal-text", message: "Normal text" }),
   },
   {
     format: "heading1",
     icon: Heading1Icon,
     id: "editor.heading1",
-    label: { id: "block-editor.toolbar.heading-1", message: "Heading 1" },
+    label: msg({ id: "block-editor.toolbar.heading-1", message: "Heading 1" }),
   },
   {
     format: "heading2",
     icon: Heading2Icon,
     id: "editor.heading2",
-    label: { id: "block-editor.toolbar.heading-2", message: "Heading 2" },
+    label: msg({ id: "block-editor.toolbar.heading-2", message: "Heading 2" }),
   },
   {
     format: "heading3",
     icon: Heading3Icon,
     id: "editor.heading3",
-    label: { id: "block-editor.toolbar.heading-3", message: "Heading 3" },
+    label: msg({ id: "block-editor.toolbar.heading-3", message: "Heading 3" }),
   },
   {
     format: "heading4",
     icon: Heading4Icon,
     id: "editor.heading4",
-    label: { id: "block-editor.toolbar.heading-4", message: "Heading 4" },
+    label: msg({ id: "block-editor.toolbar.heading-4", message: "Heading 4" }),
   },
   {
     format: "heading5",
     icon: Heading5Icon,
     id: "editor.heading5",
-    label: { id: "block-editor.toolbar.heading-5", message: "Heading 5" },
+    label: msg({ id: "block-editor.toolbar.heading-5", message: "Heading 5" }),
   },
   {
     format: "heading6",
     icon: Heading6Icon,
     id: "editor.heading6",
-    label: { id: "block-editor.toolbar.heading-6", message: "Heading 6" },
+    label: msg({ id: "block-editor.toolbar.heading-6", message: "Heading 6" }),
   },
   {
     format: "codeBlock",
     icon: BracesIcon,
     id: "editor.codeBlock",
-    label: { id: "block-editor.toolbar.code-block", message: "Code block" },
+    label: msg({ id: "block-editor.toolbar.code-block", message: "Code block" }),
   },
 ] as const satisfies readonly {
   format: BlockEditorTextStyleFormat;
@@ -110,19 +111,19 @@ const LIST_ACTIONS = [
     format: "bulletList",
     icon: ListIcon,
     id: "editor.bulletList",
-    label: { id: "block-editor.toolbar.bullet-list", message: "Bullet list" },
+    label: msg({ id: "block-editor.toolbar.bullet-list", message: "Bullet list" }),
   },
   {
     format: "orderedList",
     icon: ListOrderedIcon,
     id: "editor.orderedList",
-    label: { id: "block-editor.toolbar.numbered-list", message: "Numbered list" },
+    label: msg({ id: "block-editor.toolbar.numbered-list", message: "Numbered list" }),
   },
   {
     format: "taskList",
     icon: CheckSquareIcon,
     id: "editor.taskList",
-    label: { id: "block-editor.toolbar.task-list", message: "Task list" },
+    label: msg({ id: "block-editor.toolbar.task-list", message: "Task list" }),
   },
 ] as const satisfies readonly {
   format: BlockEditorListFormat;
@@ -136,28 +137,28 @@ const INLINE_ACTIONS = [
     format: "bold",
     icon: BoldIcon,
     id: "editor.bold",
-    label: { id: "block-editor.toolbar.bold", message: "Bold" },
+    label: msg({ id: "block-editor.toolbar.bold", message: "Bold" }),
     lexicalFormat: "bold",
   },
   {
     format: "italic",
     icon: ItalicIcon,
     id: "editor.italic",
-    label: { id: "block-editor.toolbar.italic", message: "Italic" },
+    label: msg({ id: "block-editor.toolbar.italic", message: "Italic" }),
     lexicalFormat: "italic",
   },
   {
     format: "strikethrough",
     icon: StrikethroughIcon,
     id: "editor.strikethrough",
-    label: { id: "block-editor.toolbar.strikethrough", message: "Strikethrough" },
+    label: msg({ id: "block-editor.toolbar.strikethrough", message: "Strikethrough" }),
     lexicalFormat: "strikethrough",
   },
   {
     format: "inlineCode",
     icon: Code2Icon,
     id: "editor.inlineCode",
-    label: { id: "block-editor.toolbar.inline-code", message: "Inline code" },
+    label: msg({ id: "block-editor.toolbar.inline-code", message: "Inline code" }),
     lexicalFormat: "code",
   },
 ] as const satisfies readonly {
@@ -171,7 +172,7 @@ const INLINE_ACTIONS = [
 const LINK_ACTION = {
   icon: LinkIcon,
   id: "editor.link",
-  label: { id: "block-editor.toolbar.link", message: "Link" },
+  label: msg({ id: "block-editor.toolbar.link", message: "Link" }),
 } as const satisfies {
   icon: BlockEditorActionDefinition["icon"];
   id: BlockEditorActionId;
@@ -181,7 +182,7 @@ const LINK_ACTION = {
 const QUOTE_ACTION = {
   icon: QuoteIcon,
   id: "editor.blockquote",
-  label: { id: "block-editor.toolbar.blockquote", message: "Quote" },
+  label: msg({ id: "block-editor.toolbar.blockquote", message: "Quote" }),
 } as const satisfies {
   icon: BlockEditorActionDefinition["icon"];
   id: BlockEditorActionId;
