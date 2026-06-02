@@ -10,10 +10,10 @@ import type { ForgeConfig } from "@electron-forge/shared-types";
 import type { FuseConfig } from "@electron/fuses";
 import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
-import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts";
-import { copyCliResources } from "./config/forge/cli-resources";
-import { getMacSigningConfig } from "./config/forge/mac-signing";
-import { readPackageVersion } from "./config/forge/package-version";
+import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts.ts";
+import { copyCliResources } from "./config/forge/cli-resources.ts";
+import { getMacSigningConfig } from "./config/forge/mac-signing.ts";
+import { readPackageVersion } from "./config/forge/package-version.ts";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const packageVersion = readPackageVersion(rootDir);

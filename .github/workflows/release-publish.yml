@@ -190,8 +190,8 @@ jobs:
       - name: Check artifacts
         shell: bash
         run: |
-          if [ ! -d out/make ] || [ -z "$(find out/make -type f -print -quit)" ]; then
-            echo "No release artifacts found in out/make."
+          if [ ! -d apps/desktop/out/make ] || [ -z "$(find apps/desktop/out/make -type f -print -quit)" ]; then
+            echo "No release artifacts found in apps/desktop/out/make."
             exit 1
           fi
 
@@ -199,7 +199,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
-          path: out/make/**/*
+          path: apps/desktop/out/make/**/*
           if-no-files-found: error
 
       - name: Clean up macOS signing keychain

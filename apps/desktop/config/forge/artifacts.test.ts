@@ -5,7 +5,7 @@ import path from "node:path";
 import type { ForgeMakeResult } from "@electron-forge/shared-types";
 import { describe, expect, it } from "vite-plus/test";
 
-import { getReleaseArtifactName, normalizeMakeArtifacts } from "./artifacts";
+import { getReleaseArtifactName, normalizeMakeArtifacts } from "./artifacts.ts";
 
 async function writeArtifact(directory: string, fileName: string, content = ""): Promise<string> {
   const filePath = path.join(directory, fileName);

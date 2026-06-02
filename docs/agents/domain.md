@@ -11,15 +11,18 @@ If any of these files don't exist, proceed silently. Don't flag their absence; d
 
 ## File structure
 
-Single-context repo:
+Monorepo context:
 
 ```text
 /
+|-- apps/
+|   `-- desktop/
+|       `-- src/
+|-- packages/
 |-- CONTEXT.md
 |-- docs/adr/
 |   |-- 0001-example-decision.md
 |   `-- 0002-example-decision.md
-`-- src/
 ```
 
 ## Use the glossary's vocabulary

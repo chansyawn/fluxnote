@@ -36,7 +36,7 @@ describe("database migrator", () => {
 
   it("resolves source migrations folder in development", () => {
     expect(resolveMigrationsFolder()).toBe(
-      path.resolve(process.cwd(), "src/main/core/database/drizzle"),
+      path.resolve(process.cwd(), "apps/desktop/src/main/core/database/drizzle"),
     );
   });
 

@@ -1,14 +1,17 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./config/vite/shared.ts";
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const desktopDir = path.join(rootDir, "apps/desktop");
 
-// ignore these files for linting and formatting
 const ignorePatterns = [
   ".agents/skills/**",
   "CHANGELOG.md",
   "*.gen.ts",
-  "src/renderer/locales/**",
-  "src/main/core/database/drizzle/**",
+  "apps/desktop/src/renderer/locales/**",
+  "apps/desktop/src/main/core/database/drizzle/**",
 ];
 
 export default defineConfig({
@@ -18,7 +21,7 @@ export default defineConfig({
     ignorePatterns,
   },
   lint: {
-    jsPlugins: ["./config/oxlint/fluxnotes-plugin.ts"],
+    jsPlugins: ["./apps/desktop/config/oxlint/fluxnotes-plugin.ts"],
     options: { typeAware: true, typeCheck: true },
     ignorePatterns,
     rules: {
@@ -26,13 +29,24 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: viteAliases,
+    alias: {
+      "@fluxnotes/utils": path.join(rootDir, "packages/utils/src/index.ts"),
+      "@renderer": path.join(desktopDir, "src/renderer"),
+      "@cli": path.join(desktopDir, "src/cli"),
+      "@main": path.join(desktopDir, "src/main"),
+      "@preload": path.join(desktopDir, "src/preload"),
+      "@shared": path.join(desktopDir, "src/shared"),
+    },
+  },
+  run: {
+    cache: true,
   },
   staged: {
     "*": "vp check --fix",
-    "{lingui.config.ts,src/renderer/**/*.{ts,tsx,po}}": "vp run i18n:check",
+    "{apps/desktop/lingui.config.ts,apps/desktop/src/renderer/**/*.{ts,tsx,po}}":
+      "vp run i18n:check",
   },
   test: {
-    setupFiles: ["./src/test/setup.ts"],
+    setupFiles: ["./apps/desktop/src/test/setup.ts"],
   },
 });
