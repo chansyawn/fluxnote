@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.27](https://github.com/chansyawn/fluxnotes/compare/v0.0.26...v0.0.27) (2026-06-02)
+
+
+### Features
+
+* add table dimension shortcut ([#71](https://github.com/chansyawn/fluxnotes/issues/71)) ([e9758f6](https://github.com/chansyawn/fluxnotes/commit/e9758f6753cca3f23aa986e31f5a2d55c6821cab))
+* update block editor shortcuts and toolbar ([#68](https://github.com/chansyawn/fluxnotes/issues/68)) ([cbd2702](https://github.com/chansyawn/fluxnotes/commit/cbd2702c2c229545377e5da54a14491c71c5e191))
+
+
+### Bug Fixes
+
+* simplify block editor clipboard assets ([#66](https://github.com/chansyawn/fluxnotes/issues/66)) ([af866e1](https://github.com/chansyawn/fluxnotes/commit/af866e10e81896f872e7e181c8a89c2a98fa77f6))
+
 ## [0.0.26](https://github.com/chansyawn/fluxnotes/compare/v0.0.25...v0.0.26) (2026-05-29)
 
 
