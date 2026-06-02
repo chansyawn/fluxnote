@@ -87,7 +87,7 @@ function isContainerChild(node: RootContent | DefinitionContent): node is Contai
 // Lexical → mdast
 // ============================================================================
 
-function blockFromLexical(node: LexicalNode): BlockContent[] {
+export function blockFromLexical(node: LexicalNode): BlockContent[] {
   if ($isParagraphNode(node)) {
     if ($isGapCursorParagraph(node)) {
       return [];

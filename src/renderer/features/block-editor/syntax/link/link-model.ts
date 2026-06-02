@@ -8,6 +8,7 @@ import {
 } from "@lexical/link";
 import {
   $getNearestNodeFromDOMNode,
+  createCommand,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
@@ -36,15 +37,24 @@ export interface ActiveLink {
   link: LinkSnapshot;
 }
 
+export interface OpenLinkEditorPayload {
+  focusUrlInput: boolean;
+  key: NodeKey;
+}
+
+export const OPEN_LINK_EDITOR_COMMAND = createCommand<OpenLinkEditorPayload>(
+  "OPEN_LINK_EDITOR_COMMAND",
+);
+
 export function sanitizeLinkUrlInput(url: string): string {
   return url.replace(/[\r\n]+/g, "");
 }
 
-function isMarkdownLinkNode(node: LexicalNode | null | undefined): node is LinkNode {
+export function isMarkdownLinkNode(node: LexicalNode | null | undefined): node is LinkNode {
   return $isLinkNode(node) && !$isAutoLinkNode(node);
 }
 
-function readLinkSnapshot(node: LinkNode | AutoLinkNode): LinkSnapshot {
+export function readLinkSnapshot(node: LinkNode | AutoLinkNode): LinkSnapshot {
   return {
     key: node.getKey(),
     kind: $isAutoLinkNode(node) ? "auto" : "markdown",
@@ -65,6 +75,15 @@ function measureLink(editor: LexicalEditor, link: LinkSnapshot | null): ActiveLi
   return element ? { element, link } : null;
 }
 
+export function measureLinkFromKey(editor: LexicalEditor, key: NodeKey): ActiveLink | null {
+  let link: LinkSnapshot | null = null;
+  editor.getEditorState().read(() => {
+    const node = $getNodeByKey(key);
+    link = $isLinkNode(node) ? readLinkSnapshot(node) : null;
+  });
+  return measureLink(editor, link);
+}
+
 function readLinkFromSelection(): LinkSnapshot | null {
   const selection = $getSelection();
   if (!$isRangeSelection(selection) || !selection.isCollapsed()) return null;
@@ -73,7 +92,7 @@ function readLinkFromSelection(): LinkSnapshot | null {
   return link ? readLinkSnapshot(link) : null;
 }
 
-function unwrapLinkNode(node: LinkNode): void {
+export function unwrapLinkNode(node: LinkNode): void {
   for (const child of node.getChildren()) {
     node.insertBefore(child);
   }

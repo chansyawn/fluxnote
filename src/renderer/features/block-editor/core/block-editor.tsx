@@ -7,30 +7,31 @@ import { mergeRegister } from "@lexical/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import {
-  $getSelection,
-  $isRangeSelection,
   BEFORE_INPUT_COMMAND,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  FORMAT_TEXT_COMMAND,
   KEY_DOWN_COMMAND,
   SELECTION_CHANGE_COMMAND,
   configExtension,
   defineExtension,
   type InitialEditorStateType,
-  type LexicalEditor,
 } from "lexical";
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
+import {
+  blockEditorActionStatesEqual,
+  DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  executeBlockEditorAction,
+  readBlockEditorActionState,
+  resolveBlockEditorShortcut,
+  type BlockEditorActionId,
+  type BlockEditorActionResult,
+  type BlockEditorActionState,
+  type BlockEditorActionStateListener,
+} from "../actions";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { createClipboardDataFromDocument } from "../clipboard/copy";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
-import {
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorTextFormat,
-  type BlockEditorToolbarState,
-  type BlockEditorToolbarStateListener,
-} from "../toolbar/types";
 import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
@@ -45,7 +46,6 @@ import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
 import { importMarkdownToEditor } from "./markdown-editor-io";
 import { BlockEditorRuntimeExtension, useBlockEditorRuntime } from "./runtime-extension";
-import { resolveTextFormatShortcut } from "./text-format-shortcuts";
 import type { BlockEditorProps, BlockEditorRuntime } from "./types";
 
 interface BlockEditorContentExtensionConfig {
@@ -57,42 +57,6 @@ function createInitialMarkdownEditorState(markdown: string): InitialEditorStateT
   return (editor) => {
     importMarkdownToEditor(editor, markdown);
   };
-}
-
-function readToolbarStateFromSelection(): BlockEditorToolbarState {
-  const selection = $getSelection();
-  if (!$isRangeSelection(selection)) {
-    return DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE;
-  }
-
-  return {
-    textFormats: {
-      bold: selection.hasFormat("bold"),
-      code: selection.hasFormat("code"),
-      italic: selection.hasFormat("italic"),
-      strikethrough: selection.hasFormat("strikethrough"),
-    },
-  };
-}
-
-function readToolbarState(editor: LexicalEditor): BlockEditorToolbarState {
-  let state = DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE;
-  editor.getEditorState().read(() => {
-    state = readToolbarStateFromSelection();
-  });
-  return state;
-}
-
-function toolbarStatesEqual(
-  left: BlockEditorToolbarState,
-  right: BlockEditorToolbarState,
-): boolean {
-  return (
-    left.textFormats.bold === right.textFormats.bold &&
-    left.textFormats.code === right.textFormats.code &&
-    left.textFormats.italic === right.textFormats.italic &&
-    left.textFormats.strikethrough === right.textFormats.strikethrough
-  );
 }
 
 const LEXICAL_FORMAT_INPUT_TYPES = new Set([
@@ -158,50 +122,57 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
   const [editor] = useLexicalComposerContext();
   const { shortcuts } = useBlockEditorConfig();
   const runtime = useBlockEditorRuntime();
-  const toolbarStateRef = useRef<BlockEditorToolbarState>(DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE);
-  const toolbarStateListenersRef = useRef(new Set<BlockEditorToolbarStateListener>());
+  const actionStateRef = useRef<BlockEditorActionState>(DEFAULT_BLOCK_EDITOR_ACTION_STATE);
+  const actionStateListenersRef = useRef(new Set<BlockEditorActionStateListener>());
 
-  const publishToolbarState = useCallback((nextState: BlockEditorToolbarState) => {
-    if (toolbarStatesEqual(toolbarStateRef.current, nextState)) {
+  const publishActionState = useCallback((nextState: BlockEditorActionState) => {
+    if (blockEditorActionStatesEqual(actionStateRef.current, nextState)) {
       return;
     }
 
-    toolbarStateRef.current = nextState;
-    for (const listener of toolbarStateListenersRef.current) {
+    actionStateRef.current = nextState;
+    for (const listener of actionStateListenersRef.current) {
       listener(nextState);
     }
   }, []);
 
-  const syncToolbarState = useCallback(() => {
-    publishToolbarState(readToolbarState(editor));
-  }, [editor, publishToolbarState]);
+  const syncActionState = useCallback(() => {
+    publishActionState(readBlockEditorActionState(editor));
+  }, [editor, publishActionState]);
+
+  const executeAction = useCallback(
+    (action: BlockEditorActionId): BlockEditorActionResult => {
+      const result = executeBlockEditorAction(action, { editor });
+      syncActionState();
+      return result;
+    },
+    [editor, syncActionState],
+  );
 
   useEffect(() => {
-    syncToolbarState();
+    syncActionState();
 
     return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          publishToolbarState(readToolbarStateFromSelection());
-        });
+      editor.registerUpdateListener(() => {
+        publishActionState(readBlockEditorActionState(editor));
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          syncToolbarState();
+          syncActionState();
           return false;
         },
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, publishToolbarState, syncToolbarState]);
+  }, [editor, publishActionState, syncActionState]);
 
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
         KEY_DOWN_COMMAND,
         (event) => {
-          const shortcutResolution = resolveTextFormatShortcut(event, shortcuts.textFormats);
+          const shortcutResolution = resolveBlockEditorShortcut(event, shortcuts.actions);
 
           if (shortcutResolution.type === "none") {
             return false;
@@ -218,7 +189,7 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
             return true;
           }
 
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, shortcutResolution.format);
+          executeAction(shortcutResolution.action);
           return true;
         },
         COMMAND_PRIORITY_HIGH,
@@ -237,7 +208,7 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
         COMMAND_PRIORITY_HIGH,
       ),
     );
-  }, [editor, shortcuts.textFormats]);
+  }, [editor, executeAction, shortcuts.actions]);
 
   useImperativeHandle(
     ref,
@@ -247,20 +218,18 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
         if (data === null) return;
         await runtime.clipboard.write(data);
       },
-      formatText: (format: BlockEditorTextFormat) => {
-        editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
-      },
+      executeAction,
       flush: flushMarkdown,
       focus: () => editor.focus(),
-      getToolbarState: () => toolbarStateRef.current,
-      subscribeToolbarState: (listener: BlockEditorToolbarStateListener) => {
-        toolbarStateListenersRef.current.add(listener);
+      getActionState: () => actionStateRef.current,
+      subscribeActionState: (listener: BlockEditorActionStateListener) => {
+        actionStateListenersRef.current.add(listener);
         return () => {
-          toolbarStateListenersRef.current.delete(listener);
+          actionStateListenersRef.current.delete(listener);
         };
       },
     }),
-    [editor, runtime, flushMarkdown],
+    [editor, runtime, executeAction, flushMarkdown],
   );
 
   return <BlockEditorContent onBlur={onBlur} />;

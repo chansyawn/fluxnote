@@ -1,4 +1,9 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import {
+  getBlockEditorActionDefinition,
+  type BlockEditorActionId,
+} from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   PreferencesGroup,
@@ -12,14 +17,10 @@ import {
 import {
   CheckIcon,
   ArchiveIcon,
-  BoldIcon,
-  Code2Icon,
   CopyIcon,
   KeyboardIcon,
-  ItalicIcon,
   PinIcon,
   PlusCircleIcon,
-  StrikethroughIcon,
   Trash2Icon,
   WandSparklesIcon,
   XIcon,
@@ -33,7 +34,7 @@ import { useShortcutRecorder } from "./use-shortcut-recorder";
 interface ShortcutFieldDefinition {
   action: ShortcutAction;
   icon: ReactElement<SVGProps<SVGSVGElement>>;
-  title: ReactElement;
+  title: ReactElement | string;
   description?: ReactElement;
 }
 
@@ -115,35 +116,29 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
       },
     ],
   },
-  {
-    id: "editor",
-    title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
-    fields: [
-      {
-        action: "editor.formatBold",
-        icon: <BoldIcon />,
-        title: <Trans id="preferences.shortcuts.formatBold.label">Bold</Trans>,
-      },
-      {
-        action: "editor.formatItalic",
-        icon: <ItalicIcon />,
-        title: <Trans id="preferences.shortcuts.formatItalic.label">Italic</Trans>,
-      },
-      {
-        action: "editor.formatStrikethrough",
-        icon: <StrikethroughIcon />,
-        title: <Trans id="preferences.shortcuts.formatStrikethrough.label">Strikethrough</Trans>,
-      },
-      {
-        action: "editor.formatInlineCode",
-        icon: <Code2Icon />,
-        title: <Trans id="preferences.shortcuts.formatInlineCode.label">Inline code</Trans>,
-      },
-    ],
-  },
 ];
 
+const EDITOR_SHORTCUT_ACTION_ORDER = [
+  "editor.paragraph",
+  "editor.heading1",
+  "editor.heading2",
+  "editor.heading3",
+  "editor.heading4",
+  "editor.heading5",
+  "editor.heading6",
+  "editor.orderedList",
+  "editor.bulletList",
+  "editor.taskList",
+  "editor.blockquote",
+  "editor.codeBlock",
+  "editor.bold",
+  "editor.italic",
+  "editor.strikethrough",
+  "editor.inlineCode",
+] as const satisfies readonly BlockEditorActionId[];
+
 export function ShortcutPreferencesSection() {
+  const { i18n } = useLingui();
   const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
     useShortcutState();
   const {
@@ -157,11 +152,27 @@ export function ShortcutPreferencesSection() {
     clearShortcut,
     updateShortcut,
   });
+  const shortcutFieldGroups: ShortcutFieldGroupDefinition[] = [
+    ...SHORTCUT_FIELD_GROUPS,
+    {
+      id: "editor",
+      title: <Trans id="preferences.shortcuts.group.editor">Editor</Trans>,
+      fields: EDITOR_SHORTCUT_ACTION_ORDER.map((actionId) => {
+        const action = getBlockEditorActionDefinition(actionId);
+        const Icon = action.icon;
+        return {
+          action: action.id,
+          icon: <Icon />,
+          title: i18n._(action.label),
+        };
+      }),
+    },
+  ];
 
   return (
     <PreferencesSection title={<Trans id="preferences.shortcuts.title">Shortcuts</Trans>}>
       <div className="flex flex-col gap-3">
-        {SHORTCUT_FIELD_GROUPS.map((group) => (
+        {shortcutFieldGroups.map((group) => (
           <div key={group.id} className="flex flex-col gap-1.5">
             <h3 className="text-muted-foreground px-1 text-xs font-medium">{group.title}</h3>
             <PreferencesGroup>

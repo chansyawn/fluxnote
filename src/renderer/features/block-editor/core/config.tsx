@@ -1,6 +1,11 @@
 import { createContext, useContext, type ReactNode } from "react";
 
+import { BLOCK_EDITOR_ACTION_DEFINITIONS } from "../actions";
 import type { BlockEditorConfig, BlockEditorConfigInput } from "./types";
+
+const DEFAULT_BLOCK_EDITOR_SHORTCUT_ACTIONS = Object.fromEntries(
+  BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => [action.id, null]),
+) as BlockEditorConfig["shortcuts"]["actions"];
 
 export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
   markdown: {
@@ -9,12 +14,7 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
     },
   },
   shortcuts: {
-    textFormats: {
-      bold: null,
-      code: null,
-      italic: null,
-      strikethrough: null,
-    },
+    actions: DEFAULT_BLOCK_EDITOR_SHORTCUT_ACTIONS,
   },
 };
 
@@ -28,9 +28,9 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
       },
     },
     shortcuts: {
-      textFormats: {
-        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.textFormats,
-        ...config?.shortcuts?.textFormats,
+      actions: {
+        ...DEFAULT_BLOCK_EDITOR_CONFIG.shortcuts.actions,
+        ...config?.shortcuts?.actions,
       },
     },
   };

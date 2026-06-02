@@ -8,6 +8,20 @@
 export { BlockEditor } from "./core/block-editor";
 export { normalizeExternalMarkdown } from "./markdown/external-markdown";
 export { BlockEditorToolbar } from "./toolbar";
+export {
+  BLOCK_EDITOR_ACTION_DEFINITIONS,
+  BLOCK_EDITOR_ACTION_IDS,
+  DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+  getBlockEditorActionDefinition,
+  isBlockEditorActionId,
+  type BlockEditorActionController,
+  type BlockEditorActionDefinition,
+  type BlockEditorActionId,
+  type BlockEditorActionResult,
+  type BlockEditorActionState,
+  type BlockEditorActionStateListener,
+  type BlockEditorShortcutConfig,
+} from "./actions";
 export type {
   BlockEditorCodeBlockConfig,
   BlockEditorConfig,
@@ -17,13 +31,6 @@ export type {
   BlockEditorMarkdownConfig,
   BlockEditorProps,
   BlockEditorRuntime,
-  BlockEditorToolbarState,
+  BlockEditorActionState as BlockEditorSelectionActionState,
 } from "./core/types";
-export type {
-  BlockEditorShortcutBinding,
-  BlockEditorTextFormat,
-  BlockEditorTextFormatShortcuts,
-  BlockEditorTextFormatState,
-  BlockEditorToolbarController,
-  BlockEditorToolbarStateListener,
-} from "./toolbar";
+export type { BlockEditorBlockFormat, BlockEditorFormat, BlockEditorInlineFormat } from "./toolbar";

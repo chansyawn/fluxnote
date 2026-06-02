@@ -5,6 +5,7 @@ import {
   mergeRegister,
   type EditorState,
   type LexicalEditor,
+  type NodeKey,
 } from "lexical";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -12,7 +13,10 @@ import {
   type ActiveLink,
   isSameActiveLink,
   measureLinkFromDom,
+  measureLinkFromKey,
   measureLinkFromSelection,
+  OPEN_LINK_EDITOR_COMMAND,
+  type OpenLinkEditorPayload,
   refreshActiveLink,
 } from "./link-model";
 
@@ -22,6 +26,21 @@ interface LinkSources {
   hover: ActiveLink | null;
   pinned: ActiveLink | null;
   selection: ActiveLink | null;
+}
+
+export interface LinkUrlInputFocusRequest {
+  key: NodeKey;
+  token: number;
+}
+
+export function createNextLinkUrlInputFocusRequest(
+  current: LinkUrlInputFocusRequest | null,
+  key: NodeKey,
+): LinkUrlInputFocusRequest {
+  return {
+    key,
+    token: (current?.token ?? 0) + 1,
+  };
 }
 
 type LinkSource = keyof LinkSources;
@@ -84,9 +103,14 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
   });
   const activeLinkRef = useRef<ActiveLink | null>(null);
   const editorHasFocusRef = useRef(false);
+  const pendingOpenLinkEditorRef = useRef<OpenLinkEditorPayload | null>(null);
+  const pendingOpenLinkEditorTimerRef = useRef<number | null>(null);
   const popoverElementRef = useRef<HTMLElement | null>(null);
   const rootElementRef = useRef<HTMLElement | null>(null);
   const [sources, setSources] = useState<LinkSources>(EMPTY_LINK_SOURCES);
+  const [urlInputFocusRequest, setUrlInputFocusRequest] = useState<LinkUrlInputFocusRequest | null>(
+    null,
+  );
 
   const activeLink = resolveActiveLink(sources);
 
@@ -106,6 +130,13 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
     clearCloseTimer("pinned");
   }, [clearCloseTimer]);
 
+  const clearPendingOpenLinkEditorTimer = useCallback(() => {
+    const timer = pendingOpenLinkEditorTimerRef.current;
+    if (timer === null) return;
+    window.clearTimeout(timer);
+    pendingOpenLinkEditorTimerRef.current = null;
+  }, []);
+
   const setSource = useCallback(
     (source: LinkSource, next: ActiveLink | null) =>
       setSources((current) => setLinkSource(current, source, next)),
@@ -122,8 +153,10 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
 
   const closeActiveLink = useCallback(() => {
     clearCloseTimers();
+    clearPendingOpenLinkEditorTimer();
+    pendingOpenLinkEditorRef.current = null;
     setSources(clearLinkSources);
-  }, [clearCloseTimers]);
+  }, [clearCloseTimers, clearPendingOpenLinkEditorTimer]);
 
   const holdPopoverLinkOpen = useCallback(() => {
     clearCloseTimer("pinned");
@@ -157,6 +190,37 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
       );
     },
     [clearCloseTimers],
+  );
+
+  const applyOpenLinkEditor = useCallback(
+    ({ focusUrlInput, key }: OpenLinkEditorPayload): boolean => {
+      const next = measureLinkFromKey(editor, key);
+      if (!next) return false;
+      pendingOpenLinkEditorRef.current = null;
+      clearPendingOpenLinkEditorTimer();
+      pinActiveLink(next);
+      if (focusUrlInput) {
+        setUrlInputFocusRequest((current) => createNextLinkUrlInputFocusRequest(current, key));
+      }
+      return true;
+    },
+    [clearPendingOpenLinkEditorTimer, editor, pinActiveLink],
+  );
+
+  const openLinkEditor = useCallback(
+    (payload: OpenLinkEditorPayload): boolean => {
+      if (applyOpenLinkEditor(payload)) return true;
+
+      pendingOpenLinkEditorRef.current = payload;
+      clearPendingOpenLinkEditorTimer();
+      pendingOpenLinkEditorTimerRef.current = window.setTimeout(() => {
+        pendingOpenLinkEditorTimerRef.current = null;
+        const pending = pendingOpenLinkEditorRef.current;
+        if (pending) applyOpenLinkEditor(pending);
+      }, 0);
+      return true;
+    },
+    [applyOpenLinkEditor, clearPendingOpenLinkEditorTimer],
   );
 
   const showLinkFromDom = useCallback(
@@ -227,7 +291,14 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
       editor.registerUpdateListener(({ editorState }) => {
         setSources((current) => refreshLinkSources(editor, editorState, current));
         updateSelectionLink(editorState);
+        const pending = pendingOpenLinkEditorRef.current;
+        if (pending) applyOpenLinkEditor(pending);
       }),
+      editor.registerCommand(
+        OPEN_LINK_EDITOR_COMMAND,
+        (payload) => openLinkEditor(payload),
+        COMMAND_PRIORITY_LOW,
+      ),
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
@@ -248,11 +319,14 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, setSource, updateSelectionLink]);
+  }, [applyOpenLinkEditor, editor, openLinkEditor, setSource, updateSelectionLink]);
 
   useEffect(() => {
-    return () => clearCloseTimers();
-  }, [clearCloseTimers]);
+    return () => {
+      clearCloseTimers();
+      clearPendingOpenLinkEditorTimer();
+    };
+  }, [clearCloseTimers, clearPendingOpenLinkEditorTimer]);
 
   return {
     activeLink,
@@ -262,5 +336,6 @@ export function useActiveLinkTarget(editor: LexicalEditor) {
     scheduleActiveLinkClose: schedulePinnedLinkClose,
     setPopoverElement,
     shouldIgnorePopoverClose,
+    urlInputFocusRequest,
   };
 }

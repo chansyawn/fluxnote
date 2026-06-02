@@ -1,15 +1,12 @@
 import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
-import {
-  BlockEditorToolbar,
-  type BlockEditorTextFormatShortcuts,
-} from "@renderer/features/block-editor";
-import { BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS } from "@renderer/features/block-editor/toolbar";
+import { BlockEditorToolbar } from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { cn } from "@renderer/ui/lib/utils";
 import { useMemo } from "react";
 
 import { BlockEditorRegistryProvider } from "./editor-registry/block-editor-registry-context";
+import { pickBlockEditorShortcuts } from "./editor/workspace-block-editor-surface";
 import { VirtualBlockList } from "./list/virtual-block-list";
 import {
   LoadingState,
@@ -58,15 +55,7 @@ export function BlockWorkspace() {
     }),
     [editorRegistry.getEditor, editorRegistry.registerEditor],
   );
-  const toolbarShortcuts = useMemo<BlockEditorTextFormatShortcuts>(
-    () => ({
-      bold: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.bold],
-      italic: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.italic],
-      strikethrough: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.strikethrough],
-      code: shortcuts[BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS.code],
-    }),
-    [shortcuts],
-  );
+  const toolbarShortcuts = useMemo(() => pickBlockEditorShortcuts(shortcuts), [shortcuts]);
 
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;

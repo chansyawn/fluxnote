@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE } from "@renderer/features/block-editor/toolbar";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor";
 import { renderWithProviders } from "@renderer/test/render";
 import { fireEvent, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -16,10 +16,10 @@ const mocks = vi.hoisted(() => ({
     "workspace.copyBlock": "Mod+Shift+C",
     "workspace.createBlock": "Mod+N",
     "workspace.deleteBlock": "Mod+D",
-    "editor.formatBold": "Mod+B",
-    "editor.formatInlineCode": "Mod+Shift+E",
-    "editor.formatItalic": "Mod+I",
-    "editor.formatStrikethrough": "Mod+Shift+X",
+    "editor.bold": "Mod+B",
+    "editor.inlineCode": "Mod+Shift+E",
+    "editor.italic": "Mod+I",
+    "editor.strikethrough": "Mod+Shift+X",
     "workspace.keepBlock": "Mod+K",
     "global.quickCreateBlock": "Ctrl+Alt+N",
     "workspace.submitExternalEdit": "Mod+Enter",
@@ -30,6 +30,12 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@renderer/features/block-editor", () => ({
+  BLOCK_EDITOR_ACTION_DEFINITIONS: [
+    { id: "editor.bold" },
+    { id: "editor.inlineCode" },
+    { id: "editor.italic" },
+    { id: "editor.strikethrough" },
+  ],
   BlockEditorToolbar: ({
     controller,
     inactiveContent,
@@ -38,7 +44,10 @@ vi.mock("@renderer/features/block-editor", () => ({
     inactiveContent?: ReactNode;
   }) =>
     controller ? (
-      <button type="button">Editor toolbar</button>
+      <div>
+        <button type="button">Editor toolbar</button>
+        <button type="button">Editor toolbar menu</button>
+      </div>
     ) : (
       <div tabIndex={0}>{inactiveContent}</div>
     ),
@@ -96,11 +105,15 @@ vi.mock("./workspace-runtime", () => ({
       activeEditor: mocks.activeEditorEnabled
         ? {
             copy: vi.fn(async () => undefined),
+            executeAction: vi.fn((action) => ({
+              action,
+              focus: "editor" as const,
+              status: "executed" as const,
+            })),
             flush: vi.fn(async () => ""),
             focus: vi.fn(),
-            formatText: vi.fn(),
-            getToolbarState: () => DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-            subscribeToolbarState: () => () => undefined,
+            getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+            subscribeActionState: () => () => undefined,
           }
         : undefined,
       getEditor: vi.fn(),
@@ -151,6 +164,17 @@ describe("BlockWorkspace", () => {
 
     blockEditor.focus();
     fireEvent.blur(blockEditor, { relatedTarget: toolbar });
+
+    expect(mocks.focusBlock).not.toHaveBeenCalledWith(null);
+  });
+
+  it("keeps the active Block while focus moves into a toolbar dropdown", () => {
+    renderWithProviders(<BlockWorkspace />);
+    const toolbar = screen.getByRole("button", { name: "Editor toolbar" });
+    const toolbarMenu = screen.getByRole("button", { name: "Editor toolbar menu" });
+
+    toolbar.focus();
+    fireEvent.blur(toolbar, { relatedTarget: toolbarMenu });
 
     expect(mocks.focusBlock).not.toHaveBeenCalledWith(null);
   });

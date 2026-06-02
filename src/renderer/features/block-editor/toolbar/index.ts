@@ -1,13 +1,8 @@
 export { BlockEditorToolbar } from "./block-editor-toolbar";
 export {
-  BLOCK_EDITOR_TEXT_FORMAT_SHORTCUT_ACTIONS,
-  BLOCK_EDITOR_TEXT_FORMATS,
-  DEFAULT_BLOCK_EDITOR_TOOLBAR_STATE,
-  type BlockEditorShortcutBinding,
-  type BlockEditorTextFormat,
-  type BlockEditorTextFormatShortcuts,
-  type BlockEditorTextFormatState,
-  type BlockEditorToolbarController,
-  type BlockEditorToolbarState,
-  type BlockEditorToolbarStateListener,
+  BLOCK_EDITOR_BLOCK_FORMATS,
+  BLOCK_EDITOR_INLINE_FORMATS,
+  type BlockEditorBlockFormat,
+  type BlockEditorFormat,
+  type BlockEditorInlineFormat,
 } from "./types";

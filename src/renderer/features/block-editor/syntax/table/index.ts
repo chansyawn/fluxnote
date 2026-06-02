@@ -1,8 +1,13 @@
 import { ReactExtension } from "@lexical/react/ReactExtension";
 import { TableExtension } from "@lexical/table";
+import { mergeRegister } from "@lexical/utils";
 import { configExtension, defineExtension } from "lexical";
 
 import "./index.css";
+import { MarkdownShortcutExtension } from "../../markdown/markdown-shortcut-extension";
+import { registerTableCellClipboardInsertion } from "./table-cell-insert";
+import { registerTableCellNormalization } from "./table-cell-normalize";
+import { guardTableCellBlockShortcuts } from "./table-cell-shortcuts";
 import { TableControlsDecorator } from "./table-controls-decorator";
 import { TABLE } from "./table-shortcut";
 
@@ -21,6 +26,9 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
       hasNestedTables: false,
       hasTabHandler: true,
     }),
+    configExtension(MarkdownShortcutExtension, {
+      transformerPatches: [guardTableCellBlockShortcuts],
+    }),
   ],
   theme: {
     table: "block-editor__table",
@@ -31,6 +39,12 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
     tableScrollableWrapper: "block-editor__table-scrollable-wrapper",
     tableSelected: "block-editor__table--selected",
     tableSelection: "block-editor__table-selection",
+  },
+  register(editor) {
+    return mergeRegister(
+      registerTableCellClipboardInsertion(editor),
+      registerTableCellNormalization(editor),
+    );
   },
 });
 
