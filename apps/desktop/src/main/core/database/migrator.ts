@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
 import { app } from "electron";
@@ -10,10 +9,6 @@ import type { AppDatabase } from "./client";
 const MIGRATIONS_DIR_NAME = "drizzle";
 const SOURCE_MIGRATIONS_DIR = "src/main/core/database/drizzle";
 const WORKSPACE_SOURCE_MIGRATIONS_DIR = "apps/desktop/src/main/core/database/drizzle";
-const MODULE_MIGRATIONS_DIR = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  MIGRATIONS_DIR_NAME,
-);
 
 function isPackagedElectronRuntime(): boolean {
   return Boolean(app?.isPackaged);
@@ -27,7 +22,6 @@ export function resolveMigrationsFolder(): string {
   const candidates = [
     path.resolve(process.cwd(), SOURCE_MIGRATIONS_DIR),
     path.resolve(process.cwd(), WORKSPACE_SOURCE_MIGRATIONS_DIR),
-    MODULE_MIGRATIONS_DIR,
   ];
 
   return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
