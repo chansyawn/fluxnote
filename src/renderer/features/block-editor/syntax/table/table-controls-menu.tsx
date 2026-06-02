@@ -24,6 +24,7 @@ import {
   ArrowRightToLineIcon,
   ArrowUpIcon,
   ArrowUpToLineIcon,
+  EllipsisIcon,
   TextIcon,
   Trash2Icon,
   type LucideIcon,
@@ -212,7 +213,7 @@ export function TableHandleMenu({
           insetInlineStart: target.handles[kind].inlineStart,
         }}
       >
-        <span aria-hidden="true">⋯</span>
+        <EllipsisIcon aria-hidden="true" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="center"
