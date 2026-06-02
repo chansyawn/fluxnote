@@ -373,9 +373,15 @@ msgid "header.open-preferences"
 msgstr "Open preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
 msgstr "Experiment area for infrastructure and integration demos."
+
+#. js-lingui-explicit-id
+#. placeholder {0}: helloEditor()
+#: src/renderer/routes/lab/index.tsx:23
+msgid "lab.editorPackageGreeting"
+msgstr "Editor package: {0}"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
@@ -393,7 +399,7 @@ msgid "lab.playground.title"
 msgstr "Block Editor Playground"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr "Lab"
 

@@ -373,9 +373,15 @@ msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
 msgstr "用于基础设施与集成演示的实验区域。"
+
+#. js-lingui-explicit-id
+#. placeholder {0}: helloEditor()
+#: src/renderer/routes/lab/index.tsx:23
+msgid "lab.editorPackageGreeting"
+msgstr "编辑器包：{0}"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
@@ -393,7 +399,7 @@ msgid "lab.playground.title"
 msgstr "区块编辑器演练区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr "实验室"
 

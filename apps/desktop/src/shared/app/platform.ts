@@ -1,5 +1,3 @@
-import { normalizeKnownValue } from "@fluxnotes/utils";
-
 const APP_PLATFORMS = ["darwin", "win32", "unsupported"] as const;
 
 export type AppPlatform = (typeof APP_PLATFORMS)[number];
@@ -9,5 +7,5 @@ export interface AppEnvironment {
 }
 
 export function normalizeAppPlatform(value: string): AppPlatform {
-  return normalizeKnownValue(value, APP_PLATFORMS, "unsupported");
+  return APP_PLATFORMS.find((platform) => platform === value) ?? "unsupported";
 }

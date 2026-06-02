@@ -373,8 +373,14 @@ msgid "header.open-preferences"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
+#: src/renderer/routes/lab/index.tsx:18
 msgid "lab.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#. placeholder {0}: helloEditor()
+#: src/renderer/routes/lab/index.tsx:23
+msgid "lab.editorPackageGreeting"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -393,7 +399,7 @@ msgid "lab.playground.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
+#: src/renderer/routes/lab/index.tsx:15
 msgid "lab.title"
 msgstr ""
 

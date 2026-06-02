@@ -1,16 +1,15 @@
 {
-  "name": "@fluxnotes/utils",
+  "name": "@fluxnotes/editor",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared utility helpers for Fluxnotes packages.",
-  "files": [
-    "dist"
-  ],
+  "description": "Shared block editor helpers for Fluxnotes packages.",
   "type": "module",
-  "types": "./dist/index.d.mts",
+  "types": "./src/index.ts",
   "exports": {
-    ".": "./dist/index.mjs",
-    "./package.json": "./package.json"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
   },
   "scripts": {
     "build": "vp pack",

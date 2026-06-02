@@ -9,7 +9,7 @@
       "release-type": "node",
       "versioning": "always-bump-patch"
     },
-    "packages/utils": {
+    "packages/editor": {
       "release-type": "node",
       "skip-changelog": true,
       "skip-github-release": true,

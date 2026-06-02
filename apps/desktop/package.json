@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
-    "@fluxnotes/utils": "workspace:*",
+    "@fluxnotes/editor": "workspace:*",
     "@fontsource-variable/cascadia-code": "^5.2.2",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/noto-sans-sc": "^5.2.10",
