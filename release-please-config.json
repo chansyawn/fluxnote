@@ -1,11 +1,18 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "always-update": true,
+  "plugins": ["node-workspace"],
   "packages": {
     "apps/desktop": {
       "draft": true,
       "include-component-in-tag": false,
       "release-type": "node",
+      "versioning": "always-bump-patch"
+    },
+    "packages/utils": {
+      "release-type": "node",
+      "skip-changelog": true,
+      "skip-github-release": true,
       "versioning": "always-bump-patch"
     }
   }

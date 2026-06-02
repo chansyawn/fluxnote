@@ -31,7 +31,7 @@ jobs:
         run: |
           subject="${COMMIT_MESSAGE%%$'\n'*}"
 
-          if [[ "$subject" =~ ^chore\(master\):\ release\ [0-9]+\.[0-9]+\.[0-9]+(\-[0-9A-Za-z.-]+)?\ \(#[0-9]+\)$ ]] \
+          if [[ "$subject" =~ ^chore\(master\):\ release(\ [0-9]+\.[0-9]+\.[0-9]+(\-[0-9A-Za-z.-]+)?)?\ \(#[0-9]+\)$ ]] \
             && [[ "$AUTHOR_NAME" == "fluxnotes-release-bot[bot]" ]] \
             && [[ "$AUTHOR_EMAIL" == "285336738+fluxnotes-release-bot[bot]@users.noreply.github.com" ]]; then
             echo "is_release_merge=true" >> "$GITHUB_OUTPUT"
