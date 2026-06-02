@@ -120,7 +120,7 @@ After any code change, run:
 
 ```bash
 vp check
-vp test
+vp run test
 vp run package
 ```
 
@@ -135,12 +135,12 @@ vp run package
 ## Test
 
 - Import test APIs from `vite-plus/test`, never from `vitest`.
-- Run tests with `vp test`; do not invoke `vitest` directly.
+- Run workspace tests with `vp run test`; run package-local tests with `vp test`; do not invoke `vitest` directly.
 - Use the Arrange-Act-Assert structure for readability.
 - Tests must be isolated and must not depend on execution order or shared state.
 - Use descriptive test names, preferably following `action state expected` or `given when then`.
 - Add comments only when they clarify non-obvious intent or setup.
-- Use `vp test --coverage` as a reference, not as the primary quality target.
+- Use package-local `vp test --coverage` as a reference, not as the primary quality target.
 
 ## Agent skills
 

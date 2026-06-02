@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "vp config",
     "dev": "vp exec --filter @fluxnotes/desktop -- electron-forge start",
+    "test": "vp run -r test",
     "package": "vp run @fluxnotes/desktop#package",
     "make": "vp run @fluxnotes/desktop#make",
     "flux": "vp run @fluxnotes/desktop#flux",

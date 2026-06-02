@@ -16,6 +16,8 @@
   "scripts": {
     "postinstall": "vp config",
     "dev": "electron-forge start",
+    "test": "vp test",
+    "check": "vp check",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "flux": "./src/cli/flux",
