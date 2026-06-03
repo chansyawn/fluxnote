@@ -22,7 +22,7 @@ import {
   BadgeInfoIcon,
   BugIcon,
   CircleFadingArrowUpIcon,
-  HomeIcon,
+  FolderGit2Icon,
   RefreshCwIcon,
   SendIcon,
 } from "lucide-react";
@@ -159,7 +159,7 @@ export function AboutPreferencesSection() {
                 variant="outline"
                 onClick={() => handleOpenExternalUrl(GITHUB_REPOSITORY_URL)}
               >
-                <HomeIcon />
+                <FolderGit2Icon />
                 <Trans id="preferences.github.repository.open">Repository</Trans>
               </Button>
               <Button
