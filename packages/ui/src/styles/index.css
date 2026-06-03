@@ -1,5 +1,7 @@
 @source "../components";
 @source "../lib";
 
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 @import "./theme.css";
 @import "./base.css";

@@ -972,12 +972,12 @@ msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:148
+#: src/renderer/features/tag/tag-combobox-popover.tsx:152
 msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:190
+#: src/renderer/features/tag/tag-combobox-popover.tsx:194
 msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
@@ -992,7 +992,7 @@ msgid "workspace.tags.filter.placeholder"
 msgstr "Search or create tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:157
+#: src/renderer/features/tag/tag-combobox-popover.tsx:161
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 
