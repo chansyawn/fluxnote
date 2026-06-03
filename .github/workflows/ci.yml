@@ -39,7 +39,7 @@ jobs:
         run: vp check
 
       - name: Test
-        run: vp test
+        run: vp run test
 
       - name: Check i18n
         run: vp run i18n:check

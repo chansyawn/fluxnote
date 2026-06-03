@@ -1,3 +1,4 @@
 {
-  ".": "0.0.27"
+  "apps/desktop": "0.0.27",
+  "packages/editor": "0.0.0"
 }

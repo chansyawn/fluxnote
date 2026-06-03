@@ -14,7 +14,7 @@ Use `feat` for user-visible additions, `fix` for bug fixes, and `chore` for main
 
 Releases are managed by release-please from Conventional Commits on `master`.
 
-When releasable changes land, release-please opens a release pull request that updates the version and changelog. Merging that pull request creates a draft GitHub Release, builds the signed app artifacts, uploads them, and then publishes the release.
+When releasable changes land, release-please opens a release pull request that updates the desktop app version and `apps/desktop/CHANGELOG.md`. Merging that pull request creates a draft GitHub Release, builds the signed app artifacts, uploads them, and then publishes the release.
 
 ## Pull Requests
 

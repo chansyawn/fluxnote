@@ -1,5 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+  - tools/*
+
 nodeLinker: hoisted
+catalogMode: prefer
+onlyBuiltDependencies:
+  - electron
+  - electron-winstaller
+  - fs-xattr
+  - macos-alias
 catalog:
+  "@types/node": ^24
+  typescript: ^5
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vitest: npm:@voidzero-dev/vite-plus-test@latest
   vite-plus: latest
@@ -13,3 +26,12 @@ peerDependencyRules:
   allowedVersions:
     vite: "*"
     vitest: "*"
+allowBuilds:
+  core-js: true
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+  fs-xattr: true
+  macos-alias: true
+  msw: true
+  protobufjs: true
