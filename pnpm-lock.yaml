@@ -51,45 +51,6 @@ importers:
       '@fontsource-variable/noto-sans-sc':
         specifier: ^5.2.10
         version: 5.2.10
-      '@lexical/clipboard':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code-core':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code-shiki':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/extension':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/headless':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/history':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/link':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/list':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/markdown':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/react':
-        specifier: ^0.45.0
-        version: 0.45.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yjs@13.6.30)
-      '@lexical/rich-text':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/table':
-        specifier: ^0.45.0
-        version: 0.45.0
       '@lingui/core':
         specifier: 6.0.1
         version: 6.0.1
@@ -99,9 +60,6 @@ importers:
       '@tanstack/react-hotkeys':
         specifier: ^0.10.0
         version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@tanstack/react-pacer':
-        specifier: ^0.22.0
-        version: 0.22.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
         specifier: ^5.96.2
         version: 5.96.2(react@19.2.4)
@@ -123,15 +81,6 @@ importers:
       electron-store:
         specifier: ^11.0.2
         version: 11.0.2
-      hast-util-to-html:
-        specifier: ^9.0.5
-        version: 9.0.5
-      lexical:
-        specifier: ^0.45.0
-        version: 0.45.0
-      mdast-util-to-hast:
-        specifier: ^13.2.1
-        version: 13.2.1
       posthog-js:
         specifier: ^1.376.0
         version: 1.376.0
@@ -154,9 +103,6 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0
       remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      remark-stringify:
         specifier: ^11.0.0
         version: 11.0.0
       tailwindcss:
@@ -302,6 +248,9 @@ importers:
         specifier: ^0.45.0
         version: 0.45.0
       '@lexical/table':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/utils':
         specifier: ^0.45.0
         version: 0.45.0
       '@lingui/core':
@@ -2330,11 +2279,6 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
-  '@tanstack/devtools-event-client@0.4.3':
-    resolution: {integrity: sha512-OZI6QyULw0FI0wjgmeYzCIfbgPsOEzwJtCpa69XrfLMtNXLGnz3d/dIabk7frg0TmHo+Ah49w5I4KC7Tufwsvw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   '@tanstack/history@1.161.6':
     resolution: {integrity: sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg==}
     engines: {node: '>=20.19'}
@@ -2343,22 +2287,11 @@ packages:
     resolution: {integrity: sha512-vqH7X9nb0MTJ/O08++dB5bP9jgj4+BIPOUu/U+6myG86lDsirZSVSobpq5UQpE7nBuk62i8eIYeOhd+OMl/UrA==}
     engines: {node: '>=18'}
 
-  '@tanstack/pacer@0.21.0':
-    resolution: {integrity: sha512-EZyU3fQvdz7faj0vBVrPd5ejkSS9pbGKtrGZI56dLJgotca6iZKhaNDRv7dweG4dnWx0LovE9YYf1MAErGpbLQ==}
-    engines: {node: '>=18'}
-
   '@tanstack/query-core@5.96.2':
     resolution: {integrity: sha512-hzI6cTVh4KNRk8UtoIBS7Lv9g6BnJPXvBKsvYH1aGWvv0347jT3BnSvztOE+kD76XGvZnRC/t6qdW1CaIfwCeA==}
 
   '@tanstack/react-hotkeys@0.10.0':
     resolution: {integrity: sha512-GwOSndI5j3qBVYTmgP1mYyRTnlxb2MS17cwGlsavSxMQPSnmDf+m3LzMIpRMs+3zzQMjg3cYhHsFYizYlFI2tw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-
-  '@tanstack/react-pacer@0.22.0':
-    resolution: {integrity: sha512-AuKrkcP/LheBuq1tJCN8DDkwU+RmSql3zpJ1RFwvdc7qJED7Ba+jwlfFkeOZ62WcMtV54RceG9Uyprr0j99Qnw==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=16.8'
@@ -7767,17 +7700,10 @@ snapshots:
       tailwindcss: 4.2.2
       vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)'
 
-  '@tanstack/devtools-event-client@0.4.3': {}
-
   '@tanstack/history@1.161.6': {}
 
   '@tanstack/hotkeys@0.8.0':
     dependencies:
-      '@tanstack/store': 0.11.0
-
-  '@tanstack/pacer@0.21.0':
-    dependencies:
-      '@tanstack/devtools-event-client': 0.4.3
       '@tanstack/store': 0.11.0
 
   '@tanstack/query-core@5.96.2': {}
@@ -7785,13 +7711,6 @@ snapshots:
   '@tanstack/react-hotkeys@0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@tanstack/hotkeys': 0.8.0
-      '@tanstack/react-store': 0.11.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-
-  '@tanstack/react-pacer@0.22.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
-    dependencies:
-      '@tanstack/pacer': 0.21.0
       '@tanstack/react-store': 0.11.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)

@@ -42,6 +42,7 @@
     "@lexical/react": "^0.45.0",
     "@lexical/rich-text": "^0.45.0",
     "@lexical/table": "^0.45.0",
+    "@lexical/utils": "^0.45.0",
     "@lingui/core": "6.0.1",
     "@lingui/react": "6.0.1",
     "@tanstack/react-hotkeys": "^0.10.0",
