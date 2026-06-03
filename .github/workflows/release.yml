@@ -22,9 +22,9 @@ jobs:
       issues: write
       pull-requests: write
     outputs:
-      release_created: ${{ steps.release.outputs['apps/desktop--release_created'] }}
-      tag_name: ${{ steps.release.outputs['apps/desktop--tag_name'] }}
-      version: ${{ steps.release.outputs['apps/desktop--version'] }}
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
 
     steps:
       - name: Create release app token

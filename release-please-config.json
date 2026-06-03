@@ -2,29 +2,20 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "always-update": true,
   "plugins": ["node-workspace"],
-  "pull-request-title-pattern": "chore${scope}: release${component} ${version}",
-  "separate-pull-requests": true,
   "packages": {
-    "apps/desktop": {
+    ".": {
       "component": "desktop",
       "draft": true,
+      "extra-files": [
+        {
+          "jsonpath": "$.version",
+          "path": "apps/desktop/package.json",
+          "type": "json"
+        }
+      ],
       "force-tag-creation": true,
       "include-component-in-tag": false,
       "release-type": "node",
-      "versioning": "always-bump-patch"
-    },
-    "packages/editor": {
-      "component": "editor",
-      "release-type": "node",
-      "skip-changelog": true,
-      "skip-github-release": true,
-      "versioning": "always-bump-patch"
-    },
-    "packages/ui": {
-      "component": "ui",
-      "release-type": "node",
-      "skip-changelog": true,
-      "skip-github-release": true,
       "versioning": "always-bump-patch"
     }
   }
