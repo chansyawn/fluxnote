@@ -1,0 +1,250 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-06-04 13:46+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: pseudo\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-copy-button.tsx:23
+msgid "block-editor.code.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-copy-button.tsx:19
+msgid "block-editor.code.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-language-combobox.tsx:33
+msgid "block-editor.code.language.empty"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-language-combobox.tsx:76
+msgid "block-editor.code.language.search"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/core/block-editor.tsx:102
+msgid "block-editor.content.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:121
+msgid "block-editor.link.convert"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:119
+msgid "block-editor.link.copied"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:118
+msgid "block-editor.link.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:117
+msgid "block-editor.link.open"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:120
+msgid "block-editor.link.remove"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:122
+msgid "block-editor.link.url"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/core/block-editor.tsx:101
+#: src/core/block-editor.tsx:107
+msgid "block-editor.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:179
+msgid "block-editor.table.align-center"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:175
+msgid "block-editor.table.align-default"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:177
+msgid "block-editor.table.align-left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:181
+msgid "block-editor.table.align-right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:129
+msgid "block-editor.table.column-menu"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:158
+msgid "block-editor.table.delete-column"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:168
+msgid "block-editor.table.delete-row"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:144
+msgid "block-editor.table.insert-column-left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:149
+msgid "block-editor.table.insert-column-right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:160
+msgid "block-editor.table.insert-row-above"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:162
+msgid "block-editor.table.insert-row-below"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:154
+msgid "block-editor.table.move-column-left"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:156
+msgid "block-editor.table.move-column-right"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:166
+msgid "block-editor.table.move-row-down"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:164
+msgid "block-editor.table.move-row-up"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:135
+msgid "block-editor.table.row-menu"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:185
+msgid "block-editor.toolbar.blockquote"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:140
+msgid "block-editor.toolbar.bold"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:114
+msgid "block-editor.toolbar.bullet-list"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:100
+msgid "block-editor.toolbar.code-block"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:64
+msgid "block-editor.toolbar.heading-1"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:70
+msgid "block-editor.toolbar.heading-2"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:76
+msgid "block-editor.toolbar.heading-3"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:82
+msgid "block-editor.toolbar.heading-4"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:88
+msgid "block-editor.toolbar.heading-5"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:94
+msgid "block-editor.toolbar.heading-6"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:161
+msgid "block-editor.toolbar.inline-code"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:147
+msgid "block-editor.toolbar.italic"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/toolbar/block-editor-toolbar.tsx:133
+msgid "block-editor.toolbar.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:175
+msgid "block-editor.toolbar.link"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/toolbar/block-editor-toolbar.tsx:181
+msgid "block-editor.toolbar.list"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:58
+msgid "block-editor.toolbar.normal-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:120
+msgid "block-editor.toolbar.numbered-list"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:154
+msgid "block-editor.toolbar.strikethrough"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:126
+msgid "block-editor.toolbar.task-list"
+msgstr ""

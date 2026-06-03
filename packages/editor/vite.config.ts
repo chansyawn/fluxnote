@@ -24,6 +24,9 @@ export default defineConfig({
     },
   },
   fmt: {},
+  staged: {
+    "{lingui.config.ts,src/**/*.{ts,tsx,po}}": "vp run i18n:check",
+  },
   test: {
     setupFiles: ["./src/test-helper/setup.ts"],
   },

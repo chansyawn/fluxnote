@@ -284,6 +284,12 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
     devDependencies:
+      '@lingui/cli':
+        specifier: 6.0.1
+        version: 6.0.1
+      '@lingui/format-po':
+        specifier: 6.0.1
+        version: 6.0.1
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1

@@ -18,12 +18,38 @@
       "types": "./src/shortcuts.ts",
       "import": "./src/shortcuts.ts"
     },
+    "./locales/en": {
+      "types": "./src/locales/en/messages.ts",
+      "import": "./src/locales/en/messages.ts"
+    },
+    "./locales/en/messages": {
+      "types": "./src/locales/en/messages.ts",
+      "import": "./src/locales/en/messages.ts"
+    },
+    "./locales/pseudo": {
+      "types": "./src/locales/pseudo/messages.ts",
+      "import": "./src/locales/pseudo/messages.ts"
+    },
+    "./locales/pseudo/messages": {
+      "types": "./src/locales/pseudo/messages.ts",
+      "import": "./src/locales/pseudo/messages.ts"
+    },
+    "./locales/zh-Hans": {
+      "types": "./src/locales/zh-Hans/messages.ts",
+      "import": "./src/locales/zh-Hans/messages.ts"
+    },
+    "./locales/zh-Hans/messages": {
+      "types": "./src/locales/zh-Hans/messages.ts",
+      "import": "./src/locales/zh-Hans/messages.ts"
+    },
     "./styles": "./src/styles.css",
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
+    "i18n:extract": "lingui extract --overwrite --clean && lingui compile --namespace es --typescript",
+    "i18n:check": "node scripts/check-i18n.mjs",
     "test": "vp test",
     "check": "vp check"
   },
@@ -59,6 +85,8 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
+    "@lingui/cli": "6.0.1",
+    "@lingui/format-po": "6.0.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "catalog:",

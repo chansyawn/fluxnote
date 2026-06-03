@@ -9,8 +9,9 @@ export default defineConfig({
   fallbackLocales: { default: "en" },
   catalogs: [
     {
-      path: "<rootDir>/src/renderer/locales/{locale}/messages",
-      include: ["src/renderer"],
+      path: "<rootDir>/src/locales/{locale}/messages",
+      include: ["src"],
+      exclude: ["src/locales"],
     },
   ],
   compileNamespace: "ts",

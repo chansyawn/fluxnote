@@ -11,8 +11,8 @@
     "flux": "vp run @fluxnotes/desktop#flux",
     "release:macos": "vp run @fluxnotes/desktop#release:macos",
     "db:generate": "vp run @fluxnotes/desktop#db:generate",
-    "i18n:extract": "vp run @fluxnotes/desktop#i18n:extract",
-    "i18n:check": "vp run @fluxnotes/desktop#i18n:check"
+    "i18n:extract": "vp run -r i18n:extract",
+    "i18n:check": "vp run -r i18n:check"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
