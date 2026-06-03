@@ -1,18 +1,10 @@
-import { defineConfig } from "@lingui/cli";
+import { createLinguiConfig } from "../../config/i18n/lingui.ts";
 
-const PSEUDO_LOCALE = "pseudo";
-
-export default defineConfig({
-  sourceLocale: "en",
-  locales: ["en", "zh-Hans", PSEUDO_LOCALE],
-  pseudoLocale: PSEUDO_LOCALE,
-  fallbackLocales: { default: "en" },
+export default createLinguiConfig({
   catalogs: [
     {
       path: "<rootDir>/src/renderer/locales/{locale}/messages",
       include: ["src/renderer"],
     },
   ],
-  compileNamespace: "ts",
-  orderBy: "messageId",
 });

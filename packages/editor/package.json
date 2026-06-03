@@ -48,8 +48,6 @@
   "scripts": {
     "build": "vp pack",
     "dev": "vp pack --watch",
-    "i18n:extract": "lingui extract --overwrite --clean && lingui compile --namespace es --typescript",
-    "i18n:check": "node scripts/check-i18n.mjs",
     "test": "vp test",
     "check": "vp check"
   },
@@ -85,8 +83,6 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@lingui/cli": "6.0.1",
-    "@lingui/format-po": "6.0.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "catalog:",

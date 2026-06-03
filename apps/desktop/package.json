@@ -22,9 +22,7 @@
     "make": "electron-forge make",
     "flux": "./src/cli/flux",
     "release:macos": "node scripts/release/macos.mjs",
-    "db:generate": "drizzle-kit generate",
-    "i18n:extract": "lingui extract --overwrite --clean",
-    "i18n:check": "node scripts/check-i18n.mjs"
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@fluxnotes/editor": "workspace:*",
@@ -60,8 +58,6 @@
     "@electron-forge/shared-types": "8.0.0-alpha.8",
     "@electron/fuses": "2.1.1",
     "@lingui/babel-plugin-lingui-macro": "6.0.1",
-    "@lingui/cli": "6.0.1",
-    "@lingui/format-po": "6.0.1",
     "@lingui/vite-plugin": "6.0.1",
     "@oxlint/plugins": "^1.66.0",
     "@rolldown/plugin-babel": "^0.2.2",

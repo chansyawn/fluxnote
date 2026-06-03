@@ -11,12 +11,14 @@
     "flux": "vp run @fluxnotes/desktop#flux",
     "release:macos": "vp run @fluxnotes/desktop#release:macos",
     "db:generate": "vp run @fluxnotes/desktop#db:generate",
-    "i18n:extract": "vp run -r i18n:extract",
-    "i18n:check": "vp run -r i18n:check"
+    "i18n:extract": "node scripts/i18n/extract.mjs",
+    "i18n:check": "node scripts/i18n/check-i18n.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
+    "@lingui/cli": "6.0.1",
+    "@lingui/format-po": "6.0.1",
     "vite-plus": "catalog:"
   },
   "engines": {

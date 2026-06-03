@@ -30,6 +30,12 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^21.0.1
         version: 21.0.1
+      '@lingui/cli':
+        specifier: 6.0.1
+        version: 6.0.1
+      '@lingui/format-po':
+        specifier: 6.0.1
+        version: 6.0.1
       vite-plus:
         specifier: 'catalog:'
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
@@ -128,12 +134,6 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       '@lingui/babel-plugin-lingui-macro':
-        specifier: 6.0.1
-        version: 6.0.1
-      '@lingui/cli':
-        specifier: 6.0.1
-        version: 6.0.1
-      '@lingui/format-po':
         specifier: 6.0.1
         version: 6.0.1
       '@lingui/vite-plugin':
@@ -284,12 +284,6 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
     devDependencies:
-      '@lingui/cli':
-        specifier: 6.0.1
-        version: 6.0.1
-      '@lingui/format-po':
-        specifier: 6.0.1
-        version: 6.0.1
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
