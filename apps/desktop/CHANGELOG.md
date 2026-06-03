@@ -1,12 +1,5 @@
 # Changelog
 
-## [0.0.29](https://github.com/chansyawn/fluxnotes/compare/v0.0.28...v0.0.29) (2026-06-03)
-
-
-### Bug Fixes
-
-* hide workspace footer when empty ([#76](https://github.com/chansyawn/fluxnotes/issues/76)) ([449c78e](https://github.com/chansyawn/fluxnotes/commit/449c78ea30eb755ee36dfb1558b317164972893f))
-
 ## [0.0.28](https://github.com/chansyawn/fluxnotes/compare/v0.0.27...v0.0.28) (2026-06-03)
 
 

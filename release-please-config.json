@@ -1,9 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "always-update": true,
-  "group-pull-request-title-pattern": "chore${scope}: release${component} ${version}",
   "plugins": ["node-workspace"],
   "pull-request-title-pattern": "chore${scope}: release${component} ${version}",
+  "separate-pull-requests": true,
   "packages": {
     "apps/desktop": {
       "component": "desktop",
