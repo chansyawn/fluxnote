@@ -4,12 +4,22 @@
   "private": true,
   "description": "Shared block editor helpers for Fluxnotes packages.",
   "type": "module",
-  "types": "./src/index.ts",
+  "types": "./src/index.tsx",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
-    }
+      "types": "./src/index.tsx",
+      "import": "./src/index.tsx"
+    },
+    "./models": {
+      "types": "./src/models.ts",
+      "import": "./src/models.ts"
+    },
+    "./shortcuts": {
+      "types": "./src/shortcuts.ts",
+      "import": "./src/shortcuts.ts"
+    },
+    "./styles": "./src/styles.css",
+    "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "build": "vp pack",
@@ -17,8 +27,43 @@
     "test": "vp test",
     "check": "vp check"
   },
+  "dependencies": {
+    "@fluxnotes/ui": "workspace:*",
+    "@lexical/clipboard": "^0.45.0",
+    "@lexical/code": "^0.45.0",
+    "@lexical/code-core": "^0.45.0",
+    "@lexical/code-shiki": "^0.45.0",
+    "@lexical/extension": "^0.45.0",
+    "@lexical/headless": "^0.45.0",
+    "@lexical/history": "^0.45.0",
+    "@lexical/link": "^0.45.0",
+    "@lexical/list": "^0.45.0",
+    "@lexical/markdown": "^0.45.0",
+    "@lexical/react": "^0.45.0",
+    "@lexical/rich-text": "^0.45.0",
+    "@lexical/table": "^0.45.0",
+    "@lingui/core": "6.0.1",
+    "@lingui/react": "6.0.1",
+    "@tanstack/react-hotkeys": "^0.10.0",
+    "hast-util-to-html": "^9.0.5",
+    "lexical": "^0.45.0",
+    "mdast-util-to-hast": "^13.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "tailwindcss": "^4.2.2",
+    "unified": "^11.0.5"
+  },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "catalog:",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

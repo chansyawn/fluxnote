@@ -1,4 +1,4 @@
-import { normalizeExternalMarkdown } from "@renderer/features/block-editor/markdown/external-markdown";
+import { normalizeExternalMarkdown } from "@fluxnotes/editor";
 import { useCallback, useMemo } from "react";
 
 import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-cache";

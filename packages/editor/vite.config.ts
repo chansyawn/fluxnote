@@ -1,9 +1,19 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vite-plus";
 
+const packageRoot = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@fluxnotes/ui": path.resolve(packageRoot, "../ui/src"),
+    },
+  },
   pack: {
     dts: true,
-    entry: ["src/index.ts"],
+    entry: ["src/index.tsx", "src/models.ts", "src/shortcuts.ts"],
     exports: true,
     format: ["esm"],
   },
@@ -14,4 +24,7 @@ export default defineConfig({
     },
   },
   fmt: {},
+  test: {
+    setupFiles: ["./src/test-helper/setup.ts"],
+  },
 });

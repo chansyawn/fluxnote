@@ -1,6 +1,7 @@
+import { BlockEditor, type BlockEditorRuntime } from "@fluxnotes/editor";
 import { Button } from "@fluxnotes/ui/components/button";
 import { Trans } from "@lingui/react/macro";
-import { BlockEditor, type BlockEditorRuntime } from "@renderer/features/block-editor";
+import { useThemeState } from "@renderer/app/theme";
 import { useMemo, useState } from "react";
 
 const DEFAULT_PLAYGROUND_MARKDOWN = `# Heading 1
@@ -65,6 +66,7 @@ pnpm dev
 export function BlockEditorPlaygroundPanel() {
   const [markdown, setMarkdown] = useState(DEFAULT_PLAYGROUND_MARKDOWN);
   const [editorVersion, setEditorVersion] = useState(0);
+  const { resolvedTheme } = useThemeState();
   const runtime = useMemo<BlockEditorRuntime>(
     () => ({
       assets: {
@@ -137,6 +139,7 @@ export function BlockEditorPlaygroundPanel() {
             key={editorVersion}
             runtime={runtime}
             initialMarkdown={markdown}
+            config={{ appearance: { resolvedTheme } }}
             onMarkdownChange={(latestMarkdown) => {
               setMarkdown(latestMarkdown);
             }}

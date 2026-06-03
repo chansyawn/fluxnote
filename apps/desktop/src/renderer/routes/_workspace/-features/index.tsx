@@ -1,7 +1,7 @@
+import { BlockEditorToolbar } from "@fluxnotes/editor";
 import { cn } from "@fluxnotes/ui/lib/utils";
 import type { I18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
-import { BlockEditorToolbar } from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { useMemo } from "react";
 

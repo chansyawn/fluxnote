@@ -1,9 +1,0 @@
-@reference "#global.css";
-
-.block-editor__horizontal-rule {
-  @apply border-ring my-2 h-0 border-2 border-t;
-}
-
-.block-editor__horizontal-rule--selected {
-  @apply outline-ring rounded-md outline-2 outline-offset-1;
-}

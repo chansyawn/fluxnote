@@ -1,4 +1,4 @@
-import type { BlockEditorClipboardWriteData } from "@renderer/features/block-editor";
+import type { BlockEditorClipboardWriteData } from "@fluxnotes/editor";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({

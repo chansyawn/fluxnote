@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@fluxnotes/editor";
 import { renderWithProviders } from "@renderer/test/render";
 import { fireEvent, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -29,7 +29,7 @@ const mocks = vi.hoisted(() => ({
   totalBlockCount: 1,
 }));
 
-vi.mock("@renderer/features/block-editor", () => ({
+vi.mock("@fluxnotes/editor", () => ({
   BLOCK_EDITOR_ACTION_DEFINITIONS: [
     { id: "editor.bold" },
     { id: "editor.inlineCode" },

@@ -1,0 +1,77 @@
+@reference "@fluxnotes/ui/styles/index.css";
+
+.block-editor__list {
+  --block-editor-list-indent: 1.125rem;
+  --block-editor-check-size: 0.875rem;
+
+  @apply my-1;
+
+  list-style-position: outside;
+  padding-inline-start: var(--block-editor-list-indent);
+}
+
+.block-editor__list-item > .block-editor__list {
+  @apply my-0;
+}
+
+.block-editor__list--ordered {
+  list-style-type: decimal;
+}
+
+.block-editor__list--unordered {
+  list-style-type: disc;
+}
+
+.block-editor__list--unordered-depth-disc {
+  list-style-type: disc;
+}
+
+.block-editor__list--unordered-depth-circle {
+  list-style-type: circle;
+}
+
+.block-editor__list--unordered-depth-square {
+  list-style-type: square;
+}
+
+.block-editor__list--check {
+  padding-inline-start: 0;
+}
+
+.block-editor__list-item {
+  @apply my-0.5;
+}
+
+.block-editor__list-item--checked,
+.block-editor__list-item--unchecked {
+  @apply relative list-none outline-none;
+
+  padding-inline-start: var(--block-editor-list-indent);
+}
+
+.block-editor__list-item--checked::before,
+.block-editor__list-item--unchecked::before {
+  @apply border-muted-foreground/70 bg-background text-primary absolute top-[0.35em] rounded-[3px] border text-center text-[10px];
+
+  content: "";
+  height: var(--block-editor-check-size);
+  inset-inline-start: 0;
+  line-height: calc(var(--block-editor-check-size) - 2px);
+  width: var(--block-editor-check-size);
+}
+
+.block-editor__list-item--checked::before {
+  @apply border-primary bg-primary/10;
+
+  content: "✓";
+}
+
+.block-editor__list-item--checked {
+  @apply text-muted-foreground;
+}
+
+.block-editor__list-item::marker {
+  @apply text-muted-foreground;
+
+  font-variant-numeric: tabular-nums;
+}

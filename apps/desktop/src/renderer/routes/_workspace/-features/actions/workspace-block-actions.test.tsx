@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor/actions";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@fluxnotes/editor";
 import type { WorkspaceBlockEditorHandle } from "@renderer/routes/_workspace/-features/editor/workspace-block-editor-surface";
 import type { WorkspaceCommands } from "@renderer/routes/_workspace/-features/workspace-state-context";
 import {

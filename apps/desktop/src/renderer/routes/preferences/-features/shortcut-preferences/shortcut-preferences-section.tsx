@@ -1,3 +1,4 @@
+import { getBlockEditorActionDefinition, type BlockEditorActionId } from "@fluxnotes/editor";
 import {
   CheckIcon,
   ArchiveIcon,
@@ -12,10 +13,6 @@ import {
 } from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import {
-  getBlockEditorActionDefinition,
-  type BlockEditorActionId,
-} from "@renderer/features/block-editor";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   PreferencesGroup,

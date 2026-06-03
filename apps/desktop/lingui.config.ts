@@ -10,7 +10,7 @@ export default defineConfig({
   catalogs: [
     {
       path: "<rootDir>/src/renderer/locales/{locale}/messages",
-      include: ["src/renderer"],
+      include: ["src/renderer", "../../packages/editor/src"],
     },
   ],
   compileNamespace: "ts",

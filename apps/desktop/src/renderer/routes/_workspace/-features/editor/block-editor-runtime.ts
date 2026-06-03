@@ -1,3 +1,4 @@
+import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "@fluxnotes/editor";
 import {
   copyAsset,
   createAsset,
@@ -7,10 +8,6 @@ import {
   writeBlockEditorClipboard,
   type BlockEditorClipboardWriteRequest,
 } from "@renderer/clients";
-import type {
-  BlockEditorClipboardWriteData,
-  BlockEditorRuntime,
-} from "@renderer/features/block-editor";
 
 function createClipboardWriteRequest(
   data: BlockEditorClipboardWriteData,

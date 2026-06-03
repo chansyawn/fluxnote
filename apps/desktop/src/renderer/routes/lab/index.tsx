@@ -1,4 +1,3 @@
-import { helloEditor } from "@fluxnotes/editor";
 import { Trans } from "@lingui/react/macro";
 import { BlockEditorPlaygroundPanel } from "@renderer/routes/lab/-features/block-editor-playground-panel";
 import { createFileRoute } from "@tanstack/react-router";
@@ -18,9 +17,6 @@ function RouteComponent() {
           <Trans id="lab.description">
             Experiment area for infrastructure and integration demos.
           </Trans>
-        </p>
-        <p className="text-muted-foreground text-xs">
-          <Trans id="lab.editorPackageGreeting">Editor package: {helloEditor()}</Trans>
         </p>
       </div>
 

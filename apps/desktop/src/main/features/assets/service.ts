@@ -1,13 +1,13 @@
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import type { AppDataPaths } from "@main/core/app-data";
-import type { AppDatabase } from "@main/core/database";
 import {
   collectImageAssetUrls,
   getImageAssetUrl,
   type ImageUrlNode,
-} from "@shared/features/block-editor/asset-urls";
+} from "@fluxnotes/editor/models";
+import type { AppDataPaths } from "@main/core/app-data";
+import type { AppDatabase } from "@main/core/database";
 import { businessError } from "@shared/ipc/result";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";

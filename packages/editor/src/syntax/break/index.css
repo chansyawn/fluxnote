@@ -1,0 +1,5 @@
+@reference "@fluxnotes/ui/styles/index.css";
+
+.block-editor__soft-break {
+  @apply leading-normal;
+}
