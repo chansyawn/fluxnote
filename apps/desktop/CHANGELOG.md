@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.28](https://github.com/chansyawn/fluxnotes/compare/v0.0.27...v0.0.28) (2026-06-03)
+
+
+### Bug Fixes
+
+* localize repository preference action ([#73](https://github.com/chansyawn/fluxnotes/issues/73)) ([5ccf4ad](https://github.com/chansyawn/fluxnotes/commit/5ccf4ad4d358143029c2360d8a6043dd23224b69))
+
 ## [0.0.27](https://github.com/chansyawn/fluxnotes/compare/v0.0.26...v0.0.27) (2026-06-02)
 
 
