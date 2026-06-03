@@ -2,9 +2,11 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { MakerSquirrel } from "@electron-forge/maker-squirrel";
 import type { ForgeMakeResult } from "@electron-forge/shared-types";
 import { describe, expect, it } from "vite-plus/test";
 
+import forgeConfig from "../../forge.config.ts";
 import { getReleaseArtifactName, normalizeMakeArtifacts } from "./artifacts.ts";
 
 async function writeArtifact(directory: string, fileName: string, content = ""): Promise<string> {
@@ -49,6 +51,17 @@ describe("forge artifact naming", () => {
         version: "1.2.3",
       }),
     ).toBe("fluxnotes-1.2.3-linux-x64.dmg");
+  });
+});
+
+describe("forge maker configuration", () => {
+  it("uses a filesystem-safe windows squirrel package name", async () => {
+    const maker = forgeConfig.makers?.find((candidate) => candidate instanceof MakerSquirrel);
+
+    expect(maker).toBeDefined();
+    await maker?.prepareConfig("x64");
+
+    expect(maker?.config).toMatchObject({ name: "fluxnotes" });
   });
 });
 

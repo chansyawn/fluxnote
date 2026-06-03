@@ -108,6 +108,7 @@ const config: ForgeConfig = {
     ),
     new MakerZIP({}, ["darwin"]),
     new MakerSquirrel((arch) => ({
+      name: "fluxnotes",
       setupIcon: windowsInstallerIconPath,
       setupExe: getReleaseArtifactName({
         arch,
