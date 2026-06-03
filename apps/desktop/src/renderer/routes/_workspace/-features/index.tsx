@@ -59,6 +59,7 @@ export function BlockWorkspace() {
 
   const { visibility, selectedTagIds } = viewState;
   const { totalBlockCount } = blockList;
+  const shouldShowBottomToolbar = totalBlockCount > 0;
 
   const tagFilter = (
     <WorkspaceTitlebarActionsPortal
@@ -134,28 +135,30 @@ export function BlockWorkspace() {
         }
       }}
     >
-      <div className="mx-auto flex w-full flex-1 flex-col gap-4">{workspaceContent}</div>
-      <div className="pointer-events-none sticky bottom-0 z-20 -mt-14 flex h-24 shrink-0 items-end justify-center pb-2">
-        <div
-          aria-hidden="true"
-          className={cn(
-            "fixed inset-x-0 bottom-0 z-0 h-16",
-            "from-background/80 via-background/40 to-background/0 bg-linear-to-t",
-          )}
-        />
-        <BlockEditorToolbar
-          className="pointer-events-auto relative z-10"
-          controller={editorRegistry.activeEditor}
-          shortcuts={toolbarShortcuts}
-          inactiveContent={
-            blockList.isInitialLoading ? null : (
-              <div className="text-muted-foreground/70 pointer-events-none relative z-10 mx-auto mb-2 text-xs font-medium select-none">
-                {formatWorkspaceToolbarBlockCountLabel(i18n, totalBlockCount)}
-              </div>
-            )
-          }
-        />
-      </div>
+      <div className="mx-auto flex w-full flex-1 flex-col gap-4 pb-3">{workspaceContent}</div>
+      {shouldShowBottomToolbar ? (
+        <div className="pointer-events-none sticky bottom-0 z-20 -mt-14 flex h-24 shrink-0 items-end justify-center pb-2">
+          <div
+            aria-hidden="true"
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-0 h-16",
+              "from-background/80 via-background/40 to-background/0 bg-linear-to-t",
+            )}
+          />
+          <BlockEditorToolbar
+            className="pointer-events-auto relative z-10"
+            controller={editorRegistry.activeEditor}
+            shortcuts={toolbarShortcuts}
+            inactiveContent={
+              blockList.isInitialLoading ? null : (
+                <div className="text-muted-foreground/70 pointer-events-none relative z-10 mx-auto mb-2 text-xs font-medium select-none">
+                  {formatWorkspaceToolbarBlockCountLabel(i18n, totalBlockCount)}
+                </div>
+              )
+            }
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
