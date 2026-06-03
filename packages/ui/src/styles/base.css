@@ -1,0 +1,20 @@
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-color: var(--ring) transparent;
+    scrollbar-width: thin;
+  }
+
+  html {
+    @apply text-foreground font-sans;
+  }
+
+  .lucide {
+    width: 1em;
+    height: 1em;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}

@@ -1,3 +1,6 @@
+import { BrandIcon } from "@fluxnotes/ui/components/brand-icon";
+import { Button } from "@fluxnotes/ui/components/button";
+import { Switch } from "@fluxnotes/ui/components/switch";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { openExternalUrl, toAppInvokeError } from "@renderer/clients";
@@ -15,9 +18,6 @@ import {
   PreferencesRow,
   PreferencesSection,
 } from "@renderer/routes/preferences/-features/preferences-list";
-import { BrandIcon } from "@renderer/ui/components/brand-icon";
-import { Button } from "@renderer/ui/components/button";
-import { Switch } from "@renderer/ui/components/switch";
 import {
   BadgeInfoIcon,
   BugIcon,

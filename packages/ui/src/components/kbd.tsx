@@ -1,4 +1,4 @@
-import { cn } from "@renderer/ui/lib/utils";
+import { cn } from "@fluxnotes/ui/lib/utils";
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   return (

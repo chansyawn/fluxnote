@@ -1,6 +1,6 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@fluxnotes/ui/components/tooltip";
 import { useLingui } from "@lingui/react";
-import { Button } from "@renderer/ui/components/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 

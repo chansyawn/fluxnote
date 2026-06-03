@@ -1,13 +1,3 @@
-import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
-import { deleteArchivedBlocks } from "@renderer/clients";
-import { refreshBlocks } from "@renderer/features/blocks/block-query";
-import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
-import {
-  PreferencesGroup,
-  PreferencesRow,
-  PreferencesSection,
-} from "@renderer/routes/preferences/-features/preferences-list";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,10 +8,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@renderer/ui/components/alert-dialog";
-import { Button } from "@renderer/ui/components/button";
-import { ButtonGroup } from "@renderer/ui/components/button-group";
-import { InputGroup, InputGroupInput } from "@renderer/ui/components/input-group";
+} from "@fluxnotes/ui/components/alert-dialog";
+import { Button } from "@fluxnotes/ui/components/button";
+import { ButtonGroup } from "@fluxnotes/ui/components/button-group";
+import { InputGroup, InputGroupInput } from "@fluxnotes/ui/components/input-group";
 import {
   Select,
   SelectContent,
@@ -29,8 +19,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@renderer/ui/components/select";
-import { Switch } from "@renderer/ui/components/switch";
+} from "@fluxnotes/ui/components/select";
+import { Switch } from "@fluxnotes/ui/components/switch";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { deleteArchivedBlocks } from "@renderer/clients";
+import { refreshBlocks } from "@renderer/features/blocks/block-query";
+import { useAutoArchivePreference } from "@renderer/features/preferences/preferences-query";
+import {
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
 import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,

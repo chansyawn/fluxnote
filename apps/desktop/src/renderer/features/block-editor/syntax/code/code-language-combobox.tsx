@@ -1,5 +1,4 @@
-import { useLingui } from "@lingui/react";
-import { Button } from "@renderer/ui/components/button";
+import { Button } from "@fluxnotes/ui/components/button";
 import {
   Combobox,
   ComboboxContent,
@@ -8,7 +7,8 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-} from "@renderer/ui/components/combobox";
+} from "@fluxnotes/ui/components/combobox";
+import { useLingui } from "@lingui/react";
 import { Code2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 

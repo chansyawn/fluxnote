@@ -1,7 +1,7 @@
 "use client";
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
-import { cn } from "@renderer/ui/lib/utils";
+import { cn } from "@fluxnotes/ui/lib/utils";
 
 function Switch({
   className,

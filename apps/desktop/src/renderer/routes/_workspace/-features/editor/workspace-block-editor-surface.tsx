@@ -1,3 +1,4 @@
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { type Block } from "@renderer/clients";
 import {
   BlockEditor,
@@ -10,7 +11,6 @@ import {
 } from "@renderer/features/block-editor";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
-import { cn } from "@renderer/ui/lib/utils";
 import {
   useCallback,
   useEffect,

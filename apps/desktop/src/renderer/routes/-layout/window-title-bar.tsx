@@ -1,11 +1,11 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { getAppPlatform } from "@renderer/app/platform";
 import { hideWindow } from "@renderer/clients";
 import { AppUpdateTitlebarButton } from "@renderer/features/app-update/app-update-titlebar-button";
 import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
-import { Button } from "@renderer/ui/components/button";
-import { cn } from "@renderer/ui/lib/utils";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "lucide-react";
 

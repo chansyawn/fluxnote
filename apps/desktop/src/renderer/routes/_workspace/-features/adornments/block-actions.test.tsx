@@ -52,7 +52,7 @@ vi.mock("@renderer/features/tag/tag-combobox-popover", async () => {
   };
 });
 
-vi.mock("@renderer/ui/components/dropdown-menu", async () => {
+vi.mock("@fluxnotes/ui/components/dropdown-menu", async () => {
   const React = await import("react");
 
   return {

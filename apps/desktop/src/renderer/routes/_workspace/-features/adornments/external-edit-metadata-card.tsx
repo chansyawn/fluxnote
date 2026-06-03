@@ -1,6 +1,6 @@
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@fluxnotes/ui/components/hover-card";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { Trans } from "@lingui/react/macro";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/ui/components/hover-card";
-import { cn } from "@renderer/ui/lib/utils";
 import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { SquareTerminalIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";

@@ -1,11 +1,11 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@fluxnotes/ui/components/tooltip";
 import { Trans } from "@lingui/react/macro";
 import {
   formatShortcutTokens,
   type ShortcutBinding,
 } from "@renderer/features/shortcut/shortcut-utils";
-import { Button } from "@renderer/ui/components/button";
-import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
 import { CheckIcon, CopyIcon, LoaderCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
 

@@ -1,16 +1,16 @@
-import { useLingui } from "@lingui/react";
-import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
-import { Button } from "@renderer/ui/components/button";
-import { ButtonGroup, ButtonGroupSeparator } from "@renderer/ui/components/button-group";
+import { Button } from "@fluxnotes/ui/components/button";
+import { ButtonGroup, ButtonGroupSeparator } from "@fluxnotes/ui/components/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuTrigger,
-} from "@renderer/ui/components/dropdown-menu";
-import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@renderer/ui/components/tooltip";
-import { cn } from "@renderer/ui/lib/utils";
+} from "@fluxnotes/ui/components/dropdown-menu";
+import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@fluxnotes/ui/components/tooltip";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import { useLingui } from "@lingui/react";
+import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
 import { ChevronDownIcon } from "lucide-react";
 import { type MouseEvent, type ReactNode, useCallback, useRef, useSyncExternalStore } from "react";
 

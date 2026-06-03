@@ -74,7 +74,10 @@ packages/
 ### UI Conventions
 
 - Use the shadcn CLI to create new components when appropriate.
-- Do not modify existing shadcn components in `apps/desktop/src/renderer/ui` unless explicitly requested.
+- Run shadcn commands from `packages/ui`; `packages/ui/components.json` is the source of truth for shadcn configuration.
+- Store shadcn/Base UI source components in `packages/ui/src/components` and shared UI utilities in `packages/ui/src/lib`.
+- Do not add app-specific state, routes, IPC, clients, Lingui copy, or feature/domain logic to `packages/ui`.
+- Do not modify existing shadcn components unless explicitly requested.
 - Use `lucide-react` for icons, and name icon wrappers with an `Icon` suffix.
 - Design and test with RTL behavior in mind.
 

@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/renderer/global.css",
+    "css": "src/styles/index.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
@@ -13,11 +13,11 @@
   "iconLibrary": "lucide",
   "rtl": true,
   "aliases": {
-    "components": "@renderer/ui",
-    "utils": "@renderer/ui/lib/utils",
-    "ui": "@renderer/ui/components",
-    "lib": "@renderer/ui/lib",
-    "hooks": "@renderer/ui/hooks"
+    "components": "@fluxnotes/ui",
+    "utils": "@fluxnotes/ui/lib/utils",
+    "ui": "@fluxnotes/ui/components",
+    "lib": "@fluxnotes/ui/lib",
+    "hooks": "@fluxnotes/ui/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

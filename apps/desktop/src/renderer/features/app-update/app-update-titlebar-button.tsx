@@ -1,7 +1,7 @@
+import { Button } from "@fluxnotes/ui/components/button";
 import { Trans } from "@lingui/react/macro";
 import { AppUpdateInstallDialog } from "@renderer/features/app-update/app-update-install-dialog";
 import { useAppUpdateStatusQuery } from "@renderer/features/app-update/app-update-query";
-import { Button } from "@renderer/ui/components/button";
 import { CircleFadingArrowUpIcon } from "lucide-react";
 
 export function AppUpdateTitlebarButton() {

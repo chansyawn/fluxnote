@@ -1,6 +1,4 @@
-import type { I18n } from "@lingui/core";
-import { useLingui } from "@lingui/react";
-import { Button } from "@renderer/ui/components/button";
+import { Button } from "@fluxnotes/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,8 +8,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@renderer/ui/components/dropdown-menu";
-import { cn } from "@renderer/ui/lib/utils";
+} from "@fluxnotes/ui/components/dropdown-menu";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import type { I18n } from "@lingui/core";
+import { useLingui } from "@lingui/react";
 import {
   AlignCenterIcon,
   AlignLeftIcon,

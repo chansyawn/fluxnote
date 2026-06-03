@@ -1,7 +1,7 @@
-import { Button } from "@renderer/ui/components/button";
-import { Input } from "@renderer/ui/components/input";
-import { Textarea } from "@renderer/ui/components/textarea";
-import { cn } from "@renderer/ui/lib/utils";
+import { Button } from "@fluxnotes/ui/components/button";
+import { Input } from "@fluxnotes/ui/components/input";
+import { Textarea } from "@fluxnotes/ui/components/textarea";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 

@@ -1,3 +1,12 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@fluxnotes/ui/components/item";
 import { Trans } from "@lingui/react/macro";
 import {
   destroyWindow,
@@ -7,15 +16,6 @@ import {
   toAppInvokeError,
 } from "@renderer/clients";
 import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
-import { Button } from "@renderer/ui/components/button";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemMedia,
-  ItemTitle,
-} from "@renderer/ui/components/item";
 import { AlertTriangleIcon, BugIcon, RefreshCwIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 

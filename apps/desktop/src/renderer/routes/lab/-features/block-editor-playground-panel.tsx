@@ -1,6 +1,6 @@
+import { Button } from "@fluxnotes/ui/components/button";
 import { Trans } from "@lingui/react/macro";
 import { BlockEditor, type BlockEditorRuntime } from "@renderer/features/block-editor";
-import { Button } from "@renderer/ui/components/button";
 import { useMemo, useState } from "react";
 
 const DEFAULT_PLAYGROUND_MARKDOWN = `# Heading 1

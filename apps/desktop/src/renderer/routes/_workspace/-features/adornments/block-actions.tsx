@@ -1,14 +1,5 @@
-import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
-import type { Block, Tag } from "@renderer/clients";
-import {
-  formatShortcutTokens,
-  type ShortcutBinding,
-  type ShortcutPreferences,
-} from "@renderer/features/shortcut/shortcut-utils";
-import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
-import { Button } from "@renderer/ui/components/button";
-import { ButtonGroup } from "@renderer/ui/components/button-group";
+import { Button } from "@fluxnotes/ui/components/button";
+import { ButtonGroup } from "@fluxnotes/ui/components/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +9,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@renderer/ui/components/dropdown-menu";
-import { cn } from "@renderer/ui/lib/utils";
+} from "@fluxnotes/ui/components/dropdown-menu";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Block, Tag } from "@renderer/clients";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@renderer/features/shortcut/shortcut-utils";
+import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,

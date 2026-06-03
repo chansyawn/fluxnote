@@ -1,6 +1,6 @@
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
-import { cn } from "@renderer/ui/lib/utils";
+import { cn } from "@fluxnotes/ui/lib/utils";
 
 interface AdornmentBarProps {
   disabled?: boolean;

@@ -1,5 +1,5 @@
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { getAppPlatform } from "@renderer/app/platform";
-import { cn } from "@renderer/ui/lib/utils";
 import type { AppPlatform } from "@shared/app/platform";
 import { XIcon } from "lucide-react";
 import type { ReactNode } from "react";

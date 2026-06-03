@@ -1,7 +1,5 @@
 import type { BaseUIEvent } from "@base-ui/react/types";
-import { Trans } from "@lingui/react/macro";
-import type { Tag } from "@renderer/clients";
-import { Button, buttonVariants } from "@renderer/ui/components/button";
+import { Button, buttonVariants } from "@fluxnotes/ui/components/button";
 import {
   Combobox,
   ComboboxContent,
@@ -10,8 +8,10 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-} from "@renderer/ui/components/combobox";
-import { InputGroupAddon } from "@renderer/ui/components/input-group";
+} from "@fluxnotes/ui/components/combobox";
+import { InputGroupAddon } from "@fluxnotes/ui/components/input-group";
+import { Trans } from "@lingui/react/macro";
+import type { Tag } from "@renderer/clients";
 import type { VariantProps } from "class-variance-authority";
 import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";

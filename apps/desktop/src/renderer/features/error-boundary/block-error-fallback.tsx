@@ -1,6 +1,4 @@
-import { Trans } from "@lingui/react/macro";
-import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
-import { Button } from "@renderer/ui/components/button";
+import { Button } from "@fluxnotes/ui/components/button";
 import {
   Item,
   ItemActions,
@@ -8,7 +6,9 @@ import {
   ItemDescription,
   ItemMedia,
   ItemTitle,
-} from "@renderer/ui/components/item";
+} from "@fluxnotes/ui/components/item";
+import { Trans } from "@lingui/react/macro";
+import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
 import { AlertTriangleIcon, LoaderCircleIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
