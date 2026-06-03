@@ -588,7 +588,7 @@ msgstr "GitHub"
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:163
 msgid "preferences.github.repository.open"
-msgstr "Repository"
+msgstr "仓库"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
