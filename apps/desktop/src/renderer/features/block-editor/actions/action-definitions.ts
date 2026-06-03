@@ -1,10 +1,3 @@
-import { msg } from "@lingui/core/macro";
-import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  type TextFormatType,
-} from "lexical";
 import {
   BoldIcon,
   BracesIcon,
@@ -23,7 +16,14 @@ import {
   PilcrowIcon,
   QuoteIcon,
   StrikethroughIcon,
-} from "lucide-react";
+} from "@fluxnotes/ui/icons/lucide";
+import { msg } from "@lingui/core/macro";
+import {
+  $getSelection,
+  $isRangeSelection,
+  FORMAT_TEXT_COMMAND,
+  type TextFormatType,
+} from "lexical";
 
 import {
   isBlockFormattingDisabledAtSelection,

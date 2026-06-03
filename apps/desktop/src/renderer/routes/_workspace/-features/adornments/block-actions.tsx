@@ -10,16 +10,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@fluxnotes/ui/components/dropdown-menu";
-import { cn } from "@fluxnotes/ui/lib/utils";
-import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
-import type { Block, Tag } from "@renderer/clients";
-import {
-  formatShortcutTokens,
-  type ShortcutBinding,
-  type ShortcutPreferences,
-} from "@renderer/features/shortcut/shortcut-utils";
-import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import {
   ArchiveIcon,
   ArchiveRestoreIcon,
@@ -34,7 +24,17 @@ import {
   PinIcon,
   TagIcon,
   Trash2Icon,
-} from "lucide-react";
+} from "@fluxnotes/ui/icons/lucide";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import type { Block, Tag } from "@renderer/clients";
+import {
+  formatShortcutTokens,
+  type ShortcutBinding,
+  type ShortcutPreferences,
+} from "@renderer/features/shortcut/shortcut-utils";
+import { TagComboboxPopover } from "@renderer/features/tag/tag-combobox-popover";
 import type { ComponentProps } from "react";
 
 import type { BlockReorderOperation } from "../use-block-mutations";

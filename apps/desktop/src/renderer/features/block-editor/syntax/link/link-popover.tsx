@@ -1,9 +1,15 @@
 import { Button } from "@fluxnotes/ui/components/button";
 import { Popover, PopoverContent } from "@fluxnotes/ui/components/popover";
 import { Textarea } from "@fluxnotes/ui/components/textarea";
+import {
+  CheckIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+  LinkIcon,
+  UnlinkIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLingui } from "@lingui/react";
-import { CheckIcon, CopyIcon, ExternalLinkIcon, LinkIcon, UnlinkIcon } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";

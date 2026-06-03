@@ -22,6 +22,12 @@ import {
 } from "@fluxnotes/ui/components/select";
 import { toast } from "@fluxnotes/ui/components/sonner";
 import { Switch } from "@fluxnotes/ui/components/switch";
+import {
+  ArchiveIcon,
+  ClockIcon,
+  DatabaseZapIcon,
+  LoaderCircleIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { deleteArchivedBlocks } from "@renderer/clients";
@@ -41,7 +47,6 @@ import {
 } from "@shared/features/preferences/auto-archive";
 import { DEFAULT_AUTO_ARCHIVE_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { useMutation } from "@tanstack/react-query";
-import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {

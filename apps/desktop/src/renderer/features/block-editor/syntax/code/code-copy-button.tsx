@@ -1,7 +1,7 @@
 import { Button } from "@fluxnotes/ui/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@fluxnotes/ui/components/tooltip";
+import { CheckIcon, CopyIcon } from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
-import { CheckIcon, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useBlockEditorRuntime } from "../../core/runtime-extension";

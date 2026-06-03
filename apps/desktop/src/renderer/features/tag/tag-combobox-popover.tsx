@@ -9,9 +9,9 @@ import {
   ComboboxTrigger,
 } from "@fluxnotes/ui/components/combobox";
 import { InputGroupAddon } from "@fluxnotes/ui/components/input-group";
+import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
 import type { Tag } from "@renderer/clients";
-import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useMemo, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
 
 type TagOption = {

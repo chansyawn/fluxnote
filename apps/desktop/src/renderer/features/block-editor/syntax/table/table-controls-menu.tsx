@@ -9,9 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@fluxnotes/ui/components/dropdown-menu";
-import { cn } from "@fluxnotes/ui/lib/utils";
-import type { I18n } from "@lingui/core";
-import { useLingui } from "@lingui/react";
 import {
   AlignCenterIcon,
   AlignLeftIcon,
@@ -28,7 +25,10 @@ import {
   TextIcon,
   Trash2Icon,
   type LucideIcon,
-} from "lucide-react";
+} from "@fluxnotes/ui/icons/lucide";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import type { I18n } from "@lingui/core";
+import { useLingui } from "@lingui/react";
 
 import type { TableControlKind, TableControlTarget } from "./table-controls-state";
 import type {

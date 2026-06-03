@@ -9,6 +9,16 @@ import {
 } from "@fluxnotes/ui/components/select";
 import { toast } from "@fluxnotes/ui/components/sonner";
 import { Tabs, TabsList, TabsTrigger } from "@fluxnotes/ui/components/tabs";
+import {
+  LanguagesIcon,
+  MonitorIcon,
+  MoonIcon,
+  PaletteIcon,
+  SunIcon,
+  TerminalIcon,
+  TypeIcon,
+  type LucideIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
@@ -31,16 +41,6 @@ import {
   type ThemePreference,
 } from "@shared/features/preferences/user-preferences";
 import { useQuery } from "@tanstack/react-query";
-import {
-  LanguagesIcon,
-  MonitorIcon,
-  MoonIcon,
-  PaletteIcon,
-  SunIcon,
-  TerminalIcon,
-  TypeIcon,
-  type LucideIcon,
-} from "lucide-react";
 import { useCallback, useState } from "react";
 
 export function AppPreferencesSection() {

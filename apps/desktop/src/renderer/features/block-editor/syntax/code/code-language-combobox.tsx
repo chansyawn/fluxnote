@@ -8,8 +8,8 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@fluxnotes/ui/components/combobox";
+import { Code2Icon } from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
-import { Code2Icon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {

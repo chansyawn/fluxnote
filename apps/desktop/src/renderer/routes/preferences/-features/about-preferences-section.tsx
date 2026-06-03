@@ -2,6 +2,15 @@ import { BrandIcon } from "@fluxnotes/ui/components/brand-icon";
 import { Button } from "@fluxnotes/ui/components/button";
 import { toast } from "@fluxnotes/ui/components/sonner";
 import { Switch } from "@fluxnotes/ui/components/switch";
+import {
+  BadgeInfoIcon,
+  BugIcon,
+  CircleFadingArrowUpIcon,
+  FolderGit2Icon,
+  RefreshCwIcon,
+  SendIcon,
+} from "@fluxnotes/ui/icons/lucide";
+import { siGithub } from "@fluxnotes/ui/icons/simple-icons";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { openExternalUrl, toAppInvokeError } from "@renderer/clients";
@@ -19,16 +28,7 @@ import {
   PreferencesRow,
   PreferencesSection,
 } from "@renderer/routes/preferences/-features/preferences-list";
-import {
-  BadgeInfoIcon,
-  BugIcon,
-  CircleFadingArrowUpIcon,
-  FolderGit2Icon,
-  RefreshCwIcon,
-  SendIcon,
-} from "lucide-react";
 import { useCallback } from "react";
-import { siGithub } from "simple-icons";
 
 const GITHUB_REPOSITORY_URL = "https://github.com/chansyawn/fluxnotes";
 const GITHUB_ISSUES_URL = "https://github.com/chansyawn/fluxnotes/issues";

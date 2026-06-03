@@ -90,32 +90,32 @@ msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:121
 msgid "block-editor.link.convert"
 msgstr "Convert to link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:119
 msgid "block-editor.link.copied"
 msgstr "Copied"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:118
 msgid "block-editor.link.copy"
 msgstr "Copy"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:117
 msgid "block-editor.link.open"
 msgstr "Open"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:120
 msgid "block-editor.link.remove"
 msgstr "Remove link"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:122
 msgid "block-editor.link.url"
 msgstr "Link URL"
 
@@ -301,22 +301,22 @@ msgid "block-editor.toolbar.task-list"
 msgstr "Task list"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:84
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:89
 msgid "error.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:47
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:52
 msgid "error.block.description"
 msgstr "Retry this block, or delete it if the content is corrupted."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:65
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:70
 msgid "error.block.retry"
 msgstr "Retry block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:44
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:49
 msgid "error.block.title"
 msgstr "This block failed to render"
 
@@ -455,98 +455,98 @@ msgid "preferences.app.title"
 msgstr "App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:310
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:315
 msgid "preferences.archive.clear.action"
 msgstr "Clear"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:346
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
 msgid "preferences.archive.clear.description"
 msgstr "Permanently delete every archived block. Active blocks and tags are not affected."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:327
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:332
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:339
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:344
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "Clear archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:320
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:325
 msgid "preferences.archive.clear.dialog.description"
 msgstr "This permanently deletes all archived blocks. Active blocks and tags are kept."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:317
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:322
 msgid "preferences.archive.clear.dialog.title"
 msgstr "Clear archived data?"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:93
 msgid "preferences.archive.clear.error"
 msgstr "Failed to clear archived data."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:356
 msgid "preferences.archive.clear.label"
 msgstr "Clear archived data"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:79
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:84
 msgid "preferences.archive.clear.success"
 msgstr "Archived data cleared."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:223
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:228
 msgid "preferences.archive.title"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:239
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:244
 msgid "preferences.auto-archive.enable.description"
 msgstr "When enabled, blocks with no content changes for the configured duration enter a pending state. Actual archiving runs when the window is hidden, and pending blocks appear dimmed."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:119
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:251
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:116
 msgid "preferences.auto-archive.threshold.amount.label"
 msgstr "Auto archive duration amount"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:303
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Auto archive after"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:293
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "Range: 1-20160 minutes, 1-336 hours, or 1-14 days."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:115
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:120
 msgid "preferences.auto-archive.threshold.unit.label"
 msgstr "Auto archive duration unit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:103
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:108
 msgid "preferences.auto-archive.unit.days"
 msgstr "days"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:109
 msgid "preferences.auto-archive.unit.hours"
 msgstr "hours"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:105
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:110
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 

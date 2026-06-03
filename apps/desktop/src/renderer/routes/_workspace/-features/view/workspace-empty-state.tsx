@@ -6,8 +6,8 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@fluxnotes/ui/components/empty";
+import { LoaderCircleIcon, PlusIcon } from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
-import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import type { ReactElement } from "react";
 
 export function LoadingState(): ReactElement {

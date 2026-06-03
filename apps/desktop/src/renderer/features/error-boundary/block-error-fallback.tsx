@@ -7,9 +7,14 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@fluxnotes/ui/components/item";
+import {
+  AlertTriangleIcon,
+  LoaderCircleIcon,
+  RefreshCwIcon,
+  Trash2Icon,
+} from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
 import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
-import { AlertTriangleIcon, LoaderCircleIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import type { FallbackProps } from "react-error-boundary";
 

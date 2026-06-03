@@ -1,4 +1,5 @@
 import { Button } from "@fluxnotes/ui/components/button";
+import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -7,7 +8,6 @@ import { hideWindow } from "@renderer/clients";
 import { AppUpdateTitlebarButton } from "@renderer/features/app-update/app-update-titlebar-button";
 import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "lucide-react";
 
 function HeaderActionButton() {
   const location = useLocation();

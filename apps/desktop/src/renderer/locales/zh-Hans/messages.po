@@ -90,32 +90,32 @@ msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:121
 msgid "block-editor.link.convert"
 msgstr "转换为链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:119
 msgid "block-editor.link.copied"
 msgstr "已复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:118
 msgid "block-editor.link.copy"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:117
 msgid "block-editor.link.open"
 msgstr "打开"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:120
 msgid "block-editor.link.remove"
 msgstr "移除链接"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
+#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:122
 msgid "block-editor.link.url"
 msgstr "链接 URL"
 
@@ -301,22 +301,22 @@ msgid "block-editor.toolbar.task-list"
 msgstr "任务列表"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:84
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:89
 msgid "error.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:47
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:52
 msgid "error.block.description"
 msgstr "重试此区块；如果内容已损坏，可以将其删除。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:65
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:70
 msgid "error.block.retry"
 msgstr "重试区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:44
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:49
 msgid "error.block.title"
 msgstr "此区块渲染失败"
 
@@ -455,98 +455,98 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:310
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:315
 msgid "preferences.archive.clear.action"
 msgstr "清空"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:346
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
 msgid "preferences.archive.clear.description"
 msgstr "永久删除所有归档区块。活跃区块和标签不会受到影响。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:327
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:332
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:339
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:344
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "清空归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:320
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:325
 msgid "preferences.archive.clear.dialog.description"
 msgstr "这会永久删除所有归档区块。活跃区块和标签会保留。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:317
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:322
 msgid "preferences.archive.clear.dialog.title"
 msgstr "清空归档数据？"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:93
 msgid "preferences.archive.clear.error"
 msgstr "清空归档数据失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:356
 msgid "preferences.archive.clear.label"
 msgstr "清空归档数据"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:79
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:84
 msgid "preferences.archive.clear.success"
 msgstr "归档数据已清空。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:223
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:228
 msgid "preferences.archive.title"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:239
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:244
 msgid "preferences.auto-archive.enable.description"
 msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:119
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:251
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:116
 msgid "preferences.auto-archive.threshold.amount.label"
 msgstr "自动归档时长数值"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:303
 msgid "preferences.auto-archive.threshold.label"
 msgstr "自动归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:293
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:115
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:120
 msgid "preferences.auto-archive.threshold.unit.label"
 msgstr "自动归档时长单位"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:103
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:108
 msgid "preferences.auto-archive.unit.days"
 msgstr "天"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:109
 msgid "preferences.auto-archive.unit.hours"
 msgstr "小时"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:105
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:110
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 

@@ -8,10 +8,10 @@ import {
 } from "@fluxnotes/ui/components/dropdown-menu";
 import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@fluxnotes/ui/components/tooltip";
+import { ChevronDownIcon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { formatShortcutTokens } from "@renderer/features/shortcut/shortcut-utils";
-import { ChevronDownIcon } from "lucide-react";
 import { type MouseEvent, type ReactNode, useCallback, useRef, useSyncExternalStore } from "react";
 
 import {

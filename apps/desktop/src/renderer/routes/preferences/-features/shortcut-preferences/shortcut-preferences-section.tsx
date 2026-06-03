@@ -1,3 +1,15 @@
+import {
+  CheckIcon,
+  ArchiveIcon,
+  CopyIcon,
+  KeyboardIcon,
+  PinIcon,
+  PlusCircleIcon,
+  Trash2Icon,
+  WandSparklesIcon,
+  XIcon,
+  FlagIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -14,18 +26,6 @@ import {
   DEFAULT_USER_PREFERENCES,
   type ShortcutAction,
 } from "@shared/features/preferences/user-preferences";
-import {
-  CheckIcon,
-  ArchiveIcon,
-  CopyIcon,
-  KeyboardIcon,
-  PinIcon,
-  PlusCircleIcon,
-  Trash2Icon,
-  WandSparklesIcon,
-  XIcon,
-  FlagIcon,
-} from "lucide-react";
 import { type ReactElement, type SVGProps } from "react";
 
 import { ShortcutInput } from "./shortcut-input";

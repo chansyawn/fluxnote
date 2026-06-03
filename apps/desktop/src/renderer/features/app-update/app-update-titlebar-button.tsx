@@ -1,8 +1,8 @@
 import { Button } from "@fluxnotes/ui/components/button";
+import { CircleFadingArrowUpIcon } from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
 import { AppUpdateInstallDialog } from "@renderer/features/app-update/app-update-install-dialog";
 import { useAppUpdateStatusQuery } from "@renderer/features/app-update/app-update-query";
-import { CircleFadingArrowUpIcon } from "lucide-react";
 
 export function AppUpdateTitlebarButton() {
   const { data: status } = useAppUpdateStatusQuery();

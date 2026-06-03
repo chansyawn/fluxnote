@@ -18,6 +18,10 @@
       "types": "./src/lib/*.ts",
       "import": "./src/lib/*.ts"
     },
+    "./icons/*": {
+      "types": "./src/icons/*.ts",
+      "import": "./src/icons/*.ts"
+    },
     "./styles": "./src/styles/index.css",
     "./styles/*": "./src/styles/*.css",
     "./test/*": {

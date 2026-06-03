@@ -58,7 +58,6 @@
     "electron-store": "^11.0.2",
     "hast-util-to-html": "^9.0.5",
     "lexical": "^0.45.0",
-    "lucide-react": "^1.7.0",
     "mdast-util-to-hast": "^13.2.1",
     "posthog-js": "^1.376.0",
     "posthog-node": "^5.35.1",
@@ -69,7 +68,6 @@
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
-    "simple-icons": "^16.21.0",
     "tailwindcss": "^4.2.2",
     "unified": "^11.0.5",
     "zod": "^4.3.6"

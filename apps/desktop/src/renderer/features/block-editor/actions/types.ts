@@ -1,8 +1,8 @@
+import type { LucideIcon } from "@fluxnotes/ui/icons/lucide";
 import type { MessageDescriptor } from "@lingui/core";
 import type { ShortcutBinding } from "@renderer/features/shortcut/shortcut-utils";
 import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
 import type { LexicalEditor } from "lexical";
-import type { LucideIcon } from "lucide-react";
 
 export type BlockEditorActionId = Extract<ShortcutAction, `editor.${string}`>;
 export type BlockEditorActionFocus = "editor" | "managed";
