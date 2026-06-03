@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.30](https://github.com/chansyawn/fluxnotes/compare/v0.0.29...v0.0.30) (2026-06-03)
+
+
+### Bug Fixes
+
+* use safe Windows installer package name ([022e3c9](https://github.com/chansyawn/fluxnotes/commit/022e3c987e651290a9c4893f84aface0a8ea5abb))
+
 ## [0.0.29](https://github.com/chansyawn/fluxnotes/compare/v0.0.28...v0.0.29) (2026-06-03)
 
 
