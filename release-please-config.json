@@ -19,6 +19,13 @@
       "skip-changelog": true,
       "skip-github-release": true,
       "versioning": "always-bump-patch"
+    },
+    "packages/ui": {
+      "component": "ui",
+      "release-type": "node",
+      "skip-changelog": true,
+      "skip-github-release": true,
+      "versioning": "always-bump-patch"
     }
   }
 }

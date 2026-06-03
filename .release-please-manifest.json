@@ -1,4 +1,5 @@
 {
   "apps/desktop": "0.0.30",
-  "packages/editor": "0.0.0"
+  "packages/editor": "0.0.0",
+  "packages/ui": "0.0.0"
 }
