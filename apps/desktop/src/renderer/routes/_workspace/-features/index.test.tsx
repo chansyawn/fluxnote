@@ -44,12 +44,14 @@ vi.mock("@renderer/features/block-editor", () => ({
     inactiveContent?: ReactNode;
   }) =>
     controller ? (
-      <div>
+      <div data-testid="block-editor-toolbar">
         <button type="button">Editor toolbar</button>
         <button type="button">Editor toolbar menu</button>
       </div>
     ) : (
-      <div tabIndex={0}>{inactiveContent}</div>
+      <div data-testid="block-editor-toolbar" tabIndex={0}>
+        {inactiveContent}
+      </div>
     ),
 }));
 
@@ -186,6 +188,16 @@ describe("BlockWorkspace", () => {
     renderWithProviders(<BlockWorkspace />);
 
     expect(screen.getByText("2 blocks")).toBeVisible();
+  });
+
+  it("does not show the bottom toolbar when the current view has no blocks", () => {
+    mocks.activeEditorEnabled = false;
+    mocks.totalBlockCount = 0;
+
+    renderWithProviders(<BlockWorkspace />);
+
+    expect(screen.queryByTestId("block-editor-toolbar")).not.toBeInTheDocument();
+    expect(screen.queryByText("0 blocks")).not.toBeInTheDocument();
   });
 
   it("clears the active Block when focus leaves the Workspace editing area", () => {
