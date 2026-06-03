@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@fluxnotes/ui/components/alert-dialog";
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { Trans } from "@lingui/react/macro";
 import {
   restartAndInstallAppUpdate,
@@ -16,7 +17,6 @@ import {
   type AppUpdateStatus,
 } from "@renderer/clients";
 import type { ReactElement } from "react";
-import { toast } from "sonner";
 
 type ReadyAppUpdateStatus = Extract<AppUpdateStatus, { state: "ready" }>;
 

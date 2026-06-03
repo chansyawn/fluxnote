@@ -8,7 +8,7 @@ import {
   Loader2Icon,
 } from "lucide-react";
 import type { CSSProperties } from "react";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { Toaster as Sonner, toast, type ToasterProps } from "sonner";
 
 type ToasterTheme = NonNullable<ToasterProps["theme"]>;
 type ToasterStyle = CSSProperties & Record<`--${string}`, string>;
@@ -49,4 +49,4 @@ const Toaster = ({ style, toastOptions, theme, ...props }: FluxnotesToasterProps
   );
 };
 
-export { Toaster, type FluxnotesToasterProps, type ToasterTheme };
+export { Toaster, toast, type FluxnotesToasterProps, type ToasterTheme };

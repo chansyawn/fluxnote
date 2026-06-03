@@ -1,5 +1,6 @@
 import { BrandIcon } from "@fluxnotes/ui/components/brand-icon";
 import { Button } from "@fluxnotes/ui/components/button";
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { Switch } from "@fluxnotes/ui/components/switch";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -28,7 +29,6 @@ import {
 } from "lucide-react";
 import { useCallback } from "react";
 import { siGithub } from "simple-icons";
-import { toast } from "sonner";
 
 const GITHUB_REPOSITORY_URL = "https://github.com/chansyawn/fluxnotes";
 const GITHUB_ISSUES_URL = "https://github.com/chansyawn/fluxnotes/issues";

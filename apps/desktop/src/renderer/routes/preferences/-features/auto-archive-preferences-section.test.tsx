@@ -44,7 +44,7 @@ vi.mock("@renderer/features/blocks/block-query", () => ({
   refreshBlocks: blockQueryMocks.refreshBlocks,
 }));
 
-vi.mock("sonner", () => ({
+vi.mock("@fluxnotes/ui/components/sonner", () => ({
   toast: toastMocks,
 }));
 

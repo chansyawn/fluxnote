@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@fluxnotes/ui/components/select";
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { Switch } from "@fluxnotes/ui/components/switch";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -42,7 +43,6 @@ import { DEFAULT_AUTO_ARCHIVE_PREFERENCES } from "@shared/features/preferences/u
 import { useMutation } from "@tanstack/react-query";
 import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
   days: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / (24 * 60)),

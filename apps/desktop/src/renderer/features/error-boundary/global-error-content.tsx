@@ -7,6 +7,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@fluxnotes/ui/components/item";
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { Trans } from "@lingui/react/macro";
 import {
   destroyWindow,
@@ -17,7 +18,6 @@ import {
 } from "@renderer/clients";
 import { toErrorMessage } from "@renderer/features/error-boundary/error-utils";
 import { AlertTriangleIcon, BugIcon, RefreshCwIcon, XIcon } from "lucide-react";
-import { toast } from "sonner";
 
 const GITHUB_NEW_ISSUE_URL = "https://github.com/chansyawn/fluxnotes/issues/new";
 

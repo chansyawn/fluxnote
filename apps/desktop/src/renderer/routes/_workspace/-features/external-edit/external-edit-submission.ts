@@ -1,7 +1,7 @@
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { cancelExternalEdit, submitExternalEdit, toAppInvokeError } from "@renderer/clients";
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
 
 import type { SubmittableBlockContent } from "./submittable-block-content";
 
