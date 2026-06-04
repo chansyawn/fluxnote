@@ -20,7 +20,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "flux": "./src/cli/flux",
-    "release:macos": "node scripts/release/macos.mjs",
+    "release:macos": "node scripts/release/macos.ts",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

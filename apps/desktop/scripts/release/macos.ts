@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execFileSync } from "node:child_process";
+import { execFileSync, type ExecFileSyncOptions } from "node:child_process";
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -11,13 +11,13 @@ const requiredPrepareEnvNames = [
   "MACOS_CERTIFICATE_BASE64",
   "MACOS_CERTIFICATE_PASSWORD",
   "MACOS_SIGN_IDENTITY",
-];
+] as const;
 
 const appleRootCertificateUrl = "https://www.apple.com/appleca/AppleIncRootCertificate.cer";
 const developerIdG2CertificateUrl =
   "https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer";
 
-function requireEnv(name) {
+function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
 
   if (!value) {
@@ -27,7 +27,7 @@ function requireEnv(name) {
   return value;
 }
 
-function assertRequiredEnv(names) {
+function assertRequiredEnv(names: readonly string[]): void {
   const missingNames = names.filter((name) => !process.env[name]?.trim());
 
   if (missingNames.length > 0) {
@@ -37,11 +37,11 @@ function assertRequiredEnv(names) {
   }
 }
 
-function run(command, args, options = {}) {
+function run(command: string, args: readonly string[], options: ExecFileSyncOptions = {}): void {
   execFileSync(command, args, { stdio: "inherit", ...options });
 }
 
-async function downloadFile(url, filePath) {
+async function downloadFile(url: string, filePath: string): Promise<void> {
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -51,16 +51,16 @@ async function downloadFile(url, filePath) {
   writeFileSync(filePath, Buffer.from(await response.arrayBuffer()));
 }
 
-function appendGithubEnv(values) {
+function appendGithubEnv(values: Record<string, string>): void {
   const githubEnvPath = requireEnv("GITHUB_ENV");
-  const content = Object.entries(/** @type {Record<string, string>} */ (values))
+  const content = Object.entries(values)
     .map(([name, value]) => `${name}=${value}`)
     .join("\n");
 
   writeFileSync(githubEnvPath, `${content}\n`, { flag: "a" });
 }
 
-async function prepareSigningCredentials() {
+async function prepareSigningCredentials(): Promise<void> {
   assertRequiredEnv(requiredPrepareEnvNames);
 
   const runnerTemp = requireEnv("RUNNER_TEMP");
@@ -115,7 +115,7 @@ async function prepareSigningCredentials() {
   });
 }
 
-function findFiles(directory, predicate) {
+function findFiles(directory: string, predicate: (filePath: string) => boolean): string[] {
   if (!existsSync(directory)) {
     return [];
   }
@@ -126,7 +126,7 @@ function findFiles(directory, predicate) {
     .filter(predicate);
 }
 
-function findPackagedAppBundles() {
+function findPackagedAppBundles(): string[] {
   if (!existsSync("out")) {
     return [];
   }
@@ -142,7 +142,7 @@ function findPackagedAppBundles() {
     });
 }
 
-function notarizeDmgArtifacts() {
+function notarizeDmgArtifacts(): void {
   const dmgPaths = findFiles("out/make", (filePath) => filePath.endsWith(".dmg"));
 
   if (dmgPaths.length === 0) {
@@ -167,7 +167,7 @@ function notarizeDmgArtifacts() {
   }
 }
 
-function verifyMacArtifacts() {
+function verifyMacArtifacts(): void {
   const appPaths = findPackagedAppBundles();
 
   if (appPaths.length === 0) {
@@ -181,7 +181,7 @@ function verifyMacArtifacts() {
   }
 }
 
-function cleanupSigningKeychain() {
+function cleanupSigningKeychain(): void {
   const keychainPath = process.env.MACOS_SIGNING_KEYCHAIN?.trim();
 
   if (keychainPath) {
@@ -189,7 +189,7 @@ function cleanupSigningKeychain() {
   }
 }
 
-async function main() {
+async function main(): Promise<void> {
   const command = process.argv.slice(2).find((argument) => argument !== "--");
 
   switch (command) {
@@ -206,9 +206,7 @@ async function main() {
       cleanupSigningKeychain();
       break;
     default:
-      throw new Error(
-        "Usage: node scripts/release/macos.mjs <prepare|notarize-dmg|verify|cleanup>",
-      );
+      throw new Error("Usage: node scripts/release/macos.ts <prepare|notarize-dmg|verify|cleanup>");
   }
 }
 
