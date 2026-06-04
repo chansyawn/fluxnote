@@ -5,6 +5,11 @@
 ### Architecture
 
 - Use **Vite+** as the primary toolchain.
+- This repository is a pnpm workspace monorepo managed by Vite+.
+- `apps/desktop` contains the Electron product and owns app runtime, IPC, renderer routes, and product-specific features.
+- `packages/*` contains internal shared source packages. Packages are consumed through `exports` that point to source files; they are not bundled for app consumption and are not public external APIs.
+- `packages/ui` contains app-agnostic UI primitives, design tokens, styles, and icons.
+- `packages/editor` contains reusable editor functionality and can be developed independently from the desktop app.
 
 ### File Organization
 
