@@ -39,8 +39,8 @@ jobs:
         uses: googleapis/release-please-action@v5
         with:
           token: ${{ steps.release-app.outputs.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: config/release/release-please-config.json
+          manifest-file: config/release/.release-please-manifest.json
 
   verify:
     name: Verify
