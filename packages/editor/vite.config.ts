@@ -24,19 +24,6 @@ export default defineConfig({
       "@fluxnotes/editor": path.resolve(packageRoot, "src/index.tsx"),
     },
   },
-  pack: {
-    dts: true,
-    entry: ["src/index.tsx", "src/models.ts", "src/shortcuts.ts"],
-    exports: false,
-    format: ["esm"],
-  },
-  lint: {
-    options: {
-      typeAware: true,
-      typeCheck: true,
-    },
-  },
-  fmt: {},
   staged: {
     "{lingui.config.ts,src/**/*.{ts,tsx,po}}": "vp run i18n:check",
   },

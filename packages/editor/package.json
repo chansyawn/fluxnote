@@ -46,9 +46,7 @@
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
-    "build": "vp pack",
     "dev": "vp dev",
-    "dev:pack": "vp pack --watch",
     "test": "vp test",
     "check": "vp check"
   },
