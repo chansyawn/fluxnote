@@ -60,7 +60,7 @@ msgstr "安装应用更新"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:100
+#: src/renderer/routes/-layout/window-title-bar.tsx:73
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -122,44 +122,9 @@ msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:59
-msgid "header.go-lab"
-msgstr "前往实验室"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:57
-msgid "header.open-lab"
-msgstr "打开实验室"
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:32
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
-msgid "lab.description"
-msgstr "用于基础设施与集成演示的实验区域。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:119
-msgid "lab.playground.description"
-msgstr "纯前端演练区。编辑这段预设 Markdown 来验证区块行为。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:132
-msgid "lab.playground.reset"
-msgstr "重置预设"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:116
-msgid "lab.playground.title"
-msgstr "区块编辑器演练区"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
-msgid "lab.title"
-msgstr "实验室"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
@@ -518,8 +483,8 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:71
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:44
+#: src/renderer/routes/-layout/window-title-bar.tsx:52
 msgid "window.hide"
 msgstr "隐藏窗口"
 

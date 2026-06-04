@@ -60,7 +60,7 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:100
+#: src/renderer/routes/-layout/window-title-bar.tsx:73
 msgid "app.title"
 msgstr ""
 
@@ -122,43 +122,8 @@ msgid "header.go-home"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:59
-msgid "header.go-lab"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:57
-msgid "header.open-lab"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:32
 msgid "header.open-preferences"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
-msgid "lab.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:119
-msgid "lab.playground.description"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:132
-msgid "lab.playground.reset"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:116
-msgid "lab.playground.title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
-msgid "lab.title"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -518,8 +483,8 @@ msgid "preferences.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:71
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:44
+#: src/renderer/routes/-layout/window-title-bar.tsx:52
 msgid "window.hide"
 msgstr ""
 

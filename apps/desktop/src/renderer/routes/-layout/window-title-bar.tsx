@@ -1,5 +1,5 @@
 import { Button } from "@fluxnotes/ui/components/button";
-import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "@fluxnotes/ui/icons/lucide";
+import { HouseIcon, Settings2Icon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -30,33 +30,6 @@ function HeaderActionButton() {
           <Trans id="header.go-home">Go home</Trans>
         ) : (
           <Trans id="header.open-preferences">Open preferences</Trans>
-        )}
-      </span>
-    </Button>
-  );
-}
-
-function HeaderLabButton() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const onLabPage = location.pathname === "/lab";
-
-  return (
-    <Button
-      className="[-webkit-app-region:no-drag]"
-      size="icon"
-      variant="ghost"
-      onClick={() => {
-        void navigate({ to: onLabPage ? "/" : "/lab" });
-      }}
-    >
-      {onLabPage ? <HouseIcon /> : <FlaskConicalIcon />}
-      <span className="sr-only">
-        {onLabPage ? (
-          <Trans id="header.open-lab">Open lab</Trans>
-        ) : (
-          <Trans id="header.go-lab">Go to lab</Trans>
         )}
       </span>
     </Button>
@@ -100,8 +73,6 @@ export function WindowTitleBar() {
           <Trans id="app.title">Fluxnotes</Trans>
         </div>
         <AppUpdateTitlebarButton />
-
-        {import.meta.env.DEV ? <HeaderLabButton /> : null}
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <div

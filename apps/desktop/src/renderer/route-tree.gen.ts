@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkspaceRouteRouteImport } from './routes/_workspace/route'
 import { Route as PreferencesIndexRouteImport } from './routes/preferences/index'
-import { Route as LabIndexRouteImport } from './routes/lab/index'
 import { Route as WorkspaceIndexRouteImport } from './routes/_workspace/index'
 
 const WorkspaceRouteRoute = WorkspaceRouteRouteImport.update({
@@ -23,11 +22,6 @@ const PreferencesIndexRoute = PreferencesIndexRouteImport.update({
   path: '/preferences/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LabIndexRoute = LabIndexRouteImport.update({
-  id: '/lab/',
-  path: '/lab/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -36,32 +30,28 @@ const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof WorkspaceIndexRoute
-  '/lab/': typeof LabIndexRoute
   '/preferences/': typeof PreferencesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof WorkspaceIndexRoute
-  '/lab': typeof LabIndexRoute
   '/preferences': typeof PreferencesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_workspace': typeof WorkspaceRouteRouteWithChildren
   '/_workspace/': typeof WorkspaceIndexRoute
-  '/lab/': typeof LabIndexRoute
   '/preferences/': typeof PreferencesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lab/' | '/preferences/'
+  fullPaths: '/' | '/preferences/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lab' | '/preferences'
-  id: '__root__' | '/_workspace' | '/_workspace/' | '/lab/' | '/preferences/'
+  to: '/' | '/preferences'
+  id: '__root__' | '/_workspace' | '/_workspace/' | '/preferences/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
-  LabIndexRoute: typeof LabIndexRoute
   PreferencesIndexRoute: typeof PreferencesIndexRoute
 }
 
@@ -79,13 +69,6 @@ declare module '@tanstack/react-router' {
       path: '/preferences'
       fullPath: '/preferences/'
       preLoaderRoute: typeof PreferencesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lab/': {
-      id: '/lab/'
-      path: '/lab'
-      fullPath: '/lab/'
-      preLoaderRoute: typeof LabIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_workspace/': {
@@ -112,7 +95,6 @@ const WorkspaceRouteRouteWithChildren = WorkspaceRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
-  LabIndexRoute: LabIndexRoute,
   PreferencesIndexRoute: PreferencesIndexRoute,
 }
 export const routeTree = rootRouteImport

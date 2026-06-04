@@ -55,13 +55,8 @@ function createRouteTree() {
     path: "/preferences",
     component: () => <div>preferences</div>,
   });
-  const labRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/lab",
-    component: () => <div>lab</div>,
-  });
 
-  return rootRoute.addChildren([workspaceRoute, preferencesRoute, labRoute]);
+  return rootRoute.addChildren([workspaceRoute, preferencesRoute]);
 }
 
 async function flushEffects(): Promise<void> {
@@ -141,8 +136,8 @@ describe("OpenBlockWorkspaceRouteSync", () => {
     expect(clientMocks.acknowledgePendingOpenBlock).not.toHaveBeenCalled();
   });
 
-  it("navigates from lab to the workspace for pending block requests", async () => {
-    const harness = await createHarness("/lab", { pendingTarget: { blockId: "block-1" } });
+  it("navigates from preferences to the workspace for pending block requests", async () => {
+    const harness = await createHarness("/preferences", { pendingTarget: { blockId: "block-1" } });
     mountedHarness = harness;
     await flushEffects();
 

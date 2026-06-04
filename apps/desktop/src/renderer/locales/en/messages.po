@@ -60,7 +60,7 @@ msgstr "Install app update"
 
 #. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:100
+#: src/renderer/routes/-layout/window-title-bar.tsx:73
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -122,44 +122,9 @@ msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:59
-msgid "header.go-lab"
-msgstr "Go to lab"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:57
-msgid "header.open-lab"
-msgstr "Open lab"
-
-#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:32
 msgid "header.open-preferences"
 msgstr "Open preferences"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:17
-msgid "lab.description"
-msgstr "Experiment area for infrastructure and integration demos."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:119
-msgid "lab.playground.description"
-msgstr "Frontend-only playground. Edit this preset markdown to verify Block behavior."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:132
-msgid "lab.playground.reset"
-msgstr "Reset preset"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:116
-msgid "lab.playground.title"
-msgstr "Block Editor Playground"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:14
-msgid "lab.title"
-msgstr "Lab"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
@@ -518,8 +483,8 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:71
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:44
+#: src/renderer/routes/-layout/window-title-bar.tsx:52
 msgid "window.hide"
 msgstr "Hide window"
 
