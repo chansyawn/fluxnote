@@ -166,7 +166,9 @@ describe("useWorkspaceBlockActions", () => {
         flush: vi.fn(async () => ""),
         focus: vi.fn(),
         getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+        getPreviewData: vi.fn(async () => ""),
         subscribeActionState: () => () => undefined,
+        subscribePreviewChange: () => () => undefined,
       }),
     });
 

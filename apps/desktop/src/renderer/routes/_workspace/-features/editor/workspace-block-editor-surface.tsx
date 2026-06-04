@@ -170,8 +170,12 @@ export function WorkspaceBlockEditorSurface({
       flush,
       getActionState: () =>
         editorRef.current?.getActionState() ?? DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: (request) =>
+        editorRef.current?.getPreviewData(request) ?? Promise.resolve(""),
       subscribeActionState: (listener) =>
         editorRef.current?.subscribeActionState(listener) ?? (() => undefined),
+      subscribePreviewChange: (listener) =>
+        editorRef.current?.subscribePreviewChange(listener) ?? (() => undefined),
     }),
     [flush],
   );

@@ -134,7 +134,9 @@ describe("useExternalEditActions", () => {
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),
       getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: vi.fn(async () => ""),
       subscribeActionState: () => () => undefined,
+      subscribePreviewChange: () => () => undefined,
     };
     const navigateToBlock = vi.fn(async () => undefined);
     const harness = createHarness({

@@ -24,5 +24,7 @@ export type {
   BlockEditorConfigInput,
   BlockEditorClipboardWriteData,
   BlockEditorHandle,
+  BlockEditorPreviewDataRequest,
+  BlockEditorPreviewKind,
   BlockEditorRuntime,
 } from "./core/types";

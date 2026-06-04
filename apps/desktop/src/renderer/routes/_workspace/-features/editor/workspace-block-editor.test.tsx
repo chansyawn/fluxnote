@@ -63,7 +63,9 @@ const mocks = vi.hoisted(() => ({
         "editor.taskList": false,
       },
     })),
+    getPreviewData: vi.fn(async () => ""),
     subscribeActionState: vi.fn(() => () => undefined),
+    subscribePreviewChange: vi.fn(() => () => undefined),
   },
   shortcutActionsByBlock: new Map<string, WorkspaceBlockActions>(),
   shortcuts: {

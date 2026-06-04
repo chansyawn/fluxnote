@@ -72,6 +72,19 @@ export interface BlockEditorClipboardWriteData {
   text: string;
 }
 
+export type BlockEditorPreviewKind =
+  | "html-document-export"
+  | "html-selected-export"
+  | "markdown-document-export"
+  | "markdown-selected-export"
+  | "markdown-source";
+
+export interface BlockEditorPreviewDataRequest {
+  kind: BlockEditorPreviewKind;
+}
+
+export type BlockEditorPreviewChangeListener = () => void;
+
 export interface BlockEditorRuntime {
   assets: {
     copy: (request: BlockEditorCopyAssetRequest) => Promise<BlockEditorCopyAssetResult>;
@@ -140,6 +153,8 @@ export interface BlockEditorConfigInput {
 export interface BlockEditorHandle extends BlockEditorActionController {
   copy: () => Promise<void>;
   flush: () => Promise<string>;
+  getPreviewData: (request: BlockEditorPreviewDataRequest) => Promise<string>;
+  subscribePreviewChange: (listener: BlockEditorPreviewChangeListener) => () => void;
 }
 
 export type { BlockEditorActionState };

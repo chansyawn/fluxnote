@@ -13,12 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@fluxnotes/ui/components/select";
-import { Separator } from "@fluxnotes/ui/components/separator";
 import { Switch } from "@fluxnotes/ui/components/switch";
 import { cn } from "@fluxnotes/ui/lib/utils";
-import { CheckIcon, ClipboardIcon, MoonIcon, RotateCcwIcon, SunIcon } from "lucide-react";
+import { MoonIcon, RotateCcwIcon, SunIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
+import { PlaygroundPreview } from "./playground-preview";
 import { createPlaygroundBlockEditorRuntime } from "./playground-runtime";
 
 type PlaygroundTheme = "dark" | "light";
@@ -95,10 +95,8 @@ export function PlaygroundApp() {
   const [sampleId, setSampleId] = useState<string>(PLAYGROUND_SAMPLES[0].id);
   const [editorKey, setEditorKey] = useState(0);
   const [markdown, setMarkdown] = useState(PLAYGROUND_SAMPLES[0].markdown);
-  const [flushedMarkdown, setFlushedMarkdown] = useState(PLAYGROUND_SAMPLES[0].markdown);
   const [theme, setTheme] = useState<PlaygroundTheme>("light");
   const [showLineNumbers, setShowLineNumbers] = useState(true);
-  const [copyState, setCopyState] = useState<"copied" | "idle">("idle");
 
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
@@ -123,23 +121,11 @@ export function PlaygroundApp() {
 
       setSampleId(sample.id);
       setMarkdown(sample.markdown);
-      setFlushedMarkdown(sample.markdown);
       setEditorHandle(null);
       setEditorKey((key) => key + 1);
     },
     [sampleId],
   );
-
-  const flushMarkdown = useCallback(async () => {
-    const nextMarkdown = (await editorHandle?.flush()) ?? markdown;
-    setFlushedMarkdown(nextMarkdown);
-  }, [editorHandle, markdown]);
-
-  const copyMarkdown = useCallback(async () => {
-    await navigator.clipboard?.writeText(flushedMarkdown);
-    setCopyState("copied");
-    window.setTimeout(() => setCopyState("idle"), 1400);
-  }, [flushedMarkdown]);
 
   return (
     <main
@@ -202,14 +188,9 @@ export function PlaygroundApp() {
       </section>
 
       <section className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)]">
-        <article className="bg-card min-h-0 overflow-auto rounded-lg border p-5">
+        <article className="bg-card min-h-0 overflow-auto rounded-lg border p-5 py-3">
           <BlockEditorToolbar
             controller={editorHandle}
-            inactiveContent={
-              <div className="text-muted-foreground rounded-lg border px-3 py-2 text-sm">
-                Focus editor
-              </div>
-            }
             shortcuts={BLOCK_EDITOR_SHORTCUT_DEFAULTS}
           />
           <BlockEditor
@@ -218,43 +199,11 @@ export function PlaygroundApp() {
             config={editorConfig}
             initialMarkdown={markdown}
             runtime={runtime}
-            onBlur={() => {
-              void flushMarkdown();
-            }}
             onMarkdownChange={setMarkdown}
           />
         </article>
 
-        <aside className="bg-card flex min-h-0 flex-col overflow-hidden rounded-lg border">
-          <div className="flex items-center justify-between gap-3 p-4">
-            <div>
-              <h2 className="text-sm font-medium">Markdown</h2>
-              <p className="text-muted-foreground text-sm">Latest flushed output</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                type="button"
-                variant="outline"
-                onClick={() => void flushMarkdown()}
-              >
-                Flush
-              </Button>
-              <Button
-                size="icon-sm"
-                type="button"
-                variant="outline"
-                onClick={() => void copyMarkdown()}
-              >
-                {copyState === "copied" ? <CheckIcon /> : <ClipboardIcon />}
-              </Button>
-            </div>
-          </div>
-          <Separator />
-          <pre className="min-h-0 flex-1 overflow-auto p-4 font-mono text-xs whitespace-pre-wrap">
-            {flushedMarkdown || "(empty)"}
-          </pre>
-        </aside>
+        <PlaygroundPreview editor={editorHandle} />
       </section>
     </main>
   );

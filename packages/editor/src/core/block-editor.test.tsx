@@ -294,4 +294,88 @@ describe("BlockEditor", () => {
 
     expect(runtime.clipboard.writeText).toHaveBeenCalledWith("const value = 1;");
   });
+
+  it("returns source and document export preview data", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          initialMarkdown="# Title"
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    await waitFor(() => expect(editorRef.current).not.toBeNull());
+
+    await expect(editorRef.current?.getPreviewData({ kind: "markdown-source" })).resolves.toContain(
+      "# Title",
+    );
+    await expect(
+      editorRef.current?.getPreviewData({ kind: "markdown-document-export" }),
+    ).resolves.toContain("# Title");
+    await expect(
+      editorRef.current?.getPreviewData({ kind: "html-document-export" }),
+    ).resolves.toContain("<h1>Title</h1>");
+  });
+
+  it("returns selected export preview data without changing markdown source", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          initialMarkdown="Alpha Beta"
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+    editor.focus();
+    selectEditorText(editor, "Alpha Beta");
+
+    await act(async () => {
+      document.dispatchEvent(new Event("selectionchange"));
+    });
+
+    await expect(
+      editorRef.current?.getPreviewData({ kind: "markdown-selected-export" }),
+    ).resolves.toContain("Alpha Beta");
+    await expect(
+      editorRef.current?.getPreviewData({ kind: "html-selected-export" }),
+    ).resolves.toContain("<p>Alpha Beta</p>");
+    await expect(editorRef.current?.getPreviewData({ kind: "markdown-source" })).resolves.toContain(
+      "Alpha Beta",
+    );
+  });
+
+  it("returns empty selected export preview data without a non-collapsed selection", async () => {
+    const editorRef = createRef<BlockEditorHandle>();
+
+    render(
+      <I18nProvider i18n={i18n}>
+        <BlockEditor
+          ref={editorRef}
+          initialMarkdown="Alpha"
+          runtime={createBlockEditorRuntime()}
+          onMarkdownChange={() => undefined}
+        />
+      </I18nProvider>,
+    );
+
+    await waitFor(() => expect(editorRef.current).not.toBeNull());
+
+    await expect(
+      editorRef.current?.getPreviewData({ kind: "markdown-selected-export" }),
+    ).resolves.toBe("");
+    await expect(editorRef.current?.getPreviewData({ kind: "html-selected-export" })).resolves.toBe(
+      "",
+    );
+  });
 });

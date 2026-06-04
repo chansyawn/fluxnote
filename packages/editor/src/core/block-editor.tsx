@@ -36,6 +36,7 @@ import {
   BLOCK_EDITOR_NAMESPACE,
   createBlockEditorCoreExtension,
 } from "./block-editor-core-extension";
+import { useBlockEditorPreviewController } from "./block-editor-preview-controller";
 import {
   BlockEditorConfigProvider,
   resolveBlockEditorConfig,
@@ -124,6 +125,12 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
   const runtime = useBlockEditorRuntime();
   const actionStateRef = useRef<BlockEditorActionState>(DEFAULT_BLOCK_EDITOR_ACTION_STATE);
   const actionStateListenersRef = useRef(new Set<BlockEditorActionStateListener>());
+  const { getPreviewData, publishPreviewChange, subscribePreviewChange, syncPreviewSelection } =
+    useBlockEditorPreviewController({
+      editor,
+      flushMarkdown,
+      runtime,
+    });
 
   const publishActionState = useCallback((nextState: BlockEditorActionState) => {
     if (blockEditorActionStatesEqual(actionStateRef.current, nextState)) {
@@ -151,21 +158,26 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
 
   useEffect(() => {
     syncActionState();
+    syncPreviewSelection();
 
     return mergeRegister(
-      editor.registerUpdateListener(() => {
+      editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
         publishActionState(readBlockEditorActionState(editor));
+        if (dirtyElements.size > 0 || dirtyLeaves.size > 0) {
+          publishPreviewChange();
+        }
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
           syncActionState();
+          syncPreviewSelection();
           return false;
         },
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [editor, publishActionState, syncActionState]);
+  }, [editor, publishActionState, publishPreviewChange, syncActionState, syncPreviewSelection]);
 
   useEffect(() => {
     return mergeRegister(
@@ -222,14 +234,16 @@ function BlockEditorImperative({ ref, onBlur, flushMarkdown }: BlockEditorImpera
       flush: flushMarkdown,
       focus: () => editor.focus(),
       getActionState: () => actionStateRef.current,
+      getPreviewData,
       subscribeActionState: (listener: BlockEditorActionStateListener) => {
         actionStateListenersRef.current.add(listener);
         return () => {
           actionStateListenersRef.current.delete(listener);
         };
       },
+      subscribePreviewChange,
     }),
-    [editor, runtime, executeAction, flushMarkdown],
+    [editor, runtime, executeAction, flushMarkdown, getPreviewData, subscribePreviewChange],
   );
 
   return <BlockEditorContent onBlur={onBlur} />;
