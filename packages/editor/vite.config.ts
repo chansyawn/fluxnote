@@ -24,9 +24,6 @@ export default defineConfig({
       "@fluxnotes/editor": path.resolve(packageRoot, "src/index.tsx"),
     },
   },
-  staged: {
-    "{lingui.config.ts,src/**/*.{ts,tsx,po}}": "vp run i18n:check",
-  },
   test: {
     setupFiles: ["./src/test-helper/setup.ts"],
   },
