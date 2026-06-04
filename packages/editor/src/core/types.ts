@@ -61,6 +61,11 @@ export interface BlockEditorResolveAssetResult {
   }>;
 }
 
+export interface BlockEditorRenderAssetUrlResult {
+  assetUrl: string;
+  renderUrl: string;
+}
+
 export interface BlockEditorClipboardWriteData {
   html: string;
   imageFileUrl?: string;
@@ -74,6 +79,9 @@ export interface BlockEditorRuntime {
     importFiles: (
       request: BlockEditorImportFileAssetsRequest,
     ) => Promise<BlockEditorImportFileAssetsResult>;
+    renderAssetUrls?: (
+      assetUrls: string[],
+    ) => Promise<ReadonlyArray<BlockEditorRenderAssetUrlResult>>;
     resolve: (request: BlockEditorResolveAssetRequest) => Promise<BlockEditorResolveAssetResult>;
   };
   clipboard: {

@@ -10,7 +10,9 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from "lexical";
-import { type JSX } from "react";
+import { type JSX, useEffect, useState } from "react";
+
+import { useBlockEditorRuntime } from "../../core/runtime-extension";
 
 export interface ImagePayload {
   alt: string;
@@ -24,13 +26,47 @@ interface ImageViewProps extends ImagePayload {
 
 export type SerializedImageNode = Spread<ImagePayload, SerializedLexicalNode>;
 
+function isAssetUrl(src: string): boolean {
+  return src.startsWith("assets://");
+}
+
 function ImageView({ alt, src, title }: ImageViewProps): JSX.Element {
+  const runtime = useBlockEditorRuntime();
+  const [renderSrc, setRenderSrc] = useState(src);
+
+  useEffect(() => {
+    if (!isAssetUrl(src) || !runtime.assets.renderAssetUrls) {
+      setRenderSrc(src);
+      return;
+    }
+
+    let isActive = true;
+    void runtime.assets
+      .renderAssetUrls([src])
+      .then((assets) => {
+        if (!isActive) {
+          return;
+        }
+
+        setRenderSrc(assets.find((asset) => asset.assetUrl === src)?.renderUrl ?? src);
+      })
+      .catch(() => {
+        if (isActive) {
+          setRenderSrc(src);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [runtime.assets, src]);
+
   return (
     <img
       alt={alt}
       className="block-editor__image"
       draggable={false}
-      src={src}
+      src={renderSrc}
       title={title ?? undefined}
     />
   );

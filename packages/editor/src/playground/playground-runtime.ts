@@ -79,6 +79,11 @@ export function createPlaygroundBlockEditorRuntime(): BlockEditorRuntime {
           };
         }),
       }),
+      renderAssetUrls: async (assetUrls) =>
+        assetUrls
+          .map((assetUrl) => assets.get(assetUrl))
+          .filter((asset): asset is PlaygroundAssetRecord => asset !== undefined)
+          .map(({ assetUrl, fileUrl }) => ({ assetUrl, renderUrl: fileUrl })),
       resolve: async ({ assetUrls }) => ({
         assets: assetUrls
           .map((assetUrl) => assets.get(assetUrl))
