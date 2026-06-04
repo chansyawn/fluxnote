@@ -1,9 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter/wght.css";
-@import "@fontsource-variable/inter/wght-italic.css";
-@import "@fontsource-variable/noto-sans-sc/wght.css";
-@import "@fontsource-variable/cascadia-code/wght.css";
-@import "@fontsource-variable/cascadia-code/wght-italic.css";
 @import "@fluxnotes/ui/styles/index.css";
 @import "@fluxnotes/editor/styles.css";
 
