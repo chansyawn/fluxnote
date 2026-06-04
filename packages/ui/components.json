@@ -13,11 +13,10 @@
   "iconLibrary": "lucide",
   "rtl": true,
   "aliases": {
-    "components": "@fluxnotes/ui",
+    "components": "@fluxnotes/ui/components",
     "utils": "@fluxnotes/ui/lib/utils",
     "ui": "@fluxnotes/ui/components",
-    "lib": "@fluxnotes/ui/lib",
-    "hooks": "@fluxnotes/ui/hooks"
+    "lib": "@fluxnotes/ui/lib"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

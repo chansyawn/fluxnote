@@ -4,12 +4,7 @@
   "private": true,
   "description": "Shared UI primitives and design tokens for Fluxnotes apps.",
   "type": "module",
-  "types": "./src/index.ts",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
-    },
     "./components/*": {
       "types": "./src/components/*.tsx",
       "import": "./src/components/*.tsx"
@@ -22,13 +17,7 @@
       "types": "./src/icons/*.ts",
       "import": "./src/icons/*.ts"
     },
-    "./styles": "./src/styles/index.css",
-    "./styles/index.css": "./src/styles/index.css",
-    "./styles/*": "./src/styles/*.css",
-    "./test/*": {
-      "types": "./src/test/*.tsx",
-      "import": "./src/test/*.tsx"
-    }
+    "./styles/index.css": "./src/styles/index.css"
   },
   "scripts": {
     "test": "vp test",

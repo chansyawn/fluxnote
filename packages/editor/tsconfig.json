@@ -16,10 +16,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@fluxnotes/ui/*": ["../ui/src/*"]
-    }
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }
