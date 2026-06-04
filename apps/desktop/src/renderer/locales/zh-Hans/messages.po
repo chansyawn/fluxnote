@@ -59,8 +59,13 @@ msgid "app-update.titlebar.restart"
 msgstr "安装应用更新"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/-layout/window-title-bar.tsx:77
+msgid "app.environment.development"
+msgstr "开发"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:73
+#: src/renderer/routes/-layout/window-title-bar.tsx:74
 msgid "app.title"
 msgstr "Fluxnotes"
 
@@ -117,12 +122,12 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:30
+#: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:32
+#: src/renderer/routes/-layout/window-title-bar.tsx:33
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
 
@@ -483,8 +488,8 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:44
-#: src/renderer/routes/-layout/window-title-bar.tsx:52
+#: src/renderer/routes/-layout/window-title-bar.tsx:45
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "window.hide"
 msgstr "隐藏窗口"
 

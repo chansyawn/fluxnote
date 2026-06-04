@@ -1,3 +1,4 @@
+import { Badge } from "@fluxnotes/ui/components/badge";
 import { Button } from "@fluxnotes/ui/components/button";
 import { HouseIcon, Settings2Icon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
@@ -69,8 +70,13 @@ export function WindowTitleBar() {
           </div>
         ) : null}
 
-        <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
+        <div className="pointer-events-none flex min-w-0 items-center gap-2 truncate text-sm font-medium">
           <Trans id="app.title">Fluxnotes</Trans>
+          {import.meta.env.DEV ? (
+            <Badge>
+              <Trans id="app.environment.development">Dev</Trans>
+            </Badge>
+          ) : null}
         </div>
         <AppUpdateTitlebarButton />
 
