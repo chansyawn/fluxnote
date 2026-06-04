@@ -47,7 +47,8 @@
   },
   "scripts": {
     "build": "vp pack",
-    "dev": "vp pack --watch",
+    "dev": "vp dev",
+    "dev:pack": "vp pack --watch",
     "test": "vp test",
     "check": "vp check"
   },
@@ -83,6 +84,10 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
+    "@lingui/babel-plugin-lingui-macro": "catalog:",
+    "@lingui/vite-plugin": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@tailwindcss/vite": "catalog:",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "catalog:",
@@ -90,6 +95,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/unist": "^3.0.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "babel-plugin-react-compiler": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }
