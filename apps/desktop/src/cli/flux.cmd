@@ -21,7 +21,7 @@ if not exist "%ELECTRON%" (
 
 if not exist "%CLI_JS%" (
   echo CLI script not found at %CLI_JS%. 1>&2
-  echo Run 'vp run package' or 'vp run dev' to build it. 1>&2
+  echo Run 'vp run package:desktop' or 'vp run dev:desktop' to build it. 1>&2
   exit /b 1
 )
 

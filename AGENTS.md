@@ -127,9 +127,9 @@ packages/
 After any code change, run:
 
 ```bash
-vp check
+vp run check
 vp run test
-vp run package
+vp run package:desktop
 ```
 
 ### Database Schema Changes

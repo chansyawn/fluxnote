@@ -14,7 +14,6 @@
     "#global.css": "./src/renderer/global.css"
   },
   "scripts": {
-    "postinstall": "vp config",
     "dev": "electron-forge start",
     "test": "vp test",
     "check": "vp check",

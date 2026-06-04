@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "vp config",
-    "dev": "vp exec --filter @fluxnotes/desktop -- electron-forge start",
+    "dev:desktop": "vp run @fluxnotes/desktop#dev",
+    "dev:editor": "vp run @fluxnotes/editor#dev",
+    "check": "vp run -r check",
     "test": "vp run -r test",
-    "package": "vp run @fluxnotes/desktop#package",
-    "make": "vp run @fluxnotes/desktop#make",
+    "package:desktop": "vp run @fluxnotes/desktop#package",
+    "make:desktop": "vp run @fluxnotes/desktop#make",
     "flux": "vp run @fluxnotes/desktop#flux",
-    "release:macos": "vp run @fluxnotes/desktop#release:macos",
     "db:generate": "vp run @fluxnotes/desktop#db:generate",
     "i18n:extract": "node scripts/i18n/extract.mjs",
     "i18n:check": "node scripts/i18n/check-i18n.mjs"
