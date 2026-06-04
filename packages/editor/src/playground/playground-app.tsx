@@ -20,74 +20,14 @@ import { useCallback, useMemo, useState } from "react";
 
 import { PlaygroundPreview } from "./playground-preview";
 import { createPlaygroundBlockEditorRuntime } from "./playground-runtime";
+import { findPlaygroundSample, PLAYGROUND_SAMPLES } from "./playground-samples";
 
 type PlaygroundTheme = "dark" | "light";
 
-interface PlaygroundSample {
-  id: string;
-  label: string;
-  markdown: string;
-}
-
-const PLAYGROUND_SAMPLES = [
-  {
-    id: "kitchen-sink",
-    label: "Kitchen sink",
-    markdown: [
-      "# Editor playground",
-      "",
-      "Use this page to develop `@fluxnotes/editor` without starting Electron.",
-      "",
-      "## Formatting",
-      "",
-      "- Bullet item",
-      "- Another item",
-      "- [ ] Task item",
-      "- [x] Done item",
-      "",
-      "> Quote with **bold** and _italic_ text.",
-      "",
-      "| Feature | State |",
-      "| --- | --- |",
-      "| Tables | Ready |",
-      "| Code | Ready |",
-      "",
-      "```ts",
-      'const message = "Hello from the editor playground";',
-      "console.log(message);",
-      "```",
-    ].join("\n"),
-  },
-  {
-    id: "empty",
-    label: "Empty block",
-    markdown: "",
-  },
-  {
-    id: "long",
-    label: "Long note",
-    markdown: [
-      "## Development notes",
-      "",
-      "This sample keeps enough content on screen to exercise selection, scrolling, toolbar state, and Markdown output.",
-      "",
-      "### Checklist",
-      "",
-      "- [ ] Paste Markdown",
-      "- [ ] Paste an image",
-      "- [ ] Copy rich content",
-      "- [ ] Toggle code line numbers",
-      "",
-      "### Links",
-      "",
-      "Visit [Fluxnotes](https://example.com) and edit the link popover.",
-    ].join("\n"),
-  },
-] as const satisfies readonly PlaygroundSample[];
-
-function findSample(sampleId: string): PlaygroundSample {
-  return PLAYGROUND_SAMPLES.find((sample) => sample.id === sampleId) ?? PLAYGROUND_SAMPLES[0];
-}
+const PLAYGROUND_SAMPLE_SELECT_ITEMS = PLAYGROUND_SAMPLES.map((sample) => ({
+  label: sample.label,
+  value: sample.id,
+}));
 
 export function PlaygroundApp() {
   const [editorHandle, setEditorHandle] = useState<BlockEditorHandle | null>(null);
@@ -117,7 +57,7 @@ export function PlaygroundApp() {
 
   const resetEditor = useCallback(
     (nextSampleId = sampleId) => {
-      const sample = findSample(nextSampleId);
+      const sample = findPlaygroundSample(nextSampleId);
 
       setSampleId(sample.id);
       setMarkdown(sample.markdown);
@@ -141,6 +81,7 @@ export function PlaygroundApp() {
         </div>
         <div className="flex items-center gap-2">
           <Select
+            items={PLAYGROUND_SAMPLE_SELECT_ITEMS}
             value={sampleId}
             onValueChange={(nextSampleId) => {
               if (typeof nextSampleId === "string") {

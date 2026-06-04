@@ -8,6 +8,21 @@ interface PlaygroundAssetRecord {
   fileUrl: string;
 }
 
+const PLAYGROUND_SAMPLE_ASSET_URL = "assets://block/photo.png";
+
+const PLAYGROUND_SAMPLE_IMAGE_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240">
+  <rect width="640" height="240" fill="#dddddd"/>
+  <text x="320" y="132" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="48" font-weight="600" fill="#999999">Local image</text>
+</svg>
+`)}`;
+
+const PLAYGROUND_SAMPLE_ASSET: PlaygroundAssetRecord = {
+  altText: "Asset image",
+  assetUrl: PLAYGROUND_SAMPLE_ASSET_URL,
+  fileUrl: PLAYGROUND_SAMPLE_IMAGE_URL,
+};
+
 function base64ToBlob(input: PlaygroundAssetInput): Blob {
   const bytes = Uint8Array.from(atob(input.dataBase64), (character) => character.charCodeAt(0));
   return new Blob([bytes], { type: input.mimeType });
@@ -35,7 +50,9 @@ async function writeClipboardData(data: BlockEditorClipboardWriteData): Promise<
 }
 
 export function createPlaygroundBlockEditorRuntime(): BlockEditorRuntime {
-  const assets = new Map<string, PlaygroundAssetRecord>();
+  const assets = new Map<string, PlaygroundAssetRecord>([
+    [PLAYGROUND_SAMPLE_ASSET.assetUrl, PLAYGROUND_SAMPLE_ASSET],
+  ]);
 
   return {
     assets: {
