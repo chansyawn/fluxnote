@@ -13,8 +13,8 @@
     "make:desktop": "vp run @fluxnotes/desktop#make",
     "flux": "vp run @fluxnotes/desktop#flux",
     "db:generate": "vp run @fluxnotes/desktop#db:generate",
-    "i18n:extract": "node scripts/i18n/extract.mjs",
-    "i18n:check": "node scripts/i18n/check-i18n.mjs"
+    "i18n:extract": "node scripts/i18n/extract.ts",
+    "i18n:check": "node scripts/i18n/check-i18n.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",

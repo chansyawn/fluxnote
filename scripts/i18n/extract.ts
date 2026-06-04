@@ -4,12 +4,12 @@ import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-import { i18nProjects, repositoryRoot } from "./projects.mjs";
+import { i18nProjects, repositoryRoot, type I18nProject } from "./projects.ts";
 
 const rootRequire = createRequire(pathToFileURL(path.join(repositoryRoot, "package.json")));
 const linguiCliPath = path.join(path.dirname(rootRequire.resolve("@lingui/cli")), "lingui.js");
 
-function run(project, args) {
+function run(project: I18nProject, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [linguiCliPath, ...args], {
       cwd: project.rootDir,

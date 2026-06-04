@@ -5,14 +5,48 @@ import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-import { i18nProjects, repositoryRoot } from "./projects.mjs";
+import { i18nProjects, repositoryRoot, type I18nProject } from "./projects.ts";
+
+interface LinguiCatalogConfig {
+  path: string;
+}
+
+interface LinguiConfig {
+  catalogs: LinguiCatalogConfig[];
+  locales: string[];
+  pseudoLocale: string;
+  sourceLocale: string;
+}
+
+interface CatalogMessage {
+  obsolete?: boolean;
+  translation: string;
+}
+
+interface PoFormatter {
+  parse(content: string): Record<string, CatalogMessage>;
+}
+
+interface ChangedCatalog {
+  path: string;
+  project: string;
+}
+
+interface MissingTranslation {
+  id: string;
+  locale: string;
+  path: string;
+  project: string;
+}
 
 const rootRequire = createRequire(pathToFileURL(path.join(repositoryRoot, "package.json")));
-const { formatter } = rootRequire("@lingui/format-po");
+const { formatter } = rootRequire("@lingui/format-po") as {
+  formatter: () => PoFormatter;
+};
 const poFormatter = formatter();
 const linguiCliPath = path.join(path.dirname(rootRequire.resolve("@lingui/cli")), "lingui.js");
 
-function run(project, args) {
+function run(project: I18nProject, args: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [linguiCliPath, ...args], {
       cwd: project.rootDir,
@@ -35,13 +69,15 @@ function run(project, args) {
   });
 }
 
-async function readLinguiConfig(project) {
+async function readLinguiConfig(project: I18nProject): Promise<LinguiConfig> {
   const configPath = path.join(project.rootDir, "lingui.config.ts");
-  const configModule = await import(pathToFileURL(configPath).href);
+  const configModule = (await import(pathToFileURL(configPath).href)) as {
+    default: LinguiConfig;
+  };
   return configModule.default;
 }
 
-function readShippedLocales(linguiConfig) {
+function readShippedLocales(linguiConfig: LinguiConfig): string[] {
   return linguiConfig.locales
     .filter(
       (locale) => locale !== linguiConfig.sourceLocale && locale !== linguiConfig.pseudoLocale,
@@ -49,21 +85,24 @@ function readShippedLocales(linguiConfig) {
     .sort();
 }
 
-function resolveCatalogPath(catalogPath, locale) {
+function resolveCatalogPath(catalogPath: string, locale: string): string {
   const poPath = `${catalogPath.replace("<rootDir>/", "").replace("<rootDir>", "").replace("{locale}", locale)}.po`;
 
   return path.normalize(poPath);
 }
 
-function getCatalogPaths(linguiConfig, locale) {
+function getCatalogPaths(linguiConfig: LinguiConfig, locale: string): string[] {
   return linguiConfig.catalogs.map((catalog) => resolveCatalogPath(catalog.path, locale));
 }
 
-async function readCatalog(project, relativePath) {
+async function readCatalog(project: I18nProject, relativePath: string): Promise<[string, string]> {
   return [relativePath, await readFile(path.join(project.rootDir, relativePath), "utf8")];
 }
 
-async function readCatalogSnapshot(project, linguiConfig) {
+async function readCatalogSnapshot(
+  project: I18nProject,
+  linguiConfig: LinguiConfig,
+): Promise<Map<string, string>> {
   const catalogPaths = linguiConfig.locales.flatMap((locale) =>
     getCatalogPaths(linguiConfig, locale),
   );
@@ -72,7 +111,7 @@ async function readCatalogSnapshot(project, linguiConfig) {
   );
 }
 
-function findChangedCatalogs(before, after) {
+function findChangedCatalogs(before: Map<string, string>, after: Map<string, string>): string[] {
   const paths = new Set([...before.keys(), ...after.keys()]);
 
   return [...paths]
@@ -80,8 +119,11 @@ function findChangedCatalogs(before, after) {
     .sort((left, right) => left.localeCompare(right));
 }
 
-async function findMissingTranslations(project, linguiConfig) {
-  const missing = [];
+async function findMissingTranslations(
+  project: I18nProject,
+  linguiConfig: LinguiConfig,
+): Promise<MissingTranslation[]> {
+  const missing: MissingTranslation[] = [];
 
   for (const locale of readShippedLocales(linguiConfig)) {
     for (const relativePath of getCatalogPaths(linguiConfig, locale)) {
@@ -100,8 +142,8 @@ async function findMissingTranslations(project, linguiConfig) {
   return missing;
 }
 
-const changedCatalogs = [];
-const missing = [];
+const changedCatalogs: ChangedCatalog[] = [];
+const missing: MissingTranslation[] = [];
 
 for (const project of i18nProjects) {
   const linguiConfig = await readLinguiConfig(project);

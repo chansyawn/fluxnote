@@ -9,6 +9,17 @@ const ignorePatterns = [
   "packages/editor/src/locales/**",
 ];
 
+const i18nCheckStagedFiles = [
+  "config/i18n/lingui.ts",
+  "scripts/i18n/**/*.ts",
+  "apps/desktop/lingui.config.ts",
+  "apps/desktop/src/renderer/**/*.{ts,tsx,po}",
+  "packages/editor/lingui.config.ts",
+  "packages/editor/src/**/*.{ts,tsx,po}",
+];
+
+const i18nCheckStagedPattern = `{${i18nCheckStagedFiles.join(",")}}`;
+
 export default defineConfig({
   fmt: {
     sortImports: {},
@@ -31,7 +42,6 @@ export default defineConfig({
   },
   staged: {
     "*": "vp check --fix",
-    "{config/i18n/lingui.ts,scripts/i18n/check-i18n.mjs,apps/desktop/lingui.config.ts,apps/desktop/src/renderer/**/*.{ts,tsx,po},packages/editor/lingui.config.ts,packages/editor/src/**/*.{ts,tsx,po}}":
-      "vp run i18n:check",
+    [i18nCheckStagedPattern]: "vp run i18n:check",
   },
 });
