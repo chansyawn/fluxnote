@@ -191,16 +191,7 @@ export function PlaygroundApp() {
         </div>
       </header>
 
-      <section className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <BlockEditorToolbar
-          controller={editorHandle}
-          inactiveContent={
-            <div className="text-muted-foreground rounded-lg border px-3 py-2 text-sm">
-              Focus editor
-            </div>
-          }
-          shortcuts={BLOCK_EDITOR_SHORTCUT_DEFAULTS}
-        />
+      <section className="flex flex-col gap-3 lg:flex-row">
         <label className="text-muted-foreground flex items-center gap-2 text-sm">
           <Switch
             checked={showLineNumbers}
@@ -212,6 +203,15 @@ export function PlaygroundApp() {
 
       <section className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)]">
         <article className="bg-card min-h-0 overflow-auto rounded-lg border p-5">
+          <BlockEditorToolbar
+            controller={editorHandle}
+            inactiveContent={
+              <div className="text-muted-foreground rounded-lg border px-3 py-2 text-sm">
+                Focus editor
+              </div>
+            }
+            shortcuts={BLOCK_EDITOR_SHORTCUT_DEFAULTS}
+          />
           <BlockEditor
             key={editorKey}
             ref={setEditorHandle}
