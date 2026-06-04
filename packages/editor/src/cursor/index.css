@@ -17,6 +17,6 @@
   @apply animate-caret-blink;
 }
 
-[data-block-id]:focus-within .block-editor__gap-cursor--active::before {
+[data-block-editor-root]:focus-within .block-editor__gap-cursor--active::before {
   @apply block;
 }

@@ -266,7 +266,7 @@ export function BlockEditor({
   }, [onBlur]);
 
   return (
-    <div ref={setOverlayContainer} className="relative text-sm">
+    <div ref={setOverlayContainer} className="relative text-sm" data-block-editor-root>
       <BlockEditorOverlayContainerProvider container={overlayContainer}>
         <BlockEditorConfigProvider config={resolvedConfig}>
           <LexicalExtensionComposer extension={extension} contentEditable={null}>

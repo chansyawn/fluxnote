@@ -66,7 +66,10 @@ describe("BlockEditor", () => {
       </I18nProvider>,
     );
 
-    expect(screen.getByRole("textbox", { name: /markdown block editor/i })).toBeInTheDocument();
+    const editor = screen.getByRole("textbox", { name: /markdown block editor/i });
+
+    expect(editor).toBeInTheDocument();
+    expect(editor.closest("[data-block-editor-root]")).toBeInTheDocument();
   });
 
   it("applies configured Block Editor text format shortcuts", async () => {
