@@ -1,3 +1,24 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@fluxnotes/ui/components/select";
+import { toast } from "@fluxnotes/ui/components/sonner";
+import { Tabs, TabsList, TabsTrigger } from "@fluxnotes/ui/components/tabs";
+import {
+  LanguagesIcon,
+  MonitorIcon,
+  MoonIcon,
+  PaletteIcon,
+  SunIcon,
+  TerminalIcon,
+  TypeIcon,
+  type LucideIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
@@ -12,16 +33,6 @@ import {
   PreferencesRow,
   PreferencesSection,
 } from "@renderer/routes/preferences/-features/preferences-list";
-import { Button } from "@renderer/ui/components/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@renderer/ui/components/select";
-import { Tabs, TabsList, TabsTrigger } from "@renderer/ui/components/tabs";
 import {
   FONT_SIZE_OPTIONS,
   isFontSize,
@@ -30,18 +41,7 @@ import {
   type ThemePreference,
 } from "@shared/features/preferences/user-preferences";
 import { useQuery } from "@tanstack/react-query";
-import {
-  LanguagesIcon,
-  MonitorIcon,
-  MoonIcon,
-  PaletteIcon,
-  SunIcon,
-  TerminalIcon,
-  TypeIcon,
-  type LucideIcon,
-} from "lucide-react";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
 
 export function AppPreferencesSection() {
   const { i18n } = useLingui();

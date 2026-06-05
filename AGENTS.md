@@ -5,6 +5,11 @@
 ### Architecture
 
 - Use **Vite+** as the primary toolchain.
+- This repository is a pnpm workspace monorepo managed by Vite+.
+- `apps/desktop` contains the Electron product and owns app runtime, IPC, renderer routes, and product-specific features.
+- `packages/*` contains internal shared source packages. Packages are consumed through `exports` that point to source files; they are not bundled for app consumption and are not public external APIs.
+- `packages/ui` contains app-agnostic UI primitives, design tokens, styles, and icons.
+- `packages/editor` contains reusable editor functionality and can be developed independently from the desktop app.
 
 ### File Organization
 
@@ -74,7 +79,10 @@ packages/
 ### UI Conventions
 
 - Use the shadcn CLI to create new components when appropriate.
-- Do not modify existing shadcn components in `apps/desktop/src/renderer/ui` unless explicitly requested.
+- Run shadcn commands from `packages/ui`; `packages/ui/components.json` is the source of truth for shadcn configuration.
+- Store shadcn/Base UI source components in `packages/ui/src/components` and shared UI utilities in `packages/ui/src/lib`.
+- Do not add app-specific state, routes, IPC, clients, Lingui copy, or feature/domain logic to `packages/ui`.
+- Avoid modifying existing shadcn components when possible; if a change is necessary, explain the reason and expected impact.
 - Use `lucide-react` for icons, and name icon wrappers with an `Icon` suffix.
 - Design and test with RTL behavior in mind.
 
@@ -119,9 +127,9 @@ packages/
 After any code change, run:
 
 ```bash
-vp check
+vp run check
 vp run test
-vp run package
+vp run package:desktop
 ```
 
 ### Database Schema Changes

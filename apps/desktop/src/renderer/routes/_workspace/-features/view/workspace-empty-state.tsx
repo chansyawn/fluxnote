@@ -1,13 +1,13 @@
-import { Trans } from "@lingui/react/macro";
-import { Button } from "@renderer/ui/components/button";
+import { Button } from "@fluxnotes/ui/components/button";
 import {
   Empty,
   EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-} from "@renderer/ui/components/empty";
-import { LoaderCircleIcon, PlusIcon } from "lucide-react";
+} from "@fluxnotes/ui/components/empty";
+import { LoaderCircleIcon, PlusIcon } from "@fluxnotes/ui/icons/lucide";
+import { Trans } from "@lingui/react/macro";
 import type { ReactElement } from "react";
 
 export function LoadingState(): ReactElement {

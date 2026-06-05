@@ -1,6 +1,6 @@
+import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { Trans } from "@lingui/react/macro";
-import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
-import { cn } from "@renderer/ui/lib/utils";
 
 import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";
 

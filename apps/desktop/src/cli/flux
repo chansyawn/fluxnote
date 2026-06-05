@@ -16,15 +16,35 @@ SCRIPT="$(resolve_symlink "$0")"
 CLI_DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
 ROOT_DIR="$(dirname "$(dirname "$CLI_DIR")")"
 
-ELECTRON="$ROOT_DIR/MacOS/fluxnotes"
-CLI_JS="$CLI_DIR/flux-cli.mjs"
+find_development_electron() {
+  local dir="$1"
+  local electron
+
+  while [ "$dir" != "/" ]; do
+    electron="$dir/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
+    if [ -f "$electron" ]; then
+      echo "$electron"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+
+  return 1
+}
+
+PRODUCTION_ELECTRON="$ROOT_DIR/MacOS/Fluxnotes"
+PRODUCTION_CLI_JS="$CLI_DIR/flux-cli.mjs"
+DEVELOPMENT_CLI_JS="$ROOT_DIR/.vite/cli/flux-cli.mjs"
+
+ELECTRON="$PRODUCTION_ELECTRON"
+CLI_JS="$PRODUCTION_CLI_JS"
 
 if [ ! -f "$ELECTRON" ]; then
-  ELECTRON="$ROOT_DIR/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron"
-  CLI_JS="$ROOT_DIR/.vite/cli/flux-cli.mjs"
+  ELECTRON="$(find_development_electron "$ROOT_DIR" || true)"
+  CLI_JS="$DEVELOPMENT_CLI_JS"
 fi
 
-if [ ! -f "$ELECTRON" ]; then
+if [ -z "$ELECTRON" ] || [ ! -f "$ELECTRON" ]; then
   echo "Electron binary not found." >&2
   echo "In production: reinstall Fluxnotes or run 'Install flux command in PATH' from the app." >&2
   echo "In development: run 'vp install' first." >&2
@@ -33,7 +53,7 @@ fi
 
 if [ ! -f "$CLI_JS" ]; then
   echo "CLI script not found at $CLI_JS." >&2
-  echo "Run 'vp run package' or 'vp run dev' to build it." >&2
+  echo "Run 'vp run package:desktop' or 'vp run dev:desktop' to build it." >&2
   exit 1
 fi
 

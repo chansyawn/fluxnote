@@ -1,3 +1,33 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@fluxnotes/ui/components/alert-dialog";
+import { Button } from "@fluxnotes/ui/components/button";
+import { ButtonGroup } from "@fluxnotes/ui/components/button-group";
+import { InputGroup, InputGroupInput } from "@fluxnotes/ui/components/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@fluxnotes/ui/components/select";
+import { toast } from "@fluxnotes/ui/components/sonner";
+import { Switch } from "@fluxnotes/ui/components/switch";
+import {
+  ArchiveIcon,
+  ClockIcon,
+  DatabaseZapIcon,
+  LoaderCircleIcon,
+} from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { deleteArchivedBlocks } from "@renderer/clients";
@@ -9,29 +39,6 @@ import {
   PreferencesSection,
 } from "@renderer/routes/preferences/-features/preferences-list";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@renderer/ui/components/alert-dialog";
-import { Button } from "@renderer/ui/components/button";
-import { ButtonGroup } from "@renderer/ui/components/button-group";
-import { InputGroup, InputGroupInput } from "@renderer/ui/components/input-group";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@renderer/ui/components/select";
-import { Switch } from "@renderer/ui/components/switch";
-import {
   AUTO_ARCHIVE_DURATION_UNITS,
   AUTO_ARCHIVE_MAX_IDLE_MINUTES,
   toAutoArchiveDurationViewModel,
@@ -40,9 +47,7 @@ import {
 } from "@shared/features/preferences/auto-archive";
 import { DEFAULT_AUTO_ARCHIVE_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { useMutation } from "@tanstack/react-query";
-import { ArchiveIcon, ClockIcon, DatabaseZapIcon, LoaderCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 const MAX_DURATION_BY_UNIT: Record<AutoArchiveDurationUnit, number> = {
   days: Math.floor(AUTO_ARCHIVE_MAX_IDLE_MINUTES / (24 * 60)),

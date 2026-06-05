@@ -1,0 +1,13 @@
+@reference "@fluxnotes/ui/styles/index.css";
+
+.block-editor__text--strong {
+  @apply font-semibold;
+}
+
+.block-editor__text--emphasis {
+  @apply italic;
+}
+
+.block-editor__text--strikethrough {
+  @apply line-through;
+}

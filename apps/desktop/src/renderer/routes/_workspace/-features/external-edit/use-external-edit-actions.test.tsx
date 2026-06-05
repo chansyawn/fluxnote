@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@fluxnotes/editor";
 import { queryClient } from "@renderer/app/query";
 import type { Block, ListBlocksResult } from "@renderer/clients";
-import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor/actions";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -23,7 +23,7 @@ vi.mock("@renderer/clients", () => ({
   }),
 }));
 
-vi.mock("sonner", () => ({
+vi.mock("@fluxnotes/ui/components/sonner", () => ({
   toast: {
     error: clientMocks.toastError,
   },
@@ -134,7 +134,9 @@ describe("useExternalEditActions", () => {
       flush: vi.fn(async () => String.raw`a\_b \$5 \$x\$`),
       focus: vi.fn(),
       getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: vi.fn(async () => ""),
       subscribeActionState: () => () => undefined,
+      subscribePreviewChange: () => () => undefined,
     };
     const navigateToBlock = vi.fn(async () => undefined);
     const harness = createHarness({

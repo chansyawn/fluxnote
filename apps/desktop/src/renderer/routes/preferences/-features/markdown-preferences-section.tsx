@@ -1,3 +1,5 @@
+import { Switch } from "@fluxnotes/ui/components/switch";
+import { ListOrderedIcon } from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import {
@@ -5,8 +7,6 @@ import {
   PreferencesRow,
   PreferencesSection,
 } from "@renderer/routes/preferences/-features/preferences-list";
-import { Switch } from "@renderer/ui/components/switch";
-import { ListOrderedIcon } from "lucide-react";
 
 export function MarkdownPreferencesSection() {
   const { codeBlock, patchCodeBlock } = useMarkdownCodeBlockPreference();

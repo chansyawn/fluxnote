@@ -1,9 +1,3 @@
-import { Trans } from "@lingui/react/macro";
-import {
-  restartAndInstallAppUpdate,
-  toAppInvokeError,
-  type AppUpdateStatus,
-} from "@renderer/clients";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +8,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@renderer/ui/components/alert-dialog";
+} from "@fluxnotes/ui/components/alert-dialog";
+import { toast } from "@fluxnotes/ui/components/sonner";
+import { Trans } from "@lingui/react/macro";
+import {
+  restartAndInstallAppUpdate,
+  toAppInvokeError,
+  type AppUpdateStatus,
+} from "@renderer/clients";
 import type { ReactElement } from "react";
-import { toast } from "sonner";
 
 type ReadyAppUpdateStatus = Extract<AppUpdateStatus, { state: "ready" }>;
 

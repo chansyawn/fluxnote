@@ -1,3 +1,6 @@
+import { messages as editorEnMessages } from "@fluxnotes/editor/locales/en/messages";
+import { messages as editorPseudoMessages } from "@fluxnotes/editor/locales/pseudo/messages";
+import { messages as editorZhHansMessages } from "@fluxnotes/editor/locales/zh-Hans/messages";
 import { i18n, type Messages } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { useLocalePreference } from "@renderer/features/preferences/preferences-query";
@@ -17,9 +20,9 @@ const IS_DEV = import.meta.env.DEV;
 const DEFAULT_LOCALE: LocaleCode = "en";
 
 const catalogs: Record<LocaleCode, Messages> = {
-  en: enMessages,
-  "zh-Hans": zhHansMessages,
-  pseudo: pseudoMessages,
+  en: { ...enMessages, ...editorEnMessages },
+  "zh-Hans": { ...zhHansMessages, ...editorZhHansMessages },
+  pseudo: { ...pseudoMessages, ...editorPseudoMessages },
 };
 
 for (const localeKey of Object.keys(catalogs) as LocaleCode[]) {

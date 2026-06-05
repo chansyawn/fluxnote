@@ -1,19 +1,4 @@
-import { useLingui } from "@lingui/react";
-import { Trans } from "@lingui/react/macro";
-import {
-  getBlockEditorActionDefinition,
-  type BlockEditorActionId,
-} from "@renderer/features/block-editor";
-import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
-import {
-  PreferencesGroup,
-  PreferencesRow,
-  PreferencesSection,
-} from "@renderer/routes/preferences/-features/preferences-list";
-import {
-  DEFAULT_USER_PREFERENCES,
-  type ShortcutAction,
-} from "@shared/features/preferences/user-preferences";
+import { getBlockEditorActionDefinition, type BlockEditorActionId } from "@fluxnotes/editor";
 import {
   CheckIcon,
   ArchiveIcon,
@@ -25,7 +10,19 @@ import {
   WandSparklesIcon,
   XIcon,
   FlagIcon,
-} from "lucide-react";
+} from "@fluxnotes/ui/icons/lucide";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
+import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
+import {
+  PreferencesGroup,
+  PreferencesRow,
+  PreferencesSection,
+} from "@renderer/routes/preferences/-features/preferences-list";
+import {
+  DEFAULT_USER_PREFERENCES,
+  type ShortcutAction,
+} from "@shared/features/preferences/user-preferences";
 import { type ReactElement, type SVGProps } from "react";
 
 import { ShortcutInput } from "./shortcut-input";

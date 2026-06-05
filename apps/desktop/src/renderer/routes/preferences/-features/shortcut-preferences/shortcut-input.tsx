@@ -1,15 +1,15 @@
+import { Button } from "@fluxnotes/ui/components/button";
+import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
+import { Popover, PopoverContent, PopoverTrigger } from "@fluxnotes/ui/components/popover";
+import { RotateCcwIcon, XIcon } from "@fluxnotes/ui/icons/lucide";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import {
   formatShortcutTokens,
   type ShortcutBinding,
 } from "@renderer/features/shortcut/shortcut-utils";
-import { Button } from "@renderer/ui/components/button";
-import { Kbd, KbdGroup } from "@renderer/ui/components/kbd";
-import { Popover, PopoverContent, PopoverTrigger } from "@renderer/ui/components/popover";
-import { cn } from "@renderer/ui/lib/utils";
 import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
-import { RotateCcwIcon, XIcon } from "lucide-react";
 
 import { ShortcutRecordingPopover } from "./shortcut-recording-popover";
 import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";

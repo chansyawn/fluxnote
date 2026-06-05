@@ -6,9 +6,24 @@ settings:
 
 catalogs:
   default:
+    '@lingui/babel-plugin-lingui-macro':
+      specifier: 6.0.1
+      version: 6.0.1
+    '@lingui/vite-plugin':
+      specifier: 6.0.1
+      version: 6.0.1
+    '@rolldown/plugin-babel':
+      specifier: ^0.2.2
+      version: 0.2.2
+    '@tailwindcss/vite':
+      specifier: ^4.2.2
+      version: 4.2.2
     '@types/node':
       specifier: ^24
       version: 24.12.2
+    babel-plugin-react-compiler:
+      specifier: ^1.0.0
+      version: 1.0.0
     typescript:
       specifier: ^5
       version: 5.9.3
@@ -30,66 +45,24 @@ importers:
       '@commitlint/config-conventional':
         specifier: ^21.0.1
         version: 21.0.1
+      '@lingui/cli':
+        specifier: 6.0.1
+        version: 6.0.1
+      '@lingui/format-po':
+        specifier: 6.0.1
+        version: 6.0.1
       vite-plus:
         specifier: 'catalog:'
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
 
   apps/desktop:
     dependencies:
-      '@base-ui/react':
-        specifier: ^1.3.0
-        version: 1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@fluxnotes/editor':
         specifier: workspace:*
         version: link:../../packages/editor
-      '@fontsource-variable/cascadia-code':
-        specifier: ^5.2.2
-        version: 5.2.2
-      '@fontsource-variable/inter':
-        specifier: ^5.2.8
-        version: 5.2.8
-      '@fontsource-variable/noto-sans-sc':
-        specifier: ^5.2.10
-        version: 5.2.10
-      '@lexical/clipboard':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code-core':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/code-shiki':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/extension':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/headless':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/history':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/link':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/list':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/markdown':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/react':
-        specifier: ^0.45.0
-        version: 0.45.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yjs@13.6.30)
-      '@lexical/rich-text':
-        specifier: ^0.45.0
-        version: 0.45.0
-      '@lexical/table':
-        specifier: ^0.45.0
-        version: 0.45.0
+      '@fluxnotes/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@lingui/core':
         specifier: 6.0.1
         version: 6.0.1
@@ -99,9 +72,6 @@ importers:
       '@tanstack/react-hotkeys':
         specifier: ^0.10.0
         version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@tanstack/react-pacer':
-        specifier: ^0.22.0
-        version: 0.22.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
         specifier: ^5.96.2
         version: 5.96.2(react@19.2.4)
@@ -111,36 +81,15 @@ importers:
       '@tanstack/react-virtual':
         specifier: ^3.13.24
         version: 3.13.24(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      babel-plugin-react-compiler:
-        specifier: ^1.0.0
-        version: 1.0.0
       cac:
         specifier: ^7.0.0
         version: 7.0.0
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)
       electron-store:
         specifier: ^11.0.2
         version: 11.0.2
-      hast-util-to-html:
-        specifier: ^9.0.5
-        version: 9.0.5
-      lexical:
-        specifier: ^0.45.0
-        version: 0.45.0
-      lucide-react:
-        specifier: ^1.7.0
-        version: 1.7.0(react@19.2.4)
-      mdast-util-to-hast:
-        specifier: ^13.2.1
-        version: 13.2.1
       posthog-js:
         specifier: ^1.376.0
         version: 1.376.0
@@ -156,39 +105,9 @@ importers:
       react-error-boundary:
         specifier: ^6.1.1
         version: 6.1.1(react@19.2.4)
-      remark-gfm:
-        specifier: ^4.0.1
-        version: 4.0.1
-      remark-math:
-        specifier: ^6.0.0
-        version: 6.0.0
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      remark-stringify:
-        specifier: ^11.0.0
-        version: 11.0.0
-      shadcn:
-        specifier: ^4.1.2
-        version: 4.1.2(@types/node@25.5.0)(typescript@5.9.3)
-      simple-icons:
-        specifier: ^16.21.0
-        version: 16.21.0
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      tailwind-merge:
-        specifier: ^3.5.0
-        version: 3.5.0
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
-      tw-animate-css:
-        specifier: ^1.4.0
-        version: 1.4.0
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -218,12 +137,6 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       '@lingui/babel-plugin-lingui-macro':
-        specifier: 6.0.1
-        version: 6.0.1
-      '@lingui/cli':
-        specifier: 6.0.1
-        version: 6.0.1
-      '@lingui/format-po':
         specifier: 6.0.1
         version: 6.0.1
       '@lingui/vite-plugin':
@@ -268,6 +181,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.5
         version: 4.1.5(vitest@4.1.5)
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
@@ -285,10 +201,204 @@ importers:
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(@vitest/coverage-v8@4.1.5)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3))(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)
 
   packages/editor:
+    dependencies:
+      '@fluxnotes/ui':
+        specifier: workspace:*
+        version: link:../ui
+      '@lexical/clipboard':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/code':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/code-core':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/code-shiki':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/extension':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/headless':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/history':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/link':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/list':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/markdown':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/react':
+        specifier: ^0.45.0
+        version: 0.45.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yjs@13.6.30)
+      '@lexical/rich-text':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/table':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lexical/utils':
+        specifier: ^0.45.0
+        version: 0.45.0
+      '@lingui/core':
+        specifier: 6.0.1
+        version: 6.0.1
+      '@lingui/react':
+        specifier: 6.0.1
+        version: 6.0.1(react@19.2.4)
+      '@tanstack/react-hotkeys':
+        specifier: ^0.10.0
+        version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      hast-util-to-html:
+        specifier: ^9.0.5
+        version: 9.0.5
+      lexical:
+        specifier: ^0.45.0
+        version: 0.45.0
+      mdast-util-to-hast:
+        specifier: ^13.2.1
+        version: 13.2.1
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1
+      remark-math:
+        specifier: ^6.0.0
+        version: 6.0.0
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0
+      remark-stringify:
+        specifier: ^11.0.0
+        version: 11.0.0
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.2.2
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
     devDependencies:
+      '@lingui/babel-plugin-lingui-macro':
+        specifier: 'catalog:'
+        version: 6.0.1
+      '@lingui/vite-plugin':
+        specifier: 'catalog:'
+        version: 6.0.1(@babel/core@7.29.0)(@lingui/babel-plugin-lingui-macro@6.0.1)(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)))(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+      '@rolldown/plugin-babel':
+        specifier: 'catalog:'
+        version: 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.2.2(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+      '@testing-library/jest-dom':
+        specifier: ^6.9.1
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.2
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      '@types/unist':
+        specifier: ^3.0.3
+        version: 3.0.3
+      '@vitejs/plugin-react':
+        specifier: ^6.0.1
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+
+  packages/ui:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.3.0
+        version: 1.3.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@fontsource-variable/cascadia-code':
+        specifier: ^5.2.2
+        version: 5.2.2
+      '@fontsource-variable/inter':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource-variable/noto-sans-sc':
+        specifier: ^5.2.10
+        version: 5.2.10
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: ^1.7.0
+        version: 1.7.0(react@19.2.4)
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+      simple-icons:
+        specifier: ^16.21.0
+        version: 16.21.0
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      tailwind-merge:
+        specifier: ^3.5.0
+        version: 3.5.0
+    devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^6.9.1
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.2
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      '@vitejs/plugin-react':
+        specifier: ^6.0.1
+        version: 6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+      shadcn:
+        specifier: ^4.1.2
+        version: 4.1.2(@types/node@24.12.2)(typescript@5.9.3)
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.2.2
+      tw-animate-css:
+        specifier: ^1.4.0
+        version: 1.4.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -2190,11 +2300,6 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
 
-  '@tanstack/devtools-event-client@0.4.3':
-    resolution: {integrity: sha512-OZI6QyULw0FI0wjgmeYzCIfbgPsOEzwJtCpa69XrfLMtNXLGnz3d/dIabk7frg0TmHo+Ah49w5I4KC7Tufwsvw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   '@tanstack/history@1.161.6':
     resolution: {integrity: sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg==}
     engines: {node: '>=20.19'}
@@ -2203,22 +2308,11 @@ packages:
     resolution: {integrity: sha512-vqH7X9nb0MTJ/O08++dB5bP9jgj4+BIPOUu/U+6myG86lDsirZSVSobpq5UQpE7nBuk62i8eIYeOhd+OMl/UrA==}
     engines: {node: '>=18'}
 
-  '@tanstack/pacer@0.21.0':
-    resolution: {integrity: sha512-EZyU3fQvdz7faj0vBVrPd5ejkSS9pbGKtrGZI56dLJgotca6iZKhaNDRv7dweG4dnWx0LovE9YYf1MAErGpbLQ==}
-    engines: {node: '>=18'}
-
   '@tanstack/query-core@5.96.2':
     resolution: {integrity: sha512-hzI6cTVh4KNRk8UtoIBS7Lv9g6BnJPXvBKsvYH1aGWvv0347jT3BnSvztOE+kD76XGvZnRC/t6qdW1CaIfwCeA==}
 
   '@tanstack/react-hotkeys@0.10.0':
     resolution: {integrity: sha512-GwOSndI5j3qBVYTmgP1mYyRTnlxb2MS17cwGlsavSxMQPSnmDf+m3LzMIpRMs+3zzQMjg3cYhHsFYizYlFI2tw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-
-  '@tanstack/react-pacer@0.22.0':
-    resolution: {integrity: sha512-AuKrkcP/LheBuq1tJCN8DDkwU+RmSql3zpJ1RFwvdc7qJED7Ba+jwlfFkeOZ62WcMtV54RceG9Uyprr0j99Qnw==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=16.8'
@@ -6710,12 +6804,33 @@ snapshots:
 
   '@inquirer/ansi@1.0.2': {}
 
+  '@inquirer/confirm@5.1.21(@types/node@24.12.2)':
+    dependencies:
+      '@inquirer/core': 10.3.2(@types/node@24.12.2)
+      '@inquirer/type': 3.0.10(@types/node@24.12.2)
+    optionalDependencies:
+      '@types/node': 24.12.2
+
   '@inquirer/confirm@5.1.21(@types/node@25.5.0)':
     dependencies:
       '@inquirer/core': 10.3.2(@types/node@25.5.0)
       '@inquirer/type': 3.0.10(@types/node@25.5.0)
     optionalDependencies:
       '@types/node': 25.5.0
+    optional: true
+
+  '@inquirer/core@10.3.2(@types/node@24.12.2)':
+    dependencies:
+      '@inquirer/ansi': 1.0.2
+      '@inquirer/figures': 1.0.15
+      '@inquirer/type': 3.0.10(@types/node@24.12.2)
+      cli-width: 4.1.0
+      mute-stream: 2.0.0
+      signal-exit: 4.1.0
+      wrap-ansi: 6.2.0
+      yoctocolors-cjs: 2.1.3
+    optionalDependencies:
+      '@types/node': 24.12.2
 
   '@inquirer/core@10.3.2(@types/node@25.5.0)':
     dependencies:
@@ -6729,12 +6844,18 @@ snapshots:
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
       '@types/node': 25.5.0
+    optional: true
 
   '@inquirer/figures@1.0.15': {}
+
+  '@inquirer/type@3.0.10(@types/node@24.12.2)':
+    optionalDependencies:
+      '@types/node': 24.12.2
 
   '@inquirer/type@3.0.10(@types/node@25.5.0)':
     optionalDependencies:
       '@types/node': 25.5.0
+    optional: true
 
   '@isaacs/fs-minipass@4.0.1':
     dependencies:
@@ -7068,6 +7189,20 @@ snapshots:
       '@babel/core': 7.29.0
       '@lingui/babel-plugin-lingui-macro': 6.0.1
       '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3))(rolldown@1.0.3)
+      rolldown: 1.0.3
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
+  '@lingui/vite-plugin@6.0.1(@babel/core@7.29.0)(@lingui/babel-plugin-lingui-macro@6.0.1)(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)))(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))':
+    dependencies:
+      '@lingui/cli': 6.0.1
+      '@lingui/conf': 6.0.1
+      vite: 8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)
+    optionalDependencies:
+      '@babel/core': 7.29.0
+      '@lingui/babel-plugin-lingui-macro': 6.0.1
+      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
       rolldown: 1.0.3
     transitivePeerDependencies:
       - babel-plugin-macros
@@ -7456,6 +7591,15 @@ snapshots:
       '@babel/runtime': 7.29.2
       vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)'
 
+  '@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))':
+    dependencies:
+      '@babel/core': 7.29.0
+      picomatch: 4.0.4
+      rolldown: 1.0.3
+    optionalDependencies:
+      '@babel/runtime': 7.29.2
+      vite: 8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)
+
   '@rolldown/pluginutils@1.0.0-rc.7': {}
 
   '@rolldown/pluginutils@1.0.1': {}
@@ -7590,7 +7734,12 @@ snapshots:
       tailwindcss: 4.2.2
       vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)'
 
-  '@tanstack/devtools-event-client@0.4.3': {}
+  '@tailwindcss/vite@4.2.2(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))':
+    dependencies:
+      '@tailwindcss/node': 4.2.2
+      '@tailwindcss/oxide': 4.2.2
+      tailwindcss: 4.2.2
+      vite: 8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)
 
   '@tanstack/history@1.161.6': {}
 
@@ -7598,23 +7747,11 @@ snapshots:
     dependencies:
       '@tanstack/store': 0.11.0
 
-  '@tanstack/pacer@0.21.0':
-    dependencies:
-      '@tanstack/devtools-event-client': 0.4.3
-      '@tanstack/store': 0.11.0
-
   '@tanstack/query-core@5.96.2': {}
 
   '@tanstack/react-hotkeys@0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@tanstack/hotkeys': 0.8.0
-      '@tanstack/react-store': 0.11.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
-
-  '@tanstack/react-pacer@0.22.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
-    dependencies:
-      '@tanstack/pacer': 0.21.0
       '@tanstack/react-store': 0.11.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -7869,6 +8006,14 @@ snapshots:
       vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3)'
     optionalDependencies:
       '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.24(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)(typescript@5.9.3))(rolldown@1.0.3)
+      babel-plugin-react-compiler: 1.0.0
+
+  '@vitejs/plugin-react@6.0.1(@rolldown/plugin-babel@0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))':
+    dependencies:
+      '@rolldown/pluginutils': 1.0.0-rc.7
+      vite: 8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0)
+    optionalDependencies:
+      '@rolldown/plugin-babel': 0.2.2(@babel/core@7.29.0)(@babel/runtime@7.29.2)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
       babel-plugin-react-compiler: 1.0.0
 
   '@vitest/coverage-v8@4.1.5(vitest@4.1.5)':
@@ -10116,6 +10261,31 @@ snapshots:
 
   ms@2.1.3: {}
 
+  msw@2.12.14(@types/node@24.12.2)(typescript@5.9.3):
+    dependencies:
+      '@inquirer/confirm': 5.1.21(@types/node@24.12.2)
+      '@mswjs/interceptors': 0.41.3
+      '@open-draft/deferred-promise': 2.2.0
+      '@types/statuses': 2.0.6
+      cookie: 1.1.1
+      graphql: 16.13.2
+      headers-polyfill: 4.0.3
+      is-node-process: 1.2.0
+      outvariant: 1.4.3
+      path-to-regexp: 6.3.0
+      picocolors: 1.1.1
+      rettime: 0.10.1
+      statuses: 2.0.2
+      strict-event-emitter: 0.5.1
+      tough-cookie: 6.0.1
+      type-fest: 5.5.0
+      until-async: 3.0.2
+      yargs: 17.7.2
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - '@types/node'
+
   msw@2.12.14(@types/node@25.5.0)(typescript@5.9.3):
     dependencies:
       '@inquirer/confirm': 5.1.21(@types/node@25.5.0)
@@ -10140,6 +10310,7 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - '@types/node'
+    optional: true
 
   murmur-32@0.2.0:
     dependencies:
@@ -10916,7 +11087,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@4.1.2(@types/node@25.5.0)(typescript@5.9.3):
+  shadcn@4.1.2(@types/node@24.12.2)(typescript@5.9.3):
     dependencies:
       '@babel/core': 7.29.0
       '@babel/parser': 7.29.2
@@ -10937,7 +11108,7 @@ snapshots:
       fuzzysort: 3.1.0
       https-proxy-agent: 7.0.6
       kleur: 4.1.5
-      msw: 2.12.14(@types/node@25.5.0)(typescript@5.9.3)
+      msw: 2.12.14(@types/node@24.12.2)(typescript@5.9.3)
       node-fetch: 3.3.2
       open: 11.0.0
       ora: 8.2.0

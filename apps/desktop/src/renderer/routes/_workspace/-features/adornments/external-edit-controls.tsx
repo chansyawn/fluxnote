@@ -1,7 +1,7 @@
+import { ButtonGroup } from "@fluxnotes/ui/components/button-group";
+import { CheckIcon, XIcon } from "@fluxnotes/ui/icons/lucide";
 import { Trans } from "@lingui/react/macro";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
-import { ButtonGroup } from "@renderer/ui/components/button-group";
-import { CheckIcon, XIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 
 import { AdornmentBar } from "./adornment-bar";

@@ -1,5 +1,5 @@
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { getAppPlatform } from "@renderer/app/platform";
-import { cn } from "@renderer/ui/lib/utils";
 
 export function WindowShell({ children }: { children: React.ReactNode }) {
   const platform = getAppPlatform();

@@ -1,9 +1,0 @@
-@reference "#global.css";
-
-.block-editor__paragraph {
-  @apply my-0.5 leading-normal first:mt-0 last:mb-0;
-}
-
-.block-editor__inline-code {
-  @apply bg-muted text-muted-foreground rounded px-1 py-0.5 font-mono;
-}

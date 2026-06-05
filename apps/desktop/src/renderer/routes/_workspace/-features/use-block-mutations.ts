@@ -1,3 +1,4 @@
+import { toast } from "@fluxnotes/ui/components/sonner";
 import {
   archiveBlock,
   createBlock,
@@ -12,7 +13,6 @@ import {
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useMutation, useMutationState } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { toast } from "sonner";
 
 export type BlockMutationOperation =
   | "archive"

@@ -72,7 +72,7 @@ export async function assertCliWrapperExists(target: CliInstallTarget): Promise<
 
   throw businessError(
     "BUSINESS.NOT_FOUND",
-    `CLI wrapper not found at ${target.wrapperPath}. Run 'vp run package' or 'vp run dev' first.`,
+    `CLI wrapper not found at ${target.wrapperPath}. Run 'vp run package:desktop' or 'vp run dev:desktop' first.`,
   );
 }
 
@@ -83,7 +83,7 @@ export async function assertWindowsCliScriptExists(target: WindowsCliInstallTarg
 
   throw businessError(
     "BUSINESS.NOT_FOUND",
-    `CLI script not found at ${target.cliScriptPath}. Run 'vp run package' or 'vp run dev' first.`,
+    `CLI script not found at ${target.cliScriptPath}. Run 'vp run package:desktop' or 'vp run dev:desktop' first.`,
   );
 }
 

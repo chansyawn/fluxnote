@@ -1,13 +1,14 @@
+import { Badge } from "@fluxnotes/ui/components/badge";
+import { Button } from "@fluxnotes/ui/components/button";
+import { HouseIcon, Settings2Icon } from "@fluxnotes/ui/icons/lucide";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { getAppPlatform } from "@renderer/app/platform";
 import { hideWindow } from "@renderer/clients";
 import { AppUpdateTitlebarButton } from "@renderer/features/app-update/app-update-titlebar-button";
 import { WindowCloseButton } from "@renderer/routes/-layout/window-close-button";
-import { Button } from "@renderer/ui/components/button";
-import { cn } from "@renderer/ui/lib/utils";
 import { useLocation, useNavigate } from "@tanstack/react-router";
-import { FlaskConicalIcon, HouseIcon, Settings2Icon } from "lucide-react";
 
 function HeaderActionButton() {
   const location = useLocation();
@@ -30,33 +31,6 @@ function HeaderActionButton() {
           <Trans id="header.go-home">Go home</Trans>
         ) : (
           <Trans id="header.open-preferences">Open preferences</Trans>
-        )}
-      </span>
-    </Button>
-  );
-}
-
-function HeaderLabButton() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const onLabPage = location.pathname === "/lab";
-
-  return (
-    <Button
-      className="[-webkit-app-region:no-drag]"
-      size="icon"
-      variant="ghost"
-      onClick={() => {
-        void navigate({ to: onLabPage ? "/" : "/lab" });
-      }}
-    >
-      {onLabPage ? <HouseIcon /> : <FlaskConicalIcon />}
-      <span className="sr-only">
-        {onLabPage ? (
-          <Trans id="header.open-lab">Open lab</Trans>
-        ) : (
-          <Trans id="header.go-lab">Go to lab</Trans>
         )}
       </span>
     </Button>
@@ -96,12 +70,15 @@ export function WindowTitleBar() {
           </div>
         ) : null}
 
-        <div className="pointer-events-none flex min-w-0 items-center truncate text-sm font-medium">
+        <div className="pointer-events-none flex min-w-0 items-center gap-2 truncate text-sm font-medium">
           <Trans id="app.title">Fluxnotes</Trans>
+          {import.meta.env.DEV ? (
+            <Badge>
+              <Trans id="app.environment.development">Dev</Trans>
+            </Badge>
+          ) : null}
         </div>
         <AppUpdateTitlebarButton />
-
-        {import.meta.env.DEV ? <HeaderLabButton /> : null}
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <div

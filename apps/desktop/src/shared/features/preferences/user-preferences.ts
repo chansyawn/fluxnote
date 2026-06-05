@@ -1,3 +1,4 @@
+import { BLOCK_EDITOR_SHORTCUT_DEFAULTS } from "@fluxnotes/editor/shortcuts";
 import { z } from "zod";
 
 import {
@@ -40,23 +41,7 @@ export const DEFAULT_SHORTCUTS = {
   "workspace.deleteBlock": "Mod+D",
   "workspace.submitExternalEdit": "Mod+Enter",
   "workspace.cancelExternalEdit": "Mod+\\",
-  "editor.paragraph": "Mod+Alt+0",
-  "editor.heading1": "Mod+Alt+1",
-  "editor.heading2": "Mod+Alt+2",
-  "editor.heading3": "Mod+Alt+3",
-  "editor.heading4": "Mod+Alt+4",
-  "editor.heading5": "Mod+Alt+5",
-  "editor.heading6": "Mod+Alt+6",
-  "editor.blockquote": "Mod+Alt+B",
-  "editor.bulletList": "Mod+Alt+8",
-  "editor.orderedList": "Mod+Alt+7",
-  "editor.taskList": "Mod+Alt+9",
-  "editor.codeBlock": "Mod+Alt+C",
-  "editor.bold": "Mod+B",
-  "editor.italic": "Mod+I",
-  "editor.strikethrough": "Mod+Shift+X",
-  "editor.inlineCode": "Mod+Shift+E",
-  "editor.link": "Mod+Shift+L",
+  ...BLOCK_EDITOR_SHORTCUT_DEFAULTS,
 } as const;
 
 const shortcutActions = Object.keys(DEFAULT_SHORTCUTS) as [

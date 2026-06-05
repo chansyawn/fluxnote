@@ -59,264 +59,33 @@ msgid "app-update.titlebar.restart"
 msgstr "Install app update"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/-layout/window-title-bar.tsx:77
+msgid "app.environment.development"
+msgstr "Dev"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:100
+#: src/renderer/routes/-layout/window-title-bar.tsx:74
 msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:23
-msgid "block-editor.code.copied"
-msgstr "Copied"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:19
-msgid "block-editor.code.copy"
-msgstr "Copy code"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:33
-msgid "block-editor.code.language.empty"
-msgstr "No matching languages"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:76
-msgid "block-editor.code.language.search"
-msgstr "Search language"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:102
-msgid "block-editor.content.label"
-msgstr "Markdown block editor"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
-msgid "block-editor.link.convert"
-msgstr "Convert to link"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
-msgid "block-editor.link.copied"
-msgstr "Copied"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
-msgid "block-editor.link.copy"
-msgstr "Copy"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
-msgid "block-editor.link.open"
-msgstr "Open"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
-msgid "block-editor.link.remove"
-msgstr "Remove link"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
-msgid "block-editor.link.url"
-msgstr "Link URL"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:101
-#: src/renderer/features/block-editor/core/block-editor.tsx:107
-msgid "block-editor.placeholder"
-msgstr "Write a block..."
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:179
-msgid "block-editor.table.align-center"
-msgstr "Align center"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:175
-msgid "block-editor.table.align-default"
-msgstr "Default"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:177
-msgid "block-editor.table.align-left"
-msgstr "Align left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:181
-msgid "block-editor.table.align-right"
-msgstr "Align right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:129
-msgid "block-editor.table.column-menu"
-msgstr "Open column actions menu"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:158
-msgid "block-editor.table.delete-column"
-msgstr "Delete column"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:168
-msgid "block-editor.table.delete-row"
-msgstr "Delete row"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:144
-msgid "block-editor.table.insert-column-left"
-msgstr "Insert column left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:149
-msgid "block-editor.table.insert-column-right"
-msgstr "Insert column right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:160
-msgid "block-editor.table.insert-row-above"
-msgstr "Insert row above"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:162
-msgid "block-editor.table.insert-row-below"
-msgstr "Insert row below"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:154
-msgid "block-editor.table.move-column-left"
-msgstr "Move left"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:156
-msgid "block-editor.table.move-column-right"
-msgstr "Move right"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:166
-msgid "block-editor.table.move-row-down"
-msgstr "Move down"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:164
-msgid "block-editor.table.move-row-up"
-msgstr "Move up"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:135
-msgid "block-editor.table.row-menu"
-msgstr "Open row actions menu"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:185
-msgid "block-editor.toolbar.blockquote"
-msgstr "Quote"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:140
-msgid "block-editor.toolbar.bold"
-msgstr "Bold"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:114
-msgid "block-editor.toolbar.bullet-list"
-msgstr "Bullet list"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:100
-msgid "block-editor.toolbar.code-block"
-msgstr "Code block"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:64
-msgid "block-editor.toolbar.heading-1"
-msgstr "Heading 1"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:70
-msgid "block-editor.toolbar.heading-2"
-msgstr "Heading 2"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:76
-msgid "block-editor.toolbar.heading-3"
-msgstr "Heading 3"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:82
-msgid "block-editor.toolbar.heading-4"
-msgstr "Heading 4"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:88
-msgid "block-editor.toolbar.heading-5"
-msgstr "Heading 5"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:94
-msgid "block-editor.toolbar.heading-6"
-msgstr "Heading 6"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:161
-msgid "block-editor.toolbar.inline-code"
-msgstr "Inline code"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:147
-msgid "block-editor.toolbar.italic"
-msgstr "Italic"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:133
-msgid "block-editor.toolbar.label"
-msgstr "Editor"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:175
-msgid "block-editor.toolbar.link"
-msgstr "Link"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:181
-msgid "block-editor.toolbar.list"
-msgstr "List"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:58
-msgid "block-editor.toolbar.normal-text"
-msgstr "Normal text"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:120
-msgid "block-editor.toolbar.numbered-list"
-msgstr "Numbered list"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:154
-msgid "block-editor.toolbar.strikethrough"
-msgstr "Strikethrough"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:126
-msgid "block-editor.toolbar.task-list"
-msgstr "Task list"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:84
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:89
 msgid "error.block.delete"
 msgstr "Delete block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:47
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:52
 msgid "error.block.description"
 msgstr "Retry this block, or delete it if the content is corrupted."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:65
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:70
 msgid "error.block.retry"
 msgstr "Retry block"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:44
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:49
 msgid "error.block.title"
 msgstr "This block failed to render"
 
@@ -353,55 +122,14 @@ msgid "error.global.title"
 msgstr "Something went wrong"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:30
+#: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr "Go home"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:59
-msgid "header.go-lab"
-msgstr "Go to lab"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:57
-msgid "header.open-lab"
-msgstr "Open lab"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:32
+#: src/renderer/routes/-layout/window-title-bar.tsx:33
 msgid "header.open-preferences"
 msgstr "Open preferences"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:18
-msgid "lab.description"
-msgstr "Experiment area for infrastructure and integration demos."
-
-#. js-lingui-explicit-id
-#. placeholder {0}: helloEditor()
-#: src/renderer/routes/lab/index.tsx:23
-msgid "lab.editorPackageGreeting"
-msgstr "Editor package: {0}"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
-msgid "lab.playground.description"
-msgstr "Frontend-only playground. Edit this preset markdown to verify Block behavior."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:130
-msgid "lab.playground.reset"
-msgstr "Reset preset"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:114
-msgid "lab.playground.title"
-msgstr "Block Editor Playground"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:15
-msgid "lab.title"
-msgstr "Lab"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
@@ -455,98 +183,98 @@ msgid "preferences.app.title"
 msgstr "App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:310
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:315
 msgid "preferences.archive.clear.action"
 msgstr "Clear"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:346
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
 msgid "preferences.archive.clear.description"
 msgstr "Permanently delete every archived block. Active blocks and tags are not affected."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:327
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:332
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:339
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:344
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "Clear archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:320
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:325
 msgid "preferences.archive.clear.dialog.description"
 msgstr "This permanently deletes all archived blocks. Active blocks and tags are kept."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:317
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:322
 msgid "preferences.archive.clear.dialog.title"
 msgstr "Clear archived data?"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:93
 msgid "preferences.archive.clear.error"
 msgstr "Failed to clear archived data."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:356
 msgid "preferences.archive.clear.label"
 msgstr "Clear archived data"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:79
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:84
 msgid "preferences.archive.clear.success"
 msgstr "Archived data cleared."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:223
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:228
 msgid "preferences.archive.title"
 msgstr "Archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:239
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:244
 msgid "preferences.auto-archive.enable.description"
 msgstr "When enabled, blocks with no content changes for the configured duration enter a pending state. Actual archiving runs when the window is hidden, and pending blocks appear dimmed."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:119
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:251
 msgid "preferences.auto-archive.enable.label"
 msgstr "Enable auto-archive"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:116
 msgid "preferences.auto-archive.threshold.amount.label"
 msgstr "Auto archive duration amount"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:303
 msgid "preferences.auto-archive.threshold.label"
 msgstr "Auto archive after"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:293
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "Range: 1-20160 minutes, 1-336 hours, or 1-14 days."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:115
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:120
 msgid "preferences.auto-archive.threshold.unit.label"
 msgstr "Auto archive duration unit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:103
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:108
 msgid "preferences.auto-archive.unit.days"
 msgstr "days"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:109
 msgid "preferences.auto-archive.unit.hours"
 msgstr "hours"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:105
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:110
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
@@ -606,12 +334,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:114
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "Cancel external edit"
 
@@ -622,17 +350,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:76
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "Delete block"
 
@@ -658,32 +386,32 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:159
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:156
 msgid "preferences.shortcuts.group.editor"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:50
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
 msgid "preferences.shortcuts.group.global"
 msgstr "Global"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:71
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
 msgid "preferences.shortcuts.group.workspace"
 msgstr "Workspace"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:62
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "Quickly create a new block and bring the window forward for fast capture."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "Quick create block"
 
@@ -704,22 +432,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:107
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:173
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "Pin/unpin block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:55
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "Toggle window"
 
@@ -760,8 +488,8 @@ msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:71
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:45
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "window.hide"
 msgstr "Hide window"
 
@@ -972,12 +700,12 @@ msgid "workspace.tags.assign.placeholder"
 msgstr "Search or assign tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:148
+#: src/renderer/features/tag/tag-combobox-popover.tsx:152
 msgid "workspace.tags.create-inline"
 msgstr "Create tag"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:190
+#: src/renderer/features/tag/tag-combobox-popover.tsx:194
 msgid "workspace.tags.delete-inline"
 msgstr "Delete tag"
 
@@ -992,7 +720,7 @@ msgid "workspace.tags.filter.placeholder"
 msgstr "Search or create tags"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:157
+#: src/renderer/features/tag/tag-combobox-popover.tsx:161
 msgid "workspace.tags.search.empty"
 msgstr "No matching tags"
 

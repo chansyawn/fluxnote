@@ -1,5 +1,5 @@
+import { DirectionProvider } from "@fluxnotes/ui/components/direction";
 import { useI18nState } from "@renderer/app/i18n";
-import { DirectionProvider } from "@renderer/ui/components/direction";
 import { useEffect, type ReactNode } from "react";
 
 type DirectionState = "ltr" | "rtl";

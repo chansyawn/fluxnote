@@ -1,4 +1,4 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@renderer/ui/components/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@fluxnotes/ui/components/hover-card";
 import {
   Item,
   ItemActions,
@@ -6,9 +6,9 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "@renderer/ui/components/item";
-import { Separator } from "@renderer/ui/components/separator";
-import { cn } from "@renderer/ui/lib/utils";
+} from "@fluxnotes/ui/components/item";
+import { Separator } from "@fluxnotes/ui/components/separator";
+import { cn } from "@fluxnotes/ui/lib/utils";
 import {
   Children,
   cloneElement,

@@ -1,3 +1,4 @@
+import { toast } from "@fluxnotes/ui/components/sonner";
 import {
   onPreferencesChanged,
   patchUserPreferences,
@@ -20,7 +21,6 @@ import {
 } from "@shared/features/preferences/user-preferences";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
-import { toast } from "sonner";
 
 import { normalizeShortcutPreferences, type ShortcutBinding } from "../shortcut/shortcut-utils";
 

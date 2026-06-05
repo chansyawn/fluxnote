@@ -45,7 +45,7 @@ vi.mock("@renderer/clients", () => ({
   }),
 }));
 
-vi.mock("sonner", () => ({
+vi.mock("@fluxnotes/ui/components/sonner", () => ({
   toast: toastMocks,
 }));
 

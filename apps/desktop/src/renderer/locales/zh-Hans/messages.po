@@ -59,264 +59,33 @@ msgid "app-update.titlebar.restart"
 msgstr "安装应用更新"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/-layout/window-title-bar.tsx:77
+msgid "app.environment.development"
+msgstr "开发"
+
+#. js-lingui-explicit-id
 #: src/renderer/features/error-boundary/error-title-bar.tsx:38
-#: src/renderer/routes/-layout/window-title-bar.tsx:100
+#: src/renderer/routes/-layout/window-title-bar.tsx:74
 msgid "app.title"
 msgstr "Fluxnotes"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:23
-msgid "block-editor.code.copied"
-msgstr "已复制"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-copy-button.tsx:19
-msgid "block-editor.code.copy"
-msgstr "复制代码"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:33
-msgid "block-editor.code.language.empty"
-msgstr "没有匹配的语言"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/code/code-language-combobox.tsx:76
-msgid "block-editor.code.language.search"
-msgstr "搜索语言"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:102
-msgid "block-editor.content.label"
-msgstr "Markdown 块编辑器"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:115
-msgid "block-editor.link.convert"
-msgstr "转换为链接"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:113
-msgid "block-editor.link.copied"
-msgstr "已复制"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:112
-msgid "block-editor.link.copy"
-msgstr "复制"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:111
-msgid "block-editor.link.open"
-msgstr "打开"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:114
-msgid "block-editor.link.remove"
-msgstr "移除链接"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/link/link-popover.tsx:116
-msgid "block-editor.link.url"
-msgstr "链接 URL"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/core/block-editor.tsx:101
-#: src/renderer/features/block-editor/core/block-editor.tsx:107
-msgid "block-editor.placeholder"
-msgstr "写一个区块..."
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:179
-msgid "block-editor.table.align-center"
-msgstr "居中对齐"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:175
-msgid "block-editor.table.align-default"
-msgstr "默认"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:177
-msgid "block-editor.table.align-left"
-msgstr "左对齐"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:181
-msgid "block-editor.table.align-right"
-msgstr "右对齐"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:129
-msgid "block-editor.table.column-menu"
-msgstr "打开列操作菜单"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:158
-msgid "block-editor.table.delete-column"
-msgstr "删除列"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:168
-msgid "block-editor.table.delete-row"
-msgstr "删除行"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:144
-msgid "block-editor.table.insert-column-left"
-msgstr "左侧插入列"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:149
-msgid "block-editor.table.insert-column-right"
-msgstr "右侧插入列"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:160
-msgid "block-editor.table.insert-row-above"
-msgstr "上方插入行"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:162
-msgid "block-editor.table.insert-row-below"
-msgstr "下方插入行"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:154
-msgid "block-editor.table.move-column-left"
-msgstr "左移"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:156
-msgid "block-editor.table.move-column-right"
-msgstr "右移"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:166
-msgid "block-editor.table.move-row-down"
-msgstr "下移"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:164
-msgid "block-editor.table.move-row-up"
-msgstr "上移"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/syntax/table/table-controls-menu.tsx:135
-msgid "block-editor.table.row-menu"
-msgstr "打开行操作菜单"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:185
-msgid "block-editor.toolbar.blockquote"
-msgstr "引用"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:140
-msgid "block-editor.toolbar.bold"
-msgstr "加粗"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:114
-msgid "block-editor.toolbar.bullet-list"
-msgstr "无序列表"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:100
-msgid "block-editor.toolbar.code-block"
-msgstr "代码块"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:64
-msgid "block-editor.toolbar.heading-1"
-msgstr "一级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:70
-msgid "block-editor.toolbar.heading-2"
-msgstr "二级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:76
-msgid "block-editor.toolbar.heading-3"
-msgstr "三级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:82
-msgid "block-editor.toolbar.heading-4"
-msgstr "四级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:88
-msgid "block-editor.toolbar.heading-5"
-msgstr "五级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:94
-msgid "block-editor.toolbar.heading-6"
-msgstr "六级标题"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:161
-msgid "block-editor.toolbar.inline-code"
-msgstr "行内代码"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:147
-msgid "block-editor.toolbar.italic"
-msgstr "斜体"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:133
-msgid "block-editor.toolbar.label"
-msgstr "编辑器"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:175
-msgid "block-editor.toolbar.link"
-msgstr "链接"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/toolbar/block-editor-toolbar.tsx:181
-msgid "block-editor.toolbar.list"
-msgstr "列表"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:58
-msgid "block-editor.toolbar.normal-text"
-msgstr "正文"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:120
-msgid "block-editor.toolbar.numbered-list"
-msgstr "有序列表"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:154
-msgid "block-editor.toolbar.strikethrough"
-msgstr "删除线"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/block-editor/actions/action-definitions.ts:126
-msgid "block-editor.toolbar.task-list"
-msgstr "任务列表"
-
-#. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:84
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:89
 msgid "error.block.delete"
 msgstr "删除区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:47
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:52
 msgid "error.block.description"
 msgstr "重试此区块；如果内容已损坏，可以将其删除。"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:65
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:70
 msgid "error.block.retry"
 msgstr "重试区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/error-boundary/block-error-fallback.tsx:44
+#: src/renderer/features/error-boundary/block-error-fallback.tsx:49
 msgid "error.block.title"
 msgstr "此区块渲染失败"
 
@@ -353,55 +122,14 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:30
+#: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr "返回首页"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:59
-msgid "header.go-lab"
-msgstr "前往实验室"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:57
-msgid "header.open-lab"
-msgstr "打开实验室"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:32
+#: src/renderer/routes/-layout/window-title-bar.tsx:33
 msgid "header.open-preferences"
 msgstr "打开偏好设置"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:18
-msgid "lab.description"
-msgstr "用于基础设施与集成演示的实验区域。"
-
-#. js-lingui-explicit-id
-#. placeholder {0}: helloEditor()
-#: src/renderer/routes/lab/index.tsx:23
-msgid "lab.editorPackageGreeting"
-msgstr "编辑器包：{0}"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:117
-msgid "lab.playground.description"
-msgstr "纯前端演练区。编辑这段预设 Markdown 来验证区块行为。"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:130
-msgid "lab.playground.reset"
-msgstr "重置预设"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/-features/block-editor-playground-panel.tsx:114
-msgid "lab.playground.title"
-msgstr "区块编辑器演练区"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/lab/index.tsx:15
-msgid "lab.title"
-msgstr "实验室"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
@@ -455,98 +183,98 @@ msgid "preferences.app.title"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:310
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:315
 msgid "preferences.archive.clear.action"
 msgstr "清空"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:346
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
 msgid "preferences.archive.clear.description"
 msgstr "永久删除所有归档区块。活跃区块和标签不会受到影响。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:327
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:332
 msgid "preferences.archive.clear.dialog.cancel"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:339
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:344
 msgid "preferences.archive.clear.dialog.confirm"
 msgstr "清空归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:320
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:325
 msgid "preferences.archive.clear.dialog.description"
 msgstr "这会永久删除所有归档区块。活跃区块和标签会保留。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:317
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:322
 msgid "preferences.archive.clear.dialog.title"
 msgstr "清空归档数据？"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:93
 msgid "preferences.archive.clear.error"
 msgstr "清空归档数据失败。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:351
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:356
 msgid "preferences.archive.clear.label"
 msgstr "清空归档数据"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:79
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:84
 msgid "preferences.archive.clear.success"
 msgstr "归档数据已清空。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:223
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:228
 msgid "preferences.archive.title"
 msgstr "归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:239
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:244
 msgid "preferences.auto-archive.enable.description"
 msgstr "开启后，区块在设定时长内无内容改动时会进入待归档状态；实际归档会在窗口隐藏时执行，将被归档的区块会以半透明显示。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:119
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:246
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:251
 msgid "preferences.auto-archive.enable.label"
 msgstr "启用自动归档"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:116
 msgid "preferences.auto-archive.threshold.amount.label"
 msgstr "自动归档时长数值"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:303
 msgid "preferences.auto-archive.threshold.label"
 msgstr "自动归档时间"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:293
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:298
 msgid "preferences.auto-archive.threshold.range-tooltip"
 msgstr "范围：1-20160 分钟、1-336 小时或 1-14 天。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:115
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:120
 msgid "preferences.auto-archive.threshold.unit.label"
 msgstr "自动归档时长单位"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:103
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:108
 msgid "preferences.auto-archive.unit.days"
 msgstr "天"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:109
 msgid "preferences.auto-archive.unit.hours"
 msgstr "小时"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:105
+#: src/renderer/routes/preferences/-features/auto-archive-preferences-section.tsx:110
 msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
@@ -606,12 +334,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:114
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "取消外部编辑"
 
@@ -622,17 +350,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:76
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "删除区块"
 
@@ -658,32 +386,32 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:159
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:156
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:50
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
 msgid "preferences.shortcuts.group.global"
 msgstr "全局"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:71
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
 msgid "preferences.shortcuts.group.workspace"
 msgstr "工作区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:62
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "快速记录区块"
 
@@ -704,22 +432,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:107
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:173
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "固定/取消固定区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:55
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 
@@ -760,8 +488,8 @@ msgid "preferences.title"
 msgstr "偏好设置"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/-layout/window-title-bar.tsx:71
-#: src/renderer/routes/-layout/window-title-bar.tsx:79
+#: src/renderer/routes/-layout/window-title-bar.tsx:45
+#: src/renderer/routes/-layout/window-title-bar.tsx:53
 msgid "window.hide"
 msgstr "隐藏窗口"
 
@@ -972,12 +700,12 @@ msgid "workspace.tags.assign.placeholder"
 msgstr "搜索或分配标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:148
+#: src/renderer/features/tag/tag-combobox-popover.tsx:152
 msgid "workspace.tags.create-inline"
 msgstr "创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:190
+#: src/renderer/features/tag/tag-combobox-popover.tsx:194
 msgid "workspace.tags.delete-inline"
 msgstr "删除标签"
 
@@ -992,7 +720,7 @@ msgid "workspace.tags.filter.placeholder"
 msgstr "搜索或创建标签"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/tag/tag-combobox-popover.tsx:157
+#: src/renderer/features/tag/tag-combobox-popover.tsx:161
 msgid "workspace.tags.search.empty"
 msgstr "没有匹配的标签"
 

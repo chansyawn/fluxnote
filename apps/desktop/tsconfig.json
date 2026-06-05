@@ -24,7 +24,6 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "@fluxnotes/editor": ["../../packages/editor/src/index.ts"],
       "@renderer/*": ["./src/renderer/*"],
       "@main/*": ["./src/main/*"],
       "@preload/*": ["./src/preload/*"],

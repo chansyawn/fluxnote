@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@renderer/features/block-editor/actions";
+import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@fluxnotes/editor";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -20,7 +20,9 @@ function createEditorHandle(): WorkspaceBlockEditorHandle {
     flush: vi.fn(async () => ""),
     focus: vi.fn(),
     getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+    getPreviewData: vi.fn(async () => ""),
     subscribeActionState: () => () => undefined,
+    subscribePreviewChange: () => () => undefined,
   };
 }
 

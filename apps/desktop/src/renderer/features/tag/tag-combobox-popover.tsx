@@ -1,7 +1,4 @@
-import type { BaseUIEvent } from "@base-ui/react/types";
-import { Trans } from "@lingui/react/macro";
-import type { Tag } from "@renderer/clients";
-import { Button, buttonVariants } from "@renderer/ui/components/button";
+import { Button } from "@fluxnotes/ui/components/button";
 import {
   Combobox,
   ComboboxContent,
@@ -10,22 +7,29 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-} from "@renderer/ui/components/combobox";
-import { InputGroupAddon } from "@renderer/ui/components/input-group";
-import type { VariantProps } from "class-variance-authority";
-import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+} from "@fluxnotes/ui/components/combobox";
+import { InputGroupAddon } from "@fluxnotes/ui/components/input-group";
+import { LoaderCircleIcon, PlusIcon, Trash2Icon } from "@fluxnotes/ui/icons/lucide";
+import { Trans } from "@lingui/react/macro";
+import type { Tag } from "@renderer/clients";
+import { useMemo, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
 
 type TagOption = {
   value: string;
   label: string;
 };
 
+type BaseUIKeyboardEvent<T extends HTMLElement> = KeyboardEvent<T> & {
+  preventBaseUIHandler: () => void;
+};
+
+type ButtonSize = ComponentProps<typeof Button>["size"];
+
 interface TagComboboxPopoverProps {
   tags: Tag[];
   selectedTagIds: string[];
   trigger: ReactNode;
-  triggerSize?: VariantProps<typeof buttonVariants>["size"];
+  triggerSize?: ButtonSize;
   placeholder: string;
   disabled?: boolean;
   isCreatingTag: boolean;
@@ -119,7 +123,7 @@ export function TagComboboxPopover({
           placeholder={placeholder}
           showClear={inputValue.length > 0}
           showTrigger={false}
-          onKeyDown={(event: BaseUIEvent<KeyboardEvent<HTMLInputElement>>) => {
+          onKeyDown={(event: BaseUIKeyboardEvent<HTMLInputElement>) => {
             if (event.key !== "Enter" || event.nativeEvent.isComposing || !canCreateTag) {
               return;
             }

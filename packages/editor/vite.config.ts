@@ -1,17 +1,30 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { lingui } from "@lingui/vite-plugin";
+import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
+const packageRoot = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
-  pack: {
-    dts: true,
-    entry: ["src/index.ts"],
-    exports: true,
-    format: ["esm"],
-  },
-  lint: {
-    options: {
-      typeAware: true,
-      typeCheck: true,
+  plugins: [
+    tailwindcss(),
+    babel({
+      plugins: ["@lingui/babel-plugin-lingui-macro"],
+      presets: [reactCompilerPreset()],
+    }),
+    react(),
+    lingui(),
+  ],
+  resolve: {
+    alias: {
+      "@fluxnotes/editor": path.resolve(packageRoot, "src/index.tsx"),
     },
   },
-  fmt: {},
+  test: {
+    setupFiles: ["./src/test-helper/setup.ts"],
+  },
 });

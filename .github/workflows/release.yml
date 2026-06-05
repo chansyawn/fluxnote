@@ -22,9 +22,9 @@ jobs:
       issues: write
       pull-requests: write
     outputs:
-      release_created: ${{ steps.release.outputs['apps/desktop--release_created'] }}
-      tag_name: ${{ steps.release.outputs['apps/desktop--tag_name'] }}
-      version: ${{ steps.release.outputs['apps/desktop--version'] }}
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
 
     steps:
       - name: Create release app token
@@ -39,8 +39,8 @@ jobs:
         uses: googleapis/release-please-action@v5
         with:
           token: ${{ steps.release-app.outputs.token }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: config/release/release-please-config.json
+          manifest-file: config/release/.release-please-manifest.json
 
   verify:
     name: Verify
@@ -62,7 +62,7 @@ jobs:
         run: vp install
 
       - name: Check
-        run: vp check
+        run: vp run check
 
       - name: Test
         run: vp run test
@@ -112,7 +112,7 @@ jobs:
           MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
           MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        run: vp run release:macos -- prepare
+        run: vp run @fluxnotes/desktop#release:macos -- prepare
 
       - name: Verify PostHog secrets
         env:
@@ -129,15 +129,15 @@ jobs:
         env:
           VITE_FLUXNOTES_POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
           VITE_FLUXNOTES_POSTHOG_KEY: ${{ secrets.POSTHOG_KEY }}
-        run: vp run make -- --platform=${{ matrix.platform }}
+        run: vp run make:desktop -- --platform=${{ matrix.platform }}
 
       - name: Notarize macOS disk image
         if: matrix.platform == 'darwin'
-        run: vp run release:macos -- notarize-dmg
+        run: vp run @fluxnotes/desktop#release:macos -- notarize-dmg
 
       - name: Verify macOS signature and notarization
         if: matrix.platform == 'darwin'
-        run: vp run release:macos -- verify
+        run: vp run @fluxnotes/desktop#release:macos -- verify
 
       - name: Check artifacts
         shell: bash
@@ -156,7 +156,7 @@ jobs:
 
       - name: Clean up macOS signing keychain
         if: always() && matrix.platform == 'darwin'
-        run: vp run release:macos -- cleanup
+        run: vp run @fluxnotes/desktop#release:macos -- cleanup
 
   publish:
     name: Publish

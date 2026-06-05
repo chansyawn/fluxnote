@@ -156,6 +156,7 @@ describe("dispatch-command", () => {
     });
 
     await expect(dispatchCommand("app.open", null)).resolves.toBeNull();
+    expect(mocks.stat).toHaveBeenCalledWith(expect.stringMatching(/MacOS\/Fluxnotes$/));
     expect(mocks.spawn).toHaveBeenCalledTimes(1);
     expect(mocks.spawn).toHaveBeenCalledWith("open", ["-a", expect.any(String)], {
       detached: true,

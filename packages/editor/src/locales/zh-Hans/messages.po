@@ -1,0 +1,250 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-06-04 13:46+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: zh-Hans\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-copy-button.tsx:23
+msgid "block-editor.code.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-copy-button.tsx:19
+msgid "block-editor.code.copy"
+msgstr "复制代码"
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-language-combobox.tsx:33
+msgid "block-editor.code.language.empty"
+msgstr "没有匹配的语言"
+
+#. js-lingui-explicit-id
+#: src/syntax/code/code-language-combobox.tsx:76
+msgid "block-editor.code.language.search"
+msgstr "搜索语言"
+
+#. js-lingui-explicit-id
+#: src/core/block-editor.tsx:103
+msgid "block-editor.content.label"
+msgstr "Markdown 块编辑器"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:121
+msgid "block-editor.link.convert"
+msgstr "转换为链接"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:119
+msgid "block-editor.link.copied"
+msgstr "已复制"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:118
+msgid "block-editor.link.copy"
+msgstr "复制"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:117
+msgid "block-editor.link.open"
+msgstr "打开"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:120
+msgid "block-editor.link.remove"
+msgstr "移除链接"
+
+#. js-lingui-explicit-id
+#: src/syntax/link/link-popover.tsx:122
+msgid "block-editor.link.url"
+msgstr "链接 URL"
+
+#. js-lingui-explicit-id
+#: src/core/block-editor.tsx:102
+#: src/core/block-editor.tsx:108
+msgid "block-editor.placeholder"
+msgstr "写一个区块..."
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:179
+msgid "block-editor.table.align-center"
+msgstr "居中对齐"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:175
+msgid "block-editor.table.align-default"
+msgstr "默认"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:177
+msgid "block-editor.table.align-left"
+msgstr "左对齐"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:181
+msgid "block-editor.table.align-right"
+msgstr "右对齐"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:129
+msgid "block-editor.table.column-menu"
+msgstr "打开列操作菜单"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:158
+msgid "block-editor.table.delete-column"
+msgstr "删除列"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:168
+msgid "block-editor.table.delete-row"
+msgstr "删除行"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:144
+msgid "block-editor.table.insert-column-left"
+msgstr "左侧插入列"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:149
+msgid "block-editor.table.insert-column-right"
+msgstr "右侧插入列"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:160
+msgid "block-editor.table.insert-row-above"
+msgstr "上方插入行"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:162
+msgid "block-editor.table.insert-row-below"
+msgstr "下方插入行"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:154
+msgid "block-editor.table.move-column-left"
+msgstr "左移"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:156
+msgid "block-editor.table.move-column-right"
+msgstr "右移"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:166
+msgid "block-editor.table.move-row-down"
+msgstr "下移"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:164
+msgid "block-editor.table.move-row-up"
+msgstr "上移"
+
+#. js-lingui-explicit-id
+#: src/syntax/table/table-controls-menu.tsx:135
+msgid "block-editor.table.row-menu"
+msgstr "打开行操作菜单"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:185
+msgid "block-editor.toolbar.blockquote"
+msgstr "引用"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:140
+msgid "block-editor.toolbar.bold"
+msgstr "加粗"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:114
+msgid "block-editor.toolbar.bullet-list"
+msgstr "无序列表"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:100
+msgid "block-editor.toolbar.code-block"
+msgstr "代码块"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:64
+msgid "block-editor.toolbar.heading-1"
+msgstr "一级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:70
+msgid "block-editor.toolbar.heading-2"
+msgstr "二级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:76
+msgid "block-editor.toolbar.heading-3"
+msgstr "三级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:82
+msgid "block-editor.toolbar.heading-4"
+msgstr "四级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:88
+msgid "block-editor.toolbar.heading-5"
+msgstr "五级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:94
+msgid "block-editor.toolbar.heading-6"
+msgstr "六级标题"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:161
+msgid "block-editor.toolbar.inline-code"
+msgstr "行内代码"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:147
+msgid "block-editor.toolbar.italic"
+msgstr "斜体"
+
+#. js-lingui-explicit-id
+#: src/toolbar/block-editor-toolbar.tsx:133
+msgid "block-editor.toolbar.label"
+msgstr "编辑器"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:175
+msgid "block-editor.toolbar.link"
+msgstr "链接"
+
+#. js-lingui-explicit-id
+#: src/toolbar/block-editor-toolbar.tsx:181
+msgid "block-editor.toolbar.list"
+msgstr "列表"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:58
+msgid "block-editor.toolbar.normal-text"
+msgstr "正文"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:120
+msgid "block-editor.toolbar.numbered-list"
+msgstr "有序列表"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:154
+msgid "block-editor.toolbar.strikethrough"
+msgstr "删除线"
+
+#. js-lingui-explicit-id
+#: src/actions/action-definitions.ts:126
+msgid "block-editor.toolbar.task-list"
+msgstr "任务列表"

@@ -19,7 +19,7 @@ function getProductionCandidates(cliDir: string): CliContext[] {
   if (process.platform === "darwin") {
     const contentsDir = appDir;
     const appBundlePath = path.dirname(contentsDir);
-    const executablePath = path.join(contentsDir, "MacOS", "fluxnotes");
+    const executablePath = path.join(contentsDir, "MacOS", "Fluxnotes");
     return [
       {
         appPath: "open",

@@ -1,4 +1,3 @@
-import { type Block } from "@renderer/clients";
 import {
   BlockEditor,
   type BlockEditorConfigInput,
@@ -7,10 +6,12 @@ import {
   BLOCK_EDITOR_ACTION_DEFINITIONS,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,
   type BlockEditorShortcutConfig,
-} from "@renderer/features/block-editor";
+} from "@fluxnotes/editor";
+import { cn } from "@fluxnotes/ui/lib/utils";
+import { useThemeState } from "@renderer/app/theme";
+import { type Block } from "@renderer/clients";
 import { useMarkdownCodeBlockPreference } from "@renderer/features/preferences/preferences-query";
 import type { ShortcutPreferences } from "@renderer/features/shortcut/shortcut-utils";
-import { cn } from "@renderer/ui/lib/utils";
 import {
   useCallback,
   useEffect,
@@ -117,9 +118,13 @@ export function WorkspaceBlockEditorSurface({
   const editorRef = useRef<BlockEditorHandle | null>(null);
   const runtime = useMemo(() => createWorkspaceBlockEditorRuntime(block.id), [block.id]);
   const { codeBlock } = useMarkdownCodeBlockPreference();
+  const { resolvedTheme } = useThemeState();
   const editorShortcuts = useMemo(() => pickBlockEditorShortcuts(shortcuts), [shortcuts]);
   const editorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
+      appearance: {
+        resolvedTheme,
+      },
       markdown: {
         codeBlock,
       },
@@ -127,7 +132,7 @@ export function WorkspaceBlockEditorSurface({
         actions: editorShortcuts,
       },
     }),
-    [codeBlock, editorShortcuts],
+    [codeBlock, editorShortcuts, resolvedTheme],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockEditorPersistence(block);
@@ -165,8 +170,12 @@ export function WorkspaceBlockEditorSurface({
       flush,
       getActionState: () =>
         editorRef.current?.getActionState() ?? DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: (request) =>
+        editorRef.current?.getPreviewData(request) ?? Promise.resolve(""),
       subscribeActionState: (listener) =>
         editorRef.current?.subscribeActionState(listener) ?? (() => undefined),
+      subscribePreviewChange: (listener) =>
+        editorRef.current?.subscribePreviewChange(listener) ?? (() => undefined),
     }),
     [flush],
   );

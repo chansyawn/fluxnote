@@ -1,9 +1,9 @@
+import { toast } from "@fluxnotes/ui/components/sonner";
 import { createTag, deleteTag, listTags, type Tag } from "@renderer/clients";
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { tagListQueryKey } from "@renderer/features/tag/tag-query-key";
 import { useMutation, useMutationState, useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { toast } from "sonner";
 
 export type TagMutationOperation = "create" | "delete";
 

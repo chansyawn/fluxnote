@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "@fluxnotes/ui/styles/index.css";
+@import "../styles.css";
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-background text-foreground m-0;
+  }
+}

@@ -6,7 +6,19 @@ const ignorePatterns = [
   "*.gen.ts",
   "apps/desktop/src/renderer/locales/**",
   "apps/desktop/src/main/core/database/drizzle/**",
+  "packages/editor/src/locales/**",
 ];
+
+const i18nCheckStagedFiles = [
+  "config/i18n/lingui.ts",
+  "scripts/i18n/**/*.ts",
+  "apps/desktop/lingui.config.ts",
+  "apps/desktop/src/renderer/**/*.{ts,tsx,po}",
+  "packages/editor/lingui.config.ts",
+  "packages/editor/src/**/*.{ts,tsx,po}",
+];
+
+const i18nCheckStagedPattern = `{${i18nCheckStagedFiles.join(",")}}`;
 
 export default defineConfig({
   fmt: {
@@ -30,7 +42,6 @@ export default defineConfig({
   },
   staged: {
     "*": "vp check --fix",
-    "{apps/desktop/lingui.config.ts,apps/desktop/src/renderer/**/*.{ts,tsx,po}}":
-      "vp run i18n:check",
+    [i18nCheckStagedPattern]: "vp run i18n:check",
   },
 });
