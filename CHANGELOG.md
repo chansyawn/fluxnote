@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.31](https://github.com/chansyawn/fluxnotes/compare/v0.0.30...v0.0.31) (2026-06-05)
+
+
+### Features
+
+* extract editor and ui packages ([#81](https://github.com/chansyawn/fluxnotes/issues/81)) ([7adc328](https://github.com/chansyawn/fluxnotes/commit/7adc328fc0e2e0988c73145e0e2ba62e5d9228e1))
+
 ## [0.0.30](https://github.com/chansyawn/fluxnotes/compare/v0.0.29...v0.0.30) (2026-06-03)
 
 
