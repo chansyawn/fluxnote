@@ -1,3 +1,4 @@
+import { formatShortcutTokens } from "@fluxnotes/shared/shortcuts";
 import { Button } from "@fluxnotes/ui/components/button";
 import { ButtonGroup, ButtonGroupSeparator } from "@fluxnotes/ui/components/button-group";
 import {
@@ -21,7 +22,6 @@ import {
   type BlockEditorActionState,
   type BlockEditorShortcutConfig,
 } from "../actions";
-import { formatShortcutTokens } from "../shortcuts";
 import { BLOCK_EDITOR_TOOLBAR_LAYOUT } from "./action-layout";
 import { ToolbarMenuItem, ToolbarRadioMenuItem } from "./toolbar-menu-item";
 

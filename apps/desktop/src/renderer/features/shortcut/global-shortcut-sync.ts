@@ -1,6 +1,6 @@
+import type { Hotkey } from "@fluxnotes/shared/shortcuts";
 import { isRegistered, register, unregister, type ShortcutEvent } from "@renderer/clients";
 import { toElectronAccelerator } from "@renderer/features/shortcut/electron-accelerator";
-import type { Hotkey } from "@tanstack/react-hotkeys";
 
 interface RegisterGlobalShortcutOptions {
   shortcut: Hotkey;

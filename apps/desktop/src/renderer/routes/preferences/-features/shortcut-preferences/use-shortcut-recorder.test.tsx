@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import type { Hotkey } from "@fluxnotes/shared/shortcuts";
 import {
   formatShortcutRecorderTokens,
   formatShortcutTokens,
@@ -8,7 +9,6 @@ import {
 import { dispatchDocumentKeyboardEvent } from "@renderer/test/events";
 import { renderWithProviders } from "@renderer/test/render";
 import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
-import type { Hotkey } from "@tanstack/react-hotkeys";
 import { act, useLayoutEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 

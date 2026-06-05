@@ -115,7 +115,7 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
   },
 ];
 
-const EDITOR_SHORTCUT_ACTION_ORDER = [
+export const EDITOR_SHORTCUT_ACTION_ORDER = [
   "editor.paragraph",
   "editor.heading1",
   "editor.heading2",
@@ -132,6 +132,7 @@ const EDITOR_SHORTCUT_ACTION_ORDER = [
   "editor.italic",
   "editor.strikethrough",
   "editor.inlineCode",
+  "editor.link",
 ] as const satisfies readonly BlockEditorActionId[];
 
 export function ShortcutPreferencesSection() {

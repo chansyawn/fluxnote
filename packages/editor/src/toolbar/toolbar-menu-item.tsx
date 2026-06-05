@@ -1,8 +1,7 @@
+import { formatShortcutTokens, type ShortcutBinding } from "@fluxnotes/shared/shortcuts";
 import { DropdownMenuItem, DropdownMenuRadioItem } from "@fluxnotes/ui/components/dropdown-menu";
 import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
 import { cn } from "@fluxnotes/ui/lib/utils";
-
-import { formatShortcutTokens, type ShortcutBinding } from "../shortcuts";
 
 interface ToolbarMenuItemContentProps {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;

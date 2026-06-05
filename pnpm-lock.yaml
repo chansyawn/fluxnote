@@ -60,6 +60,9 @@ importers:
       '@fluxnotes/editor':
         specifier: workspace:*
         version: link:../../packages/editor
+      '@fluxnotes/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@fluxnotes/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -69,9 +72,6 @@ importers:
       '@lingui/react':
         specifier: 6.0.1
         version: 6.0.1(react@19.2.4)
-      '@tanstack/react-hotkeys':
-        specifier: ^0.10.0
-        version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
         specifier: ^5.96.2
         version: 5.96.2(react@19.2.4)
@@ -202,6 +202,9 @@ importers:
 
   packages/editor:
     dependencies:
+      '@fluxnotes/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@fluxnotes/ui':
         specifier: workspace:*
         version: link:../ui
@@ -253,9 +256,6 @@ importers:
       '@lingui/react':
         specifier: 6.0.1
         version: 6.0.1(react@19.2.4)
-      '@tanstack/react-hotkeys':
-        specifier: ^0.10.0
-        version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       hast-util-to-html:
         specifier: ^9.0.5
         version: 9.0.5
@@ -332,6 +332,25 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+
+  packages/shared:
+    dependencies:
+      '@tanstack/react-hotkeys':
+        specifier: ^0.10.0
+        version: 0.10.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
 
   packages/ui:
     dependencies:

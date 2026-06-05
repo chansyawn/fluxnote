@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 
+import type { UseHotkeyDefinition, UseHotkeyOptions } from "@fluxnotes/shared/shortcuts";
 import type { ExternalEditSession } from "@renderer/clients";
 import type { WorkspaceBlockActions } from "@renderer/routes/_workspace/-features/actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "@renderer/routes/_workspace/-features/workspace-state-context";
 import { createExternalEditSession } from "@renderer/test/fixtures";
 import { renderWithProviders } from "@renderer/test/render";
 import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
-import type { UseHotkeyDefinition, UseHotkeyOptions } from "@tanstack/react-hotkeys";
 import { useRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
@@ -41,8 +41,8 @@ vi.mock("@renderer/features/shortcut/shortcut-state", () => ({
   }),
 }));
 
-vi.mock("@tanstack/react-hotkeys", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@tanstack/react-hotkeys")>();
+vi.mock("@fluxnotes/shared/shortcuts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@fluxnotes/shared/shortcuts")>();
   return {
     ...actual,
     useHotkeys: mocks.useHotkeys,

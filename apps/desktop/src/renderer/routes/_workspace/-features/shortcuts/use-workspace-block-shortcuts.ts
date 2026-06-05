@@ -1,14 +1,14 @@
+import {
+  useHotkeys,
+  type UseHotkeyDefinition,
+  type UseHotkeyOptions,
+} from "@fluxnotes/shared/shortcuts";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   keyboardEventMatchesShortcut,
   type ShortcutBinding,
 } from "@renderer/features/shortcut/shortcut-utils";
 import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
-import {
-  useHotkeys,
-  type UseHotkeyDefinition,
-  type UseHotkeyOptions,
-} from "@tanstack/react-hotkeys";
 import { useCallback, useMemo, type KeyboardEvent as ReactKeyboardEvent } from "react";
 
 import type { WorkspaceBlockActions } from "../actions/workspace-block-actions";

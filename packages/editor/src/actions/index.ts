@@ -1,4 +1,11 @@
 export {
+  BLOCK_EDITOR_ACTION_CATALOG,
+  BLOCK_EDITOR_SHORTCUT_DEFAULTS,
+  BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER,
+  type BlockEditorActionCatalogItem,
+  type BlockEditorActionId,
+} from "./action-catalog";
+export {
   BLOCK_EDITOR_ACTION_DEFINITION_BY_ID,
   BLOCK_EDITOR_ACTION_DEFINITIONS,
   BLOCK_EDITOR_ACTION_IDS,
@@ -15,7 +22,6 @@ export { resolveBlockEditorShortcut, type BlockEditorShortcutResolution } from "
 export type {
   BlockEditorActionController,
   BlockEditorActionDefinition,
-  BlockEditorActionId,
   BlockEditorActionResult,
   BlockEditorActionState,
   BlockEditorActionStateListener,
