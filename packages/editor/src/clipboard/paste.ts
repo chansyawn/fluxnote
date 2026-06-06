@@ -1,4 +1,6 @@
+import { $isCodeNode } from "@lexical/code";
 import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
+import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
 import type { BlockEditorRuntime } from "../runtime/types";
@@ -39,6 +41,53 @@ export function createClipboardDataSnapshot(dataTransfer: DataTransfer): Clipboa
 function claimPaste(event: PasteCommandType): void {
   event.preventDefault();
   event.stopPropagation();
+}
+
+function selectionIsInsideCodeBlock(selection: BaseSelection | null): boolean {
+  if (!$isRangeSelection(selection)) return false;
+
+  let node: ReturnType<typeof selection.anchor.getNode> | null = selection.anchor.getNode();
+  while (node) {
+    if ($isCodeNode(node)) return true;
+    node = node.getParent();
+  }
+
+  return false;
+}
+
+function insertRawClipboardTextAtSelection(
+  editor: LexicalEditor,
+  plainText: string,
+  selection: BaseSelection | null,
+): void {
+  editor.update(() => {
+    if (selection) {
+      $setSelection(selection.clone());
+    }
+
+    const currentSelection = $getSelection();
+    if ($isRangeSelection(currentSelection)) {
+      currentSelection.insertRawText(plainText);
+    }
+  });
+}
+
+function handleCodeBlockPaste(
+  editor: LexicalEditor,
+  event: PasteCommandType,
+  clipboardData: ClipboardDataSnapshot,
+  selection: BaseSelection | null,
+): boolean {
+  const isInsideCodeBlock = editor.read(() => selectionIsInsideCodeBlock(selection));
+  if (!isInsideCodeBlock) {
+    return false;
+  }
+
+  claimPaste(event);
+  if (clipboardData.plainText) {
+    insertRawClipboardTextAtSelection(editor, clipboardData.plainText, selection);
+  }
+  return true;
 }
 
 async function insertHtmlClipboardDataAtSelection(
@@ -86,6 +135,10 @@ export function handleBlockEditorPaste(
   }
 
   const clipboardDataSnapshot = createClipboardDataSnapshot(clipboardData);
+  if (handleCodeBlockPaste(editor, event, clipboardDataSnapshot, selection)) {
+    return true;
+  }
+
   if (clipboardDataSnapshot.files.length > 0) {
     claimPaste(event);
     void insertImageFilesAtSelection(editor, runtime, clipboardDataSnapshot.files, selection);
