@@ -155,6 +155,67 @@ describe("list", () => {
       ]);
     });
 
+    it("Alt+Enter splits a paragraph inside the current list item", () => {
+      const editor = editorFromMarkdown("- AlphaBeta\n");
+
+      selectText(editor, "AlphaBeta", "Alpha".length);
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Alpha" }], type: "paragraph" },
+            { children: [{ type: "text", value: "Beta" }], type: "paragraph" },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Alt+Enter in a multi-block item stays inside the current item", () => {
+      const editor = editorFromMdast(doc(ul(li([p(t("First")), p(t("Second"))]))));
+
+      selectText(editor, "First");
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "First" }], type: "paragraph" },
+            { children: [], type: "paragraph" },
+            { children: [{ type: "text", value: "Second" }], type: "paragraph" },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
+    it("Alt+Enter inside a structured child does not split the list item", () => {
+      const editor = editorFromMdast(doc(ul(li([p(t("Lead")), quote(p(t("NestedText")))]))));
+
+      selectText(editor, "NestedText", "Nested".length);
+      expect(pressEnter(editor, { altKey: true })).toBe(true);
+
+      const list = getList(readMdast(editor));
+      expect(list.children).toMatchObject([
+        {
+          children: [
+            { children: [{ type: "text", value: "Lead" }], type: "paragraph" },
+            {
+              children: [
+                { children: [{ type: "text", value: "Nested" }], type: "paragraph" },
+                { children: [{ type: "text", value: "Text" }], type: "paragraph" },
+              ],
+              type: "blockquote",
+            },
+          ],
+          type: "listItem",
+        },
+      ]);
+    });
+
     it("Enter on an empty nested item promotes it one list level", () => {
       const editor = editorFromMdast(doc(ul(li([p(t("Parent")), ul(li([p()]))]))));
 
@@ -172,6 +233,15 @@ describe("list", () => {
           type: "listItem",
         },
       ]);
+    });
+
+    it("Enter on an empty top-level item unwraps it into a paragraph", () => {
+      const editor = editorFromMdast(doc(ul(li([p()]))));
+
+      selectEmptyParagraph(editor);
+      expect(pressEnter(editor)).toBe(true);
+
+      expect(readMdast(editor).children).toMatchObject([{ children: [], type: "paragraph" }]);
     });
 
     it("Backspace at the marker position merges into the previous item", () => {

@@ -4,7 +4,6 @@ import {
   $isElementNode,
   $isParagraphNode,
   $isRootOrShadowRoot,
-  type ElementNode,
   type LexicalNode,
   type RangeSelection,
 } from "lexical";
@@ -97,19 +96,6 @@ export function exitQuoteAtEmptyParagraph(quote: QuoteNode, selection: RangeSele
   return true;
 }
 
-function getCurrentElementQuoteChild(
-  selection: RangeSelection,
-  quote: QuoteNode,
-): ElementNode | null {
-  const anchorNode = getSelectionAnchorNode(selection);
-  if (!anchorNode) {
-    return null;
-  }
-
-  const currentChild = getDirectQuoteChild(anchorNode, quote);
-  return $isElementNode(currentChild) ? currentChild : null;
-}
-
 function createQuoteSibling(quote: QuoteNode): QuoteNode {
   const sibling = $createQuoteNode();
   sibling.setDirection(quote.getDirection());
@@ -143,36 +129,16 @@ function insertParagraphAfterQuote(quote: QuoteNode): boolean {
   return true;
 }
 
-function splitQuoteChildAtSelection(
-  quote: QuoteNode,
-  selection: RangeSelection,
-): LexicalNode[] | null {
+function splitQuoteAtSelection(quote: QuoteNode, selection: RangeSelection): boolean {
   const inserted = selection.insertParagraph();
   const insertedParent = inserted?.getParent();
   if (!$isElementNode(inserted) || !insertedParent?.is(quote)) {
-    return null;
-  }
-
-  return [inserted, ...inserted.getNextSiblings()];
-}
-
-function splitQuoteAtSelection(
-  quote: QuoteNode,
-  selection: RangeSelection,
-  currentChild: ElementNode,
-): boolean {
-  const movedChildren = isCursorAtElementStart(selection, currentChild)
-    ? [currentChild, ...currentChild.getNextSiblings()]
-    : isCursorAtElementEnd(selection, currentChild)
-      ? currentChild.getNextSiblings()
-      : splitQuoteChildAtSelection(quote, selection);
-
-  if (!movedChildren) {
     return false;
   }
 
+  const movedChildren = [inserted, ...inserted.getNextSiblings()];
   const sibling = createQuoteSibling(quote);
-  sibling.splice(0, 0, movedChildren.length > 0 ? movedChildren : [$createParagraphNode()]);
+  sibling.splice(0, 0, movedChildren);
   quote.insertAfter(sibling);
   sibling.selectStart();
   return true;
@@ -182,20 +148,25 @@ export function applyAltEnterAtQuoteSelection(
   quote: QuoteNode,
   selection: RangeSelection,
 ): boolean {
-  const currentChild = getCurrentElementQuoteChild(selection, quote);
-  if (!currentChild) {
+  const anchorNode = getSelectionAnchorNode(selection);
+  if (!anchorNode) {
     return false;
   }
 
-  if (currentChild.is(quote.getFirstChild()) && isCursorAtElementStart(selection, currentChild)) {
-    return insertParagraphBeforeQuote(quote);
+  const currentChild = getDirectQuoteChild(anchorNode, quote);
+  if (!$isParagraphNode(currentChild)) {
+    return false;
   }
 
   if (currentChild.is(quote.getLastChild()) && isCursorAtElementEnd(selection, currentChild)) {
     return insertParagraphAfterQuote(quote);
   }
 
-  return splitQuoteAtSelection(quote, selection, currentChild);
+  if (currentChild.is(quote.getFirstChild()) && isCursorAtElementStart(selection, currentChild)) {
+    return insertParagraphBeforeQuote(quote);
+  }
+
+  return splitQuoteAtSelection(quote, selection);
 }
 
 /*

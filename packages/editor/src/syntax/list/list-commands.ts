@@ -27,7 +27,6 @@ import {
   ensureListItemHasParagraph,
   hasNestedListAfterCurrentParagraph,
   indentListItemSubtree,
-  insertBlockInsideListItem,
   isCursorAtLastParagraphEnd,
   isCursorAtListMarkerPosition,
   isEmptyListItem,
@@ -36,7 +35,7 @@ import {
   mergeListItemIntoPreviousSibling,
   normalizeListItemForEditing,
   outdentListItemSubtree,
-  splitListItemBlocksAtSelection,
+  splitParagraphInsideListItem,
   splitListItemAtSelection,
   unwrapListItemToBlocks,
 } from "./list-structure";
@@ -53,10 +52,9 @@ function getSelectionFromCommand(): RangeSelection | null {
 }
 
 /*
- * Alt+Enter stays inside the current list item when possible:
- * - single paragraph item: insert another paragraph in the same item;
- * - multi-block item: split the item into sibling list items;
- * - structured block: split at the block boundary, not inside block internals.
+ * Alt+Enter has one list-specific meaning: split or insert a paragraph inside
+ * the current list item. Structured child blocks keep ownership of their own
+ * Alt+Enter behavior.
  */
 function handleAltEnter(selection: RangeSelection): boolean {
   const listItem = getCurrentListItem(selection);
@@ -66,18 +64,18 @@ function handleAltEnter(selection: RangeSelection): boolean {
 
   normalizeListItemForEditing(listItem, selection);
   const currentBlock = getCurrentListItemBlock(selection, listItem);
-  if (isSingleParagraphListItem(listItem) && !isStructuredListItemBlock(currentBlock)) {
-    return insertBlockInsideListItem(selection);
+  if (isStructuredListItemBlock(currentBlock)) {
+    return false;
   }
 
-  return splitListItemBlocksAtSelection(listItem, selection);
+  return splitParagraphInsideListItem(selection);
 }
 
 /*
  * Enter key policy, in priority order:
  * - Shift+Enter belongs to soft-break handling;
  * - multiline Markdown shortcuts run before list splitting;
- * - Alt+Enter inserts/splits blocks inside the current item;
+ * - Alt+Enter inserts/splits a paragraph inside the current item;
  * - empty items exit one list level;
  * - structured children keep their own Enter behavior;
  * - paragraph endings create the next list item.
@@ -108,8 +106,11 @@ function handleEnter(
   }
 
   if (event?.altKey) {
-    event.preventDefault();
-    return handleAltEnter(selection);
+    const handled = handleAltEnter(selection);
+    if (handled) {
+      event.preventDefault();
+    }
+    return handled;
   }
 
   ensureListItemHasParagraph(listItem);

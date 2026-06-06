@@ -40,7 +40,7 @@ function getSelectionFromCommand(): RangeSelection | null {
  * Enter key policy, in priority order:
  * - Shift+Enter belongs to soft-break handling;
  * - multiline Markdown shortcuts run before quote exits;
- * - Alt+Enter exits or splits the quote at the current quote boundary;
+ * - Alt+Enter exits quote boundaries or splits the quote;
  * - an empty final paragraph exits the quote;
  * - all other positions stay owned by the active child block.
  */
@@ -70,8 +70,11 @@ function handleEnter(
   }
 
   if (event?.altKey) {
-    event.preventDefault();
-    return applyAltEnterAtQuoteSelection(quote, selection);
+    const handled = applyAltEnterAtQuoteSelection(quote, selection);
+    if (handled) {
+      event.preventDefault();
+    }
+    return handled;
   }
 
   if (exitQuoteAtEmptyParagraph(quote, selection)) {
