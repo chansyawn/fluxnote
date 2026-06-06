@@ -147,7 +147,8 @@ vp run package:desktop
 ## Test
 
 - Import test APIs from `vite-plus/test`, never from `vitest`.
-- Run workspace tests with `vp run test`; run package-local tests with `vp test`; do not invoke `vitest` directly.
+- Run tests with `vp run test` from both the repository root and package directories; do not run root-level `vp test`, because it bypasses package-local Vite+ configs and can break aliases, setup files, and cwd-dependent tests. `vp test` is allowed only when intentionally invoking a package-local Vite+ test runner directly.
+- Do not invoke `vitest` directly.
 - Use the Arrange-Act-Assert structure for readability.
 - Tests must be isolated and must not depend on execution order or shared state.
 - Use descriptive test names, preferably following `action state expected` or `given when then`.
