@@ -11,3 +11,9 @@ export const viteAliases = {
   "@preload": path.resolve(appRoot, "src/preload"),
   "@shared": path.resolve(appRoot, "src/shared"),
 };
+
+export const viteResolve = {
+  alias: viteAliases,
+  preserveSymlinks: false,
+  dedupe: ["react", "react-dom"],
+};

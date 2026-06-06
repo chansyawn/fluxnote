@@ -1,6 +1,6 @@
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./shared.ts";
+import { viteResolve } from "./shared.ts";
 
 export default defineConfig({
   build: {
@@ -10,7 +10,5 @@ export default defineConfig({
       formats: ["cjs"],
     },
   },
-  resolve: {
-    alias: viteAliases,
-  },
+  resolve: viteResolve,
 });
