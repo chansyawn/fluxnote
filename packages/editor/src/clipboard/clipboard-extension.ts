@@ -2,7 +2,11 @@ import { defineExtension } from "lexical";
 import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 
 import { BlockEditorRuntimeExtension } from "../runtime/runtime-extension";
-import { createClipboardDataFromCurrentSelection } from "./copy";
+import {
+  createClipboardDataFromSnapshot,
+  createClipboardSnapshotFromCurrentSelection,
+  writeClipboardSnapshotToDataTransfer,
+} from "./copy";
 import { handleBlockEditorPaste } from "./paste";
 import { cloneCurrentSelection } from "./rich-text-paste";
 
@@ -16,17 +20,19 @@ export const ClipboardExtension = defineExtension({
     const unregisterCopy = editor.registerCommand(
       COPY_COMMAND,
       (event) => {
-        if (event instanceof ClipboardEvent && event.clipboardData !== null) {
-          event.preventDefault();
+        const snapshot = createClipboardSnapshotFromCurrentSelection(editor);
+        if (snapshot === null) {
+          return false;
         }
 
-        void createClipboardDataFromCurrentSelection(editor, runtime.assets.resolve).then(
-          (data) => {
-            if (data !== null) {
-              void runtime.clipboard.write(data);
-            }
-          },
-        );
+        if (event instanceof ClipboardEvent && event.clipboardData !== null) {
+          event.preventDefault();
+          writeClipboardSnapshotToDataTransfer(event.clipboardData, snapshot);
+        }
+
+        void createClipboardDataFromSnapshot(snapshot, runtime.assets.resolve)
+          .then((data) => runtime.clipboard.write(data))
+          .catch(() => undefined);
         return true;
       },
       COMMAND_PRIORITY_CRITICAL,
