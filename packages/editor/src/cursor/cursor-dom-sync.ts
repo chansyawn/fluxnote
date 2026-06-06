@@ -1,7 +1,7 @@
 import { type LexicalEditor, type NodeKey } from "lexical";
 
 import { $getSelectionGapCursorKey } from "./cursor-navigation";
-import { $getRootGapCursorKeys } from "./cursor-normalize";
+import { $getGapCursorKeys } from "./cursor-normalize";
 
 const GAP_CURSOR_CLASS = "block-editor__gap-cursor";
 const GAP_CURSOR_ACTIVE_CLASS = "block-editor__gap-cursor--active";
@@ -29,7 +29,7 @@ export function registerCursorDomSync(editor: LexicalEditor): () => void {
     let nextActiveKey: NodeKey | null = null;
 
     editorState.read(() => {
-      nextGapKeys = $getRootGapCursorKeys();
+      nextGapKeys = $getGapCursorKeys();
       nextActiveKey = $getSelectionGapCursorKey();
     });
 
