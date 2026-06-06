@@ -155,62 +155,62 @@ msgid "block-editor.table.row-menu"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:139
+#: src/actions/action-catalog.ts:54
 msgid "block-editor.toolbar.blockquote"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:147
+#: src/actions/action-catalog.ts:55
 msgid "block-editor.toolbar.bold"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:115
+#: src/actions/action-catalog.ts:48
 msgid "block-editor.toolbar.bullet-list"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:107
+#: src/actions/action-catalog.ts:47
 msgid "block-editor.toolbar.code-block"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:59
+#: src/actions/action-catalog.ts:41
 msgid "block-editor.toolbar.heading-1"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:67
+#: src/actions/action-catalog.ts:42
 msgid "block-editor.toolbar.heading-2"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:75
+#: src/actions/action-catalog.ts:43
 msgid "block-editor.toolbar.heading-3"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:83
+#: src/actions/action-catalog.ts:44
 msgid "block-editor.toolbar.heading-4"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:91
+#: src/actions/action-catalog.ts:45
 msgid "block-editor.toolbar.heading-5"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:99
+#: src/actions/action-catalog.ts:46
 msgid "block-editor.toolbar.heading-6"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:175
+#: src/actions/action-catalog.ts:61
 msgid "block-editor.toolbar.inline-code"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:155
+#: src/actions/action-catalog.ts:56
 msgid "block-editor.toolbar.italic"
 msgstr ""
 
@@ -220,7 +220,7 @@ msgid "block-editor.toolbar.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:183
+#: src/actions/action-catalog.ts:62
 msgid "block-editor.toolbar.link"
 msgstr ""
 
@@ -230,21 +230,21 @@ msgid "block-editor.toolbar.list"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:51
+#: src/actions/action-catalog.ts:40
 msgid "block-editor.toolbar.normal-text"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:123
+#: src/actions/action-catalog.ts:49
 msgid "block-editor.toolbar.numbered-list"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:167
+#: src/actions/action-catalog.ts:57
 msgid "block-editor.toolbar.strikethrough"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/actions/action-catalog.ts:131
+#: src/actions/action-catalog.ts:53
 msgid "block-editor.toolbar.task-list"
 msgstr ""

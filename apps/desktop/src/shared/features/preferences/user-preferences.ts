@@ -1,4 +1,4 @@
-import { BLOCK_EDITOR_SHORTCUT_DEFAULTS } from "@fluxnotes/editor/action-catalog";
+import { BLOCK_EDITOR_SHORTCUT_DEFAULTS } from "@fluxnotes/editor/action-metadata";
 import { z } from "zod";
 
 import {

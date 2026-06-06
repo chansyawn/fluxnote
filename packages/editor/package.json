@@ -18,6 +18,10 @@
       "types": "./src/actions/action-catalog.ts",
       "import": "./src/actions/action-catalog.ts"
     },
+    "./action-metadata": {
+      "types": "./src/actions/action-metadata.ts",
+      "import": "./src/actions/action-metadata.ts"
+    },
     "./locales/*/messages": {
       "types": "./src/locales/*/messages.ts",
       "import": "./src/locales/*/messages.ts"

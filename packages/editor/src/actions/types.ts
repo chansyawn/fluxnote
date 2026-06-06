@@ -3,7 +3,7 @@ import type { LucideIcon } from "@fluxnotes/ui/icons/lucide";
 import type { MessageDescriptor } from "@lingui/core";
 import type { LexicalEditor } from "lexical";
 
-import type { BlockEditorActionId } from "./action-catalog";
+import type { BlockEditorActionId } from "./action-metadata";
 
 export type { BlockEditorActionId };
 
