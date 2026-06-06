@@ -1,29 +1,4 @@
-import {
-  BoldIcon,
-  BracesIcon,
-  CheckSquareIcon,
-  Code2Icon,
-  Heading1Icon,
-  Heading2Icon,
-  Heading3Icon,
-  Heading4Icon,
-  Heading5Icon,
-  Heading6Icon,
-  ItalicIcon,
-  LinkIcon,
-  ListIcon,
-  ListOrderedIcon,
-  PilcrowIcon,
-  QuoteIcon,
-  StrikethroughIcon,
-} from "@fluxnotes/ui/icons/lucide";
-import { msg } from "@lingui/core/macro";
-import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  type TextFormatType,
-} from "lexical";
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from "lexical";
 
 import {
   isBlockFormattingDisabledAtSelection,
@@ -33,15 +8,13 @@ import {
   toggleListFormatAtSelection,
   toggleQuoteAtSelection,
   toggleTextStyleAtSelection,
-  type BlockEditorListFormat,
-  type BlockEditorTextStyleFormat,
 } from "../core/block-format";
 import {
   executeLinkActionAtSelection,
   isLinkActionDisabledAtSelection,
   isMarkdownLinkActiveAtSelection,
 } from "../syntax/link/link-action";
-import type { BlockEditorInlineFormat } from "../toolbar/types";
+import { BLOCK_EDITOR_ACTION_CATALOG, type BlockEditorActionCatalogItem } from "./action-catalog";
 import type {
   BlockEditorActionContext,
   BlockEditorActionDefinition,
@@ -49,145 +22,6 @@ import type {
   BlockEditorActionResult,
   BlockEditorActionFocus,
 } from "./types";
-
-const TEXT_STYLE_ACTIONS = [
-  {
-    format: "paragraph",
-    icon: PilcrowIcon,
-    id: "editor.paragraph",
-    label: msg({ id: "block-editor.toolbar.normal-text", message: "Normal text" }),
-  },
-  {
-    format: "heading1",
-    icon: Heading1Icon,
-    id: "editor.heading1",
-    label: msg({ id: "block-editor.toolbar.heading-1", message: "Heading 1" }),
-  },
-  {
-    format: "heading2",
-    icon: Heading2Icon,
-    id: "editor.heading2",
-    label: msg({ id: "block-editor.toolbar.heading-2", message: "Heading 2" }),
-  },
-  {
-    format: "heading3",
-    icon: Heading3Icon,
-    id: "editor.heading3",
-    label: msg({ id: "block-editor.toolbar.heading-3", message: "Heading 3" }),
-  },
-  {
-    format: "heading4",
-    icon: Heading4Icon,
-    id: "editor.heading4",
-    label: msg({ id: "block-editor.toolbar.heading-4", message: "Heading 4" }),
-  },
-  {
-    format: "heading5",
-    icon: Heading5Icon,
-    id: "editor.heading5",
-    label: msg({ id: "block-editor.toolbar.heading-5", message: "Heading 5" }),
-  },
-  {
-    format: "heading6",
-    icon: Heading6Icon,
-    id: "editor.heading6",
-    label: msg({ id: "block-editor.toolbar.heading-6", message: "Heading 6" }),
-  },
-  {
-    format: "codeBlock",
-    icon: BracesIcon,
-    id: "editor.codeBlock",
-    label: msg({ id: "block-editor.toolbar.code-block", message: "Code block" }),
-  },
-] as const satisfies readonly {
-  format: BlockEditorTextStyleFormat;
-  icon: BlockEditorActionDefinition["icon"];
-  id: BlockEditorActionId;
-  label: BlockEditorActionDefinition["label"];
-}[];
-
-const LIST_ACTIONS = [
-  {
-    format: "bulletList",
-    icon: ListIcon,
-    id: "editor.bulletList",
-    label: msg({ id: "block-editor.toolbar.bullet-list", message: "Bullet list" }),
-  },
-  {
-    format: "orderedList",
-    icon: ListOrderedIcon,
-    id: "editor.orderedList",
-    label: msg({ id: "block-editor.toolbar.numbered-list", message: "Numbered list" }),
-  },
-  {
-    format: "taskList",
-    icon: CheckSquareIcon,
-    id: "editor.taskList",
-    label: msg({ id: "block-editor.toolbar.task-list", message: "Task list" }),
-  },
-] as const satisfies readonly {
-  format: BlockEditorListFormat;
-  icon: BlockEditorActionDefinition["icon"];
-  id: BlockEditorActionId;
-  label: BlockEditorActionDefinition["label"];
-}[];
-
-const INLINE_ACTIONS = [
-  {
-    format: "bold",
-    icon: BoldIcon,
-    id: "editor.bold",
-    label: msg({ id: "block-editor.toolbar.bold", message: "Bold" }),
-    lexicalFormat: "bold",
-  },
-  {
-    format: "italic",
-    icon: ItalicIcon,
-    id: "editor.italic",
-    label: msg({ id: "block-editor.toolbar.italic", message: "Italic" }),
-    lexicalFormat: "italic",
-  },
-  {
-    format: "strikethrough",
-    icon: StrikethroughIcon,
-    id: "editor.strikethrough",
-    label: msg({ id: "block-editor.toolbar.strikethrough", message: "Strikethrough" }),
-    lexicalFormat: "strikethrough",
-  },
-  {
-    format: "inlineCode",
-    icon: Code2Icon,
-    id: "editor.inlineCode",
-    label: msg({ id: "block-editor.toolbar.inline-code", message: "Inline code" }),
-    lexicalFormat: "code",
-  },
-] as const satisfies readonly {
-  format: BlockEditorInlineFormat;
-  icon: BlockEditorActionDefinition["icon"];
-  id: BlockEditorActionId;
-  label: BlockEditorActionDefinition["label"];
-  lexicalFormat: TextFormatType;
-}[];
-
-const LINK_ACTION = {
-  icon: LinkIcon,
-  id: "editor.link",
-  label: msg({ id: "block-editor.toolbar.link", message: "Link" }),
-} as const satisfies {
-  icon: BlockEditorActionDefinition["icon"];
-  id: BlockEditorActionId;
-  label: BlockEditorActionDefinition["label"];
-};
-
-const QUOTE_ACTION = {
-  icon: QuoteIcon,
-  id: "editor.blockquote",
-  label: msg({ id: "block-editor.toolbar.blockquote", message: "Quote" }),
-} as const satisfies {
-  icon: BlockEditorActionDefinition["icon"];
-  id: BlockEditorActionId;
-  label: BlockEditorActionDefinition["label"];
-};
 
 function disabledActionResult(action: BlockEditorActionId): BlockEditorActionResult {
   return { action, status: "disabled" };
@@ -201,7 +35,7 @@ function executedActionResult(
 }
 
 function createBlockActionDefinition(
-  action: Omit<BlockEditorActionDefinition, "execute" | "isDisabled">,
+  action: Pick<BlockEditorActionDefinition, "icon" | "id" | "isActive" | "label">,
   execute: () => void,
 ): BlockEditorActionDefinition {
   return {
@@ -219,66 +53,80 @@ function createBlockActionDefinition(
   };
 }
 
-function createTextStyleActionDefinition(
-  action: (typeof TEXT_STYLE_ACTIONS)[number],
-): BlockEditorActionDefinition {
+function createTextStyleActionDefinition(action: BlockEditorActionCatalogItem) {
+  if (action.execution.kind !== "text-style") {
+    throw new Error(`Expected text-style action: ${action.id}`);
+  }
+  const { format } = action.execution;
+
   return createBlockActionDefinition(
     {
       icon: action.icon,
       id: action.id,
-      isActive: () => isTextStyleActiveAtSelection(action.format),
+      isActive: () => isTextStyleActiveAtSelection(format),
       label: action.label,
     },
     () => {
-      toggleTextStyleAtSelection(action.format);
+      toggleTextStyleAtSelection(format);
     },
   );
 }
 
-function createListActionDefinition(
-  action: (typeof LIST_ACTIONS)[number],
-): BlockEditorActionDefinition {
+function createListActionDefinition(action: BlockEditorActionCatalogItem) {
+  if (action.execution.kind !== "list-format") {
+    throw new Error(`Expected list-format action: ${action.id}`);
+  }
+  const { format } = action.execution;
+
   return createBlockActionDefinition(
     {
       icon: action.icon,
       id: action.id,
-      isActive: () => isListFormatActiveAtSelection(action.format),
+      isActive: () => isListFormatActiveAtSelection(format),
       label: action.label,
     },
     () => {
-      toggleListFormatAtSelection(action.format);
+      toggleListFormatAtSelection(format);
     },
   );
 }
 
-function createQuoteActionDefinition(): BlockEditorActionDefinition {
+function createQuoteActionDefinition(action: BlockEditorActionCatalogItem) {
+  if (action.execution.kind !== "quote") {
+    throw new Error(`Expected quote action: ${action.id}`);
+  }
+
   return createBlockActionDefinition(
     {
-      icon: QUOTE_ACTION.icon,
-      id: QUOTE_ACTION.id,
+      icon: action.icon,
+      id: action.id,
       isActive: () => isQuoteActiveAtSelection(),
-      label: QUOTE_ACTION.label,
+      label: action.label,
     },
     toggleQuoteAtSelection,
   );
 }
 
-function createInlineActionDefinition(
-  action: (typeof INLINE_ACTIONS)[number],
-): BlockEditorActionDefinition {
+function createInlineActionDefinition(action: BlockEditorActionCatalogItem) {
+  if (action.execution.kind !== "inline-format") {
+    throw new Error(`Expected inline-format action: ${action.id}`);
+  }
+  const { lexicalFormat } = action.execution;
+
   return {
     icon: action.icon,
     id: action.id,
     isActive: () => {
       const selection = $getSelection();
-      return $isRangeSelection(selection) && selection.hasFormat(action.lexicalFormat);
+      return $isRangeSelection(selection) && selection.hasFormat(lexicalFormat);
     },
     isDisabled: () => false,
     label: action.label,
-    execute: ({ editor }) => {
+    execute: (context: BlockEditorActionContext) => {
+      const { editor } = context;
       editor.update(
         () => {
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, action.lexicalFormat);
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, lexicalFormat);
         },
         { discrete: true },
       );
@@ -287,35 +135,50 @@ function createInlineActionDefinition(
   };
 }
 
-function createLinkActionDefinition(): BlockEditorActionDefinition {
+function createLinkActionDefinition(action: BlockEditorActionCatalogItem) {
+  if (action.execution.kind !== "link") {
+    throw new Error(`Expected link action: ${action.id}`);
+  }
+
   return {
-    icon: LINK_ACTION.icon,
-    id: LINK_ACTION.id,
+    icon: action.icon,
+    id: action.id,
     isActive: () => isMarkdownLinkActiveAtSelection(),
     isDisabled: () => isLinkActionDisabledAtSelection(),
-    label: LINK_ACTION.label,
-    execute: ({ editor }) => {
+    label: action.label,
+    execute: (context: BlockEditorActionContext) => {
+      const { editor } = context;
       const result = executeLinkActionAtSelection(editor);
       if (result.kind === "disabled") {
-        return disabledActionResult(LINK_ACTION.id);
+        return disabledActionResult(action.id);
       }
 
       if (result.kind === "created") {
-        return executedActionResult(LINK_ACTION.id, "managed");
+        return executedActionResult(action.id, "managed");
       }
 
-      return executedActionResult(LINK_ACTION.id);
+      return executedActionResult(action.id);
     },
   };
 }
 
-export const BLOCK_EDITOR_ACTION_DEFINITIONS = [
-  ...TEXT_STYLE_ACTIONS.map(createTextStyleActionDefinition),
-  ...LIST_ACTIONS.map(createListActionDefinition),
-  createQuoteActionDefinition(),
-  ...INLINE_ACTIONS.map(createInlineActionDefinition),
-  createLinkActionDefinition(),
-] as const;
+function createActionDefinition(action: BlockEditorActionCatalogItem): BlockEditorActionDefinition {
+  switch (action.execution.kind) {
+    case "inline-format":
+      return createInlineActionDefinition(action);
+    case "link":
+      return createLinkActionDefinition(action);
+    case "list-format":
+      return createListActionDefinition(action);
+    case "quote":
+      return createQuoteActionDefinition(action);
+    case "text-style":
+      return createTextStyleActionDefinition(action);
+  }
+}
+
+export const BLOCK_EDITOR_ACTION_DEFINITIONS =
+  BLOCK_EDITOR_ACTION_CATALOG.map(createActionDefinition);
 
 export const BLOCK_EDITOR_ACTION_IDS = BLOCK_EDITOR_ACTION_DEFINITIONS.map((action) => action.id);
 

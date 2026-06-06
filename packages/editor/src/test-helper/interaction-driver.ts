@@ -14,8 +14,8 @@ import {
 } from "lexical";
 
 import { handleBlockEditorPaste } from "../clipboard/paste";
-import type { BlockEditorRuntime } from "../core/types";
 import { $isGapCursorParagraph } from "../cursor";
+import type { BlockEditorRuntime } from "../runtime/types";
 
 interface KeyboardCommandOptions {
   altKey?: boolean;

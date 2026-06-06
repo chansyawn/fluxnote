@@ -14,10 +14,6 @@
       "types": "./src/models.ts",
       "import": "./src/models.ts"
     },
-    "./shortcuts": {
-      "types": "./src/shortcuts.ts",
-      "import": "./src/shortcuts.ts"
-    },
     "./locales/*/messages": {
       "types": "./src/locales/*/messages.ts",
       "import": "./src/locales/*/messages.ts"
@@ -30,6 +26,7 @@
     "check": "vp check"
   },
   "dependencies": {
+    "@fluxnotes/shared": "workspace:*",
     "@fluxnotes/ui": "workspace:*",
     "@lexical/clipboard": "^0.45.0",
     "@lexical/code": "^0.45.0",
@@ -47,7 +44,6 @@
     "@lexical/utils": "^0.45.0",
     "@lingui/core": "6.0.1",
     "@lingui/react": "6.0.1",
-    "@tanstack/react-hotkeys": "^0.10.0",
     "hast-util-to-html": "^9.0.5",
     "lexical": "^0.45.0",
     "mdast-util-to-hast": "^13.2.1",

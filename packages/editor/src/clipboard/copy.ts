@@ -9,10 +9,10 @@ import {
   type LexicalNode,
 } from "lexical";
 
-import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../core/types";
 import { filterGapCursorNodes } from "../cursor";
 import { normalizeExternalMarkdown } from "../markdown/external-markdown";
 import type { ClipboardSerializedNode } from "../models/clipboard";
+import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../runtime/types";
 import {
   collectClipboardAssetUrls,
   rewriteClipboardAssetsForExternalFormats,

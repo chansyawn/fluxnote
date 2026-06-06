@@ -25,10 +25,10 @@
   },
   "dependencies": {
     "@fluxnotes/editor": "workspace:*",
+    "@fluxnotes/shared": "workspace:*",
     "@fluxnotes/ui": "workspace:*",
     "@lingui/core": "6.0.1",
     "@lingui/react": "6.0.1",
-    "@tanstack/react-hotkeys": "^0.10.0",
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-router": "^1.168.10",
     "@tanstack/react-virtual": "^3.13.24",

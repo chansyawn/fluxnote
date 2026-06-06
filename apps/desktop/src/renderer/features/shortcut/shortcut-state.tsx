@@ -1,3 +1,4 @@
+import type { Hotkey } from "@fluxnotes/shared";
 import { quickCreateBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@renderer/features/shortcut/shortcut-utils";
 import { useGlobalShortcutSync } from "@renderer/features/shortcut/use-global-shortcut-sync";
 import { type ShortcutAction } from "@shared/features/preferences/user-preferences";
-import type { Hotkey } from "@tanstack/react-hotkeys";
 import { createContext, useContext, useEffectEvent, useMemo, type ReactNode } from "react";
 
 type ShortcutUpdateResult =

@@ -1,10 +1,10 @@
+import type { Hotkey } from "@fluxnotes/shared";
 import {
   formatShortcutRecorderTokens,
   formatShortcutTokens,
   normalizeShortcutRecorderHotkey,
 } from "@renderer/features/shortcut/shortcut-utils";
 import type { ShortcutAction } from "@shared/features/preferences/user-preferences";
-import type { Hotkey } from "@tanstack/react-hotkeys";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ShortcutInputError, ShortcutRecordingState } from "./shortcut-recording-types";

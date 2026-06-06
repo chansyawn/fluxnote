@@ -23,10 +23,10 @@ import {
   type LexicalNode,
 } from "lexical";
 
+import type { BlockEditorBlockFormat } from "../actions/formats";
 import { getCurrentListItem } from "../syntax/list/list-selection";
 import { unwrapListItemToBlocks } from "../syntax/list/list-structure";
 import { unwrapQuoteToBlocks } from "../syntax/quote/quote-structure";
-import type { BlockEditorBlockFormat } from "../toolbar/types";
 
 const HEADING_FORMAT_TO_TAG = {
   heading1: "h1",

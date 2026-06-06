@@ -17,7 +17,7 @@
       "types": "./src/icons/*.ts",
       "import": "./src/icons/*.ts"
     },
-    "./styles/index.css": "./src/styles/index.css"
+    "./styles/*": "./src/styles/*"
   },
   "scripts": {
     "test": "vp test",

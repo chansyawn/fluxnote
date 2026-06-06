@@ -12,7 +12,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { useLingui } from "@lingui/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { useBlockEditorRuntime } from "../../core/runtime-extension";
+import { useBlockEditorRuntime } from "../../runtime/runtime-extension";
 import {
   convertAutoLinkToMarkdownLink,
   removeMarkdownLink,

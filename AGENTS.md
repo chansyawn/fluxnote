@@ -7,7 +7,8 @@
 - Use **Vite+** as the primary toolchain.
 - This repository is a pnpm workspace monorepo managed by Vite+.
 - `apps/desktop` contains the Electron product and owns app runtime, IPC, renderer routes, and product-specific features.
-- `packages/*` contains internal shared source packages. Packages are consumed through `exports` that point to source files; they are not bundled for app consumption and are not public external APIs.
+- `packages/*` contains internal shared source packages. Packages are consumed through `exports` that point to source files; they are not bundled for app consumption and are not public external APIs. Even though consumption resolves to source files, import cross-package dependencies through normal package specifiers instead of aliases or direct source paths.
+- `packages/shared` contains domain-agnostic helpers shared across workspace packages.
 - `packages/ui` contains app-agnostic UI primitives, design tokens, styles, and icons.
 - `packages/editor` contains reusable editor functionality and can be developed independently from the desktop app.
 
@@ -66,6 +67,9 @@ apps/
           result.ts       # IpcResult + IpcError
           types.ts        # contracts aggregation + typed command/event inference
 packages/
+  shared/
+    src/
+      index.ts          # stable package export
   <package>/
     src/
     tests/

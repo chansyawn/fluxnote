@@ -1,3 +1,4 @@
+export { BLOCK_EDITOR_ACTION_CATALOG, type BlockEditorActionCatalogItem } from "./action-catalog";
 export {
   BLOCK_EDITOR_ACTION_DEFINITION_BY_ID,
   BLOCK_EDITOR_ACTION_DEFINITIONS,
@@ -7,6 +8,13 @@ export {
   isBlockEditorActionId,
 } from "./action-definitions";
 export {
+  BLOCK_EDITOR_SHORTCUT_ACTIONS,
+  BLOCK_EDITOR_SHORTCUT_DEFAULTS,
+  BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER,
+  type BlockEditorActionId,
+  type BlockEditorShortcutAction,
+} from "./shortcuts";
+export {
   blockEditorActionStatesEqual,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,
   readBlockEditorActionState,
@@ -15,7 +23,6 @@ export { resolveBlockEditorShortcut, type BlockEditorShortcutResolution } from "
 export type {
   BlockEditorActionController,
   BlockEditorActionDefinition,
-  BlockEditorActionId,
   BlockEditorActionResult,
   BlockEditorActionState,
   BlockEditorActionStateListener,

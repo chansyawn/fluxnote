@@ -1,11 +1,9 @@
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./config/vite/shared.ts";
+import { viteResolve } from "./config/vite/shared.ts";
 
 export default defineConfig({
-  resolve: {
-    alias: viteAliases,
-  },
+  resolve: viteResolve,
   test: {
     setupFiles: ["./src/test/setup.ts"],
   },

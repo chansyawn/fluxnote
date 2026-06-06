@@ -1,5 +1,5 @@
-import type { BlockEditorRuntime } from "../core/types";
-import type { ImagePayload } from "../syntax/image/image-node";
+import type { ImagePayload } from "../models/image";
+import type { BlockEditorRuntime } from "../runtime/types";
 
 const SUPPORTED_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 

@@ -1,9 +1,9 @@
+import type { ShortcutBinding } from "@fluxnotes/shared";
 import type { LucideIcon } from "@fluxnotes/ui/icons/lucide";
 import type { MessageDescriptor } from "@lingui/core";
 import type { LexicalEditor } from "lexical";
 
-import type { BlockEditorActionId } from "../shortcut-defaults";
-import type { ShortcutBinding } from "../shortcuts";
+import type { BlockEditorActionId } from "./shortcuts";
 
 export type { BlockEditorActionId };
 

@@ -1,4 +1,4 @@
-import { BLOCK_EDITOR_SHORTCUT_DEFAULTS } from "@fluxnotes/editor/shortcuts";
+import { BLOCK_EDITOR_SHORTCUT_DEFAULTS } from "@fluxnotes/editor/models";
 import { z } from "zod";
 
 import {

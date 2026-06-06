@@ -386,7 +386,7 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:156
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
 msgid "preferences.shortcuts.group.editor"
 msgstr ""
 
@@ -437,7 +437,7 @@ msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
 msgid "preferences.shortcuts.title"
 msgstr ""
 

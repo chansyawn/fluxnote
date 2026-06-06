@@ -34,7 +34,7 @@ msgid "block-editor.code.language.search"
 msgstr "搜索语言"
 
 #. js-lingui-explicit-id
-#: src/core/block-editor.tsx:103
+#: src/core/block-editor.tsx:104
 msgid "block-editor.content.label"
 msgstr "Markdown 块编辑器"
 
@@ -69,8 +69,8 @@ msgid "block-editor.link.url"
 msgstr "链接 URL"
 
 #. js-lingui-explicit-id
-#: src/core/block-editor.tsx:102
-#: src/core/block-editor.tsx:108
+#: src/core/block-editor.tsx:103
+#: src/core/block-editor.tsx:109
 msgid "block-editor.placeholder"
 msgstr "写一个区块..."
 
@@ -155,62 +155,62 @@ msgid "block-editor.table.row-menu"
 msgstr "打开行操作菜单"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:185
+#: src/actions/action-catalog.ts:54
 msgid "block-editor.toolbar.blockquote"
 msgstr "引用"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:140
+#: src/actions/action-catalog.ts:55
 msgid "block-editor.toolbar.bold"
 msgstr "加粗"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:114
+#: src/actions/action-catalog.ts:48
 msgid "block-editor.toolbar.bullet-list"
 msgstr "无序列表"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:100
+#: src/actions/action-catalog.ts:47
 msgid "block-editor.toolbar.code-block"
 msgstr "代码块"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:64
+#: src/actions/action-catalog.ts:41
 msgid "block-editor.toolbar.heading-1"
 msgstr "一级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:70
+#: src/actions/action-catalog.ts:42
 msgid "block-editor.toolbar.heading-2"
 msgstr "二级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:76
+#: src/actions/action-catalog.ts:43
 msgid "block-editor.toolbar.heading-3"
 msgstr "三级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:82
+#: src/actions/action-catalog.ts:44
 msgid "block-editor.toolbar.heading-4"
 msgstr "四级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:88
+#: src/actions/action-catalog.ts:45
 msgid "block-editor.toolbar.heading-5"
 msgstr "五级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:94
+#: src/actions/action-catalog.ts:46
 msgid "block-editor.toolbar.heading-6"
 msgstr "六级标题"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:161
+#: src/actions/action-catalog.ts:61
 msgid "block-editor.toolbar.inline-code"
 msgstr "行内代码"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:147
+#: src/actions/action-catalog.ts:56
 msgid "block-editor.toolbar.italic"
 msgstr "斜体"
 
@@ -220,7 +220,7 @@ msgid "block-editor.toolbar.label"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:175
+#: src/actions/action-catalog.ts:62
 msgid "block-editor.toolbar.link"
 msgstr "链接"
 
@@ -230,21 +230,21 @@ msgid "block-editor.toolbar.list"
 msgstr "列表"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:58
+#: src/actions/action-catalog.ts:40
 msgid "block-editor.toolbar.normal-text"
 msgstr "正文"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:120
+#: src/actions/action-catalog.ts:49
 msgid "block-editor.toolbar.numbered-list"
 msgstr "有序列表"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:154
+#: src/actions/action-catalog.ts:57
 msgid "block-editor.toolbar.strikethrough"
 msgstr "删除线"
 
 #. js-lingui-explicit-id
-#: src/actions/action-definitions.ts:126
+#: src/actions/action-catalog.ts:53
 msgid "block-editor.toolbar.task-list"
 msgstr "任务列表"

@@ -1,6 +1,6 @@
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./shared.ts";
+import { viteResolve } from "./shared.ts";
 
 export default defineConfig({
   build: {
@@ -14,9 +14,7 @@ export default defineConfig({
     ssr: "src/cli/index.ts",
     target: "node20",
   },
-  resolve: {
-    alias: viteAliases,
-  },
+  resolve: viteResolve,
   ssr: {
     noExternal: true,
   },

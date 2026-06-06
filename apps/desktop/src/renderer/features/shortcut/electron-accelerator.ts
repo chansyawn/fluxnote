@@ -1,4 +1,4 @@
-import type { Hotkey } from "@tanstack/react-hotkeys";
+import type { Hotkey } from "@fluxnotes/shared";
 
 const ELECTRON_ACCELERATOR_TOKENS: Record<string, string> = {
   ArrowDown: "Down",

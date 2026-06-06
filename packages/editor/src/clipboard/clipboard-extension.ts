@@ -1,7 +1,7 @@
 import { defineExtension } from "lexical";
 import { COMMAND_PRIORITY_CRITICAL, COPY_COMMAND, PASTE_COMMAND } from "lexical";
 
-import { BlockEditorRuntimeExtension } from "../core/runtime-extension";
+import { BlockEditorRuntimeExtension } from "../runtime/runtime-extension";
 import { createClipboardDataFromCurrentSelection } from "./copy";
 import { handleBlockEditorPaste } from "./paste";
 import { cloneCurrentSelection } from "./rich-text-paste";

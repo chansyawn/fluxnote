@@ -5,7 +5,7 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
-import { viteAliases } from "./shared.ts";
+import { viteResolve } from "./shared.ts";
 
 export default defineConfig({
   server: {
@@ -26,8 +26,5 @@ export default defineConfig({
     react(),
     lingui(),
   ],
-  resolve: {
-    alias: viteAliases,
-    preserveSymlinks: false,
-  },
+  resolve: viteResolve,
 });

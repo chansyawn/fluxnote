@@ -386,7 +386,7 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:156
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
 
@@ -437,7 +437,7 @@ msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:170
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 

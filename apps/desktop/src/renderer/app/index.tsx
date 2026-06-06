@@ -1,3 +1,4 @@
+import { HotkeysProvider } from "@fluxnotes/shared";
 import { Toaster } from "@fluxnotes/ui/components/sonner";
 import { TooltipProvider } from "@fluxnotes/ui/components/tooltip";
 import { DirectionStateProvider } from "@renderer/app/direction";
@@ -12,7 +13,6 @@ import { PreferencesSync } from "@renderer/features/preferences/preferences-quer
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
 import { GlobalTelemetryErrorListener, TelemetryProvider } from "@renderer/features/telemetry";
 import { routeTree } from "@renderer/route-tree.gen";
-import { HotkeysProvider } from "@tanstack/react-hotkeys";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createMemoryHistory, createRouter } from "@tanstack/react-router";
 

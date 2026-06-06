@@ -2,9 +2,9 @@ import { toHtml } from "hast-util-to-html";
 import { type SerializedEditorState } from "lexical";
 import { toHast } from "mdast-util-to-hast";
 
-import { createHeadlessMarkdownEditor } from "../core/headless-markdown-editor";
-import { exportLexicalToMdast } from "../core/lexical-mdast";
-import { exportEditorStateToMarkdown } from "../core/markdown-editor-io";
+import { createHeadlessMarkdownEditor } from "../document/headless-markdown-editor";
+import { exportLexicalToMdast } from "../document/lexical-mdast";
+import { exportEditorStateToMarkdown } from "../document/markdown-editor-io";
 import type { ClipboardSerializedNode } from "../models/clipboard";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];

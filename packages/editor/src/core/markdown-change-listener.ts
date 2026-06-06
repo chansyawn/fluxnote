@@ -1,6 +1,6 @@
 import type { LexicalEditor } from "lexical";
 
-import { exportEditorStateToMarkdown } from "./markdown-editor-io";
+import { exportEditorStateToMarkdown } from "../document/markdown-editor-io";
 
 const DEBOUNCE_MS = 600;
 
