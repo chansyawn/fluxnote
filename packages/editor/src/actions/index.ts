@@ -8,12 +8,12 @@ export {
   isBlockEditorActionId,
 } from "./action-definitions";
 export {
-  BLOCK_EDITOR_ACTION_METADATA,
+  BLOCK_EDITOR_SHORTCUT_ACTIONS,
   BLOCK_EDITOR_SHORTCUT_DEFAULTS,
   BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER,
   type BlockEditorActionId,
-  type BlockEditorActionMetadataItem,
-} from "./action-metadata";
+  type BlockEditorShortcutAction,
+} from "./shortcuts";
 export {
   blockEditorActionStatesEqual,
   DEFAULT_BLOCK_EDITOR_ACTION_STATE,

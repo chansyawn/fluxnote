@@ -1,6 +1,6 @@
 import { keyboardEventMatchesShortcut } from "@fluxnotes/shared/shortcuts";
 
-import { BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER } from "./action-metadata";
+import { BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER } from "./shortcuts";
 import type { BlockEditorActionId, BlockEditorShortcutConfig } from "./types";
 
 const LEXICAL_DEFAULT_TEXT_FORMAT_SHORTCUTS = {

@@ -22,12 +22,12 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 
 import {
-  BLOCK_EDITOR_ACTION_METADATA,
+  BLOCK_EDITOR_SHORTCUT_ACTIONS,
   BLOCK_EDITOR_SHORTCUT_DEFAULTS,
   BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER,
   type BlockEditorActionExecution,
   type BlockEditorActionId,
-} from "./action-metadata";
+} from "./shortcuts";
 
 interface BlockEditorActionCatalogEntry {
   execution: BlockEditorActionExecution;
@@ -82,7 +82,7 @@ const blockEditorActionIcons = {
   "editor.link": LinkIcon,
 } as const satisfies Record<BlockEditorActionId, LucideIcon>;
 
-export const BLOCK_EDITOR_ACTION_CATALOG = BLOCK_EDITOR_ACTION_METADATA.map((action) => ({
+export const BLOCK_EDITOR_ACTION_CATALOG = BLOCK_EDITOR_SHORTCUT_ACTIONS.map((action) => ({
   execution: action.execution,
   icon: blockEditorActionIcons[action.id],
   id: action.id,

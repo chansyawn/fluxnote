@@ -11,14 +11,14 @@ export type BlockEditorActionExecution =
   | { kind: "quote" }
   | { kind: "text-style"; format: BlockEditorTextStyleFormat };
 
-interface BlockEditorActionMetadataEntry {
+interface BlockEditorShortcutEntry {
   defaultShortcut: Hotkey;
   execution: BlockEditorActionExecution;
   id: string;
   shortcutResolutionRank: number;
 }
 
-export const BLOCK_EDITOR_ACTION_METADATA = [
+export const BLOCK_EDITOR_SHORTCUT_ACTIONS = [
   {
     defaultShortcut: "Mod+Alt+0",
     execution: { kind: "text-style", format: "paragraph" },
@@ -125,15 +125,15 @@ export const BLOCK_EDITOR_ACTION_METADATA = [
     id: "editor.link",
     shortcutResolutionRank: 170,
   },
-] as const satisfies readonly BlockEditorActionMetadataEntry[];
+] as const satisfies readonly BlockEditorShortcutEntry[];
 
-export type BlockEditorActionMetadataItem = (typeof BLOCK_EDITOR_ACTION_METADATA)[number];
-export type BlockEditorActionId = BlockEditorActionMetadataItem["id"];
+export type BlockEditorShortcutAction = (typeof BLOCK_EDITOR_SHORTCUT_ACTIONS)[number];
+export type BlockEditorActionId = BlockEditorShortcutAction["id"];
 
 export const BLOCK_EDITOR_SHORTCUT_DEFAULTS = Object.fromEntries(
-  BLOCK_EDITOR_ACTION_METADATA.map((action) => [action.id, action.defaultShortcut]),
+  BLOCK_EDITOR_SHORTCUT_ACTIONS.map((action) => [action.id, action.defaultShortcut]),
 ) as Record<BlockEditorActionId, Hotkey>;
 
-export const BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER = BLOCK_EDITOR_ACTION_METADATA.toSorted(
+export const BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER = BLOCK_EDITOR_SHORTCUT_ACTIONS.toSorted(
   (left, right) => left.shortcutResolutionRank - right.shortcutResolutionRank,
 ).map((action) => action.id) as BlockEditorActionId[];
