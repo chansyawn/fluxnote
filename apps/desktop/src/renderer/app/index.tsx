@@ -1,4 +1,4 @@
-import { HotkeysProvider } from "@fluxnotes/shared/shortcuts";
+import { HotkeysProvider } from "@fluxnotes/shared";
 import { Toaster } from "@fluxnotes/ui/components/sonner";
 import { TooltipProvider } from "@fluxnotes/ui/components/tooltip";
 import { DirectionStateProvider } from "@renderer/app/direction";

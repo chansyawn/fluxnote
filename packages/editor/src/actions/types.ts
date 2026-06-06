@@ -1,4 +1,4 @@
-import type { ShortcutBinding } from "@fluxnotes/shared/shortcuts";
+import type { ShortcutBinding } from "@fluxnotes/shared";
 import type { LucideIcon } from "@fluxnotes/ui/icons/lucide";
 import type { MessageDescriptor } from "@lingui/core";
 import type { LexicalEditor } from "lexical";

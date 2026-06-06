@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { UseHotkeyDefinition, UseHotkeyOptions } from "@fluxnotes/shared/shortcuts";
+import type { UseHotkeyDefinition, UseHotkeyOptions } from "@fluxnotes/shared";
 import type { ExternalEditSession } from "@renderer/clients";
 import type { WorkspaceBlockActions } from "@renderer/routes/_workspace/-features/actions/workspace-block-actions";
 import type { WorkspaceBlockState } from "@renderer/routes/_workspace/-features/workspace-state-context";
@@ -41,8 +41,8 @@ vi.mock("@renderer/features/shortcut/shortcut-state", () => ({
   }),
 }));
 
-vi.mock("@fluxnotes/shared/shortcuts", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@fluxnotes/shared/shortcuts")>();
+vi.mock("@fluxnotes/shared", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@fluxnotes/shared")>();
   return {
     ...actual,
     useHotkeys: mocks.useHotkeys,

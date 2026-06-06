@@ -1,8 +1,4 @@
-import {
-  useHotkeys,
-  type UseHotkeyDefinition,
-  type UseHotkeyOptions,
-} from "@fluxnotes/shared/shortcuts";
+import { useHotkeys, type UseHotkeyDefinition, type UseHotkeyOptions } from "@fluxnotes/shared";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import {
   keyboardEventMatchesShortcut,

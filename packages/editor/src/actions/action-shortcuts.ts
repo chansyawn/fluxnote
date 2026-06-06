@@ -1,4 +1,4 @@
-import { keyboardEventMatchesShortcut } from "@fluxnotes/shared/shortcuts";
+import { keyboardEventMatchesShortcut } from "@fluxnotes/shared";
 
 import { BLOCK_EDITOR_SHORTCUT_RESOLUTION_ORDER } from "./shortcuts";
 import type { BlockEditorActionId, BlockEditorShortcutConfig } from "./types";

@@ -1,4 +1,4 @@
-import type { Hotkey } from "@fluxnotes/shared/shortcuts";
+import type { Hotkey } from "@fluxnotes/shared";
 import { quickCreateBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {

@@ -1,4 +1,4 @@
-import { formatShortcutTokens, type ShortcutBinding } from "@fluxnotes/shared/shortcuts";
+import { formatShortcutTokens, type ShortcutBinding } from "@fluxnotes/shared";
 import { DropdownMenuItem, DropdownMenuRadioItem } from "@fluxnotes/ui/components/dropdown-menu";
 import { Kbd, KbdGroup } from "@fluxnotes/ui/components/kbd";
 import { cn } from "@fluxnotes/ui/lib/utils";

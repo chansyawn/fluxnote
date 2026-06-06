@@ -1,4 +1,4 @@
-import { formatShortcutTokens } from "@fluxnotes/shared/shortcuts";
+import { formatShortcutTokens } from "@fluxnotes/shared";
 import { Button } from "@fluxnotes/ui/components/button";
 import { ButtonGroup, ButtonGroupSeparator } from "@fluxnotes/ui/components/button-group";
 import {

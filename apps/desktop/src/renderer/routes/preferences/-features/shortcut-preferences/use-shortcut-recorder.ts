@@ -1,4 +1,4 @@
-import type { Hotkey } from "@fluxnotes/shared/shortcuts";
+import type { Hotkey } from "@fluxnotes/shared";
 import {
   formatShortcutRecorderTokens,
   formatShortcutTokens,

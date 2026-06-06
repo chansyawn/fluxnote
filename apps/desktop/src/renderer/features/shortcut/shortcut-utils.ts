@@ -7,7 +7,7 @@ import {
   shortcutHasModifier,
   type ShortcutBinding,
   type ShortcutPlatform,
-} from "@fluxnotes/shared/shortcuts";
+} from "@fluxnotes/shared";
 import {
   shortcutActionSchema,
   type ShortcutAction,
