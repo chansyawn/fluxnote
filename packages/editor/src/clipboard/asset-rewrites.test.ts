@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import type { ClipboardSerializedNode } from "../models/clipboard";
 import {
   rewriteClipboardAssetsForExternalFormats,
   rewriteHtmlFileImageSources,
   rewriteMarkdownFileImageSources,
 } from "./asset-rewrites";
+import type { ClipboardSerializedNode } from "./clipboard-serialized-node";
 
 describe("clipboard assets", () => {
   it("rewrites copied image assets for external formats", () => {

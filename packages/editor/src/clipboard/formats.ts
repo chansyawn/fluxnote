@@ -5,7 +5,7 @@ import { toHast } from "mdast-util-to-hast";
 import { createHeadlessMarkdownEditor } from "../document/headless-markdown-editor";
 import { exportLexicalToMdast } from "../document/lexical-mdast";
 import { exportEditorStateToMarkdown } from "../document/markdown-editor-io";
-import type { ClipboardSerializedNode } from "../models/clipboard";
+import type { ClipboardSerializedNode } from "./clipboard-serialized-node";
 
 type ClipboardSerializedRoot = SerializedEditorState<ClipboardSerializedNode>["root"];
 

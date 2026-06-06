@@ -9,7 +9,7 @@ import { registerImageSelectionCommands } from "./image-selection-commands";
 import { IMAGE } from "./image-shortcut";
 
 export { $createImageNode, $isImageNode, ImageNode, type SerializedImageNode } from "./image-node";
-export type { ImagePayload } from "../../models/image";
+export type { ImagePayload } from "../../assets/image-payload";
 export { imageFromLexical, imageToLexical } from "./lexical";
 export { IMAGE } from "./image-shortcut";
 
