@@ -8,6 +8,7 @@ import {
   readMarkdown,
 } from "../test-helper/editor-driver";
 import { pasteIntoEditor, selectText, TestDataTransfer } from "../test-helper/interaction-driver";
+import { createClipboardDataFromDocument } from "./copy";
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./paste";
 
 describe("clipboard paste", () => {
@@ -65,6 +66,66 @@ describe("clipboard paste", () => {
 
     await vi.waitFor(() => {
       expect(readMarkdown(editor).trim()).toBe("# HTML");
+    });
+  });
+
+  it("pastes editor clipboard lists through markdown to preserve nested structure", async () => {
+    const source = editorFromMarkdown(
+      ["- Unordered item", "", "- Nested group", "", "  - Nested item A", "  - Nested item B"].join(
+        "\n",
+      ),
+    );
+    const target = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime();
+    const data = await createClipboardDataFromDocument(source, runtime.assets.resolve);
+
+    expect(data?.html).toContain('data-fluxnotes-clipboard="v1"');
+    expect(
+      pasteIntoEditor(
+        target,
+        runtime,
+        new Map([
+          ["text/html", data?.html ?? ""],
+          ["text/plain", data?.text ?? ""],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      const markdown = readMarkdown(target);
+      expect(markdown).toContain("- Unordered item");
+      expect(markdown).toContain("- Nested group");
+      expect(markdown).toContain("  - Nested item A");
+      expect(markdown).toContain("  - Nested item B");
+      expect(markdown).not.toContain("\n- \n");
+    });
+  });
+
+  it("pastes editor clipboard lists with a nested list under the first item", async () => {
+    const source = editorFromMarkdown(
+      ["- Nested group", "", "  - Nested item A", "  - Nested item B"].join("\n"),
+    );
+    const target = editorFromMarkdown("");
+    const runtime = createBlockEditorRuntime();
+    const data = await createClipboardDataFromDocument(source, runtime.assets.resolve);
+
+    expect(
+      pasteIntoEditor(
+        target,
+        runtime,
+        new Map([
+          ["text/html", data?.html ?? ""],
+          ["text/plain", data?.text ?? ""],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      const markdown = readMarkdown(target);
+      expect(markdown).toContain("- Nested group");
+      expect(markdown).toContain("  - Nested item A");
+      expect(markdown).toContain("  - Nested item B");
+      expect(markdown).not.toContain("\nNested group");
     });
   });
 

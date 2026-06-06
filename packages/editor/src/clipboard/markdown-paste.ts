@@ -1,5 +1,7 @@
 import { $isCodeNode } from "@lexical/code";
+import { $isTableCellNode } from "@lexical/table";
 import {
+  $findMatchingParent,
   $getRoot,
   $getSelection,
   $isNodeSelection,
@@ -24,6 +26,11 @@ function isInsideCodeBlock(selection: BaseSelection | null): boolean {
     if ($isCodeNode(node)) return true;
   }
   return false;
+}
+
+function isInsideTableCell(selection: BaseSelection | null): boolean {
+  if (!$isRangeSelection(selection)) return false;
+  return $isTableCellNode($findMatchingParent(selection.anchor.getNode(), $isTableCellNode));
 }
 
 export function insertMarkdownAtSelection(
@@ -57,12 +64,11 @@ export function insertMarkdownAtSelection(
       }
 
       if ($isRangeSelection(currentSelection) || $isNodeSelection(currentSelection)) {
-        if (
+        if ($isRangeSelection(currentSelection) && isInsideTableCell(currentSelection)) {
           editor.dispatchCommand(SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, {
             nodes,
             selection: currentSelection,
-          })
-        ) {
+          });
           return;
         }
 

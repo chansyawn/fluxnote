@@ -18,6 +18,7 @@ import {
 } from "./asset-rewrites";
 import type { ClipboardSerializedNode } from "./clipboard-serialized-node";
 import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./formats";
+import { markInternalClipboardHtml } from "./internal-clipboard-html";
 
 type ResolveAssets = BlockEditorRuntime["assets"]["resolve"];
 type ResolveAssetResult = Awaited<ReturnType<ResolveAssets>>;
@@ -163,7 +164,9 @@ export async function createClipboardDataFromSnapshot(
       : snapshot.nodes;
 
   return {
-    html: snapshot.assetUrls.length > 0 ? exportClipboardNodesToHtml(externalNodes) : snapshot.html,
+    html: markInternalClipboardHtml(
+      snapshot.assetUrls.length > 0 ? exportClipboardNodesToHtml(externalNodes) : snapshot.html,
+    ),
     ...(imageFileUrl ? { imageFileUrl } : {}),
     text: normalizeExternalMarkdown(
       snapshot.assetUrls.length > 0

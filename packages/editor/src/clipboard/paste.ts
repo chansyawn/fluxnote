@@ -6,6 +6,7 @@ import { getSupportedImageFiles } from "../assets/image-files";
 import type { BlockEditorRuntime } from "../runtime/types";
 import { insertImageFilesAtSelection } from "../syntax/image/image-insert";
 import { rewriteHtmlFileImageSources, rewriteMarkdownFileImageSources } from "./asset-rewrites";
+import { isInternalClipboardHtml } from "./internal-clipboard-html";
 import { insertMarkdownAtSelection } from "./markdown-paste";
 import { insertRichTextDataAtSelection } from "./rich-text-paste";
 
@@ -142,6 +143,21 @@ export function handleBlockEditorPaste(
   if (clipboardDataSnapshot.files.length > 0) {
     claimPaste(event);
     void insertImageFilesAtSelection(editor, runtime, clipboardDataSnapshot.files, selection);
+    return true;
+  }
+
+  if (
+    clipboardDataSnapshot.html &&
+    clipboardDataSnapshot.plainText &&
+    isInternalClipboardHtml(clipboardDataSnapshot.html)
+  ) {
+    claimPaste(event);
+    void insertPlainTextClipboardDataAtSelection(
+      editor,
+      runtime,
+      clipboardDataSnapshot.plainText,
+      selection,
+    );
     return true;
   }
 
