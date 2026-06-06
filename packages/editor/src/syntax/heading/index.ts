@@ -2,6 +2,8 @@ import { HEADING } from "@lexical/markdown";
 import { RichTextExtension } from "@lexical/rich-text";
 import { defineExtension } from "lexical";
 
+import { registerHeadingKeyboardCommands } from "./heading-commands";
+
 export {
   depthToHeadingTag,
   headingFromLexical,
@@ -23,5 +25,8 @@ export const HEADING_SYNTAX_EXTENSION = defineExtension({
       h5: "block-editor__heading block-editor__heading--h5",
       h6: "block-editor__heading block-editor__heading--h6",
     },
+  },
+  register(editor) {
+    return registerHeadingKeyboardCommands(editor);
   },
 });
