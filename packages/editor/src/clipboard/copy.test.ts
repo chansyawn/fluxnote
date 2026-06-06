@@ -1,25 +1,84 @@
+import { LexicalBuilder } from "@lexical/extension";
 import {
   $createNodeSelection,
   $createParagraphNode,
   $getRoot,
   $getSelection,
   $setSelection,
+  COPY_COMMAND,
+  configExtension,
+  type LexicalEditor,
 } from "lexical";
-import { describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
+import { createBlockEditorCoreExtension } from "../core/block-editor-core-extension";
+import { importMarkdownToEditor } from "../document/markdown-editor-io";
+import { BlockEditorRuntimeExtension } from "../runtime/runtime-extension";
 import { $createImageNode } from "../syntax/image";
 import {
   createBlockEditorRuntime,
   editorFromMarkdown,
   editorFromMdast,
 } from "../test-helper/editor-driver";
+import { selectTextRange } from "../test-helper/interaction-driver";
 import { doc, p, t } from "../test-helper/mdast-builders";
+import { ClipboardExtension } from "./clipboard-extension";
 import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
   createClipboardSnapshotFromDocument,
   createClipboardSnapshotFromSelection,
 } from "./copy";
+
+class TestClipboardEvent extends Event {
+  readonly clipboardData: CopyDataTransfer | null;
+
+  constructor(dataTransfer: CopyDataTransfer | null) {
+    super("copy");
+    this.clipboardData = dataTransfer;
+  }
+}
+
+class CopyDataTransfer {
+  readonly data = new Map<string, string>();
+
+  setData(type: string, value: string): void {
+    this.data.set(type, value);
+  }
+}
+
+function createCopyEvent(dataTransfer = new CopyDataTransfer()): ClipboardEvent {
+  return new TestClipboardEvent(dataTransfer) as unknown as ClipboardEvent;
+}
+
+function createClipboardEditor(runtime = createBlockEditorRuntime()) {
+  const editor = LexicalBuilder.fromExtensions([
+    createBlockEditorCoreExtension(),
+    configExtension(BlockEditorRuntimeExtension, { runtime }),
+    ClipboardExtension,
+  ]).buildEditor();
+
+  return { editor, runtime };
+}
+
+function dispatchCopy(editor: LexicalEditor, event: ClipboardEvent) {
+  let handled = false;
+  editor.update(
+    () => {
+      handled = editor.dispatchCommand(COPY_COMMAND, event);
+    },
+    { discrete: true },
+  );
+  return handled;
+}
+
+async function waitForClipboardWrite(): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("clipboard copy", () => {
   it("returns null for collapsed selections", () => {
@@ -33,6 +92,108 @@ describe("clipboard copy", () => {
     });
 
     expect(snapshot).toBeNull();
+  });
+
+  it("writes selected clipboard data synchronously during copy events", async () => {
+    vi.stubGlobal("ClipboardEvent", TestClipboardEvent);
+    const { editor, runtime } = createClipboardEditor();
+    const dataTransfer = new CopyDataTransfer();
+    const event = createCopyEvent(dataTransfer);
+    const preventDefault = vi.spyOn(event, "preventDefault");
+
+    importMarkdownToEditor(editor, "Hello");
+    selectTextRange(editor, "Hello", 0, 5);
+
+    const handled = dispatchCopy(editor, event);
+    await waitForClipboardWrite();
+
+    expect(handled).toBe(true);
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(dataTransfer.data.get("text/plain")?.trim()).toBe("Hello");
+    expect(dataTransfer.data.get("text/html")).toContain("Hello");
+    expect(runtime.clipboard.write).toHaveBeenCalledOnce();
+  });
+
+  it("keeps synchronous copy data when enhanced clipboard writes fail", async () => {
+    vi.stubGlobal("ClipboardEvent", TestClipboardEvent);
+    const runtime = createBlockEditorRuntime({
+      clipboard: {
+        write: vi.fn(async () => {
+          throw new Error("Clipboard write failed.");
+        }),
+      },
+    });
+    const { editor } = createClipboardEditor(runtime);
+    const dataTransfer = new CopyDataTransfer();
+
+    importMarkdownToEditor(editor, "Hello");
+    selectTextRange(editor, "Hello", 0, 5);
+
+    const handled = dispatchCopy(editor, createCopyEvent(dataTransfer));
+    await waitForClipboardWrite();
+
+    expect(handled).toBe(true);
+    expect(dataTransfer.data.get("text/plain")?.trim()).toBe("Hello");
+    expect(runtime.clipboard.write).toHaveBeenCalledOnce();
+  });
+
+  it("does not run enhanced copy without selected content", async () => {
+    vi.stubGlobal("ClipboardEvent", TestClipboardEvent);
+    const { editor, runtime } = createClipboardEditor();
+    const dataTransfer = new CopyDataTransfer();
+    const event = createCopyEvent(dataTransfer);
+
+    dispatchCopy(editor, event);
+    await waitForClipboardWrite();
+
+    expect(dataTransfer.data.size).toBe(0);
+    expect(runtime.clipboard.write).not.toHaveBeenCalled();
+  });
+
+  it("preserves enhanced selected image clipboard writes", async () => {
+    vi.stubGlobal("ClipboardEvent", TestClipboardEvent);
+    const runtime = createBlockEditorRuntime({
+      assets: {
+        resolve: vi.fn(async () => ({
+          assets: [
+            {
+              assetUrl: "assets://block/photo.png",
+              fileUrl: "file:///tmp/photo.png",
+            },
+          ],
+        })),
+      },
+    });
+    const { editor } = createClipboardEditor(runtime);
+    const dataTransfer = new CopyDataTransfer();
+
+    editor.update(
+      () => {
+        const imageNode = $createImageNode({
+          alt: "Photo",
+          src: "assets://block/photo.png",
+          title: null,
+        });
+        $getRoot().clear().append($createParagraphNode().append(imageNode));
+
+        const selection = $createNodeSelection();
+        selection.add(imageNode.getKey());
+        $setSelection(selection);
+      },
+      { discrete: true },
+    );
+
+    const handled = dispatchCopy(editor, createCopyEvent(dataTransfer));
+    await waitForClipboardWrite();
+
+    expect(handled).toBe(true);
+    expect(dataTransfer.data.get("text/plain")).toContain("assets://block/photo.png");
+    expect(runtime.clipboard.write).toHaveBeenCalledWith(
+      expect.objectContaining({
+        imageFileUrl: "file:///tmp/photo.png",
+        text: expect.stringContaining("file:///tmp/photo.png"),
+      }),
+    );
   });
 
   it("exports selected image metadata for native image clipboard writes", () => {

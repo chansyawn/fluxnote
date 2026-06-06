@@ -111,6 +111,31 @@ export function createClipboardSnapshotFromDocument(): ClipboardCopySnapshot | n
   return createClipboardCopySnapshot($getRoot().getChildren().map(serializeClipboardNode), null);
 }
 
+export function createClipboardSnapshotFromCurrentSelection(
+  editor: LexicalEditor,
+): ClipboardCopySnapshot | null {
+  return withDOM(() =>
+    editor.read(() => {
+      const selection = $getSelection();
+      if (selection === null) {
+        return null;
+      }
+
+      return createClipboardSnapshotFromSelection(editor, selection, {
+        includeImageFileUrl: true,
+      });
+    }),
+  );
+}
+
+export function writeClipboardSnapshotToDataTransfer(
+  dataTransfer: Pick<DataTransfer, "setData">,
+  snapshot: ClipboardCopySnapshot,
+): void {
+  dataTransfer.setData("text/html", snapshot.html);
+  dataTransfer.setData("text/plain", normalizeExternalMarkdown(snapshot.markdown));
+}
+
 function createAssetUrlMap(result: ResolveAssetResult): Map<string, string> {
   return new Map(result.assets.map((asset) => [asset.assetUrl, asset.fileUrl]));
 }
@@ -126,7 +151,7 @@ async function resolveClipboardAssetUrls(
   return createAssetUrlMap(resolvedAssets);
 }
 
-async function createClipboardDataFromSnapshot(
+export async function createClipboardDataFromSnapshot(
   snapshot: ClipboardCopySnapshot,
   resolveAssets: ResolveAssets,
 ): Promise<BlockEditorClipboardWriteData> {
@@ -152,18 +177,7 @@ export async function createClipboardDataFromCurrentSelection(
   editor: LexicalEditor,
   resolveAssets: ResolveAssets,
 ): Promise<BlockEditorClipboardWriteData | null> {
-  const snapshot = withDOM(() =>
-    editor.read(() => {
-      const selection = $getSelection();
-      if (selection === null) {
-        return null;
-      }
-
-      return createClipboardSnapshotFromSelection(editor, selection, {
-        includeImageFileUrl: true,
-      });
-    }),
-  );
+  const snapshot = createClipboardSnapshotFromCurrentSelection(editor);
 
   return snapshot ? await createClipboardDataFromSnapshot(snapshot, resolveAssets) : null;
 }
