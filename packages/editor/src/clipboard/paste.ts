@@ -1,6 +1,12 @@
-import { $isCodeNode } from "@lexical/code";
-import type { BaseSelection, LexicalEditor, PasteCommandType } from "lexical";
-import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
+import { $isCodeNode, type CodeNode } from "@lexical/code";
+import type {
+  BaseSelection,
+  LexicalEditor,
+  LexicalNode,
+  PasteCommandType,
+  PointType,
+} from "lexical";
+import { $createTextNode, $getSelection, $isRangeSelection, $setSelection } from "lexical";
 
 import { getSupportedImageFiles } from "../assets/image-files";
 import type { BlockEditorRuntime } from "../runtime/types";
@@ -43,33 +49,95 @@ function claimPaste(event: PasteCommandType): void {
   event.stopPropagation();
 }
 
-function selectionIsInsideCodeBlock(selection: BaseSelection | null): boolean {
-  if (!$isRangeSelection(selection)) return false;
-
-  let node: ReturnType<typeof selection.anchor.getNode> | null = selection.anchor.getNode();
-  while (node) {
-    if ($isCodeNode(node)) return true;
-    node = node.getParent();
+function getNearestCodeNode(node: LexicalNode): CodeNode | null {
+  let current: LexicalNode | null = node;
+  while (current) {
+    if ($isCodeNode(current)) return current;
+    current = current.getParent();
   }
-
-  return false;
+  return null;
 }
 
-function insertRawClipboardTextAtSelection(
+function selectionIsInsideCodeBlock(selection: BaseSelection | null): boolean {
+  if (!$isRangeSelection(selection)) return false;
+  return getNearestCodeNode(selection.anchor.getNode()) !== null;
+}
+
+function getOffsetBeforeNode(node: LexicalNode, boundary: CodeNode): number {
+  let offset = 0;
+  let current: LexicalNode | null = node;
+
+  while (current && !current.is(boundary)) {
+    for (const sibling of current.getPreviousSiblings()) {
+      offset += sibling.getTextContentSize();
+    }
+    current = current.getParent();
+  }
+
+  return offset;
+}
+
+function getCodePointOffset(point: PointType, codeNode: CodeNode): number | null {
+  const node = point.getNode();
+  if (!getNearestCodeNode(node)?.is(codeNode)) {
+    return null;
+  }
+
+  if (point.type === "text") {
+    return getOffsetBeforeNode(node, codeNode) + point.offset;
+  }
+
+  if (node.is(codeNode)) {
+    return point.offset === 0 ? 0 : codeNode.getTextContentSize();
+  }
+
+  return getOffsetBeforeNode(node, codeNode);
+}
+
+function insertPlainTextInsideCodeBlock(
   editor: LexicalEditor,
   plainText: string,
   selection: BaseSelection | null,
-): void {
+): boolean {
+  let handled = false;
   editor.update(() => {
     if (selection) {
       $setSelection(selection.clone());
     }
 
     const currentSelection = $getSelection();
-    if ($isRangeSelection(currentSelection)) {
-      currentSelection.insertRawText(plainText);
+    if (!$isRangeSelection(currentSelection)) {
+      return;
     }
+
+    const codeNode = getNearestCodeNode(currentSelection.anchor.getNode());
+    if (!codeNode) {
+      return;
+    }
+
+    const anchorOffset = getCodePointOffset(currentSelection.anchor, codeNode);
+    const focusOffset = getCodePointOffset(currentSelection.focus, codeNode);
+    if (anchorOffset === null || focusOffset === null) {
+      return;
+    }
+
+    const startOffset = Math.min(anchorOffset, focusOffset);
+    const endOffset = Math.max(anchorOffset, focusOffset);
+    const codeText = codeNode.getTextContent();
+    const nextText = `${codeText.slice(0, startOffset)}${plainText}${codeText.slice(endOffset)}`;
+    const caretOffset = startOffset + plainText.length;
+
+    codeNode.clear();
+    if (nextText.length === 0) {
+      codeNode.select(0, 0);
+    } else {
+      const textNode = $createTextNode(nextText);
+      codeNode.append(textNode);
+      textNode.select(caretOffset, caretOffset);
+    }
+    handled = true;
   });
+  return handled;
 }
 
 function handleCodeBlockPaste(
@@ -85,7 +153,7 @@ function handleCodeBlockPaste(
 
   claimPaste(event);
   if (clipboardData.plainText) {
-    insertRawClipboardTextAtSelection(editor, clipboardData.plainText, selection);
+    insertPlainTextInsideCodeBlock(editor, clipboardData.plainText, selection);
   }
   return true;
 }

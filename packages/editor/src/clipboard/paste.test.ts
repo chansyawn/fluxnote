@@ -1,4 +1,4 @@
-import { $getSelection } from "lexical";
+import { $getSelection, $isRangeSelection } from "lexical";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
@@ -7,7 +7,12 @@ import {
   readMdast,
   readMarkdown,
 } from "../test-helper/editor-driver";
-import { pasteIntoEditor, selectText, TestDataTransfer } from "../test-helper/interaction-driver";
+import {
+  pasteIntoEditor,
+  selectText,
+  selectTextRange,
+  TestDataTransfer,
+} from "../test-helper/interaction-driver";
 import { createClipboardDataSnapshot, handleBlockEditorPaste } from "./paste";
 
 describe("clipboard paste", () => {
@@ -87,6 +92,47 @@ describe("clipboard paste", () => {
       expect(readMdast(editor).children[0]).toMatchObject({
         type: "code",
         value: "const # Plainvalue = 1;",
+      });
+    });
+  });
+
+  it("inserts pasted plain text at the caret inside a code block", async () => {
+    const editor = editorFromMarkdown(["```", "content", "```", ""].join("\n"));
+    selectText(editor, "content", "con".length);
+
+    expect(
+      pasteIntoEditor(editor, createBlockEditorRuntime(), new Map([["text/plain", "insert"]])),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        type: "code",
+        value: "coninserttent",
+      });
+      expect(
+        editor.read(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) {
+            throw new Error("Expected range selection.");
+          }
+          return selection.anchor.offset;
+        }),
+      ).toBe("coninsert".length);
+    });
+  });
+
+  it("replaces selected text inside a code block with pasted plain text", async () => {
+    const editor = editorFromMarkdown(["```", "content", "```", ""].join("\n"));
+    selectTextRange(editor, "content", "co".length, "cont".length);
+
+    expect(
+      pasteIntoEditor(editor, createBlockEditorRuntime(), new Map([["text/plain", "insert"]])),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        type: "code",
+        value: "coinsertent",
       });
     });
   });
