@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import type { ClipboardSerializedNode } from "../models/clipboard";
 import { editorFromMdast } from "../test-helper/editor-driver";
 import {
   bold,
@@ -23,6 +22,7 @@ import {
   ul,
   li,
 } from "../test-helper/mdast-builders";
+import type { ClipboardSerializedNode } from "./clipboard-serialized-node";
 import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./formats";
 
 function textNode(text: string): ClipboardSerializedNode {

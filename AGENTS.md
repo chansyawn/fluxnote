@@ -156,6 +156,14 @@ vp run package:desktop
 
 ## Agent skills
 
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues for `chansyawn/fluxnotes`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage uses the default mattpocock/skills label vocabulary. See `docs/agents/triage-labels.md`.
+
 ### Domain docs
 
-@docs/agents/domain.md
+This repo uses a single-context domain docs layout. See `docs/agents/domain.md`.

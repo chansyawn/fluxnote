@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import {
   collectMarkdownImageAssetUrls,
   replaceMarkdownImageAssetUrls,
-} from "@fluxnotes/editor/models";
+} from "@fluxnotes/editor/contracts";
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import { businessError } from "@shared/ipc/result";

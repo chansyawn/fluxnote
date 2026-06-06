@@ -12,7 +12,7 @@ import {
 } from "lexical";
 import { type JSX, useEffect, useState } from "react";
 
-import type { ImagePayload } from "../../models/image";
+import type { ImagePayload } from "../../assets/image-payload";
 import { useBlockEditorRuntime } from "../../runtime/runtime-extension";
 
 interface ImageViewProps extends ImagePayload {

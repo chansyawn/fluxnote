@@ -9,7 +9,7 @@ import {
 } from "lexical";
 
 import { createImagePayloadsFromFiles } from "../../assets/image-files";
-import type { ImagePayload } from "../../models/image";
+import type { ImagePayload } from "../../assets/image-payload";
 import type { BlockEditorRuntime } from "../../runtime/types";
 import { $createImageNode } from "./image-node";
 

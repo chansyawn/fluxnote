@@ -1,7 +1,7 @@
 export {
   collectMarkdownImageAssetUrls,
   replaceMarkdownImageAssetUrls,
-} from "./models/markdown-asset-urls";
+} from "./assets/markdown-asset-urls";
 export {
   BLOCK_EDITOR_SHORTCUT_ACTIONS,
   BLOCK_EDITOR_SHORTCUT_DEFAULTS,

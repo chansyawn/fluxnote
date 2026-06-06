@@ -10,9 +10,9 @@
       "types": "./src/index.tsx",
       "import": "./src/index.tsx"
     },
-    "./models": {
-      "types": "./src/models.ts",
-      "import": "./src/models.ts"
+    "./contracts": {
+      "types": "./src/contracts.ts",
+      "import": "./src/contracts.ts"
     },
     "./locales/*/messages": {
       "types": "./src/locales/*/messages.ts",

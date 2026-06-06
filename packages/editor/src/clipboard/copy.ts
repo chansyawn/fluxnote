@@ -11,12 +11,12 @@ import {
 
 import { filterGapCursorNodes } from "../cursor";
 import { normalizeExternalMarkdown } from "../markdown/external-markdown";
-import type { ClipboardSerializedNode } from "../models/clipboard";
 import type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "../runtime/types";
 import {
   collectClipboardAssetUrls,
   rewriteClipboardAssetsForExternalFormats,
 } from "./asset-rewrites";
+import type { ClipboardSerializedNode } from "./clipboard-serialized-node";
 import { exportClipboardNodesToHtml, exportClipboardNodesToMarkdown } from "./formats";
 
 type ResolveAssets = BlockEditorRuntime["assets"]["resolve"];
