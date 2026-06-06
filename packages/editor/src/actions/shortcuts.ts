@@ -2,7 +2,7 @@ import type { Hotkey } from "@fluxnotes/shared";
 import type { TextFormatType } from "lexical";
 
 import type { BlockEditorListFormat, BlockEditorTextStyleFormat } from "../core/block-format";
-import type { BlockEditorInlineFormat } from "../toolbar/types";
+import type { BlockEditorInlineFormat } from "./formats";
 
 export type BlockEditorActionExecution =
   | { kind: "inline-format"; format: BlockEditorInlineFormat; lexicalFormat: TextFormatType }

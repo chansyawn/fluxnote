@@ -31,6 +31,9 @@ import {
 } from "../actions";
 import { ClipboardExtension } from "../clipboard/clipboard-extension";
 import { createClipboardDataFromDocument } from "../clipboard/copy";
+import { importMarkdownToEditor } from "../document/markdown-editor-io";
+import { BlockEditorRuntimeExtension, useBlockEditorRuntime } from "../runtime/runtime-extension";
+import type { BlockEditorRuntime } from "../runtime/types";
 import { SYNTAX_REACT_EXTENSIONS } from "../syntax/registry";
 import {
   BLOCK_EDITOR_NAMESPACE,
@@ -45,9 +48,7 @@ import {
 import { BlockEditorOverlayContainerProvider } from "./editor-overlay-container";
 import type { MarkdownChangeHandle } from "./markdown-change-listener";
 import { MarkdownChangePlugin } from "./markdown-change-plugin";
-import { importMarkdownToEditor } from "./markdown-editor-io";
-import { BlockEditorRuntimeExtension, useBlockEditorRuntime } from "./runtime-extension";
-import type { BlockEditorProps, BlockEditorRuntime } from "./types";
+import type { BlockEditorProps } from "./types";
 
 interface BlockEditorContentExtensionConfig {
   initialMarkdown: string;

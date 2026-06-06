@@ -2,9 +2,9 @@ import { mergeRegister } from "@lexical/utils";
 import { COMMAND_PRIORITY_HIGH, DRAGOVER_COMMAND, DROP_COMMAND, type LexicalEditor } from "lexical";
 
 import { getSupportedImageFiles, hasSupportedImageData } from "../../assets/image-files";
-import { insertImageFilesAtSelection } from "../../assets/image-insert";
 import { cloneCurrentSelection } from "../../clipboard/rich-text-paste";
-import type { BlockEditorRuntime } from "../../core/types";
+import type { BlockEditorRuntime } from "../../runtime/types";
+import { insertImageFilesAtSelection } from "./image-insert";
 
 export function registerImageInsertCommands(
   editor: LexicalEditor,

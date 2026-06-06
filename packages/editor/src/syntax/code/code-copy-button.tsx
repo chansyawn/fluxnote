@@ -4,7 +4,7 @@ import { CheckIcon, CopyIcon } from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { useEffect, useState } from "react";
 
-import { useBlockEditorRuntime } from "../../core/runtime-extension";
+import { useBlockEditorRuntime } from "../../runtime/runtime-extension";
 
 const COPY_FEEDBACK_DURATION_MS = 2000;
 

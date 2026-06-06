@@ -1,10 +1,10 @@
 import { withDOM } from "@lexical/headless/dom";
 import type { Image, Root } from "mdast";
 
-import type { BlockEditorRuntime } from "../core/types";
 import { parseMarkdownToMdast, stringifyMdastToMarkdown } from "../markdown/processor";
 import { collectImageAssetUrls, getImageAssetUrl } from "../models/asset-urls";
 import type { ClipboardSerializedNode } from "../models/clipboard";
+import type { BlockEditorRuntime } from "../runtime/types";
 
 export const UNAVAILABLE_IMAGE_URL = "Unavailable";
 

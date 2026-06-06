@@ -1,7 +1,7 @@
 import { $createTextNode, $isParagraphNode, $isTextNode, type LexicalNode } from "lexical";
 import type { Root } from "mdast";
 
-import { blockFromLexical } from "../../core/lexical-mdast";
+import { blockFromLexical } from "../../document/lexical-mdast";
 import { stringifyMdastToMarkdown } from "../../markdown/processor";
 
 interface TableCellInsertChunk {

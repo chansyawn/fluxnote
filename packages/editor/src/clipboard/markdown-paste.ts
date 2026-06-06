@@ -10,8 +10,8 @@ import {
   type LexicalEditor,
 } from "lexical";
 
-import { rootContentToLexical } from "../core/lexical-mdast";
-import { normalizeMdast } from "../core/normalize-mdast";
+import { rootContentToLexical } from "../document/lexical-mdast";
+import { normalizeMdast } from "../document/normalize-mdast";
 import { parseMarkdownToMdast } from "../markdown/processor";
 
 function isInsideCodeBlock(selection: BaseSelection | null): boolean {

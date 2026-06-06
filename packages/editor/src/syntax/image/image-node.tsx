@@ -12,13 +12,8 @@ import {
 } from "lexical";
 import { type JSX, useEffect, useState } from "react";
 
-import { useBlockEditorRuntime } from "../../core/runtime-extension";
-
-export interface ImagePayload {
-  alt: string;
-  src: string;
-  title: string | null;
-}
+import type { ImagePayload } from "../../models/image";
+import { useBlockEditorRuntime } from "../../runtime/runtime-extension";
 
 interface ImageViewProps extends ImagePayload {
   nodeKey: NodeKey;

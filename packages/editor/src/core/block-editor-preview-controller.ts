@@ -5,11 +5,11 @@ import {
   createClipboardDataFromCurrentSelection,
   createClipboardDataFromDocument,
 } from "../clipboard/copy";
+import type { BlockEditorRuntime } from "../runtime/types";
 import type {
   BlockEditorPreviewChangeListener,
   BlockEditorPreviewDataRequest,
   BlockEditorPreviewKind,
-  BlockEditorRuntime,
 } from "./types";
 
 type BlockEditorPreviewExportKind = Exclude<BlockEditorPreviewKind, "markdown-source">;

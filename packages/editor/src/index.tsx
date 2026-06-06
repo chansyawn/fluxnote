@@ -25,9 +25,8 @@ export {
 } from "./actions";
 export type {
   BlockEditorConfigInput,
-  BlockEditorClipboardWriteData,
   BlockEditorHandle,
   BlockEditorPreviewDataRequest,
   BlockEditorPreviewKind,
-  BlockEditorRuntime,
 } from "./core/types";
+export type { BlockEditorClipboardWriteData, BlockEditorRuntime } from "./runtime/types";

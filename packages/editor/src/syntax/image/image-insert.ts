@@ -8,9 +8,10 @@ import {
   type LexicalEditor,
 } from "lexical";
 
-import type { BlockEditorRuntime } from "../core/types";
-import { $createImageNode, type ImagePayload } from "../syntax/image/image-node";
-import { createImagePayloadsFromFiles } from "./image-files";
+import { createImagePayloadsFromFiles } from "../../assets/image-files";
+import type { ImagePayload } from "../../models/image";
+import type { BlockEditorRuntime } from "../../runtime/types";
+import { $createImageNode } from "./image-node";
 
 function insertImagePayloadsAtSelection(payloads: ReadonlyArray<ImagePayload>): boolean {
   if (payloads.length === 0) {

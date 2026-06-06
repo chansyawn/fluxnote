@@ -1,12 +1,12 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useImperativeHandle, useLayoutEffect, useRef, type Ref } from "react";
 
+import { exportEditorStateToMarkdown } from "../document/markdown-editor-io";
 import {
   registerMarkdownChangeListener,
   type MarkdownChangeHandle,
   type MarkdownChangeListener,
 } from "./markdown-change-listener";
-import { exportEditorStateToMarkdown } from "./markdown-editor-io";
 
 export interface MarkdownChangePluginProps {
   onMarkdownChange: (markdown: string) => void;

@@ -5,16 +5,19 @@ import type { Root } from "mdast";
 import { expect, vi } from "vite-plus/test";
 
 import { createBlockEditorCoreExtension } from "../core/block-editor-core-extension";
-import { exportLexicalToMdast, importMdastToLexical } from "../core/lexical-mdast";
-import { exportEditorStateToMarkdown, importMarkdownToEditor } from "../core/markdown-editor-io";
+import { exportLexicalToMdast, importMdastToLexical } from "../document/lexical-mdast";
+import {
+  exportEditorStateToMarkdown,
+  importMarkdownToEditor,
+} from "../document/markdown-editor-io";
+import { MarkdownShortcutExtension } from "../markdown/markdown-shortcut-extension";
 import type {
   BlockEditorCreateAssetRequest,
   BlockEditorCopyAssetRequest,
   BlockEditorImportFileAssetsRequest,
   BlockEditorResolveAssetRequest,
   BlockEditorRuntime,
-} from "../core/types";
-import { MarkdownShortcutExtension } from "../markdown/markdown-shortcut-extension";
+} from "../runtime/types";
 
 type BlockEditorRuntimeOverrides = {
   assets?: Partial<BlockEditorRuntime["assets"]>;

@@ -1,20 +1,15 @@
 import { mergeRegister } from "@lexical/utils";
 import { defineExtension } from "lexical";
 
-import { BlockEditorRuntimeExtension } from "../../core/runtime-extension";
+import { BlockEditorRuntimeExtension } from "../../runtime/runtime-extension";
 import { registerImageInsertCommands } from "./image-insert-commands";
 import { ImageNode } from "./image-node";
 import { registerImageOutlineCommands } from "./image-outline-commands";
 import { registerImageSelectionCommands } from "./image-selection-commands";
 import { IMAGE } from "./image-shortcut";
 
-export {
-  $createImageNode,
-  $isImageNode,
-  ImageNode,
-  type ImagePayload,
-  type SerializedImageNode,
-} from "./image-node";
+export { $createImageNode, $isImageNode, ImageNode, type SerializedImageNode } from "./image-node";
+export type { ImagePayload } from "../../models/image";
 export { imageFromLexical, imageToLexical } from "./lexical";
 export { IMAGE } from "./image-shortcut";
 
