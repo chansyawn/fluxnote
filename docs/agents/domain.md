@@ -11,7 +11,7 @@ If any of these files don't exist, proceed silently. Don't flag their absence; d
 
 ## File structure
 
-Monorepo context:
+Single-context repo:
 
 ```text
 /
