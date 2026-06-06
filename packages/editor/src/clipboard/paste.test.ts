@@ -1,3 +1,4 @@
+import { $getSelection } from "lexical";
 import { describe, expect, it, vi } from "vite-plus/test";
 
 import {
@@ -65,6 +66,117 @@ describe("clipboard paste", () => {
     await vi.waitFor(() => {
       expect(readMarkdown(editor).trim()).toBe("# HTML");
     });
+  });
+
+  it("pastes plain text from mixed html clipboard data inside a code block", async () => {
+    const editor = editorFromMarkdown(["```", "const value = 1;", "```", ""].join("\n"));
+    selectText(editor, "const value = 1;", "const ".length);
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([
+          ["text/html", "<h1>HTML</h1>"],
+          ["text/plain", "# Plain"],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        type: "code",
+        value: "const # Plainvalue = 1;",
+      });
+    });
+  });
+
+  it("pastes plain text inside a code block from a nested command update", () => {
+    const editor = editorFromMarkdown(["```", "const value = 1;", "```", ""].join("\n"));
+    const runtime = createBlockEditorRuntime();
+    selectText(editor, "const value = 1;", "const ".length);
+    const event = {
+      clipboardData: new TestDataTransfer(
+        new Map([
+          ["text/html", "<h1>HTML</h1>"],
+          ["text/plain", "# Plain"],
+        ]),
+      ),
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    } as unknown as Parameters<typeof handleBlockEditorPaste>[2];
+    const selection = editor.read(() => $getSelection()?.clone() ?? null);
+
+    expect(() => {
+      editor.update(
+        () => {
+          handleBlockEditorPaste(editor, runtime, event, selection);
+        },
+        { discrete: true },
+      );
+    }).not.toThrow();
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      type: "code",
+      value: "const # Plainvalue = 1;",
+    });
+  });
+
+  it("preserves markdown-looking plain text inside a code block", async () => {
+    const editor = editorFromMarkdown(["```", "before", "```", ""].join("\n"));
+    selectText(editor, "before");
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([["text/plain", "# Heading\n\n- item\n\n[link](https://example.com)"]]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        type: "code",
+        value: "before# Heading\n\n- item\n\n[link](https://example.com)",
+      });
+    });
+  });
+
+  it("does not create block assets from pasted image files inside a code block", () => {
+    const editor = editorFromMarkdown(["```", "code", "```", ""].join("\n"));
+    const runtime = createBlockEditorRuntime();
+    const image = new File(["image"], "pasted.png", { type: "image/png" });
+    selectText(editor, "code");
+
+    expect(pasteIntoEditor(editor, runtime, new Map(), [image])).toBe(true);
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      type: "code",
+      value: "code",
+    });
+    expect(runtime.assets.create).not.toHaveBeenCalled();
+    expect(runtime.assets.importFiles).not.toHaveBeenCalled();
+  });
+
+  it("does not import local html image sources inside a code block", () => {
+    const editor = editorFromMarkdown(["```", "code", "```", ""].join("\n"));
+    const runtime = createBlockEditorRuntime();
+    selectText(editor, "code");
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        runtime,
+        new Map([["text/html", '<p><img src="file:///tmp/photo.png" alt="Photo"></p>']]),
+      ),
+    ).toBe(true);
+
+    expect(readMdast(editor).children[0]).toMatchObject({
+      type: "code",
+      value: "code",
+    });
+    expect(runtime.assets.create).not.toHaveBeenCalled();
+    expect(runtime.assets.importFiles).not.toHaveBeenCalled();
   });
 
   it("pastes html blocks into a table cell as literal markdown text", async () => {
