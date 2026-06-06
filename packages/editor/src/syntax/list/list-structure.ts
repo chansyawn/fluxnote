@@ -235,56 +235,16 @@ export function hasNestedListAfterCurrentParagraph(
 }
 
 /*
- * Alt+Enter inside a simple item inserts a sibling paragraph block within the
- * same list item and selects it for continued typing.
+ * Alt+Enter inside a paragraph splits that paragraph within the same list item
+ * and selects the inserted paragraph for continued typing.
  */
-export function insertBlockInsideListItem(selection: RangeSelection): boolean {
+export function splitParagraphInsideListItem(selection: RangeSelection): boolean {
   const inserted = selection.insertParagraph();
   if (!$isElementNode(inserted)) {
     return false;
   }
 
   inserted.selectStart();
-  return true;
-}
-
-/*
- * Alt+Enter in a multi-block item splits at the current block boundary:
- * content before the cursor stays put, and content after it moves into the new
- * sibling list item.
- */
-export function splitListItemBlocksAtSelection(
-  listItem: ListItemNode,
-  selection: RangeSelection,
-): boolean {
-  const list = getListParent(listItem);
-  const currentBlock = getDirectListItemChild(selection.anchor.getNode(), listItem);
-  if (!list || !currentBlock) {
-    return false;
-  }
-
-  let movedChildren: LexicalNode[] = [];
-  if ($isParagraphNode(currentBlock)) {
-    const inserted = selection.insertParagraph();
-    const insertedParent = inserted?.getParent();
-    if (!$isElementNode(inserted) || !insertedParent?.is(listItem)) {
-      return false;
-    }
-    const nextSiblings = inserted.getNextSiblings();
-    if (inserted.getTextContentSize() === 0 && nextSiblings.length > 0) {
-      movedChildren = nextSiblings;
-      inserted.remove();
-    } else {
-      movedChildren = [inserted, ...nextSiblings];
-    }
-  } else {
-    movedChildren = currentBlock.getNextSiblings();
-  }
-
-  const sibling = createListItemForList(list);
-  sibling.splice(0, 0, movedChildren.length > 0 ? movedChildren : [$createParagraphNode()]);
-  listItem.insertAfter(sibling);
-  sibling.selectStart();
   return true;
 }
 
