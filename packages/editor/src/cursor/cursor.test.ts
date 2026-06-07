@@ -1,7 +1,10 @@
+import { $isListItemNode } from "@lexical/list";
+import { $isQuoteNode } from "@lexical/rich-text";
 import {
   $getRoot,
   $getSelection,
   $getNodeByKey,
+  $isElementNode,
   $isParagraphNode,
   $isRangeSelection,
   CONTROLLED_TEXT_INSERTION_COMMAND,
@@ -12,6 +15,7 @@ import {
   KEY_ENTER_COMMAND,
   type LexicalCommand,
   type LexicalEditor,
+  type LexicalNode,
 } from "lexical";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -75,10 +79,77 @@ function selectGap(editor: LexicalEditor, position: "first" | "last"): void {
   );
 }
 
+function selectNestedGap(editor: LexicalEditor, position: "first" | "last"): void {
+  editor.update(
+    () => {
+      const nestedGaps: LexicalNode[] = [];
+
+      function collectNestedGaps(node: LexicalNode): void {
+        if ($isGapCursorParagraph(node) && !node.getParent()?.is($getRoot())) {
+          nestedGaps.push(node);
+        }
+        if (!$isElementNode(node)) {
+          return;
+        }
+        for (const child of node.getChildren()) {
+          collectNestedGaps(child);
+        }
+      }
+
+      for (const child of $getRoot().getChildren()) {
+        collectNestedGaps(child);
+      }
+
+      const gap = position === "first" ? nestedGaps[0] : nestedGaps.at(-1);
+      if (!gap || !$isParagraphNode(gap)) {
+        throw new Error(`Unable to find ${position} nested gap cursor.`);
+      }
+
+      gap.selectStart();
+    },
+    { discrete: true },
+  );
+}
+
 function getRootSummary(editor: LexicalEditor): string[] {
   let summary: string[] = [];
   editor.getEditorState().read(() => {
     summary = $getRoot()
+      .getChildren()
+      .map((node) => ($isGapCursorParagraph(node) ? "gap" : node.getType()));
+  });
+  return summary;
+}
+
+function getFirstNestedContainerSummary(
+  editor: LexicalEditor,
+  type: "listitem" | "quote",
+): string[] {
+  let summary: string[] = [];
+  editor.getEditorState().read(() => {
+    function findContainer(node: LexicalNode): LexicalNode | null {
+      if (type === "quote" ? $isQuoteNode(node) : $isListItemNode(node)) {
+        return node;
+      }
+      if (!$isElementNode(node)) {
+        return null;
+      }
+      for (const child of node.getChildren()) {
+        const match = findContainer(child);
+        if (match) {
+          return match;
+        }
+      }
+      return null;
+    }
+
+    const container = findContainer($getRoot());
+
+    if (!$isElementNode(container)) {
+      throw new Error(`Unable to find nested ${type} container.`);
+    }
+
+    summary = container
       .getChildren()
       .map((node) => ($isGapCursorParagraph(node) ? "gap" : node.getType()));
   });
@@ -93,7 +164,14 @@ function isSelectionInGap(editor: LexicalEditor): boolean {
       return;
     }
 
-    result = $isGapCursorParagraph(selection.anchor.getNode().getTopLevelElement());
+    let current: LexicalNode | null = selection.anchor.getNode();
+    while (current) {
+      if ($isGapCursorParagraph(current)) {
+        result = true;
+        return;
+      }
+      current = current.getParent();
+    }
   });
   return result;
 }
@@ -154,6 +232,34 @@ describe("gap cursor", () => {
     expect(readMarkdown(editor)).toBe(["```ts", "const x = 1;", "```", ""].join("\n"));
   });
 
+  it("adds hidden gaps around boundary blocks nested in quotes", () => {
+    const markdown = ["> before", ">", "> ```", "> abc", "> ```", ">", "> after", ""].join("\n");
+    const editor = editorFromMarkdown(markdown);
+
+    expect(getFirstNestedContainerSummary(editor, "quote")).toEqual([
+      "paragraph",
+      "gap",
+      "code",
+      "gap",
+      "paragraph",
+    ]);
+    expect(readMarkdown(editor)).toBe(markdown);
+  });
+
+  it("adds hidden gaps around boundary blocks nested in list items", () => {
+    const editor = editorFromMarkdown(
+      ["- before", "", "  ```", "  abc", "  ```", "", "  after", ""].join("\n"),
+    );
+
+    expect(getFirstNestedContainerSummary(editor, "listitem")).toEqual([
+      "paragraph",
+      "gap",
+      "code",
+      "gap",
+      "paragraph",
+    ]);
+  });
+
   it("adds hidden gaps between ordinary paragraphs and boundary blocks", () => {
     const markdown = ["before", "", "```", "abc", "```", "", "after", ""].join("\n");
     const editor = editorFromMarkdown(markdown);
@@ -187,6 +293,20 @@ describe("gap cursor", () => {
 
   it("moves from block edges into before and after gaps", () => {
     const editor = editorFromMarkdown(["```", "abc", "```", ""].join("\n"));
+
+    selectText(editor, "abc", 0);
+    expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+
+    selectText(editor, "abc", 3);
+    expect(dispatchCommand(editor, KEY_ARROW_RIGHT_COMMAND, keyboardPayload())).toBe(true);
+    expect(isSelectionInGap(editor)).toBe(true);
+  });
+
+  it("moves from nested block edges into before and after gaps", () => {
+    const editor = editorFromMarkdown(
+      ["> before", ">", "> ```", "> abc", "> ```", ">", "> after", ""].join("\n"),
+    );
 
     selectText(editor, "abc", 0);
     expect(dispatchCommand(editor, KEY_ARROW_LEFT_COMMAND, keyboardPayload())).toBe(true);
@@ -274,6 +394,20 @@ describe("gap cursor", () => {
       expect($isParagraphNode(first)).toBe(true);
       expect($isGapCursorParagraph(first)).toBe(false);
     });
+  });
+
+  it("promotes a nested gap to a normal paragraph on enter", () => {
+    const editor = editorFromMarkdown(["> ```", "> abc", "> ```", ""].join("\n"));
+    selectNestedGap(editor, "first");
+
+    expect(dispatchCommand(editor, KEY_ENTER_COMMAND, keyboardPayload())).toBe(true);
+
+    expect(getFirstNestedContainerSummary(editor, "quote")).toEqual([
+      "paragraph",
+      "gap",
+      "code",
+      "gap",
+    ]);
   });
 
   it("promotes a gap before text insertion so typed text is persisted", () => {

@@ -12,17 +12,23 @@ import {
 } from "lexical";
 
 import { $selectThematicBreak } from "../syntax/thematic-break/thematic-break-commands";
-import { $isGapBoundaryNode } from "./cursor-normalize";
+import { $isGapBoundaryNode, $isGapCursorContainer } from "./cursor-normalize";
 import { $isGapCursorParagraph } from "./cursor-state";
 
 type Direction = "backward" | "forward";
 
-function $getTopLevelNode(node: LexicalNode): LexicalNode | null {
-  try {
-    return node.getTopLevelElementOrThrow();
-  } catch {
-    return null;
+export function $getDirectGapCursorContainerChild(node: LexicalNode): LexicalNode | null {
+  let current: LexicalNode | null = node;
+
+  while (current) {
+    const parent: LexicalNode | null = current.getParent();
+    if ($isGapCursorContainer(parent)) {
+      return current;
+    }
+    current = parent;
   }
+
+  return null;
 }
 
 function $getPointOffsetWithinBoundary(point: PointType, boundary: LexicalNode): number | null {
@@ -145,27 +151,24 @@ export function $moveGapCursorSelection(direction: Direction): boolean {
     return false;
   }
 
-  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
-  if (!topLevelNode) {
+  const block = $getDirectGapCursorContainerChild(selection.anchor.getNode());
+  if (!block) {
     return false;
   }
 
-  if ($isGapCursorParagraph(topLevelNode)) {
-    return $selectAdjacentBlockFromGap(topLevelNode, direction);
+  if ($isGapCursorParagraph(block)) {
+    return $selectAdjacentBlockFromGap(block, direction);
   }
 
-  if ($selectAdjacentThematicBreak(selection, topLevelNode, direction)) {
+  if ($selectAdjacentThematicBreak(selection, block, direction)) {
     return true;
   }
 
-  if (
-    !$isGapAdjacentBlock(topLevelNode) ||
-    !$isAtBoundaryEdge(selection, topLevelNode, direction)
-  ) {
+  if (!$isGapAdjacentBlock(block) || !$isAtBoundaryEdge(selection, block, direction)) {
     return false;
   }
 
-  return $selectGapNearBlock(topLevelNode, direction);
+  return $selectGapNearBlock(block, direction);
 }
 
 export function $selectAdjacentBoundaryFromSelection(direction: Direction): boolean {
@@ -174,19 +177,16 @@ export function $selectAdjacentBoundaryFromSelection(direction: Direction): bool
     return false;
   }
 
-  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
-  if (!topLevelNode) {
+  const block = $getDirectGapCursorContainerChild(selection.anchor.getNode());
+  if (!block) {
     return false;
   }
 
-  if (
-    !$isGapCursorParagraph(topLevelNode) &&
-    !$isAtBoundaryEdge(selection, topLevelNode, direction)
-  ) {
+  if (!$isGapCursorParagraph(block) && !$isAtBoundaryEdge(selection, block, direction)) {
     return false;
   }
 
-  return $selectBoundaryBlock($getAdjacentSiblingPastGap(topLevelNode, direction), direction);
+  return $selectBoundaryBlock($getAdjacentSiblingPastGap(block, direction), direction);
 }
 
 export function $deleteEmptyParagraphAfterBoundaryGapFromSelection(): boolean {
@@ -195,21 +195,21 @@ export function $deleteEmptyParagraphAfterBoundaryGapFromSelection(): boolean {
     return false;
   }
 
-  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
-  if (!topLevelNode || !$isParagraphNode(topLevelNode)) {
+  const block = $getDirectGapCursorContainerChild(selection.anchor.getNode());
+  if (!block || !$isParagraphNode(block)) {
     return false;
   }
 
-  const isGapParagraph: boolean = $isGapCursorParagraph(topLevelNode);
+  const isGapParagraph: boolean = $isGapCursorParagraph(block);
   if (
     isGapParagraph ||
-    topLevelNode.getTextContentSize() > 0 ||
-    !$isAtBoundaryEdge(selection, topLevelNode, "backward")
+    block.getTextContentSize() > 0 ||
+    !$isAtBoundaryEdge(selection, block, "backward")
   ) {
     return false;
   }
 
-  const gap = topLevelNode.getPreviousSibling();
+  const gap = block.getPreviousSibling();
   const boundary = gap?.getPreviousSibling();
   if (
     !$isGapCursorParagraph(gap) ||
@@ -220,7 +220,7 @@ export function $deleteEmptyParagraphAfterBoundaryGapFromSelection(): boolean {
   }
 
   gap.selectStart();
-  topLevelNode.remove();
+  block.remove();
   return true;
 }
 
@@ -239,8 +239,7 @@ export function $isSelectionInsideGapCursor(): boolean {
     return $isGapCursorParagraph(anchorNode.getParent());
   }
 
-  const topLevelNode = $getTopLevelNode(anchorNode);
-  return $isGapCursorParagraph(topLevelNode);
+  return $isGapCursorParagraph($getDirectGapCursorContainerChild(anchorNode));
 }
 
 export function $getSelectionGapCursorKey(): string | null {
@@ -249,6 +248,6 @@ export function $getSelectionGapCursorKey(): string | null {
     return null;
   }
 
-  const topLevelNode = $getTopLevelNode(selection.anchor.getNode());
-  return $isGapCursorParagraph(topLevelNode) ? topLevelNode.getKey() : null;
+  const block = $getDirectGapCursorContainerChild(selection.anchor.getNode());
+  return $isGapCursorParagraph(block) ? block.getKey() : null;
 }

@@ -3,7 +3,7 @@ import { defineExtension, mergeRegister, RootNode } from "lexical";
 import { registerCursorCommands } from "./cursor-commands";
 import { registerCursorDomSync } from "./cursor-dom-sync";
 import { registerCursorMouseCommands } from "./cursor-mouse";
-import { $normalizeRootGapCursors } from "./cursor-normalize";
+import { $normalizeGapCursors } from "./cursor-normalize";
 
 export { filterGapCursorNodes } from "./cursor-normalize";
 export { $isGapCursorParagraph } from "./cursor-state";
@@ -16,7 +16,7 @@ export const CursorExtension = defineExtension({
       registerCursorMouseCommands(editor),
       registerCursorDomSync(editor),
       editor.registerNodeTransform(RootNode, () => {
-        $normalizeRootGapCursors();
+        $normalizeGapCursors();
       }),
     );
   },

@@ -8,7 +8,7 @@ import {
   type NodeKey,
 } from "lexical";
 
-import { $getRootGapCursorKeys } from "./cursor-normalize";
+import { $getGapCursorKeys } from "./cursor-normalize";
 import { $isGapCursorParagraph, $promoteGapCursorParagraph } from "./cursor-state";
 
 const GAP_CURSOR_HIT_AREA_CLASS = "block-editor__gap-cursor-hit-area";
@@ -33,6 +33,7 @@ interface RectLike {
 }
 
 export interface GapCursorHitTarget {
+  containerRect: RectLike;
   key: NodeKey;
   nextRect: RectLike | null;
   previousRect: RectLike | null;
@@ -43,7 +44,6 @@ interface GapCursorHitTestInput {
     x: number;
     y: number;
   };
-  rootRect: RectLike;
   targets: ReadonlyArray<GapCursorHitTarget>;
 }
 
@@ -51,10 +51,7 @@ function isPointInHorizontalBounds(pointX: number, rect: RectLike): boolean {
   return pointX >= rect.left && pointX <= rect.right;
 }
 
-function resolveVerticalBounds(
-  rootRect: RectLike,
-  target: GapCursorHitTarget,
-): { bottom: number; top: number } | null {
+function resolveVerticalBounds(target: GapCursorHitTarget): { bottom: number; top: number } | null {
   if (target.previousRect && target.nextRect) {
     return {
       bottom: target.nextRect.top,
@@ -65,13 +62,13 @@ function resolveVerticalBounds(
   if (target.nextRect) {
     return {
       bottom: target.nextRect.top,
-      top: rootRect.top,
+      top: target.containerRect.top,
     };
   }
 
   if (target.previousRect) {
     return {
-      bottom: rootRect.bottom,
+      bottom: target.containerRect.bottom,
       top: target.previousRect.bottom,
     };
   }
@@ -80,12 +77,12 @@ function resolveVerticalBounds(
 }
 
 export function findGapCursorHitTarget(input: GapCursorHitTestInput): NodeKey | null {
-  if (!isPointInHorizontalBounds(input.point.x, input.rootRect)) {
-    return null;
-  }
-
   for (const target of input.targets) {
-    const bounds = resolveVerticalBounds(input.rootRect, target);
+    if (!isPointInHorizontalBounds(input.point.x, target.containerRect)) {
+      continue;
+    }
+
+    const bounds = resolveVerticalBounds(target);
     if (!bounds || bounds.bottom < bounds.top) {
       continue;
     }
@@ -113,14 +110,20 @@ function readGapCursorHitTargets(editor: LexicalEditor): GapCursorHitTarget[] {
   const targets: GapCursorHitTarget[] = [];
 
   editor.getEditorState().read(() => {
-    const gapKeys = $getRootGapCursorKeys();
+    const gapKeys = $getGapCursorKeys();
     for (const key of gapKeys) {
       const node = $getNodeByKey(key);
       if (!$isGapCursorParagraph(node)) {
         continue;
       }
 
+      const containerRect = getNodeRect(editor, node.getParent());
+      if (!containerRect) {
+        continue;
+      }
+
       targets.push({
+        containerRect,
         key,
         nextRect: getNodeRect(editor, node.getNextSibling()),
         previousRect: getNodeRect(editor, node.getPreviousSibling()),
@@ -132,8 +135,12 @@ function readGapCursorHitTargets(editor: LexicalEditor): GapCursorHitTarget[] {
 }
 
 function getNodeRect(editor: LexicalEditor, node: LexicalNode | null): DOMRect | null {
-  if (!node || node.is($getRoot())) {
+  if (!node) {
     return null;
+  }
+
+  if (node.is($getRoot())) {
+    return editor.getRootElement()?.getBoundingClientRect() ?? null;
   }
 
   return editor.getElementByKey(node.getKey())?.getBoundingClientRect() ?? null;
@@ -153,7 +160,6 @@ function getGapCursorHitKey(
       x: event.clientX,
       y: event.clientY,
     },
-    rootRect: rootElement.getBoundingClientRect(),
     targets: readGapCursorHitTargets(editor),
   });
 }

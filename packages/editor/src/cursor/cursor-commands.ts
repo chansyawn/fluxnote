@@ -19,6 +19,7 @@ import {
 } from "lexical";
 
 import {
+  $getDirectGapCursorContainerChild,
   $deleteEmptyParagraphAfterBoundaryGapFromSelection,
   $selectAdjacentBoundaryFromSelection,
   $moveGapCursorSelection,
@@ -31,7 +32,7 @@ function $promoteSelectionGapCursor(): boolean {
     return false;
   }
 
-  return $promoteGapCursorParagraph(selection.anchor.getNode().getTopLevelElement());
+  return $promoteGapCursorParagraph($getDirectGapCursorContainerChild(selection.anchor.getNode()));
 }
 
 function handleArrow(event: KeyboardEvent, direction: "backward" | "forward"): boolean {
