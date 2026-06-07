@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.0.32](https://github.com/chansyawn/fluxnotes/compare/v0.0.31...v0.0.32) (2026-06-07)
+
+
+### Features
+
+* simplify list and quote editor interactions ([#89](https://github.com/chansyawn/fluxnotes/issues/89)) ([d6346b2](https://github.com/chansyawn/fluxnotes/commit/d6346b25aabc344e1818cdcb4f6c4c0314764a8e))
+* support nested block gap cursors ([#92](https://github.com/chansyawn/fluxnotes/issues/92)) ([91341a2](https://github.com/chansyawn/fluxnotes/commit/91341a27ef25d5445adb68e4ab3e071f67900937))
+
+
+### Bug Fixes
+
+* include editor styles in desktop CSS ([#95](https://github.com/chansyawn/fluxnotes/issues/95)) ([072813b](https://github.com/chansyawn/fluxnotes/commit/072813b7c9c4558569ed23288d39b69fb2746a2e))
+* preserve nested list clipboard paste ([25c4e38](https://github.com/chansyawn/fluxnotes/commit/25c4e38c380dd9301044c60db5c7333f605ad3e8))
+* preserve playground selection copy ([#91](https://github.com/chansyawn/fluxnotes/issues/91)) ([1c2d5b0](https://github.com/chansyawn/fluxnotes/commit/1c2d5b0424249d88a2fe2239606c429f878c0b76))
+* preserve raw code block paste text ([#86](https://github.com/chansyawn/fluxnotes/issues/86)) ([a844327](https://github.com/chansyawn/fluxnotes/commit/a84432793eba4c20f0e189c4ac2290d6c547acec))
+* remove heading style on leading backspace ([0133fd8](https://github.com/chansyawn/fluxnotes/commit/0133fd850cdc5f201c34d77709bc50243c5b944e))
+
 ## [0.0.31](https://github.com/chansyawn/fluxnotes/compare/v0.0.30...v0.0.31) (2026-06-05)
 
 
