@@ -1,3 +1,5 @@
+@source ".";
+
 @import "./cursor/index.css";
 @import "./syntax/break/index.css";
 @import "./syntax/code/index.css";
