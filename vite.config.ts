@@ -27,11 +27,11 @@ export default defineConfig({
     ignorePatterns,
   },
   lint: {
-    jsPlugins: ["./apps/desktop/config/oxlint/fluxnotes-plugin.ts"],
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     options: { typeAware: true, typeCheck: true },
     ignorePatterns,
     rules: {
-      "fluxnote/no-vitest-import": "error",
+      "vite-plus/prefer-vite-plus-imports": "error",
     },
   },
   run: {

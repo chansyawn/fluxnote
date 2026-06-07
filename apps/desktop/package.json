@@ -54,7 +54,6 @@
     "@electron/fuses": "2.1.1",
     "@lingui/babel-plugin-lingui-macro": "6.0.1",
     "@lingui/vite-plugin": "6.0.1",
-    "@oxlint/plugins": "^1.66.0",
     "@rolldown/plugin-babel": "^0.2.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/router-plugin": "^1.167.12",
