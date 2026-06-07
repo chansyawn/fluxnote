@@ -1,6 +1,6 @@
 {
   "name": "@fluxnotes/desktop",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "private": true,
   "description": "A lightweight, always-on-top editor for AI-first workflows.",
   "license": "MIT",
