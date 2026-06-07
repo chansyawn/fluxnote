@@ -1,4 +1,5 @@
 import { $getRoot, $getSelection } from "lexical";
+import type { List, Root } from "mdast";
 import { describe, expect, it } from "vite-plus/test";
 
 import { editorFromMarkdown, readMarkdown, readMdast } from "../test-helper/editor-driver";
@@ -7,6 +8,14 @@ import { insertMarkdownAtSelection } from "./markdown-paste";
 
 function selectionFrom(editor: ReturnType<typeof editorFromMarkdown>) {
   return editor.read(() => $getSelection()?.clone() ?? null);
+}
+
+function firstList(root: Root): List {
+  const list = root.children.find((child): child is List => child.type === "list");
+  if (!list) {
+    throw new Error("Expected editor content to include a list.");
+  }
+  return list;
 }
 
 describe("insertMarkdownAtSelection", () => {
@@ -27,6 +36,94 @@ describe("insertMarkdownAtSelection", () => {
     expect(markdown).toContain("- one");
     expect(markdown).toContain("- two");
     expect(markdown).toContain("- three");
+  });
+
+  it("preserves nested list items after a sibling list item", () => {
+    const editor = editorFromMarkdown("");
+
+    insertMarkdownAtSelection(
+      editor,
+      ["- Unordered item", "", "- Nested group", "", "  - Nested item A", "  - Nested item B"].join(
+        "\n",
+      ),
+      selectionFrom(editor),
+    );
+
+    expect(firstList(readMdast(editor))).toMatchObject({
+      children: [
+        {
+          children: [{ children: [{ type: "text", value: "Unordered item" }], type: "paragraph" }],
+          type: "listItem",
+        },
+        {
+          children: [
+            { children: [{ type: "text", value: "Nested group" }], type: "paragraph" },
+            {
+              children: [
+                {
+                  children: [
+                    { children: [{ type: "text", value: "Nested item A" }], type: "paragraph" },
+                  ],
+                  type: "listItem",
+                },
+                {
+                  children: [
+                    { children: [{ type: "text", value: "Nested item B" }], type: "paragraph" },
+                  ],
+                  type: "listItem",
+                },
+              ],
+              type: "list",
+            },
+          ],
+          type: "listItem",
+        },
+      ],
+      type: "list",
+    });
+    expect(readMarkdown(editor)).not.toContain("\n- \n");
+  });
+
+  it("preserves a top-level list item that owns a nested list", () => {
+    const editor = editorFromMarkdown("");
+
+    insertMarkdownAtSelection(
+      editor,
+      ["- Nested group", "", "  - Nested item A", "  - Nested item B"].join("\n"),
+      selectionFrom(editor),
+    );
+
+    expect(firstList(readMdast(editor))).toMatchObject({
+      children: [
+        {
+          children: [
+            { children: [{ type: "text", value: "Nested group" }], type: "paragraph" },
+            {
+              children: [
+                {
+                  children: [
+                    { children: [{ type: "text", value: "Nested item A" }], type: "paragraph" },
+                  ],
+                  type: "listItem",
+                },
+                {
+                  children: [
+                    { children: [{ type: "text", value: "Nested item B" }], type: "paragraph" },
+                  ],
+                  type: "listItem",
+                },
+              ],
+              type: "list",
+            },
+          ],
+          type: "listItem",
+        },
+      ],
+      type: "list",
+    });
+    expect(readMarkdown(editor)).toContain("- Nested group");
+    expect(readMarkdown(editor)).toContain("  - Nested item A");
+    expect(readMarkdown(editor)).toContain("  - Nested item B");
   });
 
   it("parses blockquote markdown into a blockquote", () => {
