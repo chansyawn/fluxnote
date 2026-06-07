@@ -18,8 +18,9 @@ function target(
   key: string,
   previousRect: DOMRect | null,
   nextRect: DOMRect | null,
+  containerRect: DOMRect = rect(0, 200),
 ): GapCursorHitTarget {
-  return { key, nextRect, previousRect };
+  return { containerRect, key, nextRect, previousRect };
 }
 
 function mouseEvent(type: string, button = 0): MouseEvent {
@@ -27,13 +28,10 @@ function mouseEvent(type: string, button = 0): MouseEvent {
 }
 
 describe("gap cursor mouse hit testing", () => {
-  const rootRect = rect(0, 200);
-
   it("finds gaps before the first boundary block", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 10 },
-        rootRect,
         targets: [target("gap-before", null, rect(20, 80))],
       }),
     ).toBe("gap-before");
@@ -43,7 +41,6 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 90 },
-        rootRect,
         targets: [target("gap-between", rect(20, 80), rect(100, 160))],
       }),
     ).toBe("gap-between");
@@ -55,14 +52,12 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 80 },
-        rootRect,
         targets: [gap],
       }),
     ).toBe("gap-between");
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 100 },
-        rootRect,
         targets: [gap],
       }),
     ).toBe("gap-between");
@@ -72,7 +67,6 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 130 },
-        rootRect,
         targets: [
           target("first-gap", null, rect(20, 80)),
           target("second-gap", rect(100, 120), rect(140, 180)),
@@ -85,7 +79,6 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 180 },
-        rootRect,
         targets: [target("gap-after", rect(20, 160), null)],
       }),
     ).toBe("gap-after");
@@ -95,7 +88,6 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 50 },
-        rootRect,
         targets: [target("gap-between", rect(20, 80), rect(100, 160))],
       }),
     ).toBeNull();
@@ -105,7 +97,6 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 240, y: 90 },
-        rootRect,
         targets: [target("gap-between", rect(20, 80), rect(100, 160))],
       }),
     ).toBeNull();
@@ -115,10 +106,25 @@ describe("gap cursor mouse hit testing", () => {
     expect(
       findGapCursorHitTarget({
         point: { x: 100, y: 90 },
-        rootRect,
         targets: [target("gap-between", rect(20, 100), rect(80, 160))],
       }),
     ).toBeNull();
+  });
+
+  it("uses each gap container width for nested hit testing", () => {
+    expect(
+      findGapCursorHitTarget({
+        point: { x: 20, y: 90 },
+        targets: [target("nested-gap", rect(20, 80), rect(100, 160), rect(0, 200, 40, 180))],
+      }),
+    ).toBeNull();
+
+    expect(
+      findGapCursorHitTarget({
+        point: { x: 60, y: 90 },
+        targets: [target("nested-gap", rect(20, 80), rect(100, 160), rect(0, 200, 40, 180))],
+      }),
+    ).toBe("nested-gap");
   });
 
   it("treats nested editor controls as interactive event targets", () => {

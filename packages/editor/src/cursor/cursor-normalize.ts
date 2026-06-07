@@ -1,8 +1,15 @@
 import { $isCodeNode } from "@lexical/code";
 import { $isHorizontalRuleNode } from "@lexical/extension";
+import { $isListItemNode } from "@lexical/list";
 import { $isQuoteNode } from "@lexical/rich-text";
 import { $isTableNode } from "@lexical/table";
-import { $getRoot, $isElementNode, type LexicalNode, type NodeKey } from "lexical";
+import {
+  $getRoot,
+  $isElementNode,
+  type ElementNode,
+  type LexicalNode,
+  type NodeKey,
+} from "lexical";
 
 import { $createGapCursorParagraph, $isGapCursorParagraph } from "./cursor-state";
 
@@ -12,12 +19,14 @@ export function $isGapBoundaryNode(node: LexicalNode | null | undefined): boolea
   );
 }
 
-function $isRootChild(node: LexicalNode | null | undefined): boolean {
-  return node?.getParent()?.is($getRoot()) === true;
+export function $isGapCursorContainer(node: LexicalNode | null | undefined): node is ElementNode {
+  return (
+    $isElementNode(node) && (node.is($getRoot()) || $isQuoteNode(node) || $isListItemNode(node))
+  );
 }
 
 function $needsGapBefore(node: LexicalNode): boolean {
-  if (!$isRootChild(node) || !$isGapBoundaryNode(node)) {
+  if (!$isGapCursorContainer(node.getParent()) || !$isGapBoundaryNode(node)) {
     return false;
   }
 
@@ -26,7 +35,7 @@ function $needsGapBefore(node: LexicalNode): boolean {
 }
 
 function $needsGapAfter(node: LexicalNode): boolean {
-  if (!$isRootChild(node) || !$isGapBoundaryNode(node)) {
+  if (!$isGapCursorContainer(node.getParent()) || !$isGapBoundaryNode(node)) {
     return false;
   }
 
@@ -54,8 +63,8 @@ function $isRequiredGap(node: LexicalNode): boolean {
   return $hasGapBoundaryBefore(node) || $hasGapBoundaryAfter(node);
 }
 
-function $insertMissingRootGapCursors(): void {
-  for (const child of $getRoot().getChildren()) {
+function $insertMissingGapCursors(container: ElementNode): void {
+  for (const child of container.getChildren()) {
     if ($needsGapBefore(child)) {
       child.insertBefore($createGapCursorParagraph());
     }
@@ -65,9 +74,9 @@ function $insertMissingRootGapCursors(): void {
   }
 }
 
-function $removeUnneededRootGapCursors(): Set<NodeKey> {
+function $removeUnneededGapCursors(container: ElementNode): Set<NodeKey> {
   const gapKeys = new Set<NodeKey>();
-  for (const child of $getRoot().getChildren()) {
+  for (const child of container.getChildren()) {
     if (!$isGapCursorParagraph(child)) {
       continue;
     }
@@ -82,18 +91,50 @@ function $removeUnneededRootGapCursors(): Set<NodeKey> {
   return gapKeys;
 }
 
-export function $normalizeRootGapCursors(): Set<NodeKey> {
-  $insertMissingRootGapCursors();
-  return $removeUnneededRootGapCursors();
-}
+function $visitGapCursorContainers(
+  node: ElementNode,
+  visit: (container: ElementNode) => void,
+): void {
+  if ($isGapCursorContainer(node)) {
+    visit(node);
+  }
 
-export function $getRootGapCursorKeys(): Set<NodeKey> {
-  const gapKeys = new Set<NodeKey>();
-  for (const child of $getRoot().getChildren()) {
-    if ($isGapCursorParagraph(child)) {
-      gapKeys.add(child.getKey());
+  for (const child of node.getChildren()) {
+    if ($isElementNode(child) && !$isGapCursorParagraph(child)) {
+      $visitGapCursorContainers(child, visit);
     }
   }
+}
+
+export function $normalizeGapCursors(): Set<NodeKey> {
+  const containers: ElementNode[] = [];
+  $visitGapCursorContainers($getRoot(), (container) => {
+    containers.push(container);
+  });
+
+  for (const container of containers) {
+    $insertMissingGapCursors(container);
+  }
+
+  const gapKeys = new Set<NodeKey>();
+  for (const container of containers) {
+    for (const key of $removeUnneededGapCursors(container)) {
+      gapKeys.add(key);
+    }
+  }
+
+  return gapKeys;
+}
+
+export function $getGapCursorKeys(): Set<NodeKey> {
+  const gapKeys = new Set<NodeKey>();
+  $visitGapCursorContainers($getRoot(), (container) => {
+    for (const child of container.getChildren()) {
+      if ($isGapCursorParagraph(child)) {
+        gapKeys.add(child.getKey());
+      }
+    }
+  });
   return gapKeys;
 }
 
