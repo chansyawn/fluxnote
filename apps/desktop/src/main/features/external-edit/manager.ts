@@ -8,20 +8,30 @@ import { businessError } from "@shared/ipc/result";
 
 interface PendingExternalEdit {
   claimed: boolean;
+  onCancel?: () => void;
   originalContent: string;
   resolve: (result: ExternalEditResult) => void;
+  writeBack?: (content: string) => Promise<void>;
   session: ExternalEditSession;
 }
 
 export interface ClaimedExternalEdit {
+  cancel?: () => void;
   originalContent: string;
   resolve: (result: ExternalEditResult) => void;
   session: ExternalEditSession;
+  writeBack?: (content: string) => Promise<void>;
 }
 
 interface BeginExternalEditResult {
   result: Promise<ExternalEditResult>;
   session: ExternalEditSession;
+}
+
+interface BeginExternalEditOptions {
+  onCancel?: () => void;
+  signal?: AbortSignal;
+  writeBack?: (content: string) => Promise<void>;
 }
 
 interface ExternalEditManagerServices {
@@ -47,7 +57,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     blockId: string,
     originalContent: string,
     trigger: ExternalEditTrigger,
-    options?: { signal?: AbortSignal },
+    options?: BeginExternalEditOptions,
   ): BeginExternalEditResult {
     const session: ExternalEditSession = {
       blockId,
@@ -58,8 +68,10 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     const result = new Promise<ExternalEditResult>((resolve) => {
       pendingEdits.set(session.editId, {
         claimed: false,
+        onCancel: options?.onCancel,
         originalContent,
         resolve,
+        writeBack: options?.writeBack,
         session,
       });
     });
@@ -73,6 +85,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
         if (!entry || entry.claimed) return;
         pendingEdits.delete(session.editId);
         emitSessionsChanged();
+        entry.onCancel?.();
         entry.resolve({ blockId, status: "cancelled" });
       },
       { once: true },
@@ -100,6 +113,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     entry.claimed = true;
     emitSessionsChanged();
     return {
+      cancel: entry.onCancel,
       originalContent: entry.originalContent,
       resolve: (result) => {
         pendingEdits.delete(editId);
@@ -107,6 +121,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
         entry.resolve(result);
       },
       session: entry.session,
+      writeBack: entry.writeBack,
     };
   }
 
@@ -114,6 +129,7 @@ export function createExternalEditManager(services: ExternalEditManagerServices)
     const entries = Array.from(pendingEdits.values());
     pendingEdits.clear();
     for (const entry of entries) {
+      entry.onCancel?.();
       entry.resolve({
         blockId: entry.session.blockId,
         status: "cancelled",

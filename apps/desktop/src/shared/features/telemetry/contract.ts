@@ -8,6 +8,7 @@ export const blockCreatedSourceSchema = z.enum([
   "workspace_empty_state",
   "workspace_shortcut",
   "quick_create_shortcut",
+  "mac_accessibility_external_edit",
   "cli_add_text",
   "cli_add_file",
   "cli_external_edit",

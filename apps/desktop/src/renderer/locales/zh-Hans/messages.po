@@ -122,6 +122,11 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/external-edit/external-edit-write-back-sync.tsx:12
+msgid "external-edit.write-back.failed"
+msgstr "已编辑文本已复制到剪贴板，因为无法更新原输入框。"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr "返回首页"
@@ -334,12 +339,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:124
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "取消外部编辑"
 
@@ -350,17 +355,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:106
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "删除区块"
 
@@ -386,32 +391,42 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:72
+msgid "preferences.shortcuts.externalEdit.description"
+msgstr "从当前聚焦的 macOS 输入框启动 External edit 会话。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:69
+msgid "preferences.shortcuts.externalEdit.label"
+msgstr "外部编辑聚焦输入框"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:176
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:48
 msgid "preferences.shortcuts.group.global"
 msgstr "全局"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
 msgid "preferences.shortcuts.group.workspace"
 msgstr "工作区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:58
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "快速记录区块"
 
@@ -432,22 +447,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:117
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "固定/取消固定区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:53
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 
@@ -645,24 +660,59 @@ msgid "workspace.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:113
+msgid "workspace.external-edit.metadata.app"
+msgstr "应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:102
 msgid "workspace.external-edit.metadata.cwd"
 msgstr "工作目录"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:106
 msgid "workspace.external-edit.metadata.file"
 msgstr "目标文件"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:66
+msgid "workspace.external-edit.metadata.mac-input"
+msgstr "macOS 输入框"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:117
+msgid "workspace.external-edit.metadata.scope"
+msgstr "编辑范围"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:49
+msgid "workspace.external-edit.metadata.scope.full-value"
+msgstr "完整输入框"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:47
+msgid "workspace.external-edit.metadata.scope.selection"
+msgstr "选中文本"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:96
 msgid "workspace.external-edit.metadata.source"
 msgstr "来源"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:32
 msgid "workspace.external-edit.metadata.source.cli"
 msgstr "命令行"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:35
+msgid "workspace.external-edit.metadata.source.mac-accessibility"
+msgstr "macOS 输入框"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:70
+msgid "workspace.external-edit.metadata.unknown-application"
+msgstr "未知应用"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31

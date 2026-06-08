@@ -1,12 +1,36 @@
 import { z } from "zod";
 
-export const externalEditTriggerSchema = z.object({
+export const cliExternalEditTriggerSchema = z.object({
   cwd: z.string().min(1),
   requestedFilePath: z.string().min(1),
   source: z.literal("cli"),
   targetFilePath: z.string().min(1),
 });
+
+export const macAccessibilityExternalEditTriggerSchema = z.object({
+  appBundleId: z.string().min(1).nullable(),
+  appName: z.string().min(1).nullable(),
+  editScope: z.enum(["selection", "full_value"]),
+  elementRole: z.string().min(1).nullable(),
+  processId: z.number().int().nonnegative(),
+  selectedRange: z
+    .object({
+      length: z.number().int().nonnegative(),
+      location: z.number().int().nonnegative(),
+    })
+    .nullable(),
+  source: z.literal("mac_accessibility"),
+});
+
+export const externalEditTriggerSchema = z.discriminatedUnion("source", [
+  cliExternalEditTriggerSchema,
+  macAccessibilityExternalEditTriggerSchema,
+]);
 export type ExternalEditTrigger = z.infer<typeof externalEditTriggerSchema>;
+export type CliExternalEditTrigger = z.infer<typeof cliExternalEditTriggerSchema>;
+export type MacAccessibilityExternalEditTrigger = z.infer<
+  typeof macAccessibilityExternalEditTriggerSchema
+>;
 
 export const externalEditSessionSchema = z.object({
   editId: z.string().min(1),

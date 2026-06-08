@@ -1,6 +1,7 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@fluxnotes/ui/components/hover-card";
-import { SquareTerminalIcon } from "@fluxnotes/ui/icons/lucide";
+import { LaptopIcon, SquareTerminalIcon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import type { ComponentProps, ReactNode } from "react";
@@ -20,6 +21,8 @@ function ExternalEditSourceIcon({ source }: { source: ExternalEditTrigger["sourc
   switch (source) {
     case "cli":
       return <SquareTerminalIcon aria-hidden="true" className="size-3 shrink-0" />;
+    case "mac_accessibility":
+      return <LaptopIcon aria-hidden="true" className="size-3 shrink-0" />;
   }
 }
 
@@ -27,6 +30,23 @@ function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["sour
   switch (source) {
     case "cli":
       return <Trans id="workspace.external-edit.metadata.source.cli">Command line</Trans>;
+    case "mac_accessibility":
+      return (
+        <Trans id="workspace.external-edit.metadata.source.mac-accessibility">macOS input</Trans>
+      );
+  }
+}
+
+function ExternalEditScopeLabel({
+  scope,
+}: {
+  scope: Extract<ExternalEditTrigger, { source: "mac_accessibility" }>["editScope"];
+}) {
+  switch (scope) {
+    case "selection":
+      return <Trans id="workspace.external-edit.metadata.scope.selection">Selected text</Trans>;
+    case "full_value":
+      return <Trans id="workspace.external-edit.metadata.scope.full-value">Full input</Trans>;
   }
 }
 
@@ -42,7 +62,20 @@ function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: R
 }
 
 export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMetadataCardProps) {
-  const fileName = getFileName(trigger.targetFilePath);
+  const { i18n } = useLingui();
+  const macInputLabel = i18n._({
+    id: "workspace.external-edit.metadata.mac-input",
+    message: "macOS input",
+  });
+  const unknownApplicationLabel = i18n._({
+    id: "workspace.external-edit.metadata.unknown-application",
+    message: "Unknown application",
+  });
+  const title =
+    trigger.source === "cli"
+      ? trigger.targetFilePath
+      : (trigger.appName ?? trigger.appBundleId ?? macInputLabel);
+  const label = trigger.source === "cli" ? getFileName(trigger.targetFilePath) : title;
 
   return (
     <HoverCard>
@@ -52,10 +85,10 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
           "text-muted-foreground flex max-w-full min-w-0 items-center gap-1.5 px-2 font-mono text-xs outline-hidden",
           className,
         )}
-        title={trigger.targetFilePath}
+        title={title}
       >
         <ExternalEditSourceIcon source={trigger.source} />
-        <span className="truncate">{fileName}</span>
+        <span className="truncate">{label}</span>
       </AdornmentBar>
       <HoverCardContent align="start" className="w-[min(24rem,calc(100vw-2rem))]" side="bottom">
         <dl className="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-3 gap-y-2">
@@ -63,14 +96,29 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
             label={<Trans id="workspace.external-edit.metadata.source">Source</Trans>}
             value={<ExternalEditSourceLabel source={trigger.source} />}
           />
-          <ExternalEditMetadataItem
-            label={<Trans id="workspace.external-edit.metadata.cwd">Working directory</Trans>}
-            value={trigger.cwd}
-          />
-          <ExternalEditMetadataItem
-            label={<Trans id="workspace.external-edit.metadata.file">Target file</Trans>}
-            value={trigger.targetFilePath}
-          />
+          {trigger.source === "cli" ? (
+            <>
+              <ExternalEditMetadataItem
+                label={<Trans id="workspace.external-edit.metadata.cwd">Working directory</Trans>}
+                value={trigger.cwd}
+              />
+              <ExternalEditMetadataItem
+                label={<Trans id="workspace.external-edit.metadata.file">Target file</Trans>}
+                value={trigger.targetFilePath}
+              />
+            </>
+          ) : (
+            <>
+              <ExternalEditMetadataItem
+                label={<Trans id="workspace.external-edit.metadata.app">Application</Trans>}
+                value={trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel}
+              />
+              <ExternalEditMetadataItem
+                label={<Trans id="workspace.external-edit.metadata.scope">Edit scope</Trans>}
+                value={<ExternalEditScopeLabel scope={trigger.editScope} />}
+              />
+            </>
+          )}
         </dl>
       </HoverCardContent>
     </HoverCard>

@@ -13,6 +13,11 @@ import {
   type AutoArchiveRuntime,
 } from "@main/features/blocks/auto-archive-runtime";
 import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
+import {
+  createDefaultMacAccessibilityExternalEditService,
+  createMacAccessibilityHelperFactory,
+  type MacAccessibilityExternalEditService,
+} from "@main/features/mac-accessibility-external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
 import { createTelemetryService, type TelemetryService } from "@main/features/telemetry";
@@ -34,6 +39,7 @@ export interface MainServices {
   db: DbRuntime;
   events: EventBus;
   externalEditManager: ExternalEditManager;
+  macAccessibilityExternalEditService: MacAccessibilityExternalEditService;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
@@ -91,6 +97,14 @@ export function createMainServices(): MainServices {
     emitEvent,
     showWindow: () => windowManager.activateMainWindow(),
   });
+  const macAccessibilityExternalEditService = createDefaultMacAccessibilityExternalEditService({
+    emitEvent,
+    externalEditManager,
+    getDb: () => db.getDb(),
+    helperFactory: createMacAccessibilityHelperFactory(),
+    openBlockService,
+    telemetryService,
+  });
 
   windowManager = createWindowManager({
     captureAppShow: () => telemetryService.captureEvent("app_show"),
@@ -114,6 +128,7 @@ export function createMainServices(): MainServices {
     db,
     events,
     externalEditManager,
+    macAccessibilityExternalEditService,
     openBlockService,
     paths,
     preferencesService,

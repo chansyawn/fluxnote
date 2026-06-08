@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   registerCliCommands: vi.fn(),
   registerExternalEditCommands: vi.fn(),
   registerExternalUrlCommands: vi.fn(),
+  registerMacAccessibilityExternalEditCommands: vi.fn(),
   registerOpenBlockCommands: vi.fn(),
   registerPreferencesCommands: vi.fn(),
   registerShortcutCommands: vi.fn(),
@@ -56,6 +57,9 @@ vi.mock("../features/external-edit/command", () => ({
 }));
 vi.mock("../features/external-url", () => ({
   registerExternalUrlCommands: mocks.registerExternalUrlCommands,
+}));
+vi.mock("../features/mac-accessibility-external-edit", () => ({
+  registerMacAccessibilityExternalEditCommands: mocks.registerMacAccessibilityExternalEditCommands,
 }));
 vi.mock("../features/open-block/command", () => ({
   registerOpenBlockCommands: mocks.registerOpenBlockCommands,
@@ -124,6 +128,9 @@ describe("createBackendRuntime", () => {
       begin: vi.fn(() => ({ result: Promise.resolve({ blockId: "b1", status: "cancelled" }) })),
       cancelAll: vi.fn(),
       listSessions: vi.fn(() => []),
+    },
+    macAccessibilityExternalEditService: {
+      startFocusedExternalEdit: vi.fn(),
     },
     openBlockService: {
       requestOpen: vi.fn(),
@@ -198,6 +205,7 @@ describe("createBackendRuntime", () => {
     expect(mocks.registerClipboardCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerCliCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerExternalEditCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerMacAccessibilityExternalEditCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerExternalUrlCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerOpenBlockCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerPreferencesCommands).toHaveBeenCalledTimes(1);

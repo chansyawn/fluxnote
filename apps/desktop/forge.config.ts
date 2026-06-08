@@ -13,6 +13,7 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts.ts";
 import { copyCliResources } from "./config/forge/cli-resources.ts";
 import { getMacSigningConfig } from "./config/forge/mac-signing.ts";
+import { copyNativeResources } from "./config/forge/native-resources.ts";
 import { readPackageVersion } from "./config/forge/package-version.ts";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -84,6 +85,7 @@ const config: ForgeConfig = {
   hooks: {
     packageAfterCopy: async (_config, buildPath) => {
       await copyCliResources(buildPath);
+      await copyNativeResources(buildPath);
     },
     postMake: async (_config, makeResults) => {
       return await normalizeMakeArtifacts(makeResults);

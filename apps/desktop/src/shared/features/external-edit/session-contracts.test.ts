@@ -1,0 +1,33 @@
+import { describe, expect, it } from "vite-plus/test";
+
+import { externalEditTriggerSchema } from "./session-contracts";
+
+describe("external edit session contracts", () => {
+  it("accepts CLI external edit triggers", () => {
+    const trigger = externalEditTriggerSchema.parse({
+      cwd: "/workspace",
+      requestedFilePath: "prompt.md",
+      source: "cli",
+      targetFilePath: "/workspace/prompt.md",
+    });
+
+    expect(trigger.source).toBe("cli");
+  });
+
+  it("accepts macOS Accessibility external edit triggers", () => {
+    const trigger = externalEditTriggerSchema.parse({
+      appBundleId: "com.example.App",
+      appName: "Example",
+      editScope: "selection",
+      elementRole: "AXTextArea",
+      processId: 123,
+      selectedRange: { length: 4, location: 2 },
+      source: "mac_accessibility",
+    });
+
+    expect(trigger).toMatchObject({
+      editScope: "selection",
+      source: "mac_accessibility",
+    });
+  });
+});

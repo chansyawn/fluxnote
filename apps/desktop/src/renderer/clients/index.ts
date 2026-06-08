@@ -19,6 +19,8 @@ export {
   cancelExternalEdit,
   listExternalEditSessions,
   onExternalEditSessionsChanged,
+  onExternalEditWriteBackFailed,
+  startFocusedExternalEdit,
   submitExternalEdit,
 } from "./external-edit";
 export { openExternalUrl } from "./external-url";
@@ -61,6 +63,7 @@ export type {
   ExternalEditSession,
   ExternalEditSessionsChangedPayload,
   ExternalEditSubmitRequest,
+  ExternalEditWriteBackFailedPayload,
 } from "./external-edit";
 export type { ExternalUrlOpenRequest } from "./external-url";
 export type {
