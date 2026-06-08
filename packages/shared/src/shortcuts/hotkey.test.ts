@@ -24,6 +24,7 @@ describe("shortcut hotkey semantics", () => {
   it("matches backslash shortcuts", () => {
     const event = {
       altKey: false,
+      code: "Backslash",
       ctrlKey: false,
       key: "\\",
       metaKey: true,
@@ -31,6 +32,52 @@ describe("shortcut hotkey semantics", () => {
     } as KeyboardEvent;
 
     expect(keyboardEventMatchesShortcut(event, "Mod+\\", "mac")).toBe(true);
+  });
+
+  it("records and matches macOS Option dead-key shortcuts by physical key", () => {
+    const event = {
+      altKey: true,
+      code: "KeyU",
+      ctrlKey: false,
+      key: "Dead",
+      metaKey: true,
+      shiftKey: false,
+    } as KeyboardEvent;
+
+    expect(normalizeShortcutRecorderHotkey(event, "mac")).toBe("Mod+Alt+U");
+    expect(formatShortcutRecorderTokens(event, "mac")).toEqual(["Cmd", "Option", "U"]);
+    expect(keyboardEventMatchesShortcut(event, "Mod+Alt+U", "mac")).toBe(true);
+  });
+
+  it("records and matches macOS Option character shortcuts by physical key", () => {
+    const event = {
+      altKey: true,
+      code: "KeyX",
+      ctrlKey: false,
+      key: "≈",
+      metaKey: true,
+      shiftKey: false,
+    } as KeyboardEvent;
+
+    expect(normalizeShortcutRecorderHotkey(event, "mac")).toBe("Mod+Alt+X");
+    expect(formatShortcutRecorderTokens(event, "mac")).toEqual(["Cmd", "Option", "X"]);
+    expect(keyboardEventMatchesShortcut(event, "Mod+Alt+X", "mac")).toBe(true);
+  });
+
+  it("keeps layout-produced letter keys when they differ from physical codes", () => {
+    const event = {
+      altKey: false,
+      code: "KeyN",
+      ctrlKey: false,
+      key: "b",
+      metaKey: true,
+      shiftKey: false,
+    } as KeyboardEvent;
+
+    expect(normalizeShortcutRecorderHotkey(event, "mac")).toBe("Mod+B");
+    expect(formatShortcutRecorderTokens(event, "mac")).toEqual(["Cmd", "B"]);
+    expect(keyboardEventMatchesShortcut(event, "Mod+B", "mac")).toBe(true);
+    expect(keyboardEventMatchesShortcut(event, "Mod+N", "mac")).toBe(false);
   });
 
   it("matches Return and Escape aliases", () => {
@@ -44,6 +91,22 @@ describe("shortcut hotkey semantics", () => {
       keyboardEventMatchesShortcut(
         { altKey: false, ctrlKey: true, key: "Escape", metaKey: false, shiftKey: false },
         "Control+Esc" as ShortcutBinding,
+      ),
+    ).toBe(true);
+  });
+
+  it("matches arrow key shortcuts", () => {
+    expect(
+      keyboardEventMatchesShortcut(
+        {
+          altKey: true,
+          code: "ArrowUp",
+          ctrlKey: false,
+          key: "ArrowUp",
+          metaKey: false,
+          shiftKey: false,
+        },
+        "Alt+ArrowUp" as ShortcutBinding,
       ),
     ).toBe(true);
   });

@@ -87,6 +87,7 @@ function createRecorderHarness(
 
 describe("useShortcutRecorder", () => {
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
@@ -199,6 +200,45 @@ describe("useShortcutRecorder", () => {
 
     expect(harness.getSnapshot().feedback).toBeNull();
     expect(harness.getSnapshot().recordingAction).toBeNull();
+  });
+
+  it("records macOS Option character shortcuts by physical key", () => {
+    vi.useFakeTimers();
+    vi.stubGlobal("navigator", {
+      platform: "MacIntel",
+      userAgent: "Mac OS",
+    });
+    const updateShortcut = vi.fn<UpdateShortcut>(
+      (_action, shortcut) => ({ ok: true, shortcut: shortcut as Hotkey }) as const,
+    );
+    const harness = createRecorderHarness({ updateShortcut });
+
+    act(() => {
+      harness.getSnapshot().startRecording("workspace.createBlock");
+    });
+
+    let recordedEvent: KeyboardEvent;
+    act(() => {
+      recordedEvent = dispatchDocumentKeyboardEvent("keydown", {
+        altKey: true,
+        code: "KeyX",
+        key: "≈",
+        metaKey: true,
+      });
+    });
+    const recordedHotkey = normalizeShortcutRecorderHotkey(recordedEvent!);
+
+    if (!recordedHotkey) {
+      throw new Error("Expected the macOS Option shortcut to normalize.");
+    }
+
+    expect(recordedHotkey).toBe("Mod+Alt+X");
+    expect(updateShortcut).toHaveBeenCalledWith("workspace.createBlock", "Mod+Alt+X");
+    expect(harness.getSnapshot().feedback).toEqual({
+      error: null,
+      phase: "success",
+      tokens: formatShortcutTokens("Mod+Alt+X"),
+    });
   });
 
   it("lets the user clear or cancel a Shortcut Preference recording", () => {
