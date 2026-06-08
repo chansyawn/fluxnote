@@ -81,21 +81,21 @@ export function getTableCellRowIndex(cellNode: TableCellNode): number {
   return $getTableRowIndexFromTableCellNode(cellNode);
 }
 
-function getRows(tableNode: TableNode): TableRowNode[] {
+export function getTableRows(tableNode: TableNode): TableRowNode[] {
   return tableNode.getChildren().filter($isTableRowNode);
 }
 
-function getCells(rowNode: TableRowNode): TableCellNode[] {
+export function getTableRowCells(rowNode: TableRowNode): TableCellNode[] {
   return rowNode.getChildren().filter($isTableCellNode);
 }
 
-function getCellNodeAt(
+export function getTableCellNodeAt(
   tableNode: TableNode,
   rowIndex: number,
   columnIndex: number,
 ): TableCellNode | null {
-  const rowNode = getRows(tableNode).at(rowIndex);
-  return rowNode ? (getCells(rowNode).at(columnIndex) ?? null) : null;
+  const rowNode = getTableRows(tableNode).at(rowIndex);
+  return rowNode ? (getTableRowCells(rowNode).at(columnIndex) ?? null) : null;
 }
 
 type TableCellHeaderState = (typeof TableCellHeaderStates)[keyof typeof TableCellHeaderStates];
@@ -130,8 +130,8 @@ function createTableCell(
 }
 
 function normalizeTableRowHeaders(tableNode: TableNode): void {
-  getRows(tableNode).forEach((rowNode, rowIndex) => {
-    for (const cellNode of getCells(rowNode)) {
+  getTableRows(tableNode).forEach((rowNode, rowIndex) => {
+    for (const cellNode of getTableRowCells(rowNode)) {
       cellNode.setHeaderStyles(
         rowIndex === 0 ? TableCellHeaderStates.ROW : TableCellHeaderStates.NO_STATUS,
         TableCellHeaderStates.ROW,
@@ -142,7 +142,7 @@ function normalizeTableRowHeaders(tableNode: TableNode): void {
 
 function cloneEmptyRowFrom(rowNode: TableRowNode): TableRowNode {
   const clone = $createTableRowNode(rowNode.getHeight());
-  for (const cell of getCells(rowNode)) {
+  for (const cell of getTableRowCells(rowNode)) {
     clone.append(
       createTableCell(
         getHeaderState(cell.getHeaderStyles(), TableCellHeaderStates.COLUMN),
@@ -169,6 +169,13 @@ function insertTableRowAtCell(cellNode: TableCellNode, insertAfter: boolean): Ta
   return insertedRow;
 }
 
+export function insertTableRowBelowCell(cellNode: TableCellNode): TableRowNode | null {
+  const tableNode = $getTableNodeFromLexicalNodeOrThrow(cellNode);
+  const insertedRow = insertTableRowAtCell(cellNode, true);
+  normalizeTableRowHeaders(tableNode);
+  return insertedRow;
+}
+
 function cloneEmptyCellFrom(cellNode: TableCellNode): TableCellNode {
   return createTableCell(
     getHeaderState(cellNode.getHeaderStyles(), TableCellHeaderStates.ROW),
@@ -183,8 +190,8 @@ function setTableColumnAlign(
 ): void {
   const format = columnAlignToFormat(align);
 
-  for (const rowNode of getRows(tableNode)) {
-    const cellNode = getCells(rowNode).at(columnIndex);
+  for (const rowNode of getTableRows(tableNode)) {
+    const cellNode = getTableRowCells(rowNode).at(columnIndex);
     const firstChild = cellNode?.getFirstChild();
     if ($isParagraphNode(firstChild)) {
       firstChild.setFormat(format);
@@ -200,8 +207,8 @@ function insertTableColumnAtCell(
   const columnIndex = getTableCellColumnIndex(cellNode);
   let firstInsertedCell: TableCellNode | null = null;
 
-  for (const row of getRows(tableNode)) {
-    const anchorCell = getCells(row).at(columnIndex);
+  for (const row of getTableRows(tableNode)) {
+    const anchorCell = getTableRowCells(row).at(columnIndex);
     if (!anchorCell) continue;
 
     const insertedCell = cloneEmptyCellFrom(anchorCell);
@@ -226,7 +233,7 @@ function insertTableColumnAtCell(
 
 function moveTableRow(rowNode: TableRowNode, targetRowIndex: number): void {
   const tableNode = $getTableNodeFromLexicalNodeOrThrow(rowNode);
-  const rows = getRows(tableNode);
+  const rows = getTableRows(tableNode);
   const currentRowIndex = rows.findIndex((child) => child.is(rowNode));
   const targetRowNode = rows.at(targetRowIndex);
 
@@ -265,68 +272,68 @@ function applyTableOperation(payload: TableOperationPayload): boolean {
   switch (payload.operation) {
     case "set-column-align": {
       setTableColumnAlign(tableNode, columnIndex, payload.align);
-      selectCell(getCellNodeAt(tableNode, rowIndex, columnIndex));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex, columnIndex));
       return true;
     }
     case "insert-column-left": {
       const insertedCell = insertTableColumnAtCell(node, false);
-      selectCell(insertedCell ?? getCellNodeAt(tableNode, rowIndex, columnIndex));
+      selectCell(insertedCell ?? getTableCellNodeAt(tableNode, rowIndex, columnIndex));
       return true;
     }
     case "insert-column-right": {
       const insertedCell = insertTableColumnAtCell(node, true);
-      selectCell(insertedCell ?? getCellNodeAt(tableNode, rowIndex, columnIndex + 1));
+      selectCell(insertedCell ?? getTableCellNodeAt(tableNode, rowIndex, columnIndex + 1));
       return true;
     }
     case "move-column-left": {
       if (columnIndex <= 0) return false;
       $moveTableColumn(tableNode, columnIndex, columnIndex - 1);
-      selectCell(getCellNodeAt(tableNode, rowIndex, columnIndex - 1));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex, columnIndex - 1));
       return true;
     }
     case "move-column-right": {
       if (columnIndex < 0 || columnIndex >= columnCount - 1) return false;
       $moveTableColumn(tableNode, columnIndex, columnIndex + 1);
-      selectCell(getCellNodeAt(tableNode, rowIndex, columnIndex + 1));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex, columnIndex + 1));
       return true;
     }
     case "delete-column": {
       if (columnCount <= 1) return false;
       $deleteTableColumn(tableNode, columnIndex);
-      selectCell(getCellNodeAt(tableNode, rowIndex, Math.min(columnIndex, columnCount - 2)));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex, Math.min(columnIndex, columnCount - 2)));
       return true;
     }
     case "insert-row-above": {
       const insertedRow = insertTableRowAtCell(node, false);
       normalizeTableRowHeaders(tableNode);
-      selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
+      selectCell(insertedRow ? (getTableRowCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "insert-row-below": {
       const insertedRow = insertTableRowAtCell(node, true);
       normalizeTableRowHeaders(tableNode);
-      selectCell(insertedRow ? (getCells(insertedRow).at(columnIndex) ?? null) : null);
+      selectCell(insertedRow ? (getTableRowCells(insertedRow).at(columnIndex) ?? null) : null);
       return true;
     }
     case "move-row-up": {
       if (rowIndex <= 0) return false;
       moveTableRow(rowNode, rowIndex - 1);
       normalizeTableRowHeaders(tableNode);
-      selectCell(getCellNodeAt(tableNode, rowIndex - 1, columnIndex));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex - 1, columnIndex));
       return true;
     }
     case "move-row-down": {
       if (rowIndex < 0 || rowIndex >= rowCount - 1) return false;
       moveTableRow(rowNode, rowIndex + 1);
       normalizeTableRowHeaders(tableNode);
-      selectCell(getCellNodeAt(tableNode, rowIndex + 1, columnIndex));
+      selectCell(getTableCellNodeAt(tableNode, rowIndex + 1, columnIndex));
       return true;
     }
     case "delete-row": {
       if (rowCount <= 1) return false;
       $removeTableRowAtIndex(tableNode, rowIndex);
       normalizeTableRowHeaders(tableNode);
-      selectCell(getCellNodeAt(tableNode, Math.min(rowIndex, rowCount - 2), columnIndex));
+      selectCell(getTableCellNodeAt(tableNode, Math.min(rowIndex, rowCount - 2), columnIndex));
       return true;
     }
   }

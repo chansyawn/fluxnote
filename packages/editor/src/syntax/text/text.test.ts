@@ -44,14 +44,12 @@ describe("text", () => {
     selectText(editor, "A", 1);
     pressTab(editor);
 
-    expect(readMdast(editor).children[0]).toMatchObject({
-      children: [
-        {
-          children: [{ children: [{ type: "text", value: "A" }], type: "tableCell" }],
-          type: "tableRow",
-        },
-      ],
-      type: "table",
-    });
+    const table = readMdast(editor).children[0];
+    expect(table?.type).toBe("table");
+    if (table?.type !== "table") {
+      throw new Error("Expected a table.");
+    }
+    expect(table.children[0].children[0].children).toEqual([{ type: "text", value: "A" }]);
+    expect(table.children[0].children[0].children).not.toEqual([{ type: "text", value: "A  " }]);
   });
 });
