@@ -8,7 +8,11 @@ import { businessError } from "@shared/ipc/result";
 import { clipboard, systemPreferences } from "electron";
 
 import { createBlockRecord } from "../blocks/service";
-import type { MacAccessibilityHelper, MacAccessibilityHelperFactory } from "./helper";
+import {
+  MacAccessibilityHelperError,
+  type MacAccessibilityHelper,
+  type MacAccessibilityHelperFactory,
+} from "./helper";
 
 interface MacAccessibilityExternalEditServiceDeps {
   clipboard: Pick<typeof clipboard, "writeText">;
@@ -27,6 +31,10 @@ export interface MacAccessibilityExternalEditService {
 }
 
 function toBusinessInvalidOperation(error: unknown): never {
+  if (error instanceof MacAccessibilityHelperError && error.code === "permission_required") {
+    throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
+  }
+
   if (error instanceof Error && error.message.includes("Accessibility permission")) {
     throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
   }

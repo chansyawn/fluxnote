@@ -2,6 +2,19 @@
 #import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
 
+static NSString *const HelperErrorDomain = @"app.fluxnotes.MacAccessibilityHelper";
+static NSString *const HelperErrorCodeKey = @"code";
+static NSUInteger const MaxDescendantDepth = 8;
+
+static NSString *const ErrorInvalidPayload = @"invalid_payload";
+static NSString *const ErrorInvalidCommand = @"invalid_command";
+static NSString *const ErrorNoCapturedElement = @"no_captured_element";
+static NSString *const ErrorNoEditableElement = @"no_editable_element";
+static NSString *const ErrorPermissionRequired = @"permission_required";
+static NSString *const ErrorSecureTextField = @"secure_text_field";
+static NSString *const ErrorUnsupportedElement = @"unsupported_element";
+static NSString *const ErrorWriteBackFailed = @"write_back_failed";
+
 @interface AccessibilitySession : NSObject
 @property(nonatomic) AXUIElementRef focusedElement;
 - (NSDictionary *)capture:(NSError **)error;
@@ -11,43 +24,51 @@
 typedef struct {
   AXUIElementRef element;
   AXError error;
-} FocusedElementResult;
+} ElementLookupResult;
 
-static NSString *const HelperErrorDomain = @"app.fluxnotes.MacAccessibilityHelper";
+typedef NS_ENUM(NSInteger, EditableSearchMode) {
+  EditableSearchModeFocusedOnly,
+  EditableSearchModeAnyEditable,
+};
 
-static NSError *HelperError(NSString *message) {
-  return [NSError errorWithDomain:HelperErrorDomain code:1 userInfo:@{NSLocalizedDescriptionKey : message}];
+static NSError *HelperError(NSString *code, NSString *message) {
+  return [NSError errorWithDomain:HelperErrorDomain
+                             code:1
+                         userInfo:@{
+                           HelperErrorCodeKey : code,
+                           NSLocalizedDescriptionKey : message,
+                         }];
 }
 
-static void Emit(NSDictionary *response) {
+static NSString *HelperErrorCode(NSError *error) {
+  NSString *code = error.userInfo[HelperErrorCodeKey];
+  return [code isKindOfClass:NSString.class] ? code : ErrorWriteBackFailed;
+}
+
+static NSDictionary *SuccessResponse(id data) {
+  return @{@"ok" : @YES, @"data" : data ?: [NSNull null]};
+}
+
+static NSDictionary *FailureResponse(NSString *code, NSString *message) {
+  return @{
+    @"ok" : @NO,
+    @"code" : code ?: ErrorWriteBackFailed,
+    @"error" : message ?: @"macOS Accessibility helper failed.",
+  };
+}
+
+static NSDictionary *FailureResponseFromError(NSError *error) {
+  return FailureResponse(HelperErrorCode(error), error.localizedDescription);
+}
+
+static void EmitResponse(NSDictionary *response) {
   NSData *data = [NSJSONSerialization dataWithJSONObject:response options:0 error:nil];
-  if (!data) {
+  if (data == nil) {
     return;
   }
   NSString *line = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
   fprintf(stdout, "%s\n", line.UTF8String);
   fflush(stdout);
-}
-
-static NSDictionary *Success(id data) {
-  return @{@"ok" : @YES, @"data" : data ?: [NSNull null]};
-}
-
-static NSDictionary *Failure(NSString *message) {
-  return @{@"ok" : @NO, @"error" : message ?: @"macOS Accessibility helper failed."};
-}
-
-static NSString *ReadStringAttribute(AXUIElementRef element, CFStringRef attribute) {
-  CFTypeRef value = NULL;
-  AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
-  if (result != kAXErrorSuccess || value == NULL) {
-    return nil;
-  }
-  if (CFGetTypeID(value) != CFStringGetTypeID()) {
-    CFRelease(value);
-    return nil;
-  }
-  return CFBridgingRelease(value);
 }
 
 static NSString *AXErrorDescription(AXError error) {
@@ -93,36 +114,20 @@ static NSString *MessageWithAXError(NSString *message, AXError error) {
   return [NSString stringWithFormat:@"%@ (%@, code %d)", message, AXErrorDescription(error), error];
 }
 
-static AXUIElementRef CopyFocusedApplicationElement(AXError *systemWideError) {
-  AXUIElementRef systemWideElement = AXUIElementCreateSystemWide();
-  CFTypeRef focusedAppValue = NULL;
-  AXError appResult = AXUIElementCopyAttributeValue(
-      systemWideElement, kAXFocusedApplicationAttribute, &focusedAppValue);
-  CFRelease(systemWideElement);
-
-  if (systemWideError != NULL) {
-    *systemWideError = appResult;
+static NSString *CopyStringAttribute(AXUIElementRef element, CFStringRef attribute) {
+  CFTypeRef value = NULL;
+  AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
+  if (result != kAXErrorSuccess || value == NULL) {
+    return nil;
   }
-  if (appResult == kAXErrorSuccess && focusedAppValue != NULL) {
-    return (AXUIElementRef)focusedAppValue;
+  if (CFGetTypeID(value) != CFStringGetTypeID()) {
+    CFRelease(value);
+    return nil;
   }
-  if (focusedAppValue != NULL) {
-    CFRelease(focusedAppValue);
-  }
-
-  NSRunningApplication *frontmostApplication = NSWorkspace.sharedWorkspace.frontmostApplication;
-  if (frontmostApplication == nil || frontmostApplication.processIdentifier <= 0) {
-    return NULL;
-  }
-
-  return AXUIElementCreateApplication(frontmostApplication.processIdentifier);
+  return CFBridgingRelease(value);
 }
 
-static NSNumber *NumberOrNull(pid_t value) {
-  return [NSNumber numberWithInt:value];
-}
-
-static BOOL ReadBoolAttribute(AXUIElementRef element, CFStringRef attribute) {
+static BOOL CopyBoolAttribute(AXUIElementRef element, CFStringRef attribute) {
   CFTypeRef value = NULL;
   AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
   if (result != kAXErrorSuccess || value == NULL) {
@@ -133,7 +138,7 @@ static BOOL ReadBoolAttribute(AXUIElementRef element, CFStringRef attribute) {
   return boolValue;
 }
 
-static BOOL SupportsAttribute(AXUIElementRef element, CFStringRef attribute) {
+static BOOL CanReadAttribute(AXUIElementRef element, CFStringRef attribute) {
   CFTypeRef value = NULL;
   AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
   if (value != NULL) {
@@ -142,34 +147,7 @@ static BOOL SupportsAttribute(AXUIElementRef element, CFStringRef attribute) {
   return result == kAXErrorSuccess;
 }
 
-static NSString *ReadEditableContent(AXUIElementRef element) {
-  return ReadStringAttribute(element, kAXValueAttribute);
-}
-
-static BOOL IsEditableRole(NSString *role) {
-  NSSet *editableRoles = [NSSet setWithArray:@[
-    @"AXComboBox",
-    @"AXSearchField",
-    @"AXTextArea",
-    @"AXTextField",
-  ]];
-  return role != nil && [editableRoles containsObject:role];
-}
-
-static BOOL IsEditableCandidate(AXUIElementRef element) {
-  NSString *role = ReadStringAttribute(element, kAXRoleAttribute);
-  if ([role isEqualToString:@"AXSecureTextField"]) {
-    return NO;
-  }
-  if (IsEditableRole(role)) {
-    return ReadEditableContent(element) != nil;
-  }
-  return SupportsAttribute(element, kAXValueAttribute);
-}
-
-static AXUIElementRef CopyEditableDescendant(AXUIElementRef root, NSUInteger depth);
-
-static AXUIElementRef CopyAttributeElement(AXUIElementRef element, CFStringRef attribute,
+static AXUIElementRef CopyElementAttribute(AXUIElementRef element, CFStringRef attribute,
                                            AXError *error) {
   CFTypeRef value = NULL;
   AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
@@ -186,7 +164,7 @@ static AXUIElementRef CopyAttributeElement(AXUIElementRef element, CFStringRef a
   return (AXUIElementRef)value;
 }
 
-static NSArray *ReadElementArrayAttribute(AXUIElementRef element, CFStringRef attribute) {
+static NSArray *CopyElementArrayAttribute(AXUIElementRef element, CFStringRef attribute) {
   CFTypeRef value = NULL;
   AXError result = AXUIElementCopyAttributeValue(element, attribute, &value);
   if (result != kAXErrorSuccess || value == NULL) {
@@ -199,11 +177,36 @@ static NSArray *ReadElementArrayAttribute(AXUIElementRef element, CFStringRef at
   return CFBridgingRelease(value);
 }
 
-static AXUIElementRef CopyFocusedDescendant(AXUIElementRef root, NSUInteger depth) {
-  if (depth > 8) {
+static BOOL IsEditableRole(NSString *role) {
+  static NSSet<NSString *> *editableRoles;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    editableRoles = [NSSet setWithObjects:@"AXComboBox", @"AXSearchField", @"AXTextArea",
+                                       @"AXTextField", nil];
+  });
+  return role != nil && [editableRoles containsObject:role];
+}
+
+static BOOL IsEditableCandidate(AXUIElementRef element) {
+  NSString *role = CopyStringAttribute(element, kAXRoleAttribute);
+  if ([role isEqualToString:@"AXSecureTextField"]) {
+    return NO;
+  }
+  if (IsEditableRole(role)) {
+    return YES;
+  }
+  return CanReadAttribute(element, kAXValueAttribute);
+}
+
+static AXUIElementRef CopyEditableDescendant(AXUIElementRef root, NSUInteger depth,
+                                             EditableSearchMode mode) {
+  if (depth > MaxDescendantDepth) {
     return NULL;
   }
-  if (ReadBoolAttribute(root, kAXFocusedAttribute) && IsEditableCandidate(root)) {
+
+  BOOL isFocusedEnough =
+      mode == EditableSearchModeAnyEditable || CopyBoolAttribute(root, kAXFocusedAttribute);
+  if (isFocusedEnough && IsEditableCandidate(root)) {
     CFRetain(root);
     return root;
   }
@@ -211,15 +214,16 @@ static AXUIElementRef CopyFocusedDescendant(AXUIElementRef root, NSUInteger dept
   NSArray *childAttributes =
       @[ (__bridge NSString *)kAXChildrenAttribute, (__bridge NSString *)kAXContentsAttribute ];
   for (NSString *attribute in childAttributes) {
-    NSArray *children = ReadElementArrayAttribute(root, (__bridge CFStringRef)attribute);
+    NSArray *children = CopyElementArrayAttribute(root, (__bridge CFStringRef)attribute);
     for (id child in children) {
       if (CFGetTypeID((__bridge CFTypeRef)child) != AXUIElementGetTypeID()) {
         continue;
       }
-      AXUIElementRef editableChild =
-          CopyEditableDescendant((__bridge AXUIElementRef)child, depth + 1);
-      if (editableChild != NULL) {
-        return editableChild;
+
+      AXUIElementRef match =
+          CopyEditableDescendant((__bridge AXUIElementRef)child, depth + 1, mode);
+      if (match != NULL) {
+        return match;
       }
     }
   }
@@ -227,84 +231,85 @@ static AXUIElementRef CopyFocusedDescendant(AXUIElementRef root, NSUInteger dept
   return NULL;
 }
 
-static AXUIElementRef CopyEditableDescendant(AXUIElementRef root, NSUInteger depth) {
-  if (depth > 8) {
-    return NULL;
-  }
-  if (IsEditableCandidate(root)) {
-    CFRetain(root);
-    return root;
-  }
-
-  NSArray *childAttributes =
-      @[ (__bridge NSString *)kAXChildrenAttribute, (__bridge NSString *)kAXContentsAttribute ];
-  for (NSString *attribute in childAttributes) {
-    NSArray *children = ReadElementArrayAttribute(root, (__bridge CFStringRef)attribute);
-    for (id child in children) {
-      if (CFGetTypeID((__bridge CFTypeRef)child) != AXUIElementGetTypeID()) {
-        continue;
-      }
-      AXUIElementRef focusedChild =
-          CopyFocusedDescendant((__bridge AXUIElementRef)child, depth + 1);
-      if (focusedChild != NULL) {
-        return focusedChild;
-      }
-    }
-  }
-
-  return NULL;
-}
-
-static FocusedElementResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
-  AXError error = kAXErrorFailure;
-  AXUIElementRef element =
-      CopyAttributeElement(focusedApp, kAXFocusedUIElementAttribute, &error);
+static AXUIElementRef CopyBestEditableDescendant(AXUIElementRef root) {
+  AXUIElementRef element = CopyEditableDescendant(root, 0, EditableSearchModeFocusedOnly);
   if (element != NULL) {
-    return (FocusedElementResult){element, kAXErrorSuccess};
+    return element;
+  }
+  return CopyEditableDescendant(root, 0, EditableSearchModeAnyEditable);
+}
+
+static AXUIElementRef CopyFocusedApplicationElement(AXError *systemWideError) {
+  AXUIElementRef systemWideElement = AXUIElementCreateSystemWide();
+  CFTypeRef focusedAppValue = NULL;
+  AXError result = AXUIElementCopyAttributeValue(systemWideElement, kAXFocusedApplicationAttribute,
+                                                 &focusedAppValue);
+  CFRelease(systemWideElement);
+
+  if (systemWideError != NULL) {
+    *systemWideError = result;
+  }
+  if (result == kAXErrorSuccess && focusedAppValue != NULL) {
+    return (AXUIElementRef)focusedAppValue;
+  }
+  if (focusedAppValue != NULL) {
+    CFRelease(focusedAppValue);
+  }
+
+  NSRunningApplication *frontmostApplication = NSWorkspace.sharedWorkspace.frontmostApplication;
+  if (frontmostApplication == nil || frontmostApplication.processIdentifier <= 0) {
+    return NULL;
+  }
+
+  return AXUIElementCreateApplication(frontmostApplication.processIdentifier);
+}
+
+static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
+  AXError appFocusedError = kAXErrorFailure;
+  AXUIElementRef element =
+      CopyElementAttribute(focusedApp, kAXFocusedUIElementAttribute, &appFocusedError);
+  if (element != NULL) {
+    return (ElementLookupResult){element, kAXErrorSuccess};
   }
 
   AXUIElementRef systemWideElement = AXUIElementCreateSystemWide();
-  AXError systemWideError = kAXErrorFailure;
-  element = CopyAttributeElement(systemWideElement, kAXFocusedUIElementAttribute, &systemWideError);
+  AXError systemWideFocusedError = kAXErrorFailure;
+  element =
+      CopyElementAttribute(systemWideElement, kAXFocusedUIElementAttribute, &systemWideFocusedError);
   CFRelease(systemWideElement);
   if (element != NULL) {
-    return (FocusedElementResult){element, kAXErrorSuccess};
+    return (ElementLookupResult){element, kAXErrorSuccess};
   }
 
   AXError focusedWindowError = kAXErrorFailure;
   AXUIElementRef focusedWindow =
-      CopyAttributeElement(focusedApp, kAXFocusedWindowAttribute, &focusedWindowError);
+      CopyElementAttribute(focusedApp, kAXFocusedWindowAttribute, &focusedWindowError);
   if (focusedWindow != NULL) {
-    AXError windowFocusedElementError = kAXErrorFailure;
-    element =
-        CopyAttributeElement(focusedWindow, kAXFocusedUIElementAttribute, &windowFocusedElementError);
+    AXError windowFocusedError = kAXErrorFailure;
+    element = CopyElementAttribute(focusedWindow, kAXFocusedUIElementAttribute, &windowFocusedError);
     if (element == NULL) {
-      element = CopyFocusedDescendant(focusedWindow, 0);
-    }
-    if (element == NULL) {
-      element = CopyEditableDescendant(focusedWindow, 0);
+      element = CopyBestEditableDescendant(focusedWindow);
     }
     CFRelease(focusedWindow);
+
     if (element != NULL) {
-      return (FocusedElementResult){element, kAXErrorSuccess};
+      return (ElementLookupResult){element, kAXErrorSuccess};
     }
-    if (windowFocusedElementError != kAXErrorNoValue &&
-        windowFocusedElementError != kAXErrorAttributeUnsupported) {
-      return (FocusedElementResult){NULL, windowFocusedElementError};
+    if (windowFocusedError != kAXErrorNoValue &&
+        windowFocusedError != kAXErrorAttributeUnsupported) {
+      return (ElementLookupResult){NULL, windowFocusedError};
     }
   }
 
-  element = CopyFocusedDescendant(focusedApp, 0);
+  element = CopyBestEditableDescendant(focusedApp);
   if (element != NULL) {
-    return (FocusedElementResult){element, kAXErrorSuccess};
+    return (ElementLookupResult){element, kAXErrorSuccess};
   }
 
-  element = CopyEditableDescendant(focusedApp, 0);
-  if (element != NULL) {
-    return (FocusedElementResult){element, kAXErrorSuccess};
-  }
-
-  return (FocusedElementResult){NULL, error != kAXErrorNoValue ? error : systemWideError};
+  return (ElementLookupResult){
+      NULL,
+      appFocusedError != kAXErrorNoValue ? appFocusedError : systemWideFocusedError,
+  };
 }
 
 @implementation AccessibilitySession
@@ -317,51 +322,56 @@ static FocusedElementResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
 
 - (NSDictionary *)capture:(NSError **)error {
   if (!AXIsProcessTrusted()) {
-    if (error) {
-      *error = HelperError(@"Accessibility permission is not granted.");
+    if (error != NULL) {
+      *error = HelperError(ErrorPermissionRequired, @"Accessibility permission is not granted.");
     }
     return nil;
   }
 
-  AXError appResult = kAXErrorFailure;
-  AXUIElementRef focusedApp = CopyFocusedApplicationElement(&appResult);
+  AXError focusedAppError = kAXErrorFailure;
+  AXUIElementRef focusedApp = CopyFocusedApplicationElement(&focusedAppError);
   if (focusedApp == NULL) {
-    if (error) {
-      *error = HelperError(appResult == kAXErrorAPIDisabled
-                               ? @"Accessibility permission is not granted."
-                               : MessageWithAXError(@"Unable to read the focused application.",
-                                                    appResult));
+    if (error != NULL) {
+      *error = focusedAppError == kAXErrorAPIDisabled
+                   ? HelperError(ErrorPermissionRequired,
+                                 @"Accessibility permission is not granted.")
+                   : HelperError(ErrorNoEditableElement,
+                                 MessageWithAXError(@"Unable to read the focused application.",
+                                                    focusedAppError));
     }
     return nil;
   }
 
-  FocusedElementResult focusedElementResult = CopyFocusedUIElement(focusedApp);
+  ElementLookupResult lookup = CopyFocusedUIElement(focusedApp);
   CFRelease(focusedApp);
-  if (focusedElementResult.element == NULL) {
-    if (error) {
-      *error = HelperError(focusedElementResult.error == kAXErrorAPIDisabled
-                               ? @"Accessibility permission is not granted."
-                               : MessageWithAXError(@"No focused editable element was found.",
-                                                    focusedElementResult.error));
+  if (lookup.element == NULL) {
+    if (error != NULL) {
+      *error = lookup.error == kAXErrorAPIDisabled
+                   ? HelperError(ErrorPermissionRequired,
+                                 @"Accessibility permission is not granted.")
+                   : HelperError(ErrorNoEditableElement,
+                                 MessageWithAXError(@"No focused editable element was found.",
+                                                    lookup.error));
     }
     return nil;
   }
 
-  AXUIElementRef element = focusedElementResult.element;
-  NSString *role = ReadStringAttribute(element, kAXRoleAttribute);
+  AXUIElementRef element = lookup.element;
+  NSString *role = CopyStringAttribute(element, kAXRoleAttribute);
   if ([role isEqualToString:@"AXSecureTextField"]) {
     CFRelease(element);
-    if (error) {
-      *error = HelperError(@"Secure text fields are not supported.");
+    if (error != NULL) {
+      *error = HelperError(ErrorSecureTextField, @"Secure text fields are not supported.");
     }
     return nil;
   }
 
-  NSString *value = ReadEditableContent(element);
-  if (!value) {
+  NSString *value = CopyStringAttribute(element, kAXValueAttribute);
+  if (value == nil) {
     CFRelease(element);
-    if (error) {
-      *error = HelperError(@"The focused element does not expose editable text.");
+    if (error != NULL) {
+      *error = HelperError(ErrorUnsupportedElement,
+                           @"The focused element does not expose editable text.");
     }
     return nil;
   }
@@ -381,32 +391,78 @@ static FocusedElementResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
     @"appName" : application.localizedName ?: (id)[NSNull null],
     @"content" : value,
     @"elementRole" : role ?: (id)[NSNull null],
-    @"processId" : NumberOrNull(processId),
+    @"processId" : [NSNumber numberWithInt:processId],
   };
 }
 
 - (BOOL)writeBack:(NSString *)content error:(NSError **)error {
   if (self.focusedElement == NULL) {
-    if (error) {
-      *error = HelperError(@"No focused editable element was captured.");
+    if (error != NULL) {
+      *error = HelperError(ErrorNoCapturedElement, @"No focused editable element was captured.");
     }
     return NO;
   }
 
-  AXError valueResult = AXUIElementSetAttributeValue(
-      self.focusedElement, kAXValueAttribute, (__bridge CFTypeRef)content);
-  if (valueResult == kAXErrorSuccess) {
+  AXError result =
+      AXUIElementSetAttributeValue(self.focusedElement, kAXValueAttribute,
+                                   (__bridge CFTypeRef)content);
+  if (result == kAXErrorSuccess) {
     return YES;
   }
 
-  if (error) {
+  if (error != NULL) {
     *error = HelperError(
-        [NSString stringWithFormat:@"Unable to write edited text back: %d", valueResult]);
+        ErrorWriteBackFailed,
+        [NSString stringWithFormat:@"Unable to write edited text back: %@", AXErrorDescription(result)]);
   }
   return NO;
 }
 
 @end
+
+static NSDictionary *ReadPayloadFromLine(char *line) {
+  NSString *text = [[NSString alloc] initWithUTF8String:line];
+  if (text == nil) {
+    return nil;
+  }
+
+  NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *jsonError = nil;
+  id payload = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+  return [payload isKindOfClass:NSDictionary.class] ? payload : nil;
+}
+
+static BOOL HandlePayload(AccessibilitySession *session, NSDictionary *payload) {
+  NSString *command = payload[@"command"];
+  NSError *commandError = nil;
+
+  if ([command isEqualToString:@"capture"]) {
+    NSDictionary *capture = [session capture:&commandError];
+    EmitResponse(capture != nil ? SuccessResponse(capture) : FailureResponseFromError(commandError));
+    return YES;
+  }
+
+  if ([command isEqualToString:@"writeBack"]) {
+    NSString *content = payload[@"content"];
+    if (![content isKindOfClass:NSString.class]) {
+      EmitResponse(FailureResponse(ErrorInvalidPayload, @"Invalid helper JSON payload."));
+      return YES;
+    }
+
+    BOOL ok = [session writeBack:content error:&commandError];
+    EmitResponse(ok ? SuccessResponse(@{@"status" : @"written"})
+                    : FailureResponseFromError(commandError));
+    return YES;
+  }
+
+  if ([command isEqualToString:@"quit"]) {
+    EmitResponse(SuccessResponse(@{@"status" : @"quit"}));
+    return NO;
+  }
+
+  EmitResponse(FailureResponse(ErrorInvalidCommand, @"Invalid helper command."));
+  return YES;
+}
 
 int main(void) {
   @autoreleasepool {
@@ -416,34 +472,15 @@ int main(void) {
 
     while (getline(&line, &capacity, stdin) != -1) {
       @autoreleasepool {
-        NSString *text = [[NSString alloc] initWithUTF8String:line];
-        NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
-        NSError *jsonError = nil;
-        NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        if (![payload isKindOfClass:NSDictionary.class]) {
-          Emit(Failure(@"Invalid helper JSON payload."));
+        NSDictionary *payload = ReadPayloadFromLine(line);
+        if (payload == nil) {
+          EmitResponse(FailureResponse(ErrorInvalidPayload, @"Invalid helper JSON payload."));
           continue;
         }
 
-        NSString *command = payload[@"command"];
-        NSError *commandError = nil;
-        if ([command isEqualToString:@"capture"]) {
-          NSDictionary *capture = [session capture:&commandError];
-          Emit(capture ? Success(capture) : Failure(commandError.localizedDescription));
-        } else if ([command isEqualToString:@"writeBack"]) {
-          NSString *content = payload[@"content"];
-          if (![content isKindOfClass:NSString.class]) {
-            Emit(Failure(@"Invalid helper JSON payload."));
-            continue;
-          }
-          BOOL ok = [session writeBack:content error:&commandError];
-          Emit(ok ? Success(@{@"status" : @"written"}) : Failure(commandError.localizedDescription));
-        } else if ([command isEqualToString:@"quit"]) {
-          Emit(Success(@{@"status" : @"quit"}));
+        if (!HandlePayload(session, payload)) {
           free(line);
           return 0;
-        } else {
-          Emit(Failure(@"Invalid helper command."));
         }
       }
     }
