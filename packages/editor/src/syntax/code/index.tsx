@@ -1,3 +1,4 @@
+import { CodeIndentExtension } from "@lexical/code";
 import { CodeShikiExtension, ShikiTokenizer } from "@lexical/code-shiki";
 import { CODE } from "@lexical/markdown";
 import { ReactExtension } from "@lexical/react/ReactExtension";
@@ -20,6 +21,10 @@ const BLOCK_EDITOR_SHIKI_TOKENIZER = {
 export const CODE_SYNTAX_EXTENSION = defineExtension({
   name: "fluxnotes/block-editor/syntax/code",
   dependencies: [
+    configExtension(CodeIndentExtension, {
+      disabled: false,
+      tabSize: 2,
+    }),
     configExtension(CodeShikiExtension, {
       disabled: false,
       tokenizer: BLOCK_EDITOR_SHIKI_TOKENIZER,
