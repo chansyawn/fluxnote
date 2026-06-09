@@ -67,6 +67,17 @@ function createCopyOnlyTrigger(
   };
 }
 
+function warnCopyOnlyCaptureFallback(error: MacAccessibilityHelperError): void {
+  console.warn("External edit capture fell back to copy-only", {
+    appBundleId: error.data?.appBundleId ?? null,
+    appName: error.data?.appName ?? null,
+    code: error.code,
+    elementRole: error.data?.elementRole ?? null,
+    message: error.message,
+    processId: error.data?.processId ?? 0,
+  });
+}
+
 export function createMacAccessibilityExternalEditService(
   deps: MacAccessibilityExternalEditServiceDeps,
 ): MacAccessibilityExternalEditService {
@@ -112,6 +123,7 @@ export function createMacAccessibilityExternalEditService(
     } catch (error) {
       helper.dispose();
       if (shouldCreateCopyOnlyExternalEdit(error)) {
+        warnCopyOnlyCaptureFallback(error);
         const block = await createBlockRecord(deps.getDb(), "");
         deps.telemetryService.captureEvent("block_created", {
           source: "mac_accessibility_external_edit",

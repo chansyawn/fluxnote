@@ -5,7 +5,8 @@
 static NSString *const HelperErrorDomain = @"app.fluxnotes.MacAccessibilityHelper";
 static NSString *const HelperErrorCodeKey = @"code";
 static NSString *const HelperErrorDataKey = @"data";
-static NSUInteger const MaxDescendantDepth = 8;
+static NSUInteger const MaxDescendantDepth = 32;
+static NSUInteger const MaxVisitedDescendants = 4096;
 
 static NSString *const ErrorInvalidPayload = @"invalid_payload";
 static NSString *const ErrorInvalidCommand = @"invalid_command";
@@ -25,7 +26,23 @@ static NSString *const ErrorWriteBackFailed = @"write_back_failed";
 typedef struct {
   AXUIElementRef element;
   AXError error;
+  BOOL searchBudgetExhausted;
 } ElementLookupResult;
+
+typedef struct {
+  AXUIElementRef element;
+  BOOL searchBudgetExhausted;
+} DescendantSearchResult;
+
+typedef struct {
+  AXUIElementRef element;
+  NSUInteger depth;
+} DescendantSearchFrame;
+
+typedef struct {
+  BOOL exhausted;
+  NSUInteger visited;
+} DescendantSearchBudget;
 
 static NSError *HelperErrorWithData(NSString *code, NSString *message, NSDictionary *data) {
   NSMutableDictionary *userInfo =
@@ -251,34 +268,79 @@ static BOOL IsEditableCandidate(AXUIElementRef element) {
   return CanReadAttribute(element, kAXValueAttribute);
 }
 
-static AXUIElementRef CopyFocusedEditableDescendant(AXUIElementRef root, NSUInteger depth) {
-  if (depth > MaxDescendantDepth) {
-    return NULL;
-  }
+static void PushElementFrame(NSMutableArray<NSValue *> *stack, AXUIElementRef element,
+                             NSUInteger depth) {
+  CFRetain(element);
+  DescendantSearchFrame frame = {
+      element,
+      depth,
+  };
+  [stack addObject:[NSValue valueWithBytes:&frame objCType:@encode(DescendantSearchFrame)]];
+}
 
-  if (CopyBoolAttribute(root, kAXFocusedAttribute) && IsEditableCandidate(root)) {
-    CFRetain(root);
-    return root;
-  }
+static DescendantSearchFrame PopElementFrame(NSMutableArray<NSValue *> *stack) {
+  DescendantSearchFrame frame;
+  [[stack lastObject] getValue:&frame];
+  [stack removeLastObject];
+  return frame;
+}
 
-  NSArray *childAttributes =
-      @[ (__bridge NSString *)kAXChildrenAttribute, (__bridge NSString *)kAXContentsAttribute ];
-  for (NSString *attribute in childAttributes) {
-    NSArray *children = CopyElementArrayAttribute(root, (__bridge CFStringRef)attribute);
-    for (id child in children) {
-      if (CFGetTypeID((__bridge CFTypeRef)child) != AXUIElementGetTypeID()) {
-        continue;
-      }
-
-      AXUIElementRef match =
-          CopyFocusedEditableDescendant((__bridge AXUIElementRef)child, depth + 1);
-      if (match != NULL) {
-        return match;
-      }
+static void PushElementChildren(NSMutableArray<NSValue *> *stack, AXUIElementRef element,
+                                CFStringRef attribute, NSUInteger depth) {
+  NSArray *children = CopyElementArrayAttribute(element, attribute);
+  for (NSInteger index = (NSInteger)children.count - 1; index >= 0; index--) {
+    id child = children[(NSUInteger)index];
+    if (CFGetTypeID((__bridge CFTypeRef)child) != AXUIElementGetTypeID()) {
+      continue;
     }
+
+    PushElementFrame(stack, (__bridge AXUIElementRef)child, depth);
+  }
+}
+
+static DescendantSearchResult CopyFocusedEditableDescendant(AXUIElementRef root,
+                                                            DescendantSearchBudget *budget) {
+  NSMutableArray<NSValue *> *stack = [NSMutableArray array];
+  PushElementFrame(stack, root, 0);
+
+  while (stack.count > 0) {
+    DescendantSearchFrame frame = PopElementFrame(stack);
+    AXUIElementRef element = frame.element;
+
+    if (frame.depth > MaxDescendantDepth) {
+      CFRelease(element);
+      continue;
+    }
+
+    if (budget->visited >= MaxVisitedDescendants) {
+      CFRelease(element);
+      while (stack.count > 0) {
+        DescendantSearchFrame remainingFrame = PopElementFrame(stack);
+        CFRelease(remainingFrame.element);
+      }
+      budget->exhausted = YES;
+      return (DescendantSearchResult){NULL, YES};
+    }
+    budget->visited++;
+
+    if (CopyBoolAttribute(element, kAXFocusedAttribute) && IsEditableCandidate(element)) {
+      while (stack.count > 0) {
+        DescendantSearchFrame remainingFrame = PopElementFrame(stack);
+        CFRelease(remainingFrame.element);
+      }
+      return (DescendantSearchResult){element, NO};
+    }
+
+    NSUInteger childDepth = frame.depth + 1;
+    if (childDepth <= MaxDescendantDepth) {
+      PushElementChildren(stack, element, kAXChildrenAttribute, childDepth);
+      PushElementChildren(stack, element, kAXContentsAttribute, childDepth);
+    }
+
+    CFRelease(element);
   }
 
-  return NULL;
+  return (DescendantSearchResult){NULL, NO};
 }
 
 static AXUIElementRef CopyFocusedApplicationElement(AXError *systemWideError) {
@@ -311,7 +373,7 @@ static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
   AXUIElementRef element =
       CopyElementAttribute(focusedApp, kAXFocusedUIElementAttribute, &appFocusedError);
   if (element != NULL) {
-    return (ElementLookupResult){element, kAXErrorSuccess};
+    return (ElementLookupResult){element, kAXErrorSuccess, NO};
   }
 
   AXUIElementRef systemWideElement = AXUIElementCreateSystemWide();
@@ -320,37 +382,42 @@ static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
       CopyElementAttribute(systemWideElement, kAXFocusedUIElementAttribute, &systemWideFocusedError);
   CFRelease(systemWideElement);
   if (element != NULL) {
-    return (ElementLookupResult){element, kAXErrorSuccess};
+    return (ElementLookupResult){element, kAXErrorSuccess, NO};
   }
 
   AXError focusedWindowError = kAXErrorFailure;
   AXUIElementRef focusedWindow =
       CopyElementAttribute(focusedApp, kAXFocusedWindowAttribute, &focusedWindowError);
+  DescendantSearchBudget searchBudget = {NO, 0};
   if (focusedWindow != NULL) {
     AXError windowFocusedError = kAXErrorFailure;
     element = CopyElementAttribute(focusedWindow, kAXFocusedUIElementAttribute, &windowFocusedError);
     if (element == NULL) {
-      element = CopyFocusedEditableDescendant(focusedWindow, 0);
+      DescendantSearchResult windowSearch =
+          CopyFocusedEditableDescendant(focusedWindow, &searchBudget);
+      element = windowSearch.element;
     }
     CFRelease(focusedWindow);
 
     if (element != NULL) {
-      return (ElementLookupResult){element, kAXErrorSuccess};
+      return (ElementLookupResult){element, kAXErrorSuccess, searchBudget.exhausted};
     }
     if (windowFocusedError != kAXErrorNoValue &&
         windowFocusedError != kAXErrorAttributeUnsupported) {
-      return (ElementLookupResult){NULL, windowFocusedError};
+      return (ElementLookupResult){NULL, windowFocusedError, searchBudget.exhausted};
     }
   }
 
-  element = CopyFocusedEditableDescendant(focusedApp, 0);
+  DescendantSearchResult appSearch = CopyFocusedEditableDescendant(focusedApp, &searchBudget);
+  element = appSearch.element;
   if (element != NULL) {
-    return (ElementLookupResult){element, kAXErrorSuccess};
+    return (ElementLookupResult){element, kAXErrorSuccess, searchBudget.exhausted};
   }
 
   return (ElementLookupResult){
       NULL,
       appFocusedError != kAXErrorNoValue ? appFocusedError : systemWideFocusedError,
+      searchBudget.exhausted,
   };
 }
 
@@ -396,8 +463,11 @@ static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
                                  @"Accessibility permission is not granted.")
                    : HelperErrorWithData(
                          ErrorNoEditableElement,
-                         MessageWithAXError(@"No focused editable element was found.",
-                                            lookup.error),
+                         MessageWithAXError(
+                             lookup.searchBudgetExhausted
+                                 ? @"No focused editable element was found before the search budget was exhausted."
+                                 : @"No focused editable element was found.",
+                             lookup.error),
                          applicationMetadata);
     }
     return nil;

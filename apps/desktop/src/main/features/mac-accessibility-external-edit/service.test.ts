@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vite-plus/test";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { getPublicBlockById } from "../blocks/service";
 import { createTestDb } from "../test-db";
@@ -18,6 +18,10 @@ function createTrigger() {
     source: "mac_accessibility" as const,
   };
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 async function createService(overrides?: {
   capture?: () => Promise<{ content: string; trigger: ReturnType<typeof createTrigger> }>;
@@ -181,6 +185,7 @@ describe("macOS Accessibility external edit service", () => {
   });
 
   it("creates a copy-only session when no editable element is found", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createService({
       capture: async () => {
         throw new MacAccessibilityHelperError(
@@ -220,12 +225,21 @@ describe("macOS Accessibility external edit service", () => {
       const block = await getPublicBlockById(ctx.db, session.blockId);
       expect(block.content).toBe("");
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith("External edit capture fell back to copy-only", {
+        appBundleId: "com.example.App",
+        appName: "Example",
+        code: "no_editable_element",
+        elementRole: null,
+        message: "No focused editable element was found.",
+        processId: 123,
+      });
     } finally {
       await ctx.close();
     }
   });
 
   it("maps helper permission errors to Accessibility permission business errors", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createService({
       capture: async () => {
         throw new MacAccessibilityHelperError(
@@ -240,12 +254,14 @@ describe("macOS Accessibility external edit service", () => {
       });
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
       expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
+      expect(warn).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }
   });
 
   it("creates a copy-only session when focused element content is unreadable", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createService({
       capture: async () => {
         throw new MacAccessibilityHelperError(
@@ -276,6 +292,14 @@ describe("macOS Accessibility external edit service", () => {
         "",
         expect.objectContaining({ mode: "copy_only" }),
       );
+      expect(warn).toHaveBeenCalledWith("External edit capture fell back to copy-only", {
+        appBundleId: "com.example.App",
+        appName: "Example",
+        code: "unsupported_element",
+        elementRole: "AXGroup",
+        message: "The focused element does not expose editable text.",
+        processId: 123,
+      });
     } finally {
       await ctx.close();
     }
