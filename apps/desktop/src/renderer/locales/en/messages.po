@@ -124,7 +124,7 @@ msgstr "Something went wrong"
 #. js-lingui-explicit-id
 #: src/renderer/features/external-edit/external-edit-write-back-sync.tsx:12
 msgid "external-edit.write-back.failed"
-msgstr "Edited text was copied to the clipboard because the original input could not be updated."
+msgstr "Edited text was copied to the clipboard because the Mac App could not be updated."
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:31
@@ -339,12 +339,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:109
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:124
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:122
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "Cancel external edit"
 
@@ -355,17 +355,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:91
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:89
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:86
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:84
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:106
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "Delete block"
 
@@ -391,17 +391,17 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
 msgid "preferences.shortcuts.externalEdit.description"
-msgstr "Start an External edit session from the currently focused macOS input."
+msgstr "Start an External edit session from the active Mac App."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:69
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
 msgid "preferences.shortcuts.externalEdit.label"
-msgstr "External edit focused input"
+msgstr "External edit Mac App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:176
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:174
 msgid "preferences.shortcuts.group.editor"
 msgstr "Editor"
 
@@ -411,12 +411,12 @@ msgid "preferences.shortcuts.group.global"
 msgstr "Global"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:81
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:79
 msgid "preferences.shortcuts.group.workspace"
 msgstr "Workspace"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:96
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:94
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
 
@@ -447,17 +447,17 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:117
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:115
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:190
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:188
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:101
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:99
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "Pin/unpin block"
 
@@ -650,37 +650,47 @@ msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:55
 msgid "workspace.external-edit.cancel"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:40
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:56
 msgid "workspace.external-edit.cancel.tooltip"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:100
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
+msgid "workspace.external-edit.copy"
+msgstr "Copy external edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:47
+msgid "workspace.external-edit.copy-only.placeholder"
+msgstr "No focused input found. Write text to copy."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
+msgid "workspace.external-edit.copy.tooltip"
+msgstr "Copy"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:99
 msgid "workspace.external-edit.metadata.app"
 msgstr "Application"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:89
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:88
 msgid "workspace.external-edit.metadata.cwd"
 msgstr "Working directory"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:93
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:92
 msgid "workspace.external-edit.metadata.file"
 msgstr "Target file"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:53
-msgid "workspace.external-edit.metadata.mac-input"
-msgstr "macOS input"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:83
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:82
 msgid "workspace.external-edit.metadata.source"
 msgstr "Source"
 
@@ -690,22 +700,22 @@ msgid "workspace.external-edit.metadata.source.cli"
 msgstr "Command line"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:35
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:34
 msgid "workspace.external-edit.metadata.source.mac-accessibility"
-msgstr "macOS input"
+msgstr "Mac App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:57
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:51
 msgid "workspace.external-edit.metadata.unknown-application"
 msgstr "Unknown application"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
 msgid "workspace.external-edit.submit"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:32
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
 msgid "workspace.external-edit.submit.tooltip"
 msgstr "Submit"
 

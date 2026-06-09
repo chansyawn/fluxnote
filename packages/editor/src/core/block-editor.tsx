@@ -97,16 +97,22 @@ interface BlockEditorContentProps {
 
 function BlockEditorContent({ onBlur }: BlockEditorContentProps) {
   const { i18n } = useLingui();
+  const { content } = useBlockEditorConfig();
+  const defaultPlaceholder = i18n._({
+    id: "block-editor.placeholder",
+    message: "Write a block...",
+  });
+  const placeholder = content.placeholder ?? defaultPlaceholder;
 
   return (
     <ContentEditable
-      aria-placeholder={i18n._({ id: "block-editor.placeholder", message: "Write a block..." })}
+      aria-placeholder={placeholder}
       ariaLabel={i18n._({ id: "block-editor.content.label", message: "Markdown block editor" })}
       className="relative min-h-16 resize-none outline-none"
       onBlur={onBlur}
       placeholder={
         <div className="text-muted-foreground pointer-events-none absolute top-0 left-0">
-          <Trans id="block-editor.placeholder">Write a block...</Trans>
+          {content.placeholder ?? <Trans id="block-editor.placeholder">Write a block...</Trans>}
         </div>
       }
       spellCheck

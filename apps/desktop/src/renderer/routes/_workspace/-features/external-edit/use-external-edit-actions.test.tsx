@@ -3,6 +3,7 @@
 import { DEFAULT_BLOCK_EDITOR_ACTION_STATE } from "@fluxnotes/editor";
 import { queryClient } from "@renderer/app/query";
 import type { Block, ListBlocksResult } from "@renderer/clients";
+import { createCopyOnlyExternalEditSession } from "@renderer/test/fixtures";
 import { act, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -194,5 +195,76 @@ describe("useExternalEditActions", () => {
     expect(clientMocks.toastError).toHaveBeenCalledWith(
       "Cannot submit: block content unavailable.",
     );
+  });
+
+  it("copies the current block before ending copy-only external edit sessions", async () => {
+    clientMocks.submitExternalEdit.mockResolvedValue(createBlock("block-1", ""));
+    const copy = vi.fn(async () => undefined);
+    const editor: WorkspaceBlockEditorHandle = {
+      copy,
+      executeAction: vi.fn((action) => ({
+        action,
+        focus: "editor" as const,
+        status: "executed" as const,
+      })),
+      flush: vi.fn(async () => "copied content"),
+      focus: vi.fn(),
+      getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: vi.fn(async () => ""),
+      subscribeActionState: () => () => undefined,
+      subscribePreviewChange: () => () => undefined,
+    };
+    const harness = createHarness({
+      getEditor: vi.fn(() => editor),
+    });
+    mountedRoot = harness;
+
+    await act(async () => {
+      await harness
+        .getSnapshot()
+        .handleSubmitExternalEdit("block-1", "edit-1", createCopyOnlyExternalEditSession());
+    });
+
+    expect(copy).toHaveBeenCalledOnce();
+    expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
+      content: "copied content",
+      editId: "edit-1",
+    });
+  });
+
+  it("still ends copy-only external edit sessions when block copy fails", async () => {
+    clientMocks.submitExternalEdit.mockResolvedValue(createBlock("block-1", ""));
+    const editor: WorkspaceBlockEditorHandle = {
+      copy: vi.fn(async () => {
+        throw new Error("Clipboard unavailable");
+      }),
+      executeAction: vi.fn((action) => ({
+        action,
+        focus: "editor" as const,
+        status: "executed" as const,
+      })),
+      flush: vi.fn(async () => "fallback content"),
+      focus: vi.fn(),
+      getActionState: () => DEFAULT_BLOCK_EDITOR_ACTION_STATE,
+      getPreviewData: vi.fn(async () => ""),
+      subscribeActionState: () => () => undefined,
+      subscribePreviewChange: () => () => undefined,
+    };
+    const harness = createHarness({
+      getEditor: vi.fn(() => editor),
+    });
+    mountedRoot = harness;
+
+    await act(async () => {
+      await harness
+        .getSnapshot()
+        .handleSubmitExternalEdit("block-1", "edit-1", createCopyOnlyExternalEditSession());
+    });
+
+    expect(clientMocks.toastError).toHaveBeenCalledWith("Clipboard unavailable");
+    expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
+      content: "fallback content",
+      editId: "edit-1",
+    });
   });
 });

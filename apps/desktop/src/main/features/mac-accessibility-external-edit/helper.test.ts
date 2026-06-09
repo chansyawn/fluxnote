@@ -60,6 +60,7 @@ describe("macOS Accessibility helper wrapper", () => {
         appBundleId: "com.example.App",
         appName: "Example",
         elementRole: "AXTextArea",
+        mode: "write_back",
         processId: 123,
         source: "mac_accessibility",
       },
@@ -82,6 +83,34 @@ describe("macOS Accessibility helper wrapper", () => {
     await expect(capture).rejects.toMatchObject({
       code: "permission_required",
       message: "Accessibility permission is not granted.",
+      name: "MacAccessibilityHelperError",
+    } satisfies Partial<MacAccessibilityHelperError>);
+  });
+
+  it("preserves helper failure metadata when available", async () => {
+    const { child, helper } = createHelper();
+
+    const capture = helper.capture();
+    child.stdout.write(
+      `${JSON.stringify({
+        ok: false,
+        code: "no_editable_element",
+        data: {
+          appBundleId: "com.example.App",
+          appName: "Example",
+          processId: 123,
+        },
+        error: "No focused editable element was found.",
+      })}\n`,
+    );
+
+    await expect(capture).rejects.toMatchObject({
+      code: "no_editable_element",
+      data: {
+        appBundleId: "com.example.App",
+        appName: "Example",
+        processId: 123,
+      },
       name: "MacAccessibilityHelperError",
     } satisfies Partial<MacAccessibilityHelperError>);
   });

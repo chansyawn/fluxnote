@@ -12,7 +12,7 @@ export function ExternalEditWriteBackSync() {
         i18n._({
           id: "external-edit.write-back.failed",
           message:
-            "Edited text was copied to the clipboard because the original input could not be updated.",
+            "Edited text was copied to the clipboard because the Mac App could not be updated.",
         }),
       );
     });

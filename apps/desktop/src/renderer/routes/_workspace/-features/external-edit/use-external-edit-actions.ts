@@ -1,3 +1,5 @@
+import type { ExternalEditSession } from "@renderer/clients";
+
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 import { useExternalEditSubmission } from "./external-edit-submission";
 import { useSubmittableBlockContent } from "./submittable-block-content";
@@ -10,7 +12,11 @@ interface UseExternalEditActionsParams {
 interface UseExternalEditActionsResult {
   pendingExternalEditIds: Set<string>;
   handleCancelExternalEdit: (editId: string) => Promise<void>;
-  handleSubmitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  handleSubmitExternalEdit: (
+    blockId: string,
+    editId: string,
+    session?: ExternalEditSession,
+  ) => Promise<void>;
 }
 
 export function useExternalEditActions({
@@ -18,7 +24,11 @@ export function useExternalEditActions({
   navigateToBlock,
 }: UseExternalEditActionsParams): UseExternalEditActionsResult {
   const submittableBlockContent = useSubmittableBlockContent({ getEditor });
-  const submission = useExternalEditSubmission({ submittableBlockContent, navigateToBlock });
+  const submission = useExternalEditSubmission({
+    getEditor,
+    submittableBlockContent,
+    navigateToBlock,
+  });
 
   return {
     pendingExternalEditIds: submission.pendingExternalEditIds,

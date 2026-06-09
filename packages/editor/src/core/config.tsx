@@ -11,6 +11,9 @@ export const DEFAULT_BLOCK_EDITOR_CONFIG: BlockEditorConfig = {
   appearance: {
     resolvedTheme: "light",
   },
+  content: {
+    placeholder: null,
+  },
   markdown: {
     codeBlock: {
       showLineNumbers: false,
@@ -26,6 +29,9 @@ export function resolveBlockEditorConfig(config?: BlockEditorConfigInput): Block
     appearance: {
       resolvedTheme:
         config?.appearance?.resolvedTheme ?? DEFAULT_BLOCK_EDITOR_CONFIG.appearance.resolvedTheme,
+    },
+    content: {
+      placeholder: config?.content?.placeholder ?? DEFAULT_BLOCK_EDITOR_CONFIG.content.placeholder,
     },
     markdown: {
       codeBlock: {

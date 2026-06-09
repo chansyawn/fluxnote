@@ -16,6 +16,13 @@ export interface MacAccessibilityCapture {
   trigger: MacAccessibilityExternalEditTrigger;
 }
 
+export interface MacAccessibilityHelperErrorData {
+  appBundleId: string | null;
+  appName: string | null;
+  elementRole?: string | null;
+  processId: number;
+}
+
 interface HelperJsonResponse<T> {
   ok: boolean;
   code?: string;
@@ -43,10 +50,12 @@ interface PendingRequest {
 
 export class MacAccessibilityHelperError extends Error {
   readonly code?: string;
+  readonly data?: MacAccessibilityHelperErrorData;
 
-  constructor(message: string, code?: string) {
+  constructor(message: string, code?: string, data?: MacAccessibilityHelperErrorData) {
     super(message);
     this.code = code;
+    this.data = data;
     this.name = "MacAccessibilityHelperError";
   }
 }
@@ -140,6 +149,42 @@ function parseHelperResponse<T>(line: string): HelperJsonResponse<T> {
   return parsed;
 }
 
+function parseNullableString(value: unknown): string | null | undefined {
+  if (value === null || typeof value === "string") {
+    return value;
+  }
+  return undefined;
+}
+
+function parseHelperErrorData(data: unknown): MacAccessibilityHelperErrorData | undefined {
+  if (typeof data !== "object" || data === null) {
+    return undefined;
+  }
+
+  const record = data as Record<string, unknown>;
+  const appBundleId = parseNullableString(record.appBundleId);
+  const appName = parseNullableString(record.appName);
+  const elementRole = parseNullableString(record.elementRole);
+  const processId = record.processId;
+
+  if (
+    appBundleId === undefined ||
+    appName === undefined ||
+    typeof processId !== "number" ||
+    !Number.isInteger(processId) ||
+    processId < 0
+  ) {
+    return undefined;
+  }
+
+  return {
+    appBundleId,
+    appName,
+    ...(elementRole !== undefined ? { elementRole } : {}),
+    processId,
+  };
+}
+
 export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
   private readonly child: ChildProcessWithoutNullStreams;
   private readonly pendingRequests: PendingRequest[] = [];
@@ -162,6 +207,7 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
             new MacAccessibilityHelperError(
               response.error || "macOS Accessibility helper failed.",
               response.code,
+              parseHelperErrorData(response.data),
             ),
           );
           return;
@@ -197,6 +243,7 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
         appBundleId: data.appBundleId,
         appName: data.appName,
         elementRole: data.elementRole,
+        mode: "write_back",
         processId: data.processId,
         source: "mac_accessibility",
       },

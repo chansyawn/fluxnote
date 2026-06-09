@@ -1,11 +1,18 @@
 import { toast } from "@fluxnotes/ui/components/sonner";
-import { cancelExternalEdit, submitExternalEdit, toAppInvokeError } from "@renderer/clients";
+import {
+  cancelExternalEdit,
+  submitExternalEdit,
+  toAppInvokeError,
+  type ExternalEditSession,
+} from "@renderer/clients";
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
 import { useCallback, useState } from "react";
 
+import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
 import type { SubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditSubmissionParams {
+  getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   submittableBlockContent: SubmittableBlockContent;
   navigateToBlock?: (blockId: string) => Promise<void>;
 }
@@ -13,10 +20,15 @@ interface UseExternalEditSubmissionParams {
 interface ExternalEditSubmission {
   pendingExternalEditIds: Set<string>;
   cancelExternalEdit: (editId: string) => Promise<void>;
-  submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  submitExternalEdit: (
+    blockId: string,
+    editId: string,
+    session?: ExternalEditSession,
+  ) => Promise<void>;
 }
 
 export function useExternalEditSubmission({
+  getEditor,
   submittableBlockContent,
   navigateToBlock,
 }: UseExternalEditSubmissionParams): ExternalEditSubmission {
@@ -51,10 +63,27 @@ export function useExternalEditSubmission({
     [markPending, unmarkPending],
   );
 
+  const copyBlockContent = useCallback(
+    async (blockId: string) => {
+      try {
+        await getEditor(blockId)?.copy();
+      } catch (error) {
+        toast.error(toAppInvokeError(error).message);
+      }
+    },
+    [getEditor],
+  );
+
   const handleSubmitExternalEdit = useCallback(
-    async (blockId: string, editId: string) => {
+    async (blockId: string, editId: string, session?: ExternalEditSession) => {
       markPending(editId);
       try {
+        if (
+          session?.trigger.source === "mac_accessibility" &&
+          session.trigger.mode === "copy_only"
+        ) {
+          await copyBlockContent(blockId);
+        }
         const content = await submittableBlockContent.getSubmittableMarkdown(blockId);
         if (content === null) {
           toast.error("Cannot submit: block content unavailable.");
@@ -69,7 +98,7 @@ export function useExternalEditSubmission({
         unmarkPending(editId);
       }
     },
-    [markPending, navigateToBlock, submittableBlockContent, unmarkPending],
+    [copyBlockContent, markPending, navigateToBlock, submittableBlockContent, unmarkPending],
   );
 
   return {

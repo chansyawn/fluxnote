@@ -50,7 +50,7 @@ describe("ShortcutPreferencesSection", () => {
     renderWithProviders(<ShortcutPreferencesSection />);
 
     expect(screen.getByText("Global")).toBeVisible();
-    expect(screen.getByText("External edit focused input")).toBeVisible();
+    expect(screen.getByText("External edit Mac App")).toBeVisible();
     expect(screen.getByText("Workspace")).toBeVisible();
     expect(screen.getByText("Editor")).toBeVisible();
     expect(screen.getByText("Bold")).toBeVisible();

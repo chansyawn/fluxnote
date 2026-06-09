@@ -13,6 +13,7 @@ function createTrigger() {
     appBundleId: "com.example.App",
     appName: "Example",
     elementRole: "AXTextArea",
+    mode: "write_back" as const,
     processId: 123,
     source: "mac_accessibility" as const,
   };
@@ -179,16 +180,45 @@ describe("macOS Accessibility external edit service", () => {
     }
   });
 
-  it("disposes helper when capture fails", async () => {
+  it("creates a copy-only session when no editable element is found", async () => {
     const ctx = await createService({
       capture: async () => {
-        throw new Error("No focused editable element was found.");
+        throw new MacAccessibilityHelperError(
+          "No focused editable element was found.",
+          "no_editable_element",
+          {
+            appBundleId: "com.example.App",
+            appName: "Example",
+            processId: 123,
+          },
+        );
       },
     });
     try {
-      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
-        code: "BUSINESS.INVALID_OPERATION",
+      const session = await ctx.service.startFocusedExternalEdit();
+
+      expect(session).toMatchObject({
+        blockId: expect.any(String),
+        editId: "edit-1",
+        trigger: {
+          appBundleId: "com.example.App",
+          appName: "Example",
+          elementRole: null,
+          mode: "copy_only",
+          processId: 123,
+          source: "mac_accessibility",
+        },
       });
+      expect(ctx.deps.externalEditManager.begin).toHaveBeenCalledWith(
+        session.blockId,
+        "",
+        expect.objectContaining({ mode: "copy_only" }),
+      );
+      expect(ctx.deps.openBlockService.requestOpen).toHaveBeenCalledWith({
+        blockId: session.blockId,
+      });
+      const block = await getPublicBlockById(ctx.db, session.blockId);
+      expect(block.content).toBe("");
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
     } finally {
       await ctx.close();
@@ -215,21 +245,37 @@ describe("macOS Accessibility external edit service", () => {
     }
   });
 
-  it("maps helper editable element errors to invalid operations", async () => {
+  it("creates a copy-only session when focused element content is unreadable", async () => {
     const ctx = await createService({
       capture: async () => {
         throw new MacAccessibilityHelperError(
-          "No focused editable element was found.",
-          "no_editable_element",
+          "The focused element does not expose editable text.",
+          "unsupported_element",
+          {
+            appBundleId: "com.example.App",
+            appName: "Example",
+            elementRole: "AXGroup",
+            processId: 123,
+          },
         );
       },
     });
     try {
-      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
-        code: "BUSINESS.INVALID_OPERATION",
+      const session = await ctx.service.startFocusedExternalEdit();
+
+      expect(session.trigger).toMatchObject({
+        appName: "Example",
+        elementRole: "AXGroup",
+        mode: "copy_only",
+        processId: 123,
+        source: "mac_accessibility",
       });
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
-      expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
+      expect(ctx.deps.externalEditManager.begin).toHaveBeenCalledWith(
+        session.blockId,
+        "",
+        expect.objectContaining({ mode: "copy_only" }),
+      );
     } finally {
       await ctx.close();
     }

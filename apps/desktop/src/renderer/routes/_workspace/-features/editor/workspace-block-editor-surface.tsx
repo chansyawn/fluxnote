@@ -101,6 +101,7 @@ function BlockEditorFrame({
 interface WorkspaceBlockEditorSurfaceProps {
   block: Block;
   adornments?: ReactNode;
+  editorConfig?: BlockEditorConfigInput;
   isExternalEditPending?: boolean;
   shortcuts: ShortcutPreferences;
   onFocus: (blockId: string) => void;
@@ -110,6 +111,7 @@ interface WorkspaceBlockEditorSurfaceProps {
 export function WorkspaceBlockEditorSurface({
   block,
   adornments,
+  editorConfig,
   isExternalEditPending = false,
   shortcuts,
   onFocus,
@@ -120,11 +122,12 @@ export function WorkspaceBlockEditorSurface({
   const { codeBlock } = useMarkdownCodeBlockPreference();
   const { resolvedTheme } = useThemeState();
   const editorShortcuts = useMemo(() => pickBlockEditorShortcuts(shortcuts), [shortcuts]);
-  const editorConfig = useMemo<BlockEditorConfigInput>(
+  const resolvedEditorConfig = useMemo<BlockEditorConfigInput>(
     () => ({
       appearance: {
         resolvedTheme,
       },
+      content: editorConfig?.content,
       markdown: {
         codeBlock,
       },
@@ -132,7 +135,7 @@ export function WorkspaceBlockEditorSurface({
         actions: editorShortcuts,
       },
     }),
-    [codeBlock, editorShortcuts, resolvedTheme],
+    [codeBlock, editorConfig?.content, editorShortcuts, resolvedTheme],
   );
   const { getLatestContent, saveMarkdown, snapshotLatestContent, waitForPendingSave } =
     useBlockEditorPersistence(block);
@@ -185,7 +188,7 @@ export function WorkspaceBlockEditorSurface({
       ref={editorRef}
       blockId={block.id}
       adornments={adornments}
-      editorConfig={editorConfig}
+      editorConfig={resolvedEditorConfig}
       runtime={runtime}
       initialMarkdown={block.content}
       isExternalEditPending={isExternalEditPending}

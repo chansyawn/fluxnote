@@ -3,7 +3,10 @@ import type { EventBus } from "@main/core/ipc";
 import type { ExternalEditManager } from "@main/features/external-edit";
 import type { OpenBlockService } from "@main/features/open-block";
 import type { TelemetryService } from "@main/features/telemetry";
-import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
+import type {
+  ExternalEditSession,
+  MacAccessibilityExternalEditTrigger,
+} from "@shared/features/external-edit/session-contracts";
 import { businessError } from "@shared/ipc/result";
 import { clipboard, systemPreferences } from "electron";
 
@@ -30,6 +33,8 @@ export interface MacAccessibilityExternalEditService {
   startFocusedExternalEdit: () => Promise<ExternalEditSession>;
 }
 
+const COPY_ONLY_CAPTURE_ERROR_CODES = new Set(["no_editable_element", "unsupported_element"]);
+
 function toBusinessInvalidOperation(error: unknown): never {
   if (error instanceof MacAccessibilityHelperError && error.code === "permission_required") {
     throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
@@ -39,6 +44,27 @@ function toBusinessInvalidOperation(error: unknown): never {
     "BUSINESS.INVALID_OPERATION",
     error instanceof Error ? error.message : "Unable to start external edit from focused input.",
   );
+}
+
+function shouldCreateCopyOnlyExternalEdit(error: unknown): error is MacAccessibilityHelperError {
+  return (
+    error instanceof MacAccessibilityHelperError &&
+    typeof error.code === "string" &&
+    COPY_ONLY_CAPTURE_ERROR_CODES.has(error.code)
+  );
+}
+
+function createCopyOnlyTrigger(
+  error: MacAccessibilityHelperError,
+): MacAccessibilityExternalEditTrigger {
+  return {
+    appBundleId: error.data?.appBundleId ?? null,
+    appName: error.data?.appName ?? null,
+    elementRole: error.data?.elementRole ?? null,
+    mode: "copy_only",
+    processId: error.data?.processId ?? 0,
+    source: "mac_accessibility",
+  };
 }
 
 export function createMacAccessibilityExternalEditService(
@@ -85,6 +111,14 @@ export function createMacAccessibilityExternalEditService(
       capture = await helper.capture();
     } catch (error) {
       helper.dispose();
+      if (shouldCreateCopyOnlyExternalEdit(error)) {
+        const block = await createBlockRecord(deps.getDb(), "");
+        deps.telemetryService.captureEvent("block_created", {
+          source: "mac_accessibility_external_edit",
+        });
+        deps.openBlockService.requestOpen({ blockId: block.id });
+        return deps.externalEditManager.begin(block.id, "", createCopyOnlyTrigger(error)).session;
+      }
       toBusinessInvalidOperation(error);
     }
 

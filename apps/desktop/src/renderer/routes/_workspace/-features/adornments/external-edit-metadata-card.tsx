@@ -31,9 +31,7 @@ function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["sour
     case "cli":
       return <Trans id="workspace.external-edit.metadata.source.cli">Command line</Trans>;
     case "mac_accessibility":
-      return (
-        <Trans id="workspace.external-edit.metadata.source.mac-accessibility">macOS input</Trans>
-      );
+      return <Trans id="workspace.external-edit.metadata.source.mac-accessibility">Mac App</Trans>;
   }
 }
 
@@ -50,19 +48,20 @@ function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: R
 
 export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMetadataCardProps) {
   const { i18n } = useLingui();
-  const macInputLabel = i18n._({
-    id: "workspace.external-edit.metadata.mac-input",
-    message: "macOS input",
-  });
   const unknownApplicationLabel = i18n._({
     id: "workspace.external-edit.metadata.unknown-application",
     message: "Unknown application",
   });
+  const macApplicationLabel =
+    trigger.source === "mac_accessibility"
+      ? (trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel)
+      : undefined;
   const title =
     trigger.source === "cli"
       ? trigger.targetFilePath
-      : (trigger.appName ?? trigger.appBundleId ?? macInputLabel);
-  const label = trigger.source === "cli" ? getFileName(trigger.targetFilePath) : title;
+      : (macApplicationLabel ?? unknownApplicationLabel);
+  const label =
+    trigger.source === "cli" ? getFileName(trigger.targetFilePath) : (macApplicationLabel ?? title);
 
   return (
     <HoverCard>
@@ -98,7 +97,7 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
             <>
               <ExternalEditMetadataItem
                 label={<Trans id="workspace.external-edit.metadata.app">Application</Trans>}
-                value={trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel}
+                value={macApplicationLabel ?? unknownApplicationLabel}
               />
             </>
           )}

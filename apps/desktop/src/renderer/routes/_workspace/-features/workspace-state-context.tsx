@@ -19,7 +19,11 @@ export interface WorkspaceCommands {
   restoreBlock: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
-  submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  submitExternalEdit: (
+    blockId: string,
+    editId: string,
+    session?: ExternalEditSession,
+  ) => Promise<void>;
 }
 
 export interface WorkspaceBlockState {

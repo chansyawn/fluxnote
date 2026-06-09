@@ -65,12 +65,10 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
       {
         action: "global.externalEdit",
         icon: <SquarePenIcon />,
-        title: (
-          <Trans id="preferences.shortcuts.externalEdit.label">External edit focused input</Trans>
-        ),
+        title: <Trans id="preferences.shortcuts.externalEdit.label">External edit Mac App</Trans>,
         description: (
           <Trans id="preferences.shortcuts.externalEdit.description">
-            Start an External edit session from the currently focused macOS input.
+            Start an External edit session from the active Mac App.
           </Trans>
         ),
       },
