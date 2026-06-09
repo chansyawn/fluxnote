@@ -117,8 +117,10 @@ describe("macOS Accessibility external edit service", () => {
         "selected",
         createTrigger(),
         expect.objectContaining({
-          onCancel: expect.any(Function),
-          writeBack: expect.any(Function),
+          target: expect.objectContaining({
+            cancel: expect.any(Function),
+            submit: expect.any(Function),
+          }),
         }),
       );
       expect(ctx.deps.telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
@@ -163,7 +165,7 @@ describe("macOS Accessibility external edit service", () => {
       const session = await ctx.service.startFocusedExternalEdit();
       const beginOptions = ctx.deps.externalEditManager.begin.mock.results[0]?.value.options;
 
-      await beginOptions.writeBack("updated");
+      await beginOptions.target.submit(session, "updated");
 
       expect(ctx.deps.clipboard.writeText).toHaveBeenCalledWith("updated");
       expect(ctx.deps.emitEvent).toHaveBeenCalledWith("external-edit.write-back-failed", {
@@ -220,6 +222,23 @@ describe("macOS Accessibility external edit service", () => {
           "No focused editable element was found.",
           "no_editable_element",
         );
+      },
+    });
+    try {
+      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
+        code: "BUSINESS.INVALID_OPERATION",
+      });
+      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("maps plain permission-like errors to invalid operations", async () => {
+    const ctx = await createService({
+      capture: async () => {
+        throw new Error("Accessibility permission is not granted.");
       },
     });
     try {

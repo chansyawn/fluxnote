@@ -35,10 +35,6 @@ function toBusinessInvalidOperation(error: unknown): never {
     throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
   }
 
-  if (error instanceof Error && error.message.includes("Accessibility permission")) {
-    throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
-  }
-
   throw businessError(
     "BUSINESS.INVALID_OPERATION",
     error instanceof Error ? error.message : "Unable to start external edit from focused input.",
@@ -98,14 +94,16 @@ export function createMacAccessibilityExternalEditService(
     });
     deps.openBlockService.requestOpen({ blockId: block.id });
 
-    let session: ExternalEditSession;
     const begun = deps.externalEditManager.begin(block.id, capture.content, capture.trigger, {
-      onCancel: () => helper.dispose(),
-      writeBack: (content) => writeBackOrFallback(session, helper, content),
+      target: {
+        cancel: () => helper.dispose(),
+        submit: async (session, content) => {
+          await writeBackOrFallback(session, helper, content);
+        },
+      },
     });
-    session = begun.session;
 
-    return session;
+    return begun.session;
   }
 
   return { startFocusedExternalEdit };

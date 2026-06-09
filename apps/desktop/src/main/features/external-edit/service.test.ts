@@ -19,8 +19,10 @@ describe("external-edit service", () => {
       const resolve = vi.fn();
       const manager = {
         claim: vi.fn(() => ({
+          cancelTarget: vi.fn(),
           resolve,
           session: { blockId: block.id, createdAt: new Date().toISOString(), editId: "edit-1" },
+          submitTarget: vi.fn(async () => undefined),
         })),
       };
 
@@ -48,18 +50,19 @@ describe("external-edit service", () => {
     try {
       const block = await createBlockRecord(ctx.db, "before");
       const resolve = vi.fn();
-      const writeBack = vi.fn(async () => undefined);
+      const submitTarget = vi.fn(async () => undefined);
       const manager = {
         claim: vi.fn(() => ({
+          cancelTarget: vi.fn(),
           resolve,
           session: { blockId: block.id, createdAt: new Date().toISOString(), editId: "edit-1" },
-          writeBack,
+          submitTarget,
         })),
       };
 
       await submitEdit({ manager: manager as never, paths }, ctx.db, "edit-1", "after");
 
-      expect(writeBack).toHaveBeenCalledWith("after");
+      expect(submitTarget).toHaveBeenCalledWith("after");
     } finally {
       ctx.close();
       await ctx.cleanup();
@@ -71,14 +74,15 @@ describe("external-edit service", () => {
     try {
       const block = await createBlockRecord(ctx.db, "before");
       const resolve = vi.fn();
-      const writeBack = vi.fn(async () => {
+      const submitTarget = vi.fn(async () => {
         throw new Error("write failed");
       });
       const manager = {
         claim: vi.fn(() => ({
+          cancelTarget: vi.fn(),
           resolve,
           session: { blockId: block.id, createdAt: new Date().toISOString(), editId: "edit-1" },
-          writeBack,
+          submitTarget,
         })),
       };
 
@@ -108,8 +112,10 @@ describe("external-edit service", () => {
       const resolve = vi.fn();
       const manager = {
         claim: vi.fn(() => ({
+          cancelTarget: vi.fn(),
           resolve,
           session: { blockId: block.id, createdAt: new Date().toISOString(), editId: "edit-1" },
+          submitTarget: vi.fn(async () => undefined),
         })),
       };
       const content = [
@@ -145,11 +151,13 @@ describe("external-edit service", () => {
     const ctx = await createTestDb();
     try {
       const resolve = vi.fn();
+      const cancelTarget = vi.fn();
       const manager = {
         claim: vi.fn(() => ({
-          cancel: vi.fn(),
+          cancelTarget,
           resolve,
           session: { blockId: "missing", createdAt: new Date().toISOString(), editId: "edit-1" },
+          submitTarget: vi.fn(async () => undefined),
         })),
       };
 
@@ -159,6 +167,7 @@ describe("external-edit service", () => {
         code: "BUSINESS.NOT_FOUND",
       });
       expect(resolve).toHaveBeenCalledWith({ blockId: "missing", status: "cancelled" });
+      expect(cancelTarget).toHaveBeenCalledTimes(1);
     } finally {
       ctx.close();
       await ctx.cleanup();
@@ -166,19 +175,20 @@ describe("external-edit service", () => {
   });
 
   it("cancels edit by resolving cancelled status", async () => {
-    const cancel = vi.fn();
+    const cancelTarget = vi.fn();
     const resolve = vi.fn();
     const manager = {
       claim: vi.fn(() => ({
-        cancel,
+        cancelTarget,
         resolve,
         session: { blockId: "block-1", createdAt: new Date().toISOString(), editId: "edit-1" },
+        submitTarget: vi.fn(async () => undefined),
       })),
     };
 
     await cancelEdit({ manager: manager as never }, "edit-1");
 
     expect(resolve).toHaveBeenCalledWith({ blockId: "block-1", status: "cancelled" });
-    expect(cancel).toHaveBeenCalledTimes(1);
+    expect(cancelTarget).toHaveBeenCalledTimes(1);
   });
 });
