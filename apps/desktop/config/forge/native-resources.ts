@@ -2,26 +2,17 @@ import { spawn } from "node:child_process";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
-const macAccessibilityHelperSource = "src/native/macos-accessibility-helper/main.m";
+import {
+  createMacAccessibilityHelperCompileArgs,
+  macAccessibilityHelperOutputName,
+  macAccessibilityHelperSource,
+} from "../native/macos-accessibility-helper.ts";
 
 function compileObjc(sourcePath: string, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const child = spawn(
-      "clang",
-      [
-        sourcePath,
-        "-fobjc-arc",
-        "-framework",
-        "ApplicationServices",
-        "-framework",
-        "AppKit",
-        "-o",
-        outputPath,
-      ],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-      },
-    );
+    const child = spawn("clang", createMacAccessibilityHelperCompileArgs(sourcePath, outputPath), {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let stderr = "";
     child.stderr.on("data", (chunk: Buffer) => {
       stderr += chunk.toString("utf8");
@@ -47,6 +38,6 @@ export async function copyNativeResources(buildPath: string): Promise<void> {
   await mkdir(resourcesNativePath, { recursive: true });
   await compileObjc(
     macAccessibilityHelperSource,
-    path.join(resourcesNativePath, "macos-accessibility-helper"),
+    path.join(resourcesNativePath, macAccessibilityHelperOutputName),
   );
 }

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vite-plus/test";
 
 import { getPublicBlockById } from "../blocks/service";
 import { createTestDb } from "../test-db";
+import { MacAccessibilityHelperError } from "./helper";
 import {
   createMacAccessibilityExternalEditService,
   type MacAccessibilityExternalEditService,
@@ -187,6 +188,66 @@ describe("macOS Accessibility external edit service", () => {
         code: "BUSINESS.INVALID_OPERATION",
       });
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("maps helper permission errors to Accessibility permission business errors", async () => {
+    const ctx = await createService({
+      capture: async () => {
+        throw new MacAccessibilityHelperError(
+          "Accessibility permission is not granted.",
+          "permission_required",
+        );
+      },
+    });
+    try {
+      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
+        code: "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
+      });
+      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("maps helper editable element errors to invalid operations", async () => {
+    const ctx = await createService({
+      capture: async () => {
+        throw new MacAccessibilityHelperError(
+          "No focused editable element was found.",
+          "no_editable_element",
+        );
+      },
+    });
+    try {
+      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
+        code: "BUSINESS.INVALID_OPERATION",
+      });
+      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("maps helper secure field errors to invalid operations", async () => {
+    const ctx = await createService({
+      capture: async () => {
+        throw new MacAccessibilityHelperError(
+          "Secure text fields are not supported.",
+          "secure_text_field",
+        );
+      },
+    });
+    try {
+      await expect(ctx.service.startFocusedExternalEdit()).rejects.toMatchObject({
+        code: "BUSINESS.INVALID_OPERATION",
+      });
+      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.externalEditManager.begin).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }

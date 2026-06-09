@@ -6,6 +6,11 @@ import { createInterface } from "node:readline";
 import type { MacAccessibilityExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
 import { app } from "electron";
 
+import {
+  createMacAccessibilityHelperCompileArgs,
+  macAccessibilityHelperOutputName,
+} from "../../../../config/native/macos-accessibility-helper";
+
 export interface MacAccessibilityCapture {
   content: string;
   trigger: MacAccessibilityExternalEditTrigger;
@@ -13,6 +18,7 @@ export interface MacAccessibilityCapture {
 
 interface HelperJsonResponse<T> {
   ok: boolean;
+  code?: string;
   data?: T;
   error?: string;
 }
@@ -35,6 +41,16 @@ interface PendingRequest {
   resolve: (value: unknown) => void;
 }
 
+export class MacAccessibilityHelperError extends Error {
+  readonly code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+    this.name = "MacAccessibilityHelperError";
+  }
+}
+
 export interface MacAccessibilityHelper {
   capture: () => Promise<MacAccessibilityCapture>;
   dispose: () => void;
@@ -50,7 +66,7 @@ function getAppRoot(): string {
 }
 
 function resolvePackagedHelperPath(): string {
-  return path.join(process.resourcesPath, "native", "macos-accessibility-helper");
+  return path.join(process.resourcesPath, "native", macAccessibilityHelperOutputName);
 }
 
 function resolveDevelopmentSourcePath(): string {
@@ -58,7 +74,7 @@ function resolveDevelopmentSourcePath(): string {
 }
 
 function resolveDevelopmentHelperPath(): string {
-  return path.join(app.getPath("userData"), "native", "macos-accessibility-helper");
+  return path.join(app.getPath("userData"), "native", macAccessibilityHelperOutputName);
 }
 
 async function pathExists(filePath: string): Promise<boolean> {
@@ -82,22 +98,9 @@ async function compileDevelopmentHelper(): Promise<string> {
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await new Promise<void>((resolve, reject) => {
-    const child = spawn(
-      "clang",
-      [
-        sourcePath,
-        "-fobjc-arc",
-        "-framework",
-        "ApplicationServices",
-        "-framework",
-        "AppKit",
-        "-o",
-        outputPath,
-      ],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-      },
-    );
+    const child = spawn("clang", createMacAccessibilityHelperCompileArgs(sourcePath, outputPath), {
+      stdio: ["ignore", "pipe", "pipe"],
+    });
     let stderr = "";
     child.stderr.on("data", (chunk: Buffer) => {
       stderr += chunk.toString("utf8");
@@ -128,10 +131,16 @@ function parseHelperResponse<T>(line: string): HelperJsonResponse<T> {
   if (typeof parsed !== "object" || parsed === null || typeof parsed.ok !== "boolean") {
     throw new Error("Invalid macOS Accessibility helper response.");
   }
+  if ("code" in parsed && typeof parsed.code !== "string") {
+    throw new Error("Invalid macOS Accessibility helper response.");
+  }
+  if ("error" in parsed && typeof parsed.error !== "string") {
+    throw new Error("Invalid macOS Accessibility helper response.");
+  }
   return parsed;
 }
 
-class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
+export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
   private readonly child: ChildProcessWithoutNullStreams;
   private readonly pendingRequests: PendingRequest[] = [];
   private disposed = false;
@@ -149,7 +158,12 @@ class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
       try {
         const response = parseHelperResponse(line);
         if (!response.ok) {
-          pending.reject(new Error(response.error || "macOS Accessibility helper failed."));
+          pending.reject(
+            new MacAccessibilityHelperError(
+              response.error || "macOS Accessibility helper failed.",
+              response.code,
+            ),
+          );
           return;
         }
 
