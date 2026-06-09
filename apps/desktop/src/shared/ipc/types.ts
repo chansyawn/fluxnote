@@ -8,6 +8,7 @@ import { externalUrlContract } from "@shared/features/external-url/contract";
 import { openBlockContract } from "@shared/features/open-block/contract";
 import { preferencesContract } from "@shared/features/preferences/contract";
 import { shortcutContract } from "@shared/features/shortcut/contract";
+import { systemPermissionsContract } from "@shared/features/system-permissions/contract";
 import { tagsContract } from "@shared/features/tags/contract";
 import { telemetryContract } from "@shared/features/telemetry/contract";
 import { windowContract } from "@shared/features/window/contract";
@@ -25,6 +26,7 @@ export const contracts = {
     ...openBlockContract.commands,
     ...preferencesContract.commands,
     ...shortcutContract.commands,
+    ...systemPermissionsContract.commands,
     ...tagsContract.commands,
     ...telemetryContract.commands,
     ...windowContract.commands,
@@ -38,6 +40,7 @@ export const contracts = {
     ...openBlockContract.events,
     ...preferencesContract.events,
     ...shortcutContract.events,
+    ...systemPermissionsContract.events,
     ...windowContract.events,
     ...telemetryContract.events,
   },

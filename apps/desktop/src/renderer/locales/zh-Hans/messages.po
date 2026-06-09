@@ -142,6 +142,42 @@ msgid "preferences.about.title"
 msgstr "关于"
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:329
+msgid "preferences.accessibility.allow"
+msgstr "允许"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:336
+msgid "preferences.accessibility.description"
+msgstr "允许 Fluxnotes 读取并更新其他 Mac App 中当前聚焦的文本框，用于外部编辑。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:342
+msgid "preferences.accessibility.label"
+msgstr "辅助功能"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:327
+msgid "preferences.accessibility.open-settings"
+msgstr "打开设置"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+msgid "preferences.accessibility.status.macos-only"
+msgstr "仅 macOS"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:64
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+msgid "preferences.accessibility.status.permission-needed"
+msgstr "需要授权"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:70
+msgid "preferences.accessibility.status.ready"
+msgstr "已就绪"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:123
 msgid "preferences.app-update.auto-check.description"
 msgstr "Fluxnotes 会在后台检查更新，并在更新准备好时显示安装入口。"
@@ -183,7 +219,7 @@ msgid "preferences.app-version.label"
 msgstr "版本"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:190
 msgid "preferences.app.title"
 msgstr "应用"
 
@@ -284,27 +320,27 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:217
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:296
 msgid "preferences.cli.install"
 msgstr "安装"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:301
 msgid "preferences.cli.path.description"
 msgstr "安装 Flux CLI 以支持终端工作流。安装后可运行 `flux --help` 查看可用命令与用法。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:228
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:307
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:213
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:292
 msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:202
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:281
 msgid "preferences.font-size.label"
 msgstr "字号"
 
@@ -324,7 +360,7 @@ msgid "preferences.github.repository.open"
 msgstr "仓库"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:248
 msgid "preferences.language.label"
 msgstr "语言"
 
@@ -478,22 +514,22 @@ msgid "preferences.telemetry.label"
 msgstr "遥测"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:77
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:113
 msgid "preferences.theme.dark"
 msgstr "深色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:141
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:220
 msgid "preferences.theme.label"
 msgstr "主题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:108
 msgid "preferences.theme.light"
 msgstr "浅色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:103
 msgid "preferences.theme.system"
 msgstr "跟随系统"
 
@@ -501,6 +537,16 @@ msgstr "跟随系统"
 #: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
 msgstr "偏好设置"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:57
+msgid "shortcut.external-edit.accessibility-permission-required"
+msgstr "需要辅助功能权限。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:63
+msgid "shortcut.external-edit.accessibility-permission.allow"
+msgstr "允许"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:45

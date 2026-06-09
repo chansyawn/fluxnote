@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   registerOpenBlockCommands: vi.fn(),
   registerPreferencesCommands: vi.fn(),
   registerShortcutCommands: vi.fn(),
+  registerSystemPermissionsCommands: vi.fn(),
   registerTagsCommands: vi.fn(),
   registerTelemetryCommands: vi.fn(),
   registerWindowCommands: vi.fn(),
@@ -69,6 +70,9 @@ vi.mock("../features/preferences/command", () => ({
 }));
 vi.mock("../features/shortcut/command", () => ({
   registerShortcutCommands: mocks.registerShortcutCommands,
+}));
+vi.mock("../features/system-permissions", () => ({
+  registerSystemPermissionsCommands: mocks.registerSystemPermissionsCommands,
 }));
 vi.mock("../features/tags/command", () => ({ registerTagsCommands: mocks.registerTagsCommands }));
 vi.mock("../features/telemetry", () => ({
@@ -144,6 +148,11 @@ describe("createBackendRuntime", () => {
     preferencesService: {
       readUserPreferences: vi.fn(),
     },
+    systemPermissionsService: {
+      getStatus: vi.fn(),
+      openSettings: vi.fn(),
+      request: vi.fn(),
+    },
     telemetryService: {
       captureEvent: vi.fn(),
       notifyPreferenceChanged: vi.fn(),
@@ -216,6 +225,7 @@ describe("createBackendRuntime", () => {
       }),
     );
     expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerSystemPermissionsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTagsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTelemetryCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerWindowCommands).toHaveBeenCalledTimes(1);

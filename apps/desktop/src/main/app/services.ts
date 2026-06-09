@@ -20,6 +20,10 @@ import {
 } from "@main/features/mac-accessibility-external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
+import {
+  createDefaultSystemPermissionsService,
+  type SystemPermissionsService,
+} from "@main/features/system-permissions";
 import { createTelemetryService, type TelemetryService } from "@main/features/telemetry";
 import { createTrayManager, createWindowManager, type WindowManager } from "@main/features/window";
 import { APP_SETTINGS_STORE_FILE, APP_TELEMETRY_STORE_FILE } from "@shared/app/app-config";
@@ -43,6 +47,7 @@ export interface MainServices {
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  systemPermissionsService: SystemPermissionsService;
   telemetryService: TelemetryService;
   trayManager: TrayManager;
   windowManager: WindowManager;
@@ -105,6 +110,7 @@ export function createMainServices(): MainServices {
     openBlockService,
     telemetryService,
   });
+  const systemPermissionsService = createDefaultSystemPermissionsService();
 
   windowManager = createWindowManager({
     captureAppShow: () => telemetryService.captureEvent("app_show"),
@@ -132,6 +138,7 @@ export function createMainServices(): MainServices {
     openBlockService,
     paths,
     preferencesService,
+    systemPermissionsService,
     telemetryService,
     trayManager,
     windowManager,

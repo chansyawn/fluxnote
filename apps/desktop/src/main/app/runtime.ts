@@ -24,6 +24,10 @@ import { registerOpenBlockCommands } from "../features/open-block/command";
 import type { PreferencesService } from "../features/preferences";
 import { registerPreferencesCommands } from "../features/preferences/command";
 import { registerShortcutCommands } from "../features/shortcut/command";
+import {
+  registerSystemPermissionsCommands,
+  type SystemPermissionsService,
+} from "../features/system-permissions";
 import { registerTagsCommands } from "../features/tags/command";
 import type { TelemetryService } from "../features/telemetry";
 import { registerTelemetryCommands } from "../features/telemetry";
@@ -48,6 +52,7 @@ interface RuntimeCommandDeps {
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  systemPermissionsService: SystemPermissionsService;
   telemetryService: TelemetryService;
   trayManager: {
     refreshMenu: () => void;
@@ -99,6 +104,9 @@ function registerRuntimeCommands(
   registerShortcutCommands(ipc, {
     events: deps.events,
   });
+  registerSystemPermissionsCommands(ipc, {
+    service: deps.systemPermissionsService,
+  });
   registerTagsCommands(ipc, {
     db: deps.db,
   });
@@ -147,6 +155,7 @@ export function createBackendRuntime() {
       openBlockService: services.openBlockService,
       paths: services.paths,
       preferencesService: services.preferencesService,
+      systemPermissionsService: services.systemPermissionsService,
       telemetryService: services.telemetryService,
       trayManager: services.trayManager,
       windowManager: services.windowManager,

@@ -46,6 +46,11 @@ export {
 export { createTag, deleteTag, listTags, setBlockTags } from "./tags";
 export { isRegistered, register, unregister, type ShortcutEvent } from "./shortcut";
 export {
+  getSystemPermissionStatus,
+  openSystemPermissionSettings,
+  requestSystemPermission,
+} from "./system-permissions";
+export {
   destroyWindow,
   hideWindow,
   onWindowCloseRequested,
@@ -94,3 +99,4 @@ export type {
   UpdateBlockContentRequest,
 } from "./blocks";
 export type { CreateTagRequest, DeleteTagRequest, SetBlockTagsRequest, Tag } from "./tags";
+export type { SystemPermissionRequest, SystemPermissionStatus } from "./system-permissions";

@@ -1,7 +1,9 @@
 import type { Hotkey } from "@fluxnotes/shared";
 import { toast } from "@fluxnotes/ui/components/sonner";
+import { useLingui } from "@lingui/react";
 import {
   quickCreateBlockAndShowWindow,
+  requestSystemPermission,
   startFocusedExternalEdit,
   toAppInvokeError,
   toggleMainWindowVisibility,
@@ -31,12 +33,14 @@ interface ShortcutStateContextValue {
 }
 
 const ShortcutStateContext = createContext<ShortcutStateContextValue | null>(null);
+const ACCESSIBILITY_PERMISSION_REQUEST = { permission: "macos_accessibility" } as const;
 
 interface ShortcutStateProviderProps {
   children: ReactNode;
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
+  const { i18n } = useLingui();
   const { clearShortcut, resetShortcut, setShortcut, shortcuts } = useShortcutPreferences();
 
   const handleToggleWindow = useEffectEvent(() => {
@@ -47,7 +51,33 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   });
   const handleExternalEdit = useEffectEvent(() => {
     void startFocusedExternalEdit().catch((error: unknown) => {
-      toast.error(toAppInvokeError(error).message);
+      const invokeError = toAppInvokeError(error);
+      if (invokeError.code === "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED") {
+        toast.error(
+          i18n._({
+            id: "shortcut.external-edit.accessibility-permission-required",
+            message: "Accessibility permission is required.",
+          }),
+          {
+            action: {
+              label: i18n._({
+                id: "shortcut.external-edit.accessibility-permission.allow",
+                message: "Allow",
+              }),
+              onClick: () => {
+                void requestSystemPermission(ACCESSIBILITY_PERMISSION_REQUEST).catch(
+                  (requestError: unknown) => {
+                    toast.error(toAppInvokeError(requestError).message);
+                  },
+                );
+              },
+            },
+          },
+        );
+        return;
+      }
+
+      toast.error(invokeError.message);
     });
   });
 
@@ -102,6 +132,7 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       externalEditShortcutError,
       handleExternalEdit,
       handleQuickCreateBlock,
+      i18n,
       resetShortcut,
       setShortcut,
       shortcuts,

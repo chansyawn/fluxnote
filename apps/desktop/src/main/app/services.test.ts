@@ -56,6 +56,11 @@ const mocks = vi.hoisted(() => ({
     requestOpen: vi.fn(),
   })),
   createPreferencesService: vi.fn(() => ({ readUserPreferences: vi.fn() })),
+  createSystemPermissionsService: vi.fn(() => ({
+    getStatus: vi.fn(),
+    openSettings: vi.fn(),
+    request: vi.fn(),
+  })),
   createTelemetryService: vi.fn((_options: { emitEvent: TelemetryEventEmitter }) => ({
     captureError: vi.fn(),
     captureEvent: vi.fn(),
@@ -129,6 +134,9 @@ vi.mock("@main/features/open-block", () => ({
 }));
 vi.mock("@main/features/preferences", () => ({
   createPreferencesService: mocks.createPreferencesService,
+}));
+vi.mock("@main/features/system-permissions", () => ({
+  createDefaultSystemPermissionsService: mocks.createSystemPermissionsService,
 }));
 vi.mock("@main/features/telemetry", () => ({
   createTelemetryService: mocks.createTelemetryService,
@@ -218,5 +226,14 @@ describe("createMainServices", () => {
     createOpenBlockCall.showWindow();
 
     expect(services.windowManager.activateMainWindow).toHaveBeenCalledTimes(2);
+  });
+
+  it("creates the system permissions service", () => {
+    const services = createMainServices();
+
+    expect(mocks.createSystemPermissionsService).toHaveBeenCalledTimes(1);
+    expect(services.systemPermissionsService).toBe(
+      mocks.createSystemPermissionsService.mock.results[0]?.value,
+    );
   });
 });

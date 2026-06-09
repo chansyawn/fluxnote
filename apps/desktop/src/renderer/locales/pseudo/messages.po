@@ -142,6 +142,42 @@ msgid "preferences.about.title"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:329
+msgid "preferences.accessibility.allow"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:336
+msgid "preferences.accessibility.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:342
+msgid "preferences.accessibility.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:327
+msgid "preferences.accessibility.open-settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+msgid "preferences.accessibility.status.macos-only"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:64
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+msgid "preferences.accessibility.status.permission-needed"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:70
+msgid "preferences.accessibility.status.ready"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:123
 msgid "preferences.app-update.auto-check.description"
 msgstr ""
@@ -183,7 +219,7 @@ msgid "preferences.app-version.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:190
 msgid "preferences.app.title"
 msgstr ""
 
@@ -284,27 +320,27 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:217
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:296
 msgid "preferences.cli.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:301
 msgid "preferences.cli.path.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:228
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:307
 msgid "preferences.cli.path.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:213
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:292
 msgid "preferences.cli.uninstall"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:202
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:281
 msgid "preferences.font-size.label"
 msgstr ""
 
@@ -324,7 +360,7 @@ msgid "preferences.github.repository.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:248
 msgid "preferences.language.label"
 msgstr ""
 
@@ -478,28 +514,38 @@ msgid "preferences.telemetry.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:77
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:113
 msgid "preferences.theme.dark"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:141
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:220
 msgid "preferences.theme.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:108
 msgid "preferences.theme.light"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:103
 msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:57
+msgid "shortcut.external-edit.accessibility-permission-required"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:63
+msgid "shortcut.external-edit.accessibility-permission.allow"
 msgstr ""
 
 #. js-lingui-explicit-id
