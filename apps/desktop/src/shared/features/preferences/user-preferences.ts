@@ -33,6 +33,7 @@ export const shortcutBindingSchema = z.string().nullable();
 export const DEFAULT_SHORTCUTS = {
   "global.toggleWindow": "Alt+N",
   "global.quickCreateBlock": "Ctrl+Alt+N",
+  "global.externalEdit": "Ctrl+Alt+E",
   "workspace.createBlock": "Mod+N",
   "workspace.copyBlock": "Mod+Shift+C",
   "workspace.keepBlock": "Mod+K",

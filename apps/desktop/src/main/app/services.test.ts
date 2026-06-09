@@ -47,6 +47,10 @@ const mocks = vi.hoisted(() => ({
     cancelAll: vi.fn(),
     listSessions: vi.fn(() => []),
   })),
+  createMacAccessibilityExternalEditService: vi.fn(() => ({
+    startFocusedExternalEdit: vi.fn(),
+  })),
+  createMacAccessibilityHelperFactory: vi.fn(() => ({ create: vi.fn() })),
   createOpenBlockService: vi.fn(() => ({
     emitPending: vi.fn(),
     requestOpen: vi.fn(),
@@ -115,6 +119,10 @@ vi.mock("@main/features/blocks/auto-archive-runtime", () => ({
 }));
 vi.mock("@main/features/external-edit", () => ({
   createExternalEditManager: mocks.createExternalEditManager,
+}));
+vi.mock("@main/features/mac-accessibility-external-edit", () => ({
+  createDefaultMacAccessibilityExternalEditService: mocks.createMacAccessibilityExternalEditService,
+  createMacAccessibilityHelperFactory: mocks.createMacAccessibilityHelperFactory,
 }));
 vi.mock("@main/features/open-block", () => ({
   createOpenBlockService: mocks.createOpenBlockService,

@@ -50,6 +50,25 @@ describe("external-edit manager", () => {
     expect(emitEvent).toHaveBeenCalled();
   });
 
+  it("keeps write-back and cancel handles private while exposing sessions", async () => {
+    const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
+    const writeBack = vi.fn(async () => undefined);
+    const onCancel = vi.fn();
+
+    const begun = manager.begin("b1", "original", trigger, { onCancel, writeBack });
+
+    expect(manager.listSessions()[0]).not.toHaveProperty("writeBack");
+    expect(manager.listSessions()[0]).not.toHaveProperty("onCancel");
+
+    const claimed = manager.claim(begun.session.editId);
+
+    expect(claimed.writeBack).toBe(writeBack);
+    expect(claimed.cancel).toBe(onCancel);
+
+    claimed.resolve({ blockId: "b1", content: "next", status: "submitted" });
+    await expect(begun.result).resolves.toMatchObject({ status: "submitted" });
+  });
+
   it("keeps claimed session protected when abort signal fires", async () => {
     const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
     const controller = new AbortController();
@@ -83,14 +102,16 @@ describe("external-edit manager", () => {
 
   it("cancels all pending sessions", async () => {
     const manager = createExternalEditManager({ emitEvent: vi.fn(() => true) });
+    const onCancel = vi.fn();
 
-    const one = manager.begin("b1", "a", trigger);
+    const one = manager.begin("b1", "a", trigger, { onCancel });
     const two = manager.begin("b2", "b", trigger);
     manager.cancelAll();
 
     await expect(one.result).resolves.toEqual({ blockId: "b1", status: "cancelled" });
     await expect(two.result).resolves.toEqual({ blockId: "b2", status: "cancelled" });
     expect(manager.listSessions()).toHaveLength(0);
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
   it("aborts pending session when signal aborts", async () => {

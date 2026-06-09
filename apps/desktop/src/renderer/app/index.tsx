@@ -8,6 +8,7 @@ import { ThemeStateProvider, useThemeState } from "@renderer/app/theme";
 import { AppUpdateSync } from "@renderer/features/app-update/app-update-query";
 import { AutoArchiveSync } from "@renderer/features/auto-archive/auto-archive-sync";
 import { AppErrorBoundary, RouterErrorFallback } from "@renderer/features/error-boundary";
+import { ExternalEditWriteBackSync } from "@renderer/features/external-edit/external-edit-write-back-sync";
 import { FontSizeStateProvider } from "@renderer/features/preferences/font-size-state";
 import { PreferencesSync } from "@renderer/features/preferences/preferences-query";
 import { ShortcutStateProvider } from "@renderer/features/shortcut/shortcut-state";
@@ -54,6 +55,7 @@ export function App() {
                         <PreferencesSync />
                         <AppUpdateSync />
                         <AutoArchiveSync />
+                        <ExternalEditWriteBackSync />
                         <RouterProvider router={router} />
                         <AppToaster />
                       </TooltipProvider>

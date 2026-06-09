@@ -1,5 +1,11 @@
 import type { Hotkey } from "@fluxnotes/shared";
-import { quickCreateBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
+import { toast } from "@fluxnotes/ui/components/sonner";
+import {
+  quickCreateBlockAndShowWindow,
+  startFocusedExternalEdit,
+  toAppInvokeError,
+  toggleMainWindowVisibility,
+} from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
   normalizeShortcutBinding,
@@ -39,6 +45,11 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   const handleQuickCreateBlock = useEffectEvent(() => {
     void quickCreateBlockAndShowWindow();
   });
+  const handleExternalEdit = useEffectEvent(() => {
+    void startFocusedExternalEdit().catch((error: unknown) => {
+      toast.error(toAppInvokeError(error).message);
+    });
+  });
 
   const toggleWindowShortcutError = useGlobalShortcutSync({
     shortcut: shortcuts["global.toggleWindow"],
@@ -48,11 +59,16 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     shortcut: shortcuts["global.quickCreateBlock"],
     onPressed: handleQuickCreateBlock,
   });
+  const externalEditShortcutError = useGlobalShortcutSync({
+    shortcut: shortcuts["global.externalEdit"],
+    onPressed: handleExternalEdit,
+  });
 
   const contextValue = useMemo<ShortcutStateContextValue>(
     () => ({
       shortcuts,
       globalShortcutErrors: {
+        "global.externalEdit": externalEditShortcutError,
         "global.toggleWindow": toggleWindowShortcutError,
         "global.quickCreateBlock": quickCreateBlockShortcutError,
       },
@@ -83,6 +99,8 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     [
       quickCreateBlockShortcutError,
       clearShortcut,
+      externalEditShortcutError,
+      handleExternalEdit,
       handleQuickCreateBlock,
       resetShortcut,
       setShortcut,

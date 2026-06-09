@@ -10,6 +10,15 @@ export type ExternalEditSessionsChangedPayload = z.infer<
   typeof externalEditSessionsChangedPayloadSchema
 >;
 
+export const externalEditWriteBackFailedPayloadSchema = z.object({
+  blockId: z.string().min(1),
+  editId: z.string().min(1),
+  reason: z.string().min(1),
+});
+export type ExternalEditWriteBackFailedPayload = z.infer<
+  typeof externalEditWriteBackFailedPayloadSchema
+>;
+
 export const externalEditContract = {
   commands: {
     "external-edit.cancel": {
@@ -17,6 +26,10 @@ export const externalEditContract = {
         editId: z.string().min(1),
       }),
       output: voidSchema,
+    },
+    "external-edit.start-focused": {
+      input: voidSchema,
+      output: externalEditSessionSchema,
     },
     "external-edit.list": {
       input: voidSchema,
@@ -32,5 +45,6 @@ export const externalEditContract = {
   },
   events: {
     "external-edit.sessions-changed": externalEditSessionsChangedPayloadSchema,
+    "external-edit.write-back-failed": externalEditWriteBackFailedPayloadSchema,
   },
 } as const;

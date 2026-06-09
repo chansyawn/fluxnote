@@ -43,8 +43,14 @@ export async function submitEdit(
       content: externalContent,
       status: "submitted",
     });
+    if (claimed.writeBack) {
+      await claimed.writeBack(externalContent).catch((error: unknown) => {
+        console.error("External edit write-back failed", error);
+      });
+    }
     return await getPublicBlockById(db, claimed.session.blockId);
   } catch (error) {
+    claimed.cancel?.();
     claimed.resolve({
       blockId: claimed.session.blockId,
       status: "cancelled",
@@ -55,6 +61,7 @@ export async function submitEdit(
 
 export async function cancelEdit(deps: ExternalEditServiceOptions, editId: string): Promise<void> {
   const claimed = deps.manager.claim(editId);
+  claimed.cancel?.();
   claimed.resolve({
     blockId: claimed.session.blockId,
     status: "cancelled",

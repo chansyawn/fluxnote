@@ -15,6 +15,10 @@ import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
 import type { ExternalEditManager } from "../features/external-edit";
 import { registerExternalEditCommands } from "../features/external-edit/command";
 import { registerExternalUrlCommands } from "../features/external-url";
+import {
+  registerMacAccessibilityExternalEditCommands,
+  type MacAccessibilityExternalEditService,
+} from "../features/mac-accessibility-external-edit";
 import type { OpenBlockService } from "../features/open-block";
 import { registerOpenBlockCommands } from "../features/open-block/command";
 import type { PreferencesService } from "../features/preferences";
@@ -39,6 +43,7 @@ interface RuntimeCommandDeps {
   db: AppDatabase;
   events: EventBus;
   externalEditManager: ExternalEditManager;
+  macAccessibilityExternalEditService: MacAccessibilityExternalEditService;
   now: () => Date;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
@@ -74,6 +79,9 @@ function registerRuntimeCommands(
     db: deps.db,
     manager: deps.externalEditManager,
     paths: deps.paths,
+  });
+  registerMacAccessibilityExternalEditCommands(ipc, {
+    service: deps.macAccessibilityExternalEditService,
   });
   registerExternalUrlCommands(ipc);
   registerOpenBlockCommands(ipc, {
@@ -134,6 +142,7 @@ export function createBackendRuntime() {
       db,
       events: services.events,
       externalEditManager: services.externalEditManager,
+      macAccessibilityExternalEditService: services.macAccessibilityExternalEditService,
       now: () => new Date(),
       openBlockService: services.openBlockService,
       paths: services.paths,
