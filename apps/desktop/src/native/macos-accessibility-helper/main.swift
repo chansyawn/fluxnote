@@ -420,6 +420,21 @@ private func enableManualAccessibility(for focusedApp: AXUIElement) -> Bool {
   setAccessibilityFlag(focusedApp, "AXManualAccessibility" as CFString)
 }
 
+@discardableResult
+private func activateApplication(processId: pid_t) -> Bool {
+  guard processId > 0, let application = NSRunningApplication(processIdentifier: processId) else {
+    return false
+  }
+  return application.activate(options: [.activateAllWindows])
+}
+
+@discardableResult
+private func activateApplication(from element: AXUIElement) -> Bool {
+  var processId: pid_t = 0
+  AXUIElementGetPid(element, &processId)
+  return activateApplication(processId: processId)
+}
+
 private final class AccessibilitySession {
   private var focusedElement: AXUIElement?
 
@@ -531,6 +546,7 @@ private final class AccessibilitySession {
         data: nil,
       )
     }
+    activateApplication(from: focusedElement)
   }
 }
 
@@ -577,6 +593,25 @@ private func handlePayload(_ payload: [String: Any], session: AccessibilitySessi
     } catch {
       emitResponse(failureResponse())
     }
+    return true
+
+  case "activate":
+    guard
+      let processId = payload["processId"] as? Int,
+      processId >= 0,
+      processId <= Int(Int32.max)
+    else {
+      emitResponse(
+        failureResponse(
+          code: HelperErrorCode.invalidPayload,
+          message: "Invalid helper JSON payload.",
+        ),
+      )
+      return true
+    }
+
+    activateApplication(processId: pid_t(processId))
+    emitResponse(successResponse(["status": "activation_requested"]))
     return true
 
   case "quit":

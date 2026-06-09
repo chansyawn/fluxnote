@@ -35,6 +35,7 @@ afterEach(() => {
 });
 
 async function createRuntime(overrides?: {
+  activate?: (processId: number) => Promise<void>;
   capture?: () => Promise<{ content: string; trigger: ReturnType<typeof createFocusedAppTrigger> }>;
   isFocusedAppCaptureSupported?: () => boolean;
   isTrustedAccessibilityClient?: (prompt: boolean) => boolean;
@@ -42,6 +43,7 @@ async function createRuntime(overrides?: {
 }) {
   const ctx = await createTestDb();
   const helper = {
+    activate: vi.fn(overrides?.activate ?? (async () => undefined)),
     capture: vi.fn(
       overrides?.capture ??
         (async () => ({
@@ -249,6 +251,7 @@ describe("external edit runtime", () => {
 
       await ctx.runtime.submit(session.editId, "updated");
 
+      expect(ctx.deps.helper.activate).not.toHaveBeenCalled();
       expect(ctx.deps.helper.writeBack).toHaveBeenCalledWith("updated");
       expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
     } finally {
@@ -321,6 +324,76 @@ describe("external edit runtime", () => {
         code: "no_editable_element",
         elementRole: null,
         message: "No focused editable element was found.",
+        processId: 123,
+      });
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("activates focused app after submitting a copy-only session", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const ctx = await createRuntime({
+      capture: async () => {
+        throw new FocusedAppHelperError(
+          "No focused editable element was found.",
+          "no_editable_element",
+          {
+            appBundleId: "com.example.App",
+            appName: "Example",
+            processId: 123,
+          },
+        );
+      },
+    });
+    try {
+      const session = await ctx.runtime.capture();
+
+      await ctx.runtime.submit(session.editId, "updated");
+
+      expect(ctx.deps.helper.activate).toHaveBeenCalledWith(123);
+      expect(ctx.deps.helper.writeBack).not.toHaveBeenCalled();
+      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(2);
+      expect(warn).toHaveBeenCalledWith("External edit capture fell back to copy-only", {
+        appBundleId: "com.example.App",
+        appName: "Example",
+        code: "no_editable_element",
+        elementRole: null,
+        message: "No focused editable element was found.",
+        processId: 123,
+      });
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("keeps copy-only sessions submitted when focused app activation fails", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const ctx = await createRuntime({
+      activate: async () => {
+        throw new Error("app unavailable");
+      },
+      capture: async () => {
+        throw new FocusedAppHelperError(
+          "No focused editable element was found.",
+          "no_editable_element",
+          {
+            appBundleId: "com.example.App",
+            appName: "Example",
+            processId: 123,
+          },
+        );
+      },
+    });
+    try {
+      const session = await ctx.runtime.capture();
+
+      const updatedBlock = await ctx.runtime.submit(session.editId, "updated");
+
+      expect(updatedBlock.content).toBe("updated");
+      expect(ctx.deps.helper.activate).toHaveBeenCalledWith(123);
+      expect(warn).toHaveBeenCalledWith("External edit focused app activation failed", {
+        message: "app unavailable",
         processId: 123,
       });
     } finally {

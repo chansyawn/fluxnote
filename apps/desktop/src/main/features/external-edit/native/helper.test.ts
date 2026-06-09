@@ -37,6 +37,21 @@ function createHelper(): {
 }
 
 describe("focused app helper wrapper", () => {
+  it("sends activation requests", async () => {
+    const { child, helper, requests } = createHelper();
+
+    const activation = helper.activate(123);
+    child.stdout.write(
+      `${JSON.stringify({
+        ok: true,
+        data: { status: "activation_requested" },
+      })}\n`,
+    );
+
+    await expect(activation).resolves.toBeUndefined();
+    expect(requests).toEqual([`${JSON.stringify({ command: "activate", processId: 123 })}\n`]);
+  });
+
   it("maps capture responses to focused app captures", async () => {
     const { child, helper, requests } = createHelper();
 

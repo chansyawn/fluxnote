@@ -132,6 +132,13 @@ function warnCopyOnlyCaptureFallback(error: FocusedAppHelperError): void {
   });
 }
 
+function warnFocusedAppActivationFailure(processId: number, error: unknown): void {
+  console.warn("External edit focused app activation failed", {
+    message: error instanceof Error ? error.message : "Unknown activation failure.",
+    processId,
+  });
+}
+
 export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): ExternalEditRuntime {
   const pendingEdits = new Map<string, PendingExternalEdit>();
 
@@ -219,6 +226,22 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     return block.id;
   }
 
+  async function activateFocusedApp(processId: number): Promise<void> {
+    if (processId <= 0) {
+      return;
+    }
+
+    let helper: FocusedAppHelper | undefined;
+    try {
+      helper = await deps.helperFactory.create();
+      await helper.activate(processId);
+    } catch (error) {
+      warnFocusedAppActivationFailure(processId, error);
+    } finally {
+      helper?.dispose();
+    }
+  }
+
   async function writeBackOrFallback(
     session: ExternalEditSession,
     helper: FocusedAppHelper,
@@ -262,8 +285,15 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       helper.dispose();
       if (shouldCreateCopyOnlyExternalEdit(error)) {
         warnCopyOnlyCaptureFallback(error);
+        const trigger = createCopyOnlyTrigger(error);
         const blockId = await createExternalEditBlock("");
-        return begin(blockId, createCopyOnlyTrigger(error)).session;
+        return begin(blockId, trigger, {
+          target: {
+            submit: async () => {
+              await activateFocusedApp(trigger.processId);
+            },
+          },
+        }).session;
       }
       toBusinessInvalidOperation(error);
     }

@@ -40,6 +40,7 @@ interface HelperCaptureResponse {
 }
 
 type HelperRequest =
+  | { command: "activate"; processId: number }
   | { command: "capture" }
   | { command: "quit" }
   | { command: "writeBack"; content: string };
@@ -62,6 +63,7 @@ export class FocusedAppHelperError extends Error {
 }
 
 export interface FocusedAppHelper {
+  activate: (processId: number) => Promise<void>;
   capture: () => Promise<FocusedAppCapture>;
   dispose: () => void;
   writeBack: (content: string) => Promise<void>;
@@ -237,6 +239,10 @@ export class SpawnedFocusedAppHelper implements FocusedAppHelper {
         ),
       );
     });
+  }
+
+  async activate(processId: number): Promise<void> {
+    await this.request({ command: "activate", processId });
   }
 
   async capture(): Promise<FocusedAppCapture> {
