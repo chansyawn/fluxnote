@@ -1,18 +1,28 @@
-export const macAccessibilityHelperSource = "src/native/macos-accessibility-helper/main.m";
+export const macAccessibilityHelperSource = "src/native/macos-accessibility-helper/main.swift";
 export const macAccessibilityHelperOutputName = "macos-accessibility-helper";
 
-export function createMacAccessibilityHelperCompileArgs(
+export interface MacAccessibilityHelperCompileCommand {
+  args: string[];
+  command: string;
+  label: string;
+}
+
+export function createMacAccessibilityHelperCompileCommand(
   sourcePath: string,
   outputPath: string,
-): string[] {
-  return [
-    sourcePath,
-    "-fobjc-arc",
-    "-framework",
-    "ApplicationServices",
-    "-framework",
-    "AppKit",
-    "-o",
-    outputPath,
-  ];
+): MacAccessibilityHelperCompileCommand {
+  return {
+    args: [
+      "swiftc",
+      sourcePath,
+      "-framework",
+      "ApplicationServices",
+      "-framework",
+      "AppKit",
+      "-o",
+      outputPath,
+    ],
+    command: "xcrun",
+    label: "xcrun swiftc",
+  };
 }

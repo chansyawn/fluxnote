@@ -7,8 +7,9 @@ import type { MacAccessibilityExternalEditTrigger } from "@shared/features/exter
 import { app } from "electron";
 
 import {
-  createMacAccessibilityHelperCompileArgs,
+  createMacAccessibilityHelperCompileCommand,
   macAccessibilityHelperOutputName,
+  macAccessibilityHelperSource,
 } from "../../../../config/native/macos-accessibility-helper";
 
 export interface MacAccessibilityCapture {
@@ -79,7 +80,7 @@ function resolvePackagedHelperPath(): string {
 }
 
 function resolveDevelopmentSourcePath(): string {
-  return path.join(getAppRoot(), "src/native/macos-accessibility-helper/main.m");
+  return path.join(getAppRoot(), macAccessibilityHelperSource);
 }
 
 function resolveDevelopmentHelperPath(): string {
@@ -107,7 +108,8 @@ async function compileDevelopmentHelper(): Promise<string> {
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await new Promise<void>((resolve, reject) => {
-    const child = spawn("clang", createMacAccessibilityHelperCompileArgs(sourcePath, outputPath), {
+    const compiler = createMacAccessibilityHelperCompileCommand(sourcePath, outputPath);
+    const child = spawn(compiler.command, compiler.args, {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stderr = "";
@@ -121,7 +123,9 @@ async function compileDevelopmentHelper(): Promise<string> {
         return;
       }
 
-      reject(new Error(stderr.trim() || `clang exited with status ${code ?? "unknown"}.`));
+      reject(
+        new Error(stderr.trim() || `${compiler.label} exited with status ${code ?? "unknown"}.`),
+      );
     });
   });
   return outputPath;

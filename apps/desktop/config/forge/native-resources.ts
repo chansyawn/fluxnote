@@ -3,14 +3,15 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
 import {
-  createMacAccessibilityHelperCompileArgs,
+  createMacAccessibilityHelperCompileCommand,
   macAccessibilityHelperOutputName,
   macAccessibilityHelperSource,
 } from "../native/macos-accessibility-helper.ts";
 
-function compileObjc(sourcePath: string, outputPath: string): Promise<void> {
+function compileSwiftHelper(sourcePath: string, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const child = spawn("clang", createMacAccessibilityHelperCompileArgs(sourcePath, outputPath), {
+    const compiler = createMacAccessibilityHelperCompileCommand(sourcePath, outputPath);
+    const child = spawn(compiler.command, compiler.args, {
       stdio: ["ignore", "pipe", "pipe"],
     });
     let stderr = "";
@@ -24,7 +25,9 @@ function compileObjc(sourcePath: string, outputPath: string): Promise<void> {
         return;
       }
 
-      reject(new Error(stderr.trim() || `clang exited with status ${code ?? "unknown"}.`));
+      reject(
+        new Error(stderr.trim() || `${compiler.label} exited with status ${code ?? "unknown"}.`),
+      );
     });
   });
 }
@@ -36,7 +39,7 @@ export async function copyNativeResources(buildPath: string): Promise<void> {
 
   const resourcesNativePath = path.resolve(buildPath, "..", "native");
   await mkdir(resourcesNativePath, { recursive: true });
-  await compileObjc(
+  await compileSwiftHelper(
     macAccessibilityHelperSource,
     path.join(resourcesNativePath, macAccessibilityHelperOutputName),
   );
