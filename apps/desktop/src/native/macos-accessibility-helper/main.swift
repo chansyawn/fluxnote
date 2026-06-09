@@ -356,7 +356,11 @@ private func copyFocusedUIElement(from focusedApp: AXUIElement) -> ElementLookup
         searchBudgetExhausted: searchBudget.exhausted,
       )
     }
-    if windowFocused.error != .noValue && windowFocused.error != .attributeUnsupported {
+    if
+      windowFocused.error != .noValue,
+      windowFocused.error != .attributeUnsupported,
+      windowFocused.error != .cannotComplete
+    {
       return ElementLookupResult(
         element: nil,
         error: windowFocused.error,
@@ -381,12 +385,39 @@ private func copyFocusedUIElement(from focusedApp: AXUIElement) -> ElementLookup
   )
 }
 
-private func enableManualAccessibility(for focusedApp: AXUIElement) -> Bool {
+private func setAccessibilityFlag(_ element: AXUIElement, _ attribute: CFString) -> Bool {
   AXUIElementSetAttributeValue(
-    focusedApp,
-    "AXManualAccessibility" as CFString,
+    element,
+    attribute,
     kCFBooleanTrue,
   ) == .success
+}
+
+// Chromium/Electron exposes its web accessibility tree after assistive clients enable
+// enhanced UI on the window. This mirrors the path used by Accessibility Inspector.
+@discardableResult
+private func enableEnhancedUserInterface(for focusedApp: AXUIElement) -> Bool {
+  let focusedWindow = copyElementAttribute(focusedApp, kAXFocusedWindowAttribute as CFString)
+  if
+    let window = focusedWindow.element,
+    setAccessibilityFlag(window, "AXEnhancedUserInterface" as CFString)
+  {
+    return true
+  }
+
+  let mainWindow = copyElementAttribute(focusedApp, kAXMainWindowAttribute as CFString)
+  if
+    let window = mainWindow.element,
+    setAccessibilityFlag(window, "AXEnhancedUserInterface" as CFString)
+  {
+    return true
+  }
+
+  return setAccessibilityFlag(focusedApp, "AXEnhancedUserInterface" as CFString)
+}
+
+private func enableManualAccessibility(for focusedApp: AXUIElement) -> Bool {
+  setAccessibilityFlag(focusedApp, "AXManualAccessibility" as CFString)
 }
 
 private final class AccessibilitySession {
@@ -421,6 +452,7 @@ private final class AccessibilitySession {
     }
 
     let metadata = applicationMetadata(from: focusedApp)
+    enableEnhancedUserInterface(for: focusedApp)
     var lookup = copyFocusedUIElement(from: focusedApp)
     if lookup.element == nil && enableManualAccessibility(for: focusedApp) {
       lookup = copyFocusedUIElement(from: focusedApp)
