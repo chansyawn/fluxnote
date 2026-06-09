@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { blockSchema } from "../blocks/models";
-import { externalEditSessionSchema } from "./session-contracts";
+import { externalEditSessionSchema } from "./models";
 
 const voidSchema = z.undefined();
 
@@ -21,15 +21,15 @@ export type ExternalEditWriteBackFailedPayload = z.infer<
 
 export const externalEditContract = {
   commands: {
+    "external-edit.capture": {
+      input: voidSchema,
+      output: externalEditSessionSchema,
+    },
     "external-edit.cancel": {
       input: z.object({
         editId: z.string().min(1),
       }),
       output: voidSchema,
-    },
-    "external-edit.start-focused": {
-      input: voidSchema,
-      output: externalEditSessionSchema,
     },
     "external-edit.list": {
       input: voidSchema,

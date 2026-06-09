@@ -7,24 +7,22 @@ export const cliExternalEditTriggerSchema = z.object({
   targetFilePath: z.string().min(1),
 });
 
-export const macAccessibilityExternalEditTriggerSchema = z.object({
+export const focusedAppExternalEditTriggerSchema = z.object({
   appBundleId: z.string().min(1).nullable(),
   appName: z.string().min(1).nullable(),
   elementRole: z.string().min(1).nullable(),
   mode: z.enum(["copy_only", "write_back"]),
   processId: z.number().int().nonnegative(),
-  source: z.literal("mac_accessibility"),
+  source: z.literal("focused_app"),
 });
 
 export const externalEditTriggerSchema = z.discriminatedUnion("source", [
   cliExternalEditTriggerSchema,
-  macAccessibilityExternalEditTriggerSchema,
+  focusedAppExternalEditTriggerSchema,
 ]);
 export type ExternalEditTrigger = z.infer<typeof externalEditTriggerSchema>;
 export type CliExternalEditTrigger = z.infer<typeof cliExternalEditTriggerSchema>;
-export type MacAccessibilityExternalEditTrigger = z.infer<
-  typeof macAccessibilityExternalEditTriggerSchema
->;
+export type FocusedAppExternalEditTrigger = z.infer<typeof focusedAppExternalEditTriggerSchema>;
 
 export const externalEditSessionSchema = z.object({
   editId: z.string().min(1),

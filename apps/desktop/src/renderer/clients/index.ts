@@ -17,10 +17,10 @@ export { convertFileSrc, copyAsset, createAsset, importFileAssets, resolveAsset 
 export { writeBlockEditorClipboard } from "./clipboard";
 export {
   cancelExternalEdit,
+  captureExternalEdit,
   listExternalEditSessions,
   onExternalEditSessionsChanged,
   onExternalEditWriteBackFailed,
-  startFocusedExternalEdit,
   submitExternalEdit,
 } from "./external-edit";
 export { openExternalUrl } from "./external-url";

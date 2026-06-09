@@ -3,7 +3,7 @@ import { LaptopIcon, SquareTerminalIcon } from "@fluxnotes/ui/icons/lucide";
 import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import type { ExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
+import type { ExternalEditTrigger } from "@shared/features/external-edit/models";
 import type { ComponentProps, ReactNode } from "react";
 
 import { AdornmentBar } from "./adornment-bar";
@@ -21,7 +21,7 @@ function ExternalEditSourceIcon({ source }: { source: ExternalEditTrigger["sourc
   switch (source) {
     case "cli":
       return <SquareTerminalIcon aria-hidden="true" className="size-3 shrink-0" />;
-    case "mac_accessibility":
+    case "focused_app":
       return <LaptopIcon aria-hidden="true" className="size-3 shrink-0" />;
   }
 }
@@ -30,7 +30,7 @@ function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["sour
   switch (source) {
     case "cli":
       return <Trans id="workspace.external-edit.metadata.source.cli">Command line</Trans>;
-    case "mac_accessibility":
+    case "focused_app":
       return <Trans id="workspace.external-edit.metadata.source.mac-accessibility">Mac App</Trans>;
   }
 }
@@ -53,7 +53,7 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
     message: "Unknown application",
   });
   const macApplicationLabel =
-    trigger.source === "mac_accessibility"
+    trigger.source === "focused_app"
       ? (trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel)
       : undefined;
   const title =

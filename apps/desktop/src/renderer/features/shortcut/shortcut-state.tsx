@@ -4,7 +4,7 @@ import { useLingui } from "@lingui/react";
 import {
   quickCreateBlockAndShowWindow,
   requestSystemPermission,
-  startFocusedExternalEdit,
+  captureExternalEdit,
   toAppInvokeError,
   toggleMainWindowVisibility,
 } from "@renderer/clients";
@@ -50,7 +50,7 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     void quickCreateBlockAndShowWindow();
   });
   const handleExternalEdit = useEffectEvent(() => {
-    void startFocusedExternalEdit().catch((error: unknown) => {
+    void captureExternalEdit().catch((error: unknown) => {
       const invokeError = toAppInvokeError(error);
       if (invokeError.code === "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED") {
         toast.error(

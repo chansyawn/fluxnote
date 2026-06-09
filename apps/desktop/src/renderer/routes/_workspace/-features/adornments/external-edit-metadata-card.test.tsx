@@ -16,7 +16,7 @@ describe("ExternalEditMetadataCard", () => {
           elementRole: null,
           mode: "copy_only",
           processId: 123,
-          source: "mac_accessibility",
+          source: "focused_app",
         }}
       />,
     );

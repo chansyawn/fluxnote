@@ -1,3 +1,4 @@
+import { normalizeExternalMarkdown } from "@fluxnotes/editor";
 import { toast } from "@fluxnotes/ui/components/sonner";
 import {
   cancelExternalEdit,
@@ -6,21 +7,20 @@ import {
   type ExternalEditSession,
 } from "@renderer/clients";
 import { refreshBlocks } from "@renderer/features/blocks/block-query";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
+import { getCachedWorkspaceBlock } from "../block-collection/workspace-block-cache";
 import type { WorkspaceBlockEditorHandle } from "../editor/workspace-block-editor-surface";
-import type { SubmittableBlockContent } from "./submittable-block-content";
 
 interface UseExternalEditSubmissionParams {
   getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
-  submittableBlockContent: SubmittableBlockContent;
   navigateToBlock?: (blockId: string) => Promise<void>;
 }
 
-interface ExternalEditSubmission {
+interface UseExternalEditSubmissionResult {
   pendingExternalEditIds: Set<string>;
-  cancelExternalEdit: (editId: string) => Promise<void>;
-  submitExternalEdit: (
+  handleCancelExternalEdit: (editId: string) => Promise<void>;
+  handleSubmitExternalEdit: (
     blockId: string,
     editId: string,
     session?: ExternalEditSession,
@@ -29,9 +29,8 @@ interface ExternalEditSubmission {
 
 export function useExternalEditSubmission({
   getEditor,
-  submittableBlockContent,
   navigateToBlock,
-}: UseExternalEditSubmissionParams): ExternalEditSubmission {
+}: UseExternalEditSubmissionParams): UseExternalEditSubmissionResult {
   const [pendingExternalEditIds, setPendingExternalEditIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -47,6 +46,15 @@ export function useExternalEditSubmission({
       return next;
     });
   }, []);
+
+  const getSubmittableMarkdown = useCallback(
+    async (blockId: string) => {
+      const editorContent = await getEditor(blockId)?.flush();
+      const content = editorContent ?? getCachedWorkspaceBlock(blockId)?.content;
+      return content === undefined ? null : normalizeExternalMarkdown(content);
+    },
+    [getEditor],
+  );
 
   const handleCancelExternalEdit = useCallback(
     async (editId: string) => {
@@ -78,13 +86,10 @@ export function useExternalEditSubmission({
     async (blockId: string, editId: string, session?: ExternalEditSession) => {
       markPending(editId);
       try {
-        if (
-          session?.trigger.source === "mac_accessibility" &&
-          session.trigger.mode === "copy_only"
-        ) {
+        if (session?.trigger.source === "focused_app" && session.trigger.mode === "copy_only") {
           await copyBlockContent(blockId);
         }
-        const content = await submittableBlockContent.getSubmittableMarkdown(blockId);
+        const content = await getSubmittableMarkdown(blockId);
         if (content === null) {
           toast.error("Cannot submit: block content unavailable.");
           return;
@@ -98,12 +103,15 @@ export function useExternalEditSubmission({
         unmarkPending(editId);
       }
     },
-    [copyBlockContent, markPending, navigateToBlock, submittableBlockContent, unmarkPending],
+    [copyBlockContent, getSubmittableMarkdown, markPending, navigateToBlock, unmarkPending],
   );
 
-  return {
-    pendingExternalEditIds,
-    cancelExternalEdit: handleCancelExternalEdit,
-    submitExternalEdit: handleSubmitExternalEdit,
-  };
+  return useMemo(
+    () => ({
+      pendingExternalEditIds,
+      handleCancelExternalEdit,
+      handleSubmitExternalEdit,
+    }),
+    [handleCancelExternalEdit, handleSubmitExternalEdit, pendingExternalEditIds],
+  );
 }

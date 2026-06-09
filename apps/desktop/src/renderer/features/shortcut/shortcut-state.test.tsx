@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   })),
   resetShortcut: vi.fn(),
   setShortcut: vi.fn(),
-  startFocusedExternalEdit: vi.fn(async () => undefined),
+  captureExternalEdit: vi.fn(async () => undefined),
   syncCalls: [] as Array<{ onPressed: () => void; shortcut: string | null }>,
   toggleMainWindowVisibility: vi.fn(async () => undefined),
   toastError: vi.fn(),
@@ -41,9 +41,9 @@ vi.mock("@renderer/features/shortcut/use-global-shortcut-sync", () => ({
 }));
 
 vi.mock("@renderer/clients", () => ({
+  captureExternalEdit: mocks.captureExternalEdit,
   quickCreateBlockAndShowWindow: mocks.quickCreateBlockAndShowWindow,
   requestSystemPermission: mocks.requestSystemPermission,
-  startFocusedExternalEdit: mocks.startFocusedExternalEdit,
   toAppInvokeError: (error: unknown) =>
     error instanceof Error
       ? Object.assign(error, { code: "INTERNAL" })
@@ -63,8 +63,8 @@ import { ShortcutStateProvider } from "./shortcut-state";
 describe("ShortcutStateProvider", () => {
   beforeEach(() => {
     mocks.requestSystemPermission.mockClear();
-    mocks.startFocusedExternalEdit.mockReset();
-    mocks.startFocusedExternalEdit.mockResolvedValue(undefined);
+    mocks.captureExternalEdit.mockReset();
+    mocks.captureExternalEdit.mockResolvedValue(undefined);
     mocks.toastError.mockClear();
   });
 
@@ -81,12 +81,12 @@ describe("ShortcutStateProvider", () => {
     externalEditShortcut?.onPressed();
 
     expect(externalEditShortcut).toBeDefined();
-    expect(mocks.startFocusedExternalEdit).toHaveBeenCalledTimes(1);
+    expect(mocks.captureExternalEdit).toHaveBeenCalledTimes(1);
   });
 
   it("shows an Accessibility permission action when External edit lacks permission", async () => {
     mocks.syncCalls.length = 0;
-    mocks.startFocusedExternalEdit.mockRejectedValue({
+    mocks.captureExternalEdit.mockRejectedValue({
       code: "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
       message: "Fluxnotes needs macOS Accessibility permission.",
     });
@@ -120,7 +120,7 @@ describe("ShortcutStateProvider", () => {
 
   it("keeps normal error toasts for unrelated External edit failures", async () => {
     mocks.syncCalls.length = 0;
-    mocks.startFocusedExternalEdit.mockRejectedValue(new Error("External edit failed"));
+    mocks.captureExternalEdit.mockRejectedValue(new Error("External edit failed"));
 
     renderWithProviders(
       <ShortcutStateProvider>

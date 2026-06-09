@@ -17,7 +17,7 @@ import {
 
 function isCopyOnlyExternalEdit(state: WorkspaceBlockState): boolean {
   return (
-    state.externalEditSession?.trigger.source === "mac_accessibility" &&
+    state.externalEditSession?.trigger.source === "focused_app" &&
     state.externalEditSession.trigger.mode === "copy_only"
   );
 }

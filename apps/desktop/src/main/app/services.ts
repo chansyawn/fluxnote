@@ -12,12 +12,10 @@ import {
   createAutoArchiveRuntime,
   type AutoArchiveRuntime,
 } from "@main/features/blocks/auto-archive-runtime";
-import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
 import {
-  createDefaultMacAccessibilityExternalEditService,
-  createMacAccessibilityHelperFactory,
-  type MacAccessibilityExternalEditService,
-} from "@main/features/mac-accessibility-external-edit";
+  createDefaultExternalEditRuntime,
+  type ExternalEditRuntime,
+} from "@main/features/external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
 import {
@@ -42,8 +40,7 @@ export interface MainServices {
   autoArchiveRuntime: AutoArchiveRuntime;
   db: DbRuntime;
   events: EventBus;
-  externalEditManager: ExternalEditManager;
-  macAccessibilityExternalEditService: MacAccessibilityExternalEditService;
+  externalEditRuntime: ExternalEditRuntime;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
@@ -90,25 +87,23 @@ export function createMainServices(): MainServices {
     storage: getConfigStore(userDataPath, APP_TELEMETRY_STORE_FILE, {}),
   });
 
-  const externalEditManager = createExternalEditManager({ emitEvent });
-  const autoArchiveRuntime = createAutoArchiveRuntime({
-    emitEvent,
-    getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
-    getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
-    getDb: () => db.getDb(),
-    readUserPreferences: preferencesService.readUserPreferences,
-  });
   const openBlockService = createOpenBlockService({
     emitEvent,
     showWindow: () => windowManager.activateMainWindow(),
   });
-  const macAccessibilityExternalEditService = createDefaultMacAccessibilityExternalEditService({
+  const externalEditRuntime = createDefaultExternalEditRuntime({
     emitEvent,
-    externalEditManager,
     getDb: () => db.getDb(),
-    helperFactory: createMacAccessibilityHelperFactory(),
     openBlockService,
+    paths,
     telemetryService,
+  });
+  const autoArchiveRuntime = createAutoArchiveRuntime({
+    emitEvent,
+    getProtectedBlockIds: () => new Set(externalEditRuntime.listSessions().map((s) => s.blockId)),
+    getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
+    getDb: () => db.getDb(),
+    readUserPreferences: preferencesService.readUserPreferences,
   });
   const systemPermissionsService = createDefaultSystemPermissionsService();
 
@@ -133,8 +128,7 @@ export function createMainServices(): MainServices {
     autoArchiveRuntime,
     db,
     events,
-    externalEditManager,
-    macAccessibilityExternalEditService,
+    externalEditRuntime,
     openBlockService,
     paths,
     preferencesService,

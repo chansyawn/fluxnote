@@ -95,7 +95,7 @@ export function createCopyOnlyExternalEditSession(
       elementRole: null,
       mode: "copy_only",
       processId: 0,
-      source: "mac_accessibility",
+      source: "focused_app",
     },
     ...overrides,
   });

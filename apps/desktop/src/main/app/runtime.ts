@@ -12,13 +12,9 @@ import { registerBlocksCommands } from "../features/blocks/command";
 import { registerCliCommands } from "../features/cli/command";
 import { registerClipboardCommands } from "../features/clipboard";
 import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
-import type { ExternalEditManager } from "../features/external-edit";
+import type { ExternalEditRuntime } from "../features/external-edit";
 import { registerExternalEditCommands } from "../features/external-edit/command";
 import { registerExternalUrlCommands } from "../features/external-url";
-import {
-  registerMacAccessibilityExternalEditCommands,
-  type MacAccessibilityExternalEditService,
-} from "../features/mac-accessibility-external-edit";
 import type { OpenBlockService } from "../features/open-block";
 import { registerOpenBlockCommands } from "../features/open-block/command";
 import type { PreferencesService } from "../features/preferences";
@@ -46,8 +42,7 @@ interface RuntimeCommandDeps {
   };
   db: AppDatabase;
   events: EventBus;
-  externalEditManager: ExternalEditManager;
-  macAccessibilityExternalEditService: MacAccessibilityExternalEditService;
+  externalEditRuntime: ExternalEditRuntime;
   now: () => Date;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
@@ -74,19 +69,14 @@ function registerRuntimeCommands(
   registerBlocksCommands(ipc, {
     db: deps.db,
     getAssetPathForBlock: deps.paths.assetPathForBlock,
-    listExternalEditSessions: deps.externalEditManager.listSessions,
+    listExternalEditSessions: deps.externalEditRuntime.listSessions,
     now: deps.now,
     readUserPreferences: deps.preferencesService.readUserPreferences,
   });
   registerClipboardCommands(ipc);
   registerCliCommands(ipc);
   registerExternalEditCommands(ipc, {
-    db: deps.db,
-    manager: deps.externalEditManager,
-    paths: deps.paths,
-  });
-  registerMacAccessibilityExternalEditCommands(ipc, {
-    service: deps.macAccessibilityExternalEditService,
+    runtime: deps.externalEditRuntime,
   });
   registerExternalUrlCommands(ipc);
   registerOpenBlockCommands(ipc, {
@@ -128,8 +118,8 @@ export function createBackendRuntime() {
 
   function createEntrypoints(db: AppDatabase): EntrypointRuntime {
     return createEntrypointRuntime({
-      createExternalEditSession: (blockId, originalContent, trigger, signal) =>
-        services.externalEditManager.begin(blockId, originalContent, trigger, { signal }).result,
+      createExternalEditSession: (blockId, trigger, signal) =>
+        services.externalEditRuntime.createFileSession(blockId, trigger, signal),
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
         services.openBlockService.requestOpen({ blockId });
@@ -149,8 +139,7 @@ export function createBackendRuntime() {
       autoArchiveRuntime: services.autoArchiveRuntime,
       db,
       events: services.events,
-      externalEditManager: services.externalEditManager,
-      macAccessibilityExternalEditService: services.macAccessibilityExternalEditService,
+      externalEditRuntime: services.externalEditRuntime,
       now: () => new Date(),
       openBlockService: services.openBlockService,
       paths: services.paths,
@@ -203,7 +192,7 @@ export function createBackendRuntime() {
     services.appUpdateService.stop();
     services.autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
-    services.externalEditManager.cancelAll();
+    services.externalEditRuntime.cancelAll();
     services.telemetryService.shutdown();
     if (entrypointRuntime) {
       await entrypointRuntime.stopCliServer();

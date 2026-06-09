@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
 
-import { externalEditTriggerSchema } from "./session-contracts";
+import { externalEditTriggerSchema } from "./models";
 
-describe("external edit session contracts", () => {
+describe("external edit models", () => {
   it("accepts CLI external edit triggers", () => {
     const trigger = externalEditTriggerSchema.parse({
       cwd: "/workspace",
@@ -14,34 +14,34 @@ describe("external edit session contracts", () => {
     expect(trigger.source).toBe("cli");
   });
 
-  it("accepts macOS Accessibility external edit triggers", () => {
+  it("accepts focused app external edit triggers", () => {
     const trigger = externalEditTriggerSchema.parse({
       appBundleId: "com.example.App",
       appName: "Example",
       elementRole: "AXTextArea",
       mode: "write_back",
       processId: 123,
-      source: "mac_accessibility",
+      source: "focused_app",
     });
 
     expect(trigger).toMatchObject({
-      source: "mac_accessibility",
+      source: "focused_app",
       mode: "write_back",
     });
   });
 
-  it("accepts macOS Accessibility copy-only external edit triggers", () => {
+  it("accepts focused app copy-only external edit triggers", () => {
     const trigger = externalEditTriggerSchema.parse({
       appBundleId: null,
       appName: null,
       elementRole: null,
       mode: "copy_only",
       processId: 0,
-      source: "mac_accessibility",
+      source: "focused_app",
     });
 
     expect(trigger).toMatchObject({
-      source: "mac_accessibility",
+      source: "focused_app",
       mode: "copy_only",
     });
   });

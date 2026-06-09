@@ -34,7 +34,7 @@ export function BlockAdornments({
 }: BlockAdornmentsProps) {
   const externalEditSession = state.externalEditSession;
   const externalEditMode =
-    externalEditSession?.trigger.source === "mac_accessibility"
+    externalEditSession?.trigger.source === "focused_app"
       ? externalEditSession.trigger.mode
       : "write_back";
   const shouldShowBlockActions = active || Boolean(externalEditSession);

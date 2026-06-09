@@ -4,7 +4,7 @@ import { PassThrough } from "node:stream";
 
 import { describe, expect, it, vi } from "vite-plus/test";
 
-import { MacAccessibilityHelperError, SpawnedMacAccessibilityHelper } from "./helper";
+import { FocusedAppHelperError, SpawnedFocusedAppHelper } from "./helper";
 
 class FakeHelperProcess extends EventEmitter {
   readonly stdin = new PassThrough();
@@ -20,7 +20,7 @@ class FakeHelperProcess extends EventEmitter {
 
 function createHelper(): {
   child: FakeHelperProcess;
-  helper: SpawnedMacAccessibilityHelper;
+  helper: SpawnedFocusedAppHelper;
   requests: string[];
 } {
   const child = new FakeHelperProcess();
@@ -31,13 +31,13 @@ function createHelper(): {
 
   return {
     child,
-    helper: new SpawnedMacAccessibilityHelper(child as unknown as ChildProcessWithoutNullStreams),
+    helper: new SpawnedFocusedAppHelper(child as unknown as ChildProcessWithoutNullStreams),
     requests,
   };
 }
 
-describe("macOS Accessibility helper wrapper", () => {
-  it("maps capture responses to macOS accessibility captures", async () => {
+describe("focused app helper wrapper", () => {
+  it("maps capture responses to focused app captures", async () => {
     const { child, helper, requests } = createHelper();
 
     const capture = helper.capture();
@@ -62,7 +62,7 @@ describe("macOS Accessibility helper wrapper", () => {
         elementRole: "AXTextArea",
         mode: "write_back",
         processId: 123,
-        source: "mac_accessibility",
+        source: "focused_app",
       },
     });
     expect(requests).toEqual([`${JSON.stringify({ command: "capture" })}\n`]);
@@ -83,8 +83,8 @@ describe("macOS Accessibility helper wrapper", () => {
     await expect(capture).rejects.toMatchObject({
       code: "permission_required",
       message: "Accessibility permission is not granted.",
-      name: "MacAccessibilityHelperError",
-    } satisfies Partial<MacAccessibilityHelperError>);
+      name: "FocusedAppHelperError",
+    } satisfies Partial<FocusedAppHelperError>);
   });
 
   it("preserves helper failure metadata when available", async () => {
@@ -111,8 +111,8 @@ describe("macOS Accessibility helper wrapper", () => {
         appName: "Example",
         processId: 123,
       },
-      name: "MacAccessibilityHelperError",
-    } satisfies Partial<MacAccessibilityHelperError>);
+      name: "FocusedAppHelperError",
+    } satisfies Partial<FocusedAppHelperError>);
   });
 
   it("rejects invalid JSON output", async () => {

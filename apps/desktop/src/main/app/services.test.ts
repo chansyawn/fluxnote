@@ -42,15 +42,14 @@ const mocks = vi.hoisted(() => ({
     isSenderTrusted: vi.fn(() => true),
     registerWindow: vi.fn(),
   })),
-  createExternalEditManager: vi.fn(() => ({
-    begin: vi.fn(),
+  createDefaultExternalEditRuntime: vi.fn(() => ({
     cancelAll: vi.fn(),
+    createFileSession: vi.fn(),
     listSessions: vi.fn(() => []),
+    capture: vi.fn(),
+    cancel: vi.fn(),
+    submit: vi.fn(),
   })),
-  createMacAccessibilityExternalEditService: vi.fn(() => ({
-    startFocusedExternalEdit: vi.fn(),
-  })),
-  createMacAccessibilityHelperFactory: vi.fn(() => ({ create: vi.fn() })),
   createOpenBlockService: vi.fn(() => ({
     emitPending: vi.fn(),
     requestOpen: vi.fn(),
@@ -123,11 +122,7 @@ vi.mock("@main/features/blocks/auto-archive-runtime", () => ({
   createAutoArchiveRuntime: mocks.createAutoArchiveRuntime,
 }));
 vi.mock("@main/features/external-edit", () => ({
-  createExternalEditManager: mocks.createExternalEditManager,
-}));
-vi.mock("@main/features/mac-accessibility-external-edit", () => ({
-  createDefaultMacAccessibilityExternalEditService: mocks.createMacAccessibilityExternalEditService,
-  createMacAccessibilityHelperFactory: mocks.createMacAccessibilityHelperFactory,
+  createDefaultExternalEditRuntime: mocks.createDefaultExternalEditRuntime,
 }));
 vi.mock("@main/features/open-block", () => ({
   createOpenBlockService: mocks.createOpenBlockService,

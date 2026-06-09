@@ -1,32 +1,26 @@
-import type { AppDataPaths } from "@main/core/app-data";
-import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
 
-import type { ExternalEditManager } from "./manager";
-import { cancelEdit, submitEdit } from "./service";
+import type { ExternalEditRuntime } from "./runtime";
 
 interface ExternalEditCommandDeps {
-  manager: ExternalEditManager;
-  db: AppDatabase;
-  paths: AppDataPaths;
+  runtime: Pick<ExternalEditRuntime, "cancel" | "capture" | "listSessions" | "submit">;
 }
 
 export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditCommandDeps): void {
+  ipc.command("external-edit.capture", async () => {
+    return await deps.runtime.capture();
+  });
+
   ipc.command("external-edit.cancel", async (input) => {
-    await cancelEdit({ manager: deps.manager }, input.editId);
+    await deps.runtime.cancel(input.editId);
     return undefined;
   });
 
   ipc.command("external-edit.list", async () => {
-    return deps.manager.listSessions();
+    return deps.runtime.listSessions();
   });
 
   ipc.command("external-edit.submit", async (input) => {
-    return await submitEdit(
-      { manager: deps.manager, paths: deps.paths },
-      deps.db,
-      input.editId,
-      input.content,
-    );
+    return await deps.runtime.submit(input.editId, input.content);
   });
 }

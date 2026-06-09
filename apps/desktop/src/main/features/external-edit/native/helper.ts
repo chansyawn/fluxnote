@@ -3,21 +3,21 @@ import { mkdir, stat } from "node:fs/promises";
 import path from "node:path";
 import { createInterface } from "node:readline";
 
-import type { MacAccessibilityExternalEditTrigger } from "@shared/features/external-edit/session-contracts";
+import type { FocusedAppExternalEditTrigger } from "@shared/features/external-edit/models";
 import { app } from "electron";
 
 import {
   createMacAccessibilityHelperCompileCommand,
   macAccessibilityHelperOutputName,
   macAccessibilityHelperSource,
-} from "../../../../config/native/macos-accessibility-helper";
+} from "../../../../../config/native/macos-accessibility-helper";
 
-export interface MacAccessibilityCapture {
+export interface FocusedAppCapture {
   content: string;
-  trigger: MacAccessibilityExternalEditTrigger;
+  trigger: FocusedAppExternalEditTrigger;
 }
 
-export interface MacAccessibilityHelperErrorData {
+export interface FocusedAppHelperErrorData {
   appBundleId: string | null;
   appName: string | null;
   elementRole?: string | null;
@@ -49,26 +49,26 @@ interface PendingRequest {
   resolve: (value: unknown) => void;
 }
 
-export class MacAccessibilityHelperError extends Error {
+export class FocusedAppHelperError extends Error {
   readonly code?: string;
-  readonly data?: MacAccessibilityHelperErrorData;
+  readonly data?: FocusedAppHelperErrorData;
 
-  constructor(message: string, code?: string, data?: MacAccessibilityHelperErrorData) {
+  constructor(message: string, code?: string, data?: FocusedAppHelperErrorData) {
     super(message);
     this.code = code;
     this.data = data;
-    this.name = "MacAccessibilityHelperError";
+    this.name = "FocusedAppHelperError";
   }
 }
 
-export interface MacAccessibilityHelper {
-  capture: () => Promise<MacAccessibilityCapture>;
+export interface FocusedAppHelper {
+  capture: () => Promise<FocusedAppCapture>;
   dispose: () => void;
   writeBack: (content: string) => Promise<void>;
 }
 
-export interface MacAccessibilityHelperFactory {
-  create: () => Promise<MacAccessibilityHelper>;
+export interface FocusedAppHelperFactory {
+  create: () => Promise<FocusedAppHelper>;
 }
 
 function getAppRoot(): string {
@@ -160,7 +160,7 @@ function parseNullableString(value: unknown): string | null | undefined {
   return undefined;
 }
 
-function parseHelperErrorData(data: unknown): MacAccessibilityHelperErrorData | undefined {
+function parseHelperErrorData(data: unknown): FocusedAppHelperErrorData | undefined {
   if (typeof data !== "object" || data === null) {
     return undefined;
   }
@@ -189,7 +189,7 @@ function parseHelperErrorData(data: unknown): MacAccessibilityHelperErrorData | 
   };
 }
 
-export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
+export class SpawnedFocusedAppHelper implements FocusedAppHelper {
   private readonly child: ChildProcessWithoutNullStreams;
   private readonly pendingRequests: PendingRequest[] = [];
   private disposed = false;
@@ -208,7 +208,7 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
         const response = parseHelperResponse(line);
         if (!response.ok) {
           pending.reject(
-            new MacAccessibilityHelperError(
+            new FocusedAppHelperError(
               response.error || "macOS Accessibility helper failed.",
               response.code,
               parseHelperErrorData(response.data),
@@ -239,7 +239,7 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
     });
   }
 
-  async capture(): Promise<MacAccessibilityCapture> {
+  async capture(): Promise<FocusedAppCapture> {
     const data = await this.request<HelperCaptureResponse>({ command: "capture" });
     return {
       content: data.content,
@@ -249,7 +249,7 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
         elementRole: data.elementRole,
         mode: "write_back",
         processId: data.processId,
-        source: "mac_accessibility",
+        source: "focused_app",
       },
     };
   }
@@ -300,8 +300,8 @@ export class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
   }
 }
 
-export function createMacAccessibilityHelperFactory(): MacAccessibilityHelperFactory {
-  async function create(): Promise<MacAccessibilityHelper> {
+export function createFocusedAppHelperFactory(): FocusedAppHelperFactory {
+  async function create(): Promise<FocusedAppHelper> {
     const helperPath = await resolveHelperPath();
     const child = spawn(helperPath, [], {
       stdio: ["pipe", "pipe", "pipe"],
@@ -311,7 +311,7 @@ export function createMacAccessibilityHelperFactory(): MacAccessibilityHelperFac
       console.warn("macOS Accessibility helper stderr", chunk.toString("utf8"));
     });
 
-    return new SpawnedMacAccessibilityHelper(child);
+    return new SpawnedFocusedAppHelper(child);
   }
 
   return { create };

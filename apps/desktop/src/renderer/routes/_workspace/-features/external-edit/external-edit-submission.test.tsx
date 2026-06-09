@@ -30,26 +30,30 @@ vi.mock("@fluxnotes/ui/components/sonner", () => ({
   },
 }));
 
-import { useExternalEditActions } from "./use-external-edit-actions";
+import { useExternalEditSubmission } from "./external-edit-submission";
 
-interface ExternalEditActionsSnapshot {
-  handleCancelExternalEdit: ReturnType<typeof useExternalEditActions>["handleCancelExternalEdit"];
-  handleSubmitExternalEdit: ReturnType<typeof useExternalEditActions>["handleSubmitExternalEdit"];
-  pendingExternalEditIds: ReturnType<typeof useExternalEditActions>["pendingExternalEditIds"];
+interface ExternalEditSubmissionSnapshot {
+  handleCancelExternalEdit: ReturnType<
+    typeof useExternalEditSubmission
+  >["handleCancelExternalEdit"];
+  handleSubmitExternalEdit: ReturnType<
+    typeof useExternalEditSubmission
+  >["handleSubmitExternalEdit"];
+  pendingExternalEditIds: ReturnType<typeof useExternalEditSubmission>["pendingExternalEditIds"];
 }
 
-interface ExternalEditActionsHarnessProps {
+interface ExternalEditSubmissionHarnessProps {
   getEditor: (blockId: string) => WorkspaceBlockEditorHandle | undefined;
   navigateToBlock?: (blockId: string) => Promise<void>;
-  onSnapshot: (snapshot: ExternalEditActionsSnapshot) => void;
+  onSnapshot: (snapshot: ExternalEditSubmissionSnapshot) => void;
 }
 
-function ExternalEditActionsHarness({
+function ExternalEditSubmissionHarness({
   getEditor,
   navigateToBlock,
   onSnapshot,
-}: ExternalEditActionsHarnessProps) {
-  const actions = useExternalEditActions({ getEditor, navigateToBlock });
+}: ExternalEditSubmissionHarnessProps) {
+  const actions = useExternalEditSubmission({ getEditor, navigateToBlock });
 
   useLayoutEffect(() => {
     onSnapshot(actions);
@@ -75,17 +79,17 @@ function createBlock(id: string, content: string): Block {
 }
 
 function createHarness(options: {
-  getEditor: ExternalEditActionsHarnessProps["getEditor"];
-  navigateToBlock?: ExternalEditActionsHarnessProps["navigateToBlock"];
+  getEditor: ExternalEditSubmissionHarnessProps["getEditor"];
+  navigateToBlock?: ExternalEditSubmissionHarnessProps["navigateToBlock"];
 }) {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
-  let snapshot: ExternalEditActionsSnapshot | null = null;
+  let snapshot: ExternalEditSubmissionSnapshot | null = null;
 
   act(() => {
     root.render(
-      <ExternalEditActionsHarness
+      <ExternalEditSubmissionHarness
         getEditor={options.getEditor}
         navigateToBlock={options.navigateToBlock}
         onSnapshot={(nextSnapshot) => {
@@ -96,9 +100,9 @@ function createHarness(options: {
   });
 
   return {
-    getSnapshot(): ExternalEditActionsSnapshot {
+    getSnapshot(): ExternalEditSubmissionSnapshot {
       if (!snapshot) {
-        throw new Error("External edit actions snapshot is unavailable.");
+        throw new Error("External edit submission snapshot is unavailable.");
       }
       return snapshot;
     },
@@ -111,7 +115,7 @@ function createHarness(options: {
   };
 }
 
-describe("useExternalEditActions", () => {
+describe("useExternalEditSubmission", () => {
   let mountedRoot: { unmount: () => void } | null = null;
 
   afterEach(() => {

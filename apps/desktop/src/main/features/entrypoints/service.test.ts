@@ -121,7 +121,6 @@ describe("entrypoint service", () => {
     });
     expect(createExternalEditSession).toHaveBeenCalledWith(
       "block-1",
-      "hello",
       externalEditTrigger,
       abortController.signal,
     );
