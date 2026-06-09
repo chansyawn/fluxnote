@@ -421,6 +421,12 @@ static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
   };
 }
 
+static BOOL EnableManualAccessibility(AXUIElementRef focusedApp) {
+  AXError result =
+      AXUIElementSetAttributeValue(focusedApp, CFSTR("AXManualAccessibility"), kCFBooleanTrue);
+  return result == kAXErrorSuccess;
+}
+
 @implementation AccessibilitySession
 
 - (void)dealloc {
@@ -455,6 +461,9 @@ static ElementLookupResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
 
   NSDictionary *applicationMetadata = ApplicationMetadataFromElement(focusedApp);
   ElementLookupResult lookup = CopyFocusedUIElement(focusedApp);
+  if (lookup.element == NULL && EnableManualAccessibility(focusedApp)) {
+    lookup = CopyFocusedUIElement(focusedApp);
+  }
   CFRelease(focusedApp);
   if (lookup.element == NULL) {
     if (error != NULL) {
