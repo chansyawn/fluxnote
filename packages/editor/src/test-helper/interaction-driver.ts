@@ -19,15 +19,21 @@ import type { BlockEditorRuntime } from "../runtime/types";
 
 interface KeyboardCommandOptions {
   altKey?: boolean;
+  ctrlKey?: boolean;
+  metaKey?: boolean;
   shiftKey?: boolean;
 }
 
 function keyboardPayload({
   altKey = false,
+  ctrlKey = false,
+  metaKey = false,
   shiftKey = false,
 }: KeyboardCommandOptions = {}): KeyboardEvent {
   return {
     altKey,
+    ctrlKey,
+    metaKey,
     preventDefault() {},
     shiftKey,
   } as KeyboardEvent;

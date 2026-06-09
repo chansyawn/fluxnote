@@ -25,7 +25,12 @@ import {
   editorFromMarkdown,
   readMdast,
 } from "../../test-helper/editor-driver";
-import { pressEnter, selectText } from "../../test-helper/interaction-driver";
+import {
+  pressEnter,
+  pressTab,
+  selectText,
+  selectTextRange,
+} from "../../test-helper/interaction-driver";
 import {
   performTableStructureOperation,
   type TableColumnAlign,
@@ -433,6 +438,111 @@ describe("table", () => {
         },
       ],
       type: "table",
+    });
+  });
+
+  it("Tab moves from a table cell to the next cell in the same row", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectText(editor, "a");
+
+    expect(pressTab(editor)).toBe(true);
+
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 1,
+      nodeText: "b",
+      offset: 0,
+      rowIndex: 1,
+    });
+  });
+
+  it("Tab moves from the row end to the first cell in the next row", () => {
+    const editor = editorFromMarkdown(
+      ["| h1 | h2 |", "| -- | -- |", "| a  | b  |", "| c  | d  |", ""].join("\n"),
+    );
+    selectText(editor, "b");
+
+    expect(pressTab(editor)).toBe(true);
+
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 0,
+      nodeText: "c",
+      offset: 0,
+      rowIndex: 2,
+    });
+  });
+
+  it("Tab at the last cell inserts a row and moves to the new first cell", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectText(editor, "b");
+
+    expect(pressTab(editor)).toBe(true);
+
+    expect(getTable(editor).children).toHaveLength(3);
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 0,
+      nodeText: "",
+      offset: 0,
+      rowIndex: 2,
+    });
+    expect(cellHasRowHeader(editor, 0, 0)).toBe(true);
+    expect(cellHasRowHeader(editor, 1, 0)).toBe(false);
+    expect(cellHasRowHeader(editor, 2, 0)).toBe(false);
+  });
+
+  it("Enter uses the same forward table navigation as Tab", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectText(editor, "a");
+
+    expect(pressEnter(editor)).toBe(true);
+
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 1,
+      nodeText: "b",
+      offset: 0,
+      rowIndex: 1,
+    });
+  });
+
+  it("Enter at the last cell inserts a row like Tab", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectText(editor, "b");
+
+    expect(pressEnter(editor)).toBe(true);
+
+    expect(getTable(editor).children).toHaveLength(3);
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 0,
+      nodeText: "",
+      offset: 0,
+      rowIndex: 2,
+    });
+  });
+
+  it("does not navigate table cells when text is selected", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectTextRange(editor, "a", 0, 1);
+
+    expect(pressTab(editor)).toBe(false);
+
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 0,
+      nodeText: "a",
+      offset: 0,
+      rowIndex: 1,
+    });
+  });
+
+  it("does not handle Shift+Tab so existing table behavior can run", () => {
+    const editor = editorFromMarkdown(["| h1 | h2 |", "| -- | -- |", "| a  | b  |", ""].join("\n"));
+    selectText(editor, "b");
+
+    expect(pressTab(editor, { shiftKey: true })).toBe(false);
+
+    expect(readAnchorCellPosition(editor)).toEqual({
+      columnIndex: 1,
+      nodeText: "b",
+      offset: 1,
+      rowIndex: 1,
     });
   });
 

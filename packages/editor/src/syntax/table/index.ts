@@ -8,6 +8,7 @@ import { registerTableCellClipboardInsertion } from "./table-cell-insert";
 import { registerTableCellNormalization } from "./table-cell-normalize";
 import { guardTableCellBlockShortcuts } from "./table-cell-shortcuts";
 import { TableControlsDecorator } from "./table-controls-decorator";
+import { registerTableKeyboardCommands } from "./table-keyboard-commands";
 import { TABLE } from "./table-shortcut";
 
 export { tableFromLexical, tableToLexical } from "./lexical";
@@ -41,6 +42,7 @@ export const TABLE_SYNTAX_EXTENSION = defineExtension({
   },
   register(editor) {
     return mergeRegister(
+      registerTableKeyboardCommands(editor),
       registerTableCellClipboardInsertion(editor),
       registerTableCellNormalization(editor),
     );
