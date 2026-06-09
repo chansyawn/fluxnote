@@ -660,42 +660,27 @@ msgid "workspace.external-edit.cancel.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:113
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:100
 msgid "workspace.external-edit.metadata.app"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:102
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:89
 msgid "workspace.external-edit.metadata.cwd"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:106
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:93
 msgid "workspace.external-edit.metadata.file"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:66
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:53
 msgid "workspace.external-edit.metadata.mac-input"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:117
-msgid "workspace.external-edit.metadata.scope"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:49
-msgid "workspace.external-edit.metadata.scope.full-value"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:47
-msgid "workspace.external-edit.metadata.scope.selection"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:96
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:83
 msgid "workspace.external-edit.metadata.source"
 msgstr ""
 
@@ -710,7 +695,7 @@ msgid "workspace.external-edit.metadata.source.mac-accessibility"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:70
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:57
 msgid "workspace.external-edit.metadata.unknown-application"
 msgstr ""
 

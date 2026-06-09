@@ -37,19 +37,6 @@ function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["sour
   }
 }
 
-function ExternalEditScopeLabel({
-  scope,
-}: {
-  scope: Extract<ExternalEditTrigger, { source: "mac_accessibility" }>["editScope"];
-}) {
-  switch (scope) {
-    case "selection":
-      return <Trans id="workspace.external-edit.metadata.scope.selection">Selected text</Trans>;
-    case "full_value":
-      return <Trans id="workspace.external-edit.metadata.scope.full-value">Full input</Trans>;
-  }
-}
-
 function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: ReactNode }) {
   return (
     <>
@@ -112,10 +99,6 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
               <ExternalEditMetadataItem
                 label={<Trans id="workspace.external-edit.metadata.app">Application</Trans>}
                 value={trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel}
-              />
-              <ExternalEditMetadataItem
-                label={<Trans id="workspace.external-edit.metadata.scope">Edit scope</Trans>}
-                value={<ExternalEditScopeLabel scope={trigger.editScope} />}
               />
             </>
           )}

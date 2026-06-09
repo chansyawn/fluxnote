@@ -4,9 +4,6 @@
 
 @interface AccessibilitySession : NSObject
 @property(nonatomic) AXUIElementRef focusedElement;
-@property(nonatomic) CFRange originalRange;
-@property(nonatomic) BOOL hasOriginalRange;
-@property(nonatomic) BOOL useSelectionWriteBack;
 - (NSDictionary *)capture:(NSError **)error;
 - (BOOL)writeBack:(NSString *)content error:(NSError **)error;
 @end
@@ -146,15 +143,7 @@ static BOOL SupportsAttribute(AXUIElementRef element, CFStringRef attribute) {
 }
 
 static NSString *ReadEditableContent(AXUIElementRef element) {
-  NSString *value = ReadStringAttribute(element, kAXValueAttribute);
-  if (value != nil) {
-    return value;
-  }
-  NSString *selectedText = ReadStringAttribute(element, kAXSelectedTextAttribute);
-  if (selectedText != nil) {
-    return selectedText;
-  }
-  return nil;
+  return ReadStringAttribute(element, kAXValueAttribute);
 }
 
 static BOOL IsEditableRole(NSString *role) {
@@ -175,8 +164,7 @@ static BOOL IsEditableCandidate(AXUIElementRef element) {
   if (IsEditableRole(role)) {
     return ReadEditableContent(element) != nil;
   }
-  return SupportsAttribute(element, kAXSelectedTextAttribute) ||
-         SupportsAttribute(element, kAXSelectedTextRangeAttribute);
+  return SupportsAttribute(element, kAXValueAttribute);
 }
 
 static AXUIElementRef CopyEditableDescendant(AXUIElementRef root, NSUInteger depth);
@@ -378,49 +366,22 @@ static FocusedElementResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
     return nil;
   }
 
-  NSString *selectedText = ReadStringAttribute(element, kAXSelectedTextAttribute);
-  BOOL hasSelection = selectedText.length > 0;
-  CFRange selectedRange = CFRangeMake(0, 0);
-  BOOL hasSelectedRange = NO;
-  CFTypeRef selectedRangeValue = NULL;
-  AXError selectedRangeResult = AXUIElementCopyAttributeValue(
-      element, kAXSelectedTextRangeAttribute, &selectedRangeValue);
-  if (selectedRangeResult == kAXErrorSuccess && selectedRangeValue != NULL &&
-      CFGetTypeID(selectedRangeValue) == AXValueGetTypeID()) {
-    hasSelectedRange =
-        AXValueGetValue((AXValueRef)selectedRangeValue, kAXValueCFRangeType, &selectedRange);
-  }
-  if (selectedRangeValue != NULL) {
-    CFRelease(selectedRangeValue);
-  }
-
   if (self.focusedElement != NULL) {
     CFRelease(self.focusedElement);
   }
   self.focusedElement = element;
-  self.originalRange = selectedRange;
-  self.hasOriginalRange = hasSelectedRange;
-  self.useSelectionWriteBack = hasSelection;
 
   pid_t processId = 0;
   AXUIElementGetPid(element, &processId);
   NSRunningApplication *application =
       [NSRunningApplication runningApplicationWithProcessIdentifier:processId];
-  NSDictionary *selectedRangePayload = hasSelectedRange
-                                           ? @{
-                                               @"location" : @(selectedRange.location),
-                                               @"length" : @(selectedRange.length),
-                                             }
-                                           : (id)[NSNull null];
 
   return @{
     @"appBundleId" : application.bundleIdentifier ?: (id)[NSNull null],
     @"appName" : application.localizedName ?: (id)[NSNull null],
-    @"content" : hasSelection ? selectedText : value,
-    @"editScope" : hasSelection ? @"selection" : @"full_value",
+    @"content" : value,
     @"elementRole" : role ?: (id)[NSNull null],
     @"processId" : NumberOrNull(processId),
-    @"selectedRange" : selectedRangePayload,
   };
 }
 
@@ -428,33 +389,6 @@ static FocusedElementResult CopyFocusedUIElement(AXUIElementRef focusedApp) {
   if (self.focusedElement == NULL) {
     if (error) {
       *error = HelperError(@"No focused editable element was captured.");
-    }
-    return NO;
-  }
-
-  if (self.useSelectionWriteBack && self.hasOriginalRange) {
-    CFRange range = self.originalRange;
-    AXValueRef rangeValue = AXValueCreate(kAXValueCFRangeType, &range);
-    AXError rangeResult =
-        AXUIElementSetAttributeValue(self.focusedElement, kAXSelectedTextRangeAttribute, rangeValue);
-    if (rangeValue != NULL) {
-      CFRelease(rangeValue);
-    }
-    if (rangeResult == kAXErrorSuccess) {
-      AXError selectedTextResult = AXUIElementSetAttributeValue(
-          self.focusedElement, kAXSelectedTextAttribute, (__bridge CFTypeRef)content);
-      if (selectedTextResult == kAXErrorSuccess) {
-        return YES;
-      }
-      if (error) {
-        *error = HelperError([NSString
-            stringWithFormat:@"Unable to replace selected text: %d", selectedTextResult]);
-      }
-      return NO;
-    }
-    if (error) {
-      *error = HelperError(
-          [NSString stringWithFormat:@"Unable to restore selected range: %d", rangeResult]);
     }
     return NO;
   }

@@ -10,15 +10,8 @@ export const cliExternalEditTriggerSchema = z.object({
 export const macAccessibilityExternalEditTriggerSchema = z.object({
   appBundleId: z.string().min(1).nullable(),
   appName: z.string().min(1).nullable(),
-  editScope: z.enum(["selection", "full_value"]),
   elementRole: z.string().min(1).nullable(),
   processId: z.number().int().nonnegative(),
-  selectedRange: z
-    .object({
-      length: z.number().int().nonnegative(),
-      location: z.number().int().nonnegative(),
-    })
-    .nullable(),
   source: z.literal("mac_accessibility"),
 });
 

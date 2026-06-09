@@ -21,10 +21,8 @@ interface HelperCaptureResponse {
   appBundleId: string | null;
   appName: string | null;
   content: string;
-  editScope: MacAccessibilityExternalEditTrigger["editScope"];
   elementRole: string | null;
   processId: number;
-  selectedRange: MacAccessibilityExternalEditTrigger["selectedRange"];
 }
 
 type HelperRequest =
@@ -184,10 +182,8 @@ class SpawnedMacAccessibilityHelper implements MacAccessibilityHelper {
       trigger: {
         appBundleId: data.appBundleId,
         appName: data.appName,
-        editScope: data.editScope,
         elementRole: data.elementRole,
         processId: data.processId,
-        selectedRange: data.selectedRange,
         source: "mac_accessibility",
       },
     };

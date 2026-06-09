@@ -18,15 +18,12 @@ describe("external edit session contracts", () => {
     const trigger = externalEditTriggerSchema.parse({
       appBundleId: "com.example.App",
       appName: "Example",
-      editScope: "selection",
       elementRole: "AXTextArea",
       processId: 123,
-      selectedRange: { length: 4, location: 2 },
       source: "mac_accessibility",
     });
 
     expect(trigger).toMatchObject({
-      editScope: "selection",
       source: "mac_accessibility",
     });
   });

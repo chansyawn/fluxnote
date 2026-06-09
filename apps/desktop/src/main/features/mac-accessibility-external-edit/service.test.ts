@@ -11,10 +11,8 @@ function createTrigger() {
   return {
     appBundleId: "com.example.App",
     appName: "Example",
-    editScope: "selection" as const,
     elementRole: "AXTextArea",
     processId: 123,
-    selectedRange: { length: 5, location: 1 },
     source: "mac_accessibility" as const,
   };
 }
