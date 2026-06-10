@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.33](https://github.com/chansyawn/fluxnotes/compare/v0.0.32...v0.0.33) (2026-06-10)
+
+
+### Features
+
+* add native macOS accessibility external editing ([#101](https://github.com/chansyawn/fluxnotes/issues/101)) ([5e51de8](https://github.com/chansyawn/fluxnotes/commit/5e51de80ce7902497f934a8f438a9db1829dbbab))
+* improve table keyboard navigation ([#100](https://github.com/chansyawn/fluxnotes/issues/100)) ([d400afe](https://github.com/chansyawn/fluxnotes/commit/d400afed7591cdc240efc3c0dc58a7d1371149ba))
+
+
+### Bug Fixes
+
+* configure code block tab size ([#98](https://github.com/chansyawn/fluxnotes/issues/98)) ([a3e4db3](https://github.com/chansyawn/fluxnotes/commit/a3e4db3dc8a0b994bd32bbe1f741719a65c4241f))
+* normalize mac option shortcut recording ([#97](https://github.com/chansyawn/fluxnotes/issues/97)) ([9eac0f4](https://github.com/chansyawn/fluxnotes/commit/9eac0f4371fd352fd5912cf1b17157a4bd028982))
+
 ## [0.0.32](https://github.com/chansyawn/fluxnotes/compare/v0.0.31...v0.0.32) (2026-06-07)
 
 
