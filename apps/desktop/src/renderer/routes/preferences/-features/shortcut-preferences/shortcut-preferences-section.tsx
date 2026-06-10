@@ -7,7 +7,6 @@ import {
   PinIcon,
   PlusCircleIcon,
   Trash2Icon,
-  WandSparklesIcon,
   XIcon,
   FlagIcon,
   SquarePenIcon,
@@ -51,16 +50,6 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
         action: "global.toggleWindow",
         icon: <KeyboardIcon />,
         title: <Trans id="preferences.shortcuts.toggleWindow.label">Toggle window</Trans>,
-      },
-      {
-        action: "global.quickCreateBlock",
-        icon: <WandSparklesIcon />,
-        title: <Trans id="preferences.shortcuts.quickCreateBlock.label">Quick create block</Trans>,
-        description: (
-          <Trans id="preferences.shortcuts.quickCreateBlock.description">
-            Quickly create a new block and bring the window forward for fast capture.
-          </Trans>
-        ),
       },
       {
         action: "global.externalEdit",
@@ -148,7 +137,6 @@ export const EDITOR_SHORTCUT_ACTION_ORDER = [
 
 const GLOBAL_SHORTCUT_ACTIONS = new Set<ShortcutAction>([
   "global.externalEdit",
-  "global.quickCreateBlock",
   "global.toggleWindow",
 ]);
 

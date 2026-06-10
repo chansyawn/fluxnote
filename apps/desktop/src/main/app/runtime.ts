@@ -76,6 +76,8 @@ function registerRuntimeCommands(
   registerClipboardCommands(ipc);
   registerCliCommands(ipc);
   registerExternalEditCommands(ipc, {
+    hideMainWindow: deps.windowManager.hideMainWindow,
+    readUserPreferences: deps.preferencesService.readUserPreferences,
     runtime: deps.externalEditRuntime,
   });
   registerExternalUrlCommands(ipc);
@@ -104,9 +106,6 @@ function registerRuntimeCommands(
     telemetryService: deps.telemetryService,
   });
   registerWindowCommands(ipc, {
-    db: deps.db,
-    openBlockService: deps.openBlockService,
-    telemetryService: deps.telemetryService,
     windowManager: deps.windowManager,
   });
   ipc.register();

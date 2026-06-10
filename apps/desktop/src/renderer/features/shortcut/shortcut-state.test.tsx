@@ -6,7 +6,6 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 const mocks = vi.hoisted(() => ({
   clearShortcut: vi.fn(),
-  quickCreateBlockAndShowWindow: vi.fn(async () => undefined),
   requestSystemPermission: vi.fn(async () => ({
     granted: true,
     permission: "macos_accessibility" as const,
@@ -26,8 +25,7 @@ vi.mock("@renderer/features/preferences/preferences-query", () => ({
     resetShortcut: mocks.resetShortcut,
     setShortcut: mocks.setShortcut,
     shortcuts: {
-      "global.externalEdit": "Ctrl+Alt+E",
-      "global.quickCreateBlock": "Ctrl+Alt+N",
+      "global.externalEdit": "Mod+Alt+N",
       "global.toggleWindow": "Alt+N",
     },
   }),
@@ -42,7 +40,6 @@ vi.mock("@renderer/features/shortcut/use-global-shortcut-sync", () => ({
 
 vi.mock("@renderer/clients", () => ({
   captureExternalEdit: mocks.captureExternalEdit,
-  quickCreateBlockAndShowWindow: mocks.quickCreateBlockAndShowWindow,
   requestSystemPermission: mocks.requestSystemPermission,
   toAppInvokeError: (error: unknown) =>
     error instanceof Error
@@ -77,7 +74,7 @@ describe("ShortcutStateProvider", () => {
       </ShortcutStateProvider>,
     );
 
-    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Ctrl+Alt+E");
+    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Mod+Alt+N");
     externalEditShortcut?.onPressed();
 
     expect(externalEditShortcut).toBeDefined();
@@ -97,7 +94,7 @@ describe("ShortcutStateProvider", () => {
       </ShortcutStateProvider>,
     );
 
-    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Ctrl+Alt+E");
+    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Mod+Alt+N");
     externalEditShortcut?.onPressed();
     await waitFor(() => {
       expect(mocks.toastError).toHaveBeenCalledWith(
@@ -128,7 +125,7 @@ describe("ShortcutStateProvider", () => {
       </ShortcutStateProvider>,
     );
 
-    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Ctrl+Alt+E");
+    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Mod+Alt+N");
     externalEditShortcut?.onPressed();
 
     await waitFor(() => {

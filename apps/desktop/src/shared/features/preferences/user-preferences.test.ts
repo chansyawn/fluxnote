@@ -13,6 +13,24 @@ import {
 } from "./user-preferences";
 
 describe("preferences", () => {
+  it("keeps schema version 1 while replacing the quick create shortcut default", () => {
+    const normalized = normalizeUserPreferences({
+      ...DEFAULT_USER_PREFERENCES,
+      shortcuts: {
+        ...DEFAULT_USER_PREFERENCES.shortcuts,
+        "global.externalEdit": "Mod+Shift+N",
+        "global.quickCreateBlock": "Mod+Alt+N",
+      },
+    });
+
+    expect(DEFAULT_USER_PREFERENCES.schemaVersion).toBe(1);
+    expect(DEFAULT_USER_PREFERENCES.externalEdit).toEqual({ hideAfterSubmit: true });
+    expect(DEFAULT_USER_PREFERENCES.shortcuts["global.externalEdit"]).toBe("Mod+Alt+N");
+    expect(DEFAULT_USER_PREFERENCES.shortcuts).not.toHaveProperty("global.quickCreateBlock");
+    expect(normalized.shortcuts["global.externalEdit"]).toBe("Mod+Shift+N");
+    expect(normalized.shortcuts).not.toHaveProperty("global.quickCreateBlock");
+  });
+
   it("should validate locale code", () => {
     expect(isLocaleCode("en")).toBe(true);
     expect(isLocaleCode("zh-Hans")).toBe(true);
@@ -75,6 +93,10 @@ describe("preferences", () => {
         automaticChecksEnabled: "bad",
         unknown: true,
       },
+      externalEdit: {
+        hideAfterSubmit: "bad",
+        unknown: true,
+      },
       unknown: true,
     });
 
@@ -99,6 +121,7 @@ describe("preferences", () => {
     });
     expect(normalized.telemetry).toEqual({ enabled: true });
     expect(normalized.appUpdate).toEqual({ automaticChecksEnabled: true });
+    expect(normalized.externalEdit).toEqual({ hideAfterSubmit: true });
     expect(normalized).not.toHaveProperty("unknown");
     expect(normalized.appearance).not.toHaveProperty("unknown");
     expect(normalized.markdown).not.toHaveProperty("unknown");
@@ -118,6 +141,7 @@ describe("preferences", () => {
         markdown: { codeBlock: { showLineNumbers: true } },
         telemetry: { enabled: false },
         appUpdate: { automaticChecksEnabled: false },
+        externalEdit: { hideAfterSubmit: false },
       }),
     ).toEqual({
       appearance: { locale: "zh-Hans" },
@@ -130,6 +154,7 @@ describe("preferences", () => {
       markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },
+      externalEdit: { hideAfterSubmit: false },
     });
   });
 
@@ -194,6 +219,12 @@ describe("preferences", () => {
     expect(() =>
       normalizeUserPreferencesPatch({
         appUpdate: { unknown: true },
+      }),
+    ).toThrow();
+
+    expect(() =>
+      normalizeUserPreferencesPatch({
+        externalEdit: { unknown: true },
       }),
     ).toThrow();
   });

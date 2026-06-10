@@ -21,6 +21,10 @@ const toastMocks = vi.hoisted(() => ({
   error: vi.fn(),
 }));
 
+const preferenceMocks = vi.hoisted(() => ({
+  patchExternalEdit: vi.fn(),
+}));
+
 vi.mock("@renderer/clients", () => ({
   getCliStatus: clientMocks.getCliStatus,
   getSystemPermissionStatus: clientMocks.getSystemPermissionStatus,
@@ -56,11 +60,13 @@ vi.mock("@renderer/app/i18n", () => ({
 }));
 
 vi.mock("@renderer/features/preferences/preferences-query", () => ({
-  useFontSizePreference: () => ({ fontSize: 16, setFontSize: vi.fn() }),
-  useThemePreference: () => ({ setTheme: vi.fn(), theme: "system" }),
+  useExternalEditPreference: () => ({
+    externalEdit: { hideAfterSubmit: true },
+    patchExternalEdit: preferenceMocks.patchExternalEdit,
+  }),
 }));
 
-import { AppPreferencesSection } from "./app-preferences-section";
+import { ExternalEditPreferencesSection } from "./external-edit-preferences-section";
 
 const cliStatus = {
   canInstall: true,
@@ -81,16 +87,16 @@ function permissionStatus(overrides: Partial<SystemPermissionStatus> = {}): Syst
   };
 }
 
-function renderAppPreferences(status: SystemPermissionStatus) {
+function renderExternalEditPreferences(status: SystemPermissionStatus) {
   clientMocks.getCliStatus.mockResolvedValue(cliStatus);
   clientMocks.getSystemPermissionStatus.mockResolvedValue(status);
   clientMocks.onWindowFocusChanged.mockReturnValue(() => undefined);
-  return renderWithProviders(<AppPreferencesSection />, {
+  return renderWithProviders(<ExternalEditPreferencesSection />, {
     queryClient: createTestQueryClient(),
   });
 }
 
-describe("AppPreferencesSection", () => {
+describe("ExternalEditPreferencesSection", () => {
   beforeEach(() => {
     clientMocks.getCliStatus.mockReset();
     clientMocks.getSystemPermissionStatus.mockReset();
@@ -99,12 +105,25 @@ describe("AppPreferencesSection", () => {
     clientMocks.openSystemPermissionSettings.mockReset();
     clientMocks.requestSystemPermission.mockReset();
     clientMocks.uninstallCli.mockReset();
+    preferenceMocks.patchExternalEdit.mockReset();
     toastMocks.error.mockReset();
   });
 
-  it("shows ready Accessibility status when permission is granted", async () => {
-    renderAppPreferences(permissionStatus({ granted: true }));
+  it("updates the hide after submit preference", async () => {
+    renderExternalEditPreferences(permissionStatus({ granted: true }));
 
+    await userEvent.click(
+      await screen.findByRole("switch", { name: "Hide Fluxnotes after submit" }),
+    );
+
+    expect(preferenceMocks.patchExternalEdit).toHaveBeenCalledWith({ hideAfterSubmit: false });
+  });
+
+  it("shows ready Accessibility status when permission is granted", async () => {
+    renderExternalEditPreferences(permissionStatus({ granted: true }));
+
+    expect(await screen.findByText("External edit")).toBeInTheDocument();
+    expect(await screen.findByText("Flux CLI")).toBeInTheDocument();
     expect(await screen.findByText("Accessibility")).toBeInTheDocument();
     expect(await screen.findByText("Ready")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Allow" })).not.toBeInTheDocument();
@@ -113,7 +132,7 @@ describe("AppPreferencesSection", () => {
   it("shows an Allow action when Accessibility permission is missing", async () => {
     const grantedStatus = permissionStatus({ granted: true });
     clientMocks.requestSystemPermission.mockResolvedValue(grantedStatus);
-    renderAppPreferences(permissionStatus({ granted: false }));
+    renderExternalEditPreferences(permissionStatus({ granted: false }));
 
     await userEvent.click(await screen.findByRole("button", { name: "Allow" }));
 
@@ -128,7 +147,7 @@ describe("AppPreferencesSection", () => {
   it("switches to Open Settings when requesting permission still leaves it missing", async () => {
     clientMocks.requestSystemPermission.mockResolvedValue(permissionStatus({ granted: false }));
     clientMocks.openSystemPermissionSettings.mockResolvedValue(undefined);
-    renderAppPreferences(permissionStatus({ granted: false }));
+    renderExternalEditPreferences(permissionStatus({ granted: false }));
 
     await userEvent.click(await screen.findByRole("button", { name: "Allow" }));
     await userEvent.click(await screen.findByRole("button", { name: "Open Settings" }));
@@ -139,7 +158,7 @@ describe("AppPreferencesSection", () => {
   });
 
   it("shows macOS only when Accessibility is unsupported", async () => {
-    renderAppPreferences(permissionStatus({ granted: false, supported: false }));
+    renderExternalEditPreferences(permissionStatus({ granted: false, supported: false }));
 
     expect(await screen.findByText("macOS only")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Allow" })).toBeDisabled();
@@ -153,7 +172,9 @@ describe("AppPreferencesSection", () => {
     });
     clientMocks.getCliStatus.mockResolvedValue(cliStatus);
     clientMocks.getSystemPermissionStatus.mockResolvedValue(permissionStatus());
-    renderWithProviders(<AppPreferencesSection />, { queryClient: createTestQueryClient() });
+    renderWithProviders(<ExternalEditPreferencesSection />, {
+      queryClient: createTestQueryClient(),
+    });
     await screen.findByText("Permission needed");
 
     focusHandler?.(true);

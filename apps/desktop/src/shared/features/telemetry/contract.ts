@@ -7,7 +7,6 @@ export const blockCreatedSourceSchema = z.enum([
   "workspace_titlebar",
   "workspace_empty_state",
   "workspace_shortcut",
-  "quick_create_shortcut",
   "focused_app_external_edit",
   "cli_add_text",
   "cli_add_file",

@@ -1,38 +1,21 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 
-const mocks = vi.hoisted(() => ({
-  createBlockRecord: vi.fn(),
-}));
-
-vi.mock("../blocks/service", () => ({
-  createBlockRecord: mocks.createBlockRecord,
-}));
-
 import { registerWindowCommands } from "./command";
 
 describe("window command", () => {
-  it("dispatches destroy/hide/toggle", () => {
-    const handlers = new Map<string, () => void | Promise<{ blockId: string }>>();
+  it("dispatches destroy/hide/restart/toggle", () => {
+    const handlers = new Map<string, () => void>();
     const ipc = {
-      command: vi.fn((name: string, handler: () => void | Promise<{ blockId: string }>) =>
-        handlers.set(name, handler),
-      ),
+      command: vi.fn((name: string, handler: () => void) => handlers.set(name, handler)),
     };
     const windowManager = {
-      activateMainWindow: vi.fn(),
-      requestQuit: vi.fn(),
       hideMainWindow: vi.fn(),
+      requestQuit: vi.fn(),
       restartApp: vi.fn(),
       toggleMainWindow: vi.fn(),
-      showMainWindow: vi.fn(),
     };
-    const openBlockService = { requestOpen: vi.fn() };
-    const telemetryService = { captureEvent: vi.fn() };
 
     registerWindowCommands(ipc as never, {
-      db: {} as never,
-      openBlockService: openBlockService as never,
-      telemetryService: telemetryService as never,
       windowManager: windowManager as never,
     });
 
@@ -40,51 +23,9 @@ describe("window command", () => {
     expect(handlers.get("window.hide")?.()).toBeUndefined();
     expect(handlers.get("window.restart")?.()).toBeUndefined();
     expect(handlers.get("window.toggle")?.()).toBeUndefined();
-    expect(windowManager.requestQuit).toHaveBeenCalled();
-    expect(windowManager.hideMainWindow).toHaveBeenCalled();
-    expect(windowManager.restartApp).toHaveBeenCalled();
-    expect(windowManager.toggleMainWindow).toHaveBeenCalled();
-  });
-
-  it("quick creates a block and requests focus when window.quick-create-block is called", async () => {
-    const handlers = new Map<string, () => void | Promise<{ blockId: string }>>();
-    const ipc = {
-      command: vi.fn((name: string, handler: () => void | Promise<{ blockId: string }>) =>
-        handlers.set(name, handler),
-      ),
-    };
-    const db = {};
-    const windowManager = {
-      activateMainWindow: vi.fn(),
-      requestQuit: vi.fn(),
-      hideMainWindow: vi.fn(),
-      restartApp: vi.fn(),
-      toggleMainWindow: vi.fn(),
-      showMainWindow: vi.fn(),
-    };
-    const openBlockService = { requestOpen: vi.fn() };
-    const telemetryService = { captureEvent: vi.fn() };
-
-    const block = {
-      id: "block-1",
-    };
-    mocks.createBlockRecord.mockResolvedValue(block);
-
-    registerWindowCommands(ipc as never, {
-      db: db as never,
-      openBlockService: openBlockService as never,
-      telemetryService: telemetryService as never,
-      windowManager: windowManager as never,
-    });
-
-    const result = await handlers.get("window.quick-create-block")?.();
-
-    expect(result).toEqual({ blockId: "block-1" });
-    expect(windowManager.activateMainWindow).toHaveBeenCalledOnce();
-    expect(telemetryService.captureEvent).toHaveBeenCalledWith("block_created", {
-      source: "quick_create_shortcut",
-    });
-    expect(openBlockService.requestOpen).toHaveBeenCalledWith({ blockId: "block-1" });
-    expect(mocks.createBlockRecord).toHaveBeenCalledWith(db);
+    expect(windowManager.requestQuit).toHaveBeenCalledOnce();
+    expect(windowManager.hideMainWindow).toHaveBeenCalledOnce();
+    expect(windowManager.restartApp).toHaveBeenCalledOnce();
+    expect(windowManager.toggleMainWindow).toHaveBeenCalledOnce();
   });
 });

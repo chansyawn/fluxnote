@@ -120,6 +120,7 @@ describe("preferences service", () => {
       appearance: { locale: "zh-Hans", theme: "dark", fontSize: 20 },
       autoArchive: { enabled: false },
       appUpdate: { automaticChecksEnabled: false },
+      externalEdit: { hideAfterSubmit: false },
       markdown: { codeBlock: { showLineNumbers: true } },
       telemetry: { enabled: false },
     });
@@ -129,6 +130,7 @@ describe("preferences service", () => {
     expect(result.appearance.fontSize).toBe(20);
     expect(result.autoArchive.enabled).toBe(false);
     expect(result.appUpdate.automaticChecksEnabled).toBe(false);
+    expect(result.externalEdit.hideAfterSubmit).toBe(false);
     expect(result.markdown.codeBlock).toEqual({
       showLineNumbers: true,
     });

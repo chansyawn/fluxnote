@@ -32,8 +32,7 @@ export const shortcutBindingSchema = z.string().nullable();
 
 export const DEFAULT_SHORTCUTS = {
   "global.toggleWindow": "Alt+N",
-  "global.quickCreateBlock": "Ctrl+Alt+N",
-  "global.externalEdit": "Ctrl+Alt+E",
+  "global.externalEdit": "Mod+Alt+N",
   "workspace.createBlock": "Mod+N",
   "workspace.copyBlock": "Mod+Shift+C",
   "workspace.keepBlock": "Mod+K",
@@ -98,6 +97,10 @@ export const appUpdatePreferencesSchema = z.object({
   automaticChecksEnabled: z.boolean().catch(true),
 });
 
+export const externalEditPreferencesSchema = z.object({
+  hideAfterSubmit: z.boolean().catch(true),
+});
+
 const appearancePreferencesPatchSchema = z
   .object({
     locale: localeSchema.optional(),
@@ -150,6 +153,12 @@ const appUpdatePreferencesPatchSchema = z
   })
   .strict();
 
+const externalEditPreferencesPatchSchema = z
+  .object({
+    hideAfterSubmit: z.boolean().optional(),
+  })
+  .strict();
+
 const defaultUserPreferencesValue = {
   schemaVersion: USER_PREFERENCES_SCHEMA_VERSION,
   appearance: {
@@ -171,6 +180,9 @@ const defaultUserPreferencesValue = {
   appUpdate: {
     automaticChecksEnabled: true,
   },
+  externalEdit: {
+    hideAfterSubmit: true,
+  },
 } as const;
 
 export const userPreferencesSchema = z.object({
@@ -181,6 +193,7 @@ export const userPreferencesSchema = z.object({
   markdown: markdownPreferencesSchema.catch(defaultUserPreferencesValue.markdown),
   telemetry: telemetryPreferencesSchema.catch(defaultUserPreferencesValue.telemetry),
   appUpdate: appUpdatePreferencesSchema.catch(defaultUserPreferencesValue.appUpdate),
+  externalEdit: externalEditPreferencesSchema.catch(defaultUserPreferencesValue.externalEdit),
 });
 
 export const userPreferencesPatchSchema = z
@@ -191,6 +204,7 @@ export const userPreferencesPatchSchema = z
     markdown: markdownPreferencesPatchSchema.optional(),
     telemetry: telemetryPreferencesPatchSchema.optional(),
     appUpdate: appUpdatePreferencesPatchSchema.optional(),
+    externalEdit: externalEditPreferencesPatchSchema.optional(),
   })
   .strict();
 
@@ -208,6 +222,7 @@ export type MarkdownPreferences = z.infer<typeof markdownPreferencesSchema>;
 export type MarkdownCodeBlockPreferences = z.infer<typeof markdownCodeBlockPreferencesSchema>;
 export type TelemetryPreferences = z.infer<typeof telemetryPreferencesSchema>;
 export type AppUpdatePreferences = z.infer<typeof appUpdatePreferencesSchema>;
+export type ExternalEditPreferences = z.infer<typeof externalEditPreferencesSchema>;
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = defaultUserPreferencesValue;
 export const DEFAULT_AUTO_ARCHIVE_PREFERENCES: AutoArchivePreferences =
@@ -218,6 +233,8 @@ export const DEFAULT_TELEMETRY_PREFERENCES: TelemetryPreferences =
   DEFAULT_USER_PREFERENCES.telemetry;
 export const DEFAULT_APP_UPDATE_PREFERENCES: AppUpdatePreferences =
   DEFAULT_USER_PREFERENCES.appUpdate;
+export const DEFAULT_EXTERNAL_EDIT_PREFERENCES: ExternalEditPreferences =
+  DEFAULT_USER_PREFERENCES.externalEdit;
 
 function createUserPreferencesNormalizerSchema(
   defaults: UserPreferences,
@@ -257,6 +274,11 @@ function createUserPreferencesNormalizerSchema(
         automaticChecksEnabled: z.boolean().catch(defaults.appUpdate.automaticChecksEnabled),
       })
       .catch(defaults.appUpdate),
+    externalEdit: z
+      .object({
+        hideAfterSubmit: z.boolean().catch(defaults.externalEdit.hideAfterSubmit),
+      })
+      .catch(defaults.externalEdit),
   });
 }
 
