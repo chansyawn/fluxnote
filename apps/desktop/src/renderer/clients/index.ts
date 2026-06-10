@@ -17,8 +17,10 @@ export { convertFileSrc, copyAsset, createAsset, importFileAssets, resolveAsset 
 export { writeBlockEditorClipboard } from "./clipboard";
 export {
   cancelExternalEdit,
+  captureExternalEdit,
   listExternalEditSessions,
   onExternalEditSessionsChanged,
+  onExternalEditWriteBackFailed,
   submitExternalEdit,
 } from "./external-edit";
 export { openExternalUrl } from "./external-url";
@@ -44,6 +46,11 @@ export {
 export { createTag, deleteTag, listTags, setBlockTags } from "./tags";
 export { isRegistered, register, unregister, type ShortcutEvent } from "./shortcut";
 export {
+  getSystemPermissionStatus,
+  openSystemPermissionSettings,
+  requestSystemPermission,
+} from "./system-permissions";
+export {
   destroyWindow,
   hideWindow,
   onWindowCloseRequested,
@@ -61,6 +68,7 @@ export type {
   ExternalEditSession,
   ExternalEditSessionsChangedPayload,
   ExternalEditSubmitRequest,
+  ExternalEditWriteBackFailedPayload,
 } from "./external-edit";
 export type { ExternalUrlOpenRequest } from "./external-url";
 export type {
@@ -91,3 +99,4 @@ export type {
   UpdateBlockContentRequest,
 } from "./blocks";
 export type { CreateTagRequest, DeleteTagRequest, SetBlockTagsRequest, Tag } from "./tags";
+export type { SystemPermissionRequest, SystemPermissionStatus } from "./system-permissions";

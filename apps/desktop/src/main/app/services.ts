@@ -12,9 +12,16 @@ import {
   createAutoArchiveRuntime,
   type AutoArchiveRuntime,
 } from "@main/features/blocks/auto-archive-runtime";
-import { createExternalEditManager, type ExternalEditManager } from "@main/features/external-edit";
+import {
+  createDefaultExternalEditRuntime,
+  type ExternalEditRuntime,
+} from "@main/features/external-edit";
 import { createOpenBlockService, type OpenBlockService } from "@main/features/open-block";
 import { createPreferencesService, type PreferencesService } from "@main/features/preferences";
+import {
+  createDefaultSystemPermissionsService,
+  type SystemPermissionsService,
+} from "@main/features/system-permissions";
 import { createTelemetryService, type TelemetryService } from "@main/features/telemetry";
 import { createTrayManager, createWindowManager, type WindowManager } from "@main/features/window";
 import { APP_SETTINGS_STORE_FILE, APP_TELEMETRY_STORE_FILE } from "@shared/app/app-config";
@@ -33,10 +40,11 @@ export interface MainServices {
   autoArchiveRuntime: AutoArchiveRuntime;
   db: DbRuntime;
   events: EventBus;
-  externalEditManager: ExternalEditManager;
+  externalEditRuntime: ExternalEditRuntime;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  systemPermissionsService: SystemPermissionsService;
   telemetryService: TelemetryService;
   trayManager: TrayManager;
   windowManager: WindowManager;
@@ -79,18 +87,25 @@ export function createMainServices(): MainServices {
     storage: getConfigStore(userDataPath, APP_TELEMETRY_STORE_FILE, {}),
   });
 
-  const externalEditManager = createExternalEditManager({ emitEvent });
-  const autoArchiveRuntime = createAutoArchiveRuntime({
-    emitEvent,
-    getProtectedBlockIds: () => new Set(externalEditManager.listSessions().map((s) => s.blockId)),
-    getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
-    getDb: () => db.getDb(),
-    readUserPreferences: preferencesService.readUserPreferences,
-  });
   const openBlockService = createOpenBlockService({
     emitEvent,
     showWindow: () => windowManager.activateMainWindow(),
   });
+  const externalEditRuntime = createDefaultExternalEditRuntime({
+    emitEvent,
+    getDb: () => db.getDb(),
+    openBlockService,
+    paths,
+    telemetryService,
+  });
+  const autoArchiveRuntime = createAutoArchiveRuntime({
+    emitEvent,
+    getProtectedBlockIds: () => new Set(externalEditRuntime.listSessions().map((s) => s.blockId)),
+    getWindowVisible: () => Boolean(windowManager.getMainWindow()?.isVisible()),
+    getDb: () => db.getDb(),
+    readUserPreferences: preferencesService.readUserPreferences,
+  });
+  const systemPermissionsService = createDefaultSystemPermissionsService();
 
   windowManager = createWindowManager({
     captureAppShow: () => telemetryService.captureEvent("app_show"),
@@ -113,10 +128,11 @@ export function createMainServices(): MainServices {
     autoArchiveRuntime,
     db,
     events,
-    externalEditManager,
+    externalEditRuntime,
     openBlockService,
     paths,
     preferencesService,
+    systemPermissionsService,
     telemetryService,
     trayManager,
     windowManager,

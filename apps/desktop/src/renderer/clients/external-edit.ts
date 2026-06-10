@@ -2,8 +2,9 @@ import type { Block } from "@shared/features/blocks/models";
 import {
   externalEditContract,
   type ExternalEditSessionsChangedPayload,
+  type ExternalEditWriteBackFailedPayload,
 } from "@shared/features/external-edit/contract";
-import { type ExternalEditSession } from "@shared/features/external-edit/session-contracts";
+import { type ExternalEditSession } from "@shared/features/external-edit/models";
 import type { z } from "zod";
 
 import { invokeCommand, subscribeEvent } from "./ipc/invoke";
@@ -14,7 +15,11 @@ export type ExternalEditCancelRequest = z.input<
 export type ExternalEditSubmitRequest = z.input<
   (typeof externalEditContract)["commands"]["external-edit.submit"]["input"]
 >;
-export type { ExternalEditSession, ExternalEditSessionsChangedPayload };
+export type {
+  ExternalEditSession,
+  ExternalEditSessionsChangedPayload,
+  ExternalEditWriteBackFailedPayload,
+};
 
 export const listExternalEditSessions = (): Promise<ExternalEditSession[]> =>
   invokeCommand("external-edit.list", undefined);
@@ -25,8 +30,17 @@ export const submitExternalEdit = (req: ExternalEditSubmitRequest): Promise<Bloc
 export const cancelExternalEdit = (req: ExternalEditCancelRequest): Promise<void> =>
   invokeCommand("external-edit.cancel", req);
 
+export const captureExternalEdit = (): Promise<ExternalEditSession> =>
+  invokeCommand("external-edit.capture", undefined);
+
 export function onExternalEditSessionsChanged(
   handler: (payload: ExternalEditSessionsChangedPayload) => void,
 ): () => void {
   return subscribeEvent("external-edit.sessions-changed", handler);
+}
+
+export function onExternalEditWriteBackFailed(
+  handler: (payload: ExternalEditWriteBackFailedPayload) => void,
+): () => void {
+  return subscribeEvent("external-edit.write-back-failed", handler);
 }

@@ -122,6 +122,11 @@ msgid "error.global.title"
 msgstr "出了点问题"
 
 #. js-lingui-explicit-id
+#: src/renderer/features/external-edit/external-edit-write-back-sync.tsx:12
+msgid "external-edit.write-back.failed"
+msgstr "已编辑文本已复制到剪贴板，因为无法更新 Mac App。"
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr "返回首页"
@@ -135,6 +140,42 @@ msgstr "打开偏好设置"
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
 msgid "preferences.about.title"
 msgstr "关于"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:329
+msgid "preferences.accessibility.allow"
+msgstr "允许"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:336
+msgid "preferences.accessibility.description"
+msgstr "允许 Fluxnotes 读取并更新其他 Mac App 中当前聚焦的文本框，用于外部编辑。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:342
+msgid "preferences.accessibility.label"
+msgstr "辅助功能"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:327
+msgid "preferences.accessibility.open-settings"
+msgstr "打开设置"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+msgid "preferences.accessibility.status.macos-only"
+msgstr "仅 macOS"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:64
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+msgid "preferences.accessibility.status.permission-needed"
+msgstr "需要授权"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:70
+msgid "preferences.accessibility.status.ready"
+msgstr "已就绪"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:123
@@ -178,7 +219,7 @@ msgid "preferences.app-version.label"
 msgstr "版本"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:190
 msgid "preferences.app.title"
 msgstr "应用"
 
@@ -279,27 +320,27 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "分钟"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:217
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:296
 msgid "preferences.cli.install"
 msgstr "安装"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:301
 msgid "preferences.cli.path.description"
 msgstr "安装 Flux CLI 以支持终端工作流。安装后可运行 `flux --help` 查看可用命令与用法。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:228
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:307
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:213
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:292
 msgid "preferences.cli.uninstall"
 msgstr "卸载"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:202
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:281
 msgid "preferences.font-size.label"
 msgstr "字号"
 
@@ -319,7 +360,7 @@ msgid "preferences.github.repository.open"
 msgstr "仓库"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:248
 msgid "preferences.language.label"
 msgstr "语言"
 
@@ -334,12 +375,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:109
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "归档/恢复区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:122
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "取消外部编辑"
 
@@ -350,17 +391,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "清除快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:89
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "复制区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:84
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "新建区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "删除区块"
 
@@ -386,32 +427,42 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "该全局快捷键当前不可用，可能已被其他应用占用。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
+msgid "preferences.shortcuts.externalEdit.description"
+msgstr "从当前活跃的 Mac App 启动 External edit 会话。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+msgid "preferences.shortcuts.externalEdit.label"
+msgstr "外部编辑 Mac App"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:174
 msgid "preferences.shortcuts.group.editor"
 msgstr "编辑器"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:48
 msgid "preferences.shortcuts.group.global"
 msgstr "全局"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:79
 msgid "preferences.shortcuts.group.workspace"
 msgstr "工作区"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:94
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "保留区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "快速创建新区块并唤起窗口，适合随手记录。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:58
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "快速记录区块"
 
@@ -432,22 +483,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "重置快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:115
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:188
 msgid "preferences.shortcuts.title"
 msgstr "快捷键"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:99
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "固定/取消固定区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:53
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "开启/关闭窗口"
 
@@ -463,22 +514,22 @@ msgid "preferences.telemetry.label"
 msgstr "遥测"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:77
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:113
 msgid "preferences.theme.dark"
 msgstr "深色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:141
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:220
 msgid "preferences.theme.label"
 msgstr "主题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:108
 msgid "preferences.theme.light"
 msgstr "浅色"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:103
 msgid "preferences.theme.system"
 msgstr "跟随系统"
 
@@ -486,6 +537,16 @@ msgstr "跟随系统"
 #: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
 msgstr "偏好设置"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:57
+msgid "shortcut.external-edit.accessibility-permission-required"
+msgstr "需要辅助功能权限。"
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:63
+msgid "shortcut.external-edit.accessibility-permission.allow"
+msgstr "允许"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:45
@@ -635,42 +696,72 @@ msgid "workspace.empty.title"
 msgstr "还没有区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:55
 msgid "workspace.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:40
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:56
 msgid "workspace.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
+msgid "workspace.external-edit.copy"
+msgstr "复制外部编辑"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:47
+msgid "workspace.external-edit.copy-only.placeholder"
+msgstr "未找到聚焦的输入框。写入要复制的文本。"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
+msgid "workspace.external-edit.copy.tooltip"
+msgstr "复制"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:99
+msgid "workspace.external-edit.metadata.app"
+msgstr "应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:88
 msgid "workspace.external-edit.metadata.cwd"
 msgstr "工作目录"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:92
 msgid "workspace.external-edit.metadata.file"
 msgstr "目标文件"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:82
 msgid "workspace.external-edit.metadata.source"
 msgstr "来源"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:32
 msgid "workspace.external-edit.metadata.source.cli"
 msgstr "命令行"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:34
+msgid "workspace.external-edit.metadata.source.mac-accessibility"
+msgstr "Mac App"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:51
+msgid "workspace.external-edit.metadata.unknown-application"
+msgstr "未知应用"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
 msgid "workspace.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:32
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
 msgid "workspace.external-edit.submit.tooltip"
 msgstr "提交"
 

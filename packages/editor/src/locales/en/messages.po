@@ -34,7 +34,7 @@ msgid "block-editor.code.language.search"
 msgstr "Search language"
 
 #. js-lingui-explicit-id
-#: src/core/block-editor.tsx:104
+#: src/core/block-editor.tsx:110
 msgid "block-editor.content.label"
 msgstr "Markdown block editor"
 
@@ -69,8 +69,8 @@ msgid "block-editor.link.url"
 msgstr "Link URL"
 
 #. js-lingui-explicit-id
-#: src/core/block-editor.tsx:103
-#: src/core/block-editor.tsx:109
+#: src/core/block-editor.tsx:101
+#: src/core/block-editor.tsx:115
 msgid "block-editor.placeholder"
 msgstr "Write a block..."
 

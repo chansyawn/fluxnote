@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import type { Block, Tag } from "@renderer/clients";
 import { useShortcutState } from "@renderer/features/shortcut/shortcut-state";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -13,6 +14,13 @@ import {
   WorkspaceBlockEditorSurface,
   type WorkspaceBlockEditorHandle,
 } from "./workspace-block-editor-surface";
+
+function isCopyOnlyExternalEdit(state: WorkspaceBlockState): boolean {
+  return (
+    state.externalEditSession?.trigger.source === "focused_app" &&
+    state.externalEditSession.trigger.mode === "copy_only"
+  );
+}
 
 interface WorkspaceBlockEditorProps {
   block: Block;
@@ -35,6 +43,22 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
   const [isCopyFeedbackActive, setIsCopyFeedbackActive] = useState(false);
   const registry = useBlockEditorRegistryContext();
   const { shortcuts } = useShortcutState();
+  const { i18n } = useLingui();
+  const copyOnlyPlaceholder = i18n._({
+    id: "workspace.external-edit.copy-only.placeholder",
+    message: "No focused input found. Write text to copy.",
+  });
+  const editorConfig = useMemo(
+    () =>
+      isCopyOnlyExternalEdit(state)
+        ? {
+            content: {
+              placeholder: copyOnlyPlaceholder,
+            },
+          }
+        : undefined,
+    [copyOnlyPlaceholder, state],
+  );
 
   const clearCopyFeedbackTimer = useCallback(() => {
     if (!copyFeedbackTimerRef.current) {
@@ -130,6 +154,7 @@ export const WorkspaceBlockEditor = memo(function WorkspaceBlockEditor({
           />
         }
         isExternalEditPending={Boolean(state.externalEditSession)}
+        editorConfig={editorConfig}
         block={block}
         shortcuts={shortcuts}
         onFocus={commands.focusBlock}

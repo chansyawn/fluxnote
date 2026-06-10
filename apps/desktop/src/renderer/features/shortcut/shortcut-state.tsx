@@ -1,5 +1,13 @@
 import type { Hotkey } from "@fluxnotes/shared";
-import { quickCreateBlockAndShowWindow, toggleMainWindowVisibility } from "@renderer/clients";
+import { toast } from "@fluxnotes/ui/components/sonner";
+import { useLingui } from "@lingui/react";
+import {
+  quickCreateBlockAndShowWindow,
+  requestSystemPermission,
+  captureExternalEdit,
+  toAppInvokeError,
+  toggleMainWindowVisibility,
+} from "@renderer/clients";
 import { useShortcutPreferences } from "@renderer/features/preferences/preferences-query";
 import {
   normalizeShortcutBinding,
@@ -25,12 +33,14 @@ interface ShortcutStateContextValue {
 }
 
 const ShortcutStateContext = createContext<ShortcutStateContextValue | null>(null);
+const ACCESSIBILITY_PERMISSION_REQUEST = { permission: "macos_accessibility" } as const;
 
 interface ShortcutStateProviderProps {
   children: ReactNode;
 }
 
 export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) {
+  const { i18n } = useLingui();
   const { clearShortcut, resetShortcut, setShortcut, shortcuts } = useShortcutPreferences();
 
   const handleToggleWindow = useEffectEvent(() => {
@@ -38,6 +48,37 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   });
   const handleQuickCreateBlock = useEffectEvent(() => {
     void quickCreateBlockAndShowWindow();
+  });
+  const handleExternalEdit = useEffectEvent(() => {
+    void captureExternalEdit().catch((error: unknown) => {
+      const invokeError = toAppInvokeError(error);
+      if (invokeError.code === "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED") {
+        toast.error(
+          i18n._({
+            id: "shortcut.external-edit.accessibility-permission-required",
+            message: "Accessibility permission is required.",
+          }),
+          {
+            action: {
+              label: i18n._({
+                id: "shortcut.external-edit.accessibility-permission.allow",
+                message: "Allow",
+              }),
+              onClick: () => {
+                void requestSystemPermission(ACCESSIBILITY_PERMISSION_REQUEST).catch(
+                  (requestError: unknown) => {
+                    toast.error(toAppInvokeError(requestError).message);
+                  },
+                );
+              },
+            },
+          },
+        );
+        return;
+      }
+
+      toast.error(invokeError.message);
+    });
   });
 
   const toggleWindowShortcutError = useGlobalShortcutSync({
@@ -48,11 +89,16 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     shortcut: shortcuts["global.quickCreateBlock"],
     onPressed: handleQuickCreateBlock,
   });
+  const externalEditShortcutError = useGlobalShortcutSync({
+    shortcut: shortcuts["global.externalEdit"],
+    onPressed: handleExternalEdit,
+  });
 
   const contextValue = useMemo<ShortcutStateContextValue>(
     () => ({
       shortcuts,
       globalShortcutErrors: {
+        "global.externalEdit": externalEditShortcutError,
         "global.toggleWindow": toggleWindowShortcutError,
         "global.quickCreateBlock": quickCreateBlockShortcutError,
       },
@@ -83,7 +129,10 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     [
       quickCreateBlockShortcutError,
       clearShortcut,
+      externalEditShortcutError,
+      handleExternalEdit,
       handleQuickCreateBlock,
+      i18n,
       resetShortcut,
       setShortcut,
       shortcuts,

@@ -10,6 +10,7 @@ import {
 import { toast } from "@fluxnotes/ui/components/sonner";
 import { Tabs, TabsList, TabsTrigger } from "@fluxnotes/ui/components/tabs";
 import {
+  AccessibilityIcon,
   LanguagesIcon,
   MonitorIcon,
   MoonIcon,
@@ -22,8 +23,17 @@ import {
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { useI18nState } from "@renderer/app/i18n";
-import { queryClient } from "@renderer/app/query";
-import { getCliStatus, installCli, toAppInvokeError, uninstallCli } from "@renderer/clients";
+import {
+  getCliStatus,
+  getSystemPermissionStatus,
+  installCli,
+  onWindowFocusChanged,
+  openSystemPermissionSettings,
+  requestSystemPermission,
+  toAppInvokeError,
+  uninstallCli,
+  type SystemPermissionStatus,
+} from "@renderer/clients";
 import {
   useFontSizePreference,
   useThemePreference,
@@ -40,19 +50,45 @@ import {
   isThemePreference,
   type ThemePreference,
 } from "@shared/features/preferences/user-preferences";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
+
+const ACCESSIBILITY_PERMISSION_REQUEST = { permission: "macos_accessibility" } as const;
+const ACCESSIBILITY_PERMISSION_QUERY_KEY = [
+  "system-permissions",
+  ACCESSIBILITY_PERMISSION_REQUEST.permission,
+] as const;
+
+function getAccessibilityStatusLabel(status: SystemPermissionStatus | undefined) {
+  if (!status) {
+    return <Trans id="preferences.accessibility.status.permission-needed">Permission needed</Trans>;
+  }
+  if (!status.supported) {
+    return <Trans id="preferences.accessibility.status.macos-only">macOS only</Trans>;
+  }
+  if (status.granted) {
+    return <Trans id="preferences.accessibility.status.ready">Ready</Trans>;
+  }
+  return <Trans id="preferences.accessibility.status.permission-needed">Permission needed</Trans>;
+}
 
 export function AppPreferencesSection() {
   const { i18n } = useLingui();
   const { locale, setLocale, localeOptions } = useI18nState();
   const { fontSize, setFontSize } = useFontSizePreference();
   const { theme, setTheme } = useThemePreference();
+  const queryClient = useQueryClient();
   const { data: cliStatus, isLoading: isCliStatusLoading } = useQuery({
     queryKey: ["cli", "status"],
     queryFn: getCliStatus,
   });
+  const { data: accessibilityStatus, isLoading: isAccessibilityStatusLoading } = useQuery({
+    queryKey: ACCESSIBILITY_PERMISSION_QUERY_KEY,
+    queryFn: () => getSystemPermissionStatus(ACCESSIBILITY_PERMISSION_REQUEST),
+  });
   const [isCliPending, setIsCliPending] = useState(false);
+  const [isAccessibilityPending, setIsAccessibilityPending] = useState(false);
+  const [showAccessibilitySettingsAction, setShowAccessibilitySettingsAction] = useState(false);
   const languageItems = localeOptions.map((localeOption) => ({
     value: localeOption.key,
     label: localeOption.name,
@@ -82,6 +118,10 @@ export function AppPreferencesSection() {
   const cliDisabled = isCliStatusLoading || isCliPending;
   const canInstallCli = cliStatus?.canInstall === true;
   const canUninstallCli = cliStatus?.canUninstall === true;
+  const accessibilitySupported = accessibilityStatus?.supported === true;
+  const accessibilityGranted = accessibilityStatus?.granted === true;
+  const accessibilityDisabled =
+    isAccessibilityStatusLoading || isAccessibilityPending || !accessibilitySupported;
 
   const handleCliInstall = useCallback(async () => {
     setIsCliPending(true);
@@ -93,7 +133,7 @@ export function AppPreferencesSection() {
     } finally {
       setIsCliPending(false);
     }
-  }, []);
+  }, [queryClient]);
 
   const handleCliUninstall = useCallback(async () => {
     setIsCliPending(true);
@@ -105,7 +145,46 @@ export function AppPreferencesSection() {
     } finally {
       setIsCliPending(false);
     }
-  }, []);
+  }, [queryClient]);
+
+  const refreshAccessibilityStatus = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ACCESSIBILITY_PERMISSION_QUERY_KEY });
+  }, [queryClient]);
+
+  const handleAccessibilityRequest = useCallback(async () => {
+    setIsAccessibilityPending(true);
+    try {
+      const status = await requestSystemPermission(ACCESSIBILITY_PERMISSION_REQUEST);
+      queryClient.setQueryData(ACCESSIBILITY_PERMISSION_QUERY_KEY, status);
+      setShowAccessibilitySettingsAction(status.supported && !status.granted);
+    } catch (error) {
+      toast.error(toAppInvokeError(error).message);
+    } finally {
+      setIsAccessibilityPending(false);
+    }
+  }, [queryClient]);
+
+  const handleAccessibilityOpenSettings = useCallback(async () => {
+    setIsAccessibilityPending(true);
+    try {
+      await openSystemPermissionSettings(ACCESSIBILITY_PERMISSION_REQUEST);
+      await refreshAccessibilityStatus();
+    } catch (error) {
+      toast.error(toAppInvokeError(error).message);
+    } finally {
+      setIsAccessibilityPending(false);
+    }
+  }, [refreshAccessibilityStatus]);
+
+  useEffect(() => {
+    return onWindowFocusChanged((focused) => {
+      if (!focused) {
+        return;
+      }
+
+      void refreshAccessibilityStatus();
+    });
+  }, [refreshAccessibilityStatus]);
 
   return (
     <PreferencesSection title={<Trans id="preferences.app.title">App</Trans>}>
@@ -226,6 +305,41 @@ export function AppPreferencesSection() {
           }
           icon={<TerminalIcon />}
           label={<Trans id="preferences.cli.path.label">Flux CLI</Trans>}
+        />
+        <PreferencesRow
+          control={
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-xs whitespace-nowrap">
+                {getAccessibilityStatusLabel(accessibilityStatus)}
+              </span>
+              {!accessibilityGranted ? (
+                <Button
+                  disabled={accessibilityDisabled}
+                  size="sm"
+                  variant={showAccessibilitySettingsAction ? "outline" : "default"}
+                  onClick={
+                    showAccessibilitySettingsAction
+                      ? handleAccessibilityOpenSettings
+                      : handleAccessibilityRequest
+                  }
+                >
+                  {showAccessibilitySettingsAction ? (
+                    <Trans id="preferences.accessibility.open-settings">Open Settings</Trans>
+                  ) : (
+                    <Trans id="preferences.accessibility.allow">Allow</Trans>
+                  )}
+                </Button>
+              ) : null}
+            </div>
+          }
+          description={
+            <Trans id="preferences.accessibility.description">
+              Allow Fluxnotes to read and update the focused text field in other Mac apps for
+              External edit.
+            </Trans>
+          }
+          icon={<AccessibilityIcon />}
+          label={<Trans id="preferences.accessibility.label">Accessibility</Trans>}
         />
       </PreferencesGroup>
     </PreferencesSection>

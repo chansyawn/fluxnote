@@ -1,6 +1,6 @@
 import type { AppDatabase } from "@main/core/database";
 import type { IpcRouter } from "@main/core/ipc";
-import type { ExternalEditSession } from "@shared/features/external-edit/session-contracts";
+import type { ExternalEditSession } from "@shared/features/external-edit/models";
 import type { UserPreferences } from "@shared/features/preferences/user-preferences";
 
 import {

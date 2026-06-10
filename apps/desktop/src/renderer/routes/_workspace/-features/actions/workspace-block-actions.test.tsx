@@ -132,6 +132,17 @@ describe("useWorkspaceBlockActions", () => {
     expect(externalEdit.commands.deleteBlock).not.toHaveBeenCalled();
   });
 
+  it("submits external edit sessions with session context", async () => {
+    const session = createExternalEditSession();
+    const { actions, commands } = renderWorkspaceBlockActions({
+      state: createState({ externalEditSession: session }),
+    });
+
+    await actions.submitExternalEdit();
+
+    expect(commands.submitExternalEdit).toHaveBeenCalledWith("block-1", "edit-1", session);
+  });
+
   it("protects Pinned Blocks and External Edit Sessions from Keep and Archive actions", async () => {
     const pinned = renderWorkspaceBlockActions({
       block: createRendererBlock({ isPinned: true }),

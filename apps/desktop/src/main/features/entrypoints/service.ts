@@ -4,9 +4,9 @@ import type {
   ParsedBackendCommandRequest,
 } from "@shared/features/entrypoints/commands";
 import type {
+  CliExternalEditTrigger,
   ExternalEditResult,
-  ExternalEditTrigger,
-} from "@shared/features/external-edit/session-contracts";
+} from "@shared/features/external-edit/models";
 import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 
 import { createBlockRecord } from "../blocks/service";
@@ -16,8 +16,7 @@ import type { TelemetryService } from "../telemetry";
 interface EntrypointServiceDeps {
   createExternalEditSession: (
     blockId: string,
-    originalContent: string,
-    trigger: ExternalEditTrigger,
+    trigger: CliExternalEditTrigger,
     signal?: AbortSignal,
   ) => Promise<ExternalEditResult>;
   getDb: () => Promise<AppDatabase>;
@@ -59,12 +58,7 @@ export function createEntrypointService(services: EntrypointServiceDeps) {
     signal?: AbortSignal,
   ): Promise<BackendCommandResponse<"block.create-external-edit">> {
     const { blockId } = await createBlock(request, "cli_external_edit");
-    return await services.createExternalEditSession(
-      blockId,
-      request.content,
-      request.trigger,
-      signal,
-    );
+    return await services.createExternalEditSession(blockId, request.trigger, signal);
   }
 
   function openBlock(

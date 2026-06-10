@@ -157,7 +157,11 @@ export function useWorkspaceBlockActions({
       return;
     }
 
-    await commands.submitExternalEdit(block.id, state.externalEditSession.editId);
+    await commands.submitExternalEdit(
+      block.id,
+      state.externalEditSession.editId,
+      state.externalEditSession,
+    );
   }, [block.id, canRunExternalEditAction, commands, state.externalEditSession]);
 
   const cancelExternalEdit = useCallback(async () => {

@@ -25,4 +25,19 @@ describe("block editor config", () => {
       },
     });
   });
+
+  it("merges partial content config", () => {
+    expect(
+      resolveBlockEditorConfig({
+        content: {
+          placeholder: "No focused input found. Write text to copy.",
+        },
+      }),
+    ).toEqual({
+      ...DEFAULT_BLOCK_EDITOR_CONFIG,
+      content: {
+        placeholder: "No focused input found. Write text to copy.",
+      },
+    });
+  });
 });

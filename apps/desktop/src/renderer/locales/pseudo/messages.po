@@ -122,6 +122,11 @@ msgid "error.global.title"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/renderer/features/external-edit/external-edit-write-back-sync.tsx:12
+msgid "external-edit.write-back.failed"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/renderer/routes/-layout/window-title-bar.tsx:31
 msgid "header.go-home"
 msgstr ""
@@ -134,6 +139,42 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/about-preferences-section.tsx:58
 msgid "preferences.about.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:329
+msgid "preferences.accessibility.allow"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:336
+msgid "preferences.accessibility.description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:342
+msgid "preferences.accessibility.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:327
+msgid "preferences.accessibility.open-settings"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+msgid "preferences.accessibility.status.macos-only"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:64
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+msgid "preferences.accessibility.status.permission-needed"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:70
+msgid "preferences.accessibility.status.ready"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -178,7 +219,7 @@ msgid "preferences.app-version.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:190
 msgid "preferences.app.title"
 msgstr ""
 
@@ -279,27 +320,27 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:217
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:296
 msgid "preferences.cli.install"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:222
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:301
 msgid "preferences.cli.path.description"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:228
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:307
 msgid "preferences.cli.path.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:213
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:292
 msgid "preferences.cli.uninstall"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:202
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:281
 msgid "preferences.font-size.label"
 msgstr ""
 
@@ -319,7 +360,7 @@ msgid "preferences.github.repository.open"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:169
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:248
 msgid "preferences.language.label"
 msgstr ""
 
@@ -334,12 +375,12 @@ msgid "preferences.markdown.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:109
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:122
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr ""
 
@@ -350,17 +391,17 @@ msgid "preferences.shortcuts.clear"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:89
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:84
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr ""
 
@@ -386,32 +427,42 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:157
-msgid "preferences.shortcuts.group.editor"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
-msgid "preferences.shortcuts.group.global"
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
+msgid "preferences.shortcuts.externalEdit.description"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+msgid "preferences.shortcuts.externalEdit.label"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:174
+msgid "preferences.shortcuts.group.editor"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:48
+msgid "preferences.shortcuts.group.global"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:79
 msgid "preferences.shortcuts.group.workspace"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:94
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
 msgid "preferences.shortcuts.quickCreateBlock.description"
 msgstr "Quickly create a new block and bring the window forward for fast capture."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:58
 msgid "preferences.shortcuts.quickCreateBlock.label"
 msgstr "Quick create block"
 
@@ -432,22 +483,22 @@ msgid "preferences.shortcuts.reset"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:115
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:171
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:188
 msgid "preferences.shortcuts.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:99
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:53
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr ""
 
@@ -463,28 +514,38 @@ msgid "preferences.telemetry.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:77
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:113
 msgid "preferences.theme.dark"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:141
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:220
 msgid "preferences.theme.label"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:108
 msgid "preferences.theme.light"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:103
 msgid "preferences.theme.system"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/index.tsx:18
 msgid "preferences.title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:57
+msgid "shortcut.external-edit.accessibility-permission-required"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/features/shortcut/shortcut-state.tsx:63
+msgid "shortcut.external-edit.accessibility-permission.allow"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -635,42 +696,72 @@ msgid "workspace.empty.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:55
 msgid "workspace.external-edit.cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:40
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:56
 msgid "workspace.external-edit.cancel.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
+msgid "workspace.external-edit.copy"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:47
+msgid "workspace.external-edit.copy-only.placeholder"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
+msgid "workspace.external-edit.copy.tooltip"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:99
+msgid "workspace.external-edit.metadata.app"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:88
 msgid "workspace.external-edit.metadata.cwd"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:92
 msgid "workspace.external-edit.metadata.file"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:63
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:82
 msgid "workspace.external-edit.metadata.source"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:29
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:32
 msgid "workspace.external-edit.metadata.source.cli"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:31
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:34
+msgid "workspace.external-edit.metadata.source.mac-accessibility"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:51
+msgid "workspace.external-edit.metadata.unknown-application"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
 msgid "workspace.external-edit.submit"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:32
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
 msgid "workspace.external-edit.submit.tooltip"
 msgstr ""
 

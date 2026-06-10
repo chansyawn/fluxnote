@@ -12,6 +12,7 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
 import { getReleaseArtifactName, normalizeMakeArtifacts } from "./config/forge/artifacts.ts";
 import { copyCliResources } from "./config/forge/cli-resources.ts";
+import { copyMacNativeResources } from "./config/forge/mac-native-resources.ts";
 import { getMacSigningConfig } from "./config/forge/mac-signing.ts";
 import { readPackageVersion } from "./config/forge/package-version.ts";
 
@@ -26,7 +27,9 @@ const packagerConfig = {
   appBundleId: "app.fluxnotes",
   appCopyright: "Copyright (c) 2026 Fluxnotes",
   appCategoryType: "public.app-category.productivity",
-  asar: true,
+  asar: {
+    unpack: "**/*.node",
+  },
   executableName: "Fluxnotes",
   extendInfo: {
     LSUIElement: true,
@@ -82,8 +85,9 @@ const fuseConfig = {
 const config: ForgeConfig = {
   packagerConfig,
   hooks: {
-    packageAfterCopy: async (_config, buildPath) => {
+    packageAfterCopy: async (_config, buildPath, _electronVersion, platform) => {
       await copyCliResources(buildPath);
+      await copyMacNativeResources(buildPath, platform);
     },
     postMake: async (_config, makeResults) => {
       return await normalizeMakeArtifacts(makeResults);

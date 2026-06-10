@@ -10,6 +10,7 @@ import {
   WandSparklesIcon,
   XIcon,
   FlagIcon,
+  SquarePenIcon,
 } from "@fluxnotes/ui/icons/lucide";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
@@ -58,6 +59,16 @@ const SHORTCUT_FIELD_GROUPS: ShortcutFieldGroupDefinition[] = [
         description: (
           <Trans id="preferences.shortcuts.quickCreateBlock.description">
             Quickly create a new block and bring the window forward for fast capture.
+          </Trans>
+        ),
+      },
+      {
+        action: "global.externalEdit",
+        icon: <SquarePenIcon />,
+        title: <Trans id="preferences.shortcuts.externalEdit.label">External edit Mac App</Trans>,
+        description: (
+          <Trans id="preferences.shortcuts.externalEdit.description">
+            Start an External edit session from the active Mac App.
           </Trans>
         ),
       },
@@ -135,6 +146,12 @@ export const EDITOR_SHORTCUT_ACTION_ORDER = [
   "editor.link",
 ] as const satisfies readonly BlockEditorActionId[];
 
+const GLOBAL_SHORTCUT_ACTIONS = new Set<ShortcutAction>([
+  "global.externalEdit",
+  "global.quickCreateBlock",
+  "global.toggleWindow",
+]);
+
 export function ShortcutPreferencesSection() {
   const { i18n } = useLingui();
   const { shortcuts, clearShortcut, globalShortcutErrors, resetShortcut, updateShortcut } =
@@ -178,8 +195,7 @@ export function ShortcutPreferencesSection() {
                 const isRecording = recordingAction === field.action;
                 const shortcut = shortcuts[field.action];
                 const fieldError =
-                  (field.action === "global.toggleWindow" ||
-                    field.action === "global.quickCreateBlock") &&
+                  GLOBAL_SHORTCUT_ACTIONS.has(field.action) &&
                   shortcut !== null &&
                   globalShortcutErrors[field.action] === shortcut
                     ? ("unavailable" as const)

@@ -84,3 +84,19 @@ export function createExternalEditSession(
     ...overrides,
   };
 }
+
+export function createCopyOnlyExternalEditSession(
+  overrides: Partial<ExternalEditSession> = {},
+): ExternalEditSession {
+  return createExternalEditSession({
+    trigger: {
+      appBundleId: null,
+      appName: null,
+      elementRole: null,
+      mode: "copy_only",
+      processId: 0,
+      source: "focused_app",
+    },
+    ...overrides,
+  });
+}

@@ -12,7 +12,7 @@ import { registerBlocksCommands } from "../features/blocks/command";
 import { registerCliCommands } from "../features/cli/command";
 import { registerClipboardCommands } from "../features/clipboard";
 import { extractDeepLinkFromArgv } from "../features/deep-link/handler";
-import type { ExternalEditManager } from "../features/external-edit";
+import type { ExternalEditRuntime } from "../features/external-edit";
 import { registerExternalEditCommands } from "../features/external-edit/command";
 import { registerExternalUrlCommands } from "../features/external-url";
 import type { OpenBlockService } from "../features/open-block";
@@ -20,6 +20,10 @@ import { registerOpenBlockCommands } from "../features/open-block/command";
 import type { PreferencesService } from "../features/preferences";
 import { registerPreferencesCommands } from "../features/preferences/command";
 import { registerShortcutCommands } from "../features/shortcut/command";
+import {
+  registerSystemPermissionsCommands,
+  type SystemPermissionsService,
+} from "../features/system-permissions";
 import { registerTagsCommands } from "../features/tags/command";
 import type { TelemetryService } from "../features/telemetry";
 import { registerTelemetryCommands } from "../features/telemetry";
@@ -38,11 +42,12 @@ interface RuntimeCommandDeps {
   };
   db: AppDatabase;
   events: EventBus;
-  externalEditManager: ExternalEditManager;
+  externalEditRuntime: ExternalEditRuntime;
   now: () => Date;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   preferencesService: PreferencesService;
+  systemPermissionsService: SystemPermissionsService;
   telemetryService: TelemetryService;
   trayManager: {
     refreshMenu: () => void;
@@ -64,16 +69,14 @@ function registerRuntimeCommands(
   registerBlocksCommands(ipc, {
     db: deps.db,
     getAssetPathForBlock: deps.paths.assetPathForBlock,
-    listExternalEditSessions: deps.externalEditManager.listSessions,
+    listExternalEditSessions: deps.externalEditRuntime.listSessions,
     now: deps.now,
     readUserPreferences: deps.preferencesService.readUserPreferences,
   });
   registerClipboardCommands(ipc);
   registerCliCommands(ipc);
   registerExternalEditCommands(ipc, {
-    db: deps.db,
-    manager: deps.externalEditManager,
-    paths: deps.paths,
+    runtime: deps.externalEditRuntime,
   });
   registerExternalUrlCommands(ipc);
   registerOpenBlockCommands(ipc, {
@@ -90,6 +93,9 @@ function registerRuntimeCommands(
   });
   registerShortcutCommands(ipc, {
     events: deps.events,
+  });
+  registerSystemPermissionsCommands(ipc, {
+    service: deps.systemPermissionsService,
   });
   registerTagsCommands(ipc, {
     db: deps.db,
@@ -112,8 +118,8 @@ export function createBackendRuntime() {
 
   function createEntrypoints(db: AppDatabase): EntrypointRuntime {
     return createEntrypointRuntime({
-      createExternalEditSession: (blockId, originalContent, trigger, signal) =>
-        services.externalEditManager.begin(blockId, originalContent, trigger, { signal }).result,
+      createExternalEditSession: (blockId, trigger, signal) =>
+        services.externalEditRuntime.createFileSession(blockId, trigger, signal),
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
         services.openBlockService.requestOpen({ blockId });
@@ -133,11 +139,12 @@ export function createBackendRuntime() {
       autoArchiveRuntime: services.autoArchiveRuntime,
       db,
       events: services.events,
-      externalEditManager: services.externalEditManager,
+      externalEditRuntime: services.externalEditRuntime,
       now: () => new Date(),
       openBlockService: services.openBlockService,
       paths: services.paths,
       preferencesService: services.preferencesService,
+      systemPermissionsService: services.systemPermissionsService,
       telemetryService: services.telemetryService,
       trayManager: services.trayManager,
       windowManager: services.windowManager,
@@ -185,7 +192,7 @@ export function createBackendRuntime() {
     services.appUpdateService.stop();
     services.autoArchiveRuntime.stop();
     globalShortcut.unregisterAll();
-    services.externalEditManager.cancelAll();
+    services.externalEditRuntime.cancelAll();
     services.telemetryService.shutdown();
     if (entrypointRuntime) {
       await entrypointRuntime.stopCliServer();

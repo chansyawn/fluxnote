@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
     "editor.link": "Mod+Shift+L",
     "editor.strikethrough": "Mod+Shift+X",
     "workspace.keepBlock": "Mod+K",
+    "global.externalEdit": "Ctrl+Alt+E",
     "global.quickCreateBlock": "Ctrl+Alt+N",
     "workspace.submitExternalEdit": "Mod+Enter",
     "workspace.togglePinBlock": "Mod+T",
@@ -49,6 +50,7 @@ describe("ShortcutPreferencesSection", () => {
     renderWithProviders(<ShortcutPreferencesSection />);
 
     expect(screen.getByText("Global")).toBeVisible();
+    expect(screen.getByText("External edit Mac App")).toBeVisible();
     expect(screen.getByText("Workspace")).toBeVisible();
     expect(screen.getByText("Editor")).toBeVisible();
     expect(screen.getByText("Bold")).toBeVisible();

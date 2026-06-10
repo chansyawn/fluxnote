@@ -1,4 +1,4 @@
-import type { Block, Tag } from "@renderer/clients";
+import type { Block, ExternalEditSession, Tag } from "@renderer/clients";
 import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 import { useMemo } from "react";
 
@@ -18,7 +18,11 @@ interface UseWorkspaceCommandsParams {
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
-  submitExternalEdit: (blockId: string, editId: string) => Promise<void>;
+  submitExternalEdit: (
+    blockId: string,
+    editId: string,
+    session?: ExternalEditSession,
+  ) => Promise<void>;
 }
 
 export function useWorkspaceCommandsValue({

@@ -158,7 +158,6 @@ describe("createEntrypointRuntime", () => {
     });
     expect(createExternalEditSession).toHaveBeenCalledWith(
       "block-1",
-      "hello",
       externalEditTrigger,
       undefined,
     );

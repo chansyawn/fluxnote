@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   registerOpenBlockCommands: vi.fn(),
   registerPreferencesCommands: vi.fn(),
   registerShortcutCommands: vi.fn(),
+  registerSystemPermissionsCommands: vi.fn(),
   registerTagsCommands: vi.fn(),
   registerTelemetryCommands: vi.fn(),
   registerWindowCommands: vi.fn(),
@@ -65,6 +66,9 @@ vi.mock("../features/preferences/command", () => ({
 }));
 vi.mock("../features/shortcut/command", () => ({
   registerShortcutCommands: mocks.registerShortcutCommands,
+}));
+vi.mock("../features/system-permissions", () => ({
+  registerSystemPermissionsCommands: mocks.registerSystemPermissionsCommands,
 }));
 vi.mock("../features/tags/command", () => ({ registerTagsCommands: mocks.registerTagsCommands }));
 vi.mock("../features/telemetry", () => ({
@@ -120,10 +124,13 @@ describe("createBackendRuntime", () => {
       isSenderTrusted: vi.fn(() => true),
       registerWindow: vi.fn(),
     },
-    externalEditManager: {
-      begin: vi.fn(() => ({ result: Promise.resolve({ blockId: "b1", status: "cancelled" }) })),
+    externalEditRuntime: {
       cancelAll: vi.fn(),
+      createFileSession: vi.fn(async () => ({ blockId: "b1", status: "cancelled" })),
       listSessions: vi.fn(() => []),
+      capture: vi.fn(),
+      cancel: vi.fn(),
+      submit: vi.fn(),
     },
     openBlockService: {
       requestOpen: vi.fn(),
@@ -136,6 +143,11 @@ describe("createBackendRuntime", () => {
     },
     preferencesService: {
       readUserPreferences: vi.fn(),
+    },
+    systemPermissionsService: {
+      getStatus: vi.fn(),
+      openSettings: vi.fn(),
+      request: vi.fn(),
     },
     telemetryService: {
       captureEvent: vi.fn(),
@@ -208,6 +220,7 @@ describe("createBackendRuntime", () => {
       }),
     );
     expect(mocks.registerShortcutCommands).toHaveBeenCalledTimes(1);
+    expect(mocks.registerSystemPermissionsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTagsCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerTelemetryCommands).toHaveBeenCalledTimes(1);
     expect(mocks.registerWindowCommands).toHaveBeenCalledTimes(1);
@@ -295,7 +308,7 @@ describe("createBackendRuntime", () => {
     expect(services.autoArchiveRuntime.stop).toHaveBeenCalledTimes(1);
     expect(mocks.unregisterAll).toHaveBeenCalledTimes(1);
     expect(services.trayManager.destroyTray).not.toHaveBeenCalled();
-    expect(services.externalEditManager.cancelAll).toHaveBeenCalledTimes(1);
+    expect(services.externalEditRuntime.cancelAll).toHaveBeenCalledTimes(1);
     expect(services.telemetryService.shutdown).toHaveBeenCalledTimes(1);
     expect(entrypointRuntime.stopCliServer).toHaveBeenCalledTimes(1);
     expect(services.db.close).toHaveBeenCalledTimes(1);

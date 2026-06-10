@@ -11,6 +11,7 @@
 - `packages/shared` contains domain-agnostic helpers shared across workspace packages.
 - `packages/ui` contains app-agnostic UI primitives, design tokens, styles, and icons.
 - `packages/editor` contains reusable editor functionality and can be developed independently from the desktop app.
+- `packages/mac-native` contains macOS native addons for the Electron main process.
 
 ### File Organization
 
@@ -119,6 +120,14 @@ packages/
 - Business errors must use `BUSINESS.[CODE]` naming (for example, `BUSINESS.NOT_FOUND`, `BUSINESS.INVALID_INVOKE`).
 - Use `BUSINESS.INVALID_INVOKE` for command argument validation failures and include validation details in `details`.
 - Map all internal errors (database, IO, runtime failures, and others) to `INTERNAL` and preserve debug context in `details` when available.
+
+### macOS Native Addons
+
+- Use `@fluxnotes/mac-native` for macOS Accessibility integration; do not reintroduce a spawned Electron helper app for this path.
+- `packages/mac-native` uses `node-addon-api` with Swift/Objective-C++ and builds `build/Release/mac_native.node`.
+- Treat `packages/mac-native/build/` and `packages/mac-native/bin/` as generated native build output; keep them ignored.
+- After changing native sources or `binding.gyp`, run `vp run build:native` from `packages/mac-native` before desktop packaging.
+- Keep the desktop main bundle externalizing `@fluxnotes/mac-native`; packaged apps load its CJS facade and unpacked `.node` from app resources.
 
 ## Workflow & Verification
 

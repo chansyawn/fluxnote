@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 
+import { I18nProvider } from "@lingui/react";
 import type { Block, Tag } from "@renderer/clients";
+import { createCopyOnlyExternalEditSession } from "@renderer/test/fixtures";
+import { activateTestI18n } from "@renderer/test/render";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -67,6 +70,7 @@ const mocks = vi.hoisted(() => ({
     subscribeActionState: vi.fn(() => () => undefined),
     subscribePreviewChange: vi.fn(() => () => undefined),
   },
+  editorConfigsByBlock: new Map<string, unknown>(),
   shortcutActionsByBlock: new Map<string, WorkspaceBlockActions>(),
   shortcuts: {
     "workspace.archiveBlock": "Mod+E",
@@ -146,14 +150,17 @@ vi.mock("./workspace-block-editor-surface", async () => {
     WorkspaceBlockEditorSurface: ({
       adornments,
       block,
+      editorConfig,
       onFocus,
       ref,
     }: {
       adornments?: React.ReactNode;
       block: Block;
+      editorConfig?: unknown;
       onFocus: (blockId: string) => void;
       ref?: React.Ref<WorkspaceBlockEditorHandle>;
     }) => {
+      mocks.editorConfigsByBlock.set(block.id, editorConfig);
       React.useEffect(() => {
         setRef(ref, mocks.editorHandle as WorkspaceBlockEditorHandle);
         return () => {
@@ -194,7 +201,7 @@ function createBlock(id: string): Block {
   };
 }
 
-function createState(): WorkspaceBlockState {
+function createState(overrides: Partial<WorkspaceBlockState> = {}): WorkspaceBlockState {
   return {
     externalEditSession: undefined,
     isArchivePending: false,
@@ -206,6 +213,7 @@ function createState(): WorkspaceBlockState {
     isReorderPending: false,
     isTagCreatePending: false,
     visibility: "active",
+    ...overrides,
   };
 }
 
@@ -232,7 +240,10 @@ function createCommands(): WorkspaceCommands {
   };
 }
 
-function renderWorkspaceBlockEditors(blocks: Block[]) {
+function renderWorkspaceBlockEditors(
+  blocks: Block[],
+  options: { state?: (block: Block) => WorkspaceBlockState } = {},
+) {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
@@ -250,19 +261,22 @@ function renderWorkspaceBlockEditors(blocks: Block[]) {
   };
 
   act(() => {
+    const i18n = activateTestI18n();
     root.render(
-      <BlockEditorRegistryProvider value={registry}>
-        {blocks.map((block) => (
-          <WorkspaceBlockEditor
-            key={block.id}
-            block={block}
-            commands={createCommands()}
-            position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
-            state={createState()}
-            tags={[] satisfies Tag[]}
-          />
-        ))}
-      </BlockEditorRegistryProvider>,
+      <I18nProvider i18n={i18n}>
+        <BlockEditorRegistryProvider value={registry}>
+          {blocks.map((block) => (
+            <WorkspaceBlockEditor
+              key={block.id}
+              block={block}
+              commands={createCommands()}
+              position={{ canMoveDown: true, canMoveToTop: true, canMoveUp: true }}
+              state={options.state?.(block) ?? createState()}
+              tags={[] satisfies Tag[]}
+            />
+          ))}
+        </BlockEditorRegistryProvider>
+      </I18nProvider>,
     );
   });
 
@@ -286,6 +300,7 @@ describe("WorkspaceBlockEditor", () => {
     mocks.editorHandle.copy.mockClear();
     mocks.editorHandle.flush.mockClear();
     mocks.editorHandle.focus.mockClear();
+    mocks.editorConfigsByBlock.clear();
     mocks.shortcutActionsByBlock.clear();
 
     if (mountedRoot) {
@@ -335,5 +350,22 @@ describe("WorkspaceBlockEditor", () => {
     expect(mocks.editorHandle.copy).toHaveBeenCalledTimes(2);
     expect(getCopyButton(container, "block-2").dataset.copied).toBe("true");
     expect(getCopyButton(container, "block-1").dataset.copied).toBe("false");
+  });
+
+  it("uses a no-input placeholder for copy-only external edits", () => {
+    const { container, root } = renderWorkspaceBlockEditors([createBlock("block-1")], {
+      state: () =>
+        createState({
+          externalEditSession: createCopyOnlyExternalEditSession(),
+        }),
+    });
+    mountedRoot = root;
+    mountedContainer = container;
+
+    expect(mocks.editorConfigsByBlock.get("block-1")).toEqual({
+      content: {
+        placeholder: "No focused input found. Write text to copy.",
+      },
+    });
   });
 });

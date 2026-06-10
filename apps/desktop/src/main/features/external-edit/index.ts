@@ -1,3 +1,6 @@
 export { registerExternalEditCommands } from "./command";
-export { createExternalEditManager, type ExternalEditManager } from "./manager";
-export { cancelEdit, submitEdit } from "./service";
+export {
+  createDefaultExternalEditRuntime,
+  createExternalEditRuntime,
+  type ExternalEditRuntime,
+} from "./runtime";

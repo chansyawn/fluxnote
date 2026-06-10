@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import type { WorkspaceBlockCollection } from "./block-collection/workspace-block-collection";
 import type { WorkspaceBlockViewState } from "./block-collection/workspace-block-view";
 import type { BlockEditorRegistry } from "./editor-registry/use-block-editor-registry";
-import { useExternalEditActions } from "./external-edit/use-external-edit-actions";
+import { useExternalEditSubmission } from "./external-edit/external-edit-submission";
 import type { ActiveBlockFocus } from "./navigation/use-active-block-focus";
 import { useBlockFocusActions } from "./navigation/use-block-focus-actions";
 import type { useBlockNavigation } from "./navigation/use-block-navigation";
@@ -63,7 +63,7 @@ export function useWorkspaceCommandRuntime({
     setActiveBlockId: activeBlockFocus.focusBlock,
   });
 
-  const externalEditActions = useExternalEditActions({
+  const externalEditActions = useExternalEditSubmission({
     getEditor: editorRegistry.getEditor,
     navigateToBlock: blockNavigation.navigateToBlock,
   });

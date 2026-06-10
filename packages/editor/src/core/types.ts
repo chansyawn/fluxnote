@@ -30,10 +30,15 @@ export interface BlockEditorMarkdownConfig {
   codeBlock: BlockEditorCodeBlockConfig;
 }
 
+export interface BlockEditorContentConfig {
+  placeholder: string | null;
+}
+
 export interface BlockEditorConfig {
   appearance: {
     resolvedTheme: BlockEditorResolvedTheme;
   };
+  content: BlockEditorContentConfig;
   markdown: BlockEditorMarkdownConfig;
   shortcuts: BlockEditorShortcutsConfig;
 }
@@ -50,6 +55,10 @@ export interface BlockEditorMarkdownConfigInput {
   codeBlock?: BlockEditorCodeBlockConfigInput;
 }
 
+export interface BlockEditorContentConfigInput {
+  placeholder?: string;
+}
+
 export interface BlockEditorShortcutsConfig {
   actions: BlockEditorActionShortcutConfig;
 }
@@ -60,6 +69,7 @@ export interface BlockEditorShortcutsConfigInput {
 
 export interface BlockEditorConfigInput {
   appearance?: BlockEditorAppearanceConfigInput;
+  content?: BlockEditorContentConfigInput;
   markdown?: BlockEditorMarkdownConfigInput;
   shortcuts?: BlockEditorShortcutsConfigInput;
 }
