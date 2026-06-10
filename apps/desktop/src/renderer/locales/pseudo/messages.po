@@ -727,63 +727,63 @@ msgid "workspace.external-edit.copy.tooltip"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:148
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:155
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:138
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:145
 msgid "workspace.external-edit.metadata.app"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:130
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:120
 msgid "workspace.external-edit.metadata.branch"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:137
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:127
 msgid "workspace.external-edit.metadata.cwd"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:141
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:131
 msgid "workspace.external-edit.metadata.file"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:124
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:114
 msgid "workspace.external-edit.metadata.repository"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:115
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:105
 msgid "workspace.external-edit.metadata.source"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:61
 msgid "workspace.external-edit.metadata.source.browser"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:57
 msgid "workspace.external-edit.metadata.source.cli"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:69
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:59
 msgid "workspace.external-edit.metadata.source.mac-accessibility"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:160
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:150
 msgid "workspace.external-edit.metadata.title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:88
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:78
 msgid "workspace.external-edit.metadata.unknown-application"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:166
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:156
 msgid "workspace.external-edit.metadata.url"
 msgstr ""
 
