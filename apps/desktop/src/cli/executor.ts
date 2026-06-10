@@ -10,6 +10,7 @@ import type { BlockCreatedSource } from "@shared/features/telemetry/contract";
 
 import type { FluxCliCommand } from "./args";
 import { dispatchCommand } from "./dispatch-command";
+import { resolveGitInfo } from "./git-info";
 
 interface FileStat {
   isFile: () => boolean;
@@ -23,6 +24,7 @@ interface CliExecutorDeps {
     payload: unknown,
   ) => Promise<BackendCommandResponse<TKey>>;
   readFile: typeof readFile;
+  resolveGitInfo: typeof resolveGitInfo;
   stat: (path: string) => Promise<FileStat>;
   writeFile: typeof writeFile;
 }
@@ -32,6 +34,7 @@ const defaultDeps: CliExecutorDeps = {
   cwd: () => process.cwd(),
   dispatchCommand,
   readFile,
+  resolveGitInfo,
   stat,
   writeFile,
 };
@@ -151,6 +154,7 @@ export async function executeExternalEdit(
   const cwd = deps.cwd();
   const resolvedPath = resolveTextFilePath(filePath, cwd);
   const originalContent = await readTextFile(filePath, deps);
+  const git = await deps.resolveGitInfo(cwd);
 
   try {
     const result = await deps.dispatchCommand("block.create-external-edit", {
@@ -158,6 +162,7 @@ export async function executeExternalEdit(
       tagNames,
       trigger: {
         cwd,
+        git,
         requestedFilePath: filePath,
         source: "cli",
         targetFilePath: resolvedPath,

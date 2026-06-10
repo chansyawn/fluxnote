@@ -23,6 +23,7 @@ const block = {
 };
 const externalEditTrigger = {
   cwd: "/workspace",
+  git: null,
   requestedFilePath: "block.md",
   source: "cli" as const,
   targetFilePath: "/workspace/block.md",

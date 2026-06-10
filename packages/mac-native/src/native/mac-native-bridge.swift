@@ -83,6 +83,7 @@ private func stringifyJson(_ value: [String: Any]) -> String {
 func normalizedTargetMetadata(_ metadata: [String: Any]?) -> [String: Any] {
   [
     "appBundleId": metadata?["appBundleId"] ?? NSNull(),
+    "appIcon": metadata?["appIcon"] ?? NSNull(),
     "appName": metadata?["appName"] ?? NSNull(),
     "elementRole": metadata?["elementRole"] ?? NSNull(),
     "processId": metadata?["processId"] ?? 0,

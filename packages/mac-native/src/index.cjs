@@ -43,6 +43,7 @@ function parseTarget(value) {
 
   return {
     appBundleId: parseNullableString(value.appBundleId),
+    appIcon: parseNullableString(value.appIcon),
     appName: parseNullableString(value.appName),
     elementRole: parseNullableString(value.elementRole),
     processId,

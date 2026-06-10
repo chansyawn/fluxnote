@@ -23,7 +23,7 @@ export {
   onExternalEditWriteBackFailed,
   submitExternalEdit,
 } from "./external-edit";
-export { openExternalUrl } from "./external-url";
+export { fetchUrlFavicon, openExternalUrl } from "./external-url";
 export { onAutoArchiveStateChanged } from "./ipc/events";
 export {
   acknowledgePendingOpenBlock,

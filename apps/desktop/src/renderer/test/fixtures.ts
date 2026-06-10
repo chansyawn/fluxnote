@@ -81,6 +81,7 @@ export function createExternalEditSession(
     editId: "edit-1",
     trigger: {
       cwd: "/tmp",
+      git: null,
       requestedFilePath: "/tmp/requested.md",
       source: "cli",
       targetFilePath: "/tmp/target.md",
@@ -95,6 +96,7 @@ export function createCopyOnlyExternalEditSession(
   return createExternalEditSession({
     trigger: {
       appBundleId: null,
+      appIcon: null,
       appName: null,
       elementRole: null,
       mode: "copy_only",

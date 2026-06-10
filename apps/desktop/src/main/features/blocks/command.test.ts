@@ -74,6 +74,7 @@ describe("blocks command", () => {
           editId: "edit-1",
           trigger: {
             cwd: "/tmp",
+            git: null,
             requestedFilePath: "/tmp/requested.md",
             source: "cli" as const,
             targetFilePath: "/tmp/target.md",
