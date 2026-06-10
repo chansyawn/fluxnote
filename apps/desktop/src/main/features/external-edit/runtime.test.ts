@@ -1,8 +1,8 @@
+import { MacNativeError, type MacAccessibilityNative } from "@fluxnotes/mac-native";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
 import { createTestDb } from "../test-db";
-import { FocusedAppHelperError } from "./native/helper";
 import { createExternalEditRuntime } from "./runtime";
 
 const paths = {
@@ -36,33 +36,37 @@ afterEach(() => {
 
 async function createRuntime(overrides?: {
   activate?: (processId: number) => Promise<void>;
-  capture?: () => Promise<{ content: string; trigger: ReturnType<typeof createFocusedAppTrigger> }>;
-  isFocusedAppCaptureSupported?: () => boolean;
-  isTrustedAccessibilityClient?: (prompt: boolean) => boolean;
-  writeBack?: (content: string) => Promise<void>;
+  capture?: MacAccessibilityNative["capture"];
+  isAccessibilityTrusted?: (prompt: boolean) => boolean;
+  isSupported?: () => boolean;
+  writeBack?: (sessionId: string, content: string) => Promise<void>;
 }) {
   const ctx = await createTestDb();
-  const helper = {
+  const macAccessibility: MacAccessibilityNative = {
     activate: vi.fn(overrides?.activate ?? (async () => undefined)),
     capture: vi.fn(
       overrides?.capture ??
         (async () => ({
           content: "selected",
-          trigger: createFocusedAppTrigger(),
+          mode: "write_back" as const,
+          sessionId: "native-session-1",
+          target: {
+            appBundleId: "com.example.App",
+            appName: "Example",
+            elementRole: "AXTextArea",
+            processId: 123,
+          },
         })),
     ),
-    dispose: vi.fn(),
+    closeSession: vi.fn(async () => undefined),
+    isAccessibilityTrusted: vi.fn(overrides?.isAccessibilityTrusted ?? (() => true)),
+    isSupported: vi.fn(overrides?.isSupported ?? (() => true)),
     writeBack: vi.fn(overrides?.writeBack ?? (async () => undefined)),
   };
   const deps = {
     clipboard: { writeText: vi.fn() },
     emitEvent: vi.fn(() => true),
-    helper,
-    helperFactory: {
-      create: vi.fn(async () => helper),
-    },
-    isFocusedAppCaptureSupported: overrides?.isFocusedAppCaptureSupported ?? (() => true),
-    isTrustedAccessibilityClient: overrides?.isTrustedAccessibilityClient ?? (() => true),
+    macAccessibility,
     openBlockService: { requestOpen: vi.fn() },
     telemetryService: { captureEvent: vi.fn() },
   };
@@ -70,9 +74,7 @@ async function createRuntime(overrides?: {
     clipboard: deps.clipboard,
     emitEvent: deps.emitEvent,
     getDb: () => ctx.db,
-    helperFactory: deps.helperFactory,
-    isFocusedAppCaptureSupported: deps.isFocusedAppCaptureSupported,
-    isTrustedAccessibilityClient: deps.isTrustedAccessibilityClient,
+    macAccessibility: deps.macAccessibility,
     openBlockService: deps.openBlockService as never,
     paths,
     telemetryService: deps.telemetryService,
@@ -131,7 +133,7 @@ describe("external edit runtime", () => {
         editId: session.editId,
         reason: "lost element",
       });
-      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.macAccessibility.closeSession).toHaveBeenCalledWith("native-session-1");
     } finally {
       await ctx.close();
     }
@@ -251,16 +253,19 @@ describe("external edit runtime", () => {
 
       await ctx.runtime.submit(session.editId, "updated");
 
-      expect(ctx.deps.helper.activate).not.toHaveBeenCalled();
-      expect(ctx.deps.helper.writeBack).toHaveBeenCalledWith("updated");
-      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
+      expect(ctx.deps.macAccessibility.activate).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.writeBack).toHaveBeenCalledWith(
+        "native-session-1",
+        "updated",
+      );
+      expect(ctx.deps.macAccessibility.closeSession).toHaveBeenCalledWith("native-session-1");
     } finally {
       await ctx.close();
     }
   });
 
   it("rejects unsupported focused app capture platforms before creating a block", async () => {
-    const ctx = await createRuntime({ isFocusedAppCaptureSupported: () => false });
+    const ctx = await createRuntime({ isSupported: () => false });
     try {
       await expect(ctx.runtime.capture()).rejects.toMatchObject({
         code: "BUSINESS.UNSUPPORTED_PLATFORM",
@@ -272,7 +277,7 @@ describe("external edit runtime", () => {
   });
 
   it("rejects missing Accessibility permission before creating a block", async () => {
-    const ctx = await createRuntime({ isTrustedAccessibilityClient: () => false });
+    const ctx = await createRuntime({ isAccessibilityTrusted: () => false });
     try {
       await expect(ctx.runtime.capture()).rejects.toMatchObject({
         code: "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
@@ -284,18 +289,19 @@ describe("external edit runtime", () => {
   });
 
   it("creates a copy-only session when no focused editable element is found", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createRuntime({
       capture: async () => {
-        throw new FocusedAppHelperError(
-          "No focused editable element was found.",
-          "no_editable_element",
-          {
+        return {
+          content: "",
+          mode: "copy_only",
+          reason: "NO_EDITABLE_ELEMENT",
+          target: {
             appBundleId: "com.example.App",
             appName: "Example",
+            elementRole: null,
             processId: 123,
           },
-        );
+        };
       },
     });
     try {
@@ -317,33 +323,26 @@ describe("external edit runtime", () => {
       });
       const block = await getPublicBlockById(ctx.db, session.blockId);
       expect(block.content).toBe("");
-      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
-      expect(warn).toHaveBeenCalledWith("External edit capture fell back to copy-only", {
-        appBundleId: "com.example.App",
-        appName: "Example",
-        code: "no_editable_element",
-        elementRole: null,
-        message: "No focused editable element was found.",
-        processId: 123,
-      });
+      expect(ctx.deps.macAccessibility.closeSession).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }
   });
 
   it("activates focused app after submitting a copy-only session", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createRuntime({
       capture: async () => {
-        throw new FocusedAppHelperError(
-          "No focused editable element was found.",
-          "no_editable_element",
-          {
+        return {
+          content: "",
+          mode: "copy_only",
+          reason: "NO_EDITABLE_ELEMENT",
+          target: {
             appBundleId: "com.example.App",
             appName: "Example",
+            elementRole: null,
             processId: 123,
           },
-        );
+        };
       },
     });
     try {
@@ -351,17 +350,9 @@ describe("external edit runtime", () => {
 
       await ctx.runtime.submit(session.editId, "updated");
 
-      expect(ctx.deps.helper.activate).toHaveBeenCalledWith(123);
-      expect(ctx.deps.helper.writeBack).not.toHaveBeenCalled();
-      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(2);
-      expect(warn).toHaveBeenCalledWith("External edit capture fell back to copy-only", {
-        appBundleId: "com.example.App",
-        appName: "Example",
-        code: "no_editable_element",
-        elementRole: null,
-        message: "No focused editable element was found.",
-        processId: 123,
-      });
+      expect(ctx.deps.macAccessibility.activate).toHaveBeenCalledWith(123);
+      expect(ctx.deps.macAccessibility.writeBack).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.closeSession).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }
@@ -374,15 +365,17 @@ describe("external edit runtime", () => {
         throw new Error("app unavailable");
       },
       capture: async () => {
-        throw new FocusedAppHelperError(
-          "No focused editable element was found.",
-          "no_editable_element",
-          {
+        return {
+          content: "",
+          mode: "copy_only",
+          reason: "NO_EDITABLE_ELEMENT",
+          target: {
             appBundleId: "com.example.App",
             appName: "Example",
+            elementRole: null,
             processId: 123,
           },
-        );
+        };
       },
     });
     try {
@@ -391,7 +384,7 @@ describe("external edit runtime", () => {
       const updatedBlock = await ctx.runtime.submit(session.editId, "updated");
 
       expect(updatedBlock.content).toBe("updated");
-      expect(ctx.deps.helper.activate).toHaveBeenCalledWith(123);
+      expect(ctx.deps.macAccessibility.activate).toHaveBeenCalledWith(123);
       expect(warn).toHaveBeenCalledWith("External edit focused app activation failed", {
         message: "app unavailable",
         processId: 123,
@@ -401,12 +394,12 @@ describe("external edit runtime", () => {
     }
   });
 
-  it("maps helper permission errors to Accessibility permission business errors", async () => {
+  it("maps native permission errors to Accessibility permission business errors", async () => {
     const ctx = await createRuntime({
       capture: async () => {
-        throw new FocusedAppHelperError(
+        throw new MacNativeError(
+          "ACCESSIBILITY.PERMISSION_REQUIRED",
           "Accessibility permission is not granted.",
-          "permission_required",
         );
       },
     });
@@ -414,7 +407,6 @@ describe("external edit runtime", () => {
       await expect(ctx.runtime.capture()).rejects.toMatchObject({
         code: "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
       });
-      expect(ctx.deps.helper.dispose).toHaveBeenCalledTimes(1);
       expect(ctx.runtime.listSessions()).toHaveLength(0);
     } finally {
       await ctx.close();

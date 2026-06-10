@@ -1,3 +1,9 @@
+import {
+  createMacAccessibilityNative,
+  MacNativeError,
+  type MacAccessibilityCaptureResult,
+  type MacAccessibilityNative,
+} from "@fluxnotes/mac-native";
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
 import { blocks, getSqliteChangedRows, nowIsoString } from "@main/core/database";
@@ -13,16 +19,10 @@ import type {
 } from "@shared/features/external-edit/models";
 import { businessError } from "@shared/ipc/result";
 import { eq } from "drizzle-orm";
-import { clipboard, systemPreferences } from "electron";
+import { clipboard } from "electron";
 
 import { externalizeMarkdownAssetUrls } from "../assets/service";
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
-import {
-  createFocusedAppHelperFactory,
-  FocusedAppHelperError,
-  type FocusedAppHelper,
-  type FocusedAppHelperFactory,
-} from "./native/helper";
 
 interface PendingExternalEdit {
   claimed: boolean;
@@ -57,9 +57,7 @@ interface ExternalEditRuntimeDeps {
   clipboard: Pick<typeof clipboard, "writeText">;
   emitEvent: EventBus["emit"];
   getDb: () => AppDatabase;
-  helperFactory: FocusedAppHelperFactory;
-  isFocusedAppCaptureSupported: () => boolean;
-  isTrustedAccessibilityClient: (prompt: boolean) => boolean;
+  macAccessibility: MacAccessibilityNative;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   telemetryService: Pick<TelemetryService, "captureEvent">;
@@ -81,8 +79,6 @@ export interface ExternalEditRuntime {
   ) => Promise<Awaited<ReturnType<typeof getPublicBlockById>>>;
 }
 
-const COPY_ONLY_CAPTURE_ERROR_CODES = new Set(["no_editable_element", "unsupported_element"]);
-
 function createEditId(): string {
   return crypto.randomUUID();
 }
@@ -92,7 +88,7 @@ function createCreatedAt(): string {
 }
 
 function toBusinessInvalidOperation(error: unknown): never {
-  if (error instanceof FocusedAppHelperError && error.code === "permission_required") {
+  if (error instanceof MacNativeError && error.code === "ACCESSIBILITY.PERMISSION_REQUIRED") {
     throw businessError("BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED", error.message);
   }
 
@@ -102,41 +98,24 @@ function toBusinessInvalidOperation(error: unknown): never {
   );
 }
 
-function shouldCreateCopyOnlyExternalEdit(error: unknown): error is FocusedAppHelperError {
-  return (
-    error instanceof FocusedAppHelperError &&
-    typeof error.code === "string" &&
-    COPY_ONLY_CAPTURE_ERROR_CODES.has(error.code)
-  );
-}
-
-function createCopyOnlyTrigger(error: FocusedAppHelperError): FocusedAppExternalEditTrigger {
-  return {
-    appBundleId: error.data?.appBundleId ?? null,
-    appName: error.data?.appName ?? null,
-    elementRole: error.data?.elementRole ?? null,
-    mode: "copy_only",
-    processId: error.data?.processId ?? 0,
-    source: "focused_app",
-  };
-}
-
-function warnCopyOnlyCaptureFallback(error: FocusedAppHelperError): void {
-  console.warn("External edit capture fell back to copy-only", {
-    appBundleId: error.data?.appBundleId ?? null,
-    appName: error.data?.appName ?? null,
-    code: error.code,
-    elementRole: error.data?.elementRole ?? null,
-    message: error.message,
-    processId: error.data?.processId ?? 0,
-  });
-}
-
 function warnFocusedAppActivationFailure(processId: number, error: unknown): void {
   console.warn("External edit focused app activation failed", {
     message: error instanceof Error ? error.message : "Unknown activation failure.",
     processId,
   });
+}
+
+function createFocusedAppTrigger(
+  captureResult: MacAccessibilityCaptureResult,
+): FocusedAppExternalEditTrigger {
+  return {
+    appBundleId: captureResult.target.appBundleId,
+    appName: captureResult.target.appName,
+    elementRole: captureResult.target.elementRole,
+    mode: captureResult.mode,
+    processId: captureResult.target.processId,
+    source: "focused_app",
+  };
 }
 
 export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): ExternalEditRuntime {
@@ -231,24 +210,20 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       return;
     }
 
-    let helper: FocusedAppHelper | undefined;
     try {
-      helper = await deps.helperFactory.create();
-      await helper.activate(processId);
+      await deps.macAccessibility.activate(processId);
     } catch (error) {
       warnFocusedAppActivationFailure(processId, error);
-    } finally {
-      helper?.dispose();
     }
   }
 
   async function writeBackOrFallback(
     session: ExternalEditSession,
-    helper: FocusedAppHelper,
+    nativeSessionId: string,
     content: string,
   ): Promise<void> {
     try {
-      await helper.writeBack(content);
+      await deps.macAccessibility.writeBack(nativeSessionId, content);
     } catch (error) {
       const reason = error instanceof Error ? error.message : "Unknown write-back failure.";
       deps.clipboard.writeText(content);
@@ -258,52 +233,51 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
         reason,
       });
     } finally {
-      helper.dispose();
+      await deps.macAccessibility.closeSession(nativeSessionId);
     }
   }
 
   async function capture(): Promise<ExternalEditSession> {
-    if (!deps.isFocusedAppCaptureSupported()) {
+    if (!deps.macAccessibility.isSupported()) {
       throw businessError(
         "BUSINESS.UNSUPPORTED_PLATFORM",
         "External edit from focused inputs is only supported on macOS.",
       );
     }
 
-    if (!deps.isTrustedAccessibilityClient(true)) {
+    if (!deps.macAccessibility.isAccessibilityTrusted(true)) {
       throw businessError(
         "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
         "Fluxnotes needs macOS Accessibility permission to read focused inputs.",
       );
     }
 
-    const helper = await deps.helperFactory.create();
-    let captureResult: Awaited<ReturnType<FocusedAppHelper["capture"]>>;
+    let captureResult: MacAccessibilityCaptureResult;
     try {
-      captureResult = await helper.capture();
+      captureResult = await deps.macAccessibility.capture();
     } catch (error) {
-      helper.dispose();
-      if (shouldCreateCopyOnlyExternalEdit(error)) {
-        warnCopyOnlyCaptureFallback(error);
-        const trigger = createCopyOnlyTrigger(error);
-        const blockId = await createExternalEditBlock("");
-        return begin(blockId, trigger, {
-          target: {
-            submit: async () => {
-              await activateFocusedApp(trigger.processId);
-            },
-          },
-        }).session;
-      }
       toBusinessInvalidOperation(error);
     }
 
+    const trigger = createFocusedAppTrigger(captureResult);
     const blockId = await createExternalEditBlock(captureResult.content);
-    return begin(blockId, captureResult.trigger, {
+    if (captureResult.mode === "copy_only") {
+      return begin(blockId, trigger, {
+        target: {
+          submit: async () => {
+            await activateFocusedApp(trigger.processId);
+          },
+        },
+      }).session;
+    }
+
+    return begin(blockId, trigger, {
       target: {
-        cancel: () => helper.dispose(),
+        cancel: () => {
+          void deps.macAccessibility.closeSession(captureResult.sessionId);
+        },
         submit: async (session, content) => {
-          await writeBackOrFallback(session, helper, content);
+          await writeBackOrFallback(session, captureResult.sessionId, content);
         },
       },
     }).session;
@@ -383,17 +357,11 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
 }
 
 export function createDefaultExternalEditRuntime(
-  deps: Omit<
-    ExternalEditRuntimeDeps,
-    "clipboard" | "helperFactory" | "isFocusedAppCaptureSupported" | "isTrustedAccessibilityClient"
-  >,
+  deps: Omit<ExternalEditRuntimeDeps, "clipboard" | "macAccessibility">,
 ): ExternalEditRuntime {
   return createExternalEditRuntime({
     ...deps,
     clipboard,
-    helperFactory: createFocusedAppHelperFactory(),
-    isFocusedAppCaptureSupported: () => process.platform === "darwin",
-    isTrustedAccessibilityClient: (prompt) =>
-      systemPreferences.isTrustedAccessibilityClient(prompt),
+    macAccessibility: createMacAccessibilityNative(),
   });
 }

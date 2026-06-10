@@ -1,21 +1,30 @@
 import ApplicationServices
 import Foundation
 
-enum HelperErrorCode {
-  static let invalidPayload = "invalid_payload"
-  static let invalidCommand = "invalid_command"
-  static let noCapturedElement = "no_captured_element"
-  static let noEditableElement = "no_editable_element"
-  static let permissionRequired = "permission_required"
-  static let secureTextField = "secure_text_field"
-  static let unsupportedElement = "unsupported_element"
-  static let writeBackFailed = "write_back_failed"
+enum MacNativeErrorCode {
+  static let addonLoadFailed = "NATIVE.ADDON_LOAD_FAILED"
+  static let internalError = "NATIVE.INTERNAL"
+  static let invalidPayload = "NATIVE.INVALID_PAYLOAD"
+  static let sessionLimitExceeded = "NATIVE.SESSION_LIMIT_EXCEEDED"
+  static let sessionNotFound = "NATIVE.SESSION_NOT_FOUND"
+  static let unsupportedPlatform = "NATIVE.UNSUPPORTED_PLATFORM"
+
+  static let activateFailed = "ACCESSIBILITY.ACTIVATE_FAILED"
+  static let permissionRequired = "ACCESSIBILITY.PERMISSION_REQUIRED"
+  static let secureTextField = "ACCESSIBILITY.SECURE_TEXT_FIELD"
+  static let writeBackFailed = "ACCESSIBILITY.WRITE_BACK_FAILED"
 }
 
-struct HelperFailure: Error {
+enum MacAccessibilityCopyOnlyReason {
+  static let noEditableElement = "NO_EDITABLE_ELEMENT"
+  static let searchBudgetExhausted = "SEARCH_BUDGET_EXHAUSTED"
+  static let unsupportedElement = "UNSUPPORTED_ELEMENT"
+}
+
+struct MacNativeFailure: Error {
   let code: String
   let message: String
-  let data: [String: Any]?
+  let details: [String: Any]?
 }
 
 func axErrorDescription(_ error: AXError) -> String {

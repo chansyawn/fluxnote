@@ -1,15 +1,15 @@
+import { createMacAccessibilityNative, type MacAccessibilityNative } from "@fluxnotes/mac-native";
 import type {
   SystemPermission,
   SystemPermissionStatus,
 } from "@shared/features/system-permissions/contract";
-import { shell, systemPreferences } from "electron";
+import { shell } from "electron";
 
 const MACOS_ACCESSIBILITY_SETTINGS_URL =
   "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility";
 
 interface SystemPermissionsServiceDeps {
-  isMac: () => boolean;
-  isTrustedAccessibilityClient: (prompt: boolean) => boolean;
+  macAccessibility: Pick<MacAccessibilityNative, "isAccessibilityTrusted" | "isSupported">;
   openExternal: (url: string) => Promise<void>;
 }
 
@@ -31,31 +31,31 @@ export function createSystemPermissionsService(
   deps: SystemPermissionsServiceDeps,
 ): SystemPermissionsService {
   function getStatus(permission: SystemPermission): SystemPermissionStatus {
-    if (!deps.isMac()) {
+    if (!deps.macAccessibility.isSupported()) {
       return unsupportedStatus(permission);
     }
 
     return {
-      granted: deps.isTrustedAccessibilityClient(false),
+      granted: deps.macAccessibility.isAccessibilityTrusted(false),
       permission,
       supported: true,
     };
   }
 
   function request(permission: SystemPermission): SystemPermissionStatus {
-    if (!deps.isMac()) {
+    if (!deps.macAccessibility.isSupported()) {
       return unsupportedStatus(permission);
     }
 
     return {
-      granted: deps.isTrustedAccessibilityClient(true),
+      granted: deps.macAccessibility.isAccessibilityTrusted(true),
       permission,
       supported: true,
     };
   }
 
   async function openSettings(permission: SystemPermission): Promise<void> {
-    if (!deps.isMac()) {
+    if (!deps.macAccessibility.isSupported()) {
       return;
     }
 
@@ -75,9 +75,7 @@ export function createSystemPermissionsService(
 
 export function createDefaultSystemPermissionsService(): SystemPermissionsService {
   return createSystemPermissionsService({
-    isMac: () => process.platform === "darwin",
-    isTrustedAccessibilityClient: (prompt) =>
-      systemPreferences.isTrustedAccessibilityClient(prompt),
+    macAccessibility: createMacAccessibilityNative(),
     openExternal: (url) => shell.openExternal(url),
   });
 }

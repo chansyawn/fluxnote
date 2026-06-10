@@ -4,10 +4,12 @@ import { createSystemPermissionsService } from "./service";
 
 describe("system permissions service", () => {
   it("returns unsupported Accessibility status outside macOS", () => {
-    const isTrustedAccessibilityClient = vi.fn();
+    const isAccessibilityTrusted = vi.fn();
     const service = createSystemPermissionsService({
-      isMac: () => false,
-      isTrustedAccessibilityClient,
+      macAccessibility: {
+        isAccessibilityTrusted,
+        isSupported: () => false,
+      },
       openExternal: vi.fn(),
     });
 
@@ -16,14 +18,16 @@ describe("system permissions service", () => {
       permission: "macos_accessibility",
       supported: false,
     });
-    expect(isTrustedAccessibilityClient).not.toHaveBeenCalled();
+    expect(isAccessibilityTrusted).not.toHaveBeenCalled();
   });
 
   it("checks macOS Accessibility status without prompting", () => {
-    const isTrustedAccessibilityClient = vi.fn(() => true);
+    const isAccessibilityTrusted = vi.fn(() => true);
     const service = createSystemPermissionsService({
-      isMac: () => true,
-      isTrustedAccessibilityClient,
+      macAccessibility: {
+        isAccessibilityTrusted,
+        isSupported: () => true,
+      },
       openExternal: vi.fn(),
     });
 
@@ -32,14 +36,16 @@ describe("system permissions service", () => {
       permission: "macos_accessibility",
       supported: true,
     });
-    expect(isTrustedAccessibilityClient).toHaveBeenCalledWith(false);
+    expect(isAccessibilityTrusted).toHaveBeenCalledWith(false);
   });
 
   it("requests macOS Accessibility permission with prompting", () => {
-    const isTrustedAccessibilityClient = vi.fn(() => false);
+    const isAccessibilityTrusted = vi.fn(() => false);
     const service = createSystemPermissionsService({
-      isMac: () => true,
-      isTrustedAccessibilityClient,
+      macAccessibility: {
+        isAccessibilityTrusted,
+        isSupported: () => true,
+      },
       openExternal: vi.fn(),
     });
 
@@ -48,14 +54,16 @@ describe("system permissions service", () => {
       permission: "macos_accessibility",
       supported: true,
     });
-    expect(isTrustedAccessibilityClient).toHaveBeenCalledWith(true);
+    expect(isAccessibilityTrusted).toHaveBeenCalledWith(true);
   });
 
   it("opens macOS Accessibility settings as best effort", async () => {
     const openExternal = vi.fn(async () => undefined);
     const service = createSystemPermissionsService({
-      isMac: () => true,
-      isTrustedAccessibilityClient: vi.fn(),
+      macAccessibility: {
+        isAccessibilityTrusted: vi.fn(),
+        isSupported: () => true,
+      },
       openExternal,
     });
 
@@ -69,8 +77,10 @@ describe("system permissions service", () => {
   it("does not open settings outside macOS", async () => {
     const openExternal = vi.fn(async () => undefined);
     const service = createSystemPermissionsService({
-      isMac: () => false,
-      isTrustedAccessibilityClient: vi.fn(),
+      macAccessibility: {
+        isAccessibilityTrusted: vi.fn(),
+        isSupported: () => false,
+      },
       openExternal,
     });
 

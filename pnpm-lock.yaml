@@ -60,6 +60,9 @@ importers:
       '@fluxnotes/editor':
         specifier: workspace:*
         version: link:../../packages/editor
+      '@fluxnotes/mac-native':
+        specifier: workspace:*
+        version: link:../../packages/mac-native
       '@fluxnotes/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -329,6 +332,19 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@24.12.2)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
+
+  packages/mac-native:
+    dependencies:
+      node-addon-api:
+        specifier: ^8.5.0
+        version: 8.8.0
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@25.5.0)(esbuild@0.27.5)(happy-dom@20.9.0)(jiti@2.6.1)(jsdom@29.1.1(@noble/hashes@1.8.0))(tsx@4.21.0)(typescript@5.9.3)(vite@8.0.16(@types/node@25.5.0)(esbuild@0.27.5)(jiti@2.6.1)(tsx@4.21.0))
 
   packages/shared:
     dependencies:
@@ -4611,6 +4627,10 @@ packages:
   node-abi@4.28.0:
     resolution: {integrity: sha512-Qfp5XZL1cJDOabOT8H5gnqMTmM4NjvYzHp4I/Kt/Sl76OVkOBBHRFlPspGV0hYvMoqQsypFjT/Yp7Km0beXW9g==}
     engines: {node: '>=22.12.0'}
+
+  node-addon-api@8.8.0:
+    resolution: {integrity: sha512-c5Ko1fZJIJmzhFIkhRN76WTq+fC6tWnGy9CXA0fA+XygsWZmEwG8vmbkNqxMyoaa0Tin4djul49NzdVcJJcjeA==}
+    engines: {node: ^18 || ^20 || >= 21}
 
   node-api-version@0.2.1:
     resolution: {integrity: sha512-2xP/IGGMmmSQpI1+O/k72jF/ykvZ89JeuKX3TLJAYPDVLUalrshrLHkeVcCCZqG/eEa635cr8IBYzgnDvM2O8Q==}
@@ -10346,6 +10366,8 @@ snapshots:
   node-abi@4.28.0:
     dependencies:
       semver: 7.8.0
+
+  node-addon-api@8.8.0: {}
 
   node-api-version@0.2.1:
     dependencies:

@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@fluxnotes/editor": "workspace:*",
+    "@fluxnotes/mac-native": "workspace:*",
     "@fluxnotes/shared": "workspace:*",
     "@fluxnotes/ui": "workspace:*",
     "@lingui/core": "6.0.1",

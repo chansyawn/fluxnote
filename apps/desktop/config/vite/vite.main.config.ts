@@ -9,6 +9,9 @@ export default defineConfig({
       fileName: () => "main.cjs",
       formats: ["cjs"],
     },
+    rollupOptions: {
+      external: ["@fluxnotes/mac-native"],
+    },
   },
   resolve: viteResolve,
 });

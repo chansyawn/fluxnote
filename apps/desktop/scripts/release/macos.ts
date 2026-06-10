@@ -175,6 +175,25 @@ function verifyMacArtifacts(): void {
   }
 
   for (const appPath of appPaths) {
+    const appContentsPath = path.join(appPath, "Contents");
+    const nativeAddonPaths = findFiles(appContentsPath, (filePath) => filePath.endsWith(".node"));
+    if (nativeAddonPaths.length === 0) {
+      throw new Error("No native addon files found in packaged macOS app.");
+    }
+    for (const nativeAddonPath of nativeAddonPaths) {
+      run("codesign", ["--verify", "--strict", "--verbose=2", nativeAddonPath]);
+    }
+
+    const macNativeDylibs = findFiles(
+      appContentsPath,
+      (filePath) => filePath.includes("mac-native") && filePath.endsWith(".dylib"),
+    );
+    if (macNativeDylibs.length > 0) {
+      throw new Error(
+        `Unexpected mac-native dynamic libraries found: ${macNativeDylibs.join(", ")}`,
+      );
+    }
+
     run("codesign", ["--verify", "--deep", "--strict", "--verbose=2", appPath]);
     run("spctl", ["--assess", "--type", "execute", "--verbose=4", appPath]);
     run("xcrun", ["stapler", "validate", appPath]);
