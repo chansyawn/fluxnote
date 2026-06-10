@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.34](https://github.com/chansyawn/fluxnotes/compare/v0.0.33...v0.0.34) (2026-06-10)
+
+
+### Features
+
+* enrich external edit metadata ([#104](https://github.com/chansyawn/fluxnotes/issues/104)) ([9a222be](https://github.com/chansyawn/fluxnotes/commit/9a222be42690edbe4039cead150388f7c180e8a2))
+* improve external edit workflow ([#102](https://github.com/chansyawn/fluxnotes/issues/102)) ([f6d9f6c](https://github.com/chansyawn/fluxnotes/commit/f6d9f6c353d0507d9eeed3e113f3c00b4f1b8ece))
+
 ## [0.0.33](https://github.com/chansyawn/fluxnotes/compare/v0.0.32...v0.0.33) (2026-06-10)
 
 
