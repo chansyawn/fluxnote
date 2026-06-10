@@ -5,12 +5,12 @@ import path from "node:path";
 import {
   createMacAccessibilityHelperCompileCommand,
   macAccessibilityHelperOutputName,
-  macAccessibilityHelperSource,
+  macAccessibilityHelperSources,
 } from "../native/macos-accessibility-helper.ts";
 
-function compileSwiftHelper(sourcePath: string, outputPath: string): Promise<void> {
+function compileSwiftHelper(sourcePaths: string[], outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const compiler = createMacAccessibilityHelperCompileCommand(sourcePath, outputPath);
+    const compiler = createMacAccessibilityHelperCompileCommand(sourcePaths, outputPath);
     const child = spawn(compiler.command, compiler.args, {
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -40,7 +40,7 @@ export async function copyNativeResources(buildPath: string): Promise<void> {
   const resourcesNativePath = path.resolve(buildPath, "..", "native");
   await mkdir(resourcesNativePath, { recursive: true });
   await compileSwiftHelper(
-    macAccessibilityHelperSource,
+    macAccessibilityHelperSources,
     path.join(resourcesNativePath, macAccessibilityHelperOutputName),
   );
 }

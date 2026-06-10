@@ -8,8 +8,9 @@ import { app } from "electron";
 
 import {
   createMacAccessibilityHelperCompileCommand,
+  isMacAccessibilityHelperOutputCurrent,
   macAccessibilityHelperOutputName,
-  macAccessibilityHelperSource,
+  macAccessibilityHelperSources,
 } from "../../../../../config/native/macos-accessibility-helper";
 
 export interface FocusedAppCapture {
@@ -81,8 +82,8 @@ function resolvePackagedHelperPath(): string {
   return path.join(process.resourcesPath, "native", macAccessibilityHelperOutputName);
 }
 
-function resolveDevelopmentSourcePath(): string {
-  return path.join(getAppRoot(), macAccessibilityHelperSource);
+function resolveDevelopmentSourcePaths(): string[] {
+  return macAccessibilityHelperSources.map((sourcePath) => path.join(getAppRoot(), sourcePath));
 }
 
 function resolveDevelopmentHelperPath(): string {
@@ -100,17 +101,20 @@ async function pathExists(filePath: string): Promise<boolean> {
 
 async function compileDevelopmentHelper(): Promise<string> {
   const outputPath = resolveDevelopmentHelperPath();
-  const sourcePath = resolveDevelopmentSourcePath();
+  const sourcePaths = resolveDevelopmentSourcePaths();
   if (await pathExists(outputPath)) {
-    const [sourceStats, outputStats] = await Promise.all([stat(sourcePath), stat(outputPath)]);
-    if (outputStats.mtimeMs >= sourceStats.mtimeMs) {
+    const [sourceStats, outputStats] = await Promise.all([
+      Promise.all(sourcePaths.map((sourcePath) => stat(sourcePath))),
+      stat(outputPath),
+    ]);
+    if (isMacAccessibilityHelperOutputCurrent(sourceStats, outputStats)) {
       return outputPath;
     }
   }
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await new Promise<void>((resolve, reject) => {
-    const compiler = createMacAccessibilityHelperCompileCommand(sourcePath, outputPath);
+    const compiler = createMacAccessibilityHelperCompileCommand(sourcePaths, outputPath);
     const child = spawn(compiler.command, compiler.args, {
       stdio: ["ignore", "pipe", "pipe"],
     });

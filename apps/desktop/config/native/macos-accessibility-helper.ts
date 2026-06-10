@@ -1,4 +1,15 @@
-export const macAccessibilityHelperSource = "src/native/macos-accessibility-helper/main.swift";
+import type { Stats } from "node:fs";
+
+export const macAccessibilityHelperSources = [
+  "src/native/macos-accessibility-helper/helper-errors.swift",
+  "src/native/macos-accessibility-helper/helper-protocol.swift",
+  "src/native/macos-accessibility-helper/ax-attributes.swift",
+  "src/native/macos-accessibility-helper/app-metadata.swift",
+  "src/native/macos-accessibility-helper/editable-element-lookup.swift",
+  "src/native/macos-accessibility-helper/accessibility-session.swift",
+  "src/native/macos-accessibility-helper/command-handler.swift",
+  "src/native/macos-accessibility-helper/main.swift",
+];
 export const macAccessibilityHelperOutputName = "macos-accessibility-helper";
 
 export interface MacAccessibilityHelperCompileCommand {
@@ -8,13 +19,13 @@ export interface MacAccessibilityHelperCompileCommand {
 }
 
 export function createMacAccessibilityHelperCompileCommand(
-  sourcePath: string,
+  sourcePaths: string[],
   outputPath: string,
 ): MacAccessibilityHelperCompileCommand {
   return {
     args: [
       "swiftc",
-      sourcePath,
+      ...sourcePaths,
       "-framework",
       "ApplicationServices",
       "-framework",
@@ -25,4 +36,12 @@ export function createMacAccessibilityHelperCompileCommand(
     command: "xcrun",
     label: "xcrun swiftc",
   };
+}
+
+export function isMacAccessibilityHelperOutputCurrent(
+  sourceStats: Pick<Stats, "mtimeMs">[],
+  outputStats: Pick<Stats, "mtimeMs">,
+): boolean {
+  const newestSourceMtime = Math.max(...sourceStats.map((sourceStat) => sourceStat.mtimeMs));
+  return outputStats.mtimeMs >= newestSourceMtime;
 }
