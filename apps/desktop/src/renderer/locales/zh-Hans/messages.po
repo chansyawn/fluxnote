@@ -727,63 +727,63 @@ msgid "workspace.external-edit.copy.tooltip"
 msgstr "复制"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:135
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:142
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:148
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:155
 msgid "workspace.external-edit.metadata.app"
 msgstr "应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:117
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:130
 msgid "workspace.external-edit.metadata.branch"
 msgstr "分支"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:124
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:137
 msgid "workspace.external-edit.metadata.cwd"
 msgstr "工作目录"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:128
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:141
 msgid "workspace.external-edit.metadata.file"
 msgstr "目标文件"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:111
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:124
 msgid "workspace.external-edit.metadata.repository"
 msgstr "仓库"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:102
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:115
 msgid "workspace.external-edit.metadata.source"
 msgstr "来源"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:58
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:71
 msgid "workspace.external-edit.metadata.source.browser"
 msgstr "浏览器"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:54
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:67
 msgid "workspace.external-edit.metadata.source.cli"
 msgstr "命令行"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:56
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:69
 msgid "workspace.external-edit.metadata.source.mac-accessibility"
 msgstr "Mac App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:147
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:160
 msgid "workspace.external-edit.metadata.title"
 msgstr "标题"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:75
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:88
 msgid "workspace.external-edit.metadata.unknown-application"
 msgstr "未知应用"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:153
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-metadata-card.tsx:166
 msgid "workspace.external-edit.metadata.url"
 msgstr "网址"
 

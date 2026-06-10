@@ -130,7 +130,6 @@ function createBrowserTrigger(
     appBundleId: captureResult.target.appBundleId,
     appIcon: captureResult.target.appIcon,
     appName: captureResult.target.appName,
-    faviconDataUrl: browser.faviconDataUrl,
     mode: captureResult.mode,
     processId: captureResult.target.processId,
     source: "browser",

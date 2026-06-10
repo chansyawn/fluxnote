@@ -3,7 +3,9 @@ import { GlobeIcon, LaptopIcon, SquareTerminalIcon } from "@fluxnotes/ui/icons/l
 import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
+import { fetchUrlFavicon } from "@renderer/clients";
 import type { ExternalEditTrigger } from "@shared/features/external-edit/models";
+import { useQuery } from "@tanstack/react-query";
 import type { ComponentProps, ReactNode } from "react";
 
 import { AdornmentBar } from "./adornment-bar";
@@ -29,6 +31,21 @@ function ImageIcon({ src }: { src: string }) {
   return <img alt="" aria-hidden="true" className="size-3 shrink-0 rounded-xs" src={src} />;
 }
 
+function BrowserFaviconIcon({ url }: { url: string | null }) {
+  const { data } = useQuery({
+    enabled: url !== null,
+    queryFn: () => fetchUrlFavicon(url ?? ""),
+    queryKey: ["url-favicon", url],
+    staleTime: Number.POSITIVE_INFINITY,
+  });
+
+  return data?.faviconDataUrl ? (
+    <ImageIcon src={data.faviconDataUrl} />
+  ) : (
+    <GlobeIcon aria-hidden="true" className="size-3 shrink-0" />
+  );
+}
+
 function ExternalEditSourceIcon({ trigger }: { trigger: ExternalEditTrigger }) {
   switch (trigger.source) {
     case "cli":
@@ -40,11 +57,7 @@ function ExternalEditSourceIcon({ trigger }: { trigger: ExternalEditTrigger }) {
         <LaptopIcon aria-hidden="true" className="size-3 shrink-0" />
       );
     case "browser":
-      return trigger.faviconDataUrl ? (
-        <ImageIcon src={trigger.faviconDataUrl} />
-      ) : (
-        <GlobeIcon aria-hidden="true" className="size-3 shrink-0" />
-      );
+      return <BrowserFaviconIcon url={trigger.url} />;
   }
 }
 

@@ -28,7 +28,6 @@ export const browserExternalEditTriggerSchema = z.object({
   appBundleId: z.string().min(1).nullable(),
   appIcon: z.string().min(1).nullable(),
   appName: z.string().min(1).nullable(),
-  faviconDataUrl: z.string().min(1).nullable(),
   mode: z.enum(["copy_only", "write_back"]),
   processId: z.number().int().nonnegative(),
   source: z.literal("browser"),

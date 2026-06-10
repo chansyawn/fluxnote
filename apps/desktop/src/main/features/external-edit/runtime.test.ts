@@ -427,7 +427,6 @@ describe("external edit runtime", () => {
   it("builds a browser trigger when the focused app is a known browser", async () => {
     const ctx = await createRuntime({
       resolveBrowserMetadata: async () => ({
-        faviconDataUrl: "data:image/png;base64,FAVICON",
         title: "Example Page",
         url: "https://example.com/page",
       }),
@@ -439,7 +438,6 @@ describe("external edit runtime", () => {
         appBundleId: "com.example.App",
         appIcon: null,
         appName: "Example",
-        faviconDataUrl: "data:image/png;base64,FAVICON",
         mode: "write_back",
         processId: 123,
         source: "browser",

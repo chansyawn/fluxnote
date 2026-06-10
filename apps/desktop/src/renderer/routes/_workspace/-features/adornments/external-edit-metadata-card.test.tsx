@@ -1,8 +1,16 @@
 // @vitest-environment jsdom
 
 import { renderWithProviders } from "@renderer/test/render";
-import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vite-plus/test";
+import { screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vite-plus/test";
+
+const clientMocks = vi.hoisted(() => ({
+  fetchUrlFavicon: vi.fn(),
+}));
+
+vi.mock("@renderer/clients", () => ({
+  fetchUrlFavicon: clientMocks.fetchUrlFavicon,
+}));
 
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
 
@@ -78,14 +86,17 @@ describe("ExternalEditMetadataCard", () => {
     expect(screen.getByText("note.md")).toBeVisible();
   });
 
-  it("shows the page title and favicon for browser edits", () => {
+  it("shows the page title and lazily fetches the favicon for browser edits", async () => {
+    clientMocks.fetchUrlFavicon.mockResolvedValue({
+      faviconDataUrl: "data:image/png;base64,FAVICON",
+    });
+
     const { container } = renderWithProviders(
       <ExternalEditMetadataCard
         trigger={{
           appBundleId: "com.google.Chrome",
           appIcon: null,
           appName: "Google Chrome",
-          faviconDataUrl: "data:image/png;base64,FAVICON",
           mode: "write_back",
           processId: 321,
           source: "browser",
@@ -96,6 +107,12 @@ describe("ExternalEditMetadataCard", () => {
     );
 
     expect(screen.getByText("Example Page")).toBeVisible();
-    expect(container.querySelector("img")).toHaveAttribute("src", "data:image/png;base64,FAVICON");
+    await waitFor(() =>
+      expect(container.querySelector("img")).toHaveAttribute(
+        "src",
+        "data:image/png;base64,FAVICON",
+      ),
+    );
+    expect(clientMocks.fetchUrlFavicon).toHaveBeenCalledWith("https://example.com/page");
   });
 });
