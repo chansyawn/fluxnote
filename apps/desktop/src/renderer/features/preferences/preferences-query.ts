@@ -11,6 +11,7 @@ import {
   type AppUpdatePreferences,
   type AutoArchivePreferences,
   type FontSize,
+  type ExternalEditPreferences,
   type LocaleCode,
   type MarkdownCodeBlockPreferences,
   type UserPreferences,
@@ -225,5 +226,21 @@ export function useAppUpdatePreference() {
   return {
     appUpdate: preferences.appUpdate,
     patchAppUpdate,
+  };
+}
+
+export function useExternalEditPreference() {
+  const preferences = useUserPreferencesValue();
+  const mutation = usePatchUserPreferencesMutation();
+  const patchExternalEdit = useCallback(
+    (patch: Partial<ExternalEditPreferences>) => {
+      mutation.mutate({ externalEdit: patch });
+    },
+    [mutation],
+  );
+
+  return {
+    externalEdit: preferences.externalEdit,
+    patchExternalEdit,
   };
 }

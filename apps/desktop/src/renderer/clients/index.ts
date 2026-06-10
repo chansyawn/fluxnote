@@ -55,7 +55,6 @@ export {
   hideWindow,
   onWindowCloseRequested,
   onWindowFocusChanged,
-  quickCreateBlockAndShowWindow,
   restartApp,
   toggleMainWindowVisibility,
 } from "./window";

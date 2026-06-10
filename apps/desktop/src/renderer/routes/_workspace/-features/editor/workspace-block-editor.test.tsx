@@ -84,7 +84,6 @@ const mocks = vi.hoisted(() => ({
     "editor.link": "Mod+Shift+L",
     "editor.strikethrough": "Mod+Shift+X",
     "workspace.keepBlock": "Mod+K",
-    "global.quickCreateBlock": "Ctrl+Alt+N",
     "workspace.togglePinBlock": "Mod+T",
     "workspace.submitExternalEdit": "Mod+Enter",
     "global.toggleWindow": "Alt+N",

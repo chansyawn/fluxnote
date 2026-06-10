@@ -1,3 +1,4 @@
+import { DEFAULT_USER_PREFERENCES } from "@shared/features/preferences/user-preferences";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { registerExternalEditCommands } from "./command";
@@ -10,20 +11,32 @@ describe("external-edit command", () => {
     ),
   };
   const runtime = {
-    cancel: vi.fn(async () => undefined),
-    capture: vi.fn(async () => ({ editId: "capture-1" })),
-    listSessions: vi.fn(() => [{ editId: "e1" }]),
-    submit: vi.fn(async () => ({ id: "b1" })),
+    cancel: vi.fn(),
+    capture: vi.fn(),
+    listSessions: vi.fn(),
+    submit: vi.fn(),
+  };
+  const deps = {
+    hideMainWindow: vi.fn(),
+    readUserPreferences: vi.fn(),
+    runtime,
   };
 
   beforeEach(() => {
     handlers.clear();
     ipc.command.mockClear();
-    Object.values(runtime).forEach((fn) => fn.mockClear());
+    Object.values(runtime).forEach((fn) => fn.mockReset());
+    deps.hideMainWindow.mockReset();
+    deps.readUserPreferences.mockReset();
+    runtime.cancel.mockResolvedValue(undefined);
+    runtime.capture.mockResolvedValue({ editId: "capture-1" });
+    runtime.listSessions.mockReturnValue([{ editId: "e1" }]);
+    runtime.submit.mockResolvedValue({ id: "b1" });
+    deps.readUserPreferences.mockReturnValue(DEFAULT_USER_PREFERENCES);
   });
 
-  it("dispatches capture/cancel/list/submit commands", async () => {
-    registerExternalEditCommands(ipc as never, { runtime } as never);
+  it("dispatches commands and hides after a successful submit by default", async () => {
+    registerExternalEditCommands(ipc as never, deps as never);
 
     const captureResult = await handlers.get("external-edit.capture")?.(undefined);
     const cancelResult = await handlers.get("external-edit.cancel")?.({ editId: "e1" });
@@ -33,13 +46,54 @@ describe("external-edit command", () => {
       content: "after",
     });
 
-    expect(runtime.capture).toHaveBeenCalledTimes(1);
+    expect(runtime.capture).toHaveBeenCalledOnce();
     expect(runtime.cancel).toHaveBeenCalledWith("e1");
-    expect(runtime.listSessions).toHaveBeenCalledTimes(1);
+    expect(runtime.listSessions).toHaveBeenCalledOnce();
     expect(runtime.submit).toHaveBeenCalledWith("e1", "after");
+    expect(deps.hideMainWindow).toHaveBeenCalledOnce();
     expect(captureResult).toEqual({ editId: "capture-1" });
     expect(cancelResult).toBeUndefined();
     expect(listResult).toEqual([{ editId: "e1" }]);
     expect(submitResult).toEqual({ id: "b1" });
+  });
+
+  it("keeps the window visible when hiding after submit is disabled", async () => {
+    deps.readUserPreferences.mockReturnValue({
+      ...DEFAULT_USER_PREFERENCES,
+      externalEdit: { hideAfterSubmit: false },
+    });
+    registerExternalEditCommands(ipc as never, deps as never);
+
+    await handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" });
+
+    expect(deps.hideMainWindow).not.toHaveBeenCalled();
+  });
+
+  it("does not hide after a failed submit", async () => {
+    runtime.submit.mockRejectedValue(new Error("submit failed"));
+    registerExternalEditCommands(ipc as never, deps as never);
+
+    await expect(
+      handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" }),
+    ).rejects.toThrow("submit failed");
+
+    expect(deps.hideMainWindow).not.toHaveBeenCalled();
+  });
+
+  it("keeps a successful submit successful when hiding fails", async () => {
+    const error = new Error("hide failed");
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    deps.hideMainWindow.mockRejectedValue(error);
+    registerExternalEditCommands(ipc as never, deps as never);
+
+    await expect(
+      handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" }),
+    ).resolves.toEqual({ id: "b1" });
+
+    expect(consoleError).toHaveBeenCalledWith(
+      "Failed to hide Fluxnotes after external edit submit",
+      error,
+    );
+    consoleError.mockRestore();
   });
 });

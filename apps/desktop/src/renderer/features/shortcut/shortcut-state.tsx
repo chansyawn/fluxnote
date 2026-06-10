@@ -2,7 +2,6 @@ import type { Hotkey } from "@fluxnotes/shared";
 import { toast } from "@fluxnotes/ui/components/sonner";
 import { useLingui } from "@lingui/react";
 import {
-  quickCreateBlockAndShowWindow,
   requestSystemPermission,
   captureExternalEdit,
   toAppInvokeError,
@@ -46,9 +45,6 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
   const handleToggleWindow = useEffectEvent(() => {
     void toggleMainWindowVisibility();
   });
-  const handleQuickCreateBlock = useEffectEvent(() => {
-    void quickCreateBlockAndShowWindow();
-  });
   const handleExternalEdit = useEffectEvent(() => {
     void captureExternalEdit().catch((error: unknown) => {
       const invokeError = toAppInvokeError(error);
@@ -85,10 +81,6 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
     shortcut: shortcuts["global.toggleWindow"],
     onPressed: handleToggleWindow,
   });
-  const quickCreateBlockShortcutError = useGlobalShortcutSync({
-    shortcut: shortcuts["global.quickCreateBlock"],
-    onPressed: handleQuickCreateBlock,
-  });
   const externalEditShortcutError = useGlobalShortcutSync({
     shortcut: shortcuts["global.externalEdit"],
     onPressed: handleExternalEdit,
@@ -100,7 +92,6 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       globalShortcutErrors: {
         "global.externalEdit": externalEditShortcutError,
         "global.toggleWindow": toggleWindowShortcutError,
-        "global.quickCreateBlock": quickCreateBlockShortcutError,
       },
       clearShortcut: (action) => {
         clearShortcut(action);
@@ -127,11 +118,9 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
       },
     }),
     [
-      quickCreateBlockShortcutError,
       clearShortcut,
       externalEditShortcutError,
       handleExternalEdit,
-      handleQuickCreateBlock,
       i18n,
       resetShortcut,
       setShortcut,

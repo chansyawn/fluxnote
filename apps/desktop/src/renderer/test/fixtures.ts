@@ -65,6 +65,10 @@ export function createRendererUserPreferences(patch: UserPreferencesPatch = {}):
       ...DEFAULT_USER_PREFERENCES.appUpdate,
       ...patch.appUpdate,
     },
+    externalEdit: {
+      ...DEFAULT_USER_PREFERENCES.externalEdit,
+      ...patch.externalEdit,
+    },
   };
 }
 

@@ -59,6 +59,10 @@ function mergeUserPreferences(
         ...current.appUpdate,
         ...patch.appUpdate,
       },
+      externalEdit: {
+        ...current.externalEdit,
+        ...patch.externalEdit,
+      },
     },
     defaults,
   );

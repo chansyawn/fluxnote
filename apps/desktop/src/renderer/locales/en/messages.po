@@ -142,38 +142,38 @@ msgid "preferences.about.title"
 msgstr "About"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:329
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:205
 msgid "preferences.accessibility.allow"
 msgstr "Allow"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:336
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:212
 msgid "preferences.accessibility.description"
 msgstr "Allow Fluxnotes to read and update the focused text field in other Mac apps for External edit."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:342
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:218
 msgid "preferences.accessibility.label"
 msgstr "Accessibility"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:327
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:203
 msgid "preferences.accessibility.open-settings"
 msgstr "Open Settings"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:67
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:38
 msgid "preferences.accessibility.status.macos-only"
 msgstr "macOS only"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:64
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:72
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:35
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:43
 msgid "preferences.accessibility.status.permission-needed"
 msgstr "Permission needed"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:70
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:41
 msgid "preferences.accessibility.status.ready"
 msgstr "Ready"
 
@@ -219,7 +219,7 @@ msgid "preferences.app-version.label"
 msgstr "Version"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:190
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:71
 msgid "preferences.app.title"
 msgstr "App"
 
@@ -320,27 +320,43 @@ msgid "preferences.auto-archive.unit.minutes"
 msgstr "minutes"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:296
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:172
 msgid "preferences.cli.install"
 msgstr "Install"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:301
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:177
 msgid "preferences.cli.path.description"
 msgstr "Install the Flux CLI for terminal workflows. After installation, run `flux --help` to view available commands and usage."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:307
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:183
 msgid "preferences.cli.path.label"
 msgstr "Flux CLI"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:292
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:168
 msgid "preferences.cli.uninstall"
 msgstr "Uninstall"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:281
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:148
+msgid "preferences.external-edit.hide-after-submit.description"
+msgstr "Hide the Fluxnotes window after an External edit is submitted successfully."
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:137
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:154
+msgid "preferences.external-edit.hide-after-submit.label"
+msgstr "Hide Fluxnotes after submit"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/external-edit-preferences-section.tsx:132
+msgid "preferences.external-edit.title"
+msgstr "External edit"
+
+#. js-lingui-explicit-id
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:162
 msgid "preferences.font-size.label"
 msgstr "Font size"
 
@@ -360,7 +376,7 @@ msgid "preferences.github.repository.open"
 msgstr "Repository"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:248
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:129
 msgid "preferences.language.label"
 msgstr "Language"
 
@@ -375,12 +391,12 @@ msgid "preferences.markdown.title"
 msgstr "Markdown"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:109
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:98
 msgid "preferences.shortcuts.archiveBlock.label"
 msgstr "Archive/restore block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:122
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:111
 msgid "preferences.shortcuts.cancelExternalEdit.label"
 msgstr "Cancel external edit"
 
@@ -391,17 +407,17 @@ msgid "preferences.shortcuts.clear"
 msgstr "Clear shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:89
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:78
 msgid "preferences.shortcuts.copyBlock.label"
 msgstr "Copy block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:84
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:73
 msgid "preferences.shortcuts.createBlock.label"
 msgstr "Create block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:93
 msgid "preferences.shortcuts.deleteBlock.label"
 msgstr "Delete block"
 
@@ -427,44 +443,34 @@ msgid "preferences.shortcuts.error.unavailable"
 msgstr "This global shortcut is unavailable. Another app may already be using it."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:70
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:59
 msgid "preferences.shortcuts.externalEdit.description"
 msgstr "Start an External edit session from the active Mac App."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:57
 msgid "preferences.shortcuts.externalEdit.label"
 msgstr "External edit Mac App"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:174
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:162
 msgid "preferences.shortcuts.group.editor"
 msgstr "Editor"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:48
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:47
 msgid "preferences.shortcuts.group.global"
 msgstr "Global"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:79
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:68
 msgid "preferences.shortcuts.group.workspace"
 msgstr "Workspace"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:94
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:83
 msgid "preferences.shortcuts.keepBlock.label"
 msgstr "Keep block"
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:60
-msgid "preferences.shortcuts.quickCreateBlock.description"
-msgstr "Quickly create a new block and bring the window forward for fast capture."
-
-#. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:58
-msgid "preferences.shortcuts.quickCreateBlock.label"
-msgstr "Quick create block"
 
 #. js-lingui-explicit-id
 #: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-recording-popover.tsx:69
@@ -483,22 +489,22 @@ msgid "preferences.shortcuts.reset"
 msgstr "Reset shortcut"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:115
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:104
 msgid "preferences.shortcuts.submitExternalEdit.label"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:188
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:176
 msgid "preferences.shortcuts.title"
 msgstr "Shortcuts"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:99
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:88
 msgid "preferences.shortcuts.togglePinBlock.label"
 msgstr "Pin/unpin block"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:53
+#: src/renderer/routes/preferences/-features/shortcut-preferences/shortcut-preferences-section.tsx:52
 msgid "preferences.shortcuts.toggleWindow.label"
 msgstr "Toggle window"
 
@@ -514,37 +520,37 @@ msgid "preferences.telemetry.label"
 msgstr "Telemetry"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:113
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:65
 msgid "preferences.theme.dark"
 msgstr "Dark"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:220
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:101
 msgid "preferences.theme.label"
 msgstr "Theme"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:108
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:60
 msgid "preferences.theme.light"
 msgstr "Light"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:103
+#: src/renderer/routes/preferences/-features/app-preferences-section.tsx:55
 msgid "preferences.theme.system"
 msgstr "System"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/preferences/index.tsx:18
+#: src/renderer/routes/preferences/index.tsx:19
 msgid "preferences.title"
 msgstr "Preferences"
 
 #. js-lingui-explicit-id
-#: src/renderer/features/shortcut/shortcut-state.tsx:57
+#: src/renderer/features/shortcut/shortcut-state.tsx:53
 msgid "shortcut.external-edit.accessibility-permission-required"
 msgstr "Accessibility permission is required."
 
 #. js-lingui-explicit-id
-#: src/renderer/features/shortcut/shortcut-state.tsx:63
+#: src/renderer/features/shortcut/shortcut-state.tsx:59
 msgid "shortcut.external-edit.accessibility-permission.allow"
 msgstr "Allow"
 
