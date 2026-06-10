@@ -15,14 +15,22 @@
   },
   "scripts": {
     "build:native": "node scripts/build-native.mjs",
+    "dev": "vp dev --host 127.0.0.1 --open",
     "install": "node scripts/build-native.mjs",
     "test": "vp test",
     "check": "vp check"
   },
   "dependencies": {
-    "node-addon-api": "^8.5.0"
+    "node-addon-api": "^8.5.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }
