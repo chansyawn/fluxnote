@@ -19,6 +19,7 @@ export type MacAccessibilityCopyOnlyReason =
 
 export interface MacAccessibilityTargetMetadata {
   appBundleId: string | null;
+  appIcon: string | null;
   appName: string | null;
   elementRole: string | null;
   processId: number;

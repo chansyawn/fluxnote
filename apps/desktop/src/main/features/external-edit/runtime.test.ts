@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
 import { createTestDb } from "../test-db";
+import type { resolveBrowserMetadata } from "./browser-metadata";
 import { createExternalEditRuntime } from "./runtime";
 
 const paths = {
@@ -14,6 +15,7 @@ const paths = {
 
 const cliTrigger = {
   cwd: "/workspace",
+  git: null,
   requestedFilePath: "block.md",
   source: "cli" as const,
   targetFilePath: "/workspace/block.md",
@@ -22,6 +24,7 @@ const cliTrigger = {
 function createFocusedAppTrigger() {
   return {
     appBundleId: "com.example.App",
+    appIcon: null,
     appName: "Example",
     elementRole: "AXTextArea",
     mode: "write_back" as const,
@@ -39,6 +42,7 @@ async function createRuntime(overrides?: {
   capture?: MacAccessibilityNative["capture"];
   isAccessibilityTrusted?: (prompt: boolean) => boolean;
   isSupported?: () => boolean;
+  resolveBrowserMetadata?: typeof resolveBrowserMetadata;
   writeBack?: (sessionId: string, content: string) => Promise<void>;
 }) {
   const ctx = await createTestDb();
@@ -52,6 +56,7 @@ async function createRuntime(overrides?: {
           sessionId: "native-session-1",
           target: {
             appBundleId: "com.example.App",
+            appIcon: null,
             appName: "Example",
             elementRole: "AXTextArea",
             processId: 123,
@@ -68,6 +73,7 @@ async function createRuntime(overrides?: {
     emitEvent: vi.fn(() => true),
     macAccessibility,
     openBlockService: { requestOpen: vi.fn() },
+    resolveBrowserMetadata: vi.fn(overrides?.resolveBrowserMetadata ?? (async () => null)),
     telemetryService: { captureEvent: vi.fn() },
   };
   const runtime = createExternalEditRuntime({
@@ -77,6 +83,7 @@ async function createRuntime(overrides?: {
     macAccessibility: deps.macAccessibility,
     openBlockService: deps.openBlockService as never,
     paths,
+    resolveBrowserMetadata: deps.resolveBrowserMetadata,
     telemetryService: deps.telemetryService,
   });
 
@@ -297,6 +304,7 @@ describe("external edit runtime", () => {
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
+            appIcon: null,
             appName: "Example",
             elementRole: null,
             processId: 123,
@@ -311,6 +319,7 @@ describe("external edit runtime", () => {
         blockId: expect.any(String),
         trigger: {
           appBundleId: "com.example.App",
+          appIcon: null,
           appName: "Example",
           elementRole: null,
           mode: "copy_only",
@@ -338,6 +347,7 @@ describe("external edit runtime", () => {
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
+            appIcon: null,
             appName: "Example",
             elementRole: null,
             processId: 123,
@@ -371,6 +381,7 @@ describe("external edit runtime", () => {
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
+            appIcon: null,
             appName: "Example",
             elementRole: null,
             processId: 123,
@@ -408,6 +419,66 @@ describe("external edit runtime", () => {
         code: "BUSINESS.ACCESSIBILITY_PERMISSION_REQUIRED",
       });
       expect(ctx.runtime.listSessions()).toHaveLength(0);
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("builds a browser trigger when the focused app is a known browser", async () => {
+    const ctx = await createRuntime({
+      resolveBrowserMetadata: async () => ({
+        faviconDataUrl: "data:image/png;base64,FAVICON",
+        title: "Example Page",
+        url: "https://example.com/page",
+      }),
+    });
+    try {
+      const session = await ctx.runtime.capture();
+
+      expect(session.trigger).toEqual({
+        appBundleId: "com.example.App",
+        appIcon: null,
+        appName: "Example",
+        faviconDataUrl: "data:image/png;base64,FAVICON",
+        mode: "write_back",
+        processId: 123,
+        source: "browser",
+        title: "Example Page",
+        url: "https://example.com/page",
+      });
+
+      await ctx.runtime.submit(session.editId, "updated");
+
+      expect(ctx.deps.macAccessibility.writeBack).toHaveBeenCalledWith(
+        "native-session-1",
+        "updated",
+      );
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("falls back to a focused app trigger when browser metadata is unavailable", async () => {
+    const ctx = await createRuntime({ resolveBrowserMetadata: async () => null });
+    try {
+      const session = await ctx.runtime.capture();
+
+      expect(session.trigger).toEqual(createFocusedAppTrigger());
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("falls back to a focused app trigger when browser metadata resolution throws", async () => {
+    const ctx = await createRuntime({
+      resolveBrowserMetadata: async () => {
+        throw new Error("osascript failed");
+      },
+    });
+    try {
+      const session = await ctx.runtime.capture();
+
+      expect(session.trigger).toEqual(createFocusedAppTrigger());
     } finally {
       await ctx.close();
     }

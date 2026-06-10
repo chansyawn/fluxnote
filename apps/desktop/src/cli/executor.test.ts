@@ -20,6 +20,7 @@ function createDeps() {
     cwd: vi.fn(() => "/workspace"),
     dispatchCommand: vi.fn(),
     readFile: vi.fn(),
+    resolveGitInfo: vi.fn<typeof import("./git-info").resolveGitInfo>(async () => null),
     stat: vi.fn(async () => createFileStat(true)),
     writeFile: vi.fn(),
   };
@@ -153,21 +154,38 @@ describe("executor", () => {
   it("writes updated content on external edit submit", async () => {
     const deps = createDeps();
     deps.readFile.mockResolvedValue("original");
+    deps.resolveGitInfo.mockResolvedValue({ branch: "main", root: "/workspace" });
     deps.dispatchCommand.mockResolvedValue({ status: "submitted", content: "updated" });
 
     await executeExternalEdit("block.md", ["work"], deps);
 
+    expect(deps.resolveGitInfo).toHaveBeenCalledWith("/workspace");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
       content: "original",
       tagNames: ["work"],
       trigger: {
         cwd: "/workspace",
+        git: { branch: "main", root: "/workspace" },
         requestedFilePath: "block.md",
         source: "cli",
         targetFilePath: "/workspace/block.md",
       },
     });
     expect(deps.writeFile).toHaveBeenCalledWith("/workspace/block.md", "updated", "utf8");
+  });
+
+  it("records null git info outside a repository", async () => {
+    const deps = createDeps();
+    deps.readFile.mockResolvedValue("original");
+    deps.resolveGitInfo.mockResolvedValue(null);
+    deps.dispatchCommand.mockResolvedValue({ status: "cancelled" });
+
+    await executeExternalEdit("block.md", [], deps);
+
+    expect(deps.dispatchCommand).toHaveBeenCalledWith(
+      "block.create-external-edit",
+      expect.objectContaining({ trigger: expect.objectContaining({ git: null }) }),
+    );
   });
 
   it("does not write file when external edit is canceled", async () => {

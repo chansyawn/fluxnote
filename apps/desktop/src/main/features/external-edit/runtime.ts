@@ -11,6 +11,7 @@ import type { EventBus } from "@main/core/ipc";
 import type { OpenBlockService } from "@main/features/open-block";
 import type { TelemetryService } from "@main/features/telemetry";
 import type {
+  BrowserExternalEditTrigger,
   CliExternalEditTrigger,
   ExternalEditResult,
   ExternalEditSession,
@@ -23,6 +24,7 @@ import { clipboard } from "electron";
 
 import { externalizeMarkdownAssetUrls } from "../assets/service";
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
+import { resolveBrowserMetadata, type BrowserMetadata } from "./browser-metadata";
 
 interface PendingExternalEdit {
   claimed: boolean;
@@ -60,6 +62,7 @@ interface ExternalEditRuntimeDeps {
   macAccessibility: MacAccessibilityNative;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
+  resolveBrowserMetadata: typeof resolveBrowserMetadata;
   telemetryService: Pick<TelemetryService, "captureEvent">;
 }
 
@@ -110,11 +113,29 @@ function createFocusedAppTrigger(
 ): FocusedAppExternalEditTrigger {
   return {
     appBundleId: captureResult.target.appBundleId,
+    appIcon: captureResult.target.appIcon,
     appName: captureResult.target.appName,
     elementRole: captureResult.target.elementRole,
     mode: captureResult.mode,
     processId: captureResult.target.processId,
     source: "focused_app",
+  };
+}
+
+function createBrowserTrigger(
+  captureResult: MacAccessibilityCaptureResult,
+  browser: BrowserMetadata,
+): BrowserExternalEditTrigger {
+  return {
+    appBundleId: captureResult.target.appBundleId,
+    appIcon: captureResult.target.appIcon,
+    appName: captureResult.target.appName,
+    faviconDataUrl: browser.faviconDataUrl,
+    mode: captureResult.mode,
+    processId: captureResult.target.processId,
+    source: "browser",
+    title: browser.title,
+    url: browser.url,
   };
 }
 
@@ -237,6 +258,15 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     }
   }
 
+  async function buildFocusedTrigger(
+    captureResult: MacAccessibilityCaptureResult,
+  ): Promise<FocusedAppExternalEditTrigger | BrowserExternalEditTrigger> {
+    const browser = await deps.resolveBrowserMetadata(captureResult.target).catch(() => null);
+    return browser
+      ? createBrowserTrigger(captureResult, browser)
+      : createFocusedAppTrigger(captureResult);
+  }
+
   async function capture(): Promise<ExternalEditSession> {
     if (!deps.macAccessibility.isSupported()) {
       throw businessError(
@@ -259,7 +289,7 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       toBusinessInvalidOperation(error);
     }
 
-    const trigger = createFocusedAppTrigger(captureResult);
+    const trigger = await buildFocusedTrigger(captureResult);
     const blockId = await createExternalEditBlock(captureResult.content);
     if (captureResult.mode === "copy_only") {
       return begin(blockId, trigger, {
@@ -357,11 +387,12 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
 }
 
 export function createDefaultExternalEditRuntime(
-  deps: Omit<ExternalEditRuntimeDeps, "clipboard" | "macAccessibility">,
+  deps: Omit<ExternalEditRuntimeDeps, "clipboard" | "macAccessibility" | "resolveBrowserMetadata">,
 ): ExternalEditRuntime {
   return createExternalEditRuntime({
     ...deps,
     clipboard,
     macAccessibility: createMacAccessibilityNative(),
+    resolveBrowserMetadata,
   });
 }
