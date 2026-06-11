@@ -78,14 +78,15 @@ export function createExternalEditSession(
   return {
     blockId: "block-1",
     createdAt: FIXTURE_TIMESTAMP,
-    editId: "edit-1",
-    trigger: {
+    id: "edit-1",
+    origin: {
       cwd: "/tmp",
       git: null,
+      kind: "cli",
       requestedFilePath: "/tmp/requested.md",
-      source: "cli",
       targetFilePath: "/tmp/target.md",
     },
+    submission: { transport: "direct" },
     ...overrides,
   };
 }
@@ -94,15 +95,17 @@ export function createCopyOnlyExternalEditSession(
   overrides: Partial<ExternalEditSession> = {},
 ): ExternalEditSession {
   return createExternalEditSession({
-    trigger: {
-      appBundleId: null,
-      appIcon: null,
-      appName: null,
+    origin: {
+      app: {
+        bundleId: null,
+        icon: null,
+        name: null,
+        processId: 0,
+      },
       elementRole: null,
-      mode: "copy_only",
-      processId: 0,
-      source: "focused_app",
+      kind: "macApp",
     },
+    submission: { transport: "clipboard" },
     ...overrides,
   });
 }

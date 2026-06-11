@@ -9,7 +9,7 @@ export type WorkspacePendingBlockOps = Record<BlockMutationOperation, Set<string
 export interface WorkspaceCommands {
   archiveBlock: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
-  cancelExternalEdit: (editId: string) => Promise<void>;
+  cancelExternalEdit: (id: string) => Promise<void>;
   createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
   deleteBlock: (blockId: string) => Promise<void>;
@@ -19,11 +19,7 @@ export interface WorkspaceCommands {
   restoreBlock: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
-  submitExternalEdit: (
-    blockId: string,
-    editId: string,
-    session?: ExternalEditSession,
-  ) => Promise<void>;
+  submitExternalEdit: (blockId: string, id: string, session?: ExternalEditSession) => Promise<void>;
 }
 
 export interface WorkspaceBlockState {
@@ -115,7 +111,7 @@ export function useWorkspaceBlockState(blockId: string): WorkspaceBlockState {
   return useMemo(() => {
     const externalEditSession = runtime.sessionsByBlockId.get(blockId);
     const isExternalEditPending = externalEditSession
-      ? runtime.pendingExternalEditIds.has(externalEditSession.editId)
+      ? runtime.pendingExternalEditIds.has(externalEditSession.id)
       : false;
     const isArchivePending =
       runtime.pendingBlockOps[view.visibility === "active" ? "archive" : "restore"].has(blockId);

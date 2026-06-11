@@ -23,53 +23,53 @@ Napi::Value IsAccessibilityTrusted(const Napi::CallbackInfo& info) {
   return Napi::Boolean::New(env, [Bridge() isAccessibilityTrusted:prompt]);
 }
 
-Napi::Value CaptureJson(const Napi::CallbackInfo& info) {
+Napi::Value CaptureTextJson(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
-  return ToNapiString(env, [Bridge() captureJson]);
+  return ToNapiString(env, [Bridge() captureTextJson]);
 }
 
-Napi::Value WriteBackJson(const Napi::CallbackInfo& info) {
+Napi::Value ReplaceTextJson(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   if (info.Length() < 2 || !info[0].IsString() || !info[1].IsString()) {
-    Napi::TypeError::New(env, "writeBackJson expects sessionId and content strings.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "replaceTextJson expects textRef and text strings.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
-  std::string sessionId = info[0].As<Napi::String>().Utf8Value();
-  std::string content = info[1].As<Napi::String>().Utf8Value();
-  NSString* nativeSessionId = [NSString stringWithUTF8String:sessionId.c_str()];
-  NSString* nativeContent = [NSString stringWithUTF8String:content.c_str()];
-  return ToNapiString(env, [Bridge() writeBackJson:nativeSessionId content:nativeContent]);
+  std::string textRef = info[0].As<Napi::String>().Utf8Value();
+  std::string text = info[1].As<Napi::String>().Utf8Value();
+  NSString* nativeTextRef = [NSString stringWithUTF8String:textRef.c_str()];
+  NSString* nativeText = [NSString stringWithUTF8String:text.c_str()];
+  return ToNapiString(env, [Bridge() replaceTextJson:nativeTextRef text:nativeText]);
 }
 
-Napi::Value CloseSessionJson(const Napi::CallbackInfo& info) {
+Napi::Value ReleaseTextJson(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   if (info.Length() < 1 || !info[0].IsString()) {
-    Napi::TypeError::New(env, "closeSessionJson expects a sessionId string.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "releaseTextJson expects a textRef string.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
-  std::string sessionId = info[0].As<Napi::String>().Utf8Value();
-  NSString* nativeSessionId = [NSString stringWithUTF8String:sessionId.c_str()];
-  return ToNapiString(env, [Bridge() closeSessionJson:nativeSessionId]);
+  std::string textRef = info[0].As<Napi::String>().Utf8Value();
+  NSString* nativeTextRef = [NSString stringWithUTF8String:textRef.c_str()];
+  return ToNapiString(env, [Bridge() releaseTextJson:nativeTextRef]);
 }
 
-Napi::Value ActivateJson(const Napi::CallbackInfo& info) {
+Napi::Value ActivateApplicationJson(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
   if (info.Length() < 1 || !info[0].IsNumber()) {
-    Napi::TypeError::New(env, "activateJson expects a process id number.").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "activateApplicationJson expects a process id number.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
 
-  return ToNapiString(env, [Bridge() activateJson:info[0].As<Napi::Number>().Int32Value()]);
+  return ToNapiString(env, [Bridge() activateApplicationJson:info[0].As<Napi::Number>().Int32Value()]);
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set("isAccessibilityTrusted", Napi::Function::New(env, IsAccessibilityTrusted));
-  exports.Set("captureJson", Napi::Function::New(env, CaptureJson));
-  exports.Set("writeBackJson", Napi::Function::New(env, WriteBackJson));
-  exports.Set("closeSessionJson", Napi::Function::New(env, CloseSessionJson));
-  exports.Set("activateJson", Napi::Function::New(env, ActivateJson));
+  exports.Set("captureTextJson", Napi::Function::New(env, CaptureTextJson));
+  exports.Set("replaceTextJson", Napi::Function::New(env, ReplaceTextJson));
+  exports.Set("releaseTextJson", Napi::Function::New(env, ReleaseTextJson));
+  exports.Set("activateApplicationJson", Napi::Function::New(env, ActivateApplicationJson));
   return exports;
 }
 

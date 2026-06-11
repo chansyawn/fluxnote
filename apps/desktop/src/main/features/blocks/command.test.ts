@@ -71,14 +71,15 @@ describe("blocks command", () => {
         {
           blockId: "b1",
           createdAt: "2026-01-01T00:00:00.000Z",
-          editId: "edit-1",
-          trigger: {
+          id: "edit-1",
+          origin: {
             cwd: "/tmp",
             git: null,
             requestedFilePath: "/tmp/requested.md",
-            source: "cli" as const,
+            kind: "cli" as const,
             targetFilePath: "/tmp/target.md",
           },
+          submission: { transport: "direct" as const },
         },
       ],
     };

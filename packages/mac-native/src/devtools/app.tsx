@@ -90,8 +90,8 @@ export function App() {
       setLastEvent(captureEvent);
       setCaptureState(captureEvent.type === "capture:error" ? "error" : "idle");
       setWriteBackMessage(null);
-      if (captureEvent.type === "capture:success" && captureEvent.result.mode === "write_back") {
-        setContentDraft(captureEvent.result.content);
+      if (captureEvent.type === "capture:success" && captureEvent.result.kind === "editableText") {
+        setContentDraft(captureEvent.result.text);
       }
       void refreshStatus();
     });
@@ -111,8 +111,8 @@ export function App() {
         method: "POST",
       });
       setLastEvent(event);
-      if (event.type === "capture:success" && event.result.mode === "write_back") {
-        setContentDraft(event.result.content);
+      if (event.type === "capture:success" && event.result.kind === "editableText") {
+        setContentDraft(event.result.text);
       }
       setCaptureState(event.type === "capture:error" ? "error" : "idle");
       await refreshStatus();
@@ -160,7 +160,7 @@ export function App() {
   }, [captureNow, countdown]);
 
   const result = lastEvent?.type === "capture:success" ? lastEvent.result : null;
-  const canWriteBack = result?.mode === "write_back";
+  const canWriteBack = result?.kind === "editableText";
 
   const targetRows = useMemo(() => {
     if (!result) {
@@ -182,7 +182,7 @@ export function App() {
     setWriteBackMessage(null);
     const request: DevtoolsWriteBackRequest = {
       content: contentDraft,
-      sessionId: result.sessionId,
+      textRef: result.textRef,
     };
     try {
       await readJson<{ ok: true }>("/__mac-native-devtools/write-back", {
@@ -271,10 +271,10 @@ export function App() {
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-zinc-950">Capture Result</h2>
                 <span className="rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">
-                  {result.mode}
+                  {result.kind}
                 </span>
               </div>
-              {result.mode === "copy_only" ? (
+              {result.kind === "targetOnly" ? (
                 <div className="mt-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
                   {result.reason}
                 </div>

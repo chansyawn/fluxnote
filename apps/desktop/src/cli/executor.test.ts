@@ -162,14 +162,14 @@ describe("executor", () => {
     expect(deps.resolveGitInfo).toHaveBeenCalledWith("/workspace");
     expect(deps.dispatchCommand).toHaveBeenCalledWith("block.create-external-edit", {
       content: "original",
-      tagNames: ["work"],
-      trigger: {
+      origin: {
         cwd: "/workspace",
         git: { branch: "main", root: "/workspace" },
+        kind: "cli",
         requestedFilePath: "block.md",
-        source: "cli",
         targetFilePath: "/workspace/block.md",
       },
+      tagNames: ["work"],
     });
     expect(deps.writeFile).toHaveBeenCalledWith("/workspace/block.md", "updated", "utf8");
   });
@@ -184,7 +184,7 @@ describe("executor", () => {
 
     expect(deps.dispatchCommand).toHaveBeenCalledWith(
       "block.create-external-edit",
-      expect.objectContaining({ trigger: expect.objectContaining({ git: null }) }),
+      expect.objectContaining({ origin: expect.objectContaining({ git: null }) }),
     );
   });
 

@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 
 const block = {
   archivedAt: null,
-  content: "hello",
+  text: "hello",
   contentUpdatedAt: "2026-01-01T00:00:00.000Z",
   createdAt: "2026-01-01T00:00:00.000Z",
   id: "block-1",
@@ -25,7 +25,7 @@ const externalEditTrigger = {
   cwd: "/workspace",
   git: null,
   requestedFilePath: "block.md",
-  source: "cli" as const,
+  kind: "cli" as const,
   targetFilePath: "/workspace/block.md",
 };
 
@@ -112,7 +112,7 @@ describe("entrypoint service", () => {
     const abortController = new AbortController();
 
     const result = await service.createExternalEdit(
-      { content: "hello", tagNames: ["work"], trigger: externalEditTrigger },
+      { content: "hello", tagNames: ["work"], origin: externalEditTrigger },
       abortController.signal,
     );
 

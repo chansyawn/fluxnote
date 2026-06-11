@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { cliExternalEditTriggerSchema, externalEditResultSchema } from "../external-edit/models";
+import { cliExternalEditOriginSchema, externalEditResultSchema } from "../external-edit/models";
 import { blockCreatedSourceSchema } from "../telemetry/contract";
 
 export const backendCommandKeys = [
@@ -23,7 +23,7 @@ const blockCreationRequestSchema = blockContentRequestSchema.extend({
   ]),
 });
 const externalEditBlockCreationRequestSchema = blockContentRequestSchema.extend({
-  trigger: cliExternalEditTriggerSchema,
+  origin: cliExternalEditOriginSchema,
 });
 
 export const backendCommandContracts = {

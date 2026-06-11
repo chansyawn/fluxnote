@@ -77,23 +77,23 @@ final class AccessibilitySessionStore {
       )
     }
 
-    let sessionId = try createSession(element: element)
+    let textRef = try createSession(element: element)
     var processId: pid_t = 0
     AXUIElementGetPid(element, &processId)
 
     return [
-      "mode": "write_back",
-      "sessionId": sessionId,
-      "content": value,
+      "kind": "editableText",
+      "textRef": textRef,
+      "text": value,
       "target": targetMetadata(processId: processId, role: role),
     ]
   }
 
-  func closeSession(_ sessionId: String) {
-    sessions.removeValue(forKey: sessionId)
+  func releaseText(_ textRef: String) {
+    sessions.removeValue(forKey: textRef)
   }
 
-  func writeBack(sessionId: String, content: String) throws {
+  func replaceText(textRef: String, text: String) throws {
     guard AXIsProcessTrusted() else {
       throw MacNativeFailure(
         code: MacNativeErrorCode.permissionRequired,
@@ -102,10 +102,10 @@ final class AccessibilitySessionStore {
       )
     }
 
-    guard let session = sessions[sessionId] else {
+    guard let session = sessions[textRef] else {
       throw MacNativeFailure(
         code: MacNativeErrorCode.sessionNotFound,
-        message: "Native accessibility session was not found.",
+        message: "Native accessibility text reference was not found.",
         details: nil,
       )
     }
@@ -113,7 +113,7 @@ final class AccessibilitySessionStore {
     let result = AXUIElementSetAttributeValue(
       session.element,
       kAXValueAttribute as CFString,
-      content as CFString,
+      text as CFString,
     )
     guard result == .success else {
       throw MacNativeFailure(
@@ -145,9 +145,9 @@ final class AccessibilitySessionStore {
       )
     }
 
-    let sessionId = UUID().uuidString
-    sessions[sessionId] = StoredAccessibilitySession(createdAt: Date(), element: element)
-    return sessionId
+    let textRef = UUID().uuidString
+    sessions[textRef] = StoredAccessibilitySession(createdAt: Date(), element: element)
+    return textRef
   }
 
   private func pruneExpiredSessions() {
@@ -159,8 +159,7 @@ final class AccessibilitySessionStore {
 
   private func copyOnlyCapture(reason: String, metadata: [String: Any]?) -> [String: Any] {
     [
-      "mode": "copy_only",
-      "content": "",
+      "kind": "targetOnly",
       "reason": reason,
       "target": normalizedTargetMetadata(metadata),
     ]

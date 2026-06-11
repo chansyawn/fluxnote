@@ -19,10 +19,10 @@ interface UseExternalEditSubmissionParams {
 
 interface UseExternalEditSubmissionResult {
   pendingExternalEditIds: Set<string>;
-  handleCancelExternalEdit: (editId: string) => Promise<void>;
+  handleCancelExternalEdit: (id: string) => Promise<void>;
   handleSubmitExternalEdit: (
     blockId: string,
-    editId: string,
+    id: string,
     session?: ExternalEditSession,
   ) => Promise<void>;
 }
@@ -35,14 +35,14 @@ export function useExternalEditSubmission({
     () => new Set(),
   );
 
-  const markPending = useCallback((editId: string) => {
-    setPendingExternalEditIds((current) => new Set(current).add(editId));
+  const markPending = useCallback((id: string) => {
+    setPendingExternalEditIds((current) => new Set(current).add(id));
   }, []);
 
-  const unmarkPending = useCallback((editId: string) => {
+  const unmarkPending = useCallback((id: string) => {
     setPendingExternalEditIds((current) => {
       const next = new Set(current);
-      next.delete(editId);
+      next.delete(id);
       return next;
     });
   }, []);
@@ -57,15 +57,15 @@ export function useExternalEditSubmission({
   );
 
   const handleCancelExternalEdit = useCallback(
-    async (editId: string) => {
-      markPending(editId);
+    async (id: string) => {
+      markPending(id);
       try {
-        await cancelExternalEdit({ editId });
+        await cancelExternalEdit({ id });
         refreshBlocks();
       } catch (error) {
         toast.error(toAppInvokeError(error).message);
       } finally {
-        unmarkPending(editId);
+        unmarkPending(id);
       }
     },
     [markPending, unmarkPending],
@@ -83,10 +83,10 @@ export function useExternalEditSubmission({
   );
 
   const handleSubmitExternalEdit = useCallback(
-    async (blockId: string, editId: string, session?: ExternalEditSession) => {
-      markPending(editId);
+    async (blockId: string, id: string, session?: ExternalEditSession) => {
+      markPending(id);
       try {
-        if (session?.trigger.source === "focused_app" && session.trigger.mode === "copy_only") {
+        if (session?.submission.transport === "clipboard") {
           await copyBlockContent(blockId);
         }
         const content = await getSubmittableMarkdown(blockId);
@@ -94,13 +94,13 @@ export function useExternalEditSubmission({
           toast.error("Cannot submit: block content unavailable.");
           return;
         }
-        await submitExternalEdit({ content, editId });
+        await submitExternalEdit({ content, id });
         refreshBlocks();
         void navigateToBlock?.(blockId).catch(() => undefined);
       } catch (error) {
         toast.error(toAppInvokeError(error).message);
       } finally {
-        unmarkPending(editId);
+        unmarkPending(id);
       }
     },
     [copyBlockContent, getSubmittableMarkdown, markPending, navigateToBlock, unmarkPending],

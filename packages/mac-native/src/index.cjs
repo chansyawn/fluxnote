@@ -50,41 +50,39 @@ function parseTarget(value) {
   };
 }
 
-function parseCaptureResult(value) {
+function parseTextCapture(value) {
   if (!isRecord(value)) {
     throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native capture result.");
   }
 
-  if (value.mode === "write_back") {
-    if (typeof value.sessionId !== "string" || typeof value.content !== "string") {
-      throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native write-back capture.");
+  if (value.kind === "editableText") {
+    if (typeof value.textRef !== "string" || typeof value.text !== "string") {
+      throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native editable text capture.");
     }
     return {
-      content: value.content,
-      mode: "write_back",
-      sessionId: value.sessionId,
+      kind: "editableText",
       target: parseTarget(value.target),
+      text: value.text,
+      textRef: value.textRef,
     };
   }
 
-  if (value.mode === "copy_only") {
+  if (value.kind === "targetOnly") {
     if (
-      value.content !== "" ||
-      (value.reason !== "NO_EDITABLE_ELEMENT" &&
-        value.reason !== "SEARCH_BUDGET_EXHAUSTED" &&
-        value.reason !== "UNSUPPORTED_ELEMENT")
+      value.reason !== "NO_EDITABLE_ELEMENT" &&
+      value.reason !== "SEARCH_BUDGET_EXHAUSTED" &&
+      value.reason !== "UNSUPPORTED_ELEMENT"
     ) {
-      throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native copy-only capture.");
+      throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native target-only capture.");
     }
     return {
-      content: "",
-      mode: "copy_only",
+      kind: "targetOnly",
       reason: value.reason,
       target: parseTarget(value.target),
     };
   }
 
-  throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native capture mode.");
+  throw new MacNativeError("NATIVE.INVALID_PAYLOAD", "Invalid native capture kind.");
 }
 
 function parseEnvelope(json) {
@@ -140,16 +138,16 @@ function loadAddon() {
 
 function createUnsupportedNative() {
   return {
-    activate: async () => {
+    activateApplication: async () => {
       throw createUnsupportedError();
     },
-    capture: async () => {
+    captureText: async () => {
       throw createUnsupportedError();
     },
-    closeSession: async () => undefined,
     isAccessibilityTrusted: () => false,
     isSupported: () => false,
-    writeBack: async () => {
+    releaseText: async () => undefined,
+    replaceText: async () => {
       throw createUnsupportedError();
     },
   };
@@ -162,17 +160,17 @@ function createMacAccessibilityNative() {
 
   const addon = loadAddon();
   return {
-    activate: async (processId) => {
-      unwrapEnvelope(addon.activateJson(processId));
+    activateApplication: async (processId) => {
+      unwrapEnvelope(addon.activateApplicationJson(processId));
     },
-    capture: async () => parseCaptureResult(unwrapEnvelope(addon.captureJson())),
-    closeSession: async (sessionId) => {
-      unwrapEnvelope(addon.closeSessionJson(sessionId));
-    },
+    captureText: async () => parseTextCapture(unwrapEnvelope(addon.captureTextJson())),
     isAccessibilityTrusted: (prompt) => addon.isAccessibilityTrusted(prompt),
     isSupported: () => true,
-    writeBack: async (sessionId, content) => {
-      unwrapEnvelope(addon.writeBackJson(sessionId, content));
+    releaseText: async (textRef) => {
+      unwrapEnvelope(addon.releaseTextJson(textRef));
+    },
+    replaceText: async (textRef, text) => {
+      unwrapEnvelope(addon.replaceTextJson(textRef, text));
     },
   };
 }

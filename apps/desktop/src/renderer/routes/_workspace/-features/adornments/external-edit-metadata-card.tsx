@@ -9,14 +9,14 @@ import { cn } from "@fluxnotes/ui/lib/utils";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { fetchUrlFavicon } from "@renderer/clients";
-import type { ExternalEditTrigger } from "@shared/features/external-edit/models";
+import type { ExternalEditOrigin } from "@shared/features/external-edit/models";
 import { useQuery } from "@tanstack/react-query";
 import type { ComponentProps, ReactNode } from "react";
 
 import { AdornmentBar } from "./adornment-bar";
 
 interface ExternalEditMetadataCardProps extends Pick<ComponentProps<"div">, "className"> {
-  trigger: ExternalEditTrigger;
+  origin: ExternalEditOrigin;
 }
 
 function getFileName(filePath: string): string {
@@ -51,11 +51,11 @@ function BrowserFaviconIcon({ url }: { url: string | null }) {
   );
 }
 
-function ExternalEditSourceLabel({ source }: { source: ExternalEditTrigger["source"] }) {
-  switch (source) {
+function ExternalEditSourceLabel({ kind }: { kind: ExternalEditOrigin["kind"] }) {
+  switch (kind) {
     case "cli":
       return <Trans id="workspace.external-edit.metadata.source.cli">Command line</Trans>;
-    case "focused_app":
+    case "macApp":
       return <Trans id="workspace.external-edit.metadata.source.mac-accessibility">Mac App</Trans>;
     case "browser":
       return <Trans id="workspace.external-edit.metadata.source.browser">Browser</Trans>;
@@ -73,7 +73,7 @@ function ExternalEditMetadataItem({ label, value }: { label: ReactNode; value: R
   );
 }
 
-export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMetadataCardProps) {
+export function ExternalEditMetadataCard({ className, origin }: ExternalEditMetadataCardProps) {
   const { i18n } = useLingui();
   const unknownApplicationLabel = i18n._({
     id: "workspace.external-edit.metadata.unknown-application",
@@ -81,10 +81,10 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
   });
 
   const appLabel =
-    trigger.source === "cli"
+    origin.kind === "cli"
       ? undefined
-      : (trigger.appName ?? trigger.appBundleId ?? unknownApplicationLabel);
-  const { icon, label, title } = resolveHeadline(trigger, appLabel ?? unknownApplicationLabel);
+      : (origin.app.name ?? origin.app.bundleId ?? unknownApplicationLabel);
+  const { icon, label, title } = resolveHeadline(origin, appLabel ?? unknownApplicationLabel);
 
   return (
     <HoverCard>
@@ -103,58 +103,58 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
         <dl className="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-2 gap-y-1">
           <ExternalEditMetadataItem
             label={<Trans id="workspace.external-edit.metadata.source">Source</Trans>}
-            value={<ExternalEditSourceLabel source={trigger.source} />}
+            value={<ExternalEditSourceLabel kind={origin.kind} />}
           />
-          {trigger.source === "cli" && (
+          {origin.kind === "cli" && (
             <>
-              {trigger.git && (
+              {origin.git && (
                 <>
                   <ExternalEditMetadataItem
                     label={
                       <Trans id="workspace.external-edit.metadata.repository">Repository</Trans>
                     }
-                    value={trigger.git.root}
+                    value={origin.git.root}
                   />
-                  {trigger.git.branch && (
+                  {origin.git.branch && (
                     <ExternalEditMetadataItem
                       label={<Trans id="workspace.external-edit.metadata.branch">Branch</Trans>}
-                      value={trigger.git.branch}
+                      value={origin.git.branch}
                     />
                   )}
                 </>
               )}
               <ExternalEditMetadataItem
                 label={<Trans id="workspace.external-edit.metadata.cwd">Working directory</Trans>}
-                value={trigger.cwd}
+                value={origin.cwd}
               />
               <ExternalEditMetadataItem
                 label={<Trans id="workspace.external-edit.metadata.file">Target file</Trans>}
-                value={trigger.targetFilePath}
+                value={origin.targetFilePath}
               />
             </>
           )}
-          {trigger.source === "focused_app" && (
+          {origin.kind === "macApp" && (
             <ExternalEditMetadataItem
               label={<Trans id="workspace.external-edit.metadata.app">Application</Trans>}
               value={appLabel ?? unknownApplicationLabel}
             />
           )}
-          {trigger.source === "browser" && (
+          {origin.kind === "browser" && (
             <>
               <ExternalEditMetadataItem
                 label={<Trans id="workspace.external-edit.metadata.app">Application</Trans>}
                 value={appLabel ?? unknownApplicationLabel}
               />
-              {trigger.title && (
+              {origin.page.title && (
                 <ExternalEditMetadataItem
                   label={<Trans id="workspace.external-edit.metadata.title">Title</Trans>}
-                  value={trigger.title}
+                  value={origin.page.title}
                 />
               )}
-              {trigger.url && (
+              {origin.page.url && (
                 <ExternalEditMetadataItem
                   label={<Trans id="workspace.external-edit.metadata.url">URL</Trans>}
-                  value={trigger.url}
+                  value={origin.page.url}
                 />
               )}
             </>
@@ -166,16 +166,16 @@ export function ExternalEditMetadataCard({ className, trigger }: ExternalEditMet
 }
 
 function resolveHeadline(
-  trigger: ExternalEditTrigger,
+  origin: ExternalEditOrigin,
   appLabel: string,
 ): { icon: ReactNode; label: ReactNode; title: string } {
-  switch (trigger.source) {
+  switch (origin.kind) {
     case "cli": {
-      if (trigger.git) {
-        const repository = getFileName(trigger.git.root);
-        const label = trigger.git.branch ? (
+      if (origin.git) {
+        const repository = getFileName(origin.git.root);
+        const label = origin.git.branch ? (
           <span className="flex items-center gap-1">
-            {repository} <GitBranchIcon className="inline size-3 shrink-0" /> {trigger.git.branch}
+            {repository} <GitBranchIcon className="inline size-3 shrink-0" /> {origin.git.branch}
           </span>
         ) : (
           repository
@@ -183,19 +183,19 @@ function resolveHeadline(
         return {
           icon: <SquareTerminalIcon className="size-3 shrink-0" />,
           label,
-          title: trigger.git.root,
+          title: origin.git.root,
         };
       }
       return {
         icon: <SquareTerminalIcon aria-hidden="true" className="size-3 shrink-0" />,
-        label: getFileName(trigger.targetFilePath),
-        title: trigger.targetFilePath,
+        label: getFileName(origin.targetFilePath),
+        title: origin.targetFilePath,
       };
     }
-    case "focused_app":
+    case "macApp":
       return {
-        icon: trigger.appIcon ? (
-          <ImageIcon src={trigger.appIcon} />
+        icon: origin.app.icon ? (
+          <ImageIcon src={origin.app.icon} />
         ) : (
           <LaptopIcon aria-hidden="true" className="size-3 shrink-0" />
         ),
@@ -203,8 +203,12 @@ function resolveHeadline(
         title: appLabel,
       };
     case "browser": {
-      const label = trigger.title ?? (trigger.url ? getUrlHost(trigger.url) : appLabel);
-      return { icon: <BrowserFaviconIcon url={trigger.url} />, label, title: trigger.url ?? label };
+      const label = origin.page.title ?? (origin.page.url ? getUrlHost(origin.page.url) : appLabel);
+      return {
+        icon: <BrowserFaviconIcon url={origin.page.url} />,
+        label,
+        title: origin.page.url ?? label,
+      };
     }
   }
 }

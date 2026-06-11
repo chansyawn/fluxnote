@@ -156,7 +156,7 @@ describe("useExternalEditSubmission", () => {
 
     expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
       content: String.raw`a_b $5 \$x\$`,
-      editId: "edit-1",
+      id: "edit-1",
     });
     expect(navigateToBlock).toHaveBeenCalledWith("block-1");
   });
@@ -181,7 +181,7 @@ describe("useExternalEditSubmission", () => {
 
     expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
       content: "a_b $5",
-      editId: "edit-1",
+      id: "edit-1",
     });
   });
 
@@ -232,7 +232,7 @@ describe("useExternalEditSubmission", () => {
     expect(copy).toHaveBeenCalledOnce();
     expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
       content: "copied content",
-      editId: "edit-1",
+      id: "edit-1",
     });
   });
 
@@ -268,7 +268,7 @@ describe("useExternalEditSubmission", () => {
     expect(clientMocks.toastError).toHaveBeenCalledWith("Clipboard unavailable");
     expect(clientMocks.submitExternalEdit).toHaveBeenCalledWith({
       content: "fallback content",
-      editId: "edit-1",
+      id: "edit-1",
     });
   });
 });

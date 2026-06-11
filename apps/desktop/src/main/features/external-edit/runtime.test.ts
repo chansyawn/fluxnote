@@ -13,23 +13,24 @@ const paths = {
   userDataPath: "/tmp",
 };
 
-const cliTrigger = {
+const cliOrigin = {
   cwd: "/workspace",
   git: null,
   requestedFilePath: "block.md",
-  source: "cli" as const,
+  kind: "cli" as const,
   targetFilePath: "/workspace/block.md",
 };
 
-function createFocusedAppTrigger() {
+function createMacAppOrigin() {
   return {
-    appBundleId: "com.example.App",
-    appIcon: null,
-    appName: "Example",
+    app: {
+      bundleId: "com.example.App",
+      icon: null,
+      name: "Example",
+      processId: 123,
+    },
     elementRole: "AXTextArea",
-    mode: "write_back" as const,
-    processId: 123,
-    source: "focused_app" as const,
+    kind: "macApp" as const,
   };
 }
 
@@ -38,22 +39,20 @@ afterEach(() => {
 });
 
 async function createRuntime(overrides?: {
-  activate?: (processId: number) => Promise<void>;
-  capture?: MacAccessibilityNative["capture"];
+  activateApplication?: (processId: number) => Promise<void>;
+  captureText?: MacAccessibilityNative["captureText"];
   isAccessibilityTrusted?: (prompt: boolean) => boolean;
   isSupported?: () => boolean;
   resolveBrowserMetadata?: typeof resolveBrowserMetadata;
-  writeBack?: (sessionId: string, content: string) => Promise<void>;
+  replaceText?: (textRef: string, content: string) => Promise<void>;
 }) {
   const ctx = await createTestDb();
   const macAccessibility: MacAccessibilityNative = {
-    activate: vi.fn(overrides?.activate ?? (async () => undefined)),
-    capture: vi.fn(
-      overrides?.capture ??
+    activateApplication: vi.fn(overrides?.activateApplication ?? (async () => undefined)),
+    captureText: vi.fn(
+      overrides?.captureText ??
         (async () => ({
-          content: "selected",
-          mode: "write_back" as const,
-          sessionId: "native-session-1",
+          kind: "editableText" as const,
           target: {
             appBundleId: "com.example.App",
             appIcon: null,
@@ -61,12 +60,14 @@ async function createRuntime(overrides?: {
             elementRole: "AXTextArea",
             processId: 123,
           },
+          text: "selected",
+          textRef: "text-ref-1",
         })),
     ),
-    closeSession: vi.fn(async () => undefined),
+    releaseText: vi.fn(async () => undefined),
     isAccessibilityTrusted: vi.fn(overrides?.isAccessibilityTrusted ?? (() => true)),
     isSupported: vi.fn(overrides?.isSupported ?? (() => true)),
-    writeBack: vi.fn(overrides?.writeBack ?? (async () => undefined)),
+    replaceText: vi.fn(overrides?.replaceText ?? (async () => undefined)),
   };
   const deps = {
     clipboard: { writeText: vi.fn() },
@@ -103,12 +104,16 @@ describe("external edit runtime", () => {
     const ctx = await createRuntime();
     try {
       const block = await createBlockRecord(ctx.db, "before");
-      const resultPromise = ctx.runtime.createFileSession(block.id, cliTrigger);
+      const resultPromise = ctx.runtime.createFileSession(block.id, cliOrigin);
       const session = ctx.runtime.listSessions()[0];
 
-      expect(session).toMatchObject({ blockId: block.id, trigger: cliTrigger });
+      expect(session).toMatchObject({
+        blockId: block.id,
+        origin: cliOrigin,
+        submission: { transport: "direct" },
+      });
 
-      const updatedBlock = await ctx.runtime.submit(session!.editId, "after");
+      const updatedBlock = await ctx.runtime.submit(session!.id, "after");
 
       await expect(resultPromise).resolves.toEqual({
         blockId: block.id,
@@ -124,23 +129,23 @@ describe("external edit runtime", () => {
 
   it("keeps submitted edit successful when focused app write-back fails", async () => {
     const ctx = await createRuntime({
-      writeBack: async () => {
+      replaceText: async () => {
         throw new Error("lost element");
       },
     });
     try {
       const session = await ctx.runtime.capture();
 
-      const updatedBlock = await ctx.runtime.submit(session.editId, "updated");
+      const updatedBlock = await ctx.runtime.submit(session.id, "updated");
 
       expect(updatedBlock.content).toBe("updated");
       expect(ctx.deps.clipboard.writeText).toHaveBeenCalledWith("updated");
       expect(ctx.deps.emitEvent).toHaveBeenCalledWith("external-edit.write-back-failed", {
         blockId: session.blockId,
-        editId: session.editId,
+        id: session.id,
         reason: "lost element",
       });
-      expect(ctx.deps.macAccessibility.closeSession).toHaveBeenCalledWith("native-session-1");
+      expect(ctx.deps.macAccessibility.releaseText).toHaveBeenCalledWith("text-ref-1");
     } finally {
       await ctx.close();
     }
@@ -150,7 +155,7 @@ describe("external edit runtime", () => {
     const ctx = await createRuntime();
     try {
       const block = await createBlockRecord(ctx.db, "before");
-      const resultPromise = ctx.runtime.createFileSession(block.id, cliTrigger);
+      const resultPromise = ctx.runtime.createFileSession(block.id, cliOrigin);
       const session = ctx.runtime.listSessions()[0]!;
       const content = [
         "Literal assets://not-an-image/photo.png",
@@ -158,7 +163,7 @@ describe("external edit runtime", () => {
         `![Alt](assets://${block.id}/photo.png)`,
       ].join("\n");
 
-      const updatedBlock = await ctx.runtime.submit(session.editId, content);
+      const updatedBlock = await ctx.runtime.submit(session.id, content);
 
       expect(updatedBlock.content).toBe(content);
       await expect(resultPromise).resolves.toEqual({
@@ -179,10 +184,10 @@ describe("external edit runtime", () => {
     const ctx = await createRuntime();
     try {
       const block = await createBlockRecord(ctx.db, "before");
-      const resultPromise = ctx.runtime.createFileSession(block.id, cliTrigger);
+      const resultPromise = ctx.runtime.createFileSession(block.id, cliOrigin);
       const session = ctx.runtime.listSessions()[0]!;
 
-      await ctx.runtime.cancel(session.editId);
+      await ctx.runtime.cancel(session.id);
 
       await expect(resultPromise).resolves.toEqual({ blockId: block.id, status: "cancelled" });
       expect(ctx.runtime.listSessions()).toHaveLength(0);
@@ -196,8 +201,8 @@ describe("external edit runtime", () => {
     try {
       const one = await createBlockRecord(ctx.db, "one");
       const two = await createBlockRecord(ctx.db, "two");
-      const oneResult = ctx.runtime.createFileSession(one.id, cliTrigger);
-      const twoResult = ctx.runtime.createFileSession(two.id, cliTrigger);
+      const oneResult = ctx.runtime.createFileSession(one.id, cliOrigin);
+      const twoResult = ctx.runtime.createFileSession(two.id, cliOrigin);
 
       ctx.runtime.cancelAll();
 
@@ -214,7 +219,7 @@ describe("external edit runtime", () => {
     try {
       const block = await createBlockRecord(ctx.db, "before");
       const controller = new AbortController();
-      const resultPromise = ctx.runtime.createFileSession(block.id, cliTrigger, controller.signal);
+      const resultPromise = ctx.runtime.createFileSession(block.id, cliOrigin, controller.signal);
 
       controller.abort();
 
@@ -228,10 +233,10 @@ describe("external edit runtime", () => {
   it("resolves submitted sessions as cancelled when submit fails", async () => {
     const ctx = await createRuntime();
     try {
-      const resultPromise = ctx.runtime.createFileSession("missing", cliTrigger);
+      const resultPromise = ctx.runtime.createFileSession("missing", cliOrigin);
       const session = ctx.runtime.listSessions()[0]!;
 
-      await expect(ctx.runtime.submit(session.editId, "after")).rejects.toMatchObject({
+      await expect(ctx.runtime.submit(session.id, "after")).rejects.toMatchObject({
         code: "BUSINESS.NOT_FOUND",
       });
       await expect(resultPromise).resolves.toEqual({ blockId: "missing", status: "cancelled" });
@@ -247,7 +252,8 @@ describe("external edit runtime", () => {
 
       expect(session).toMatchObject({
         blockId: expect.any(String),
-        trigger: createFocusedAppTrigger(),
+        origin: createMacAppOrigin(),
+        submission: { transport: "direct" },
       });
       expect(ctx.deps.openBlockService.requestOpen).toHaveBeenCalledWith({
         blockId: session.blockId,
@@ -258,14 +264,11 @@ describe("external edit runtime", () => {
       const block = await getPublicBlockById(ctx.db, session.blockId);
       expect(block.content).toBe("selected");
 
-      await ctx.runtime.submit(session.editId, "updated");
+      await ctx.runtime.submit(session.id, "updated");
 
-      expect(ctx.deps.macAccessibility.activate).not.toHaveBeenCalled();
-      expect(ctx.deps.macAccessibility.writeBack).toHaveBeenCalledWith(
-        "native-session-1",
-        "updated",
-      );
-      expect(ctx.deps.macAccessibility.closeSession).toHaveBeenCalledWith("native-session-1");
+      expect(ctx.deps.macAccessibility.activateApplication).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.replaceText).toHaveBeenCalledWith("text-ref-1", "updated");
+      expect(ctx.deps.macAccessibility.releaseText).toHaveBeenCalledWith("text-ref-1");
     } finally {
       await ctx.close();
     }
@@ -295,12 +298,11 @@ describe("external edit runtime", () => {
     }
   });
 
-  it("creates a copy-only session when no focused editable element is found", async () => {
+  it("creates a clipboard session when no focused editable element is found", async () => {
     const ctx = await createRuntime({
-      capture: async () => {
+      captureText: async () => {
         return {
-          content: "",
-          mode: "copy_only",
+          kind: "targetOnly",
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
@@ -317,33 +319,34 @@ describe("external edit runtime", () => {
 
       expect(session).toMatchObject({
         blockId: expect.any(String),
-        trigger: {
-          appBundleId: "com.example.App",
-          appIcon: null,
-          appName: "Example",
+        origin: {
+          app: {
+            bundleId: "com.example.App",
+            icon: null,
+            name: "Example",
+            processId: 123,
+          },
           elementRole: null,
-          mode: "copy_only",
-          processId: 123,
-          source: "focused_app",
+          kind: "macApp",
         },
+        submission: { transport: "clipboard" },
       });
       expect(ctx.deps.openBlockService.requestOpen).toHaveBeenCalledWith({
         blockId: session.blockId,
       });
       const block = await getPublicBlockById(ctx.db, session.blockId);
       expect(block.content).toBe("");
-      expect(ctx.deps.macAccessibility.closeSession).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.releaseText).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }
   });
 
-  it("activates focused app after submitting a copy-only session", async () => {
+  it("activates focused app after submitting a clipboard session", async () => {
     const ctx = await createRuntime({
-      capture: async () => {
+      captureText: async () => {
         return {
-          content: "",
-          mode: "copy_only",
+          kind: "targetOnly",
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
@@ -358,26 +361,25 @@ describe("external edit runtime", () => {
     try {
       const session = await ctx.runtime.capture();
 
-      await ctx.runtime.submit(session.editId, "updated");
+      await ctx.runtime.submit(session.id, "updated");
 
-      expect(ctx.deps.macAccessibility.activate).toHaveBeenCalledWith(123);
-      expect(ctx.deps.macAccessibility.writeBack).not.toHaveBeenCalled();
-      expect(ctx.deps.macAccessibility.closeSession).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.activateApplication).toHaveBeenCalledWith(123);
+      expect(ctx.deps.macAccessibility.replaceText).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.releaseText).not.toHaveBeenCalled();
     } finally {
       await ctx.close();
     }
   });
 
-  it("keeps copy-only sessions submitted when focused app activation fails", async () => {
+  it("keeps clipboard sessions submitted when focused app activation fails", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const ctx = await createRuntime({
-      activate: async () => {
+      activateApplication: async () => {
         throw new Error("app unavailable");
       },
-      capture: async () => {
+      captureText: async () => {
         return {
-          content: "",
-          mode: "copy_only",
+          kind: "targetOnly",
           reason: "NO_EDITABLE_ELEMENT",
           target: {
             appBundleId: "com.example.App",
@@ -392,10 +394,10 @@ describe("external edit runtime", () => {
     try {
       const session = await ctx.runtime.capture();
 
-      const updatedBlock = await ctx.runtime.submit(session.editId, "updated");
+      const updatedBlock = await ctx.runtime.submit(session.id, "updated");
 
       expect(updatedBlock.content).toBe("updated");
-      expect(ctx.deps.macAccessibility.activate).toHaveBeenCalledWith(123);
+      expect(ctx.deps.macAccessibility.activateApplication).toHaveBeenCalledWith(123);
       expect(warn).toHaveBeenCalledWith("External edit focused app activation failed", {
         message: "app unavailable",
         processId: 123,
@@ -407,7 +409,7 @@ describe("external edit runtime", () => {
 
   it("maps native permission errors to Accessibility permission business errors", async () => {
     const ctx = await createRuntime({
-      capture: async () => {
+      captureText: async () => {
         throw new MacNativeError(
           "ACCESSIBILITY.PERMISSION_REQUIRED",
           "Accessibility permission is not granted.",
@@ -424,7 +426,7 @@ describe("external edit runtime", () => {
     }
   });
 
-  it("builds a browser trigger when the focused app is a known browser", async () => {
+  it("builds a browser origin when the focused app is a known browser", async () => {
     const ctx = await createRuntime({
       resolveBrowserMetadata: async () => ({
         title: "Example Page",
@@ -434,40 +436,42 @@ describe("external edit runtime", () => {
     try {
       const session = await ctx.runtime.capture();
 
-      expect(session.trigger).toEqual({
-        appBundleId: "com.example.App",
-        appIcon: null,
-        appName: "Example",
-        mode: "write_back",
-        processId: 123,
-        source: "browser",
-        title: "Example Page",
-        url: "https://example.com/page",
+      expect(session.origin).toEqual({
+        app: {
+          bundleId: "com.example.App",
+          icon: null,
+          name: "Example",
+          processId: 123,
+        },
+        elementRole: "AXTextArea",
+        kind: "browser",
+        page: {
+          title: "Example Page",
+          url: "https://example.com/page",
+        },
       });
+      expect(session.submission).toEqual({ transport: "direct" });
 
-      await ctx.runtime.submit(session.editId, "updated");
+      await ctx.runtime.submit(session.id, "updated");
 
-      expect(ctx.deps.macAccessibility.writeBack).toHaveBeenCalledWith(
-        "native-session-1",
-        "updated",
-      );
+      expect(ctx.deps.macAccessibility.replaceText).toHaveBeenCalledWith("text-ref-1", "updated");
     } finally {
       await ctx.close();
     }
   });
 
-  it("falls back to a focused app trigger when browser metadata is unavailable", async () => {
+  it("falls back to a focused app origin when browser metadata is unavailable", async () => {
     const ctx = await createRuntime({ resolveBrowserMetadata: async () => null });
     try {
       const session = await ctx.runtime.capture();
 
-      expect(session.trigger).toEqual(createFocusedAppTrigger());
+      expect(session.origin).toEqual(createMacAppOrigin());
     } finally {
       await ctx.close();
     }
   });
 
-  it("falls back to a focused app trigger when browser metadata resolution throws", async () => {
+  it("falls back to a focused app origin when browser metadata resolution throws", async () => {
     const ctx = await createRuntime({
       resolveBrowserMetadata: async () => {
         throw new Error("osascript failed");
@@ -476,7 +480,7 @@ describe("external edit runtime", () => {
     try {
       const session = await ctx.runtime.capture();
 
-      expect(session.trigger).toEqual(createFocusedAppTrigger());
+      expect(session.origin).toEqual(createMacAppOrigin());
     } finally {
       await ctx.close();
     }

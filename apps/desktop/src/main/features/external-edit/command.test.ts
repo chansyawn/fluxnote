@@ -29,8 +29,8 @@ describe("external-edit command", () => {
     deps.hideMainWindow.mockReset();
     deps.readUserPreferences.mockReset();
     runtime.cancel.mockResolvedValue(undefined);
-    runtime.capture.mockResolvedValue({ editId: "capture-1" });
-    runtime.listSessions.mockReturnValue([{ editId: "e1" }]);
+    runtime.capture.mockResolvedValue({ id: "capture-1" });
+    runtime.listSessions.mockReturnValue([{ id: "e1" }]);
     runtime.submit.mockResolvedValue({ id: "b1" });
     deps.readUserPreferences.mockReturnValue(DEFAULT_USER_PREFERENCES);
   });
@@ -39,10 +39,10 @@ describe("external-edit command", () => {
     registerExternalEditCommands(ipc as never, deps as never);
 
     const captureResult = await handlers.get("external-edit.capture")?.(undefined);
-    const cancelResult = await handlers.get("external-edit.cancel")?.({ editId: "e1" });
+    const cancelResult = await handlers.get("external-edit.cancel")?.({ id: "e1" });
     const listResult = await handlers.get("external-edit.list")?.(undefined);
     const submitResult = await handlers.get("external-edit.submit")?.({
-      editId: "e1",
+      id: "e1",
       content: "after",
     });
 
@@ -51,9 +51,9 @@ describe("external-edit command", () => {
     expect(runtime.listSessions).toHaveBeenCalledOnce();
     expect(runtime.submit).toHaveBeenCalledWith("e1", "after");
     expect(deps.hideMainWindow).toHaveBeenCalledOnce();
-    expect(captureResult).toEqual({ editId: "capture-1" });
+    expect(captureResult).toEqual({ id: "capture-1" });
     expect(cancelResult).toBeUndefined();
-    expect(listResult).toEqual([{ editId: "e1" }]);
+    expect(listResult).toEqual([{ id: "e1" }]);
     expect(submitResult).toEqual({ id: "b1" });
   });
 
@@ -64,7 +64,7 @@ describe("external-edit command", () => {
     });
     registerExternalEditCommands(ipc as never, deps as never);
 
-    await handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" });
+    await handlers.get("external-edit.submit")?.({ id: "e1", content: "after" });
 
     expect(deps.hideMainWindow).not.toHaveBeenCalled();
   });
@@ -74,7 +74,7 @@ describe("external-edit command", () => {
     registerExternalEditCommands(ipc as never, deps as never);
 
     await expect(
-      handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" }),
+      handlers.get("external-edit.submit")?.({ id: "e1", content: "after" }),
     ).rejects.toThrow("submit failed");
 
     expect(deps.hideMainWindow).not.toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe("external-edit command", () => {
     registerExternalEditCommands(ipc as never, deps as never);
 
     await expect(
-      handlers.get("external-edit.submit")?.({ editId: "e1", content: "after" }),
+      handlers.get("external-edit.submit")?.({ id: "e1", content: "after" }),
     ).resolves.toEqual({ id: "b1" });
 
     expect(consoleError).toHaveBeenCalledWith(

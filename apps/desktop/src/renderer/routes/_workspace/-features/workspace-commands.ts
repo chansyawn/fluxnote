@@ -8,7 +8,7 @@ import type { WorkspaceCommands } from "./workspace-state-context";
 interface UseWorkspaceCommandsParams {
   archiveBlockWithFocus: (blockId: string) => Promise<void>;
   assignBlockTags: (blockId: string, tagIds: string[]) => Promise<Block>;
-  cancelExternalEdit: (editId: string) => Promise<void>;
+  cancelExternalEdit: (id: string) => Promise<void>;
   createBlockWithFocus: (source: BlockCreatedSource) => Promise<void>;
   createTag: (name: string) => Promise<Tag>;
   deleteBlockWithFocus: (blockId: string) => Promise<void>;
@@ -18,11 +18,7 @@ interface UseWorkspaceCommandsParams {
   restoreBlockWithFocus: (blockId: string) => Promise<void>;
   setBlockKeepState: (blockId: string, isKept: boolean) => Promise<Block>;
   setBlockPinnedState: (blockId: string, isPinned: boolean) => Promise<Block>;
-  submitExternalEdit: (
-    blockId: string,
-    editId: string,
-    session?: ExternalEditSession,
-  ) => Promise<void>;
+  submitExternalEdit: (blockId: string, id: string, session?: ExternalEditSession) => Promise<void>;
 }
 
 export function useWorkspaceCommandsValue({

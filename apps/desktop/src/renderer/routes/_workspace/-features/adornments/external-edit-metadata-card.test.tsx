@@ -15,17 +15,18 @@ vi.mock("@renderer/clients", () => ({
 import { ExternalEditMetadataCard } from "./external-edit-metadata-card";
 
 describe("ExternalEditMetadataCard", () => {
-  it("shows Mac App source and app name for copy-only macOS external edits", () => {
+  it("shows Mac App source and app name for macOS external edits", () => {
     renderWithProviders(
       <ExternalEditMetadataCard
-        trigger={{
-          appBundleId: "com.example.App",
-          appIcon: null,
-          appName: "Example",
+        origin={{
+          app: {
+            bundleId: "com.example.App",
+            icon: null,
+            name: "Example",
+            processId: 123,
+          },
           elementRole: null,
-          mode: "copy_only",
-          processId: 123,
-          source: "focused_app",
+          kind: "macApp",
         }}
       />,
     );
@@ -38,14 +39,15 @@ describe("ExternalEditMetadataCard", () => {
   it("renders the captured app icon when available", () => {
     const { container } = renderWithProviders(
       <ExternalEditMetadataCard
-        trigger={{
-          appBundleId: "com.example.App",
-          appIcon: "data:image/png;base64,ICON",
-          appName: "Example",
+        origin={{
+          app: {
+            bundleId: "com.example.App",
+            icon: "data:image/png;base64,ICON",
+            name: "Example",
+            processId: 123,
+          },
           elementRole: null,
-          mode: "write_back",
-          processId: 123,
-          source: "focused_app",
+          kind: "macApp",
         }}
       />,
     );
@@ -56,11 +58,11 @@ describe("ExternalEditMetadataCard", () => {
   it("shows the repository name and branch for git-backed CLI edits", () => {
     renderWithProviders(
       <ExternalEditMetadataCard
-        trigger={{
+        origin={{
           cwd: "/Users/dev/project/src",
           git: { branch: "feature/x", root: "/Users/dev/project" },
+          kind: "cli",
           requestedFilePath: "note.md",
-          source: "cli",
           targetFilePath: "/Users/dev/project/src/note.md",
         }}
       />,
@@ -73,11 +75,11 @@ describe("ExternalEditMetadataCard", () => {
   it("falls back to the file name for non-git CLI edits", () => {
     renderWithProviders(
       <ExternalEditMetadataCard
-        trigger={{
+        origin={{
           cwd: "/tmp",
           git: null,
+          kind: "cli",
           requestedFilePath: "note.md",
-          source: "cli",
           targetFilePath: "/tmp/note.md",
         }}
       />,
@@ -93,15 +95,19 @@ describe("ExternalEditMetadataCard", () => {
 
     const { container } = renderWithProviders(
       <ExternalEditMetadataCard
-        trigger={{
-          appBundleId: "com.google.Chrome",
-          appIcon: null,
-          appName: "Google Chrome",
-          mode: "write_back",
-          processId: 321,
-          source: "browser",
-          title: "Example Page",
-          url: "https://example.com/page",
+        origin={{
+          app: {
+            bundleId: "com.google.Chrome",
+            icon: null,
+            name: "Google Chrome",
+            processId: 321,
+          },
+          elementRole: "AXTextArea",
+          kind: "browser",
+          page: {
+            title: "Example Page",
+            url: "https://example.com/page",
+          },
         }}
       />,
     );

@@ -12,7 +12,7 @@ export type ExternalEditSessionsChangedPayload = z.infer<
 
 export const externalEditWriteBackFailedPayloadSchema = z.object({
   blockId: z.string().min(1),
-  editId: z.string().min(1),
+  id: z.string().min(1),
   reason: z.string().min(1),
 });
 export type ExternalEditWriteBackFailedPayload = z.infer<
@@ -27,7 +27,7 @@ export const externalEditContract = {
     },
     "external-edit.cancel": {
       input: z.object({
-        editId: z.string().min(1),
+        id: z.string().min(1),
       }),
       output: voidSchema,
     },
@@ -37,8 +37,8 @@ export const externalEditContract = {
     },
     "external-edit.submit": {
       input: z.object({
-        editId: z.string().min(1),
         content: z.string(),
+        id: z.string().min(1),
       }),
       output: blockSchema,
     },
