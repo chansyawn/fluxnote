@@ -1,6 +1,6 @@
-import type { MacAccessibilityCaptureResult } from "../index";
+import type { MacAccessibilityTextCapture } from "../index";
 
-export type DevtoolsCaptureResult = MacAccessibilityCaptureResult;
+export type DevtoolsCaptureResult = MacAccessibilityTextCapture;
 
 export interface DevtoolsErrorPayload {
   code?: string;
@@ -28,5 +28,5 @@ export type DevtoolsCaptureEvent =
 
 export interface DevtoolsWriteBackRequest {
   content: string;
-  sessionId: string;
+  textRef: string;
 }

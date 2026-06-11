@@ -16,10 +16,7 @@ import {
 } from "./workspace-block-editor-surface";
 
 function isCopyOnlyExternalEdit(state: WorkspaceBlockState): boolean {
-  return (
-    state.externalEditSession?.trigger.source === "focused_app" &&
-    state.externalEditSession.trigger.mode === "copy_only"
-  );
+  return state.externalEditSession?.submission.transport === "clipboard";
 }
 
 interface WorkspaceBlockEditorProps {

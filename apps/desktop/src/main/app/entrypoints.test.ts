@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 
 const block = {
   archivedAt: null,
-  content: "hello",
+  text: "hello",
   contentUpdatedAt: "2026-01-01T00:00:00.000Z",
   createdAt: "2026-01-01T00:00:00.000Z",
   id: "block-1",
@@ -28,7 +28,7 @@ const externalEditTrigger = {
   cwd: "/workspace",
   git: null,
   requestedFilePath: "block.md",
-  source: "cli" as const,
+  kind: "cli" as const,
   targetFilePath: "/workspace/block.md",
 };
 
@@ -146,7 +146,7 @@ describe("createEntrypointRuntime", () => {
     const result = await runtime.dispatchCommand("block.create-external-edit", {
       content: "hello",
       tagNames: ["work"],
-      trigger: externalEditTrigger,
+      origin: externalEditTrigger,
     });
 
     expect(result).toEqual({

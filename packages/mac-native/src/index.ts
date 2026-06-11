@@ -25,27 +25,26 @@ export interface MacAccessibilityTargetMetadata {
   processId: number;
 }
 
-export type MacAccessibilityCaptureResult =
+export type MacAccessibilityTextCapture =
   | {
-      content: string;
-      mode: "write_back";
-      sessionId: string;
+      kind: "editableText";
+      text: string;
+      textRef: string;
       target: MacAccessibilityTargetMetadata;
     }
   | {
-      content: "";
-      mode: "copy_only";
+      kind: "targetOnly";
       reason: MacAccessibilityCopyOnlyReason;
       target: MacAccessibilityTargetMetadata;
     };
 
 export interface MacAccessibilityNative {
-  activate: (processId: number) => Promise<void>;
-  capture: () => Promise<MacAccessibilityCaptureResult>;
-  closeSession: (sessionId: string) => Promise<void>;
+  activateApplication: (processId: number) => Promise<void>;
+  captureText: () => Promise<MacAccessibilityTextCapture>;
   isAccessibilityTrusted: (prompt: boolean) => boolean;
   isSupported: () => boolean;
-  writeBack: (sessionId: string, content: string) => Promise<void>;
+  releaseText: (textRef: string) => Promise<void>;
+  replaceText: (textRef: string, text: string) => Promise<void>;
 }
 
 export interface MacNativeError extends Error {

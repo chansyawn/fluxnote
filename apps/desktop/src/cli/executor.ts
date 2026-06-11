@@ -159,14 +159,14 @@ export async function executeExternalEdit(
   try {
     const result = await deps.dispatchCommand("block.create-external-edit", {
       content: originalContent,
-      tagNames,
-      trigger: {
+      origin: {
         cwd,
         git,
+        kind: "cli",
         requestedFilePath: filePath,
-        source: "cli",
         targetFilePath: resolvedPath,
       },
+      tagNames,
     });
     if (result.status === "submitted") {
       await deps.writeFile(resolvedPath, result.content, "utf8");

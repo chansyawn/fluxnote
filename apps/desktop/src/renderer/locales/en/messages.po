@@ -702,27 +702,27 @@ msgid "workspace.empty.title"
 msgstr "No blocks yet"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:55
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:62
 msgid "workspace.external-edit.cancel"
 msgstr "Cancel external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:56
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:63
 msgid "workspace.external-edit.cancel.tooltip"
 msgstr "Cancel"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
 msgid "workspace.external-edit.copy"
 msgstr "Copy external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:47
+#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:44
 msgid "workspace.external-edit.copy-only.placeholder"
 msgstr "No focused input found. Write text to copy."
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:51
 msgid "workspace.external-edit.copy.tooltip"
 msgstr "Copy"
 
@@ -788,12 +788,12 @@ msgid "workspace.external-edit.metadata.url"
 msgstr "URL"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
 msgid "workspace.external-edit.submit"
 msgstr "Submit external edit"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:53
 msgid "workspace.external-edit.submit.tooltip"
 msgstr "Submit"
 

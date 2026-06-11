@@ -6,50 +6,60 @@ export const gitRepositoryInfoSchema = z.object({
 });
 export type GitRepositoryInfo = z.infer<typeof gitRepositoryInfoSchema>;
 
-export const cliExternalEditTriggerSchema = z.object({
+export const externalAppMetadataSchema = z.object({
+  bundleId: z.string().min(1).nullable(),
+  icon: z.string().min(1).nullable(),
+  name: z.string().min(1).nullable(),
+  processId: z.number().int().nonnegative(),
+});
+export type ExternalAppMetadata = z.infer<typeof externalAppMetadataSchema>;
+
+export const cliExternalEditOriginSchema = z.object({
   cwd: z.string().min(1),
   git: gitRepositoryInfoSchema.nullable(),
+  kind: z.literal("cli"),
   requestedFilePath: z.string().min(1),
-  source: z.literal("cli"),
   targetFilePath: z.string().min(1),
 });
 
-export const focusedAppExternalEditTriggerSchema = z.object({
-  appBundleId: z.string().min(1).nullable(),
-  appIcon: z.string().min(1).nullable(),
-  appName: z.string().min(1).nullable(),
+export const macAppExternalEditOriginSchema = z.object({
+  app: externalAppMetadataSchema,
   elementRole: z.string().min(1).nullable(),
-  mode: z.enum(["copy_only", "write_back"]),
-  processId: z.number().int().nonnegative(),
-  source: z.literal("focused_app"),
+  kind: z.literal("macApp"),
 });
 
-export const browserExternalEditTriggerSchema = z.object({
-  appBundleId: z.string().min(1).nullable(),
-  appIcon: z.string().min(1).nullable(),
-  appName: z.string().min(1).nullable(),
-  mode: z.enum(["copy_only", "write_back"]),
-  processId: z.number().int().nonnegative(),
-  source: z.literal("browser"),
-  title: z.string().min(1).nullable(),
-  url: z.string().min(1).nullable(),
+export const browserExternalEditOriginSchema = z.object({
+  app: externalAppMetadataSchema,
+  elementRole: z.string().min(1).nullable(),
+  kind: z.literal("browser"),
+  page: z.object({
+    title: z.string().min(1).nullable(),
+    url: z.string().min(1).nullable(),
+  }),
 });
 
-export const externalEditTriggerSchema = z.discriminatedUnion("source", [
-  cliExternalEditTriggerSchema,
-  focusedAppExternalEditTriggerSchema,
-  browserExternalEditTriggerSchema,
+export const externalEditOriginSchema = z.discriminatedUnion("kind", [
+  cliExternalEditOriginSchema,
+  macAppExternalEditOriginSchema,
+  browserExternalEditOriginSchema,
 ]);
-export type ExternalEditTrigger = z.infer<typeof externalEditTriggerSchema>;
-export type CliExternalEditTrigger = z.infer<typeof cliExternalEditTriggerSchema>;
-export type FocusedAppExternalEditTrigger = z.infer<typeof focusedAppExternalEditTriggerSchema>;
-export type BrowserExternalEditTrigger = z.infer<typeof browserExternalEditTriggerSchema>;
+export type ExternalEditOrigin = z.infer<typeof externalEditOriginSchema>;
+export type CliExternalEditOrigin = z.infer<typeof cliExternalEditOriginSchema>;
+export type MacAppExternalEditOrigin = z.infer<typeof macAppExternalEditOriginSchema>;
+export type BrowserExternalEditOrigin = z.infer<typeof browserExternalEditOriginSchema>;
+
+export const externalEditSubmissionSchema = z.discriminatedUnion("transport", [
+  z.object({ transport: z.literal("direct") }),
+  z.object({ transport: z.literal("clipboard") }),
+]);
+export type ExternalEditSubmission = z.infer<typeof externalEditSubmissionSchema>;
 
 export const externalEditSessionSchema = z.object({
-  editId: z.string().min(1),
   blockId: z.string().min(1),
   createdAt: z.string(),
-  trigger: externalEditTriggerSchema,
+  id: z.string().min(1),
+  origin: externalEditOriginSchema,
+  submission: externalEditSubmissionSchema,
 });
 export type ExternalEditSession = z.infer<typeof externalEditSessionSchema>;
 

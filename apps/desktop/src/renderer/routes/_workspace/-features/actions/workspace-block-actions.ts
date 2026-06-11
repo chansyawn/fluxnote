@@ -141,7 +141,7 @@ export function useWorkspaceBlockActions({
         return;
       }
 
-      await commands.cancelExternalEdit(state.externalEditSession.editId);
+      await commands.cancelExternalEdit(state.externalEditSession.id);
       return;
     }
 
@@ -159,7 +159,7 @@ export function useWorkspaceBlockActions({
 
     await commands.submitExternalEdit(
       block.id,
-      state.externalEditSession.editId,
+      state.externalEditSession.id,
       state.externalEditSession,
     );
   }, [block.id, canRunExternalEditAction, commands, state.externalEditSession]);
@@ -169,7 +169,7 @@ export function useWorkspaceBlockActions({
       return;
     }
 
-    await commands.cancelExternalEdit(state.externalEditSession.editId);
+    await commands.cancelExternalEdit(state.externalEditSession.id);
   }, [canRunExternalEditAction, commands, state.externalEditSession]);
 
   return useMemo(

@@ -26,7 +26,7 @@ export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditC
   });
 
   ipc.command("external-edit.cancel", async (input) => {
-    await deps.runtime.cancel(input.editId);
+    await deps.runtime.cancel(input.id);
     return undefined;
   });
 
@@ -35,7 +35,7 @@ export function registerExternalEditCommands(ipc: IpcRouter, deps: ExternalEditC
   });
 
   ipc.command("external-edit.submit", async (input) => {
-    const block = await deps.runtime.submit(input.editId, input.content);
+    const block = await deps.runtime.submit(input.id, input.content);
     await hideMainWindowAfterSubmit(deps);
     return block;
   });

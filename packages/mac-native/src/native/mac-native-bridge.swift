@@ -15,30 +15,30 @@ public final class MacNativeBridge: NSObject {
   }
 
   @objc
-  public func captureJson() -> String {
+  public func captureTextJson() -> String {
     encodeEnvelope {
       try sessions.capture()
     }
   }
 
   @objc
-  public func writeBackJson(_ sessionId: String, content: String) -> String {
+  public func replaceTextJson(_ textRef: String, text: String) -> String {
     encodeEnvelope {
-      try sessions.writeBack(sessionId: sessionId, content: content)
+      try sessions.replaceText(textRef: textRef, text: text)
       return [:]
     }
   }
 
   @objc
-  public func closeSessionJson(_ sessionId: String) -> String {
+  public func releaseTextJson(_ textRef: String) -> String {
     encodeEnvelope {
-      sessions.closeSession(sessionId)
+      sessions.releaseText(textRef)
       return [:]
     }
   }
 
   @objc
-  public func activateJson(_ processId: Int32) -> String {
+  public func activateApplicationJson(_ processId: Int32) -> String {
     encodeEnvelope {
       try sessions.activate(processId: processId)
       return [:]

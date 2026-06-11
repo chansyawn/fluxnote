@@ -1,8 +1,9 @@
 import {
   createMacAccessibilityNative,
   MacNativeError,
-  type MacAccessibilityCaptureResult,
   type MacAccessibilityNative,
+  type MacAccessibilityTextCapture,
+  type MacAccessibilityTargetMetadata,
 } from "@fluxnotes/mac-native";
 import type { AppDataPaths } from "@main/core/app-data";
 import type { AppDatabase } from "@main/core/database";
@@ -11,12 +12,13 @@ import type { EventBus } from "@main/core/ipc";
 import type { OpenBlockService } from "@main/features/open-block";
 import type { TelemetryService } from "@main/features/telemetry";
 import type {
-  BrowserExternalEditTrigger,
-  CliExternalEditTrigger,
+  BrowserExternalEditOrigin,
+  CliExternalEditOrigin,
   ExternalEditResult,
+  ExternalEditOrigin,
   ExternalEditSession,
-  ExternalEditTrigger,
-  FocusedAppExternalEditTrigger,
+  ExternalEditSubmission,
+  MacAppExternalEditOrigin,
 } from "@shared/features/external-edit/models";
 import { businessError } from "@shared/ipc/result";
 import { eq } from "drizzle-orm";
@@ -67,22 +69,19 @@ interface ExternalEditRuntimeDeps {
 }
 
 export interface ExternalEditRuntime {
-  cancel: (editId: string) => Promise<void>;
+  cancel: (id: string) => Promise<void>;
   cancelAll: () => void;
   capture: () => Promise<ExternalEditSession>;
   createFileSession: (
     blockId: string,
-    trigger: CliExternalEditTrigger,
+    origin: CliExternalEditOrigin,
     signal?: AbortSignal,
   ) => Promise<ExternalEditResult>;
   listSessions: () => ExternalEditSession[];
-  submit: (
-    editId: string,
-    content: string,
-  ) => Promise<Awaited<ReturnType<typeof getPublicBlockById>>>;
+  submit: (id: string, content: string) => Promise<Awaited<ReturnType<typeof getPublicBlockById>>>;
 }
 
-function createEditId(): string {
+function createSessionId(): string {
   return crypto.randomUUID();
 }
 
@@ -108,33 +107,35 @@ function warnFocusedAppActivationFailure(processId: number, error: unknown): voi
   });
 }
 
-function createFocusedAppTrigger(
-  captureResult: MacAccessibilityCaptureResult,
-): FocusedAppExternalEditTrigger {
+function toAppMetadata(target: MacAccessibilityTargetMetadata) {
   return {
-    appBundleId: captureResult.target.appBundleId,
-    appIcon: captureResult.target.appIcon,
-    appName: captureResult.target.appName,
-    elementRole: captureResult.target.elementRole,
-    mode: captureResult.mode,
-    processId: captureResult.target.processId,
-    source: "focused_app",
+    bundleId: target.appBundleId,
+    icon: target.appIcon,
+    name: target.appName,
+    processId: target.processId,
   };
 }
 
-function createBrowserTrigger(
-  captureResult: MacAccessibilityCaptureResult,
-  browser: BrowserMetadata,
-): BrowserExternalEditTrigger {
+function createMacAppOrigin(captureResult: MacAccessibilityTextCapture): MacAppExternalEditOrigin {
   return {
-    appBundleId: captureResult.target.appBundleId,
-    appIcon: captureResult.target.appIcon,
-    appName: captureResult.target.appName,
-    mode: captureResult.mode,
-    processId: captureResult.target.processId,
-    source: "browser",
-    title: browser.title,
-    url: browser.url,
+    app: toAppMetadata(captureResult.target),
+    elementRole: captureResult.target.elementRole,
+    kind: "macApp",
+  };
+}
+
+function createBrowserOrigin(
+  captureResult: MacAccessibilityTextCapture,
+  browser: BrowserMetadata,
+): BrowserExternalEditOrigin {
+  return {
+    app: toAppMetadata(captureResult.target),
+    elementRole: captureResult.target.elementRole,
+    kind: "browser",
+    page: {
+      title: browser.title,
+      url: browser.url,
+    },
   };
 }
 
@@ -151,17 +152,19 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
 
   function begin(
     blockId: string,
-    trigger: ExternalEditTrigger,
+    origin: ExternalEditOrigin,
+    submission: ExternalEditSubmission,
     options?: BeginExternalEditOptions,
   ): BeginExternalEditResult {
     const session: ExternalEditSession = {
       blockId,
       createdAt: createCreatedAt(),
-      editId: createEditId(),
-      trigger,
+      id: createSessionId(),
+      origin,
+      submission,
     };
     const result = new Promise<ExternalEditResult>((resolve) => {
-      pendingEdits.set(session.editId, {
+      pendingEdits.set(session.id, {
         claimed: false,
         resolve,
         session,
@@ -174,9 +177,9 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     options?.signal?.addEventListener(
       "abort",
       () => {
-        const entry = pendingEdits.get(session.editId);
+        const entry = pendingEdits.get(session.id);
         if (!entry || entry.claimed) return;
-        pendingEdits.delete(session.editId);
+        pendingEdits.delete(session.id);
         emitSessionsChanged();
         entry.target?.cancel?.(entry.session);
         entry.resolve({ blockId, status: "cancelled" });
@@ -187,17 +190,15 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     return { result, session };
   }
 
-  function claim(editId: string): ClaimedExternalEdit {
-    const entry = pendingEdits.get(editId);
+  function claim(id: string): ClaimedExternalEdit {
+    const entry = pendingEdits.get(id);
     if (!entry) {
-      throw businessError("BUSINESS.NOT_FOUND", `External edit not found: ${editId}`);
+      throw businessError("BUSINESS.NOT_FOUND", `External edit not found: ${id}`);
     }
     if (entry.claimed) {
-      throw businessError(
-        "BUSINESS.INVALID_OPERATION",
-        `External edit already claimed: ${editId}`,
-        { editId },
-      );
+      throw businessError("BUSINESS.INVALID_OPERATION", `External edit already claimed: ${id}`, {
+        id,
+      });
     }
 
     entry.claimed = true;
@@ -205,7 +206,7 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     return {
       cancelTarget: () => entry.target?.cancel?.(entry.session),
       resolve: (result) => {
-        pendingEdits.delete(editId);
+        pendingEdits.delete(id);
         emitSessionsChanged();
         entry.resolve(result);
       },
@@ -231,39 +232,39 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     }
 
     try {
-      await deps.macAccessibility.activate(processId);
+      await deps.macAccessibility.activateApplication(processId);
     } catch (error) {
       warnFocusedAppActivationFailure(processId, error);
     }
   }
 
-  async function writeBackOrFallback(
+  async function replaceTextOrFallback(
     session: ExternalEditSession,
-    nativeSessionId: string,
+    textRef: string,
     content: string,
   ): Promise<void> {
     try {
-      await deps.macAccessibility.writeBack(nativeSessionId, content);
+      await deps.macAccessibility.replaceText(textRef, content);
     } catch (error) {
       const reason = error instanceof Error ? error.message : "Unknown write-back failure.";
       deps.clipboard.writeText(content);
       deps.emitEvent("external-edit.write-back-failed", {
         blockId: session.blockId,
-        editId: session.editId,
+        id: session.id,
         reason,
       });
     } finally {
-      await deps.macAccessibility.closeSession(nativeSessionId);
+      await deps.macAccessibility.releaseText(textRef);
     }
   }
 
-  async function buildFocusedTrigger(
-    captureResult: MacAccessibilityCaptureResult,
-  ): Promise<FocusedAppExternalEditTrigger | BrowserExternalEditTrigger> {
+  async function buildFocusedOrigin(
+    captureResult: MacAccessibilityTextCapture,
+  ): Promise<MacAppExternalEditOrigin | BrowserExternalEditOrigin> {
     const browser = await deps.resolveBrowserMetadata(captureResult.target).catch(() => null);
     return browser
-      ? createBrowserTrigger(captureResult, browser)
-      : createFocusedAppTrigger(captureResult);
+      ? createBrowserOrigin(captureResult, browser)
+      : createMacAppOrigin(captureResult);
   }
 
   async function capture(): Promise<ExternalEditSession> {
@@ -281,47 +282,59 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       );
     }
 
-    let captureResult: MacAccessibilityCaptureResult;
+    let captureResult: MacAccessibilityTextCapture;
     try {
-      captureResult = await deps.macAccessibility.capture();
+      captureResult = await deps.macAccessibility.captureText();
     } catch (error) {
       toBusinessInvalidOperation(error);
     }
 
-    const trigger = await buildFocusedTrigger(captureResult);
-    const blockId = await createExternalEditBlock(captureResult.content);
-    if (captureResult.mode === "copy_only") {
-      return begin(blockId, trigger, {
-        target: {
-          submit: async () => {
-            await activateFocusedApp(trigger.processId);
+    const origin = await buildFocusedOrigin(captureResult);
+    const blockId = await createExternalEditBlock(
+      captureResult.kind === "editableText" ? captureResult.text : "",
+    );
+    if (captureResult.kind === "targetOnly") {
+      return begin(
+        blockId,
+        origin,
+        { transport: "clipboard" },
+        {
+          target: {
+            submit: async () => {
+              await activateFocusedApp(origin.app.processId);
+            },
           },
         },
-      }).session;
+      ).session;
     }
 
-    return begin(blockId, trigger, {
-      target: {
-        cancel: () => {
-          void deps.macAccessibility.closeSession(captureResult.sessionId);
-        },
-        submit: async (session, content) => {
-          await writeBackOrFallback(session, captureResult.sessionId, content);
+    return begin(
+      blockId,
+      origin,
+      { transport: "direct" },
+      {
+        target: {
+          cancel: () => {
+            void deps.macAccessibility.releaseText(captureResult.textRef);
+          },
+          submit: async (session, content) => {
+            await replaceTextOrFallback(session, captureResult.textRef, content);
+          },
         },
       },
-    }).session;
+    ).session;
   }
 
   async function createFileSession(
     blockId: string,
-    trigger: CliExternalEditTrigger,
+    origin: CliExternalEditOrigin,
     signal?: AbortSignal,
   ): Promise<ExternalEditResult> {
-    return await begin(blockId, trigger, { signal }).result;
+    return await begin(blockId, origin, { transport: "direct" }, { signal }).result;
   }
 
-  async function submit(editId: string, content: string) {
-    const claimed = claim(editId);
+  async function submit(id: string, content: string) {
+    const claimed = claim(id);
     try {
       const externalContent = await externalizeMarkdownAssetUrls(
         { paths: deps.paths },
@@ -360,8 +373,8 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
     }
   }
 
-  async function cancel(editId: string): Promise<void> {
-    const claimed = claim(editId);
+  async function cancel(id: string): Promise<void> {
+    const claimed = claim(id);
     claimed.cancelTarget();
     claimed.resolve({
       blockId: claimed.session.blockId,

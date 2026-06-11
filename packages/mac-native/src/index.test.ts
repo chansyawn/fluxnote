@@ -13,7 +13,7 @@ describe("mac native facade", () => {
 
     expect(native.isSupported()).toBe(false);
     expect(native.isAccessibilityTrusted(true)).toBe(false);
-    await expect(native.capture()).rejects.toMatchObject({
+    await expect(native.captureText()).rejects.toMatchObject({
       code: "NATIVE.UNSUPPORTED_PLATFORM",
       name: "MacNativeError",
     } satisfies Partial<MacNativeError>);

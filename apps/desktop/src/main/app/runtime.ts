@@ -117,8 +117,8 @@ export function createBackendRuntime() {
 
   function createEntrypoints(db: AppDatabase): EntrypointRuntime {
     return createEntrypointRuntime({
-      createExternalEditSession: (blockId, trigger, signal) =>
-        services.externalEditRuntime.createFileSession(blockId, trigger, signal),
+      createExternalEditSession: (blockId, origin, signal) =>
+        services.externalEditRuntime.createFileSession(blockId, origin, signal),
       getDb: async () => db,
       requestOpenBlock: (blockId) => {
         services.openBlockService.requestOpen({ blockId });

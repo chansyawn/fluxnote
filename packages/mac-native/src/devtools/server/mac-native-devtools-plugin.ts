@@ -116,7 +116,7 @@ async function capture(state: DevtoolsState): Promise<DevtoolsCaptureEvent> {
 
     return {
       capturedAt,
-      result: await native.capture(),
+      result: await native.captureText(),
       type: "capture:success",
     };
   } catch (error) {
@@ -143,17 +143,17 @@ async function handleWriteBack(
 ): Promise<void> {
   try {
     const body = await readRequestJson<DevtoolsWriteBackRequest>(request);
-    if (typeof body.sessionId !== "string" || typeof body.content !== "string") {
+    if (typeof body.textRef !== "string" || typeof body.content !== "string") {
       sendJson(response, 400, {
-        message: "write-back requires sessionId and content strings.",
+        message: "write-back requires textRef and content strings.",
         name: "InvalidRequestError",
       });
       return;
     }
 
     const native = await getNative(state);
-    await native.writeBack(body.sessionId, body.content);
-    await native.closeSession(body.sessionId);
+    await native.replaceText(body.textRef, body.content);
+    await native.releaseText(body.textRef);
     sendJson(response, 200, { ok: true });
   } catch (error) {
     sendJson(response, 500, serializeError(error));

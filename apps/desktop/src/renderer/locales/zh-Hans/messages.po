@@ -702,27 +702,27 @@ msgid "workspace.empty.title"
 msgstr "还没有区块"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:55
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:62
 msgid "workspace.external-edit.cancel"
 msgstr "取消外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:56
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:63
 msgid "workspace.external-edit.cancel.tooltip"
 msgstr "取消"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:37
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
 msgid "workspace.external-edit.copy"
 msgstr "复制外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:47
+#: src/renderer/routes/_workspace/-features/editor/workspace-block-editor.tsx:44
 msgid "workspace.external-edit.copy-only.placeholder"
 msgstr "未找到聚焦的输入框。写入要复制的文本。"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:44
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:51
 msgid "workspace.external-edit.copy.tooltip"
 msgstr "复制"
 
@@ -788,12 +788,12 @@ msgid "workspace.external-edit.metadata.url"
 msgstr "网址"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:39
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
 msgid "workspace.external-edit.submit"
 msgstr "提交外部编辑"
 
 #. js-lingui-explicit-id
-#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:46
+#: src/renderer/routes/_workspace/-features/adornments/external-edit-controls.tsx:53
 msgid "workspace.external-edit.submit.tooltip"
 msgstr "提交"
 

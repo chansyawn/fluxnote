@@ -33,10 +33,6 @@ export function BlockAdornments({
   tags,
 }: BlockAdornmentsProps) {
   const externalEditSession = state.externalEditSession;
-  const externalEditMode =
-    externalEditSession?.trigger.source === "focused_app"
-      ? externalEditSession.trigger.mode
-      : "write_back";
   const shouldShowBlockActions = active || Boolean(externalEditSession);
   const autoArchiveProtectionReason: AutoArchiveProtectionReason = externalEditSession
     ? "external-edit"
@@ -54,7 +50,7 @@ export function BlockAdornments({
         <>
           <ExternalEditControls
             className="shrink-0"
-            mode={externalEditMode}
+            submission={externalEditSession.submission}
             shortcuts={shortcuts}
             pending={state.isExternalEditPending}
             onCancel={() => {
@@ -64,7 +60,7 @@ export function BlockAdornments({
               void actions.submitExternalEdit();
             }}
           />
-          <ExternalEditMetadataCard className="min-w-0" trigger={externalEditSession.trigger} />
+          <ExternalEditMetadataCard className="min-w-0" origin={externalEditSession.origin} />
         </>
       ) : null}
       {shouldShowBlockActions ? (
