@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.35](https://github.com/chansyawn/fluxnotes/compare/v0.0.34...v0.0.35) (2026-06-11)
+
+
+### Features
+
+* simplify external edit transport model ([#105](https://github.com/chansyawn/fluxnotes/issues/105)) ([4f23d9a](https://github.com/chansyawn/fluxnotes/commit/4f23d9ab9b8d602d95bb7f11604d810b8cd862cf))
+
 ## [0.0.34](https://github.com/chansyawn/fluxnotes/compare/v0.0.33...v0.0.34) (2026-06-10)
 
 
