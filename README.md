@@ -16,7 +16,7 @@ Fluxnotes is a lightweight[^lightweight], always-on-top Markdown Block editor fo
 
 It is not another knowledge base, and it is not a full Markdown editor. It is a visible context buffer: each Block is an input draft that can be edited, organized, and archived independently.
 
-- **Polish input**: organize and revise longer text before sending it to chat tools, CLI agents, or other input boxes.
+- **Refine input**: organize and revise longer text before sending it to chat tools, CLI agents, or other input boxes.
 - **Organize context**: keep temporary working context while switching between tasks, windows, and tools.
 - **Capture temporary**: save ideas, snippets, and pending items before moving them into a more formal knowledge base or document.
 
@@ -31,7 +31,7 @@ Download the latest version from [GitHub Releases](https://github.com/chansyawn/
 - **Always on top**: stays visible while you move between browsers, IDEs, terminals, documents, and AI tools, acting as a temporary context buffer for the current work.
 - **Auto archive**: automatically moves inactive Blocks out of the active Workspace to reduce buildup from long-running parallel tasks.
 - **WYSIWYG Markdown**: write Markdown in a close-to-what-you-see-is-what-you-get editing experience for structured prompts.
-- **Input handoff**: use the `flux` CLI to open Fluxnotes, create Blocks, or connect it as an external editor for CLI agents such as Codex and Claude Code. More launch and handoff paths will be explored over time.
+- **Input handoff**: start External edit from the active Mac App input field on macOS, or use the `flux` CLI to open Fluxnotes, create Blocks, and connect CLI agents such as Codex and Claude Code.
 
 ## Usage
 
@@ -42,15 +42,23 @@ Using shortcuts is strongly recommended for controlling the window, Block action
 - `Alt/Option+N`: show or hide the Fluxnotes window.
 - More window, Block, and editor shortcuts can be viewed and customized in Fluxnotes Preferences.
 
+### Input Handoff Examples
+
+| Mac App input field                                                                                                          | Web input field                                                                                                          | CLI Agent                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| <img src="./docs/readme/assets/use-with-app.gif" alt="Use Fluxnotes External edit from a Mac App input field" width="240" /> | <img src="./docs/readme/assets/use-with-web.gif" alt="Use Fluxnotes External edit from a Web input field" width="240" /> | <img src="./docs/readme/assets/use-with-cli.gif" alt="Use Fluxnotes External edit with a CLI Agent" width="240" /> |
+
+### Edit From Mac App Input Fields
+
+External edit currently supports macOS only. Before first use, grant Accessibility permission in Fluxnotes Preferences under External edit.
+
+Place the cursor in the target app's input field and press `Command+Option+N`; Fluxnotes opens the current input as a Block. When finished, submit with the button or `Command+Enter`; cancel with `Command+\`. If the target input cannot be written back directly, Fluxnotes copies the result to the clipboard instead. Secure fields such as password inputs cannot be read or written back. Related shortcuts can be changed in Shortcuts.
+
 ### Use Flux CLI
 
 Open Fluxnotes Preferences, go to the App section, find Flux CLI, and click Install. After installation, run `flux --help` to view available commands and options.
 
 #### Use With Codex / Claude Code
-
-<p align="center">
-  <img src="./docs/readme/assets/use-with-codex.gif" alt="Use Fluxnotes with Codex" />
-</p>
 
 Enable Fluxnotes only for Codex / Claude Code with aliases:
 
@@ -61,7 +69,7 @@ alias cld='EDITOR="flux edit" claude'
 
 Start the CLI agent with `cdx` or `cld`. In Codex / Claude Code, press the default external-editor shortcut `Ctrl+G`; the alias sends the draft to Fluxnotes through `EDITOR="flux edit"`.
 
-Polish it in Fluxnotes, then submit or cancel to return to the CLI agent.
+Revise it in Fluxnotes, then submit or cancel to return to the CLI agent.
 
 Avoid setting `EDITOR="flux edit"` globally; it also affects Git, shell commands, and other CLI tools.
 
@@ -98,7 +106,7 @@ Fluxnotes includes a telemetry setting that can be turned off. Telemetry helps u
 ## Roadmap
 
 - Broader Markdown syntax support and a better editing experience.
-- Smoother input handoff: explore Accessibility APIs, browser extensions, and other ways to launch Fluxnotes from input boxes or send content directly to different AI apps.
+- Smoother input handoff: keep exploring more input contexts for launching Fluxnotes or sending content directly to different AI apps.
 
 ## Alternative
 
