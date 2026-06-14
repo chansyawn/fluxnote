@@ -69,6 +69,97 @@ describe("clipboard paste", () => {
     });
   });
 
+  it("keeps pasted html nested ordered lists under their parent item", async () => {
+    const editor = editorFromMarkdown("");
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([
+          ["text/html", "<ol><li>AAA</li><li>BBB<ol><li>CCC</li><li>DDD</li></ol></li></ol>"],
+          ["text/plain", "1. AAA\n2. BBB\n\t1. CCC\n\t2. DDD"],
+        ]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        children: [
+          {
+            children: [{ children: [{ type: "text", value: "AAA" }], type: "paragraph" }],
+            type: "listItem",
+          },
+          {
+            children: [
+              { children: [{ type: "text", value: "BBB" }], type: "paragraph" },
+              {
+                children: [
+                  {
+                    children: [{ children: [{ type: "text", value: "CCC" }], type: "paragraph" }],
+                    type: "listItem",
+                  },
+                  {
+                    children: [{ children: [{ type: "text", value: "DDD" }], type: "paragraph" }],
+                    type: "listItem",
+                  },
+                ],
+                ordered: true,
+                type: "list",
+              },
+            ],
+            type: "listItem",
+          },
+        ],
+        ordered: true,
+        type: "list",
+      });
+      expect(readMarkdown(editor)).not.toMatch(/^3\.\s*$/m);
+    });
+  });
+
+  it("preserves pasted html empty parent list items with nested lists", async () => {
+    const editor = editorFromMarkdown("");
+
+    expect(
+      pasteIntoEditor(
+        editor,
+        createBlockEditorRuntime(),
+        new Map([["text/html", "<ul><li>One</li><li><ul><li>Two</li></ul></li></ul>"]]),
+      ),
+    ).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(readMdast(editor).children[0]).toMatchObject({
+        children: [
+          {
+            children: [{ children: [{ type: "text", value: "One" }], type: "paragraph" }],
+            type: "listItem",
+          },
+          {
+            children: [
+              { children: [], type: "paragraph" },
+              {
+                children: [
+                  {
+                    children: [{ children: [{ type: "text", value: "Two" }], type: "paragraph" }],
+                    type: "listItem",
+                  },
+                ],
+                ordered: false,
+                type: "list",
+              },
+            ],
+            type: "listItem",
+          },
+        ],
+        ordered: false,
+        type: "list",
+      });
+      expect(readMarkdown(editor)).toMatch(/^-\s*$/m);
+    });
+  });
+
   it("pastes editor clipboard lists through markdown to preserve nested structure", async () => {
     const source = editorFromMarkdown(
       ["- Unordered item", "", "- Nested group", "", "  - Nested item A", "  - Nested item B"].join(
