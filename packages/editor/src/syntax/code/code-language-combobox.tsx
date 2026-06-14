@@ -13,7 +13,7 @@ import { useLingui } from "@lingui/react";
 import { useMemo, useState } from "react";
 
 import {
-  CODE_LANGUAGE_OPTIONS,
+  filterCodeLanguageOptions,
   getCodeLanguageOption,
   type CodeLanguageOption,
 } from "./code-language-options";
@@ -21,10 +21,6 @@ import {
 interface CodeLanguageComboboxProps {
   language: string | null;
   onLanguageChange: (option: CodeLanguageOption) => void;
-}
-
-function normalizeSearchValue(value: string): string {
-  return value.trim().toLocaleLowerCase();
 }
 
 export function CodeLanguageCombobox({ language, onLanguageChange }: CodeLanguageComboboxProps) {
@@ -35,16 +31,7 @@ export function CodeLanguageCombobox({ language, onLanguageChange }: CodeLanguag
     message: "No matching languages",
   });
   const selectedOption = getCodeLanguageOption(language);
-  const normalizedInputValue = normalizeSearchValue(inputValue);
-  const filteredOptions = useMemo(() => {
-    if (!normalizedInputValue) {
-      return CODE_LANGUAGE_OPTIONS;
-    }
-
-    return CODE_LANGUAGE_OPTIONS.filter((option) =>
-      normalizeSearchValue(`${option.label} ${option.value}`).includes(normalizedInputValue),
-    );
-  }, [normalizedInputValue]);
+  const filteredOptions = useMemo(() => filterCodeLanguageOptions(inputValue), [inputValue]);
 
   return (
     <Combobox<CodeLanguageOption>

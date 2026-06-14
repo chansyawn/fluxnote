@@ -24,12 +24,12 @@ msgid "block-editor.code.copy"
 msgstr "Copy code"
 
 #. js-lingui-explicit-id
-#: src/syntax/code/code-language-combobox.tsx:33
+#: src/syntax/code/code-language-combobox.tsx:29
 msgid "block-editor.code.language.empty"
 msgstr "No matching languages"
 
 #. js-lingui-explicit-id
-#: src/syntax/code/code-language-combobox.tsx:76
+#: src/syntax/code/code-language-combobox.tsx:63
 msgid "block-editor.code.language.search"
 msgstr "Search language"
 
