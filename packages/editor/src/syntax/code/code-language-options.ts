@@ -49,6 +49,10 @@ export const CODE_LANGUAGE_OPTIONS: ReadonlyArray<CodeLanguageOption> = [
   { label: "Makefile", value: "make" },
 ];
 
+function normalizeCodeLanguageSearchValue(value: string): string {
+  return value.trim().toLocaleLowerCase();
+}
+
 export function normalizeCodeBlockLanguage(language: string | null | undefined): string {
   if (!language) {
     return PLAIN_TEXT_LANGUAGE;
@@ -72,4 +76,20 @@ export function getCodeLanguageLabel(language: string | null | undefined): strin
 
 export function getCodeNodeLanguage(option: CodeLanguageOption): string | null {
   return option.value === PLAIN_TEXT_LANGUAGE ? PLAIN_TEXT_LANGUAGE : option.value;
+}
+
+export function filterCodeLanguageOptions(searchValue: string): ReadonlyArray<CodeLanguageOption> {
+  const normalizedSearchValue = normalizeCodeLanguageSearchValue(searchValue);
+  if (!normalizedSearchValue) {
+    return CODE_LANGUAGE_OPTIONS;
+  }
+
+  const normalizedSearchLanguage = normalizeCodeLanguage(normalizedSearchValue);
+
+  return CODE_LANGUAGE_OPTIONS.filter((option) => {
+    const optionSearchValue = normalizeCodeLanguageSearchValue(`${option.label} ${option.value}`);
+    return (
+      optionSearchValue.includes(normalizedSearchValue) || option.value === normalizedSearchLanguage
+    );
+  });
 }
