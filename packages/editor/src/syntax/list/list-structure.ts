@@ -31,6 +31,10 @@ import {
   isInlineRuntimeNode,
 } from "./list-selection";
 
+export interface GeneratedNestedListItemMergePlan {
+  readonly generatedListItemIndexes: ReadonlySet<number>;
+}
+
 /*
  * List items are block containers. Structural helpers move Lexical subtrees
  * directly so paragraphs, structured blocks, and nested lists keep their runtime
@@ -136,6 +140,84 @@ export function normalizeListItemForEditing(
 
 export function isEmptyListItem(listItem: ListItemNode): boolean {
   return !listItem.getChildren().some(isMeaningfulContainerChild);
+}
+
+function collectListItems(node: LexicalNode, listItems: ListItemNode[]): void {
+  if ($isListItemNode(node)) {
+    listItems.push(node);
+  }
+
+  if (!$isElementNode(node)) {
+    return;
+  }
+
+  for (const child of node.getChildren()) {
+    collectListItems(child, listItems);
+  }
+}
+
+export function getListItemKeys(node: LexicalNode): Set<string> {
+  const listItems: ListItemNode[] = [];
+  collectListItems(node, listItems);
+  return new Set(listItems.map((listItem) => listItem.getKey()));
+}
+
+function isEmptyParagraph(node: LexicalNode): boolean {
+  return $isParagraphNode(node) && node.getChildrenSize() === 0;
+}
+
+function mergeGeneratedNestedListItemIntoPreviousSibling(listItem: ListItemNode): boolean {
+  const previous = listItem.getPreviousSibling();
+  if (!$isListItemNode(previous)) {
+    return false;
+  }
+
+  const children = listItem.getChildren();
+  const nestedLists = children.filter((child): child is ListNode => $isListNode(child));
+  if (
+    nestedLists.length === 0 ||
+    !children.every((child) => $isListNode(child) || isEmptyParagraph(child))
+  ) {
+    return false;
+  }
+
+  previous.splice(previous.getChildrenSize(), 0, nestedLists);
+  listItem.remove();
+  return true;
+}
+
+export function mergeGeneratedNestedListItemsIntoPreviousSiblings(
+  node: LexicalNode,
+  existingListItemKeys: ReadonlySet<string>,
+  mergePlan: GeneratedNestedListItemMergePlan,
+): boolean {
+  if (mergePlan.generatedListItemIndexes.size === 0) {
+    return false;
+  }
+
+  const listItems: ListItemNode[] = [];
+  collectListItems(node, listItems);
+
+  let changed = false;
+  let newListItemIndex = 0;
+  for (const listItem of listItems) {
+    if (existingListItemKeys.has(listItem.getKey())) {
+      continue;
+    }
+
+    const shouldMerge = mergePlan.generatedListItemIndexes.has(newListItemIndex);
+    newListItemIndex += 1;
+
+    if (
+      shouldMerge &&
+      listItem.isAttached() &&
+      mergeGeneratedNestedListItemIntoPreviousSibling(listItem)
+    ) {
+      changed = true;
+    }
+  }
+
+  return changed;
 }
 
 /*
