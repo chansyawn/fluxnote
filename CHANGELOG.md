@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.36](https://github.com/chansyawn/fluxnotes/compare/v0.0.35...v0.0.36) (2026-06-15)
+
+
+### Features
+
+* support code block language aliases in search ([#109](https://github.com/chansyawn/fluxnotes/issues/109)) ([ba5111a](https://github.com/chansyawn/fluxnotes/commit/ba5111aa98ec0a0eadbf197e929f9971660ceb3b))
+
+
+### Bug Fixes
+
+* preserve nested list html paste ([#107](https://github.com/chansyawn/fluxnotes/issues/107)) ([21aa4a4](https://github.com/chansyawn/fluxnotes/commit/21aa4a4a57fa9a99932d15a88599e062b928928a))
+
 ## [0.0.35](https://github.com/chansyawn/fluxnotes/compare/v0.0.34...v0.0.35) (2026-06-11)
 
 
