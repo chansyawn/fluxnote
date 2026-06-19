@@ -11,6 +11,7 @@ import { blocks, getSqliteChangedRows, nowIsoString } from "@main/core/database"
 import type { EventBus } from "@main/core/ipc";
 import type { OpenBlockService } from "@main/features/open-block";
 import type { TelemetryService } from "@main/features/telemetry";
+import { APP_MACOS_BUNDLE_ID } from "@shared/app/app-config";
 import type {
   BrowserExternalEditOrigin,
   CliExternalEditOrigin,
@@ -22,7 +23,7 @@ import type {
 } from "@shared/features/external-edit/models";
 import { businessError } from "@shared/ipc/result";
 import { eq } from "drizzle-orm";
-import { clipboard } from "electron";
+import { app, clipboard } from "electron";
 
 import { externalizeMarkdownAssetUrls } from "../assets/service";
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
@@ -61,10 +62,12 @@ interface ExternalEditRuntimeDeps {
   clipboard: Pick<typeof clipboard, "writeText">;
   emitEvent: EventBus["emit"];
   getDb: () => AppDatabase;
+  getSelfTargetProcessIds?: () => Iterable<number>;
   macAccessibility: MacAccessibilityNative;
   openBlockService: OpenBlockService;
   paths: AppDataPaths;
   resolveBrowserMetadata: typeof resolveBrowserMetadata;
+  selfTargetBundleIds?: ReadonlySet<string>;
   telemetryService: Pick<TelemetryService, "captureEvent">;
 }
 
@@ -97,6 +100,60 @@ function toBusinessInvalidOperation(error: unknown): never {
   throw businessError(
     "BUSINESS.INVALID_OPERATION",
     error instanceof Error ? error.message : "Unable to start external edit from focused input.",
+  );
+}
+
+function normalizeBundleId(bundleId: string | null | undefined): string | null {
+  const normalized = bundleId?.trim().toLowerCase();
+  return normalized ? normalized : null;
+}
+
+function normalizeBundleIds(bundleIds: Iterable<string>): ReadonlySet<string> {
+  return new Set(
+    Array.from(bundleIds)
+      .map((bundleId) => normalizeBundleId(bundleId))
+      .filter((bundleId): bundleId is string => Boolean(bundleId)),
+  );
+}
+
+function getDefaultSelfTargetProcessIds(): number[] {
+  return app.getAppMetrics().map((metric) => metric.pid);
+}
+
+function getSelfTargetProcessIdSet(
+  getSelfTargetProcessIds: () => Iterable<number>,
+): ReadonlySet<number> {
+  return new Set(
+    Array.from(getSelfTargetProcessIds()).filter(
+      (processId) => Number.isInteger(processId) && processId > 0,
+    ),
+  );
+}
+
+function isSelfTarget(
+  target: MacAccessibilityTargetMetadata,
+  options: {
+    getSelfTargetProcessIds: () => Iterable<number>;
+    selfTargetBundleIds: ReadonlySet<string>;
+  },
+): boolean {
+  const targetBundleId = normalizeBundleId(target.appBundleId);
+  if (targetBundleId && options.selfTargetBundleIds.has(targetBundleId)) {
+    return true;
+  }
+
+  return getSelfTargetProcessIdSet(options.getSelfTargetProcessIds).has(target.processId);
+}
+
+function toSelfTargetBusinessError(target: MacAccessibilityTargetMetadata): never {
+  throw businessError(
+    "BUSINESS.EXTERNAL_EDIT_SELF_TARGET",
+    "External edit cannot target Fluxnotes itself.",
+    {
+      appBundleId: target.appBundleId,
+      appName: target.appName,
+      processId: target.processId,
+    },
   );
 }
 
@@ -141,6 +198,8 @@ function createBrowserOrigin(
 
 export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): ExternalEditRuntime {
   const pendingEdits = new Map<string, PendingExternalEdit>();
+  const getSelfTargetProcessIds = deps.getSelfTargetProcessIds ?? getDefaultSelfTargetProcessIds;
+  const selfTargetBundleIds = normalizeBundleIds(deps.selfTargetBundleIds ?? [APP_MACOS_BUNDLE_ID]);
 
   function listSessions(): ExternalEditSession[] {
     return Array.from(pendingEdits.values()).map((entry) => entry.session);
@@ -267,6 +326,21 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       : createMacAppOrigin(captureResult);
   }
 
+  async function rejectSelfTargetCapture(
+    captureResult: MacAccessibilityTextCapture,
+  ): Promise<never> {
+    if (captureResult.kind === "editableText") {
+      await deps.macAccessibility.releaseText(captureResult.textRef).catch((error: unknown) => {
+        console.warn("Failed to close self-target external edit native session", {
+          message: error instanceof Error ? error.message : "Unknown close-session failure.",
+          textRef: captureResult.textRef,
+        });
+      });
+    }
+
+    toSelfTargetBusinessError(captureResult.target);
+  }
+
   async function capture(): Promise<ExternalEditSession> {
     if (!deps.macAccessibility.isSupported()) {
       throw businessError(
@@ -287,6 +361,15 @@ export function createExternalEditRuntime(deps: ExternalEditRuntimeDeps): Extern
       captureResult = await deps.macAccessibility.captureText();
     } catch (error) {
       toBusinessInvalidOperation(error);
+    }
+
+    if (
+      isSelfTarget(captureResult.target, {
+        getSelfTargetProcessIds,
+        selfTargetBundleIds,
+      })
+    ) {
+      await rejectSelfTargetCapture(captureResult);
     }
 
     const origin = await buildFocusedOrigin(captureResult);

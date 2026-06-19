@@ -115,6 +115,30 @@ describe("ShortcutStateProvider", () => {
     });
   });
 
+  it("silently ignores External edit when Fluxnotes is the focused app", async () => {
+    mocks.syncCalls.length = 0;
+    mocks.captureExternalEdit.mockRejectedValue({
+      code: "BUSINESS.EXTERNAL_EDIT_SELF_TARGET",
+      message: "External edit cannot target Fluxnotes itself.",
+    });
+
+    renderWithProviders(
+      <ShortcutStateProvider>
+        <div />
+      </ShortcutStateProvider>,
+    );
+
+    const externalEditShortcut = mocks.syncCalls.find((call) => call.shortcut === "Mod+Alt+N");
+    externalEditShortcut?.onPressed();
+
+    await waitFor(() => {
+      expect(mocks.captureExternalEdit).toHaveBeenCalledTimes(1);
+    });
+    await Promise.resolve();
+
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
   it("keeps normal error toasts for unrelated External edit failures", async () => {
     mocks.syncCalls.length = 0;
     mocks.captureExternalEdit.mockRejectedValue(new Error("External edit failed"));
