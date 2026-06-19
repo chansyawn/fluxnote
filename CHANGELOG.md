@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.37](https://github.com/chansyawn/fluxnotes/compare/v0.0.36...v0.0.37) (2026-06-19)
+
+
+### Bug Fixes
+
+* prevent external edit targeting Fluxnotes ([#111](https://github.com/chansyawn/fluxnotes/issues/111)) ([9b09280](https://github.com/chansyawn/fluxnotes/commit/9b0928080e224707991a4c58aac85258e771c48d))
+
 ## [0.0.36](https://github.com/chansyawn/fluxnotes/compare/v0.0.35...v0.0.36) (2026-06-15)
 
 
