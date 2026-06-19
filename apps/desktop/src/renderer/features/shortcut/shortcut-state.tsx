@@ -72,6 +72,9 @@ export function ShortcutStateProvider({ children }: ShortcutStateProviderProps) 
         );
         return;
       }
+      if (invokeError.code === "BUSINESS.EXTERNAL_EDIT_SELF_TARGET") {
+        return;
+      }
 
       toast.error(invokeError.message);
     });

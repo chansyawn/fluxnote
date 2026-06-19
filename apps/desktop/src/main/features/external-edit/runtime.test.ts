@@ -1,4 +1,6 @@
 import { MacNativeError, type MacAccessibilityNative } from "@fluxnotes/mac-native";
+import { blocks } from "@main/core/database";
+import { APP_MACOS_BUNDLE_ID } from "@shared/app/app-config";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { createBlockRecord, getPublicBlockById } from "../blocks/service";
@@ -44,6 +46,8 @@ async function createRuntime(overrides?: {
   isAccessibilityTrusted?: (prompt: boolean) => boolean;
   isSupported?: () => boolean;
   resolveBrowserMetadata?: typeof resolveBrowserMetadata;
+  selfTargetBundleIds?: readonly string[];
+  selfTargetProcessIds?: readonly number[];
   replaceText?: (textRef: string, content: string) => Promise<void>;
 }) {
   const ctx = await createTestDb();
@@ -72,19 +76,23 @@ async function createRuntime(overrides?: {
   const deps = {
     clipboard: { writeText: vi.fn() },
     emitEvent: vi.fn(() => true),
+    getSelfTargetProcessIds: vi.fn(() => overrides?.selfTargetProcessIds ?? []),
     macAccessibility,
     openBlockService: { requestOpen: vi.fn() },
     resolveBrowserMetadata: vi.fn(overrides?.resolveBrowserMetadata ?? (async () => null)),
+    selfTargetBundleIds: new Set(overrides?.selfTargetBundleIds ?? [APP_MACOS_BUNDLE_ID]),
     telemetryService: { captureEvent: vi.fn() },
   };
   const runtime = createExternalEditRuntime({
     clipboard: deps.clipboard,
     emitEvent: deps.emitEvent,
     getDb: () => ctx.db,
+    getSelfTargetProcessIds: deps.getSelfTargetProcessIds,
     macAccessibility: deps.macAccessibility,
     openBlockService: deps.openBlockService as never,
     paths,
     resolveBrowserMetadata: deps.resolveBrowserMetadata,
+    selfTargetBundleIds: deps.selfTargetBundleIds,
     telemetryService: deps.telemetryService,
   });
 
@@ -269,6 +277,67 @@ describe("external edit runtime", () => {
       expect(ctx.deps.macAccessibility.activateApplication).not.toHaveBeenCalled();
       expect(ctx.deps.macAccessibility.replaceText).toHaveBeenCalledWith("text-ref-1", "updated");
       expect(ctx.deps.macAccessibility.releaseText).toHaveBeenCalledWith("text-ref-1");
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("rejects focused app captures from the Fluxnotes bundle before creating a block", async () => {
+    const ctx = await createRuntime({
+      captureText: async () => ({
+        kind: "editableText",
+        target: {
+          appBundleId: APP_MACOS_BUNDLE_ID,
+          appIcon: null,
+          appName: "Fluxnotes",
+          elementRole: "AXTextArea",
+          processId: 456,
+        },
+        text: "selected",
+        textRef: "self-text-ref-1",
+      }),
+    });
+    try {
+      await expect(ctx.runtime.capture()).rejects.toMatchObject({
+        code: "BUSINESS.EXTERNAL_EDIT_SELF_TARGET",
+      });
+
+      expect(ctx.runtime.listSessions()).toHaveLength(0);
+      expect(await ctx.db.select().from(blocks).all()).toHaveLength(0);
+      expect(ctx.deps.openBlockService.requestOpen).not.toHaveBeenCalled();
+      expect(ctx.deps.telemetryService.captureEvent).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.releaseText).toHaveBeenCalledWith("self-text-ref-1");
+    } finally {
+      await ctx.close();
+    }
+  });
+
+  it("rejects focused app captures from Fluxnotes renderer processes before creating a block", async () => {
+    const ctx = await createRuntime({
+      captureText: async () => ({
+        kind: "editableText",
+        target: {
+          appBundleId: "com.example.App",
+          appIcon: null,
+          appName: "Fluxnotes Helper",
+          elementRole: "AXTextArea",
+          processId: 789,
+        },
+        text: "selected",
+        textRef: "self-text-ref-2",
+      }),
+      selfTargetProcessIds: [789],
+    });
+    try {
+      await expect(ctx.runtime.capture()).rejects.toMatchObject({
+        code: "BUSINESS.EXTERNAL_EDIT_SELF_TARGET",
+      });
+
+      expect(ctx.runtime.listSessions()).toHaveLength(0);
+      expect(await ctx.db.select().from(blocks).all()).toHaveLength(0);
+      expect(ctx.deps.openBlockService.requestOpen).not.toHaveBeenCalled();
+      expect(ctx.deps.telemetryService.captureEvent).not.toHaveBeenCalled();
+      expect(ctx.deps.macAccessibility.releaseText).toHaveBeenCalledWith("self-text-ref-2");
     } finally {
       await ctx.close();
     }
