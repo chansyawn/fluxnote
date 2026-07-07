@@ -61,14 +61,45 @@ Open Fluxnotes Preferences, go to the App section, find Flux CLI, and click Inst
 
 #### Use With Codex / Claude Code
 
-Enable Fluxnotes only for Codex / Claude Code with aliases:
+Enable Fluxnotes only for Codex / Claude Code with shell aliases or functions.
+
+For macOS/Linux shells:
 
 ```bash
 alias cdx='EDITOR="flux edit" codex'
 alias cld='EDITOR="flux edit" claude'
 ```
 
-Start the CLI agent with `cdx` or `cld`. In Codex / Claude Code, press the default external-editor shortcut `Ctrl+G`; the alias sends the draft to Fluxnotes through `EDITOR="flux edit"`.
+For Windows PowerShell, add functions like these to your PowerShell profile:
+
+```powershell
+function cdx {
+  $oldEditor = $env:EDITOR
+  $env:EDITOR = "flux edit"
+  try { codex @args } finally {
+    if ($null -eq $oldEditor) { Remove-Item Env:EDITOR -ErrorAction SilentlyContinue }
+    else { $env:EDITOR = $oldEditor }
+  }
+}
+
+function cld {
+  $oldEditor = $env:EDITOR
+  $env:EDITOR = "flux edit"
+  try { claude @args } finally {
+    if ($null -eq $oldEditor) { Remove-Item Env:EDITOR -ErrorAction SilentlyContinue }
+    else { $env:EDITOR = $oldEditor }
+  }
+}
+```
+
+For Windows Command Prompt, use `doskey` macros:
+
+```bat
+doskey cdx=cmd /C "set EDITOR=flux edit&& codex $*"
+doskey cld=cmd /C "set EDITOR=flux edit&& claude $*"
+```
+
+Start the CLI agent with `cdx` or `cld`. In Codex / Claude Code, press the default external-editor shortcut `Ctrl+G`; the wrapper sends the draft to Fluxnotes through `EDITOR="flux edit"`.
 
 Revise it in Fluxnotes, then submit or cancel to return to the CLI agent.
 

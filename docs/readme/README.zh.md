@@ -61,14 +61,45 @@ External edit 目前仅支持 macOS。首次使用前，在「偏好设置」的
 
 #### 配合 Codex / Claude Code 使用
 
-用 alias 只为 Codex / Claude Code 启用 Fluxnotes：
+用 shell alias 或函数只为 Codex / Claude Code 启用 Fluxnotes。
+
+macOS/Linux shell：
 
 ```bash
 alias cdx='EDITOR="flux edit" codex'
 alias cld='EDITOR="flux edit" claude'
 ```
 
-之后用 `cdx` 或 `cld` 启动 CLI Agent。在 Codex / Claude Code 中按默认外部编辑器快捷键 `Ctrl+G`；alias 会通过 `EDITOR="flux edit"` 把草稿送入 Fluxnotes。
+Windows PowerShell 中，可以把这些函数加入 PowerShell profile：
+
+```powershell
+function cdx {
+  $oldEditor = $env:EDITOR
+  $env:EDITOR = "flux edit"
+  try { codex @args } finally {
+    if ($null -eq $oldEditor) { Remove-Item Env:EDITOR -ErrorAction SilentlyContinue }
+    else { $env:EDITOR = $oldEditor }
+  }
+}
+
+function cld {
+  $oldEditor = $env:EDITOR
+  $env:EDITOR = "flux edit"
+  try { claude @args } finally {
+    if ($null -eq $oldEditor) { Remove-Item Env:EDITOR -ErrorAction SilentlyContinue }
+    else { $env:EDITOR = $oldEditor }
+  }
+}
+```
+
+Windows Command Prompt 中，可以用 `doskey` macro：
+
+```bat
+doskey cdx=cmd /C "set EDITOR=flux edit&& codex $*"
+doskey cld=cmd /C "set EDITOR=flux edit&& claude $*"
+```
+
+之后用 `cdx` 或 `cld` 启动 CLI Agent。在 Codex / Claude Code 中按默认外部编辑器快捷键 `Ctrl+G`；这些封装会通过 `EDITOR="flux edit"` 把草稿送入 Fluxnotes。
 
 在 Fluxnotes 里修改完善后，提交或取消即可回到 CLI Agent。
 
